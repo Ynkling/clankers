@@ -1,368 +1,337 @@
 """
-Interference test: two-stream Hebbian memory collision.
+test_interference.py — Two-stream Hebbian memory interference test.
 
-Both streams write the SAME key tokens with CONFLICTING value tokens.
-The architecture uses BIGRAM Hebbian writes: at position t, write
-    outer(W_k @ embed(x_{t-1}), W_v @ embed(x_t))
-so the write at a VALUE position uses the PRECEDING KEY as the memory address.
+Both streams share the SAME P key tokens but write different values:
+  stream-1: KEY_i → VAL_A  (or VAL_B if coin-flipped this sequence)
+  stream-2: KEY_i → VAL_B  (or VAL_A)
 
-Stream-1: KEY_i -> VAL_A  (both streams use the same KEY_i)
-Stream-2: KEY_i -> VAL_B  (different value, same key)
-In a single Hebbian memory this writes outer(K_i, VAL_A) + outer(K_i, VAL_B)
-into the SAME synapses. Reading with K_i returns VAL_A + VAL_B — irresolvably
-ambiguous. Max accuracy for any single-channel model is analytically ≤ 50%.
+Pairs from both streams are interleaved into a single sequence.
+Context tokens (CTX1, CTX2) mark which stream each write belongs to.
+At query time, a context token specifies which stream to retrieve from.
 
-With k=2 channels and a gate that routes stream-1 writes to channel 0 and
-stream-2 writes to channel 1, each channel holds one clean association:
-  S_0: outer(K_i, VAL_A)  →  query K_i from ch-0 → VAL_A ✓
-  S_1: outer(K_i, VAL_B)  →  query K_i from ch-1 → VAL_B ✓
+Single-channel analytical ceiling: 50%
+  Hebbian state accumulates outer(VAL_A, KEY_i) + outer(VAL_B, KEY_i)
+  for every key i (from both streams), so S @ KEY_q proportional to VAL_A + VAL_B,
+  which has equal projection on VAL_A and VAL_B regardless of assignment.
 
-The gate is informed by a recurrent hidden state h_t that accumulates context
-(CTX1 or CTX2 tokens in the sequence). Both write-time and read-time gates
-can thus distinguish the active stream.
-
-Task constants (not tuned to force an outcome):
+Conditions:
+  1. single-channel baseline           (expected ~50%)
+  2. MC k=2, learned gate              (does gate spontaneously separate?)
+  3. MC k=2, perfect gate (ceiling)    (context-latching, analytical upper bound)
+  4. MC k=2, uniform gate (floor)      (g=[0.5,0.5] always, same collision as cond 1)
 """
 
-import random
-import numpy as np
+import math
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from bdh_recurrent  import BDHRecurrent,     BDHRecurrentConfig
-from bdh_multichannel import BDHMultiChannel, BDHMultiChannelConfig
+sys.path.insert(0, ".")
+from bdh_recurrent import bdh_layer_parallel, bdh_layer_mc_parallel, ln
 
-# ── Task constants ─────────────────────────────────────────────────────────
-NUM_PAIRS       = 4   # conflicting key-value pairs
-INTERLEAVE_DENS = 2   # each (key,val) pair is written INTERLEAVE_DENS times
-                      # per stream before queries; more writes → stronger memory
+# Hyperparameters
+P     = 4      # key-value pairs per stream
+k     = 2      # MC channels
+D     = 32     # embedding dim
+N     = 64     # sparse feature dim
+BATCH = 32
+ITERS = 1200
+LR    = 4e-3
+SEEDS = [0, 1, 2]
 
-# ── Training constants ─────────────────────────────────────────────────────
-D_MODEL    = 48
-N_STEPS    = 800
-BATCH_SIZE = 32
-LR         = 3e-3
-SEEDS      = [0, 1, 2]
+# Sequence layout (BLOCK = 6P + 3 = 27 for P=4):
+#   Write phase: for each pair (in random order):
+#     [CTX1, KEY_i, VAL_s1,  CTX2, KEY_i, VAL_s2]   (6 tokens per pair)
+#   Query phase: [CTX_q, KEY_q, TARGET]               (3 tokens, loss at last)
+BLOCK = 6 * P + 3
 
-# ── Vocabulary ─────────────────────────────────────────────────────────────
-# PAD CTX1 CTX2  KEY_0..KEY_{P-1}  VAL_A  VAL_B  QUERY
-PAD      = 0
-CTX1     = 1
-CTX2     = 2
-KEY_BASE = 3                        # KEY_i = KEY_BASE + i
-VAL_A    = KEY_BASE + NUM_PAIRS     # stream-1 value
-VAL_B    = KEY_BASE + NUM_PAIRS + 1 # stream-2 value
-QUERY    = KEY_BASE + NUM_PAIRS + 2
-VOCAB    = KEY_BASE + NUM_PAIRS + 3
+# Vocabulary (size = P + 4)
+CTX1  = 0
+CTX2  = 1
+# KEY_i = 2 + i    for i in 0..P-1
+VAL_A = 2 + P
+VAL_B = 2 + P + 1
+V     = 2 + P + 2
 
-
-# ── Sequence builder ───────────────────────────────────────────────────────
-def make_sequence():
-    """
-    Interleaved write phase then query phase.
-
-    Write phase (for each repetition and each pair):
-      [CTX1, KEY_i, VAL_A,  CTX2, KEY_i, VAL_B]
-
-    Query phase (for each pair):
-      [CTX1, KEY_i, QUERY, VAL_A]   → loss/mask at QUERY position
-      [CTX2, KEY_i, QUERY, VAL_B]   → loss/mask at QUERY position
-
-    Targets are the NEXT token at each position.
-    loss_mask = 1 only at QUERY positions (the model must predict the answer).
-    stream_mask = 1 (s1) or 2 (s2) at query positions, else 0.
-
-    NOTE on bigram write: the model writes outer(embed(x_{t-1}), embed(x_t)).
-    At VAL_A/VAL_B positions: x_{t-1} = KEY_i → writes KEY_i -> VAL_A/VAL_B.
-    At QUERY positions:        x_{t-1} = KEY_i → reads with KEY_i as address.
-    At CTX positions:          x_{t-1} = previous token (VAL or KEY); also updates h.
-    """
-    toks  = []
-    tgts  = []
-    lmask = []
-    smask = []
-
-    # Write phase: interleaved streams, INTERLEAVE_DENS repetitions
-    for _ in range(INTERLEAVE_DENS):
-        for i in range(NUM_PAIRS):
-            key = KEY_BASE + i
-            # stream-1 triplet: predict next token at each position
-            toks  += [CTX1, key,  VAL_A]
-            tgts  += [key,  VAL_A, PAD]   # next-token targets (PAD = don't care non-query)
-            lmask += [0, 0, 0]
-            smask += [0, 0, 0]
-            # stream-2 triplet
-            toks  += [CTX2, key,  VAL_B]
-            tgts  += [key,  VAL_B, PAD]
-            lmask += [0, 0, 0]
-            smask += [0, 0, 0]
-
-    # Query phase: for each pair, one query per stream
-    for i in range(NUM_PAIRS):
-        key = KEY_BASE + i
-        # stream-1 query: [CTX1, KEY_i, QUERY, VAL_A]
-        # loss at QUERY position (model predicts VAL_A)
-        toks  += [CTX1, key,   QUERY, VAL_A]
-        tgts  += [key,  QUERY, VAL_A, PAD]
-        lmask += [0,    0,     1,     0   ]
-        smask += [0,    0,     1,     0   ]
-        # stream-2 query: [CTX2, KEY_i, QUERY, VAL_B]
-        toks  += [CTX2, key,   QUERY, VAL_B]
-        tgts  += [key,  QUERY, VAL_B, PAD]
-        lmask += [0,    0,     1,     0   ]
-        smask += [0,    0,     2,     0   ]
-
-    return (
-        torch.tensor(toks,  dtype=torch.long),
-        torch.tensor(tgts,  dtype=torch.long),
-        torch.tensor(lmask, dtype=torch.float),
-        torch.tensor(smask, dtype=torch.long),
-    )
+def key_tok(i):
+    return 2 + i
 
 
-def make_perfect_gate(tokens: torch.Tensor, k: int = 2) -> torch.Tensor:
-    """One-hot gate by stream: CTX1 sets channel-0, CTX2 sets channel-1.
-    The gate 'latches' — stays at the last-seen context.
-    Applied at write and read positions."""
-    T  = tokens.shape[0]
-    g  = torch.zeros(T, k)
-    ch = 0
+# Sanity check: analytical proof that single-channel <= 50%
+def _run_sanity():
+    emb = torch.zeros(V, D)
+    for i in range(V):
+        emb[i, i % D] = 1.0   # deterministic non-zero embeddings
+
+    va = emb[VAL_A]
+    vb = emb[VAL_B]
+    S  = torch.zeros(D, D)
+    for i in range(P):
+        ki = emb[key_tok(i)]
+        S = S + torch.outer(va, ki)   # stream-1 write  outer(value, key)
+        S = S + torch.outer(vb, ki)   # stream-2 write
+
+    for i in range(P):
+        ki = emb[key_tok(i)]
+        r  = S @ ki
+        sA = (r @ va).item()
+        sB = (r @ vb).item()
+        assert abs(sA - sB) < 1e-5, \
+            f"Key {i}: score_A={sA:.4f} vs score_B={sB:.4f}; expected equal"
+
+    print("[sanity] single-channel analytical max accuracy = 50.0% <= 50% v")
+    print("         (read vector aligns equally with VAL_A and VAL_B "
+          "because r proportional to VAL_A + VAL_B for every key)")
+    print()
+
+
+# Data generation
+def make_batch(B, rng):
+    seqs      = []
+    q_streams = []
+    for _ in range(B):
+        flip   = torch.randint(2, (1,), generator=rng).item()
+        val_s1 = VAL_A if flip == 0 else VAL_B
+        val_s2 = VAL_B if flip == 0 else VAL_A
+
+        perm = torch.randperm(P, generator=rng).tolist()
+
+        seq = []
+        for i in perm:
+            seq += [CTX1, key_tok(i), val_s1]
+            seq += [CTX2, key_tok(i), val_s2]
+
+        q_stream = torch.randint(2, (1,), generator=rng).item()
+        q_key    = torch.randint(P, (1,), generator=rng).item()
+        q_ctx    = CTX1 if q_stream == 0 else CTX2
+        q_val    = val_s1 if q_stream == 0 else val_s2
+        seq += [q_ctx, key_tok(q_key), q_val]
+
+        assert len(seq) == BLOCK
+        seqs.append(seq)
+        q_streams.append(q_stream)
+
+    return (torch.tensor(seqs, dtype=torch.long),
+            torch.tensor(q_streams, dtype=torch.long))
+
+
+# Perfect context-latching gate
+def _perfect_gate(inp_seq):
+    """inp_seq: (T,) input tokens; returns (T, k) hard gate."""
+    T   = len(inp_seq)
+    g   = torch.zeros(T, k)
+    cur = torch.tensor([0.5, 0.5])
     for t in range(T):
-        tok = tokens[t].item()
+        tok = inp_seq[t].item()
         if tok == CTX1:
-            ch = 0
+            cur = torch.tensor([1.0, 0.0])
         elif tok == CTX2:
-            ch = 1
-        g[t, ch] = 1.0
+            cur = torch.tensor([0.0, 1.0])
+        g[t] = cur
     return g
 
 
-# ── Analytical sanity check ────────────────────────────────────────────────
-def sanity_check_conflict():
-    """
-    With a single-channel Hebbian memory and keys K_i (orthonormal), after:
-      S += outer(K_i, VAL_A_emb) + outer(K_i, VAL_B_emb)   for each i
-    reading with K_i yields VAL_A_emb + VAL_B_emb, equidistant from both targets.
-    The best a single-channel model can do is GUESS: 50% correct.
-    We verify this analytically for D=8, NUM_PAIRS orthonormal keys.
-    """
-    D = 8
-    assert NUM_PAIRS <= D, "need D >= NUM_PAIRS for orthonormal keys"
-    K = torch.eye(D)[:NUM_PAIRS]                   # orthonormal keys
-    vA = F.normalize(torch.randn(D), dim=0)
-    vB = F.normalize(torch.randn(D), dim=0)
-    while abs((vA * vB).sum()) > 0.1:              # ensure non-collinear
-        vB = F.normalize(torch.randn(D), dim=0)
-
-    # Write outer(value, key): S @ key → value
-    S = torch.zeros(D, D)
-    for i in range(NUM_PAIRS):
-        S += torch.outer(vA, K[i])
-        S += torch.outer(vB, K[i])
-
-    correct_if_pick_a = 0
-    correct_if_pick_b = 0
-    for i in range(NUM_PAIRS):
-        r      = S @ K[i]                          # output for key i
-        score_a = float((r * vA).sum())
-        score_b = float((r * vB).sum())
-        # r is proportional to vA + vB: dot with vA == dot with vB (when |vA|=|vB|=1)
-        # A model can pick either but not both for the same key
-        correct_if_pick_a += 1   # gets s1 right, s2 wrong
-        correct_if_pick_b += 1   # gets s2 right, s1 wrong
-        # Confirm: both dot products are equal
-        assert abs(score_a - score_b) < 1e-3, (
-            f"Key {i}: score_A={score_a:.4f} vs score_B={score_b:.4f}; "
-            "expected equal — single-channel read is not equidistant, "
-            "task may not force genuine conflict."
-        )
-
-    total   = 2 * NUM_PAIRS   # s1-queries + s2-queries
-    max_acc = correct_if_pick_a / total   # = 0.5
-    assert max_acc <= 0.5 + 1e-6, (
-        f"Single-channel analytical max accuracy = {max_acc:.3f} > 0.5 — "
-        "conflict is not genuine."
-    )
-    print(f"[sanity] single-channel analytical max accuracy = {max_acc:.1%} ≤ 50% ✓")
-    print(f"         (read vector aligns equally with VAL_A and VAL_B "
-          f"because r ∝ VAL_A + VAL_B for every key)")
+def _mc_fixed_gate_forward(embed, Dx, Dy, E, head, tokens):
+    B, T = tokens.shape
+    v    = embed(tokens)
+    out  = []
+    for b in range(B):
+        g      = _perfect_gate(tokens[b])
+        x      = F.relu(ln(v[b]) @ Dx)
+        scores = ((x @ x.T) * (g @ g.T)).tril(diagonal=-1)
+        a_ast  = scores @ v[b]
+        y      = F.relu(ln(a_ast) @ Dy) * x
+        v_next = v[b] + ln(y @ E)
+        out.append(v_next)
+    return head(torch.stack(out))
 
 
-# ── Training ───────────────────────────────────────────────────────────────
-def train_model(model, n_steps, batch_size, is_mc, gate_mode, seed):
-    torch.manual_seed(seed)
-    opt = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-4)
+# Model classes
+class BDHSingle(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embed = nn.Embedding(V, D)
+        self.Dx    = nn.Parameter(torch.randn(D, N) * 0.1)
+        self.Dy    = nn.Parameter(torch.randn(D, N) * 0.1)
+        self.E     = nn.Parameter(torch.randn(N, D) * 0.1)
+        self.head  = nn.Linear(D, V, bias=False)
 
-    for _ in range(n_steps):
-        batch = [make_sequence() for _ in range(batch_size)]
-        toks  = torch.stack([b[0] for b in batch])
-        tgts  = torch.stack([b[1] for b in batch])
-        lmask = torch.stack([b[2] for b in batch])
+    def forward(self, tokens):
+        B, T = tokens.shape
+        v    = self.embed(tokens)
+        out  = []
+        for b in range(B):
+            v_next, *_ = bdh_layer_parallel(v[b], self.Dx, self.Dy, self.E)
+            out.append(v_next)
+        return self.head(torch.stack(out))
 
-        go = None
-        if is_mc and gate_mode != 'learned':
-            B, T = toks.shape
-            if gate_mode == 'perfect':
-                go = torch.stack([make_perfect_gate(toks[b], k=2) for b in range(B)])
-            elif gate_mode == 'uniform':
-                go = torch.full((B, T, 2), 0.5)
 
-        if is_mc:
-            _, loss, _ = model(toks, targets=tgts, loss_mask=lmask, gate_override=go)
+class BDHMCMC(nn.Module):
+    def __init__(self, uniform_gate=False):
+        super().__init__()
+        self.embed        = nn.Embedding(V, D)
+        self.Dx           = nn.Parameter(torch.randn(D, N) * 0.1)
+        self.Dy           = nn.Parameter(torch.randn(D, N) * 0.1)
+        self.E            = nn.Parameter(torch.randn(N, D) * 0.1)
+        self.head         = nn.Linear(D, V, bias=False)
+        self.uniform_gate = uniform_gate
+        if uniform_gate:
+            self.register_buffer('W_g', torch.zeros(D, k))
         else:
-            _, loss    = model(toks, targets=tgts, loss_mask=lmask)
+            self.W_g = nn.Parameter(torch.randn(D, k) * 0.1)
 
-        opt.zero_grad()
-        loss.backward()
-        nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-        opt.step()
+    def forward(self, tokens):
+        B, T = tokens.shape
+        v    = self.embed(tokens)
+        out  = []
+        for b in range(B):
+            v_next, *_ = bdh_layer_mc_parallel(v[b], self.Dx, self.Dy, self.E, self.W_g)
+            out.append(v_next)
+        return self.head(torch.stack(out))
 
 
-@torch.no_grad()
-def evaluate_model(model, is_mc, gate_mode, n_eval=512):
+class BDHMCPerfect(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.embed = nn.Embedding(V, D)
+        self.Dx    = nn.Parameter(torch.randn(D, N) * 0.1)
+        self.Dy    = nn.Parameter(torch.randn(D, N) * 0.1)
+        self.E     = nn.Parameter(torch.randn(N, D) * 0.1)
+        self.head  = nn.Linear(D, V, bias=False)
+
+    def forward(self, tokens):
+        return _mc_fixed_gate_forward(self.embed, self.Dx, self.Dy, self.E,
+                                      self.head, tokens)
+
+
+# Training + evaluation
+def run(make_model, seed, collect_gates=False):
+    torch.manual_seed(seed)
+    model = make_model()
+    opt   = torch.optim.Adam(model.parameters(), lr=LR)
+    rng   = torch.Generator(); rng.manual_seed(seed + 10_000)
+
+    for step in range(ITERS):
+        tokens, _ = make_batch(BATCH, rng)
+        inp        = tokens[:, :-1]
+        tgt        = tokens[:, 1:]
+        logits     = model(inp)
+        loss       = F.cross_entropy(logits[:, -1, :], tgt[:, -1])
+        opt.zero_grad(); loss.backward(); opt.step()
+
     model.eval()
-    batch = [make_sequence() for _ in range(n_eval)]
-    toks  = torch.stack([b[0] for b in batch])
-    tgts  = torch.stack([b[1] for b in batch])
-    lmask = torch.stack([b[2] for b in batch])
-    smask = torch.stack([b[3] for b in batch])
+    with torch.no_grad():
+        tokens, q_streams = make_batch(512, rng)
+        inp    = tokens[:, :-1]
+        tgt    = tokens[:, 1:]
+        logits = model(inp)
 
-    B, T = toks.shape
-    go = None
-    if is_mc and gate_mode != 'learned':
-        if gate_mode == 'perfect':
-            go = torch.stack([make_perfect_gate(toks[b], k=2) for b in range(B)])
-        elif gate_mode == 'uniform':
-            go = torch.full((B, T, 2), 0.5)
+        q_logits = logits[:, -1, :]
+        q_tgt    = tgt[:, -1]
+        preds    = q_logits.argmax(-1)
+        correct  = (preds == q_tgt)
 
-    if is_mc:
-        logits, _, gates = model(toks, targets=tgts, loss_mask=lmask, gate_override=go)
-    else:
-        logits, _        = model(toks, targets=tgts, loss_mask=lmask)
-        gates = None
+        m1 = (q_streams == 0)
+        m2 = (q_streams == 1)
+        loss_s1 = F.cross_entropy(q_logits[m1], q_tgt[m1]).item()
+        loss_s2 = F.cross_entropy(q_logits[m2], q_tgt[m2]).item()
+        acc_s1  = correct[m1].float().mean().item()
+        acc_s2  = correct[m2].float().mean().item()
 
-    results   = {}
-    gate_info = None
+        gate_info = None
+        if collect_gates and hasattr(model, 'W_g'):
+            v_emb  = model.embed(inp)
+            g_last = F.softmax(v_emb[:, -1, :] @ model.W_g, dim=-1)
+            g_s1   = g_last[m1].mean(0)
+            g_s2   = g_last[m2].mean(0)
+            cos    = F.cosine_similarity(g_s1.unsqueeze(0), g_s2.unsqueeze(0)).item()
+            gate_info = (g_s1.tolist(), g_s2.tolist(), cos)
 
-    for s in [1, 2]:
-        mask = (smask == s)                         # (B, T) bool
-        flat_l = logits.reshape(-1, VOCAB)
-        flat_t = tgts.reshape(-1)
-        flat_m = mask.reshape(-1)
-        pos_loss = F.cross_entropy(flat_l[flat_m], flat_t[flat_m]).item()
-        acc      = (flat_l[flat_m].argmax(-1) == flat_t[flat_m]).float().mean().item()
-        results[s] = (pos_loss, acc)
-
-    if is_mc and gate_mode == 'learned' and gates is not None:
-        # Mean gate at query positions per stream
-        gs1_vecs, gs2_vecs = [], []
-        for s, vec_list in [(1, gs1_vecs), (2, gs2_vecs)]:
-            mask = (smask == s).reshape(-1)
-            g_flat = gates.reshape(-1, 2)
-            vec_list.append(g_flat[mask].mean(0))
-        if gs1_vecs and gs2_vecs:
-            gs1 = torch.stack(gs1_vecs).mean(0)
-            gs2 = torch.stack(gs2_vecs).mean(0)
-            gate_info = (gs1, gs2)
-
-    model.train()
-    return results, gate_info
-
-
-# ── Run one condition across seeds ─────────────────────────────────────────
-def run_condition(label, make_model_fn, is_mc, gate_mode='learned'):
-    print(f"\n── {label} ──")
-    all_loss = {1: [], 2: []}
-    all_acc  = {1: [], 2: []}
-    gate_reports = []
-
-    for seed in SEEDS:
-        random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
-        model = make_model_fn()
-        train_model(model, N_STEPS, BATCH_SIZE, is_mc, gate_mode, seed)
-        results, gi = evaluate_model(model, is_mc, gate_mode)
-        for s in [1, 2]:
-            all_loss[s].append(results[s][0])
-            all_acc[s].append(results[s][1])
-        if gi is not None:
-            gate_reports.append(gi)
-
-    for s in [1, 2]:
-        ls = all_loss[s]; ac = all_acc[s]
-        print(f"  stream-{s}: loss={np.mean(ls):.4f}±{np.std(ls):.4f}  "
-              f"acc={np.mean(ac):.3f}±{np.std(ac):.3f}")
-
-    if gate_reports:
-        gs1 = torch.stack([g[0] for g in gate_reports]).mean(0)
-        gs2 = torch.stack([g[1] for g in gate_reports]).mean(0)
-        cos = F.cosine_similarity(gs1.unsqueeze(0), gs2.unsqueeze(0)).item()
-        print(f"  gate @query  stream-1: [{gs1[0].item():.3f}, {gs1[1].item():.3f}]")
-        print(f"  gate @query  stream-2: [{gs2[0].item():.3f}, {gs2[1].item():.3f}]")
-        print(f"  cosine(g_s1, g_s2) = {cos:.4f}  "
-              f"({'near-orthogonal → SEPARATED' if cos < 0.5 else 'overlapping → PERMISSIVE'})")
-
-    return all_loss, all_acc
-
-
-# ── Main ───────────────────────────────────────────────────────────────────
-def main():
-    print("=" * 62)
-    print("Interference test: Hebbian memory collision, two streams")
-    print(f"  NUM_PAIRS={NUM_PAIRS}  INTERLEAVE_DENS={INTERLEAVE_DENS}")
-    print(f"  VOCAB={VOCAB}  D_MODEL={D_MODEL}  N_STEPS={N_STEPS}  SEEDS={SEEDS}")
-    print("=" * 62)
-
-    sanity_check_conflict()
-
-    def make_single():
-        return BDHRecurrent(BDHRecurrentConfig(VOCAB, d_model=D_MODEL))
-
-    def make_mc():
-        return BDHMultiChannel(BDHMultiChannelConfig(VOCAB, d_model=D_MODEL, n_channels=2))
-
-    l1, a1 = run_condition("Cond 1: single-channel baseline",     make_single, is_mc=False)
-    l2, a2 = run_condition("Cond 2: MC k=2, learned gate",        make_mc,     is_mc=True,  gate_mode='learned')
-    l3, a3 = run_condition("Cond 3: MC k=2, perfect gate (ceil)", make_mc,     is_mc=True,  gate_mode='perfect')
-    l4, a4 = run_condition("Cond 4: MC k=2, uniform gate (floor)",make_mc,     is_mc=True,  gate_mode='uniform')
-
-    # ── Summary table ──────────────────────────────────────────────────────
-    print("\n" + "=" * 62)
-    print("Summary — query-position accuracy")
-    print(f"{'Condition':<42} {'S1 acc':>7} {'S2 acc':>7} {'avg':>7}")
-    rows = [
-        ("1. single-channel baseline",    a1),
-        ("2. MC learned gate",            a2),
-        ("3. MC perfect gate (ceiling)",  a3),
-        ("4. MC uniform gate (floor)",    a4),
-    ]
-    for label, a in rows:
-        m1 = np.mean(a[1]); m2 = np.mean(a[2])
-        print(f"  {label:<40} {m1:>7.3f} {m2:>7.3f} {(m1+m2)/2:>7.3f}")
-
-    # ── Verdict ────────────────────────────────────────────────────────────
-    ceil_avg  = (np.mean(a3[1]) + np.mean(a3[2])) / 2
-    floor_avg = (np.mean(a4[1]) + np.mean(a4[2])) / 2
-    learn_avg = (np.mean(a2[1]) + np.mean(a2[2])) / 2
-    gap_total   = ceil_avg  - floor_avg
-    gap_learned = learn_avg - floor_avg
-
-    print("\n" + "=" * 62)
-    print("Verdict")
-    if gap_total > 0.05 and gap_learned >= 0.7 * gap_total:
-        frac = gap_learned / max(gap_total, 1e-6)
-        print(f"(a) Gate SPONTANEOUSLY SEPARATES the streams. Condition 2 "
-              f"recovers {frac:.0%} of the ceiling–floor gap "
-              f"({learn_avg:.3f} vs ceil {ceil_avg:.3f}, floor {floor_avg:.3f}). "
-              "The mechanism works and is useful under end-to-end training.")
-    else:
-        frac = gap_learned / max(gap_total, 1e-6)
-        print(f"(b) Gate STAYS PERMISSIVE. Condition 2 recovers only {frac:.0%} of "
-              f"the ceiling–floor gap "
-              f"(learned {learn_avg:.3f}, ceil {ceil_avg:.3f}, floor {floor_avg:.3f}). "
-              "Separation is available and beneficial but the mechanism does NOT "
-              "engage under end-to-end training.")
+    return loss_s1, loss_s2, acc_s1, acc_s2, gate_info
 
 
 if __name__ == "__main__":
-    main()
+    print("=" * 62)
+    print("Interference test: Hebbian memory collision, two streams")
+    print(f"  NUM_PAIRS={P}  VOCAB={V}  D_MODEL={D}  N_FEAT={N}")
+    print(f"  BLOCK={BLOCK}  BATCH={BATCH}  ITERS={ITERS}  SEEDS={SEEDS}")
+    print("=" * 62)
+    print()
+
+    _run_sanity()
+
+    conditions = [
+        ("Cond 1: single-channel baseline",     lambda: BDHSingle(),    False),
+        ("Cond 2: MC k=2, learned gate",        lambda: BDHMCMC(False), True),
+        ("Cond 3: MC k=2, perfect gate (ceil)", lambda: BDHMCPerfect(), False),
+        ("Cond 4: MC k=2, uniform gate (floor)",lambda: BDHMCMC(True),  False),
+    ]
+
+    results = {}
+    for name, make_model, do_gates in conditions:
+        print(f"\n-- {name} --")
+        all_l1, all_l2, all_a1, all_a2 = [], [], [], []
+        gate_infos = []
+        for seed in SEEDS:
+            l1, l2, a1, a2, gi = run(make_model, seed, collect_gates=do_gates)
+            all_l1.append(l1); all_l2.append(l2)
+            all_a1.append(a1); all_a2.append(a2)
+            if gi:
+                gate_infos.append(gi)
+
+        def ms(xs):
+            m = sum(xs)/len(xs)
+            s = (sum((x-m)**2 for x in xs)/len(xs))**0.5
+            return m, s
+
+        ml1,sl1 = ms(all_l1); ml2,sl2 = ms(all_l2)
+        ma1,sa1 = ms(all_a1); ma2,sa2 = ms(all_a2)
+        print(f"  stream-1: loss={ml1:.4f}+-{sl1:.4f}  acc={ma1:.3f}+-{sa1:.3f}")
+        print(f"  stream-2: loss={ml2:.4f}+-{sl2:.4f}  acc={ma2:.3f}+-{sa2:.3f}")
+
+        if gate_infos:
+            gs1 = [sum(gi[0][c] for gi in gate_infos)/len(gate_infos) for c in range(k)]
+            gs2 = [sum(gi[1][c] for gi in gate_infos)/len(gate_infos) for c in range(k)]
+            avg_cos = sum(gi[2] for gi in gate_infos)/len(gate_infos)
+            gs1_str = "[" + ", ".join(f"{v:.3f}" for v in gs1) + "]"
+            gs2_str = "[" + ", ".join(f"{v:.3f}" for v in gs2) + "]"
+            sep = "SEPARATED" if avg_cos < 0.5 else "not separated"
+            print(f"  gate @query  stream-1: {gs1_str}")
+            print(f"  gate @query  stream-2: {gs2_str}")
+            print(f"  cosine(g_s1, g_s2) = {avg_cos:.4f}  ({sep})")
+
+        results[name] = dict(acc1=ma1, acc2=ma2)
+
+    print()
+    print("-- Verdict --")
+    cond1 = (results["Cond 1: single-channel baseline"]["acc1"] +
+             results["Cond 1: single-channel baseline"]["acc2"]) / 2
+    cond2 = (results["Cond 2: MC k=2, learned gate"]["acc1"] +
+             results["Cond 2: MC k=2, learned gate"]["acc2"]) / 2
+    cond3 = (results["Cond 3: MC k=2, perfect gate (ceil)"]["acc1"] +
+             results["Cond 3: MC k=2, perfect gate (ceil)"]["acc2"]) / 2
+    cond4 = (results["Cond 4: MC k=2, uniform gate (floor)"]["acc1"] +
+             results["Cond 4: MC k=2, uniform gate (floor)"]["acc2"]) / 2
+
+    range_  = cond3 - cond4    # full separation benefit
+    lift    = cond2 - cond4    # how much cond 2 improved over floor
+    frac    = lift / range_ if range_ > 1e-3 else 0.0
+
+    print(f"  Cond 1 (single-channel): {cond1:.3f}")
+    print(f"  Cond 2 (learned gate):   {cond2:.3f}")
+    print(f"  Cond 3 (perfect gate):   {cond3:.3f}  <- ceiling")
+    print(f"  Cond 4 (uniform gate):   {cond4:.3f}  <- floor")
+    print(f"  Lift fraction (cond2-floor)/(ceil-floor) = {frac:.2f}")
+    print()
+
+    if frac > 0.7:
+        print("(a) The gate SPONTANEOUSLY SEPARATED the streams. "
+              f"Condition 2 captures {frac:.0%} of the ceiling benefit. "
+              "The mechanism works and is useful under end-to-end training.")
+    else:
+        print("(b) The gate DID NOT ENGAGE. "
+              f"Condition 2 captures only {frac:.0%} of the ceiling benefit "
+              f"(cond2={cond2:.3f}, ceil={cond3:.3f}, floor={cond4:.3f}). "
+              "The gate mechanism does not spontaneously separate streams "
+              "under end-to-end training even when separation is available and beneficial.")
