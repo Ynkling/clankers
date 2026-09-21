@@ -49,7 +49,52 @@ WHAT IS RE-RUN
            Plus the asymmetric Gumbel hard-write / soft-read condition.
   Exp 6 — bounded per-channel capacity, swept.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (3 seeds): THE INSTRUMENT WAS THE PROBLEM.
+
+FLOOR RE-DERIVATION. Measured, not assumed, at every decay: single-channel 0.498,
+uniform-gate 0.498, perfect-gate 1.000, span +0.502 at decay 1.0, 0.95 and 0.85 alike.
+Randomized order did its job — CHECK 6 shows the flip-invariance PROOF lapses once
+U != I (4.6e-16 at decay 1, but 3.6e-02 at 0.95 and 1.5e-01 at 0.85), yet the measured
+floor stays at chance, because random block order removes the systematic recency cue
+that residual position information would otherwise expose. Operating point decay=0.95.
+
+  Exp 2, recurrent-state gate : acc 1.000  lift +1.00  VAL cos 0.0024  KEY cos 0.0121
+  Exp 2, token-identity gate  : acc 0.498  lift +0.00  VAL cos 0.9999  KEY cos 1.0000
+  Exp 5, asymmetric Gumbel    : acc 1.000  lift +1.00  VAL cos 0.0053
+  Exp 6, bounded capacity     : lift +1.00 at every C tried
+
+The plain SYMMETRIC soft gate reaches the ceiling on its own — no asymmetric routing,
+no capacity bound, no separated init. The token-identity control at the same decay on
+the same task stays pinned at the floor with VAL cosine 0.9999, which is what pins the
+cause on the gate's function class rather than on U != I or the order randomization.
+
+Separation emerges spontaneously and fast. Per role (KEY/VAL carry it; CTX need not
+split because their identity already marks the stream), a dense single-seed trace:
+
+    step   acc  |  CTX cos  KEY cos  VAL cos
+       0  0.340 |    0.962    0.999    0.999
+      40  0.541 |    0.941    0.857    0.977
+      60  0.651 |    0.803    0.019    0.050
+      80  1.000 |    0.938    0.001    0.002
+    1199  1.000 |    0.946    0.002    0.002
+
+and it is stable for the remaining 1120 steps.
+
+WHAT THIS DOES TO EXPERIMENTS 2-6. Arm 1 is still true and still irrelevant: the
+write-routing cancellation under an EXACTLY uniform read is still exact here (1.33e-15)
+and U != I does not disturb it, so experiment 5's mathematics was right. But it never
+was a barrier. It is a measure-zero stationary point — the gate is only near-uniform at
+initialization, never exactly uniform — and once the solution is inside the function
+class the resulting gradient leaves it within ~60 steps. The two-arm deadlock described
+the gradients correctly and misdiagnosed their significance: it was a description of a
+system that could not move because it had nowhere to go, not one trapped by its
+gradients. The interventions retire with it — asymmetric routing and bounded capacity
+both reach lift +1.00, exactly what doing nothing achieves.
+
+One residue of the old recency artifact survives: at C=16 the bounded floor rises to
+0.741 and the span narrows to +0.259, so hard clipping still partially dissolves the
+task even with randomized order, just far less than the +0.502 -> 0.000 collapse seen
+in test_bounded_capacity.py.
 """
 
 import sys
