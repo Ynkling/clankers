@@ -116,6 +116,12 @@ from test_interference import (
 
 # ── Instrument constants ─────────────────────────────────────────────────────
 DECAY_SWEEP = [1.0, 0.95, 0.85]      # U = decay * I  (decay=1 recovers U = I)
+# The decay the floor re-derivation selects as the operating point: the first non-unity
+# decay whose measured floor is intact and whose span is live. Hoisted to module level so
+# other scripts (test_phase2_seeds.py) can import the operating point instead of
+# re-deriving or hard-coding it. The main block below still checks it against the
+# measured sweep and says so if they disagree.
+OPERATING_DECAY = 0.95
 H_GATE      = 32                      # recurrent gate hidden width
 GATE_FIT_ITERS = 400                  # supervised fit of the gate to perfect-gate targets
 C_SWEEP     = [None, 48.0, 16.0]      # bounded-capacity radii for the Exp-6 re-run
@@ -330,7 +336,9 @@ class Instrument(nn.Module):
 
 
 # ── Training / evaluation ────────────────────────────────────────────────────
-def run(gate, mode, n_ch, decay, C, seed, anneal=False):
+def run(gate, mode, n_ch, decay, C, seed, anneal=False, ckpts=None):
+    """`ckpts`: explicit checkpoint steps. Default keeps the original N_CKPT schedule;
+    callers wanting finer resolution on when separation emerges pass their own."""
     torch.manual_seed(seed)
     model = Instrument(gate, mode, n_ch, decay, C)
     opt = torch.optim.Adam(model.parameters(), lr=LR)
@@ -338,7 +346,10 @@ def run(gate, mode, n_ch, decay, C, seed, anneal=False):
     prng = torch.Generator(); prng.manual_seed(seed + 99_000)
     ptok, _ = make_batch(PROBE_B, prng)
     pinp, plab = ptok[:, :-1], stream_labels(ptok[:, :-1])
-    ckpts = sorted({int(i * (ITERS - 1) / (N_CKPT - 1)) for i in range(N_CKPT)})
+    if ckpts is None:
+        ckpts = sorted({int(i * (ITERS - 1) / (N_CKPT - 1)) for i in range(N_CKPT)})
+    else:
+        ckpts = sorted(set(ckpts))
     trace = []
 
     prole = role_masks(pinp)
@@ -602,7 +613,12 @@ if __name__ == "__main__":
     if not live:
         print("  NO DECAY LEAVES A USABLE INSTRUMENT — the experiments below are vacuous.")
         sys.exit(0)
-    DECAY = live[0] if 1.0 not in live else (live[1] if len(live) > 1 else live[0])
+    if OPERATING_DECAY in live:
+        DECAY = OPERATING_DECAY
+    else:
+        DECAY = live[0] if 1.0 not in live else (live[1] if len(live) > 1 else live[0])
+        print(f"  NOTE: module constant OPERATING_DECAY={OPERATING_DECAY} is NOT among the"
+              f" decays with an intact floor; using {DECAY} instead.")
     FLOOR = floors[DECAY]['unif']['acc']
     CEIL  = floors[DECAY]['perf']['acc']
     print(f"  operating point: decay={DECAY}  floor={FLOOR:.3f}  ceiling={CEIL:.3f}")
