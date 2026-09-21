@@ -92,7 +92,10 @@ from test_interference import (
 #   C=128 never binds; C=48 binds while retaining ~87% of the earliest write; C=32 and
 #   C=16 bind progressively harder with memory degrading; C=8 erases the early writes
 #   almost entirely (surviving weight ~1e-4). Measured by the calibration table below.
-C_SWEEP = [None, 128.0, 48.0, 32.0, 16.0, 8.0]
+#   C=96 and C=64 map the transition: C=128 leaves the task discriminative while C=48
+#   already dissolves it, so the band between them is where the (a)/(b) question can
+#   actually be asked and is sampled at three points rather than one.
+C_SWEEP = [None, 128.0, 96.0, 64.0, 48.0, 32.0, 16.0, 8.0]
 
 # ── Thresholds ────────────────────────────────────────────────────────────────
 BIND_THRESH  = 0.05    # saturation fraction above which capacity meaningfully binds
@@ -718,14 +721,16 @@ if __name__ == "__main__":
         print()
         if o['lift'] > LIFT_THRESH and sep:
             print(f"(a) BOUNDED CAPACITY RESCUES THE MECHANISM. At C={C} the cancellation")
-            print(f"    is broken (divergence {r['div']:.2e}), capacity binds "
+            print(f"    is broken (trained-model divergence {o['tdiv']:.2e}), capacity binds "
                   f"(saturation {fmt(o['sat'])}), the gate separates")
             print(f"    (stream-1 {fmt(o['g_s1'])}, stream-2 {fmt(o['g_s2'])}, "
                   f"cos={o['gcos']:.4f}), and lift reaches {o['lift']:.0%} of the")
             print("    recomputed bounded ceiling.")
         else:
             print(f"(b) THE GRADIENT EXISTS BUT DOES NOT POINT TOWARD SEPARATION. At C={C}")
-            print(f"    the cancellation IS broken (divergence {r['div']:.2e}) and capacity")
+            print(f"    the cancellation IS broken (trained-model divergence "
+                  f"{o['tdiv']:.2e}; the untrained probe reads {r['div']:.2e} because it")
+            print(f"    measures a different state scale than training reaches) and capacity")
             print(f"    DOES bind (saturation {fmt(o['sat'])}), so the write-gate gradient is")
             print("    genuinely nonzero — yet lift stays at "
                   f"{o['lift']:+.0%} of the recomputed ceiling.")
