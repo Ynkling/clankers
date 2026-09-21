@@ -121,6 +121,21 @@ def make_seq_explicit(perm, orders, flip, q_stream, q_key):
     return torch.tensor(seq, dtype=torch.long)
 
 
+def role_masks(tokens):
+    """
+    Separation only MATTERS on the KEY and VAL tokens: those are the ones whose identity
+    is shared across streams, so routing is the only thing that can tell them apart. The
+    CTX tokens already mark their own stream by identity and need not separate, so
+    averaging the gate over all roles at once understates separation badly.
+    """
+    ctx = (tokens == CTX1) | (tokens == CTX2)
+    val = (tokens == VAL_A) | (tokens == VAL_B)
+    key = torch.zeros_like(ctx)
+    for i in range(P):
+        key |= (tokens == key_tok(i))
+    return {'ctx': ctx, 'key': key, 'val': val}
+
+
 def stream_labels(tokens):
     B, T = tokens.shape
     lab = torch.full((B, T), -1, dtype=torch.long)
@@ -281,6 +296,8 @@ def run(gate, mode, n_ch, decay, C, seed, anneal=False):
     ckpts = sorted({int(i * (ITERS - 1) / (N_CKPT - 1)) for i in range(N_CKPT)})
     trace = []
 
+    prole = role_masks(pinp)
+
     def diag(step, tau):
         with torch.no_grad():
             _, _, gr, gw = model(pinp, tau)
@@ -289,6 +306,12 @@ def run(gate, mode, n_ch, decay, C, seed, anneal=False):
                 g0, g1 = g[plab == 0].mean(0), g[plab == 1].mean(0)
                 d[f'{nm}_s1'], d[f'{nm}_s2'] = g0.tolist(), g1.tolist()
                 d[f'{nm}_cos'] = F.cosine_similarity(g0.unsqueeze(0), g1.unsqueeze(0)).item()
+            # per-role cosines; 'val' and 'key' are the ones that carry the separation
+            for rn, rm in prole.items():
+                a = gr[(plab == 0) & rm].mean(0)
+                b = gr[(plab == 1) & rm].mean(0)
+                d[f'{rn}_cos'] = F.cosine_similarity(a.unsqueeze(0), b.unsqueeze(0)).item()
+                d[f'{rn}_s1'], d[f'{rn}_s2'] = a.tolist(), b.tolist()
             return d
 
     for step in range(ITERS):
@@ -356,16 +379,17 @@ def print_trace(label, traces):
     traces = [t for t in traces if t]
     if not traces:
         return
-    print(f"  gate trace ({label}, mean over {len(traces)} seeds):")
-    print(f"    {'step':>5} | {'read cos':>9} {'write cos':>10} | {'read s1':>16} "
-          f"{'read s2':>16} | {'write s1':>16} {'write s2':>16}")
+    print(f"  gate trace ({label}, mean over {len(traces)} seeds). Separation lives on the")
+    print(f"  KEY/VAL tokens — CTX tokens mark their own stream by identity and need not split:")
+    print(f"    {'step':>5} | {'all cos':>8} {'ctx cos':>8} {'KEY cos':>8} {'VAL cos':>8} | "
+          f"{'VAL s1':>15} {'VAL s2':>15}")
     for i in range(len(traces[0])):
         pts = [t[i] for t in traces]
         av = lambda key: sum(p[key] for p in pts) / len(pts)
         avv = lambda key: [sum(p[key][c] for p in pts) / len(pts) for c in range(k)]
-        print(f"    {pts[0]['step']:>5} | {av('r_cos'):>9.4f} {av('w_cos'):>10.4f} | "
-              f"{fmt(avv('r_s1')):>16} {fmt(avv('r_s2')):>16} | "
-              f"{fmt(avv('w_s1')):>16} {fmt(avv('w_s2')):>16}")
+        print(f"    {pts[0]['step']:>5} | {av('r_cos'):>8.4f} {av('ctx_cos'):>8.4f} "
+              f"{av('key_cos'):>8.4f} {av('val_cos'):>8.4f} | "
+              f"{fmt(avv('val_s1')):>15} {fmt(avv('val_s2')):>15}")
     print()
 
 
@@ -608,21 +632,35 @@ if __name__ == "__main__":
     print("VERDICT")
     print("=" * 96)
     l2r, l2t, l5 = lift(e2_rec), lift(e2_tok), lift(e5)
-    sep2 = final(e2_rec, 'r_cos') < SEP_COS
+    # separation is judged on the KEY/VAL tokens, the ones whose identity is shared
+    # across streams; the all-role average mixes in CTX tokens that need not split.
+    sep2 = final(e2_rec, 'val_cos') < SEP_COS
     print(f"  instrument: decay={DECAY}, randomized order, recurrent-state gate")
     print(f"  floor={FLOOR:.3f}  ceiling={CEIL:.3f}")
-    print(f"  Exp 2 (recurrent gate) : acc={e2_rec['acc']:.3f} lift={l2r:+.2f} "
-          f"cos={final(e2_rec,'r_cos'):.4f} {'SEPARATED' if sep2 else 'not separated'}")
-    print(f"  Exp 2 (token gate)     : acc={e2_tok['acc']:.3f} lift={l2t:+.2f} "
-          f"cos={final(e2_tok,'r_cos'):.4f}")
-    print(f"  Exp 5 (asymmetric)     : acc={e5['acc']:.3f} lift={l5:+.2f}")
+    print(f"  Exp 2 (recurrent gate) : acc={e2_rec['acc']:.3f} lift={l2r:+.2f}  "
+          f"VAL cos={final(e2_rec,'val_cos'):.4f} KEY cos={final(e2_rec,'key_cos'):.4f} "
+          f"(all-role {final(e2_rec,'r_cos'):.4f})  "
+          f"{'SEPARATED' if sep2 else 'not separated'}")
+    print(f"  Exp 2 (token gate)     : acc={e2_tok['acc']:.3f} lift={l2t:+.2f}  "
+          f"VAL cos={final(e2_tok,'val_cos'):.4f} KEY cos={final(e2_tok,'key_cos'):.4f}")
+    print(f"  Exp 5 (asymmetric)     : acc={e5['acc']:.3f} lift={l5:+.2f}  "
+          f"VAL cos={final(e5,'val_cos'):.4f}")
     best6 = max((v['lift'] for v in e6.values() if v['lift'] == v['lift']), default=float('nan'))
     print(f"  Exp 6 (best bounded C) : lift={best6:+.2f}")
     print()
     if l2r > LIFT_THRESH and sep2:
-        print("THE INSTRUMENT WAS THE PROBLEM. With a gate that can latch, the symmetric")
-        print("soft gate separates the streams on its own and climbs toward the ceiling.")
-        print("Experiments 2-6 were measuring an unreachable target, not a real deadlock.")
+        print("THE INSTRUMENT WAS THE PROBLEM. With a gate that can latch, the plain")
+        print("symmetric soft gate separates the streams ON ITS OWN and reaches the")
+        print("ceiling, with no asymmetric routing and no capacity bound. Experiments 2-6")
+        print("were measuring an unreachable target, not a real deadlock.")
+        print()
+        print("Arm 1 still holds as a mathematical fact — the write-routing cancellation")
+        print(f"under an EXACTLY uniform read is still exact here ({arm1:.2e}, Exp-5 block")
+        print("above), and U != I does not disturb it. But it never was a barrier. It is a")
+        print("measure-zero stationary point: the gate is only near-uniform at init, never")
+        print("exactly uniform, and once the solution is inside the function class the")
+        print("resulting gradient is enough to leave it. The two-arm deadlock described")
+        print("the gradients correctly and misdiagnosed their significance.")
     elif l2r > l2t + 0.15:
         print("PARTIAL. The recurrent-state gate does better than the token gate it")
         print("replaces, so the representational cap was real and binding, but it does not")
