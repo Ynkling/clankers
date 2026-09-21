@@ -82,8 +82,8 @@ from bdh_recurrent import (
 )
 import test_interference as ti
 from test_interference import (
-    P, k, D, N, BATCH, ITERS, LR, SEEDS, BLOCK, CTX1, CTX2, V,
-    make_batch, _perfect_gate, run as ti_run, BDHMCMC,
+    P, k, D, N, BATCH, ITERS, LR, SEEDS, BLOCK, CTX1, CTX2, V, VAL_A, VAL_B,
+    key_tok, make_batch, _perfect_gate, run as ti_run, BDHMCMC,
 )
 
 # ── Capacity sweep (C = Frobenius-ball radius per channel; None = unbounded) ──
@@ -270,6 +270,7 @@ def run_bounded(C, n_ch, gate_mode, seed):
         pinp = ptok[:, :-1]
         _, sat = model(pinp, track_sat=True)
         out['sat'] = sat.tolist() if sat is not None else [0.0] * n_ch
+        out['tdiv'] = trained_cancellation_divergence(model, pinp[:32])
         lab = stream_labels(pinp)
         g = model.gate(pinp, model.embed(pinp))
         g0, g1 = g[lab == 0].mean(0), g[lab == 1].mean(0)
@@ -296,6 +297,8 @@ def agg(runs):
         o[key], o[key + '_sd'] = ms([r[key] for r in runs])
     o['acc'] = (o['a1'] + o['a2']) / 2
     nc = len(runs[0]['sat'])
+    td = [r['tdiv'] for r in runs if r.get('tdiv') is not None]
+    o['tdiv'] = (sum(td) / len(td)) if td else None
     o['sat']  = [sum(r['sat'][c] for r in runs) / len(runs) for c in range(nc)]
     o['g_s1'] = [sum(r['g_s1'][c] for r in runs) / len(runs) for c in range(nc)]
     o['g_s2'] = [sum(r['g_s2'][c] for r in runs) / len(runs) for c in range(nc)]
@@ -307,6 +310,65 @@ def fmt(xs):
 
 
 # ── Cancellation-breaking diagnostic (CHECK 3) ───────────────────────────────
+def analytical_floor_gap(C_frac):
+    """
+    Replicates test_interference._run_sanity's analytical argument WITH clipping.
+
+    That argument is what caps single-channel / uniform-gate at 50%: the Hebbian state
+    accumulates outer(VAL_A, KEY_i) + outer(VAL_B, KEY_i) for every key, so the read
+    from any key is EXACTLY equally aligned with VAL_A and VAL_B whatever the assignment.
+    It assumes the two writes carry equal weight. Clipping breaks that assumption —
+    stream-2 writes after stream-1 within each pair, so the earlier write is decayed more
+    and the alignment gap becomes nonzero. C_frac is C as a fraction of the unbounded
+    final ||S||_F. Returns (mean |score_A - score_B| over keys, clipped fraction).
+    """
+    emb = torch.zeros(V, D, dtype=torch.float64)
+    for i in range(V):
+        emb[i, i % D] = 1.0
+    va, vb = emb[VAL_A], emb[VAL_B]
+
+    def build(C):
+        S = torch.zeros(D, D, dtype=torch.float64)
+        nclip = nw = 0
+        for i in range(P):
+            ki = emb[key_tok(i)]
+            for val in (va, vb):          # stream-1 writes, then stream-2, as in the task
+                S = S + torch.outer(val, ki)
+                nw += 1
+                if C is not None and S.norm().item() > C:
+                    S = S * (C / S.norm().item())
+                    nclip += 1
+        return S, nclip / nw
+
+    S_unb, _ = build(None)
+    C = None if C_frac is None else S_unb.norm().item() * C_frac
+    S, cf = build(C)
+    gaps = [abs(((S @ emb[key_tok(i)]) @ va).item() - ((S @ emb[key_tok(i)]) @ vb).item())
+            for i in range(P)]
+    return sum(gaps) / len(gaps), cf
+
+
+@torch.no_grad()
+def trained_cancellation_divergence(model, tokens, n_draws=4, seed=3):
+    """
+    Same probe as CHECK 3, but using a TRAINED model's own parameters and real task
+    sequences, so it answers 'is the cancellation broken for THIS model?' rather than
+    for an untrained one at an arbitrary scale. Returns None for a single-channel model.
+    """
+    if model.n_ch < 2:
+        return None
+    g = torch.Generator().manual_seed(seed)
+    v = model.embed(tokens)
+    B, T, _ = v.shape
+    gr = torch.full((B, T, model.n_ch), 1.0 / model.n_ch)
+    outs = []
+    for _ in range(n_draws):
+        gw = F.softmax(torch.randn(B, T, model.n_ch, generator=g) * 40.0, dim=-1)
+        out, _ = mc_bounded(v, model.Dx, model.Dy, model.E, gw, gr, model.C)
+        outs.append(out)
+    return max((outs[i] - outs[0]).abs().max().item() for i in range(1, n_draws))
+
+
 def cancellation_divergence(C, n_draws=4, seed=7, dtype=torch.float64):
     """
     Replicates test_asymmetric_routing.py CHECK 5 with clipping added: several
@@ -422,6 +484,28 @@ def verify():
     print("            forgetting. A C that binds hard enough to erase the early writes")
     print("            makes the task unsolvable for ANY gate, which is why the ceiling")
     print("            and floor are recomputed at every C below.\n")
+
+    # CHECK 5 — clipping VOIDS the analytical 50% bound that defines this task's floor
+    print("CHECK 5  FLOOR INTEGRITY: test_interference._run_sanity proves single-channel /")
+    print("         uniform-gate cannot exceed 50%, because the state accumulates")
+    print("         outer(VAL_A,KEY_i) + outer(VAL_B,KEY_i) with EQUAL weight, so the read")
+    print("         from any key is exactly equally aligned with both values. That")
+    print("         assumes equal weight. Clipping decays the earlier write more (stream-2")
+    print("         writes after stream-1 within each pair), so the gap opens up:")
+    g_unb, _ = analytical_floor_gap(None)
+    print(f"         {'C / ||S||_unbounded':>21} {'clipped frac':>13} "
+          f"{'mean |score_A - score_B|':>26}")
+    print(f"         {'unbounded':>21} {0.0:>13.2f} {g_unb:>26.4f}")
+    worst5 = 0.0
+    for frac in (0.8, 0.6, 0.4, 0.25):
+        gp, cf = analytical_floor_gap(frac)
+        worst5 = max(worst5, gp)
+        print(f"         {frac:>21.2f} {cf:>13.2f} {gp:>26.4f}")
+    ok &= (g_unb < 1e-12 < worst5)
+    print("         -> the 50% cap holds EXACTLY only while capacity is unbounded. Once")
+    print("            clipping binds, a model can read the stream off the recency")
+    print("            asymmetry instead of separating channels, so the floor of this")
+    print("            task is no longer 50% and floor/ceiling must be re-read per C.\n")
 
     print(f"{'ALL VERIFICATION CHECKS PASSED' if ok else 'SOME VERIFICATION CHECKS FAILED'}\n")
     assert ok, "verification failed — do not trust the results below"
@@ -546,50 +630,89 @@ if __name__ == "__main__":
           f"{'':>7} {'':>7} {c2['acc']:>7.3f} {'':>7} {c2['gcos']:>9.4f}   <- cond 2")
     print()
 
-    engaged = {C: r for C, r in results.items()
-               if r['div'] > BREAK_THRESH and max(r['test']['sat']) > BIND_THRESH}
-    live = {C: r for C, r in engaged.items()
-            if (r['ceil']['acc'] - r['floor']['acc']) > SPAN_THRESH}
-    dead = sorted(set(engaged) - set(live))
+    # Classify every C: does capacity bind for the TRAINED model, is the cancellation
+    # broken for it, and is the task still able to tell separation from non-separation?
+    print("=" * 78)
+    print("PER-C CLASSIFICATION")
+    print("=" * 78)
+    print(f"  {'C':>7} {'binds':>7} {'trained div':>12} {'floor':>7} {'ceil':>7} "
+          f"{'span':>7}   task status")
+    cls = {}
+    for C in C_SWEEP:
+        if C is None:
+            continue
+        r = results[C]
+        fl, ce = r['floor']['acc'], r['ceil']['acc']
+        span = ce - fl
+        binds = max(r['test']['sat']) > BIND_THRESH
+        tdiv  = r['test']['tdiv']
+        breaks = (tdiv is not None and tdiv > BREAK_THRESH)
+        if span > SPAN_THRESH:
+            status = "DISCRIMINATIVE (question is askable)"
+        elif fl > 0.90:
+            status = "DISSOLVED — floor ROSE to the ceiling"
+        else:
+            status = "DESTROYED — ceiling FELL to the floor"
+        cls[C] = dict(binds=binds, breaks=breaks, span=span, status=status,
+                      floor=fl, ceil=ce)
+        print(f"  {C:>7} {str(binds):>7} {tdiv if tdiv is None else f'{tdiv:.2e}':>12} "
+              f"{fl:>7.3f} {ce:>7.3f} {span:>7.3f}   {status}")
+    print()
+
+    askable = {C: results[C] for C in cls
+               if cls[C]['span'] > SPAN_THRESH and cls[C]['binds']}
+    dissolved = sorted(C for C in cls if cls[C]['status'].startswith("DISSOLVED"))
+    destroyed = sorted(C for C in cls if cls[C]['status'].startswith("DESTROYED"))
+    engaged = {C: results[C] for C in cls if cls[C]['binds'] and cls[C]['breaks']}
+
     print("=" * 78)
     print("VERDICT")
     print("=" * 78)
-    if dead:
-        print(f"  C values that engage but whose RECOMPUTED CEILING collapsed onto their")
-        print(f"  floor (ceiling - floor <= {SPAN_THRESH}): {dead}")
-        for C in dead:
-            r = results[C]
-            print(f"    C={C}: ceiling={r['ceil']['acc']:.3f}  floor={r['floor']['acc']:.3f}"
-                  f"  -> capacity binds hard enough to erase the early writes, so the task")
-            print(f"           is unsolvable even with a perfect hand-set gate. Lift at this")
-            print(f"           C carries NO information about separation; excluded below.")
+    if dissolved:
+        print(f"  C values where bounded capacity DISSOLVED the task: {dissolved}")
+        for C in dissolved:
+            r, c = results[C], cls[C]
+            print(f"    C={C}: floor (uniform gate) = {c['floor']:.3f}, "
+                  f"ceiling (perfect gate) = {c['ceil']:.3f}")
+            print(f"           the single-channel model — which has NO channels to route "
+                  f"between — scores {r['floor1']['acc']:.3f},")
+            print(f"           and the learned gate scores {r['test']['acc']:.3f} while "
+                  f"NOT separating (cos={r['test']['gcos']:.4f},")
+            print(f"           gate s1={fmt(r['test']['g_s1'])} s2={fmt(r['test']['g_s2'])}). "
+                  f"Separation is not needed to win.")
+        print("    CHECK 5 is the reason: clipping voids the analytical 50% bound that")
+        print("    defines this task's floor, because the earlier of the two same-key")
+        print("    writes is decayed more, leaving a recency asymmetry a single channel")
+        print("    can read off directly. Lift is undefined where floor == ceiling.")
         print()
-    if not engaged:
-        broke = [C for C, r in results.items() if r['div'] > BREAK_THRESH]
-        bound = [C for C, r in results.items() if max(r['test']['sat']) > BIND_THRESH]
-        print("(c) THE INTERVENTION IS INERT on this task. No swept C both breaks the")
-        print(f"    cancellation (C with divergence > {BREAK_THRESH:g}: "
-              f"{broke if broke else 'none'}) and binds "
-              f"(C with saturation > {BIND_THRESH:g}: {bound if bound else 'none'}).")
-        print("    This is NOT a negative result about separation — bounded capacity never")
-        print("    got the chance to act, so the experiment says nothing about whether a")
-        print("    working capacity bound would rescue the gate.")
-    elif not live:
-        print("(c') THE INTERVENTION ENGAGES BUT DESTROYS THE TASK. Every C that breaks the")
-        print("    cancellation and binds also forgets hard enough that the recomputed")
-        print("    ceiling collapses onto its floor (CHECK 4: clipping multiplies old")
-        print("    memories down once per subsequent token). There is no C at which the")
-        print("    question 'does the gradient point toward separation?' can even be asked,")
-        print("    so this is NOT a negative result about separation. On this task bounded")
-        print("    capacity trades the cancellation it fixes for a memory it destroys.")
+    if destroyed:
+        print(f"  C values where bounded capacity DESTROYED the task "
+              f"(ceiling fell to floor): {destroyed}")
+        print()
+
+    if not engaged and not askable:
+        print("(c) THE INTERVENTION IS INERT on this task: no swept C both binds and")
+        print("    breaks the cancellation. This is NOT a negative result about")
+        print("    separation — bounded capacity never got the chance to act.")
+    elif not askable:
+        print("(c'') THE INTERVENTION ENGAGES BUT THE TASK CANNOT MEASURE IT. Every C that")
+        print("    binds also removes the task's ability to distinguish a separating gate")
+        print("    from a non-separating one: the floor rises to meet the ceiling (or the")
+        print("    ceiling falls to meet the floor), so lift is undefined everywhere the")
+        print("    mechanism is active. The cancellation IS broken — that part of the")
+        print("    premise holds — but on THIS task the question 'does the resulting")
+        print("    gradient point toward separation?' cannot be asked at any C that binds.")
+        print("    This is neither (a) nor (b): it is a statement about the task, not")
+        print("    about the mechanism. Testing bounded capacity properly needs a task")
+        print("    whose floor survives forgetting.")
     else:
-        best = max(live.items(), key=lambda kv: kv[1]['test']['lift'])
+        best = max(askable.items(), key=lambda kv: kv[1]['test']['lift'])
         C, r = best
         o = r['test']
         sep = (max(o['g_s1']) > SEP_THRESH and max(o['g_s2']) > SEP_THRESH
                and (o['g_s1'][0] > o['g_s1'][1]) != (o['g_s2'][0] > o['g_s2'][1]))
-        print(f"    C values that break the cancellation, bind, AND keep a live ceiling: "
-              f"{sorted(live, key=lambda c: -live[c]['test']['lift'])}")
+        print(f"    C values that bind AND keep the task discriminative: "
+              f"{sorted(askable, key=lambda c: -askable[c]['test']['lift'])}")
         print(f"    Best of them: C={C}  lift={o['lift']:+.2f}  acc={o['acc']:.3f} "
               f"(recomputed floor {r['floor']['acc']:.3f}, ceiling {r['ceil']['acc']:.3f})")
         print()
