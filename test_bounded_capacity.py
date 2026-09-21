@@ -67,6 +67,35 @@ Verdict:
      actually moved is reported);
  (c) no C both binds and breaks the cancellation -> the intervention is INERT on this
      task, which is not a negative result about separation at all.
+
+RESULT (3 seeds): (b). The sweep splits into two regimes.
+
+  DISCRIMINATIVE (C = 128, 96, 64): capacity binds and the cancellation IS broken for
+  the trained model (divergence 9.1e-02, 3.2e-01, 3.2e+00 — note the UNTRAINED CHECK-3
+  probe reads 2.2e-15 at C=128 because it measures a state scale training never
+  reaches). The gate nonetheless never separates at any of them:
+      C=128  floor 0.500  ceil 1.000  test 0.496  lift -0.01  gate cos 0.9531
+      C=96   floor 0.667  ceil 1.000  test 0.496  lift -0.51  gate cos 0.9573
+      C=64   floor 0.667  ceil 1.000  test 0.719  lift +0.16  gate cos 0.9051
+  The per-stream gates stay at roughly [0.5, 0.5] throughout (C=64: stream-1
+  [0.489, 0.511], stream-2 [0.503, 0.497]) against the perfect gate's [1,0]/[0,1] and
+  cosine 0.0000. The +0.16 at C=64 therefore is NOT separation — it comes from the same
+  recency shortcut that lifts the uniform-gate floor to 0.667, and at C=96 the learned
+  gate is actually 0.51 of the span WORSE than the uniform-gate floor it should match.
+  So: breaking the exact cancellation is necessary but not sufficient. A nonzero gate
+  gradient does not by itself carry information about WHICH stream belongs in WHICH
+  channel.
+
+  DISSOLVED (C <= 48): the floor rises to 1.000 and the task stops measuring anything.
+  The single-channel model — no channels to route between — scores 1.000, as does the
+  uniform gate, and the learned gate scores 1.000 while not separating (cos 0.987-0.995).
+  CHECK 5 gives the cause, and it is a property of the task: clipping voids the
+  analytical 50% bound, so a model reads the stream off the recency asymmetry instead.
+
+  Note also that a SECOND channel HURTS wherever clipping does the work: at C=96 and
+  C=64 the single-channel bounded model reaches 1.000 while every k=2 variant scores
+  0.496-0.719, because splitting each write across two channels halves the per-channel
+  accumulation against the same C and weakens the recency signal.
 """
 
 import sys
