@@ -467,7 +467,7 @@ if __name__ == "__main__":
               f"stream-2 loss={o['l2']:.4f}+-{o['l2_sd']:.4f} "
               f"acc={o['a2']:.3f}+-{o['a2_sd']:.3f}")
         line = f"      avg acc={o['acc']:.3f}  lift={o['lift']:+.2f}"
-        if o['traces']:
+        if o['traces'] and o['traces'][0]:   # conds 1 and 2 have no learned gate to trace
             fin = [t[-1] for t in o['traces']]
             av = lambda key: sum(p[key] for p in fin) / len(fin)
             line += (f"  read cos={av('r_cos'):.4f} (ctx {av('r_cos_ctx'):.4f})"
