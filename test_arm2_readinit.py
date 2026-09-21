@@ -50,7 +50,44 @@ Verdict:
  (d) 4b works but 4 does not -> the bootstrap is real but the separated read erodes
      before the write can exploit it.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (3 seeds): (c), and CHECK 6 identifies the third obstacle. Floor 0.500, ceiling
+1.000 (perfect hand-set gate); every learned-gate condition sits at 0.496-0.500:
+
+    3.  both random                 acc 0.496  lift -0.01  read cos@ctx 0.818
+    4.  read separated, free        acc 0.500  lift +0.00  read cos@ctx 0.000 -> 0.000
+    4b. read separated, frozen      acc 0.500  lift +0.00  read cos@ctx 0.000 -> 0.000
+    5.  write separated, free       acc 0.496  lift -0.01  write cos@ctx 0.000 -> 0.000
+    6.  both separated, free        acc 0.496  lift -0.01  both cos@ctx 0.000 -> 0.000
+
+Three things make this a clean (c) rather than a (d) or an inconclusive null:
+
+  * Conditions 4 and 4b are IDENTICAL in every digit — same losses, same accuracies,
+    same gate cosines. A free separated read gate does not move at all (cos@ctx stays
+    0.0000 and the per-stream routing is unchanged at all 21 checkpoints), so freezing
+    it is a no-op. The separated read is an exact stationary point, which rules out (d):
+    the read does not erode, there is simply nothing pulling on it.
+  * Write separation NEVER emerged in 4 or 4b (write cos@ctx 0.8628 -> 0.8390, never
+    below 0.5 at any checkpoint), even though CHECK 5 confirms the separated read makes
+    write routing observable (divergence 3.13). The signal is there; it carries no
+    stream identity.
+  * Condition 6 is the decisive one. Both gates start perfectly separated and HOLD
+    perfectly (cos@ctx 0.0000 -> 0.0000 on both), and accuracy is still 0.496.
+    Separation at the only place a token-identity gate can express it is perfectly
+    stable AND completely useless.
+
+That last point is CHECK 6 observed in training rather than proved: the gate can only
+separate the CTX tokens, and the task is decided by the KEY and VAL tokens, whose
+identity is shared across streams. The two-arm deadlock is a correct description of the
+gradients but sits downstream of the real barrier — the solution is not in the gate's
+function class, so no gradient could ever have found it. Arm 1 and arm 2 are
+consequences of that cap rather than independent obstacles, and experiment 6's
+"necessary but not sufficient" reading was too generous to the mechanism.
+
+This does NOT show that BDH gating cannot separate streams in general. It shows a
+token-identity gate cannot separate streams whose token content is identical, which is
+exactly how this task is built. Testing the gating hypothesis needs either a gate with
+access to recurrent context (so it can latch, as the perfect gate does) or a task whose
+streams differ in token content and not only in position.
 """
 
 import sys
