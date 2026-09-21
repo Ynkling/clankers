@@ -61,6 +61,20 @@ instead (numbers printed, and asserted):
   4. (machine precision, possible because the sampled noise is held fixed) the factorized
      score form equals an explicit token-by-token hard-write / soft-read Hebbian loop.
      This is what pins down the gate orientation (read on rows, write on columns).
+  5. STRUCTURAL (added after the result came back negative, and it explains why): because
+     the write gate's rows sum to 1, sum_c S^(c) is independent of the write routing, so
+     with a uniform read gate a*_t = (1/k) x_t @ sum_c S^(c) and even a perfectly
+     committed write is INVISIBLE to the read. dL/dW_write is exactly zero there.
+     Verified to machine precision across wildly different near-one-hot routings.
+
+RESULT (3 seeds): (b) — decoupling does not fix it. Floor 0.500, ceiling 1.000; the
+symmetric soft gate gets 0.496, asymmetric-shared 0.500, asymmetric-separate 0.496, all
+at lift 0.00. The write DOES commit (mean max write weight 0.87 when sampled as in
+training) but never separates the streams: at the end of training stream-1 writes
+[0.335, 0.665] and stream-2 writes [0.448, 0.552] — both prefer the same channel. The
+routing trace shows separation never emerges at any checkpoint, and the read-gate cosine
+stays at 0.96-0.99 throughout. CHECK 5 is the reason: the deadlock is structural, so
+hardening the write cannot break it.
 """
 
 import sys
@@ -399,6 +413,41 @@ def verify():
     ok &= d4 < 1e-12
     print(f"         -> {'IDENTICAL' if d4 < 1e-12 else 'FAILED'}\n")
 
+    # CHECK 5 — why asymmetry alone cannot bootstrap (structural, not a soundness check)
+    #   sum_c S^(c) = sum_tau (sum_c g_write[tau,c]) outer(x_tau, v*_tau)
+    #               = sum_tau outer(x_tau, v*_tau)          (write gate rows sum to 1)
+    # so with g_read = [1/k..1/k], a*_t = (1/k) x_t @ sum_c S^(c) — the write routing
+    # cancels completely. A committed write is INVISIBLE to a uniform read, hence
+    # dL/dW_write is exactly zero there and the write gate gets no signal to separate.
+    gr_uni = torch.full((T, k), 1.0 / k, dtype=dt)
+    outs, commits = [], []
+    for _ in range(4):
+        lw = torch.randn(T, k, generator=g, dtype=dt) * 5.0    # wildly different routings
+        gwi = gumbel_write(lw, 0.01, gen=g)                    # driven to near one-hot
+        commits.append(gwi.max(-1).values.mean().item())
+        x = F.relu(ln(v) @ Dx)
+        a = ((x @ x.T) * (gr_uni @ gwi.T)).tril(diagonal=-1) @ v
+        y = F.relu(ln(a) @ Dy) * x
+        outs.append(v + ln(y @ E))
+    d5 = max((outs[i] - outs[0]).abs().max().item() for i in range(1, 4))
+    # ...and the common value is the ungated single-channel form with scores scaled by 1/k
+    x_s = F.relu(ln(v) @ Dx)
+    a_s = ((x_s @ x_s.T) / k).tril(diagonal=-1) @ v
+    y_s = F.relu(ln(a_s) @ Dy) * x_s
+    d5b = (outs[0] - (v + ln(y_s @ E))).abs().max().item()
+    print("CHECK 5  STRUCTURAL: a committed write is invisible to a UNIFORM read gate.")
+    print("         sum_c S^(c) is independent of the write routing (gate rows sum to 1),")
+    print("         so g_read = [1/k..1/k] gives a*_t = (1/k) x_t @ sum_c S^(c).")
+    print(f"         4 near-one-hot write routings (mean commitment "
+          f"{sum(commits)/len(commits):.4f}), uniform read:")
+    print(f"           max |output difference| between them = {d5:.3e}")
+    print(f"           max |output - single-channel with scores/k| = {d5b:.3e}")
+    print("         -> dL/dW_write is EXACTLY zero at a uniform read gate. The write gate")
+    print("            cannot learn to separate until the read gate separates first, and")
+    print("            the read gate has nothing to separate until the write gate does.")
+    print("            Asymmetry alone does not break this deadlock.\n")
+    ok &= d5 < 1e-12 and d5b < 1e-12
+
     print(f"{'ALL VERIFICATION CHECKS PASSED' if ok else 'SOME VERIFICATION CHECKS FAILED'}\n")
     assert ok, "verification failed — do not trust the results below"
 
@@ -518,3 +567,16 @@ if __name__ == "__main__":
         print("    Making the Hebbian write commit to one channel while the read stays")
         print("    soft is NOT sufficient to make the router separate interfering streams")
         print("    under end-to-end training.")
+        print()
+        print("    CHECK 5 above gives the reason, and it is structural rather than an")
+        print("    optimization accident: because the write gate's rows sum to 1, the")
+        print("    channel sum sum_c S^(c) does not depend on the routing at all, so a")
+        print("    uniform read gate makes even a perfectly committed write invisible")
+        print("    (verified to machine precision). The gradient on the write gate is")
+        print("    exactly zero there. Training starts with a near-uniform read gate, so")
+        print("    the write gate begins with no signal telling it how to route, and the")
+        print("    read gate has no separated memories to exploit — neither side can move")
+        print("    first. Hardening the write changes HOW the write commits, not WHETHER")
+        print("    the read can see it, so it cannot break the deadlock. Any fix has to")
+        print(f"    make the read gate separate too (cond 4 hand-sets it and reaches "
+              f"{CEIL:.3f}).")
