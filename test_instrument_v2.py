@@ -425,8 +425,43 @@ def final(o, key):
     return (sum(p[key] for p in fin) / len(fin)) if fin else float('nan')
 
 
+# Gate-vector keys in a trace point. Everything else (cosines, step) is a scalar and is
+# permutation-invariant, so canonicalization below cannot touch it.
+VEC_KEYS = ('r_s1', 'r_s2', 'w_s1', 'w_s2',
+            'ctx_s1', 'ctx_s2', 'key_s1', 'key_s2', 'val_s1', 'val_s2')
+
+
+def canonicalize(traces, ref='val_s1'):
+    """
+    DISPLAY ONLY. Which physical channel a seed puts stream-1 into is arbitrary — it is
+    fixed by that run's initialization. Averaging raw gate vectors across seeds therefore
+    mixes incompatible labelings: three seeds splitting 2:1 average to exactly
+    [0.667, 0.333] no matter how cleanly each individual seed separated, which reads as
+    weak routing when the routing is in fact near-one-hot.
+
+    Fix: per seed, pick the channel permutation that puts stream-1's majority VAL mass in
+    channel 0, decided at the FINAL checkpoint so one labeling holds for the whole run,
+    and apply it to every gate vector of that seed. Accuracy, loss and every cosine are
+    permutation-invariant and are not recomputed or touched here.
+    """
+    out = []
+    for tr in traces:
+        if not tr:
+            out.append(tr)
+            continue
+        v = tr[-1].get(ref)
+        perm = [0, 1] if (not v or len(v) != 2 or v[0] >= v[1]) else [1, 0]
+        if perm == [0, 1]:
+            out.append(tr)
+            continue
+        out.append([{kk: ([vv[i] for i in perm]
+                          if kk in VEC_KEYS and isinstance(vv, list) else vv)
+                     for kk, vv in p.items()} for p in tr])
+    return out
+
+
 def finalv(o, key):
-    fin = [t[-1] for t in o['traces'] if t]
+    fin = [t[-1] for t in canonicalize(o['traces']) if t]
     return ([sum(p[key][c] for p in fin) / len(fin) for c in range(k)] if fin
             else [float('nan')] * k)
 
@@ -435,8 +470,11 @@ def print_trace(label, traces):
     traces = [t for t in traces if t]
     if not traces:
         return
+    traces = canonicalize(traces)     # display only; see canonicalize() docstring
     print(f"  gate trace ({label}, mean over {len(traces)} seeds). Separation lives on the")
-    print(f"  KEY/VAL tokens — CTX tokens mark their own stream by identity and need not split:")
+    print(f"  KEY/VAL tokens — CTX tokens mark their own stream by identity and need not split.")
+    print(f"  Channel labels are canonicalized per seed before averaging, so the vectors show")
+    print(f"  how sharply each seed routes rather than how the seeds happened to label channels:")
     print(f"    {'step':>5} | {'all cos':>8} {'ctx cos':>8} {'KEY cos':>8} {'VAL cos':>8} | "
           f"{'VAL s1':>15} {'VAL s2':>15}")
     for i in range(len(traces[0])):
