@@ -284,13 +284,26 @@ class Instrument(nn.Module):
     mode: 'sym' (one gate for read and write) | 'asym' (Gumbel hard write, soft read)
     """
 
-    def __init__(self, gate='recurrent', mode='sym', n_ch=k, decay=1.0, C=None):
+    def __init__(self, gate='recurrent', mode='sym', n_ch=k, decay=1.0, C=None,
+                 n_feat=None, gate_to_readout=False):
+        """
+        n_feat: width of the sparse feature dimension (Dx/Dy/E), i.e. the per-channel
+            fast-weight state is n_feat x D. Defaults to the module's N, so the default
+            path draws exactly the same random numbers in the same order as before.
+        gate_to_readout: add a learned projection of the recurrent gate's hidden state
+            into the residual before the head. Its parameter is created AFTER all
+            pre-existing ones and only when the flag is set, so the default path's RNG
+            stream is untouched. Both knobs exist for test_capacity_control.py's
+            resource-matched single-channel controls.
+        """
         super().__init__()
         self.gate_kind, self.mode, self.n_ch, self.decay, self.C = gate, mode, n_ch, decay, C
+        nf = N if n_feat is None else int(n_feat)
+        self.n_feat, self.gate_to_readout = nf, bool(gate_to_readout)
         self.embed = nn.Embedding(V, D)
-        self.Dx = nn.Parameter(torch.randn(D, N) * 0.1)
-        self.Dy = nn.Parameter(torch.randn(D, N) * 0.1)
-        self.E  = nn.Parameter(torch.randn(N, D) * 0.1)
+        self.Dx = nn.Parameter(torch.randn(D, nf) * 0.1)
+        self.Dy = nn.Parameter(torch.randn(D, nf) * 0.1)
+        self.E  = nn.Parameter(torch.randn(nf, D) * 0.1)
         self.head = nn.Linear(D, V, bias=False)
         if gate == 'recurrent':
             self.W_in = nn.Parameter(torch.randn(H_GATE, D) * 0.1)
@@ -298,6 +311,9 @@ class Instrument(nn.Module):
             self.W_g  = nn.Parameter(torch.randn(n_ch, H_GATE) * 0.1)
         elif gate == 'token':
             self.W_tok = nn.Parameter(torch.randn(D, n_ch) * 0.1)
+        if self.gate_to_readout:
+            assert gate == 'recurrent', "gate_to_readout needs the recurrent gate"
+            self.W_ro = nn.Parameter(torch.randn(D, H_GATE) * 0.1)
 
     def gates(self, tokens, v, tau=None):
         if self.gate_kind == 'none':
@@ -312,11 +328,14 @@ class Instrument(nn.Module):
         if self.gate_kind == 'recurrent':
             B, T, _ = v.shape
             h = torch.zeros(B, H_GATE, dtype=v.dtype)
-            logits = []
+            logits, hs = [], []
             for t in range(T):
                 h = torch.tanh(v[:, t] @ self.W_in.T + h @ self.W_h.T)
+                hs.append(h)
                 logits.append(h @ self.W_g.T)
             lg = torch.stack(logits, dim=1)
+            if self.gate_to_readout:
+                self._h_seq = torch.stack(hs, dim=1)          # (B, T, H_GATE)
         else:
             lg = v @ self.W_tok
         gr = F.softmax(lg, dim=-1)
@@ -332,15 +351,21 @@ class Instrument(nn.Module):
         else:
             out, sat = mc_recurrent_bounded(v, self.Dx, self.Dy, self.E, gr, gw,
                                             self.decay, self.C, track_sat)
+        if self.gate_to_readout:
+            out = out + self._h_seq @ self.W_ro.T
         return self.head(out), sat, gr, gw
 
 
 # ── Training / evaluation ────────────────────────────────────────────────────
-def run(gate, mode, n_ch, decay, C, seed, anneal=False, ckpts=None):
+def run(gate, mode, n_ch, decay, C, seed, anneal=False, ckpts=None,
+        n_feat=None, gate_to_readout=False):
     """`ckpts`: explicit checkpoint steps. Default keeps the original N_CKPT schedule;
-    callers wanting finer resolution on when separation emerges pass their own."""
+    callers wanting finer resolution on when separation emerges pass their own.
+    `n_feat` / `gate_to_readout`: passed straight to Instrument; both default to the
+    original behaviour (see Instrument.__init__)."""
     torch.manual_seed(seed)
-    model = Instrument(gate, mode, n_ch, decay, C)
+    model = Instrument(gate, mode, n_ch, decay, C,
+                       n_feat=n_feat, gate_to_readout=gate_to_readout)
     opt = torch.optim.Adam(model.parameters(), lr=LR)
     rng = torch.Generator(); rng.manual_seed(seed + 10_000)
     prng = torch.Generator(); prng.manual_seed(seed + 99_000)
