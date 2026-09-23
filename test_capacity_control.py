@@ -70,6 +70,51 @@ labelled PARTIAL. A run that merely scores badly is a RESULT, not a failure — 
 no convergence threshold that could quietly discard an inconvenient seed. Results
 persist atomically to capacity_control_results.json after every run; cached seeds are
 skipped unless --force.
+
+RESULT (10 seeds, 70/70 runs completed): FAIL on the pre-registered criterion.
+
+    arm                                params  state   accuracy
+    A. k=2 recurrent-state gate          8768   4096   identical: 1.0000
+    B. single-channel (plain)            6656   2048   0.5040 +- 0.0180
+    C. single-channel MEMORY-matched    12800   4096   0.4998 +- 0.0178
+    D. single-channel PARAM-matched      8768   2752   0.5035 +- 0.0182
+    E. single-channel + gate features    9760   2048   identical: 1.0000
+    floor  (uniform gate)                6656   4096   0.5040 +- 0.0180
+    ceiling (perfect gate)               6656   4096   identical: 1.0000
+
+  margin (A - best matched control) = +0.0000 < EPS 0.05, on 10/10 seeds. A and E both
+  reach the ceiling on every seed; B, C and D sit at the floor on every seed.
+
+  What the panel shows, control by control:
+    * Resources buy NOTHING. C holds exactly A's memory AND 46% more parameters and
+      stays at the floor (0.4998). D holds exactly A's parameter count and stays at the
+      floor (0.5035). So the k=2 win is not "more stored state" and not "more weights".
+    * Channels are NOT the discriminating variable. E has ONE channel — with n_ch=1 the
+      gate's softmax is over a single logit, so it is identically 1.0 and cannot route
+      anything — yet E matches A exactly on every seed.
+
+  POST-HOC DIAGNOSTIC (run after the panel, recorded here rather than added to the
+  pre-registered arms). Arm E differs from arm A in two ways at once: it drops a channel
+  AND gains a readout path. Splitting those apart with E0 = recurrent gate, one channel,
+  gate_to_readout=False, over 5 seeds:
+
+      seed   B (none)   E0 (gate, no readout)   E (gate + readout)
+         0     0.4853                  0.4853               1.0000
+         4     0.5060                  0.5060               1.0000
+      mean     0.5046                  0.5046               1.0000
+
+  E0 is BITWISE equal to B on every seed: the gate alone is worth +0.0000, and the
+  readout path is worth +0.4954. So arm E ties arm A through a recurrent readout that
+  arm A does not have, not by showing A's routing is redundant inside A's own
+  architecture. This does not rescue the verdict — the criterion is mechanical and E is
+  a legitimate matched control — but it locates the effect precisely: what solves this
+  task is a recurrent pathway that can carry stream identity to the output. A gets one
+  by having the gate modulate routing; E gets one by having the gate feed the readout.
+  Neither needs two channels, and neither is bought with parameters or memory.
+
+  The honest summary is therefore stronger than "channels are a re-parameterization of
+  resources": on this task channels are not doing the work at all, and the task cannot
+  discriminate the multi-channel idea.
 """
 
 import argparse
