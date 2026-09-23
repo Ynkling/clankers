@@ -89,7 +89,50 @@ test_phase2_seeds.py: per-seed raw values before any aggregate, population std,
 "identical: X", failures recorded per seed and never dropped, PARTIAL labels. Results
 persist atomically to multilayer_binding_results.json.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT: UNTESTED. Gate 0 failed; the script stopped before the channel comparison.
+
+  Verification passed, bitwise where it could be: MultiBDH reproduced bdh.BDH's logits at
+  0.00e+00 for n_layer 1, 2, 3; RoPE scores equalled bdh.Attention's at 0.00e+00; the gate
+  equalled the instrument's bitwise; the perfect gate zeroed every cross-stream score
+  inside each of three layers.
+
+  GATE 0 GRID (S=1, P=4, n_q=4; query accuracy per seed; binds = every seed >= 0.95):
+    n_layer  pos   |    @1200          @2400          @4800          @9600      | binds
+       1     rope  | .271 .269 .290 | .276 .290 .285 | .270 .313 .284 | .281 .360 .276 | never
+       1     decay | .267 .312 .339 | .267 .324 .351 | .276 .330 .363 | .281 .342 .338 | never
+       2     rope  | .555 .567 .565 | .554 .559 .559 | .564 .543 .557 | .549 .565 .536 | never
+       2     decay | .369 .396 .422 | .438 .438 .472 | .471 .423 .494 | .485 .514 .518 | never
+       3     rope  | .533 .579 .545 | .558 .533 .559 | .575 .548 .546 | .557 .566 .571 | never
+       3     decay | .363 .379 .378 | .413 .493 .486 | .429 .534 .542 | .509 .555 .554 | never
+  One layer sits at ~1/P under both operators. Two or three layers reach ~0.55 and stop:
+  with RoPE the plateau is there at 1200 and unchanged at 9600 (8x the budget), depth 3
+  matches depth 2, and decay climbs more slowly to the same level.
+
+  POST-HOC DIAGNOSTIC — recorded here, not part of the pre-registered test. The ~0.55 is
+  NOT partial binding. Gate 0's configuration queries every key (n_q = S*P = 4, drawn
+  without replacement), so later queries can be answered by ELIMINATION: once earlier
+  answers are revealed, pick a body value not yet used. Accuracy by query position,
+  seed 0 at 2400 steps:
+      n_layer 1 rope   0.283  0.276  0.270  0.251    flat: no elimination, no binding
+      n_layer 2 rope   0.314  0.383  0.528  0.999    tracks 1/4, 1/3, 1/2, 1
+      n_layer 3 rope   0.334  0.383  0.527  1.000    the same
+  Elimination alone predicts ~0.25/0.33/0.50/1.00. The first query is the only one
+  elimination cannot touch, and there even three layers reach just 0.33 against a
+  non-binding guess among the body's values of ~0.28. Wrong answers are body values 96-98%
+  of the time. Multilayer BDH at this scale learned a set-difference across the sequence;
+  it did not learn to bind a key to the value that follows it.
+
+  The verdict is robust to this — a leak can only inflate accuracy, and nothing reached
+  0.95 — but any rerun of Gate 0 should score only elimination-free queries (the first
+  query, or n_q well below S*P). The pre-registered gate is left as it ran.
+
+  Candidate causes of the missing binding, as hypotheses for a next experiment rather than
+  findings: bdh.Attention ties Q and K (it asserts K is Q), so the query position
+  [prev=CTX, cur=KEY_q] is content-identical to the body position where KEY_q is the
+  current token, and the linear read mixes that position's own value with the value after
+  it; linear attention has no softmax with which to sharpen onto one position; and the
+  scale is small (D=32, N=64). Untying Q and K and re-running an elimination-free Gate 0
+  is the most direct test.
 """
 
 import argparse
