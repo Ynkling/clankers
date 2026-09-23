@@ -220,6 +220,26 @@ def perfect_gate_batched(tokens, dtype=torch.float32):
     return g
 
 
+def perfect_gate_general(tokens, ctx_tokens, dtype=torch.float32):
+    """
+    S-stream perfect gate: latch onto the most recent context token and emit the one-hot
+    for its stream index; before any context token has been seen, emit uniform 1/S.
+    With ctx_tokens=(CTX1, CTX2) this equals _perfect_gate exactly (proved by a CHECK in
+    test_binding_capacity.py). Only used when Instrument(ctx_tokens=...) is set.
+    """
+    B, T = tokens.shape
+    S = len(ctx_tokens)
+    idx = torch.arange(T).expand(B, T)
+    ctx_id = torch.full_like(tokens, -1)
+    for s, c in enumerate(ctx_tokens):
+        ctx_id = torch.where(tokens == c, torch.full_like(tokens, s), ctx_id)
+    last = torch.where(ctx_id >= 0, idx, torch.full_like(idx, -1)).cummax(dim=1).values
+    seen = (last >= 0).unsqueeze(-1)
+    stream = ctx_id.gather(1, last.clamp(min=0)).clamp(min=0)
+    onehot = F.one_hot(stream, S).to(dtype)
+    return torch.where(seen, onehot, torch.full_like(onehot, 1.0 / S))
+
+
 def decay_mask(T, decay, dtype=torch.float32):
     """M[t,s] = decay^(t-s) for s<t, else 0 — the parallel form of U = decay*I."""
     idx = torch.arange(T)
@@ -285,7 +305,8 @@ class Instrument(nn.Module):
     """
 
     def __init__(self, gate='recurrent', mode='sym', n_ch=k, decay=1.0, C=None,
-                 n_feat=None, gate_to_readout=False):
+                 n_feat=None, gate_to_readout=False, vocab=None, h_gate=None,
+                 ctx_tokens=None):
         """
         n_feat: width of the sparse feature dimension (Dx/Dy/E), i.e. the per-channel
             fast-weight state is n_feat x D. Defaults to the module's N, so the default
@@ -295,25 +316,35 @@ class Instrument(nn.Module):
             pre-existing ones and only when the flag is set, so the default path's RNG
             stream is untouched. Both knobs exist for test_capacity_control.py's
             resource-matched single-channel controls.
+        vocab: token vocabulary size (embed rows, head outputs). Defaults to V.
+        h_gate: recurrent-gate hidden width. Defaults to H_GATE.
+        ctx_tokens: context-token ids for an S-stream perfect gate; None keeps the
+            original two-stream perfect_gate_batched. None of these three creates a
+            parameter; at their defaults every shape and every random draw is as before.
+            They exist for test_binding_capacity.py, which proves them inert.
         """
         super().__init__()
         self.gate_kind, self.mode, self.n_ch, self.decay, self.C = gate, mode, n_ch, decay, C
         nf = N if n_feat is None else int(n_feat)
+        vv = V if vocab is None else int(vocab)
+        hg = H_GATE if h_gate is None else int(h_gate)
         self.n_feat, self.gate_to_readout = nf, bool(gate_to_readout)
-        self.embed = nn.Embedding(V, D)
+        self.vocab, self.h_gate = vv, hg
+        self.ctx_tokens = None if ctx_tokens is None else tuple(ctx_tokens)
+        self.embed = nn.Embedding(vv, D)
         self.Dx = nn.Parameter(torch.randn(D, nf) * 0.1)
         self.Dy = nn.Parameter(torch.randn(D, nf) * 0.1)
         self.E  = nn.Parameter(torch.randn(nf, D) * 0.1)
-        self.head = nn.Linear(D, V, bias=False)
+        self.head = nn.Linear(D, vv, bias=False)
         if gate == 'recurrent':
-            self.W_in = nn.Parameter(torch.randn(H_GATE, D) * 0.1)
-            self.W_h  = nn.Parameter(torch.randn(H_GATE, H_GATE) * 0.1)
-            self.W_g  = nn.Parameter(torch.randn(n_ch, H_GATE) * 0.1)
+            self.W_in = nn.Parameter(torch.randn(hg, D) * 0.1)
+            self.W_h  = nn.Parameter(torch.randn(hg, hg) * 0.1)
+            self.W_g  = nn.Parameter(torch.randn(n_ch, hg) * 0.1)
         elif gate == 'token':
             self.W_tok = nn.Parameter(torch.randn(D, n_ch) * 0.1)
         if self.gate_to_readout:
             assert gate == 'recurrent', "gate_to_readout needs the recurrent gate"
-            self.W_ro = nn.Parameter(torch.randn(D, H_GATE) * 0.1)
+            self.W_ro = nn.Parameter(torch.randn(D, hg) * 0.1)
 
     def gates(self, tokens, v, tau=None):
         if self.gate_kind == 'none':
@@ -323,11 +354,12 @@ class Instrument(nn.Module):
             g = torch.full((v.shape[0], v.shape[1], self.n_ch), 1.0 / self.n_ch, dtype=v.dtype)
             return g, g
         if self.gate_kind == 'perfect':
-            g = perfect_gate_batched(tokens, v.dtype)
+            g = (perfect_gate_batched(tokens, v.dtype) if self.ctx_tokens is None
+                 else perfect_gate_general(tokens, self.ctx_tokens, v.dtype))
             return g, g
         if self.gate_kind == 'recurrent':
             B, T, _ = v.shape
-            h = torch.zeros(B, H_GATE, dtype=v.dtype)
+            h = torch.zeros(B, self.h_gate, dtype=v.dtype)
             logits, hs = [], []
             for t in range(T):
                 h = torch.tanh(v[:, t] @ self.W_in.T + h @ self.W_h.T)
