@@ -245,8 +245,9 @@ def load_results(path):
         return blank
 
 
-def attempt(task, make_model, seed, data, **run_kw):
-    """One onset_run as a record; an exception or a non-finite curve becomes FAILED."""
+def attempt(task, make_model, seed, data, post=None, **run_kw):
+    """One onset_run as a record; an exception or a non-finite curve becomes FAILED.
+    post(model), if given, returns extra fields measured on the trained model."""
     ts = time.time()
     try:
         model, curve, _ = onset_run(task, make_model, seed, data=data, **run_kw)
@@ -255,6 +256,8 @@ def attempt(task, make_model, seed, data, **run_kw):
         rec = dict(ok=True, seed=seed, curve=curve, transition=transition(curve),
                    stopped_at=curve[-1][0] if curve else 0, params=n_params(model),
                    secs=time.time() - ts)
+        if post is not None:
+            rec.update(post(model))
     except Exception as e:
         rec = dict(ok=False, seed=seed, error=f"{type(e).__name__}: {e}",
                    traceback=traceback.format_exc()[-1500:], secs=time.time() - ts)
