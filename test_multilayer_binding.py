@@ -270,6 +270,28 @@ def n_state(m):
     return m.n_layers * m.n_ch * m.n_feat * D
 
 
+# ── Per-role gate cosines between streams ────────────────────────────────────
+def probe_batch(task, seed):
+    """The fixed probe batch run_ml's diagnostics use: its own generator, seed + 99_000."""
+    prng = torch.Generator(); prng.manual_seed(seed + 99_000)
+    ptok, _ = task.make_batch(PROBE_B, prng)
+    pinp = ptok[:, :-1]
+    return pinp, task.stream_labels(pinp), task.role_masks(pinp)
+
+
+def role_cosines(model, probe, step):
+    """Per role (ctx/key/val): cosine between the two streams' mean read gates."""
+    pinp, plab, prole = probe
+    with torch.no_grad():
+        _, _, gr, _ = model(pinp)
+        d = {"step": step}
+        for rn, rm in prole.items():
+            a = gr[(plab == 0) & rm].mean(0)
+            b = gr[(plab == 1) & rm].mean(0)
+            d[f"{rn}_cos"] = F.cosine_similarity(a.unsqueeze(0), b.unsqueeze(0)).item()
+        return d
+
+
 # ── Training: test_binding_capacity.run_bind's structure, for MultiBDH ──────
 def run_ml(task, arch, gate, n_ch, seed, iters, gate_to_readout=False, h_gate=None,
            mult=MULT, ckpts=None):
@@ -279,23 +301,13 @@ def run_ml(task, arch, gate, n_ch, seed, iters, gate_to_readout=False, h_gate=No
                      ctx_tokens=task.ctx_tokens)
     opt = torch.optim.Adam(model.parameters(), lr=LR)
     rng = torch.Generator(); rng.manual_seed(seed + 10_000)
-    prng = torch.Generator(); prng.manual_seed(seed + 99_000)
-    ptok, _ = task.make_batch(PROBE_B, prng)
-    pinp, plab = ptok[:, :-1], task.stream_labels(ptok[:, :-1])
+    probe = probe_batch(task, seed)
     if ckpts is None:
         ckpts = sorted({int(i * (iters - 1) / (N_CKPT - 1)) for i in range(N_CKPT)})
     trace = []
-    prole = task.role_masks(pinp)
 
     def diag(step):
-        with torch.no_grad():
-            _, _, gr, _ = model(pinp)
-            d = {"step": step}
-            for rn, rm in prole.items():
-                a = gr[(plab == 0) & rm].mean(0)
-                b = gr[(plab == 1) & rm].mean(0)
-                d[f"{rn}_cos"] = F.cosine_similarity(a.unsqueeze(0), b.unsqueeze(0)).item()
-            return d
+        return role_cosines(model, probe, step)
 
     for step in range(iters):
         if step in ckpts and n_ch > 1:
@@ -406,21 +418,22 @@ def arm(key, label, gate, n_ch, g2r=False, h_gate=None, mult=MULT):
                 mult=mult)
 
 
-def arms_for(task):
+def arms_for(task, mult=MULT, h_widths=E_H_WIDTHS):
+    """mult (N = mult * D) and h_widths are test_channel_binding's knobs; defaults = here."""
     S = task.S
     out = [
-        arm("floor", "floor    uniform gate, k=S", "uniform", S),
-        arm("ceiling", "ceiling  perfect gate, k=S", "perfect", S),
-        arm("A", "A        recurrent k=S, no readout", "recurrent", S),
-        arm("A_ro", "A_ro     recurrent k=S + readout", "recurrent", S, g2r=True),
-        arm("B", "B        plain single channel", "none", 1),
-        arm("E", "E        1ch + readout (h=32)", "recurrent", 1, g2r=True),
+        arm("floor", "floor    uniform gate, k=S", "uniform", S, mult=mult),
+        arm("ceiling", "ceiling  perfect gate, k=S", "perfect", S, mult=mult),
+        arm("A", "A        recurrent k=S, no readout", "recurrent", S, mult=mult),
+        arm("A_ro", "A_ro     recurrent k=S + readout", "recurrent", S, g2r=True, mult=mult),
+        arm("B", "B        plain single channel", "none", 1, mult=mult),
+        arm("E", "E        1ch + readout (h=32)", "recurrent", 1, g2r=True, mult=mult),
         arm("E_mem", "E_mem    1ch, width N*S + readout", "recurrent", 1, g2r=True,
-            mult=MULT * S),
+            mult=mult * S),
     ]
-    for h in E_H_WIDTHS:
+    for h in h_widths:
         out.append(arm(f"E_h{h}", f"E_h{h:<4}  1ch + readout, h_gate={h}", "recurrent", 1,
-                       g2r=True, h_gate=h))
+                       g2r=True, h_gate=h, mult=mult))
     return out
 
 
@@ -637,7 +650,10 @@ def accs(store, cfg, key, arch, it, seeds):
     return out
 
 
-def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note=""):
+def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note="",
+           arms_fn=None, flag_floor=True):
+    """arms_fn and flag_floor are test_channel_binding's knobs; defaults = here."""
+    arms_fn = arms_for if arms_fn is None else arms_fn
     print("#" * 100)
     print(("INTERIM REPORT" + partial_note) if partial_note else "FINAL REPORT")
     print("#" * 100)
@@ -650,7 +666,7 @@ def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note="")
         print("=" * 100)
         print(f"{t.label}   {'VALID' if ex['valid'] else 'EXCLUDED — ' + ex['reason']}")
         print("=" * 100)
-        keys = [a["key"] for a in arms_for(t)]
+        keys = [a["key"] for a in arms_fn(t)]
         W = 9
         print("  PER-SEED RAW ACCURACY — every value, before any aggregate")
         print("  seed " + "".join(f"{kk:>{W}}" for kk in keys))
@@ -668,19 +684,24 @@ def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note="")
                 print(f"    {kk:>5}: " + "  ".join("--" if v is None else f"{v:.4f}" for v in vc))
         chance = 1.0 / t.S
         fl = accs(store, t.key, "floor", arch, it, seeds)
-        flags = []
-        for s, f in zip(seeds, fl):
-            if f is None:
-                continue
-            if f > chance + FLOOR_FLAG:
-                flags.append(f"seed {s}: floor {f:.4f} RISES more than {FLOOR_FLAG} above 1/S")
-        print(f"  floor vs 1/S = {chance:.3f}: {'no seed rises above it' if not flags else ''}")
-        for f in flags:
-            print(f"    FLAG {f}")
+        if flag_floor:
+            flags = []
+            for s, f in zip(seeds, fl):
+                if f is None:
+                    continue
+                if f > chance + FLOOR_FLAG:
+                    flags.append(f"seed {s}: floor {f:.4f} RISES more than {FLOOR_FLAG} above 1/S")
+            print(f"  floor vs 1/S = {chance:.3f}: {'no seed rises above it' if not flags else ''}")
+            for f in flags:
+                print(f"    FLAG {f}")
+        else:
+            print(f"  floor vs 1/S = {chance:.3f} (reported, not flagged): "
+                  + "  ".join(f"seed {s} {'--' if f is None else format(f, '.4f')}"
+                              for s, f in zip(seeds, fl)))
         print()
         print(f"  {'arm':<36} {'params':>7} {'state':>7} {'accuracy mean +- std':>24} "
               f"{'min':>7} {'max':>7} {'n':>3}")
-        for a in arms_for(t):
+        for a in arms_fn(t):
             kk = a["key"]
             xs = accs(store, t.key, kk, arch, it, seeds)
             nf = sum(1 for s in seeds if get_run(store, t.key, kk, arch, it, s) is not None
@@ -710,7 +731,7 @@ def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note="")
     print()
     attempted = completed = 0
     for t in valid:
-        for a in arms_for(t):
+        for a in arms_fn(t):
             for s in seeds:
                 attempted += 1
                 r = get_run(store, t.key, a["key"], arch, it, s)
@@ -719,7 +740,7 @@ def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note="")
           + ("   *** PARTIAL SWEEP ***" if (completed < attempted or partial_note) else ""))
     if completed < attempted:
         for t in valid:
-            for a in arms_for(t):
+            for a in arms_fn(t):
                 for s in seeds:
                     r = get_run(store, t.key, a["key"], arch, it, s)
                     if r is None:
@@ -773,7 +794,7 @@ def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note="")
     if not valid:
         print("  none: no valid config.")
     else:
-        keys = [a["key"] for a in arms_for(valid[0])]
+        keys = [a["key"] for a in arms_fn(valid[0])]
         print("  mean accuracy vs P (valid configs only):")
         print(f"  {'arm':>8}" + "".join(f"{'P=' + str(t.P):>10}" for t in valid))
         means = {}
@@ -795,6 +816,7 @@ def report(store, tasks, seeds, arch, it, g1, info, wall, path, partial_note="")
             return None
         print(f"  first P at which each readout width falls below {E_DROP}:")
         widths = [("E", H_GATE)] + [(f"E_h{h}", h) for h in E_H_WIDTHS]
+        widths = [(kk, h) for kk, h in widths if kk in means]     # arms_fn may drop a width
         drops = []
         for kk, h in widths:
             p = first_below(kk)
