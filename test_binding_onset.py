@@ -191,12 +191,15 @@ def evaluate(model, task, data):
 
 
 def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY,
-              data=None, early_stop=True, lr=LR, warmup=0, param_groups=None, on_eval=None):
+              data=None, early_stop=True, lr=LR, warmup=0, param_groups=None, on_eval=None,
+              grad_hook=None, post_step=None):
     """run_ml's training recipe, run long, with periodic held-out evaluation.
     lr and warmup (linear over the first `warmup` steps) are test_binding_recipe's knobs;
     with warmup=0 the param-group lr is never touched after the optimizer is built.
     param_groups(model) -> Adam groups, and on_eval(model, step), called right after each
-    held-out evaluation, are test_router_discovery's knobs; None = unchanged."""
+    held-out evaluation, are test_router_discovery's knobs; grad_hook(model, step), run after
+    loss.backward() and before opt.step(), and post_step(model, step), run right after
+    opt.step() (before that step's evaluation), are test_router_curriculum's. None = unchanged."""
     torch.manual_seed(seed)
     model = make_model()
     if param_groups is None:
@@ -214,7 +217,12 @@ def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY
         inp, tgt = tokens[:, :-1], tokens[:, 1:]
         ql, qt, _ = task.select(logits_of(model, inp), tgt, None)
         loss = F.cross_entropy(ql, qt)
-        opt.zero_grad(); loss.backward(); opt.step()
+        opt.zero_grad(); loss.backward()
+        if grad_hook is not None:
+            grad_hook(model, step)
+        opt.step()
+        if post_step is not None:
+            post_step(model, step)
         if data is not None and step % eval_every == 0:
             acc, el = evaluate(model, task, data)
             curve.append([step, acc, el])
