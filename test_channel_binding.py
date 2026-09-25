@@ -69,7 +69,38 @@ run to MAX_ITERS, stage by stage); over 8 hours, P=16 is dropped first, then E_h
 that is said. Results persist atomically to channel_binding_results.json (gitignored).
 Seed-level outcomes differ between machines.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz, 4 workers x 1 thread;
+121 min after verification).
+  Projection: full design 16.8 h on 4 workers (> 8 h) -> P=16 DROPPED; the rest projected
+  7.2 h, so E_h128 was kept.
+  Gate 0: S=1 P=4 bound 3/3 (all at step 1200). S=1 P=8 did NOT bind every seed on this
+  machine (@37200, @28800, seed 2 at 0.905 after 38400 steps) -> P=8 EXCLUDED. (The other
+  machine bound P=8 5/5.)
+  Gate 1 at P=4: ceiling bound 5/5 (@2400 @1200 @1200 @4800 @2400); the recurrent gate
+  fits the perfect routing exactly (mse 0.00000, argmax 1.0000) -> P4 VALID, the only
+  scored config.
+
+  PRE-REGISTERED VERDICT: NOT SUPPORTED. At P=4 the best channel arm (A_ro 0.5018) beats
+  the best control (E_mem 0.5003) by +0.0015 < EPS, not on every seed, and does not
+  separate (VAL cosine >= 0.9997 on every seed).
+
+    P=4, S=2, 5 seeds, accuracy mean +- std (every seed ran the full 38400 steps unless noted)
+      floor   0.5001 +- 0.0085      B       0.4996 +- 0.0128
+      ceiling 0.9999 +- 0.0002 (all bound)
+      A       0.4971 +- 0.0147      E       0.4984 +- 0.0101
+      A_ro    0.5018 +- 0.0180      E_mem   0.5003 +- 0.0103
+                                    E_h64   0.4890 +- 0.0202
+                                    E_h128  0.4949 +- 0.0168
+
+  In substance: every arm but the ceiling reached 0.50 = 1/S by step 13200 and stayed
+  there (A_ro seed 3 collapsed briefly twice, to 0.06 and 0.10, and recovered): each binds a key to its two candidate values but cannot pick the queried
+  stream's. The perfect gate turns that into 1.00, so channels CAN resolve this
+  interference; the learned recurrent gate never found the routing (KEY and VAL cosines
+  >= 0.998 on every seed) although the same gate fits that routing exactly when it is the
+  training target. What fails is discovering the routing from the task loss, not
+  expressing it. Attention alone did not resolve the interference either: floor and B sit
+  at 1/S, not above it. The readout controls (E, E_mem, E_h64, E_h128) sit at 1/S too, so
+  the width diagnostic is uninformative with one valid P.
 """
 
 import argparse
