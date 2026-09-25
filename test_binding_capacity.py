@@ -90,7 +90,28 @@ test_phase2_seeds.py: per-seed raw values before any aggregate, population std,
 seed and never dropped, PARTIAL labels on incomplete sweeps. Results persist atomically
 to binding_capacity_results.json after every run.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full 5-seed rerun, every config complete).
+  Mechanical verdict: NOT SUPPORTED — the only valid config is C0, and E ties A there.
+  In substance: UNTESTED. Every new-task config failed expressibility: the perfect-gate
+  ceiling stayed below 0.95 at every rung up to 4800 steps, so the question this test was
+  built for was never asked of an architecture that could answer it.
+
+    mean accuracy over 5 seeds (C0 at 1200 steps, new-task configs at 4800):
+    config  floor  ceiling    B      A     A_ro    E    E_mem  E_wide
+      C0    0.502  1.000    0.502  1.000  1.000  1.000  1.000  1.000
+      P4    0.153  0.281    0.154  0.288  0.304  0.168  0.169  0.171
+      P8    0.121  0.159    0.120  0.161  0.171  0.129  0.144  0.135
+      P16   0.129  0.148    0.124  0.146  0.151  0.122  0.126  0.122
+      P32   0.102  0.130    0.106  0.121  0.129  0.104  0.108  0.101
+
+  The recurrent gate fitted perfect routing on every config (argmax 1.000); separation
+  was never the problem. The ceiling sits near 1/P at P=4 because stream separation
+  narrows a query to its stream's P values but nothing binds a key to the value after
+  it. Arm E (single channel + recurrent readout) scored 0.168 at P=4, BELOW the 0.281
+  perfect-gate ceiling — so the RNN readout did not supply the binding either. The
+  one-layer instrument cannot bind by any route it has: not through its Hebbian memory,
+  whose write stores (x_s -> v_s) for the same token, and not through the readout. The
+  channel-vs-readout question moved to test_multilayer_binding.py.
 """
 
 import argparse
