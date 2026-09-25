@@ -191,13 +191,19 @@ def evaluate(model, task, data):
 
 
 def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY,
-              data=None, early_stop=True, lr=LR, warmup=0):
+              data=None, early_stop=True, lr=LR, warmup=0, param_groups=None, on_eval=None):
     """run_ml's training recipe, run long, with periodic held-out evaluation.
     lr and warmup (linear over the first `warmup` steps) are test_binding_recipe's knobs;
-    with warmup=0 the param-group lr is never touched after the optimizer is built."""
+    with warmup=0 the param-group lr is never touched after the optimizer is built.
+    param_groups(model) -> Adam groups, and on_eval(model, step), called right after each
+    held-out evaluation, are test_router_discovery's knobs; None = unchanged."""
     torch.manual_seed(seed)
     model = make_model()
-    opt = torch.optim.Adam(model.parameters(), lr=lr)
+    if param_groups is None:
+        opt = torch.optim.Adam(model.parameters(), lr=lr)
+    else:
+        assert warmup == 0, "param_groups sets per-group lrs; warmup would overwrite them"
+        opt = torch.optim.Adam(param_groups(model), lr=lr)
     rng = torch.Generator(); rng.manual_seed(seed + 10_000)
     curve, streak = [], 0
     for step in range(1, max_iters + 1):
@@ -212,6 +218,8 @@ def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY
         if data is not None and step % eval_every == 0:
             acc, el = evaluate(model, task, data)
             curve.append([step, acc, el])
+            if on_eval is not None:
+                on_eval(model, step)
             streak = streak + 1 if acc >= BIND_PASS else 0
             if early_stop and streak >= STOP_AFTER:
                 break
