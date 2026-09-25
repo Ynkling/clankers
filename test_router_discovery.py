@@ -115,6 +115,21 @@ RESULT (full run, 60/60 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2
     A_ro on this machine is 1/10 over seeds 0-9; the other machine's A_ro was 1/5.
   - The scratch diagnostic's nudge successes (seeds 0, 1, 2 at 2400, 2400, 7200) were on
     arm A on the other machine; here, on A_ro, seeds 0, 1 and 2 stayed at 0.48-0.51.
+
+POST-HOC (added after the result; it does not change the INVALID verdict above).
+  The positive control failed because of the arm, not the machine; the verdict line's "does
+  not reproduce on this machine" names the wrong cause.
+  - Scratch runs on one machine, same seeds 0 and 1, same 5% nudge: on A (no readout) the
+    lean grew, sep 0.05 -> 0.42 and 0.36 by step 100, and both bound by 2400. On A_ro it
+    was erased, sep 0.05 -> 0.011 and 0.005 by step 100 while spread rose; both were at
+    0.26-0.28 accuracy at step 2400.
+  - Mechanism: A_ro's readout gives the gate's recurrent state a first-order gradient (at
+    step 1 the gate gradient is ~10x A's), which moves the gate off uniform along non-stream
+    splits before the stream lean can grow.
+  - This test's own stats agree: on both machines A_ro's gate hardened within 1200 steps
+    (spread 0.16-0.89) without separating streams. "Stuck at uniform" describes arm A only;
+    A_ro's failures are commitments to the wrong split. test_router_curriculum.py takes the
+    question to arm A.
 """
 
 import argparse
@@ -310,14 +325,15 @@ def load_at(sha, fname, modname):
     return mod
 
 
-def load_legacy_pair():
-    """test_multilayer_binding and test_binding_onset at LEGACY_SHA, the onset module bound to
-    the legacy multilayer module (not to the current one)."""
-    leg_ml = load_at(LEGACY_SHA, "test_multilayer_binding.py", "test_multilayer_binding")
+def load_legacy_pair(sha=None):
+    """test_multilayer_binding and test_binding_onset at sha (default LEGACY_SHA), the onset
+    module bound to the legacy multilayer module (not to the current one)."""
+    sha = LEGACY_SHA if sha is None else sha
+    leg_ml = load_at(sha, "test_multilayer_binding.py", "test_multilayer_binding")
     saved = sys.modules["test_multilayer_binding"]
     sys.modules["test_multilayer_binding"] = leg_ml
     try:
-        leg_on = load_at(LEGACY_SHA, "test_binding_onset.py", "test_binding_onset_legacy")
+        leg_on = load_at(sha, "test_binding_onset.py", "test_binding_onset_legacy")
     finally:
         sys.modules["test_multilayer_binding"] = saved
     return leg_ml, leg_on
