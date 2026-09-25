@@ -227,7 +227,7 @@ class MultiBDH(BDH):
 
     def __init__(self, vocab, n_layer, gate="none", n_ch=1, positional="rope",
                  gate_to_readout=False, h_gate=None, mult=MULT, ctx_tokens=None,
-                 decay=OPERATING_DECAY):
+                 decay=OPERATING_DECAY, gate_ln=False, gate_noise=0.0, noise_seed=None):
         cfg = BDHConfig(n_layer=n_layer, n_embd=D, dropout=0.0, n_head=1,
                         mlp_internal_dim_multiplier=mult, vocab_size=vocab)
         super().__init__(cfg)
@@ -249,10 +249,24 @@ class MultiBDH(BDH):
         if self.gate_to_readout:
             assert gate == "recurrent", "gate_to_readout needs the recurrent gate"
             self.W_ro = nn.Parameter(torch.randn(D, hg) * 0.1)
+        # test_router_discovery's knobs, inert at their defaults and drawing nothing from the
+        # global RNG: gate_ln layer-normalises the gate's input (not the BDH stack's);
+        # gate_noise adds sigma*N(0,1) to the gate logits in training forwards only, drawn
+        # from this model's own generator.
+        self.gate_ln, self.gate_noise = bool(gate_ln), float(gate_noise)
+        self.noise_gen = (None if noise_seed is None
+                          else torch.Generator().manual_seed(int(noise_seed)))
+        assert self.gate_noise == 0.0 or self.noise_gen is not None, \
+            "gate_noise needs noise_seed"
 
     def forward(self, tokens, tau=None, track_sat=False):
         v = self.embed(tokens)
-        gr, gw = Instrument.gates(self, tokens, v, tau)          # the instrument's own code
+        vg = F.layer_norm(v, (v.shape[-1],)) if self.gate_ln else v
+        gr, gw = Instrument.gates(self, tokens, vg, tau)         # the instrument's own code
+        if self.gate_noise > 0 and self.training:
+            eps = torch.randn(gr.shape, generator=self.noise_gen, dtype=gr.dtype)
+            gr = F.softmax(torch.log(gr) + self.gate_noise * eps, dim=-1)
+            gw = gr                                               # read and write alike
         self.attn.G = (None if self.gate_kind == "none"
                        else torch.einsum("btk,bsk->bts", gr, gw).unsqueeze(1))
         logits, _ = BDH.forward(self, tokens)                     # bdh's own layer loop
@@ -443,10 +457,11 @@ CONTROL_ARMS = ("B", "E", "E_mem") + tuple(f"E_h{h}" for h in E_H_WIDTHS)
 
 
 def build(task, a, arch, seed=0):
+    """An arm may carry "model_kw" (test_router_discovery's MultiBDH knobs)."""
     torch.manual_seed(seed)
     return MultiBDH(task.vocab, arch["n_layer"], a["gate"], a["n_ch"], arch["positional"],
                     gate_to_readout=a["g2r"], h_gate=a["h_gate"], mult=a["mult"],
-                    ctx_tokens=task.ctx_tokens)
+                    ctx_tokens=task.ctx_tokens, **a.get("model_kw", {}))
 
 
 # ── Verification ─────────────────────────────────────────────────────────────
