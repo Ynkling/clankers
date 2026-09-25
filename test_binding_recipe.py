@@ -100,6 +100,17 @@ workers x 1 thread; 121 min after verification).
     rope lr=1e-3 N=256 warmup=1000   2/5  (@20400, @9600; others 0.761, 0.323, 0.324)
   The reliable config does not carry to P=8: the channel test should run at P=4, or
   confirm a wider N at P=8 on its own first.
+
+  Other machine (reported by the user, not rerun here): the same verdict, RELIABLE CONFIG
+  rope lr=1e-3 N=256, 10/10 at step 1200. Its P=8 check covered four cells: rope N=256
+  1/5, rope N=256 + warmup 3/5, rope N=1024 4/5, decay N=256 5/5 (single-stream binding
+  took up to 28800 steps). On this machine decay lr=1e-3 N=256 bound 3/3 at step 1200 in
+  Stage A but lost the Stage-B tie-break, so it was never confirmed here or run at P=8.
+
+  SUBSTRATE CHOSEN for test_channel_binding.py: decay, lr=1e-3, N=256 (mult=8), the only
+  cell that bound every seed at both P=4 and P=8 on the other machine. That test's Gate 0
+  checks, on the machine it runs on, that this substrate binds a single stream at every P
+  it scores.
 """
 
 import argparse
