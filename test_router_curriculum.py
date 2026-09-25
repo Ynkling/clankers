@@ -69,7 +69,29 @@ LOGISTICS. Parallel single-thread workers as in test_binding_recipe.py; wall clo
 before training (no drop rule). Results persist atomically to router_curriculum_results.json
 (gitignored). Seed-level outcomes differ between machines.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 60/60 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 81 min after verification; no --also file, so not pooled).
+  PRE-REGISTERED VERDICT: PARTIAL. The positive control is valid (A_nudge 9/10, all by
+  7200; seed 8 locked on keys). Best candidate A_late_ln 7/10 (seeds 0,2,3,5,6,7,8);
+  A_late 6/10 (seeds 0,2,4,6,7,8). Never candidates: A 4/10, A_ln 7/10, B bound 0/10.
+
+  Diagnostics (not part of the verdict):
+  - The precondition held: held-out accuracy at T was 0.445-0.508 in all 20 curriculum
+    runs. The re-init left the gate near uniform and unseparated (sep <= 0.016; spread
+    0.015-0.043 without LayerNorm, 0.088-0.264 with it). Escapes came T+1200 to T+6000,
+    one at T+10800 (A_late seed 6); every escape coincided with the transition.
+  - The curriculum's effect is not separated from its controls with 10 seeds: A_late 6/10
+    vs A 4/10, and A_late_ln 7/10 vs A_ln 7/10 exactly. LayerNorm on the gate input alone,
+    from step 0, discovered as often as with the curriculum, and early (escape at the
+    first evaluation, transitions 1200-6000).
+  - A's 4/10 is not in tension with test_channel_binding's A 0/5 on this machine: seeds
+    0-4 fail here too; A's successes are seeds 6, 7, 9 (bound at 2400) and 8 (15600),
+    seeds the channel test never ran. On seed 9 the curriculum turned an early
+    spontaneous success into a failure (A bound at 2400; A_late and A_late_ln did not).
+  - How runs failed differs with the curriculum: none of the 7 non-discovering curriculum
+    runs locked on keys (key_part <= 0.71; 2 left near uniform, spread < 0.1, the rest
+    weakly spread and unseparated), while 4 of the 9 non-discovering A and A_ln runs
+    locked on keys (key_part >= 0.999 in 3 of them).
 """
 
 import argparse
