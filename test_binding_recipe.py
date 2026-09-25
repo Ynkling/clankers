@@ -59,7 +59,47 @@ is said. Stage A is reported before Stage B starts. Results persist atomically a
 run to binding_recipe_results.json (gitignored); its meta records the torch version, CPU
 model, worker and thread counts. Seed-level outcomes differ between machines.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, nothing dropped, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz, 4
+workers x 1 thread; 121 min after verification).
+  PRE-REGISTERED VERDICT: RELIABLE CONFIG — positional=rope, lr=1e-3, mult=8 (N=256),
+  warmup=0: 10/10 seeds bound, every transition at step 1200.
+  RECOMMENDED BUDGET = ceil(1.25 x 1200 / 1200) x 1200 = 2400 steps.
+
+  Stage A, seeds bound of 3 (19200 steps):
+                    N=64  N=256  N=1024
+    rope  lr=1e-3    2/3   3/3    3/3
+    rope  lr=2e-3    1/3   2/3    3/3
+    rope  lr=4e-3    1/3   3/3    3/3       <- lr=4e-3 N=64 is test_binding_onset.py's
+    rope  lr=8e-3    0/3   2/3    1/3          setting: seed 2 at 3600 again, as
+    decay lr=1e-3    2/3   3/3    3/3          determinism predicts
+    decay lr=2e-3    0/3   3/3    3/3
+    decay lr=4e-3    0/3   3/3    1/3
+    decay lr=8e-3    0/3   0/3    0/3
+  Marginals: N=64 6/24, N=256 19/24, N=1024 17/24; lr 1e-3 16/18, 2e-3 12/18, 4e-3 11/18,
+  8e-3 3/18; rope 24/36, decay 18/36. Width and a lower lr move BDH from rare binding to
+  routine binding; the positional operator matters less. Non-binders still sit on the
+  same flat plateaus (~0.33, ~0.53, ~0.76) joined by abrupt jumps; no setting removed them.
+
+  Stage B, 10 seeds (38400 steps):
+    rope lr=1e-3 N=256               10/10  all @1200
+    rope lr=1e-3 N=1024              10/10  all @1200
+    rope lr=4e-3 N=1024               9/10  seed 3 stayed at 0.530; seeds 4 and 7 bound
+                                            late (19200, 9600) -> NOT RELIABLE
+    rope lr=1e-3 N=256 warmup=1000   10/10  all @1200
+  Selection note: five Stage-A cells tied on every ranking key (3/3, median 1200, max
+  1200); the pre-registered grid-order tie-break took the three rope cells, so
+  decay lr=1e-3 at N=256 and N=1024 were never confirmed. In Stage B three cells tied at
+  max 1200; the rule took the first, N=256, also the cheapest (~19 ms/step vs ~57).
+  Every transition in the chosen cell is at the first evaluation, so the 1200-step
+  evaluation grid cannot say how early within those steps binding happens; warmup had
+  nothing to improve on.
+
+  P=8 CHECK (informational, 5 seeds, 38400 steps):
+    rope lr=1e-3 N=256               2/5  (@12000, @7200; others 0.266, 0.257, 0.341)
+    rope lr=1e-3 N=1024              4/5  (@4800, @3600, @3600, @7200; seed 3 at 0.327)
+    rope lr=1e-3 N=256 warmup=1000   2/5  (@20400, @9600; others 0.761, 0.323, 0.324)
+  The reliable config does not carry to P=8: the channel test should run at P=4, or
+  confirm a wider N at P=8 on its own first.
 """
 
 import argparse
