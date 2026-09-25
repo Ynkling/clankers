@@ -53,7 +53,37 @@ LOGISTICS. Wall clock is projected before the sweep; over WALL_LIMIT_H, n_layer=
 dropped and that is said. Failures (exception or non-finite) are recorded per run and
 never dropped. Results persist atomically to binding_onset_results.json after every run.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 5 seeds, every run complete, no failures; torch 2.14.0, 1 thread, Intel
+Xeon @ 2.10GHz; 122 min).
+  Mechanical: NO RELIABLE CONFIG. Most seeds bound: n_layer=3 rope, 1/5 = 20%.
+
+    config                   bound  per-seed transition           final held-out acc
+    primary n_q=1  L2 decay   0/5   never x5                      0.3195 +- 0.0096
+    primary n_q=1  L2 rope    0/5   never x5                      0.4587 +- 0.1785
+    primary n_q=1  L3 decay   0/5   never x5                      0.4453 +- 0.0965
+    primary n_q=1  L3 rope    1/5   never never 3600 never never  0.4996 +- 0.2627
+    primary n_q=1  L4 decay   0/5   never x5                      0.4111 +- 0.1052
+    primary n_q=1  L4 rope    0/5   never x5                      0.4943 +- 0.1614
+    secondary n_q=4 L3 decay  0/5   never x5                      0.5782 +- 0.0427
+    reference transformer     5/5   1200 x5                       identical: 1.0000
+
+  BDH bound in 1 of 35 runs within 38400 steps on this machine (L3 rope seed 2: 0.52, 0.76,
+  then 1.00 from step 3600). The machine that produced the original binding reported 4 of
+  35 for the same test; seed-level outcomes are machine-dependent. The 29 primary
+  non-binders sit on flat plateaus, not slow climbs: final accuracy < 0.43 in 18 runs
+  (~0.33), 0.43-0.65 in 9 (~0.53), 0.65-0.95 in 2 (~0.76). Moves between plateaus are
+  abrupt jumps (L2 rope seed 0: 0.52-0.56 for 19 evaluations, then 0.77 from step 25200). The
+  only binding happened by step 3600; no run still on a plateau at step 6000 bound later.
+  Secondary: n_q=4 bound 0/5 as well, including seed 0, which bound at 9600 steps on the
+  other machine; this run tells nothing about whether elimination speeds or delays
+  binding.
+  Reproduction: the exact Gate 0 code path gives 1042/2048 (0.5088, loss 1.066) here,
+  identical to this project's first run, vs 2048/2048 on the other machine: that binding
+  does not reproduce on this machine.
+  Reference: the 2-layer causal softmax transformer bound 5/5 by its first evaluation
+  (step 1200) — the task is easy for softmax attention with the same recipe.
+  Next: test_binding_recipe.py asks whether ordinary training settings (lr, N, warmup)
+  make native BDH bind on every seed.
 """
 
 import argparse
