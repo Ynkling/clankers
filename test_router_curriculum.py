@@ -191,7 +191,9 @@ def curriculum(a, seed, T, probe, data, out):
 # ── Worker-side ──────────────────────────────────────────────────────────────
 def run_spec(sp):
     """One arm, one seed: test_router_discovery.run_spec's record, plus the curriculum."""
-    task, a, seed, T = TASK, ARM[sp["arm"]], sp["seed"], sp["T"]
+    # sp may carry the arm itself as "arm_def" (test_router_confirm's E_mem); else by name.
+    a = sp["arm_def"] if "arm_def" in sp else ARM[sp["arm"]]
+    task, seed, T = TASK, sp["seed"], sp["T"]
     chan = a["n_ch"] > 1
     probe = probe_batch(task, seed) if chan else None
     data = eval_batch(task)
@@ -227,8 +229,9 @@ def run_spec(sp):
 
 
 def time_arm(key):
-    """ms/step with evaluation charged once per EVAL_EVERY, plus a fixed per-run cost."""
-    a = ARM[key]
+    """ms/step with evaluation charged once per EVAL_EVERY, plus a fixed per-run cost.
+    key is an arm name, or an arm dict (test_router_confirm's E_mem)."""
+    a = key if isinstance(key, dict) else ARM[key]
     t0 = time.time()
     make_fn(a, 0)()
     fixed = time.time() - t0 if a.get("nudge") else 0.0
