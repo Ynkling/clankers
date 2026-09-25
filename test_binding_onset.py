@@ -156,10 +156,11 @@ class CausalTransformer(nn.Module):
         return (self.head(self.ln(h)),)
 
 
-def make_bdh(task, n_layer, positional):
-    """Exactly the model run_ml builds for Gate 0's single-channel, ungated arm."""
+def make_bdh(task, n_layer, positional, mult=MULT):
+    """Exactly the model run_ml builds for Gate 0's single-channel, ungated arm.
+    mult sets N = mult * D (test_binding_recipe); the default is Gate 0's N=64."""
     return lambda: MultiBDH(task.vocab, n_layer, "none", 1, positional,
-                            gate_to_readout=False, h_gate=None, mult=MULT,
+                            gate_to_readout=False, h_gate=None, mult=mult,
                             ctx_tokens=task.ctx_tokens)
 
 
@@ -190,14 +191,19 @@ def evaluate(model, task, data):
 
 
 def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY,
-              data=None, early_stop=True):
-    """run_ml's training recipe, run long, with periodic held-out evaluation."""
+              data=None, early_stop=True, lr=LR, warmup=0):
+    """run_ml's training recipe, run long, with periodic held-out evaluation.
+    lr and warmup (linear over the first `warmup` steps) are test_binding_recipe's knobs;
+    with warmup=0 the param-group lr is never touched after the optimizer is built."""
     torch.manual_seed(seed)
     model = make_model()
-    opt = torch.optim.Adam(model.parameters(), lr=LR)
+    opt = torch.optim.Adam(model.parameters(), lr=lr)
     rng = torch.Generator(); rng.manual_seed(seed + 10_000)
     curve, streak = [], 0
     for step in range(1, max_iters + 1):
+        if warmup > 0:
+            for g in opt.param_groups:
+                g["lr"] = lr * min(1.0, step / warmup)
         tokens, _ = task.make_batch(BATCH, rng)
         inp, tgt = tokens[:, :-1], tokens[:, 1:]
         ql, qt, _ = task.select(logits_of(model, inp), tgt, None)
@@ -239,16 +245,11 @@ def load_results(path):
         return blank
 
 
-def do_run(store, path, group, name, task, make_model, seed, data, force, t0):
-    key = f"{group}|{name}|{seed}"
-    cached = store["runs"].get(key)
-    if cached is not None and not force:
-        print(f"   {group} {name:<10} seed {seed}  cached "
-              f"({'ok' if cached.get('ok') else 'FAILED'})")
-        return cached
+def attempt(task, make_model, seed, data, **run_kw):
+    """One onset_run as a record; an exception or a non-finite curve becomes FAILED."""
     ts = time.time()
     try:
-        model, curve, _ = onset_run(task, make_model, seed, data=data)
+        model, curve, _ = onset_run(task, make_model, seed, data=data, **run_kw)
         if not all(math.isfinite(a) and math.isfinite(l) for _, a, l in curve):
             raise ValueError("non-finite accuracy or loss in the curve")
         rec = dict(ok=True, seed=seed, curve=curve, transition=transition(curve),
@@ -257,8 +258,24 @@ def do_run(store, path, group, name, task, make_model, seed, data, force, t0):
     except Exception as e:
         rec = dict(ok=False, seed=seed, error=f"{type(e).__name__}: {e}",
                    traceback=traceback.format_exc()[-1500:], secs=time.time() - ts)
+    return rec
+
+
+def do_run(store, path, group, name, task, make_model, seed, data, force, t0):
+    key = f"{group}|{name}|{seed}"
+    cached = store["runs"].get(key)
+    if cached is not None and not force:
+        print(f"   {group} {name:<10} seed {seed}  cached "
+              f"({'ok' if cached.get('ok') else 'FAILED'})")
+        return cached
+    rec = attempt(task, make_model, seed, data)
     store["runs"][key] = rec
     save_results(path, store)
+    print_run(group, name, seed, rec, t0)
+    return rec
+
+
+def print_run(group, name, seed, rec, t0):
     el = (time.time() - t0) / 60
     if rec["ok"]:
         last = rec["curve"][-1] if rec["curve"] else [0, float("nan"), float("nan")]
@@ -269,7 +286,6 @@ def do_run(store, path, group, name, task, make_model, seed, data, force, t0):
     else:
         print(f"   {group} {name:<10} seed {seed}  *** FAILED: {rec['error']}   "
               f"(elapsed {el:.1f}m)")
-    return rec
 
 
 # ── Verification ─────────────────────────────────────────────────────────────
@@ -384,6 +400,16 @@ def fmt_step(x):
     return "--" if x is None else f"{x:.0f}"
 
 
+def curve_row(r):
+    """Held-out accuracy x100 per evaluation, '|' before the transition."""
+    cells = []
+    for step, acc, _ in r["curve"]:
+        mark = "|" if r["transition"] == step else " "
+        cells.append(f"{mark}{round(acc * 100):>3}")
+    tr = r["transition"]
+    return "".join(cells) + f"   -> {'bound @' + str(tr) if tr else 'not bound'}"
+
+
 def report(store, seeds, layers, wall, path):
     print("#" * 100)
     print("SUMMARY — printed mechanically")
@@ -472,13 +498,7 @@ def report(store, seeds, layers, wall, path):
             if not r.get("ok"):
                 print(f"  {group} {name:<10} s{s}  FAILED — {r['error']}")
                 continue
-            cells = []
-            for step, acc, _ in r["curve"]:
-                mark = "|" if r["transition"] == step else " "
-                cells.append(f"{mark}{round(acc * 100):>3}")
-            tr = r["transition"]
-            print(f"  {group} {name:<10} s{s} " + "".join(cells)
-                  + f"   -> {'bound @' + str(tr) if tr else 'not bound'}")
+            print(f"  {group} {name:<10} s{s} " + curve_row(r))
     print()
     print(f"  total wall clock this invocation: {wall / 60:.1f} min ({wall:.0f}s)")
     print(f"  raw records: {path}")
