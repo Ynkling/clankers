@@ -170,7 +170,7 @@ TASKS.update({lay: BindTask(TASK.P, S=TASK.S, n_vals=TASK.n_vals, n_q=TASK.n_q, 
               for lay in NEW_LAYOUTS})
 _BASE = {a["key"]: a for a in cb_arms(TASK)}
 A = trc.ARM["A"]
-ARMS = [dict(A, key=f"A_{lay}", layout=lay, label=f"A_{lay:<16} arm A, {lay} layout")
+ARMS = [dict(A, key=f"A_{lay}", layout=lay, label=f"{'A_' + lay:<16} arm A, {lay} layout")
         for lay in LAYOUTS] + [
     dict(_BASE["B"], key="B_blocked", layout="blocked", label="B_blocked        single channel"),
     dict(_BASE["B"], key="B_shuffled", layout="shuffled", label="B_shuffled       single channel"),
@@ -548,7 +548,7 @@ def report(store, wall, path, also):
         bound[k] = count(store, k, SEEDS[k], "transition")
         rs = [get(store, k, s) for s in SEEDS[k]]
         failed = sum(1 for r in rs if r is not None and not r.get("ok"))
-        print(f"  {a['label']:<38} discovered {c[k]:>2}/{ns}   bound {bound[k]:>2}/{ns}   completed "
+        print(f"  {a['label']:<42} discovered {c[k]:>2}/{ns}   bound {bound[k]:>2}/{ns}   completed "
               f"{sum(1 for r in rs if r and r.get('ok'))}/{ns}" + (f"   [{failed} FAILED]" if failed else ""))
     print()
 
@@ -751,7 +751,7 @@ def main():
           f"{trc.SUB_LR}), MAX_ITERS={MAX_ITERS}; layouts {', '.join(LAYOUTS)}")
     for a in ARMS:
         s = SEEDS[a["key"]]
-        print(f"  {a['label']:<38} seeds {s[0]}-{s[-1]} ({len(s)})")
+        print(f"  {a['label']:<42} seeds {s[0]}-{s[-1]} ({len(s)})")
     print(f"  all seeds disjoint from earlier seeds 0-119: {not all_seeds & set(EARLIER_SEEDS)}")
     print(f"  torch {torch.__version__}   CPU {cpu_model()}   {args.workers} worker processes x 1 "
           f"thread   git {head}")
