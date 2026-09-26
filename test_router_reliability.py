@@ -127,7 +127,47 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 rule). Results persist atomically to router_reliability_results.json (gitignored; copied
 into results/X/ after the run).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 150/150 jobs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 129.4 min after verification, projection 7.18 h worst case; no --also
+file; machine X, commit 001c63e).
+  K8 MORE CHANNELS HELP: NOT SHOWN. A_k8 27/40 vs A 21/40; Fisher one-sided p = 0.127.
+  K4 MORE CHANNELS HELP: NOT SHOWN. A_k4 23/40 vs A 21/40; p = 0.411.
+  Bands: A 21/40 MAJORITY, A_k4 23/40 MAJORITY, A_k8 27/40 MAJORITY.
+  RESTART: RELIABLE, 30/30 trials succeeded. This is the procedure (restarts chosen by
+  held-out accuracy at step 2400), not the gate learning more reliably; the gate's own
+  per-run rate on these fresh seeds is arm A's 21/40.
+
+  Diagnostics (not part of the verdict):
+  - Paired, exact McNemar two-sided: A_k8 vs A 11 / 5 discordant, p = 0.21; A_k4 vs A 10 / 8,
+    p = 0.815. The k=8 count is higher, but 40 seeds do not show it.
+  - Escape (VAL cos < 0.5) at the first evaluation (1200) in 17/21 A, 21/23 A_k4 and 22/27
+    A_k8 discoveries. Median sep at 1200 over all runs: A 0.032, A_k4 0.524, A_k8 0.607;
+    median eff_ch at the end: 2.00, 3.70, 6.12 (the extra channels are in use).
+  - Do discovered gates split keys too? Median key_sep of discovered runs: A 0.006 (max
+    0.012), A_k4 0.017 (max 0.24), A_k8 0.024, but 8 of A_k8's 27 discoveries also split keys
+    (key_sep 0.54-0.83: seeds 83, 87, 90, 92, 96, 104, 113, 114).
+  - Failures: no run sat at the saddle. Key split (key_sep > 0.5, sep < 0.2): A 1 of 19,
+    A_k4 3 of 17, A_k8 1 of 13; the rest "other". At k=2 the old classification finds 6 of
+    19 locked on keys (key_part > 0.8): the key positions saturate, mostly without routing the
+    keys apart.
+  - Gradient norms: at steps 1 and 10 the gate's gradient is 1e-6 to 2e-5 at every k (median
+    step 1: 7.5e-06, 7.0e-06, 6.4e-06), the stationary point's scale; at step 100 its median
+    is lower at k=4 and 8 (9.0e-05, 7.9e-05) than at k=2 (2.5e-04).
+  - Bound but not discovered: A_k4 seed 83 (bound at 15600 with VAL cos 0.78). No run
+    collapsed.
+  - The check on Part 1's arm A: 18/40 runs had held-out accuracy >= 0.6 at 2400 (p_hat
+    0.45); 17 of them discovered. The exception, seed 116, had split the streams (VAL cos 0,
+    accuracy 0.92 at 2400) and then lost the split by 3600 (VAL cos 1.0, accuracy 0.42),
+    ending at 0.49; so "every run past the check discovers" does not hold without exception.
+    The other A runs that did not discover were at <= 0.39 at 2400. The check would have
+    abandoned 4 of A's 21 discoveries (seeds 96, 107, 118, 119). A_k8 seed 98 would also have
+    passed (0.83) and ended at 0.87 with a partial split (VAL cos 0.13).
+  - Part 2: 30 of 53 attempts passed the check (0.566); all 30 continued attempts discovered
+    (transition at 1200 to 3600). Abandoned attempts were at <= 0.489 at 2400, passed ones at
+    >= 0.746. Predicted trial success 1 - (1 - 0.45)^5 = 0.950, observed 30/30. Attempts
+    used: 1 in 13 trials, 2 in 12, 3 in 4, 4 in 1, 5 in none. Cost: 6480 training steps per
+    trial on average (max 10800), against 14880 per run of Part 1's arm A (ratio 0.44),
+    because abandoned attempts stop at 2400 and continued ones early-stop.
 """
 
 import argparse
@@ -241,21 +281,25 @@ class Abandon(Exception):
     """Raised from onset_run's on_eval when the restart rule abandons an attempt."""
 
 
-def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None):
+def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=None,
+            stats_fn=None):
     """test_readout_path.run_spec's record for one arm and seed, with the generalized gate
     statistics. check(model, step, data) runs after each evaluation's statistics (Part 2);
-    keep (CHECK 46 only) receives the weights after opt.step at keep["at"] and the model."""
-    task = TASK
+    keep (CHECK 46 only) receives the weights after opt.step at keep["at"] and the model.
+    task and stats_fn(model, task, probe, step) are test_router_layout's knobs (a BindTask
+    layout, and its statistics); None = TASK and gate_stats_k, unchanged."""
+    task = TASK if task is None else task
+    stats_fn = gate_stats_k if stats_fn is None else stats_fn
     probe, data = probe_batch(task, seed), eval_batch(task)
     make, stats, grad = make_fn(a, seed), [], {}
 
     def make_and_measure():
         m = make()
-        stats.append(gate_stats_k(m, task, probe, 0))
+        stats.append(stats_fn(m, task, probe, 0))
         return m
 
     def on_eval(m, step):
-        stats.append(gate_stats_k(m, task, probe, step))
+        stats.append(stats_fn(m, task, probe, step))
         if check is not None:
             check(m, step, data)
 
@@ -270,7 +314,7 @@ def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None):
     def post(m):
         if keep is not None:
             keep["model"] = m
-        end = gate_stats_k(m, task, probe, "end")
+        end = stats_fn(m, task, probe, "end")
         return dict(key_cos=end["key_cos"], val_cos=end["val_cos"], ctx_cos=end["ctx_cos"],
                     end=end)
 
