@@ -88,7 +88,48 @@ LOGISTICS. Parallel single-thread workers as in test_binding_recipe.py; wall clo
 before training (no drop rule). Results persist atomically to router_discovery_results.json
 (gitignored). Seed-level outcomes differ between machines.
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 60/60 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 87 min after verification).
+  PRE-REGISTERED VERDICT: INVALID. The positive control A_ro_nudge discovered on 2/10
+  (seed 3 bound at 4800; seed 5 only at its final evaluation, 0.961 at 19200, VAL cos
+  0.238), fewer than 8/10: the saddle account does not reproduce on this machine and no
+  candidate is interpreted. Counts, for the record: A_ro_lr10 0/10, A_ro_ln 2/10 (seeds 0
+  and 9), A_ro_noise 0/10; baseline A_ro 1/10 (seed 8, bound at 6000, VAL cos 0.009).
+  B bound 0/10. No run collapsed.
+
+  Diagnostics (not part of the verdict):
+  - The nudge's lean was erased, not amplified. Every nudged seed starts at sep 0.050; by
+    the first evaluation (step 1200) 8/10 are at sep <= 0.015 while spread has jumped from
+    0.05 to 0.44-0.89. The gate does not sit at the uniform saddle on this machine: in
+    every channel arm it goes hard within the first 1200 steps (A_ro: spread 0.00 -> 0.23-
+    0.88), in a direction that is not the stream.
+  - Final gate states of the 45 non-discovering channel runs: "saddle" (spread < 0.1) 1,
+    "locked on keys" (key_part > 0.8, sep < 0.2) 15, "other" 29. Final spread is 0.59-1.00
+    in all of them but one (A_ro_lr10 seed 7, 0.08). The failure is a hard gate routing by
+    something other than the stream, not a gate stuck at uniform.
+  - Discovery, when it happened, happened early and abruptly: escape (VAL cos < 0.5) at
+    1200 for both A_ro_ln seeds, 3600 for nudge seed 3, 4800 for A_ro seed 8, each at or
+    before the body step (accuracy >= 0.45), except nudge seed 5 (escape 19200, body 9600).
+  - A_ro seeds 0-4 reproduce test_channel_binding's curves exactly for all 16 evaluations
+    up to step 19200 (this also shows on_eval does not perturb training). With those five,
+    A_ro on this machine is 1/10 over seeds 0-9; the other machine's A_ro was 1/5.
+  - The scratch diagnostic's nudge successes (seeds 0, 1, 2 at 2400, 2400, 7200) were on
+    arm A on the other machine; here, on A_ro, seeds 0, 1 and 2 stayed at 0.48-0.51.
+
+POST-HOC (added after the result; it does not change the INVALID verdict above).
+  The positive control failed because of the arm, not the machine; the verdict line's "does
+  not reproduce on this machine" names the wrong cause.
+  - Scratch runs on one machine, same seeds 0 and 1, same 5% nudge: on A (no readout) the
+    lean grew, sep 0.05 -> 0.42 and 0.36 by step 100, and both bound by 2400. On A_ro it
+    was erased, sep 0.05 -> 0.011 and 0.005 by step 100 while spread rose; both were at
+    0.26-0.28 accuracy at step 2400.
+  - Mechanism: A_ro's readout gives the gate's recurrent state a first-order gradient (at
+    step 1 the gate gradient is ~10x A's), which moves the gate off uniform along non-stream
+    splits before the stream lean can grow.
+  - This test's own stats agree: on both machines A_ro's gate hardened within 1200 steps
+    (spread 0.16-0.89) without separating streams. "Stuck at uniform" describes arm A only;
+    A_ro's failures are commitments to the wrong split. test_router_curriculum.py takes the
+    question to arm A.
 """
 
 import argparse
@@ -284,14 +325,15 @@ def load_at(sha, fname, modname):
     return mod
 
 
-def load_legacy_pair():
-    """test_multilayer_binding and test_binding_onset at LEGACY_SHA, the onset module bound to
-    the legacy multilayer module (not to the current one)."""
-    leg_ml = load_at(LEGACY_SHA, "test_multilayer_binding.py", "test_multilayer_binding")
+def load_legacy_pair(sha=None):
+    """test_multilayer_binding and test_binding_onset at sha (default LEGACY_SHA), the onset
+    module bound to the legacy multilayer module (not to the current one)."""
+    sha = LEGACY_SHA if sha is None else sha
+    leg_ml = load_at(sha, "test_multilayer_binding.py", "test_multilayer_binding")
     saved = sys.modules["test_multilayer_binding"]
     sys.modules["test_multilayer_binding"] = leg_ml
     try:
-        leg_on = load_at(LEGACY_SHA, "test_binding_onset.py", "test_binding_onset_legacy")
+        leg_on = load_at(sha, "test_binding_onset.py", "test_binding_onset_legacy")
     finally:
         sys.modules["test_multilayer_binding"] = saved
     return leg_ml, leg_on
