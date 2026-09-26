@@ -192,14 +192,16 @@ def evaluate(model, task, data):
 
 def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY,
               data=None, early_stop=True, lr=LR, warmup=0, param_groups=None, on_eval=None,
-              grad_hook=None, post_step=None):
+              grad_hook=None, post_step=None, early_stop_after=None):
     """run_ml's training recipe, run long, with periodic held-out evaluation.
     lr and warmup (linear over the first `warmup` steps) are test_binding_recipe's knobs;
     with warmup=0 the param-group lr is never touched after the optimizer is built.
     param_groups(model) -> Adam groups, and on_eval(model, step), called right after each
     held-out evaluation, are test_router_discovery's knobs; grad_hook(model, step), run after
     loss.backward() and before opt.step(), and post_step(model, step), run right after
-    opt.step() (before that step's evaluation), are test_router_curriculum's. None = unchanged."""
+    opt.step() (before that step's evaluation), are test_router_curriculum's; with
+    early_stop_after=S (test_readout_path's) the early-stop streak counts only
+    evaluations at steps > S. None = unchanged."""
     torch.manual_seed(seed)
     model = make_model()
     if param_groups is None:
@@ -228,7 +230,8 @@ def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY
             curve.append([step, acc, el])
             if on_eval is not None:
                 on_eval(model, step)
-            streak = streak + 1 if acc >= BIND_PASS else 0
+            counts = early_stop_after is None or step > early_stop_after
+            streak = streak + 1 if (acc >= BIND_PASS and counts) else 0
             if early_stop and streak >= STOP_AFTER:
                 break
     return model, curve, rng

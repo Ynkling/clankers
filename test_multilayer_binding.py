@@ -227,7 +227,8 @@ class MultiBDH(BDH):
 
     def __init__(self, vocab, n_layer, gate="none", n_ch=1, positional="rope",
                  gate_to_readout=False, h_gate=None, mult=MULT, ctx_tokens=None,
-                 decay=OPERATING_DECAY, gate_ln=False, gate_noise=0.0, noise_seed=None):
+                 decay=OPERATING_DECAY, gate_ln=False, gate_noise=0.0, noise_seed=None,
+                 readout_sg=False):
         cfg = BDHConfig(n_layer=n_layer, n_embd=D, dropout=0.0, n_head=1,
                         mlp_internal_dim_multiplier=mult, vocab_size=vocab)
         super().__init__(cfg)
@@ -254,6 +255,9 @@ class MultiBDH(BDH):
         # gate_noise adds sigma*N(0,1) to the gate logits in training forwards only, drawn
         # from this model's own generator.
         self.gate_ln, self.gate_noise = bool(gate_ln), float(gate_noise)
+        # test_readout_path's knob: the readout reads the gate's recurrent state through
+        # a stop-gradient, so W_ro trains but sends no gradient into the gate.
+        self.readout_sg = bool(readout_sg)
         self.noise_gen = (None if noise_seed is None
                           else torch.Generator().manual_seed(int(noise_seed)))
         assert self.gate_noise == 0.0 or self.noise_gen is not None, \
@@ -271,7 +275,8 @@ class MultiBDH(BDH):
                        else torch.einsum("btk,bsk->bts", gr, gw).unsqueeze(1))
         logits, _ = BDH.forward(self, tokens)                     # bdh's own layer loop
         if self.gate_to_readout:
-            logits = logits + (self._h_seq @ self.W_ro.T) @ self.lm_head
+            h = self._h_seq.detach() if self.readout_sg else self._h_seq
+            logits = logits + (h @ self.W_ro.T) @ self.lm_head
         return logits, None, gr, gw
 
 
