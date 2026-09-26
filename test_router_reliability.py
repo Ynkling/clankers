@@ -281,21 +281,25 @@ class Abandon(Exception):
     """Raised from onset_run's on_eval when the restart rule abandons an attempt."""
 
 
-def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None):
+def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=None,
+            stats_fn=None):
     """test_readout_path.run_spec's record for one arm and seed, with the generalized gate
     statistics. check(model, step, data) runs after each evaluation's statistics (Part 2);
-    keep (CHECK 46 only) receives the weights after opt.step at keep["at"] and the model."""
-    task = TASK
+    keep (CHECK 46 only) receives the weights after opt.step at keep["at"] and the model.
+    task and stats_fn(model, task, probe, step) are test_router_layout's knobs (a BindTask
+    layout, and its statistics); None = TASK and gate_stats_k, unchanged."""
+    task = TASK if task is None else task
+    stats_fn = gate_stats_k if stats_fn is None else stats_fn
     probe, data = probe_batch(task, seed), eval_batch(task)
     make, stats, grad = make_fn(a, seed), [], {}
 
     def make_and_measure():
         m = make()
-        stats.append(gate_stats_k(m, task, probe, 0))
+        stats.append(stats_fn(m, task, probe, 0))
         return m
 
     def on_eval(m, step):
-        stats.append(gate_stats_k(m, task, probe, step))
+        stats.append(stats_fn(m, task, probe, step))
         if check is not None:
             check(m, step, data)
 
@@ -310,7 +314,7 @@ def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None):
     def post(m):
         if keep is not None:
             keep["model"] = m
-        end = gate_stats_k(m, task, probe, "end")
+        end = stats_fn(m, task, probe, "end")
         return dict(key_cos=end["key_cos"], val_cos=end["val_cos"], ctx_cos=end["ctx_cos"],
                     end=end)
 

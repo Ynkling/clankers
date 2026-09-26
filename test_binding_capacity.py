@@ -26,6 +26,11 @@ with n_q queries [CTX_q, KEY_q, VAL_{q_key,q}], whose (stream, key) pairs are dr
 WITHOUT replacement — otherwise an earlier query would reveal a later query's answer.
 Loss and accuracy are on every query's value position. Vocabulary: CTX_s = s,
 KEY_i = S + i, VAL_j = S + P + j.
+BindTask's layout knob (added for test_router_layout; "grouped", the default, is the
+layout above and runs make_batch unchanged, CHECK 48 there): "blocked" puts each stream's
+P triples contiguous (block order a random permutation of the streams, key order random
+and independent per block); "shuffled" puts all S*P triples in a uniformly random order.
+Values and queries are drawn as in the grouped layout.
 
 DISCIPLINE. The old task path is untouched: make_seq, make_batch and run() are unchanged.
 Three knobs were added to test_instrument_v2.Instrument — vocab, h_gate, ctx_tokens —
@@ -144,6 +149,7 @@ N_SEEDS = 5
 S_STREAMS = 2
 N_VALS = 16
 N_Q = 4
+LAYOUTS = ("grouped", "blocked", "shuffled")   # BindTask's layout knob (test_router_layout)
 P_LIST = [4, 8, 16, 32]
 DECAY_BIND = 1.0
 ITERS_LADDER = (1200, 2400, 4800)
@@ -185,8 +191,9 @@ class OldTask:
 class BindTask:
     sanity = False
 
-    def __init__(self, P, S=S_STREAMS, n_vals=N_VALS, n_q=N_Q):
+    def __init__(self, P, S=S_STREAMS, n_vals=N_VALS, n_q=N_Q, layout="grouped"):
         assert n_q <= S * P and S <= n_vals
+        assert layout in LAYOUTS
         self.S, self.P, self.n_vals, self.n_q = S, P, n_vals, n_q
         self.key = f"P{P}"
         self.label = f"P={P}: new task, S={S}, n_vals={n_vals}, n_q={n_q}"
@@ -196,8 +203,14 @@ class BindTask:
         self.T = self.L - 1
         self.qpos = [3 * (S * P + j) + 1 for j in range(n_q)]
         self.info_bits = P * S * math.log2(n_vals)
+        # test_router_layout's knob; "grouped" (the default) is the layout above, unchanged
+        self.layout = layout
+        if layout != "grouped":
+            self.label += f", layout={layout}"
 
     def make_batch(self, B, gen):
+        if self.layout != "grouped":
+            return self.make_batch_layout(B, gen)
         S, P, nv, nq = self.S, self.P, self.n_vals, self.n_q
         vals = torch.rand(B, P, nv, generator=gen).argsort(-1)[..., :S]    # (B,P,S) distinct
         korder = torch.rand(B, P, generator=gen).argsort(-1)                # key order
@@ -205,6 +218,27 @@ class BindTask:
         vg = vals.gather(1, korder.unsqueeze(-1).expand(B, P, S)).gather(2, sorder)
         keys = (S + korder).unsqueeze(-1).expand(B, P, S)
         body = torch.stack([sorder, keys, S + P + vg], dim=-1).reshape(B, -1)
+        q = torch.rand(B, S * P, generator=gen).argsort(-1)[:, :nq]         # no replacement
+        qs, qk = q // P, q % P
+        qv = vals.reshape(B, P * S).gather(1, qk * S + qs)
+        queries = torch.stack([qs, S + qk, S + P + qv], dim=-1).reshape(B, -1)
+        return torch.cat([body, queries], dim=1), qs
+
+    def make_batch_layout(self, B, gen):
+        """The same S*P triples [CTX_s, KEY_i, VAL_{i,s}], values and queries as make_batch,
+        in the "blocked" or "shuffled" order (see the module docstring)."""
+        S, P, nv, nq = self.S, self.P, self.n_vals, self.n_q
+        vals = torch.rand(B, P, nv, generator=gen).argsort(-1)[..., :S]    # (B,P,S) distinct
+        if self.layout == "blocked":
+            sblk = torch.rand(B, S, generator=gen).argsort(-1)               # stream of block j
+            kblk = torch.rand(B, S, P, generator=gen).argsort(-1)            # key order per block
+            ss = sblk.unsqueeze(-1).expand(B, S, P).reshape(B, -1)
+            kk = kblk.reshape(B, -1)
+        else:
+            slot = torch.rand(B, S * P, generator=gen).argsort(-1)           # (stream, key) per slot
+            ss, kk = slot // P, slot % P
+        vv = vals.reshape(B, P * S).gather(1, kk * S + ss)
+        body = torch.stack([ss, S + kk, S + P + vv], dim=-1).reshape(B, -1)
         q = torch.rand(B, S * P, generator=gen).argsort(-1)[:, :nq]         # no replacement
         qs, qk = q // P, q % P
         qv = vals.reshape(B, P * S).gather(1, qk * S + qs)
