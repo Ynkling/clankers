@@ -64,7 +64,25 @@ LOGISTICS. Parallel single-thread workers as in test_binding_recipe.py; wall clo
 before training (no drop rule). Results persist atomically to router_confirm_results.json
 (gitignored).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 120/120 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 148 min after verification; no --also file).
+  VALID: the positive control A_nudge discovered on 18/20 (>= 16).
+  C1 CHANNELS BEAT SINGLE CHANNEL: SUPPORTED. A_ln 19/40 vs the better single-channel arm
+     0/10 (B 0/10, E_mem 0/10); Fisher one-sided p = 0.00432.
+  C2 RELIABILITY of A_ln: MINORITY, 19/40 (one short of MAJORITY).
+  C3 LAYERNORM EFFECT: NOT SHOWN. A_ln 19/40 vs A 23/40; Fisher one-sided p = 0.869.
+
+  Diagnostics (not part of the verdict):
+  - The exploratory A_ln 7/10 vs A 4/10 did not replicate. On the fresh seeds A was
+    ahead: paired over seeds 10-49, both 14, A only 9, A_ln only 5, neither 12 (exact
+    McNemar two-sided p = 0.424). Exploratory + confirmatory, not the verdict: A 27/50,
+    A_ln 26/50, A_nudge 27/30, B 0/20.
+  - Discovery is decided early: escape (VAL cos < 0.5) at the first evaluation (1200) in 19/19
+    A_ln and 18/18 A_nudge discoveries and in 20/23 A discoveries (the other three at 2400,
+    6000, 13200).
+  - Failures: no run sat at the saddle. LayerNorm made key-identity locking more common:
+    locked on keys in 12 of A_ln's 21 failures vs 6 of A's 17 (A_nudge: 0 of 2).
+  - No run collapsed; no single-channel run (B, E_mem) bound.
 """
 
 import argparse
