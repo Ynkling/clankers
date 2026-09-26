@@ -67,7 +67,33 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 rule). Results persist atomically to readout_path_results.json (gitignored; copied into
 results/X/ after the run).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 120/120 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 141.5 min after verification; no --also file; machine X, commit 58c625c).
+  R1 READOUT HARMS: CONFIRMED. A 22/30 vs A_ro 2/30; Fisher one-sided p = 7.23e-08.
+  R2 THE GRADIENT IS THE CAUSE: GRADIENT. A_ro_sg 22/30 vs A_ro 2/30; p = 7.23e-08.
+  R3 TIMING: TIMING HELPS. A_ro_late 23/30 vs A_ro 2/30; p = 1.74e-08.
+
+  Diagnostics (not part of the verdict):
+  - Recovery, Fisher two-sided vs A: A_ro_sg 22/30 p = 1; A_ro_late 23/30 p = 1. No
+    difference detected; 30 seeds cannot show equivalence. A_ro_sg matches A's count on a
+    different seed set: it gains 59, 71, 77 and loses 55, 72, 74.
+  - Paired, exact McNemar two-sided: A vs A_ro 21 / 1 discordant, p = 1.1e-05; A_ro_sg vs A_ro
+    21 / 1, p = 1.1e-05; A_ro_late vs A_ro 22 / 1, p = 5.72e-06.
+  - Gradient norms, median over seeds (gate = W_in, W_h, W_g): step 1, A 6.66e-06, A_ro
+    1.96e-03 (~300x), A_ro_sg 6.66e-06, A_ro_late 6.66e-06; step 10, A 2.0e-06, A_ro 2.1e-03,
+    A_ro_sg 2.1e-06; step 100, A 3.7e-04, A_ro 3.7e-02, A_ro_sg 3.0e-04. The rest of the model
+    is equal across arms at steps 1 and 10 (2.67, 1.28); at step 100 A_ro's is larger (2.04 vs
+    1.23-1.31). Stopping the readout's gradient into h returns the gate gradient to A's level.
+  - A_ro_late around T_RO = 4800: 21 gates separated (VAL cos < 0.5) at T_RO; all 21 stayed
+    separated to the end, 19 bound. The two that did not bind: seed 55 (VAL cos 0, accuracy
+    held at 75-78 after the release, where A bound at 12000) and seed 64 (partial split, VAL
+    cos 0.32, not bound in A either). Of 9 unseparated at T_RO, 4 discovered later (escape at
+    9600, 12000, 12000, 21600: seeds 72, 59, 78, 54), where A found 2 of the same 9 (72, 78).
+  - Escape (VAL cos < 0.5): at the first evaluation (1200) in 19/22 A, 22/22 A_ro_sg and 18/23
+    A_ro_late discoveries. A_ro's two discoveries escaped late (14400, 18000).
+  - Failures: no run sat at the saddle. Locked on keys: A 2 of 8, A_ro 7 of 28, A_ro_sg 2 of 8,
+    A_ro_late 1 of 7; the rest "other". No run collapsed.
+  - Projection 6.53 h on 4 workers (every run to 24000); early stop brought it to 2.4 h.
 """
 
 import argparse
