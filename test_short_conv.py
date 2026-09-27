@@ -132,8 +132,10 @@ file; machine X, commit f1cc9ab).
   Diagnostics (not part of the verdict):
   - B_conv's two binders (seeds 181, 184) sat at ~0.50 for 18000 and 15600 steps and jumped to
     1.00 at steps 21600 and 16800; the other 38 ended at 0.48-0.51. Plain B's final accuracy
-    was also ~0.50 (median 0.495), as was B_conv_in's (0.502, 0/20 bound). So on this task the
-    convolution did not lift a single channel's plateau; binding with it was rare and late.
+    was also ~0.50 (median 0.495), as was B_conv_in's (0.502, 0/20 bound). The convolution
+    reached that 0.50 plateau much sooner (B_conv and B_conv_in by step 2400-3600, plain B only
+    after ~10000 steps) but did not lift a single channel above it: binding with it was rare
+    and late.
   - Arm A bound on only 12/40 of these seeds (32/40 on seeds 120-159 in test_router_layout;
     ~64% pooled). Two of its runs, re-run through test_router_reliability.run_one's defaults
     after the fact, reproduced the recorded curves exactly, so this is the seed set, not the
