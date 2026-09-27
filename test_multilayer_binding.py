@@ -222,13 +222,34 @@ class GatedAttention(Attention):
         return scores @ V
 
 
+class CausalConv(nn.Module):
+    """test_short_conv's depthwise, strictly causal convolution over time:
+    out_t = sum_{j=0}^{K-1} conv_w[:, j] * x_{t-j}, zero-padded, so position t sees only
+    t-K+1..t. Identity init (conv_w[:, 0] = 1, every other lag 0) draws nothing from any RNG."""
+
+    def __init__(self, D, K):
+        super().__init__()
+        w = torch.zeros(D, K)
+        w[:, 0] = 1.0
+        self.conv_w = nn.Parameter(w)
+
+    def forward(self, x):                                         # x: (..., T, D)
+        K, T = self.conv_w.shape[1], x.shape[-2]
+        xp = F.pad(x, (0, 0, K - 1, 0))
+        out = x * self.conv_w[:, 0]
+        for j in range(1, K):
+            out = out + xp[..., K - 1 - j:K - 1 - j + T, :] * self.conv_w[:, j]
+        return out
+
+
 class MultiBDH(BDH):
-    """bdh.BDH with a channel gate. forward() calls BDH.forward unmodified."""
+    """bdh.BDH with a channel gate. forward() calls BDH.forward unmodified (with conv set,
+    a line-for-line copy of its layer loop with the convolution inserted)."""
 
     def __init__(self, vocab, n_layer, gate="none", n_ch=1, positional="rope",
                  gate_to_readout=False, h_gate=None, mult=MULT, ctx_tokens=None,
                  decay=OPERATING_DECAY, gate_ln=False, gate_noise=0.0, noise_seed=None,
-                 readout_sg=False):
+                 readout_sg=False, conv=None, conv_k=4):
         cfg = BDHConfig(n_layer=n_layer, n_embd=D, dropout=0.0, n_head=1,
                         mlp_internal_dim_multiplier=mult, vocab_size=vocab)
         super().__init__(cfg)
@@ -262,6 +283,41 @@ class MultiBDH(BDH):
                           else torch.Generator().manual_seed(int(noise_seed)))
         assert self.gate_noise == 0.0 or self.noise_gen is not None, \
             "gate_noise needs noise_seed"
+        # test_short_conv's knob: a short causal convolution, "in" (on the embeddings, once)
+        # or "layer" (one shared convolution on x before the encoder at every layer). None
+        # creates nothing and leaves forward() calling BDH.forward.
+        assert conv in (None, "in", "layer")
+        self.conv = conv
+        if conv is not None:
+            self.short_conv = CausalConv(D, int(conv_k))
+
+    def forward_conv(self, idx):
+        """bdh.BDH.forward's layer loop, line for line, with the convolution inserted: "in"
+        on the embeddings before the first LayerNorm; "layer" on x before the encoder at every
+        layer, its output feeding Q = K and V (the residual stream is not convolved)."""
+        C = self.config
+        B, T = idx.size()
+        D_ = C.n_embd
+        nh = C.n_head
+        N = D_ * C.mlp_internal_dim_multiplier // nh
+        x = self.embed(idx).unsqueeze(1)
+        if self.conv == "in":
+            x = self.short_conv(x)
+        x = self.ln(x)
+        for level in range(C.n_layer):
+            xc = self.short_conv(x) if self.conv == "layer" else x
+            x_latent = xc @ self.encoder
+            x_sparse = F.relu(x_latent)
+            yKV = self.attn(Q=x_sparse, K=x_sparse, V=xc)
+            yKV = self.ln(yKV)
+            y_latent = yKV @ self.encoder_v
+            y_sparse = F.relu(y_latent)
+            xy_sparse = x_sparse * y_sparse
+            xy_sparse = self.drop(xy_sparse)
+            yMLP = xy_sparse.transpose(1, 2).reshape(B, 1, T, N * nh) @ self.decoder
+            y = self.ln(yMLP)
+            x = self.ln(x + y)
+        return x.view(B, T, D_) @ self.lm_head
 
     def forward(self, tokens, tau=None, track_sat=False):
         v = self.embed(tokens)
@@ -273,7 +329,10 @@ class MultiBDH(BDH):
             gw = gr                                               # read and write alike
         self.attn.G = (None if self.gate_kind == "none"
                        else torch.einsum("btk,bsk->bts", gr, gw).unsqueeze(1))
-        logits, _ = BDH.forward(self, tokens)                     # bdh's own layer loop
+        if self.conv is None:
+            logits, _ = BDH.forward(self, tokens)                 # bdh's own layer loop
+        else:
+            logits = self.forward_conv(tokens)
         if self.gate_to_readout:
             h = self._h_seq.detach() if self.readout_sg else self._h_seq
             logits = logits + (h @ self.W_ro.T) @ self.lm_head

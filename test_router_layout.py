@@ -110,7 +110,44 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 rule). Results persist atomically to router_layout_results.json (gitignored; copied into
 results/X/ after the run).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 160/160 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 150.4 min after verification, projection 6.78 h worst case; no --also
+file; machine X, commit 24987ec).
+  Validity: blocked VALID (ceiling 5/5, gate fit argmax 1.0) and DISCRIMINATIVE (B 0/20);
+  shuffled VALID (ceiling 5/5, argmax 1.0) and DISCRIMINATIVE (B 0/10).
+  L1 BLOCKS HELP: NOT SHOWN. A_blocked 19/40 vs A_grouped 32/40; Fisher one-sided p = 1.
+  L2 SHUFFLING HELPS: NOT SHOWN. A_shuffled 28/40 vs A_grouped 32/40; p = 0.902.
+  Bands: A_grouped 32/40 MAJORITY, A_blocked 19/40 MINORITY, A_shuffled 28/40 MAJORITY.
+
+  Diagnostics (not part of the verdict):
+  - Paired, exact McNemar two-sided: blocked vs grouped 5 / 18 discordant, p = 0.0106, i.e.
+    the blocked layout discovered LESS often, the opposite direction to L1 (post hoc, not a
+    claim); shuffled vs grouped 5 / 9, p = 0.424.
+  - A_grouped's 32/40 on these fresh seeds is above arm A's 21/40 on seeds 80-119
+    (test_router_reliability) and the ~55-65% across machines.
+  - Failure classes (end statistics): grouped, 8 failures: POSITION 6 (seeds 125, 137, 146,
+    148, 155, 156; eta^2 by triple index at key positions 0.97-1.00), KEY 1 (144),
+    STREAM-PARTIAL 1 (135: margin 0.74, accuracy 0.875); the old key_part classification
+    called 2 of the 8 "locked on keys". Shuffled, 12: KEY 5, POSITION 5, STREAM-PARTIAL 1,
+    OTHER 1, so position splits also occur when neither keys nor streams are contiguous.
+    Blocked, 21: STREAM-PARTIAL 9, KEY 7, POSITION 2, OTHER 3.
+  - In the blocked layout routing and binding came apart: 8 of its 9 STREAM-PARTIAL runs
+    route by stream at the end (margin >= 0.98, VAL cos <= 0.004; seeds 120, 130, 136, 140,
+    144, 149, 156, 157) but had not bound by 24000 (accuracy 0.33-0.76). Several split late
+    (e.g. 120, 130, 136 after step 15000), but 140 and 149 already had margin >= 0.99 at step
+    1200 and still ended at 0.76 and 0.60. DISCOVERED (which needs binding) therefore counts
+    fewer stream-routing gates in the blocked layout than it would in the others.
+  - Learning speed without routing: B's final accuracy, median [min, max], blocked 0.229
+    [0.217, 0.313], shuffled 0.293 [0.240, 0.496] (grouped reaches ~0.5 by step 12000, per
+    the background). Arm A's median held-out accuracy at 1200 / 2400: grouped 0.656 / 0.975,
+    blocked 0.233 / 0.420, shuffled 0.599 / 0.997. The ceilings bound at step 1200-2400 in
+    both new layouts.
+  - The restart check (accuracy >= 0.6 at 2400): grouped 30/40 pass, 29 of them discovered
+    (not seed 135); blocked 16/40, all 16; shuffled 26/40, all 26. Discoveries the check would
+    have abandoned: 3, 3, 2.
+  - Escape at the first evaluation (1200) in 29/32 grouped, 17/19 blocked and 27/28 shuffled
+    discoveries. Gate-gradient norms at steps 1 and 10 are alike across layouts (median
+    7.5e-06 to 9.0e-06 at step 1). No run collapsed; no arm-A run bound without discovering.
 """
 
 import argparse

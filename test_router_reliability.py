@@ -282,14 +282,16 @@ class Abandon(Exception):
 
 
 def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=None,
-            stats_fn=None):
+            stats_fn=None, grad_fn=None):
     """test_readout_path.run_spec's record for one arm and seed, with the generalized gate
     statistics. check(model, step, data) runs after each evaluation's statistics (Part 2);
     keep (CHECK 46 only) receives the weights after opt.step at keep["at"] and the model.
     task and stats_fn(model, task, probe, step) are test_router_layout's knobs (a BindTask
-    layout, and its statistics); None = TASK and gate_stats_k, unchanged."""
+    layout, and its statistics); None = TASK and gate_stats_k, unchanged. grad_fn(model) is
+    test_short_conv's (gradient norms by parameter group); None = grad_norms, unchanged."""
     task = TASK if task is None else task
     stats_fn = gate_stats_k if stats_fn is None else stats_fn
+    grad_fn = grad_norms if grad_fn is None else grad_fn
     probe, data = probe_batch(task, seed), eval_batch(task)
     make, stats, grad = make_fn(a, seed), [], {}
 
@@ -305,7 +307,7 @@ def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=N
 
     def grad_hook(m, step):
         if step in GRAD_STEPS:
-            grad[str(step)] = grad_norms(m)
+            grad[str(step)] = grad_fn(m)
 
     def post_step(m, step):
         if step == keep["at"]:
