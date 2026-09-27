@@ -282,18 +282,22 @@ class Abandon(Exception):
 
 
 def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=None,
-            stats_fn=None, grad_fn=None):
+            stats_fn=None, grad_fn=None, lr=None, builder=None):
     """test_readout_path.run_spec's record for one arm and seed, with the generalized gate
     statistics. check(model, step, data) runs after each evaluation's statistics (Part 2);
     keep (CHECK 46 only) receives the weights after opt.step at keep["at"] and the model.
     task and stats_fn(model, task, probe, step) are test_router_layout's knobs (a BindTask
     layout, and its statistics); None = TASK and gate_stats_k, unchanged. grad_fn(model) is
-    test_short_conv's (gradient norms by parameter group); None = grad_norms, unchanged."""
+    test_short_conv's (gradient norms by parameter group); None = grad_norms, unchanged. lr and
+    builder(a, seed) -> make_model are test_conv_lr's (a learning rate, and a model builder for
+    a task with another vocabulary); None = SUB_LR and make_fn, unchanged."""
     task = TASK if task is None else task
     stats_fn = gate_stats_k if stats_fn is None else stats_fn
     grad_fn = grad_norms if grad_fn is None else grad_fn
+    lr = SUB_LR if lr is None else lr
+    builder = make_fn if builder is None else builder
     probe, data = probe_batch(task, seed), eval_batch(task)
-    make, stats, grad = make_fn(a, seed), [], {}
+    make, stats, grad = builder(a, seed), [], {}
 
     def make_and_measure():
         m = make()
@@ -321,7 +325,7 @@ def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=N
                     end=end)
 
     rec = attempt(task, make_and_measure, seed, data, post=post, max_iters=iters,
-                  eval_every=eval_every, lr=SUB_LR, on_eval=on_eval, grad_hook=grad_hook,
+                  eval_every=eval_every, lr=lr, on_eval=on_eval, grad_hook=grad_hook,
                   post_step=post_step if keep is not None else None)
     rec.update(stats=stats, grad=grad, iters=iters, k=a["n_ch"])
     if rec["ok"]:
