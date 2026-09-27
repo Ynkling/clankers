@@ -160,6 +160,18 @@ file; machine X, commit f1cc9ab).
     binders, 2 A binders and both B_conv binders.
   - Step-1 gradient norms: the conv receives a first-order gradient (median 5.6e-02) where the
     gate's is ~8e-06 at every gated arm.
+
+POST-HOC (added after the result; it does not change the verdict or the reading above).
+  The BACKGROUND's scratch figures were NOT run with this test's recipe.
+  - The scratch runs called onset_run with its default learning rate, test_instrument_v2.LR
+    = 4e-3; this test uses SUB_LR = 1e-3 throughout.
+  - So "bound 2/4", "bound 1/3" and "seed 0 at 15600" describe lr 4e-3, not the recipe tested
+    here.
+  - The P=8 line compares a 4e-3 conv run with Gate 0 runs at 1e-3 without the convolution,
+    so it mixes two changes (learning rate and convolution).
+  - A check afterwards, seed 3: one channel + conv bound at step 1200 at lr 4e-3 but stayed at
+    0.50 to step 24000 at 1e-3; plain B at 4e-3 stayed at 0.20.
+  test_conv_lr.py takes the learning rate as its own question.
 """
 
 import argparse
