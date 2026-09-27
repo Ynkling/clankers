@@ -115,7 +115,58 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 rule). Results persist atomically to conv_lr_results.json (gitignored; copied into results/X/
 after the run).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 135/135 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 249.2 min after verification, projection 7.79 h worst case; paired with
+results/X/short_conv_results.json; no --also file; machine X, commit 3c69afd).
+  VALID: ceiling_conv4 bound 5/5 (all at step 1200) and the pairing CHECK (59) passed.
+  LR1 ONE CHANNEL BINDS MORE AT 4e-3: SHOWN. B_conv4 18/40 vs the recorded B_conv 2/40 at
+      1e-3; 4e-3 only 17, 1e-3 only 1; one-sided McNemar p = 7.25e-05.
+  LR2 GATE + CONV BINDS MORE AT 4e-3: NOT SHOWN. A_conv4 22/40 vs the recorded A_conv 23/40;
+      4e-3 only 10, 1e-3 only 11; p = 0.668.
+  LR3 THE GATE STILL ADDS AT 4e-3: NOT SHOWN. A_conv4 22/40 vs B_conv4 18/40; Fisher one-sided
+      p = 0.251; McNemar on the pairs: A_conv4 only 12, B_conv4 only 8, p = 0.503.
+  LR4 TWO CHANNELS BEAT ONE CHANNEL WITH THE SAME MEMORY: NOT SHOWN. A_conv4 22/40 vs
+      B_wide_conv4 10/20; Fisher one-sided p = 0.463; McNemar on seeds 160-179: A_conv4 only 5,
+      B_wide_conv4 only 3, p = 0.727.
+  M1 LAG 2 MARKS SINGLE-CHANNEL BINDING: SHOWN. B_conv4 + B_wide_conv4: the 28 bound runs have
+      end lag-2 mean |w| median 0.158 [0.075, 0.295], the 32 unbound runs 0.082 [0.050, 0.120];
+      U = 856, one-sided p = 2.07e-12.
+  Bands (bound): B_conv4 18/40 MINORITY, A_conv4 22/40 MAJORITY.
+  The pre-registered reading: LR3 NOT SHOWN: "at 4e-3 one channel with the convolution binds
+  about as often as the gated model; channels must earn their place on capacity."
+
+  Diagnostics (not part of the verdict):
+  - The BACKGROUND's scratch runs reproduced exactly: B_conv4 162 bound at step 1200 and 163
+    at 10800; A_conv4 161 and 162 at 3600; B_wide_conv4 160 not bound; A4 160 ended at 0.31.
+  - B_conv's two binders at 1e-3 (seeds 181, 184): at 4e-3, 181 bound (step 21600) and 184 did
+    not. Single-channel binding at 4e-3 is late: B_conv4 transition median 15000 [1200, 24000]
+    after a plateau at ~0.50 of median 12600 steps; B_wide_conv4 median 16800 [2400, 21600].
+    Every unbound B_conv4, B_wide_conv4 and A_conv4 run but one ended at 0.48-0.52 (A_conv4
+    seed 170: 0.62).
+  - B_conv4 vs B_wide_conv4 on seeds 160-179: 10/20 each (6 vs 6 discordant). Doubling one
+    channel's memory to A_conv's fast-weight state did not change its binding rate here.
+  - The gated model at 4e-3 mostly bound WITHOUT routing: of A_conv4's 22 binders, 6 route
+    (margin >= 0.9) and 16 do not; only 7/40 were DISCOVERED (VAL cos < 0.5). At 1e-3 the same
+    seeds had 23 bound, 16 routed, 17 discovered. Post hoc (not a claim): discovered at 1e-3
+    only 14, at 4e-3 only 4, McNemar p = 0.0309. So the higher learning rate lifted one channel
+    to about the gated model's rate, and moved the gated model from routing towards binding
+    the way one channel does, at the same overall rate.
+  - The unrouted A_conv4 binders carry the single-channel signature: lag 2 median 0.165, vs
+    0.082 for the routed ones (and 0.149 / 0.081 for B_conv4 bound / unbound, 0.165 / 0.086 for
+    B_wide_conv4).
+  - A_conv4's 18 failures: POSITION 10, OTHER 5, KEY 3.
+  - Without the convolution the higher lr hurt: A4 0/10 (the recorded A bound 4/10 on these
+    seeds at 1e-3), B4 0/10; final accuracies 0.21-0.51 for both; none collapsed (< 0.15). Two A4
+    runs separated the streams (VAL cos < 0.5, STREAM-PARTIAL; seeds 162, 165) and still did
+    not bind.
+  - The restart check (>= 0.6 at step 2400) does not transfer to 4e-3: it passed 3/40 A_conv4
+    runs (all bound) and would have thrown away 19 of its 22 binders; for B_conv4 it passed 1/40
+    and would have thrown away 17 of 18. No A_conv4 run bound at step 1200 (A_conv at 1e-3:
+    13 of 23).
+  - Step-1 gradient norms: conv median 5.6e-02, gate ~8e-06, as at 1e-3.
+  - Part 2 (descriptive): G0_P8_conv4 (S=1, P=8, one channel + conv) bound 5/5, four of them at
+    step 1200 and one at 3600. ceiling_P8_conv4 (S=2, P=8, perfect gate + conv) bound 5/5, at
+    steps 1200, 2400, 8400, 9600 and 15600.
 """
 
 import argparse
