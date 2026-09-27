@@ -117,7 +117,61 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 rule). Results persist atomically to short_conv_results.json (gitignored; copied into
 results/X/ after the run).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 165/165 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 273.9 min after verification, projection 8.63 h worst case; no --also
+file; machine X, commit f1cc9ab).
+  VALID: ceiling_conv bound 5/5 (all at step 1200) and CHECK 54 passed.
+  K1 CONV LETS ONE CHANNEL BIND: NOT SHOWN. B_conv 2/40 vs B 0/20; Fisher one-sided p = 0.441.
+  K2 GATE VS CONV: DIFFERENT, A higher. A 12/40 vs B_conv 2/40; Fisher two-sided p = 0.00645;
+     exact McNemar on the pairs: A only 11, B_conv only 1, p = 0.00635.
+  K3 GATE ADDS TO CONV: SHOWN. A_conv 23/40 vs B_conv 2/40; Fisher one-sided p = 1.97e-07.
+  Bands (bound): B_conv 2/40 MINORITY, A_conv 23/40 MAJORITY, A 12/40 MINORITY.
+  The pre-registered reading: K1 NOT SHOWN: the convolution does not substitute for routing
+  here; P-scaling compares A with B_conv.
+
+  Diagnostics (not part of the verdict):
+  - B_conv's two binders (seeds 181, 184) sat at ~0.50 for 18000 and 15600 steps and jumped to
+    1.00 at steps 21600 and 16800; the other 38 ended at 0.48-0.51. Plain B's final accuracy
+    was also ~0.50 (median 0.495), as was B_conv_in's (0.502, 0/20 bound). The convolution
+    reached that 0.50 plateau much sooner (B_conv and B_conv_in by step 2400-3600, plain B only
+    after ~10000 steps) but did not lift a single channel above it: binding with it was rare
+    and late.
+  - Arm A bound on only 12/40 of these seeds (32/40 on seeds 120-159 in test_router_layout;
+    ~64% pooled). Two of its runs, re-run through test_router_reliability.run_one's defaults
+    after the fact, reproduced the recorded curves exactly, so this is the seed set, not the
+    new code. A's failures: POSITION 18, KEY 9, OTHER 1; one A run (seed 180) collapsed to 0.06
+    at the final evaluation.
+  - Paired, post hoc (not claims): A_conv vs A, A_conv only 13, A only 2, McNemar p = 0.00739:
+    the convolution raised the gated model's binding on the same seeds. A_conv vs B_conv: 21 /
+    0, p = 9.5e-07.
+  - A_conv's 23 binders: 16 with routing (margin >= 0.9) and 7 WITHOUT (seeds 166, 169, 171,
+    186, 188, 193, 194). Of those 7: 171 and 193 have a key-split gate (eta^2 by key 1.00);
+    186 a position split; 169 (margin 0.83, VAL cos 0.11) and 188 (0.47, 0.61) route partly;
+    166 and 194 bound late (steps 24000, 19200) with VAL cos 0.94 and 0.58. So with the
+    convolution a gated model can bind without stream routing; that happened in 7 of 23.
+    Note: seed 166 counts as bound on its final evaluation alone.
+  - A_conv's 17 failures: POSITION 16, OTHER 1.
+  - Convolution weights at the end (mean |w| per lag, median): lag 0 stays at 0.87-0.98, lag 1
+    grows to 0.13-0.34, lags 2-3 stay at or below 0.15; bound and unbound runs show no
+    consistent difference.
+  - Transitions: A_conv median 1200 [1200, 24000], 13 of its 23 binders at 1200 with no
+    plateau; A median 2400 [1200, 8400]. The restart check (>= 0.6 at 2400) passed 14/40
+    A_conv runs (all bound) and 10/40 A runs (all bound); it would have thrown away 9 A_conv
+    binders, 2 A binders and both B_conv binders.
+  - Step-1 gradient norms: the conv receives a first-order gradient (median 5.6e-02) where the
+    gate's is ~8e-06 at every gated arm.
+
+POST-HOC (added after the result; it does not change the verdict or the reading above).
+  The BACKGROUND's scratch figures were NOT run with this test's recipe.
+  - The scratch runs called onset_run with its default learning rate, test_instrument_v2.LR
+    = 4e-3; this test uses SUB_LR = 1e-3 throughout.
+  - So "bound 2/4", "bound 1/3" and "seed 0 at 15600" describe lr 4e-3, not the recipe tested
+    here.
+  - The P=8 line compares a 4e-3 conv run with Gate 0 runs at 1e-3 without the convolution,
+    so it mixes two changes (learning rate and convolution).
+  - A check afterwards, seed 3: one channel + conv bound at step 1200 at lr 4e-3 but stayed at
+    0.50 to step 24000 at 1e-3; plain B at 4e-3 stayed at 0.20.
+  test_conv_lr.py takes the learning rate as its own question.
 """
 
 import argparse
