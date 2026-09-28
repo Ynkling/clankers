@@ -1,0 +1,10 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 1: local_gate, kwta, aux_gate
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git a3f7e90 | python 3.11.15
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, seeds 160-179 (20)
+  screen rule: promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (outcome DISCOVERED, vs X's recorded arm A)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: DIFFERS from X (66s)
+    here [[1200, 0.25390625, 2.095628261566162], [2400, 0.47265625, 1.2364170551300049]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  ! this container does not reproduce X: the recorded pairing is invalid; stopping.

@@ -1,0 +1,48 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 1: local_gate, kwta, aux_gate
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git 8544207 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, seeds 160-179 (20)
+  screen rule: promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (outcome DISCOVERED, vs X's recorded arm A)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (96s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK local_gate: local=False equals arm A (parameters): ok
+  CHECK local_gate: local=False equals arm A (logits): ok
+  CHECK local_gate: local=True shares arm A's parameters: ok
+  CHECK local_gate: gate at t ignores token t-3: ok
+  CHECK local_gate: gate at t sees token t-2: ok
+  CHECK kwta: K_TOP=N equals arm A (logits through bdh.BDH.forward): ok
+  CHECK kwta: parameters equal arm A's: ok
+  CHECK kwta: kWTA keeps min(#positive, 16) units: ok
+  CHECK aux_gate: parameters equal arm A's (plus W_aux): ok
+  CHECK aux_gate: eval-mode logits equal arm A's: ok
+  CHECK aux_gate: training-mode logits equal arm A's: ok
+  CHECK aux_gate: aux gradient reaches exactly W_in, W_h, W_aux (got ['W_aux', 'W_h', 'W_in']): ok
+  CHECK aux_gate: aux gradient injected through the task loss's backward: ok
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN local_gate
+  idea    gate from a width-3 causal conv of the embeddings, no recurrence (cannot split by position)
+  source  Mamba (Gu & Dao 2023) conv-before-selective-gates; H3 shift-SSM; RWKV token shift
+  change  arm A with h_t = tanh(W_in conv3(v)_t) instead of tanh(W_in v_t + W_h h_{t-1}); conv init uniform +-1/sqrt(3) from its own generator; all else arm A
+  arm LOCAL3         lr 0.001  iters 24000  seeds 160-179 (20)  — arm A, gate from a width-3 causal conv (no recurrence)
+  paired with X's recorded arm A (test_short_conv, lr 0.001), seeds 160-179 (20)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN kwta
+  idea    keep only the top 16 of 256 units of x_sparse at every layer (near-orthogonal key codes)
+  source  FlyHash (Dasgupta et al., Science 2017); k-WTA (Ahmad & Hawkins 2019)
+  change  arm A with x_sparse = topk-mask(relu(x @ encoder), 16) at every layer; all else arm A
+  arm KWTA16_ceil    lr 0.001  iters 24000  seeds 160-162 (3)  — perfect gate + kWTA (validity)
+  arm KWTA16         lr 0.001  iters 24000  seeds 160-179 (20)  — arm A + kWTA 16/256 at every layer
+  paired with X's recorded arm A (test_short_conv, lr 0.001), seeds 160-179 (20)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN aux_gate
+  idea    self-supervised next-token prediction from the gate's recurrent state (aux loss, weight 1)
+  source  UNREAL auxiliary tasks (Jaderberg et al. 2017); CPC (van den Oord et al. 2018)
+  change  arm A + LAMBDA*CE(next token | h_aux), h_aux = gate recurrence on detached embeddings; gradient to W_in, W_h, W_aux only
+  arm AUX1           lr 0.001  iters 24000  seeds 160-179 (20)  — arm A + next-token aux on the gate state (lambda 1)
+  paired with X's recorded arm A (test_short_conv, lr 0.001), seeds 160-179 (20)
+----------------------------------------------------------------------------------------------------
+  63 runs queued on 4 workers
