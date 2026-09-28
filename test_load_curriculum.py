@@ -281,12 +281,13 @@ def attempt_seeds(s):
 
 
 # ── The curriculum run ───────────────────────────────────────────────────────
-def cur_stats_fn(t_switch):
+def cur_stats_fn(t_switch, also=()):
     """test_short_conv.conv_stats, plus test_router_layout.routing_stats at the switch (it is
-    already in conv_stats at step 1200 and at the end)."""
+    already in conv_stats at step 1200 and at the end). also (test_curriculum_confirm's knob):
+    further steps that get routing_stats; () = unchanged."""
     def stats(model, task, probe, step):
         out = conv_stats(model, task, probe, step)
-        if step == t_switch and model.n_ch == 2:
+        if (step == t_switch or step in also) and model.n_ch == 2:
             out.update(routing_stats(model, task, probe))
         return out
     return stats
@@ -296,11 +297,12 @@ def grad_steps_of(sched):
     return tuple(GRAD_STEPS) + (sched["t_switch"] + 1, sched["t_switch"] + 10)
 
 
-def run_cur(a, seed, sched, decide=None, abandon=False, keep=None):
+def run_cur(a, seed, sched, decide=None, abandon=False, keep=None, stats_at=()):
     """One curriculum run: test_router_reliability.run_one on task_for(8, 2) (the P=8 held-out
     set, probe, statistics and early stop, as test_p_scaling), with phase 1's batches and lr up
     to the switch. check() evaluates the phase-1 set at every evaluation; at t_check it gives
-    decide(step, phase-1 accuracy), and with abandon=True a failing attempt stops there."""
+    decide(step, phase-1 accuracy), and with abandon=True a failing attempt stops there.
+    stats_at (test_curriculum_confirm's knob): further steps with routing_stats; () = unchanged."""
     ts = sched["t_switch"]
     lr2 = a["lr2"]
     data1 = eval_batch(TASK1)
@@ -316,7 +318,7 @@ def run_cur(a, seed, sched, decide=None, abandon=False, keep=None):
                 raise trr.Abandon(f"phase-1 held-out accuracy {acc:.4f} at step {step}")
 
     rec = run_one(a, seed, sched["total"], sched["eval_every"], check=check, keep=keep, task=TASK8,
-                  stats_fn=cur_stats_fn(ts), grad_fn=conv_grad_norms, lr=LR1,
+                  stats_fn=cur_stats_fn(ts, also=stats_at), grad_fn=conv_grad_norms, lr=LR1,
                   builder=tcl.builder_for(a), grad_steps=grad_steps_of(sched),
                   run_kw=dict(task_at=lambda step: TASK1 if step <= ts else TASK8,
                               lr_at=lambda step: LR1 if step <= ts else lr2,
@@ -330,15 +332,18 @@ def run_cur(a, seed, sched, decide=None, abandon=False, keep=None):
     return rec
 
 
-def run_trial(seed, sched, start=1, decide=None):
+def run_trial(seed, sched, start=1, decide=None, arm=None, stats_at=()):
     """CUR_A_R from attempt `start`: attempts s + 1000*j in order; a failing attempt is
-    abandoned at t_check, except the last (j = R_MAX-1), which continues."""
+    abandoned at t_check, except the last (j = R_MAX-1), which continues. arm and stats_at are
+    test_curriculum_confirm's knobs (the arm dict, and run_cur's stats_at); None and () =
+    CUR_A_R's, unchanged."""
     decide = trr.make_decide(sched["t_check"], sched["a_check"]) if decide is None else decide
+    arm = ARM["CUR_A_R"] if arm is None else arm
     ts0 = time.time()
     attempts = []
     for j in range(start, R_MAX):
         sj, last = seed + STRIDE * j, j == R_MAX - 1
-        rec = run_cur(ARM["CUR_A_R"], sj, sched, decide=decide, abandon=not last)
+        rec = run_cur(arm, sj, sched, decide=decide, abandon=not last, stats_at=stats_at)
         attempts.append(dict(j=j, seed=sj, acc_check=rec.get("acc_check"), passed=rec.get("passed")))
         if rec.get("passed") is False and not last:
             continue
@@ -493,40 +498,7 @@ def verify(pool, p8_path):
 
     N = 10_000
     print(f"CHECK 70 n_active={N_ACTIVE} of P=8, over {N:,} sequences (generator seed 70):")
-    t = TASK1
-    S, P, A = t.S, t.P, t.n_active
-    tok, qs = t.make_batch(N, torch.Generator().manual_seed(70))
-    j = torch.arange(S * A)
-    ctx, key, val = tok[:, 3 * j], tok[:, 3 * j + 1] - S, tok[:, 3 * j + 2]
-    act = torch.zeros(N, P, dtype=torch.long).scatter_(1, key, 1)
-    n_keys = act.sum(1)
-    four = bool((n_keys == A).all())
-    freq = act.float().mean(0)
-    freq_ok = bool(((freq - A / P).abs() <= 0.02).all())
-    pairs = ctx * P + key
-    once = bool((torch.sort(pairs, 1).values.diff(dim=1) != 0).all())
-    per_key = torch.zeros(N, P, dtype=torch.long).scatter_add_(1, key, torch.ones_like(key))
-    both = bool((per_key[act.bool()] == S).all())
-    grouped = bool(((key[:, 0::2] == key[:, 1::2]) & (ctx[:, 0::2] != ctx[:, 1::2])).all())
-    vv = val.view(N, A, S)
-    distinct = bool((vv[..., 0] != vv[..., 1]).all())
-    n = S * A
-    qc, qk, qv = tok[:, 3 * n], tok[:, 3 * n + 1] - S, tok[:, 3 * n + 2]
-    hit = (ctx == qc[:, None]) & (key == qk[:, None])
-    answered = (bool((hit.sum(1) == 1).all()) and bool((val[hit] == qv).all())
-                and bool((qc == qs.reshape(-1)).all()))
-    in_vocab = bool((tok >= 0).all()) and bool((tok < TASK8.vocab).all()) and t.vocab == TASK8.vocab
-    lens = (t.L == 3 * (S * A + 1), t.qpos == [3 * S * A + 1])
-    good = four and freq_ok and once and both and grouped and distinct and answered and in_vocab and all(lens)
-    print(f"         {A} distinct keys in every sequence: {four}   key frequencies "
-          f"{[round(x, 3) for x in freq.tolist()]} (0.5 +- 0.02): {freq_ok}")
-    print(f"         every used (stream, key) pair once: {once} and both streams per active key: {both}   "
-          f"grouped structure: {grouped}   S distinct values per key: {distinct}")
-    print(f"         the query answered by its own stream's value: {answered}   token ids in [0, {TASK8.vocab}) "
-          f"(task_for(8, 2)'s vocabulary): {in_vocab}")
-    print(f"         length {t.L}, query position {t.qpos} (P=8: length {TASK8.L}, query position {TASK8.qpos}); "
-          f"e.g. {tps_decode(tok[0], t)}")
-    print(f"         -> {'OK' if good else 'WRONG'}")
+    good = generator_check(TASK1, TASK8, N, 70)
     ok &= good
     print()
 
@@ -699,6 +671,45 @@ def verify(pool, p8_path):
           + ("" if pair["ok"] else "   (CHECK 72, the pairing, did not pass: see VALIDITY)") + "\n")
     assert ok, "verification failed — do not trust the results below"
     return pair
+
+
+def generator_check(t, full, N=10_000, gseed=70):
+    """CHECK 70's generator checks for an n_active task t against its full task (the same P and
+    vocabulary); prints CHECK 70's lines and returns whether all hold. S = 2."""
+    S, P, A = t.S, t.P, t.n_active
+    tok, qs = t.make_batch(N, torch.Generator().manual_seed(gseed))
+    j = torch.arange(S * A)
+    ctx, key, val = tok[:, 3 * j], tok[:, 3 * j + 1] - S, tok[:, 3 * j + 2]
+    act = torch.zeros(N, P, dtype=torch.long).scatter_(1, key, 1)
+    n_keys = act.sum(1)
+    four = bool((n_keys == A).all())
+    freq = act.float().mean(0)
+    freq_ok = bool(((freq - A / P).abs() <= 0.02).all())
+    pairs = ctx * P + key
+    once = bool((torch.sort(pairs, 1).values.diff(dim=1) != 0).all())
+    per_key = torch.zeros(N, P, dtype=torch.long).scatter_add_(1, key, torch.ones_like(key))
+    both = bool((per_key[act.bool()] == S).all())
+    grouped = bool(((key[:, 0::2] == key[:, 1::2]) & (ctx[:, 0::2] != ctx[:, 1::2])).all())
+    vv = val.view(N, A, S)
+    distinct = bool((vv[..., 0] != vv[..., 1]).all())
+    n = S * A
+    qc, qk, qv = tok[:, 3 * n], tok[:, 3 * n + 1] - S, tok[:, 3 * n + 2]
+    hit = (ctx == qc[:, None]) & (key == qk[:, None])
+    answered = (bool((hit.sum(1) == 1).all()) and bool((val[hit] == qv).all())
+                and bool((qc == qs.reshape(-1)).all()))
+    in_vocab = bool((tok >= 0).all()) and bool((tok < full.vocab).all()) and t.vocab == full.vocab
+    lens = (t.L == 3 * (S * A + 1), t.qpos == [3 * S * A + 1])
+    good = four and freq_ok and once and both and grouped and distinct and answered and in_vocab and all(lens)
+    print(f"         {A} distinct keys in every sequence: {four}   key frequencies "
+          f"{[round(x, 3) for x in freq.tolist()]} ({A / P:g} +- 0.02): {freq_ok}")
+    print(f"         every used (stream, key) pair once: {once} and both streams per active key: {both}   "
+          f"grouped structure: {grouped}   S distinct values per key: {distinct}")
+    print(f"         the query answered by its own stream's value: {answered}   token ids in [0, {full.vocab}) "
+          f"(task_for({full.P}, {full.S})'s vocabulary): {in_vocab}")
+    print(f"         length {t.L}, query position {t.qpos} (P={full.P}: length {full.L}, query position "
+          f"{full.qpos}); e.g. {tps_decode(tok[0], t)}")
+    print(f"         -> {'OK' if good else 'WRONG'}")
+    return good
 
 
 def tps_decode(row, task):
