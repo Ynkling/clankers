@@ -63,6 +63,7 @@ ARM_A = tsc.ARM["A"]                   # test_router_curriculum's arm A
 SEEDS = tuple(range(160, 180))
 ROUTED_MARGIN = tsc.ROUTED_MARGIN      # 0.9
 WORKERS = min(4, os.cpu_count() or 1)
+THREADS = 1                            # every run single-threaded, as X's workers were
 
 REPRO_SEED, REPRO_ITERS = 160, 2400
 
@@ -92,14 +93,17 @@ def git_head():
 
 def provenance():
     return dict(banner=BANNER, cpu=cpu_model(), torch=torch.__version__, git=git_head(),
-                python=platform.python_version(), started=time.strftime("%Y-%m-%d %H:%M:%S"))
+                python=platform.python_version(), threads=THREADS,
+                started=time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 def print_banner(title):
+    torch.set_num_threads(THREADS)                  # X's runs: single-thread workers
     print("=" * 100)
     print(f"{BANNER.upper()} — {title}")
     pv = provenance()
-    print(f"  cpu {pv['cpu']} | torch {pv['torch']} | git {pv['git']} | python {pv['python']}")
+    print(f"  cpu {pv['cpu']} | torch {pv['torch']} | git {pv['git']} | python {pv['python']}"
+          f" | torch threads {torch.get_num_threads()}")
     print("=" * 100)
     return pv
 
@@ -134,6 +138,7 @@ def recorded(arm):
 
 
 def repro_check():
+    torch.set_num_threads(THREADS)                  # the thread count changes the float sums
     rec = recorded("A")[REPRO_SEED]
     t = time.time()
     r = run_one(ARM_A, REPRO_SEED, REPRO_ITERS, task=TASK, stats_fn=tsc.conv_stats,
@@ -156,7 +161,7 @@ def run_recipe(a, seed, builder=None, run_kw=None, iters=None, lr=None, task=Non
 
 
 def _worker_init():
-    torch.set_num_threads(1)
+    torch.set_num_threads(THREADS)
 
 
 def _worker(job):
