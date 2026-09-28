@@ -282,7 +282,7 @@ class Abandon(Exception):
 
 
 def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=None,
-            stats_fn=None, grad_fn=None, lr=None, builder=None):
+            stats_fn=None, grad_fn=None, lr=None, builder=None, grad_steps=None, run_kw=None):
     """test_readout_path.run_spec's record for one arm and seed, with the generalized gate
     statistics. check(model, step, data) runs after each evaluation's statistics (Part 2);
     keep (CHECK 46 only) receives the weights after opt.step at keep["at"] and the model.
@@ -290,12 +290,16 @@ def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=N
     layout, and its statistics); None = TASK and gate_stats_k, unchanged. grad_fn(model) is
     test_short_conv's (gradient norms by parameter group); None = grad_norms, unchanged. lr and
     builder(a, seed) -> make_model are test_conv_lr's (a learning rate, and a model builder for
-    a task with another vocabulary); None = SUB_LR and make_fn, unchanged."""
+    a task with another vocabulary); None = SUB_LR and make_fn, unchanged. grad_steps (the
+    steps whose gradient norms are recorded) and run_kw (extra onset_run keywords) are
+    test_load_curriculum's; None = GRAD_STEPS and none, unchanged."""
     task = TASK if task is None else task
     stats_fn = gate_stats_k if stats_fn is None else stats_fn
     grad_fn = grad_norms if grad_fn is None else grad_fn
     lr = SUB_LR if lr is None else lr
     builder = make_fn if builder is None else builder
+    grad_steps = GRAD_STEPS if grad_steps is None else grad_steps
+    run_kw = {} if run_kw is None else run_kw
     probe, data = probe_batch(task, seed), eval_batch(task)
     make, stats, grad = builder(a, seed), [], {}
 
@@ -310,7 +314,7 @@ def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=N
             check(m, step, data)
 
     def grad_hook(m, step):
-        if step in GRAD_STEPS:
+        if step in grad_steps:
             grad[str(step)] = grad_fn(m)
 
     def post_step(m, step):
@@ -326,7 +330,7 @@ def run_one(a, seed, iters, eval_every=EVAL_EVERY, check=None, keep=None, task=N
 
     rec = attempt(task, make_and_measure, seed, data, post=post, max_iters=iters,
                   eval_every=eval_every, lr=lr, on_eval=on_eval, grad_hook=grad_hook,
-                  post_step=post_step if keep is not None else None)
+                  post_step=post_step if keep is not None else None, **run_kw)
     rec.update(stats=stats, grad=grad, iters=iters, k=a["n_ch"])
     if rec["ok"]:
         rec["acc"] = rec["curve"][-1][1] if rec["curve"] else float("nan")

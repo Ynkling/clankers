@@ -192,7 +192,7 @@ def evaluate(model, task, data):
 
 def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY,
               data=None, early_stop=True, lr=LR, warmup=0, param_groups=None, on_eval=None,
-              grad_hook=None, post_step=None, early_stop_after=None):
+              grad_hook=None, post_step=None, early_stop_after=None, task_at=None, lr_at=None):
     """run_ml's training recipe, run long, with periodic held-out evaluation.
     lr and warmup (linear over the first `warmup` steps) are test_binding_recipe's knobs;
     with warmup=0 the param-group lr is never touched after the optimizer is built.
@@ -201,7 +201,9 @@ def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY
     loss.backward() and before opt.step(), and post_step(model, step), run right after
     opt.step() (before that step's evaluation), are test_router_curriculum's; with
     early_stop_after=S (test_readout_path's) the early-stop streak counts only
-    evaluations at steps > S. None = unchanged."""
+    evaluations at steps > S. task_at(step) -> the task whose batch and query positions train
+    that step, and lr_at(step) -> the lr set on every param group before that step, are
+    test_load_curriculum's (evaluation stays on task and data). None = unchanged."""
     torch.manual_seed(seed)
     model = make_model()
     if param_groups is None:
@@ -209,15 +211,20 @@ def onset_run(task, make_model, seed, max_iters=MAX_ITERS, eval_every=EVAL_EVERY
     else:
         assert warmup == 0, "param_groups sets per-group lrs; warmup would overwrite them"
         opt = torch.optim.Adam(param_groups(model), lr=lr)
+    assert lr_at is None or (warmup == 0 and param_groups is None), "lr_at sets every group's lr"
     rng = torch.Generator(); rng.manual_seed(seed + 10_000)
     curve, streak = [], 0
     for step in range(1, max_iters + 1):
         if warmup > 0:
             for g in opt.param_groups:
                 g["lr"] = lr * min(1.0, step / warmup)
-        tokens, _ = task.make_batch(BATCH, rng)
+        if lr_at is not None:
+            for g in opt.param_groups:
+                g["lr"] = lr_at(step)
+        bt = task if task_at is None else task_at(step)
+        tokens, _ = bt.make_batch(BATCH, rng)
         inp, tgt = tokens[:, :-1], tokens[:, 1:]
-        ql, qt, _ = task.select(logits_of(model, inp), tgt, None)
+        ql, qt, _ = bt.select(logits_of(model, inp), tgt, None)
         loss = F.cross_entropy(ql, qt)
         opt.zero_grad(); loss.backward()
         if grad_hook is not None:

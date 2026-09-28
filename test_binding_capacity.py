@@ -190,25 +190,37 @@ class OldTask:
 
 class BindTask:
     sanity = False
+    n_active = None          # test_load_curriculum's knob; set on the instance only when used
 
-    def __init__(self, P, S=S_STREAMS, n_vals=N_VALS, n_q=N_Q, layout="grouped"):
+    def __init__(self, P, S=S_STREAMS, n_vals=N_VALS, n_q=N_Q, layout="grouped", n_active=None):
         assert n_q <= S * P and S <= n_vals
         assert layout in LAYOUTS
+        # n_active (test_load_curriculum's knob): each sequence uses n_active of the P keys.
+        # None or P is the task above, unchanged (no instance attribute is set).
+        A = P if n_active is None else n_active
+        assert 1 <= A <= P and n_q <= S * A
+        assert A == P or layout == "grouped", "n_active is implemented for the grouped layout"
         self.S, self.P, self.n_vals, self.n_q = S, P, n_vals, n_q
         self.key = f"P{P}"
         self.label = f"P={P}: new task, S={S}, n_vals={n_vals}, n_q={n_q}"
         self.vocab = S + P + n_vals
         self.ctx_tokens = tuple(range(S))
-        self.L = 3 * (S * P + n_q)
+        self.L = 3 * (S * A + n_q)
         self.T = self.L - 1
-        self.qpos = [3 * (S * P + j) + 1 for j in range(n_q)]
-        self.info_bits = P * S * math.log2(n_vals)
+        self.qpos = [3 * (S * A + j) + 1 for j in range(n_q)]
+        self.info_bits = A * S * math.log2(n_vals)
         # test_router_layout's knob; "grouped" (the default) is the layout above, unchanged
         self.layout = layout
         if layout != "grouped":
             self.label += f", layout={layout}"
+        if A != P:
+            self.n_active = A
+            self.key = f"P{P}a{A}"
+            self.label += f", n_active={A}"
 
     def make_batch(self, B, gen):
+        if self.n_active is not None:
+            return self.make_batch_active(B, gen)
         if self.layout != "grouped":
             return self.make_batch_layout(B, gen)
         S, P, nv, nq = self.S, self.P, self.n_vals, self.n_q
@@ -221,6 +233,25 @@ class BindTask:
         q = torch.rand(B, S * P, generator=gen).argsort(-1)[:, :nq]         # no replacement
         qs, qk = q // P, q % P
         qv = vals.reshape(B, P * S).gather(1, qk * S + qs)
+        queries = torch.stack([qs, S + qk, S + P + qv], dim=-1).reshape(B, -1)
+        return torch.cat([body, queries], dim=1), qs
+
+    def make_batch_active(self, B, gen):
+        """n_active of the P keys per sequence (test_load_curriculum's knob): a uniformly
+        random subset of n_active distinct keys, in random order; each gets S distinct values;
+        its S triples are adjacent in random stream order (the grouped layout), and the query
+        is drawn from the S*n_active triples, as in make_batch. The vocabulary stays P's."""
+        S, P, A, nv, nq = self.S, self.P, self.n_active, self.n_vals, self.n_q
+        act = torch.rand(B, P, generator=gen).argsort(-1)[:, :A]            # active keys, in order
+        vals = torch.rand(B, A, nv, generator=gen).argsort(-1)[..., :S]    # (B,A,S) distinct
+        sorder = torch.rand(B, A, S, generator=gen).argsort(-1)             # stream order
+        vg = vals.gather(2, sorder)
+        keys = (S + act).unsqueeze(-1).expand(B, A, S)
+        body = torch.stack([sorder, keys, S + P + vg], dim=-1).reshape(B, -1)
+        q = torch.rand(B, S * A, generator=gen).argsort(-1)[:, :nq]         # no replacement
+        qs, qi = q // A, q % A
+        qk = act.gather(1, qi)
+        qv = vals.reshape(B, A * S).gather(1, qi * S + qs)
         queries = torch.stack([qs, S + qk, S + P + qv], dim=-1).reshape(B, -1)
         return torch.cat([body, queries], dim=1), qs
 
