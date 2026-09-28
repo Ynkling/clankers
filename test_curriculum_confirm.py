@@ -117,6 +117,52 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 CUR_lo_R's trials are queued as soon as their CUR_lo run is known; CUR16 is queued when the
 last CUR16_ceiling run is known. Results persist atomically to curriculum_confirm_results.json
 (gitignored; copied into results/X/ after the run).
+
+RESULT (full run, 83/83 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz, 4 workers
+x 1 thread; projection 8.72 h worst case, so Part 2 ran; 216.9 min after verification; --prev
+results/X/load_curriculum_results.json; no --also file; machine X, commit c5ec279).
+  VALID: CUR_ceiling_lo bound 5/5.
+  K1 THE CURRICULUM BEATS TRAINING FROM SCRATCH: NOT SHOWN. CUR_lo 16/20 vs DIRECT_lo 12/15;
+     Fisher one-sided p = 0.66; McNemar on seeds 200-214: CUR_lo only 2 (s208, s213), DIRECT_lo
+     only 3 (s203, s204, s214), p = 1.
+  K2 THE GAIN NEEDS CHANNELS: SHOWN. CUR_lo 16/20 vs CUR_B_lo 0/15; Fisher one-sided p = 1.19e-06;
+     McNemar on seeds 200-214: CUR_lo only 11, CUR_B_lo only 0, p = 0.000977.
+  K3 RELIABLE: RELIABLE. CUR_lo_R bound 20/20 (CUR_lo alone 16/20: MAJORITY).
+  The pre-registered reading: K1 NOT SHOWN: "at a constant 1e-3, training at P=8 from scratch
+  does about as well as the curriculum." (K1 NOT SHOWN rules out the reading that needs K1, K2
+  and K3 together.)
+
+  Diagnostics (not part of the verdict):
+  - At lr 1e-3 the gate binds P=8 from scratch: DIRECT_lo 12/15 (transition median 3600, three
+    runs at 1200). The recorded A_conv8 at 4e-3 bound 4/30 on seeds 160-189; the seeds differ, so
+    this is descriptive, but it points at the lr, not the curriculum, as what rescued the gate at
+    P=8. DIRECT_lo's failures: s207 and s213 KEY, s208 OTHER.
+  - Every binder of every gated Part 1 arm ended routed (end margin >= 0.9): CUR_ceiling_lo 5/5,
+    CUR_lo 16/16, CUR_lo_R 20/20, DIRECT_lo 12/12. test_load_curriculum's CUR_A (4e-3 in phase 2)
+    had 4 unrouted binders of 20.
+  - Routing persistence: of the 21 distinct CUR_lo / CUR_lo_R runs routed at the switch, 0 lost it
+    by step 6000 (on accuracy < 0.8, on margin < 0.5, and on VAL cos > 0.5 alike); all 21 bound.
+    test_load_curriculum's CUR_A on this machine: 21/30 routed at the switch, 5 lost on accuracy
+    alone, 6 with VAL cos > 0.5 at 6000; its CUR_A_lo: 0 of 7. CUR_ceiling_lo s200 is counted as
+    lost on accuracy alone (0.634 at the switch, 0.670 at 6000) with its margin at 1.000
+    throughout: the accuracy criterion also counts runs that were never above 0.8.
+  - The phase-1 check sorts CUR_lo: the 13 runs that passed it (>= 0.6 at 2400) all bound, 12 of
+    them at 6000 (s200 at 9600); of the 7 that failed it, 3 bound (s215 at 6000; s205 and s210 at 13200 and 14400,
+    routing found in phase 2) and 4 did not (s203, s204, s207, s214, all POSITION-split at the
+    switch and at the end, near 0.34-0.48). CUR_lo_R restarted those 7: attempt 2 for 203, 204,
+    207, 210 and 214, attempt 3 for 205 and 215; all 7 passed, routed at the switch and bound (s214
+    at 10800, the rest at 6000). CUR_lo_R vs CUR_lo: 4 vs 0, McNemar p = 0.125.
+  - The transfer is immediate: 8-key accuracy at the switch, before any 8-key training, median
+    0.949 in CUR_lo (>= 0.95 in 10/20) and 0.967 in CUR_lo_R (14/20).
+  - One channel does not bind at 1e-3 with or without the curriculum: CUR_B_lo 0/15, every run
+    between 0.39 and 0.51 at 28800; its phase-1 accuracy stayed near 0.5 (median 0.48 at 4800).
+  - Part 2 (P=16, descriptive): CUR16_ceiling bound 3/3 (10800, 10800, 22800). CUR16 bound 4/5:
+    s203 and s204 routed from stage 1 (margin >= 0.999 at 4800) and bound at 10800, the first
+    16-key evaluation after the second switch; s200 (12000) and s201 (22800) bound WITHOUT the
+    stream routing (margin ~0 and VAL cos ~1 at every stage; end lag-2 |w| 0.09 and 0.06 vs 0.04 and
+    0.05 for the routed binders); s202 did not bind (0.40 at 33600, OTHER; 0.38 on the 4-key set at
+    4800). 16-key accuracy at 9600, before any 16-key training: routed CUR16 0.77 and 0.88, the
+    ceiling 0.62-0.87, the unrouted s200 0.91 and s201 0.71.
 """
 
 import argparse
