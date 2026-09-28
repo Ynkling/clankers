@@ -129,7 +129,48 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 rule). CUR_A_R's trials are queued as soon as their CUR_A run is known. Results persist
 atomically to load_curriculum_results.json (gitignored; copied into results/X/ after the run).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 95/95 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; projection 11.83 h worst case; paired with results/X/p_scaling_results.json;
+no --also file; machine X, commit b7c18f0). The container restarted after 94 of 95 runs (216.9
+min after verification); the same command was re-run on the same results file, which re-ran the
+full verification (all passed) and only the missing run, CUR_A_lo seed 169 (24.2 min). Runs are
+deterministic per seed, so the cached records stand. meta.started is the first start; meta.resumed
+records the second.
+  VALID: CUR_ceiling bound 5/5 and the pairing CHECK (72) passed.
+  C1 THE CURRICULUM HELPS THE GATE: SHOWN. CUR_A 20/30 vs the recorded A_conv8 4/30 on the same
+     seeds; CUR_A only 16, A_conv8 only 0; one-sided McNemar p = 1.53e-05.
+  C2 THE GAIN NEEDS CHANNELS: SHOWN. CUR_A 14/20 (seeds 160-179) vs CUR_B 4/20; Fisher one-sided
+     p = 0.00182; McNemar on the pairs: CUR_A only 11, CUR_B only 1, p = 0.00635.
+  C3 ROUTING TRANSFERS: SHOWN. Over 38 distinct runs of CUR_A and CUR_A_R, runs routed at the
+     switch bound 27/29, runs not routed 1/9; Fisher one-sided p = 7.79e-06.
+  C4 A RELIABLE RECIPE: RELIABLE. CUR_A_R bound 28/30.
+  The pre-registered readings: C1 SHOWN and C3 SHOWN: "routing found at a low load carries over
+  to a high load: learn the partition where it is easy." C4 RELIABLE: "curriculum + restarts
+  binds P=8 reliably."
+
+  Diagnostics (not part of the verdict):
+  - Much of the transfer is immediate: at the switch, before any P=8 training, P=8 held-out
+    accuracy was >= 0.95 in 16/30 CUR_A runs (median 0.952), and 17 of CUR_A's 20 binders held
+    from the first phase-2 evaluation (step 6000); the other 3 bound at 14400 (s166), 21600
+    (s177) and 24000 (s183). CUR_ceiling was >= 0.95 at the switch in 3/5 runs.
+  - The restart rule: 22/30 CUR_A runs passed the phase-1 check (>= 0.6 at 2400); every CUR_A
+    binder was among them (20 of the 22; s175 and s186 passed and did not bind). The 8 restarted
+    seeds passed at attempt 2 (161, 170, 171) or 3 (163, 169, 181, 187, 188) and all 8 bound; no
+    trial needed the last-attempt fallback. CUR_A_R vs CUR_A: 8 vs 0, McNemar p = 0.0078.
+  - Routing at the switch was the gate: routed at the switch 29/38 distinct runs. Of the 27
+    routed binders, 22 were still routed at the end; 5 lost the routing in phase 2 (end margin
+    ~0: CUR_A s166, s177, s182; CUR_A_R attempts 1170 and 2181) yet stayed bound, with the
+    single-channel lag-2 signature (unrouted binders lag 2 median 0.158-0.196, routed 0.049).
+    The one binder not routed at the switch was CUR_A s172 (bound at 6000, unrouted). CUR_A's
+    10 failures: KEY 5, POSITION 5 at the end; all 9 of CUR_A's runs not routed at the switch
+    were POSITION-split there.
+  - Phase 2 at lr 1e-3 (CUR_A_lo) bound 9/10 and every binder ended routed (CUR_A at 4e-3 on the
+    same seeds: 7/10; CUR_A_lo only 2, CUR_A only 0). At 4e-3 some routed binders drift to
+    unrouted binding after the switch; at 1e-3 none did.
+  - A single channel gains little from the curriculum: CUR_B 4/20 vs the recorded B_conv8 1/20
+    (4 vs 1, p = 0.375); its phase-1 accuracy stayed at the ~0.5 plateau (median 0.49 at 4800),
+    and its binders came late (median 23400, plateau median 12600 steps).
+  - Unbound runs end near the 0.50 plateau (CUR_A 0.33-0.53, CUR_B 0.29-0.51); none collapsed.
 """
 
 import argparse

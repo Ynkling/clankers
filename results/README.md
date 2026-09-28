@@ -16,3 +16,4 @@ Commit = the git head each run was started from (its `meta.git`); date = its `me
 | X/short_conv_results.json | X: Intel(R) Xeon(R) Processor @ 2.10GHz | f1cc9ab | 2026-09-27 05:14 |
 | X/conv_lr_results.json | X: Intel(R) Xeon(R) Processor @ 2.10GHz | 3c69afd | 2026-09-27 17:43 |
 | X/p_scaling_results.json | X: Intel(R) Xeon(R) Processor @ 2.10GHz | 745564f | 2026-09-27 23:46 |
+| X/load_curriculum_results.json | X: Intel(R) Xeon(R) Processor @ 2.10GHz | b7c18f0 | 2026-09-28 07:23 |
