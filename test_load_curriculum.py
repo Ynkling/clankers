@@ -164,9 +164,14 @@ records the second.
     The one binder not routed at the switch was CUR_A s172 (bound at 6000, unrouted). CUR_A's
     10 failures: KEY 5, POSITION 5 at the end; all 9 of CUR_A's runs not routed at the switch
     were POSITION-split there.
-  - Phase 2 at lr 1e-3 (CUR_A_lo) bound 9/10 and every binder ended routed (CUR_A at 4e-3 on the
-    same seeds: 7/10; CUR_A_lo only 2, CUR_A only 0). At 4e-3 some routed binders drift to
-    unrouted binding after the switch; at 1e-3 none did.
+  - The lr jump at the switch breaks the routing in some runs (post hoc): of the 29 distinct
+    CUR_A / CUR_A_R runs routed at the switch, 9 had VAL cos ~1 at the first phase-2 evaluation
+    (6000; VAL cos ~0 at 4800), and P=8 accuracy fell from 0.93-0.99 to 0.2-0.7 in 8 of them.
+    Of those 9: 2 re-routed and bound (s183 at 24000, attempt 2169 at 7200), 5 bound without
+    routing (s166, s177, s182, 1170, 2181), 2 never bound (s175, s186; they are 2 of the 2
+    routed-at-the-switch failures). In CUR_A_lo (phase 2 at lr 1e-3) none of the 7 runs routed
+    at the switch lost it; CUR_A_lo bound 9/10 and every binder ended routed (CUR_A at 4e-3 on
+    the same seeds: 7/10; CUR_A_lo only 2, CUR_A only 0).
   - A single channel gains little from the curriculum: CUR_B 4/20 vs the recorded B_conv8 1/20
     (4 vs 1, p = 0.375); its phase-1 accuracy stayed at the ~0.5 plateau (median 0.49 at 4800),
     and its binders came late (median 23400, plateau median 12600 steps).
