@@ -101,7 +101,45 @@ LOGISTICS. Parallel single-thread workers; wall clock projected before training 
 rule). Results persist atomically to p_scaling_results.json (gitignored; copied into
 results/X/ after the run).
 
-(Results are recorded at the bottom of this docstring after the run.)
+RESULT (full run, 84/84 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz,
+4 workers x 1 thread; 318.0 min after verification, projection 8.46 h worst case; paired with
+results/X/conv_lr_results.json; no --also file; machine X, commit 745564f).
+  VALID: ceiling_conv8 bound 8/8 (steps 1200-15600) and the pairing CHECK (64) passed.
+  P1 THE GATE ADDS AT P=8: NOT SHOWN. A_conv8 4/30 vs B_conv8 2/30; Fisher one-sided p = 0.335;
+     McNemar on the pairs: A_conv8 only 4, B_conv8 only 2, p = 0.688.
+  P2 THE GATE'S ADVANTAGE GROWS WITH P: NOT SHOWN. Over seeds 160-189, sum D_4 = +3 (A_conv4
+     17, B_conv4 14) and sum D_8 = +2 (A_conv8 4, B_conv8 2); D_8 - D_4 positive 7, negative 9,
+     zero 14; one-sided sign test p = 0.773.
+  P3 TWO CHANNELS BEAT ONE CHANNEL WITH THE SAME MEMORY AT P=8: NOT SHOWN. A_conv8 4/30 vs
+     B_wide_conv8 1/16; Fisher one-sided p = 0.424; McNemar on seeds 160-175: A_conv8 only 2,
+     B_wide_conv8 only 1, p = 1.
+  M1-P8 LAG 2 STILL MARKS SINGLE-CHANNEL BINDING AT P=8: SHOWN. B_conv8 + B_wide_conv8: the 3
+     bound runs (the minimum testable) have end lag-2 mean |w| median 0.152 [0.141, 0.210], the
+     43 unbound 0.076 [0.046, 0.133]; U = 129, one-sided p = 6.59e-05.
+  The pre-registered reading: P1 NOT SHOWN: "at P=8 one channel with the convolution keeps up
+  with the gated model: no capacity advantage from two channels at this load."
+
+  Diagnostics (not part of the verdict):
+  - At P=8 the learned arms almost never bind within 24000 steps, so P1-P3 compare two rates
+    near the floor. On the same seeds, binding fell from P=4 to P=8: A_conv 17/30 -> 4/30
+    (15 bound at P=4 only, 2 at P=8 only), B_conv 14/30 -> 2/30 (14 / 2), B_wide_conv 9/16 ->
+    1/16 (9 / 1). The perfect gate still bound 8/8. The reading's "keeps up" here means both
+    arms fail about equally often, not that either binds P=8.
+  - Final accuracy (median [min, max]; count >= 0.9): B_conv8 0.495 [0.340, 1.000], 2/30;
+    A_conv8 0.502 [0.219, 1.000], 4/30; B_wide_conv8 0.504 [0.306, 1.000], 1/16; ceiling_conv8
+    1.000 [0.994, 1.000], 8/8. Unbound runs sit mostly at the ~0.50 stream-ambiguity plateau
+    (B_conv8 0.34-0.53, B_wide_conv8 0.31-0.52, A_conv8 0.22-0.76; below 0.45: 8, 3 and 6 runs).
+  - A_conv8's 4 binders: 2 routed and DISCOVERED (seeds 172, 177), 2 not routed (162, 179).
+    Its 26 failures: POSITION 15, OTHER 8, KEY 3, STREAM-PARTIAL 0.
+  - Lag 2 at the end: single-channel binders 0.14-0.21 against a median of 0.075-0.079 for
+    non-binders; A_conv8's unrouted binders 0.19-0.25, routed binders 0.045-0.050.
+  - Transitions: ceiling_conv8 median 3000 [1200, 15600] (P=4: all at 1200). The learned arms'
+    few binders came at 2400-21600.
+  - The restart check (>= 0.6 at step 2400) passed 0/30 A_conv8 runs and 1/30 B_conv8 runs; it
+    would have thrown away every A_conv8 binder.
+  - Step-1 gradient norms: conv median 5.8e-02, gate ~7e-06, as at P=4.
+  - ceiling_conv8 seeds 160-164 repeat test_conv_lr's ceiling_P8_conv4 runs (same arm, seed and
+    task) and bound at the same steps (15600, 9600, 2400, 1200, 8400).
 """
 
 import argparse
