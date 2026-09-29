@@ -144,6 +144,9 @@ X, commit 248c482).
     ~0.5, ~0.5; the merged pair was streams 0+1 in s221, s226, s239 and 2+3 in s223, s225), and 6
     with every stream on one channel at 0.24-0.38 (POSITION s227, s232, s234, s235; OTHER s224;
     KEY s238).
+  - The curves show A4k4's routing arriving in steps: held-out accuracy (and the margin) climb
+    through plateaus near 0.5 and 0.75 before binding (e.g. s222, s228, s230, s231, s233); the 5
+    STREAM-PARTIAL failures stopped on the 0.75 plateau (margin 0.70-0.84).
   - The restart check (>= 0.6 at 2400) does not transfer to S=4: A4k4 passed it in 1/20 runs (s226,
     which did not bind), and all 9 binders failed it. DIRECT8 passed in 10/20, all 10 bound; 3 of
     the 10 that failed also bound.
