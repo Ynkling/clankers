@@ -108,6 +108,43 @@ test's), then
 LOGISTICS. Parallel single-thread workers; wall clock projected before training (worst case,
 no drop rule). Results persist atomically to stream_channels_results.json (gitignored; copied
 into results/X/ after the run).
+
+RESULT (full run, 43/43 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz, 4 workers
+x 1 thread; projection 4.60 h worst case; 174.0 min after verification; paired with
+results/X/scale_axes_results.json; no --also file; machine X, commit e5a24ae).
+  VALID: ceiling4k8 bound 3/3 (all at 1200); the pairing CHECK (85) passed; the k=8 and k=16
+  recurrent gates fit the perfect routing (argmax 1.0000 each).
+  K8 EIGHT CHANNELS BIND MORE: NOT SHOWN. A4k8 10/20 vs the recorded A4k4 9/20; A4k8 only 4
+     (s221, s227, s234, s235), A4k4 only 3 (s222, s230, s231); one-sided McNemar p = 0.5.
+  K16 SIXTEEN CHANNELS BIND MORE: NOT SHOWN. A4k16 10/20 vs 9/20; A4k16 only 4 (s224, s225, s227,
+     s232), A4k4 only 3 (s222, s230, s237); p = 0.5.
+  MG FEWER MERGES: NOT SHOWN. MERGED A4k16 10/20 vs the recorded A4k4 12/20; Fisher one-sided
+     p = 0.376.
+  Bands: A4k8 10/20 MAJORITY, A4k16 10/20 MAJORITY.
+  The pre-registered reading: K8 and K16 NOT SHOWN: "spare channels do not help four streams at
+  this size."
+
+  Diagnostics (not part of the verdict):
+  - The kind of merge changes, not the count. MERGED as defined (shared >= 2) includes runs with
+    every stream on one channel. By how many streams share: A4k4 had 5 two-stream merges
+    (STREAM-PARTIAL at ~0.75), 1 three-stream binder and 6 runs with all four streams on one
+    channel; A4k8 had 1 two-stream merge (s232, 0.75) and 9 all-on-one-channel runs; A4k16 had 1
+    two-stream merge (s237, at 0.51 with two pairs) and 9 all-on-one-channel runs. Every k=8 and
+    k=16 all-on-one-channel run ended at chance (0.21-0.26) with the margin 0 at every evaluation
+    (non-stream POSITION or OTHER). Post hoc and descriptive: the spare channels removed most
+    two-stream stalls, and the failures moved to runs that never split the streams at all.
+  - Every k=8 and k=16 binder ended with a one-to-one stream -> channel map (10/10 and 10/10;
+    A4k4 8/9) and bound earlier: transition median 5400 (k=8) and 3600 (k=16) vs 14400 for A4k4;
+    time on the 0.70-0.80 plateau before the transition, median 1800 and 1200 vs 4800.
+  - The margin's "routed" line (0.9) is rarely crossed at k > 4: 3 of 10 k=8 binders and 0 of 10
+    k=16 binders, all with every stream at 1.00. Their streams spread over more channels than
+    four (channels used by binders, median 6 at both k=8 and k=16; eff_ch median 6.2 and 9.2),
+    so the query's gate is less peaked and g_q.g_tgt smaller. "Routed" at k > 4 therefore
+    undercounts; one-to-one and per-stream accuracy are the better signs here.
+  - Seeds: 5 seeds bound at every k (220, 228, 229, 233, 236); 4 failed at every k (223, 226,
+    238, 239).
+  - The restart check (>= 0.6 at 2400) passed 3/20 (k=8) and 4/20 (k=16), all of which bound;
+    A4k4 1/20 (not bound).
 """
 
 import argparse
