@@ -112,6 +112,42 @@ earlier test's), then
 LOGISTICS. Parallel single-thread workers; wall clock projected before training (worst case,
 no drop rule). Results persist atomically to scale_axes_results.json (gitignored; copied into
 results/X/ after the run).
+
+RESULT (full run, 80/80 runs complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz, 4 workers
+x 1 thread; projection 8.61 h worst case; 362.8 min after verification; no --also file; machine
+X, commit 248c482).
+  VALID A: ceiling8 bound 3/3. VALID B: ceiling4k4 bound 5/5 (all at 1200), and the recurrent
+  k=4 gate fits the perfect 4-way routing (argmax 1.0000, mse 3.9e-06).
+  M1 THE GATE BEATS ONE CHANNEL OF THE SAME MEMORY AT P=8: SHOWN. DIRECT8 13/20 vs B_wide8 0/12;
+     Fisher one-sided p = 0.000223; McNemar on seeds 220-231: DIRECT8 only 8, B_wide8 only 0,
+     p = 0.0078.
+  S1 FOUR STREAMS BIND: MINORITY. A4k4 bound 9/20.
+  S2 THE GATE BEATS ONE CHANNEL AT S=4: SHOWN. A4k4 9/20 vs B4s 0/10; Fisher one-sided p = 0.0117.
+  The pre-registered readings: M1 SHOWN: "at P=8 the gate beats a single channel with the same
+  total memory: the partition, not the memory size." S1 MINORITY: "four streams defeat routing
+  discovery from scratch at this size." (S1 MINORITY rules out the S1 + S2 reading.)
+
+  Diagnostics (not part of the verdict):
+  - The memory-matched single channel does not bind at 1e-3 either: B_wide8 0/12 and B8 0/10,
+    every run at 0.48-0.53 with both streams at ~0.5 (keys bound, streams at chance). B_wide8 has
+    DIRECT8's fast-weight state (49152) and 1.8x its parameters (50944 vs 28480).
+  - Every DIRECT8 binder ended routed (13/13, one-to-one maps). Its 7 failures: 5 POSITION near
+    0.5 (s222, s223, s229, s236, s239) and 2 STREAM-PARTIAL at 0.89 (s221, s232; margins 0.87 and
+    0.98 but accuracy still under 0.95 at 28800). DIRECT8 13/20 vs test_curriculum_confirm's
+    DIRECT_lo 12/15 (different seeds).
+  - Four streams: A4k4's 9 binders came late (transition median 14400, range 6000-26400); the
+    margin was ~0 at 1200 and 2400 in 19/20 runs. 8 binders ended routed with a one-to-one
+    stream -> channel map (margin 0.93-0.98); s237 bound WITHOUT routing (map [3, 0, 0, 0], margin
+    0.34, end lag-2 |w| 0.089 vs 0.033 median for the routed binders).
+  - A4k4's 11 failures fall into two groups, none one-to-one: 5 STREAM-PARTIAL at 0.74-0.75 with
+    exactly two streams sharing a channel, the other two solved (per-stream accuracy 1.0, 1.0,
+    ~0.5, ~0.5; the merged pair was streams 0+1 in s221, s226, s239 and 2+3 in s223, s225), and 6
+    with every stream on one channel at 0.24-0.38 (POSITION s227, s232, s234, s235; OTHER s224;
+    KEY s238).
+  - The restart check (>= 0.6 at 2400) does not transfer to S=4: A4k4 passed it in 1/20 runs (s226,
+    which did not bind), and all 9 binders failed it. DIRECT8 passed in 10/20, all 10 bound; 3 of
+    the 10 that failed also bound.
+  - One channel at S=4: B4s 0/10, every run at 0.23-0.26 (chance over the 4 streams' values).
 """
 
 import argparse
