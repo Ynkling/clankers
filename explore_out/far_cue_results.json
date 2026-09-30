@@ -81,5 +81,158 @@
    "torch": "2.14.0+cu130"
   }
  },
- "runs": {}
+ "runs": {
+  "far_ceil|160": {
+   "acc": 1.0,
+   "collapsed": false,
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     1.0,
+     0.03522912412881851
+    ],
+    [
+     2400,
+     1.0,
+     0.007015636190772057
+    ],
+    [
+     3600,
+     1.0,
+     0.0044663348235189915
+    ]
+   ],
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9997558780843985,
+    "eta_key_by_half": 0.00152587890625,
+    "eta_key_by_index": 0.00152587890625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.00152587890625,
+    "eta_val_by_index": 0.00152587890625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.01816725730895996,
+    "key_sep": 0.00947547952334086,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "grad": {
+    "1": [
+     0.0,
+     2.9492215794429724,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.5048492101127233,
+     0.0
+    ],
+    "100": [
+     0.0,
+     3.2857461098127883,
+     0.0
+    ]
+   },
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "ok": true,
+   "params": 25984,
+   "sched": "lr 0.001 throughout",
+   "secs": 55.06573939323425,
+   "secs_wall": 55.25124454498291,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9997558780843985,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.01816725730895996,
+     "key_sep": 0.00947547952334086,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9997558780843985,
+     "eta_key_by_half": 0.00152587890625,
+     "eta_key_by_index": 0.00152587890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00152587890625,
+     "eta_val_by_index": 0.00152587890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.01816725730895996,
+     "key_sep": 0.00947547952334086,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9997558780843985,
+     "eta_key_by_half": 0.00152587890625,
+     "eta_key_by_index": 0.00152587890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00152587890625,
+     "eta_val_by_index": 0.00152587890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.01816725730895996,
+     "key_sep": 0.00947547952334086,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9997558780843985,
+     "eta_key_by_half": 0.00152587890625,
+     "eta_key_by_index": 0.00152587890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00152587890625,
+     "eta_val_by_index": 0.00152587890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.01816725730895996,
+     "key_sep": 0.00947547952334086,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": 1200,
+   "val_cos": 0.0
+  }
+ }
 }
