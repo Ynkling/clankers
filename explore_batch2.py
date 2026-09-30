@@ -60,11 +60,25 @@ schedule; per-seed tables (with X's A and A_conv columns for S4 and S5), then th
 verdicts. Records: explore_out/<screen>_results.json. --dry writes dry_<screen>_results.json:
 1 seed per arm, runs capped at 3600 steps (so both switches at 2400 run), labelled DRY RUN.
 
-Run:  python explore_batch2.py [--workers 4] [--dry]
+SEGMENTS (added after the dry run, before any batch-2 result was read; rules and arms unchanged)
+The session's background time limit stops long runs, so the batch runs in segments; every saved
+run is reused and only missing runs re-run (runs are deterministic per seed).
+  --order a,b,c,d   queue order by screen NAME. run_jobs2 queues runs by arm priority; the driver
+                    sets the priorities in memory (len..1 in this order). Screen files unchanged.
+  --resume          prints a RESUME line; always runs the repro check. If no file outside
+                    explore_out/ and explore_batch2.py differs from CHECKS_SHA (the head whose full
+                    CHECK suite is in the first segment's log), the rest of the CHECK suite is
+                    skipped and the git diff --stat is printed; otherwise every CHECK runs.
+  --report-only     prints the reports from the saved runs (no repro check, CHECKs or runs).
+  --stopped-early N a screen left incomplete on purpose is reported "stopped early, n/N seeds, no
+                    verdict". Any incomplete screen gets no verdict (and no S5/S6 reading).
+
+Run:  python explore_batch2.py [--workers 4] [--dry] [--order ...] [--resume] [--report-only]
 """
 
 import argparse
 import os
+import subprocess
 import sys
 import time
 
@@ -81,6 +95,7 @@ from explore_batch1 import verdict, PROMISING_D, PROMISING_P
 
 SCREENS = (s4, s5, s6)
 DRY_ITERS = 3600
+CHECKS_SHA = "6f529b5"          # the head whose full CHECK suite ran in segment 1
 
 
 def make_dry():
@@ -91,14 +106,58 @@ def make_dry():
                   for k, a in m.ARMS.items()}
 
 
+def git(*a):
+    return subprocess.run(["git", "-C", HERE, *a], capture_output=True, text=True,
+                          check=True).stdout
+
+
+def code_changes():
+    """Files outside explore_out/ and explore_batch2.py that differ from CHECKS_SHA (working
+    tree, tracked) or are untracked (not ignored)."""
+    files = git("diff", "--name-only", CHECKS_SHA).split() + \
+        git("ls-files", "--others", "--exclude-standard").split()
+    return sorted(f for f in set(files)
+                  if not f.startswith("explore_out/") and f != "explore_batch2.py")
+
+
+def base(m):
+    return m.NAME[4:] if m.NAME.startswith("dry_") else m.NAME
+
+
+def apply_order(order):
+    mods = {base(m): m for m in SCREENS + (ref,)}
+    names = order.split(",")
+    assert sorted(names) == sorted(mods), f"--order must name each of {sorted(mods)}"
+    for i, n in enumerate(names):
+        for a in mods[n].ARMS.values():
+            a["prio"] = len(names) - i
+    print(f"  order (--order): {', '.join(names)} — run_jobs2 queues runs by arm priority, set in "
+          f"memory to {len(names)}..1 in this order (the screen files are unchanged)")
+
+
+def completeness(m):
+    st = ec.load_store(m.NAME)
+    want = [(k, s) for k, a in m.ARMS.items() for s in a["seeds"]]
+    have = [1 for k, s in want if (r := st["runs"].get(f"{k}|{s}")) and r.get("ok")]
+    return len(have), len(want)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=ec.WORKERS)
     ap.add_argument("--dry", action="store_true")
+    ap.add_argument("--order", default=None)
+    ap.add_argument("--resume", action="store_true")
+    ap.add_argument("--report-only", action="store_true")
+    ap.add_argument("--stopped-early", default=None)
     args = ap.parse_args()
     if args.dry:
         make_dry()
     dl = c2.dry_label()
+    if args.resume:
+        print("#" * 20 + f" RESUME {time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())} UTC — the "
+              "previous segment was stopped by the session's background time limit; saved runs are "
+              f"reused, missing runs re-run ({ec.BANNER}) " + "#" * 20)
     pv = ec.print_banner("batch 2: kwta_warm (S4), slow_mem (S5), far_cue (S6), ref_a2400" + dl)
     print(f"  recipe: lr = test_channel_binding.SUB_LR = {ec.SUB_LR:g} (passed explicitly), "
           f"MAX_ITERS = test_short_conv.MAX_ITERS = {ec.MAX_ITERS}, task P={ec.TASK.P} S={ec.TASK.S} "
@@ -110,42 +169,70 @@ def main():
           "b - c <= 0; neither otherwise")
     print("  S6: UNTESTED if far_ceil < 2/3; 'LOCAL3 survives a distant cue' if far_L3 >= far_A + 3; "
           "'LOCAL3's gain needs the cue in view' if far_L3 <= far_A")
-    if not ec.repro_check():
-        print("  ! this container does not reproduce X: the recorded pairing is invalid; stopping.")
-        sys.exit(1)
-    t0 = time.time()
-    for s in SCREENS:
-        if not s.check():
-            print(f"  ! CHECK failed in {s.NAME}; stopping.")
+    if args.order:
+        apply_order(args.order)
+    if not args.report_only:
+        if not ec.repro_check():
+            print("  ! this container does not reproduce X: the recorded pairing is invalid; stopping.")
             sys.exit(1)
-    print(f"  all CHECKs passed ({(time.time() - t0) / 60:.1f} min)", flush=True)
-    for s in SCREENS + (ref,):
-        c2.print_screen_header2(s)
-    c2.projection(SCREENS + (ref,), args.workers)
-    t0 = time.time()
-    c2.run_jobs2(SCREENS + (ref,), workers=args.workers, pv=pv)
-    print(f"  batch wall clock {(time.time() - t0) / 60:.1f} min")
+        changed = code_changes() if args.resume else None
+        if args.resume and not changed:
+            print(f"  CHECKs skipped (repro check above still run): the screen code is unchanged — no "
+                  f"file outside explore_out/ and explore_batch2.py differs from {CHECKS_SHA}; the "
+                  f"first segment's full CHECK output is in this log. git diff --stat {CHECKS_SHA}:")
+            for ln in git("diff", "--stat", CHECKS_SHA).rstrip().splitlines():
+                print(f"    {ln}")
+        else:
+            if args.resume:
+                print(f"  code differs from {CHECKS_SHA} outside explore_out/ and explore_batch2.py "
+                      f"({changed}): running every CHECK")
+            t0 = time.time()
+            for s in SCREENS:
+                if not s.check():
+                    print(f"  ! CHECK failed in {s.NAME}; stopping.")
+                    sys.exit(1)
+            print(f"  all CHECKs passed ({(time.time() - t0) / 60:.1f} min)", flush=True)
+        for s in SCREENS + (ref,):
+            c2.print_screen_header2(s)
+        c2.projection(SCREENS + (ref,), args.workers)
+        t0 = time.time()
+        c2.run_jobs2(SCREENS + (ref,), workers=args.workers, pv=pv)
+        print(f"  batch wall clock {(time.time() - t0) / 60:.1f} min (this segment)")
+    else:
+        print("  REPORT ONLY: from the saved runs (no repro check, CHECKs or runs in this call)")
     print("#" * 100)
     print(f"REPORTS — {ec.BANNER}{dl}")
     print("#" * 100)
     refs = ref.report(ec.load_store(ref.NAME))
     print()
     tagp = "DRY RUN " if args.dry else ""
+
+    def status(m, v):
+        n, N = completeness(m)
+        if n == N:
+            return v, True
+        if args.stopped_early and base(m) == args.stopped_early:
+            return f"stopped early, {n}/{N} seeds, no verdict", False
+        return f"INCOMPLETE, {n}/{N} runs, no verdict", False
+
     d4 = s4.report(ec.load_store(s4.NAME), refs)
-    v4 = verdict(d4)
+    v4, _ = status(s4, verdict(d4))
     print(f"  {tagp}VERDICT {s4.NAME}: {v4}  [{ec.BANNER}]\n")
     d5 = s5.report(ec.load_store(s5.NAME), refs)
-    v5 = verdict(d5)
+    v5, full5 = status(s5, verdict(d5))
+    if not full5:
+        d5["reading"] = "none (S5 incomplete; the READING line above is not applied)"
     print(f"  {tagp}VERDICT {s5.NAME}: {v5}  [{ec.BANNER}]\n")
     d6 = s6.report(ec.load_store(s6.NAME))
-    print(f"  {tagp}S6 {s6.NAME}: {d6['reading']}  (descriptive)  [{ec.BANNER}]\n")
+    v6, full6 = status(s6, d6["reading"])
+    print(f"  {tagp}S6 {s6.NAME}: {v6}  (descriptive)  [{ec.BANNER}]\n")
     print("#" * 100)
     print(f"SUMMARY — {ec.BANNER}{dl}")
     print(f"  S4 kwta_warm: {v4} (DISCOVERED {d4['new']}/{d4['n']} vs X A {d4['old']}/{d4['n']}, "
           f"{d4['b']} vs {d4['c']}, p = {d4['p']:.3g})")
     print(f"  S5 slow_mem:  {v5} (DISCOVERED {d5['new']}/{d5['n']} vs X A {d5['old']}/{d5['n']}, "
           f"{d5['b']} vs {d5['c']}, p = {d5['p']:.3g}); reading: {d5['reading']}")
-    print(f"  S6 far_cue:   {d6['reading']}")
+    print(f"  S6 far_cue:   {v6}")
     print("#" * 100)
 
 
