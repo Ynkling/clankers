@@ -1,1 +1,117 @@
 #################### NOTE 2026-09-30 16:01:38 UTC — batch 3 runs in segments with batch 2's machinery: the first segment runs the full CHECK suite and records its head in explore_out/batch3_checks.json; each later segment (--resume, after the session's background time limit stops the previous one) runs the repro check and skips the rest only if the screen code is unchanged. Order: slow_mem_ext, far_gates, near_check. A watcher outside the repo commits and pushes explore_out/ after every saved run. (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 3: slow_mem_ext (S7), far_gates (S8), near_check (S9)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 82ee219+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S7 rule (20 new seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED vs X's arm A)
+  S8 rule per arm: promising if DISCOVERED >= 4/10; not if <= 1/10; else inconclusive (batch 2's far_A: 0/10)
+  S9 per arm: 'keeps the near case' if DISCOVERED >= X's arm A (4/10) - 1
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): slow_mem_ext, far_gates, near_check — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (49s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  (S7 runs explore_slow_mem's run path unchanged; its CHECKs:)
+  CHECK slow_mem: parameters equal arm A's (build) for the same seed: ok
+  CHECK slow_mem: run completed all 24000 updates under the stubs (24000 recorded, ok=True): ok
+  CHECK slow_mem: gate group holds exactly W_in, W_h, W_g (['W_in', 'W_h', 'W_g']): ok
+  CHECK slow_mem: other group holds every other parameter, embed.weight included (5 tensors): ok
+  CHECK slow_mem: gate group lr 0.001 at every update: ok
+  CHECK slow_mem: other group lr 0.0001 for updates 1-2400, 0.001 for 2401-24000 (update 2400: [0.001, 0.0001], 2401: [0.001, 0.001], 24000: [0.001, 0.001]): ok
+  CHECK far_gates/far_EMA: every parameter shared with arm A is bitwise arm A's (new: ['theta']): ok
+  CHECK far_gates/far_EMA: closed form equals the loop on inflated weights (gates far from uniform, spread 0.60; max diff 2.68e-07 < 1e-6) and stays causal there: ok
+  CHECK far_gates/far_EMA: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK far_gates/far_EMA: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK far_gates/far_EMA: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK far_gates/far_EMA: causal in eval: ok
+  CHECK far_gates/far_EMA: initial half-lives are the log-spaced set 1..32 (max rel. diff 1.1e-07; 1.000, 1.118, ..., 32.000): ok
+  CHECK far_gates/far_EMA: theta is a permutation drawn from its own generator (differs across seeds, same set): ok
+  CHECK far_gates/far_SEL: every parameter shared with arm A is bitwise arm A's (new: ['W_z', 'b_z']): ok
+  CHECK far_gates/far_SEL: closed form equals the loop on inflated weights (gates far from uniform, spread 0.60; max diff 4.77e-07 < 1e-6) and stays causal there: ok
+  CHECK far_gates/far_SEL: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK far_gates/far_SEL: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK far_gates/far_SEL: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK far_gates/far_SEL: causal in eval: ok
+  CHECK far_gates/far_SEL: b_z = -1 at init: ok
+  CHECK far_gates: far_A_slow: parameters equal arm A's (build on HEADER) for the same seed: ok
+  CHECK far_gates: far_A_slow: run completed all 24000 updates under the stubs (24000 recorded, ok=True): ok
+  CHECK far_gates: far_A_slow: gate group holds exactly W_in, W_h, W_g: ok
+  CHECK far_gates: far_A_slow: other group holds every other parameter: ok
+  CHECK far_gates: far_A_slow: gate group lr 0.001 at every update: ok
+  CHECK far_gates: far_A_slow: other group lr 0.0001 for updates 1-2400, 0.001 after (update 2400: [0.001, 0.0001], 2401: [0.001, 0.001], 24000: [0.001, 0.001]): ok
+  (the header layout: explore_far_cue's CHECKs)
+  CHECK far_cue: every (stream, key) appears once: ok
+  CHECK far_cue: S distinct values per key: ok
+  CHECK far_cue: each query is answered by its own stream's value: ok
+  CHECK far_cue: exactly one CTX token per block; block streams a permutation: ok
+  CHECK far_cue: stream_labels = the block's stream (body), the query's stream (query): ok
+  CHECK far_cue: L = 21, qpos = [19]: ok
+  CHECK far_cue: select reads the query's KEY position and targets its value: ok
+  CHECK far_cue: stream token in a width-3 window only for each block's first pair; the query sees its CTX at t-1: ok
+  CHECK far_cue: perfect gate zeroes every cross-stream score at every layer (same-stream scores non-zero): ok
+  CHECK far_cue: header_routing_stats under the perfect gate: margin 1.0000, eta_key_by_stream 1.0000: ok
+  CHECK far_cue: far_A and far_L3 share arm A's initial parameters and vocabulary: ok
+  CHECK near_check/EMA_near: every parameter shared with arm A is bitwise arm A's (new: ['theta']): ok
+  CHECK near_check/EMA_near: closed form equals the loop on inflated weights (gates far from uniform, spread 0.62; max diff 2.68e-07 < 1e-6) and stays causal there: ok
+  CHECK near_check/EMA_near: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK near_check/EMA_near: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK near_check/EMA_near: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK near_check/EMA_near: causal in eval: ok
+  CHECK near_check/EMA_near: initial half-lives are the log-spaced set 1..32 (max rel. diff 1.1e-07; 1.000, 1.118, ..., 32.000): ok
+  CHECK near_check/EMA_near: theta is a permutation drawn from its own generator (differs across seeds, same set): ok
+  CHECK near_check/SEL_near: every parameter shared with arm A is bitwise arm A's (new: ['W_z', 'b_z']): ok
+  CHECK near_check/SEL_near: closed form equals the loop on inflated weights (gates far from uniform, spread 0.72; max diff 4.77e-07 < 1e-6) and stays causal there: ok
+  CHECK near_check/SEL_near: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK near_check/SEL_near: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK near_check/SEL_near: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK near_check/SEL_near: causal in eval: ok
+  CHECK near_check/SEL_near: b_z = -1 at init: ok
+  all CHECKs passed (0.8 min)
+  recorded the full CHECK pass at 82ee219 in /home/user/clankers/explore_out/batch3_checks.json
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_mem_ext
+  idea    S5's slow-memory schedule, unchanged, on 20 new seeds
+  source  batch 2's S5 slow_mem (two-timescale training; the race reading)
+  change  arm A, one Adam, two groups: gate (W_in, W_h, W_g) 1e-3 throughout; the rest 1e-4 for updates 1-2400, 1e-3 after
+  arm SLOW_MEM     lr 0.001  iters 24000  seeds 180-199 (20)  — S5's SLOW_MEM, unchanged; seeds 180-199
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 180-199, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); pool 160-199 with batch 2's S5 records
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_gates
+  idea    gates with memory beyond a window on the header layout: multi-scale EMA, selective (minGRU)
+  source  multi-timescale fading memory (e.g. RetNet / S4-style decays); minGRU (Feng et al. 2024); S5's slow-memory schedule
+  change  far_EMA, far_SEL: the gate's recurrence (explore_gates); far_A_slow: S5's schedule
+  arm far_EMA      lr 0.001  iters 24000  seeds 160-169 (10)  — multi-scale EMA gate (half-lives 1..32), header layout
+                   schedule: lr 0.001 throughout
+  arm far_SEL      lr 0.001  iters 24000  seeds 160-169 (10)  — selective (minGRU-style) gate, header layout
+                   schedule: lr 0.001 throughout
+  arm far_A_slow   lr 0.001  iters 24000  seeds 160-169 (10)  — arm A + S5's schedule, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json; same shared initial parameters, same batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN near_check
+  idea    S8's EMA and selective gates on the standard grouped task (the near case)
+  source  explore_gates (multi-timescale EMA; minGRU, Feng et al. 2024)
+  change  the gate's recurrence only (explore_gates); grouped layout, arm A otherwise
+  arm EMA_near     lr 0.001  iters 24000  seeds 160-169 (10)  — multi-scale EMA gate, grouped layout
+                   schedule: lr 0.001 throughout
+  arm SEL_near     lr 0.001  iters 24000  seeds 160-169 (10)  — selective (minGRU-style) gate, grouped layout
+                   schedule: lr 0.001 throughout
+  pairing seeds 160-169, paired with X's recorded arm A (test_short_conv, lr 1e-3; same shared initial parameters and batches); X's ROUTED* at 2400 from batch 2's ref_a2400
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    slow_mem_ext   SLOW_MEM   20 runs x   8.8 min  (24000 steps x 21.1 ms + 20 evals x 1.2 s)
+    far_gates      far_EMA    10 runs x   6.5 min  (24000 steps x 15.6 ms + 20 evals x 0.7 s)
+    far_gates      far_SEL    10 runs x   8.1 min  (24000 steps x 19.4 ms + 20 evals x 1.2 s)
+    far_gates      far_A_slow 10 runs x   6.3 min  (24000 steps x 15.1 ms + 20 evals x 0.7 s)
+    near_check     EMA_near   10 runs x   6.9 min  (24000 steps x 16.0 ms + 20 evals x 1.4 s)
+    near_check     SEL_near   10 runs x  11.1 min  (24000 steps x 25.9 ms + 20 evals x 2.2 s)
+    total 9.42 h of runs; makespan on 4 workers 2.40 h (worst case)
+  70 runs queued on 4 workers (1 torch thread each)
+  [  1/70]    1.7 min  slow_mem_ext   SLOW_MEM   seed 183  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+          acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  2/70]    2.1 min  slow_mem_ext   SLOW_MEM   seed 182  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+          acc 1.000  trans  3600  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y

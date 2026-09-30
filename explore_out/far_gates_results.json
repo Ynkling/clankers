@@ -1,0 +1,95 @@
+{
+ "meta": {
+  "arms": {
+   "far_A_slow": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "far_A_slow",
+    "label": "arm A + S5's schedule, header layout",
+    "lr": 0.001,
+    "lr_gate": 0.001,
+    "lr_rest_warm": 0.0001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169
+    ],
+    "warm_updates": 2400
+   },
+   "far_EMA": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "far_EMA",
+    "label": "multi-scale EMA gate (half-lives 1..32), header layout",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169
+    ]
+   },
+   "far_SEL": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "far_SEL",
+    "label": "selective (minGRU-style) gate, header layout",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "82ee219+dirty",
+   "python": "3.11.15",
+   "started": "2026-09-30 16:01:40",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
