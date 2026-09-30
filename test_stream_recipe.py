@@ -150,6 +150,46 @@ OUTPUT AND LOGISTICS. Parallel single-thread workers; the wall clock is projecte
 (worst case). Results persist atomically to stream_recipe_results.json (gitignored; copied into
 results/X/ after the run). Flags: --workers, --force, --results, --also (a second machine's file,
 for pooled counts).
+
+RESULT (full run, 83/83 records complete, no failures; torch 2.14.0, Intel Xeon @ 2.10GHz, 4 workers
+x 1 thread; machine X, commit 092937b; 271.1 min after verification; no --also file. Two earlier
+starts were killed by container restarts during verification, before any training; nothing was
+recorded from them.)
+  PART 2 DROPPED by the drop rule: the printed projection was 14.04 h > 12 h on the workers (Part 1
+  alone 11.28 h). ceiling8k16 and A8k16_R were not run.
+  VALID: ceiling4k16 bound 3/3 (all at 1200); the k=16 gate fits the perfect 4-way routing (argmax
+  1.0000, mse 2.5e-06).
+  R1 THE RECIPE IS RELIABLE: MAJORITY. A4k16_R bound 17/20 (16 ROUTED; 34 attempts, 12 of them the
+     reused plain run).
+  R2 THE CHECK IS PRECISE: NOT PRECISE. 20 distinct A4k16 / A4k16_R attempts passed the check; 17 bound
+     (0.850, Wilson 95% [0.640, 0.948]). The 3 that passed and did not bind: s254 and s256 (three
+     streams merged in one channel, ~0.48) and s259 (two streams sharing, 0.88).
+  R3 SPARE CHANNELS MAKE RESTARTS WORK: SHOWN. A4k16_R 17/20 vs A4k4_R 10/20, Fisher one-sided
+     p = 0.0204 (McNemar one-sided alongside: A4k16_R only 9, A4k4_R only 2, p = 0.0327).
+  R4 REPLICATION OF K16 ON FRESH SEEDS: NOT SHOWN. A4k16 12/20 vs A4k4 10/20; A4k16 only 5, A4k4 only
+     3; one-sided McNemar p = 0.363.
+  The pre-registered reading: R3 SHOWN: "the early check works only with spare channels: at k=4 merged
+  runs pass it and stall." (R1 MAJORITY with R2 NOT PRECISE gives no R1/R2 reading.)
+
+  Diagnostics (not part of the verdict):
+  - Why the check fails at k=4: A4k4_R continued 18 attempts that passed the check; 9 did not bind,
+    and all 9 ended MERGED (8 with two streams sharing a channel, stalled at 0.75-0.81; 1 with three,
+    at 0.50). At k=16, 3 of 20 passing attempts did not bind, all merges.
+  - The check on the plain arms (every run has its full curve): A4k16 passed 12, 9 of them bound, and
+    it missed 3 late binders (s242, s243, s249; transitions 16800-22800); A4k4 passed 12, 7 bound,
+    missed 3. For reference only: (6000, 0.4) on A4k16 passed 13, 10 bound, missed 2; (4800, 0.5)
+    passed 8, 7 bound, missed 5.
+  - At k=16 the restarts turned failures into binders: A4k16_R only 5 vs A4k16 plain only 0 (seeds
+    241, 244, 245, 247, 248, bound on attempts 1-3). No A4k16_R trial reached its last attempt; A4k4_R
+    reached it three times (s240 failed all 5 checks and still bound, at 28800; s243 failed all 5 and
+    did not bind; s252 passed on attempt 4 and merged).
+  - Failure classes, plain k=16: 4 merges (three 3-stream, one 2-stream) and 4 non-stream (POSITION
+    2, KEY 1, OTHER 1); plain k=4: 6 merges (five 2-stream) and 4 non-stream POSITION. Every binder in
+    every arm ended ROUTED except A4k16_R s243, which bound (every stream 1.00) with a KEY split: its
+    gate is the same for every stream (eta^2 by stream 0.000, by key 0.99-1.00), each key on its own
+    channel (5, 7, 10, 14).
+  - Transitions, median: A4k16 6600, A4k16_R 6000, A4k4 12000, A4k4_R 8400. Binders at k=16 used a
+    median of 6 channels (eff_ch 8.8-9.6), at k=4 all 4.
 """
 
 import argparse
