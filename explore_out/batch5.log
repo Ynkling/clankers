@@ -227,3 +227,67 @@ EXPLORATORY, NOT A RESULT — batch 5: slow_hinge (S13), stall_probe (S14), far_
           acc 1.000  trans  3600  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [ 30/54]   28.6 min  slow_hinge     SLOW_HINGE seed 185  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
           acc 1.000  trans  2400  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+#################### RESUME 2026-09-30 23:34:28 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 5: slow_hinge (S13), stall_probe (S14), far_nudge_slow (S15)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 4ca2403+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S13 rule (vs SLOW_MEM, 40 seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED)
+  S13 reading (160-179): 'noise floor' if ROUTED*@1200 >= 8/20 and <= 2 uncommitted failures; 'not the noise floor' if ROUTED*@1200 <= 3/20; else neither
+  S14: diagnostic; SWAP-FIXES / MEMORY-STUCK / SLOW-ONLY / NEITHER per run
+  S15 rule (vs far_nudge): promising if DISCOVERED >= 8/10; not if <= 5/10; else inconclusive
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): stall_probe, slow_hinge, far_nudge_slow — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (51s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch5.py differs from edf3152, where the full CHECK suite passed (2026-09-30 22:24:18 UTC; its output is earlier in this log). git diff --stat edf3152:
+     explore_out/README.md                   |    2 +-
+     explore_out/batch5.log                  |  218 +
+     explore_out/batch5_checks.json          |    6 +
+     explore_out/far_nudge_slow_results.json |   46 +
+     explore_out/slow_hinge_results.json     | 6815 +++++++++++++++++++++++++++++++
+     explore_out/stall_probe_results.json    | 2354 +++++++++++
+     6 files changed, 9440 insertions(+), 1 deletion(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_hinge
+  idea    SLOW_MEM + a hinge on the read gate's position eta^2 (zero below TAU = 0.2)
+  source  batch 4's SLOW_POS (a full eta^2 penalty sat at its sampling floor and delayed commitment); hinge / margin penalties that act only past a threshold
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] of the read gate at key positions, on each training batch
+  arm SLOW_HINGE   lr 0.001  iters 24000  seeds 160-199 (40)  — SLOW_MEM + hinge on position eta^2 (TAU 0.2)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199), X's recorded arm A, and batch 4's SLOW_POS on 160-179 (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN stall_probe
+  idea    why routed gates fail to bind: perfect-gate swap, continued training, gate profile
+  source  stalled runs of batches 2 and 4 (header layout) and of the main line's test_router_layout (blocked layout)
+  change  none to the runs; probes at their end states
+  arm hdr_far_nudge lr 0.001  iters 24000  seeds [160, 161, 164, 165] (4)  — batch 4's far_nudge (160 = control)
+                   schedule: lr 0.001 throughout
+  arm hdr_far_A    lr 0.001  iters 24000  seeds 165-166 (2)  — batch 2's far_A
+                   schedule: lr 0.001 throughout
+  arm blk_A        lr 0.001  iters 24000  seeds [120, 130, 136] (3)  — X's test_router_layout A_blocked
+                   schedule: lr 0.001 throughout
+  pairing each probe against its own recorded run (reproduced exactly first)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_nudge_slow
+  idea    the 5% labelled nudge on the header layout, trained with the SLOW_MEM schedule
+  source  batch 4's far_nudge (routed 7/10, bound 5/10) and batches 2-3's SLOW_MEM
+  change  far_nudge + SLOW_MEM's groups: gate 1e-3 throughout; everything else 1e-4 for updates 1-2400, 1e-3 after; nudge pre-fit unchanged
+  arm FAR_NUDGE_SLOW lr 0.001  iters 24000  seeds 160-169 (10)  — far_nudge + the SLOW_MEM schedule, header layout
+                   schedule: nudge pre-fit unchanged; then gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 4's far_nudge (same weights after the pre-fit, same batches)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    slow_hinge     SLOW_HINGE 40 runs x   7.8 min  (24000 steps x 18.8 ms + 20 evals x 0.9 s)
+    stall_probe    hdr_far_nudge  4 runs x  17.1 min  (33600 steps x 29.9 ms + 28 evals x 0.7 s)
+    stall_probe    hdr_far_A   2 runs x   8.2 min  (33600 steps x 14.2 ms + 28 evals x 0.5 s)
+    stall_probe    blk_A       3 runs x  13.5 min  (33600 steps x 23.4 ms + 28 evals x 0.8 s)
+    far_nudge_slow FAR_NUDGE_SLOW 10 runs x  12.1 min  (24000 steps x 29.7 ms + 20 evals x 0.7 s)
+    total 9.31 h of runs; makespan on 4 workers 2.35 h (worst case)
+  24 runs queued on 4 workers (1 torch thread each)
+  [  1/24]    1.9 min  slow_hinge     SLOW_HINGE seed 188  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+          acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
