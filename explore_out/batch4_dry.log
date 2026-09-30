@@ -1,0 +1,162 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 4: far_express (S10), gate_reset (S11), slow_pos (S12) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git fdd1a46 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S10 readings: a gate fits (argmax >= 0.99) and far_nudge >= 7/10 -> discovery problem; a gate fits and far_nudge <= 3/10 -> the loss cannot finish it; no gate fits -> cannot express
+  S11, S12 rule: promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED vs X's arm A)
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): far_express, gate_reset, slow_pos — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (50s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_far_express: the header routing target equals the perfect gate's (one-hot of the block's stream = far_ceil's gate) on the fit batch: ok
+  CHECK dry_far_express: fit('A') on the grouped layout reproduces CHECK 45's gate_fit_k at k=2 exactly (mse 3.103e-07 vs 3.103e-07, argmax 1.0000 vs 1.0000): ok
+  (the header layout: explore_far_cue's CHECKs)
+  CHECK far_cue: every (stream, key) appears once: ok
+  CHECK far_cue: S distinct values per key: ok
+  CHECK far_cue: each query is answered by its own stream's value: ok
+  CHECK far_cue: exactly one CTX token per block; block streams a permutation: ok
+  CHECK far_cue: stream_labels = the block's stream (body), the query's stream (query): ok
+  CHECK far_cue: L = 21, qpos = [19]: ok
+  CHECK far_cue: select reads the query's KEY position and targets its value: ok
+  CHECK far_cue: stream token in a width-3 window only for each block's first pair; the query sees its CTX at t-1: ok
+  CHECK far_cue: perfect gate zeroes every cross-stream score at every layer (same-stream scores non-zero): ok
+  CHECK far_cue: header_routing_stats under the perfect gate: margin 1.0000, eta_key_by_stream 1.0000: ok
+  CHECK far_cue: far_A and far_L3 share arm A's initial parameters and vocabulary: ok
+  CHECK dry_gate_reset: detector inputs are ['model', 'tokens', 'task'] (no labels); with the probe's stream labels and role masks withheld it equals routing_stats' eta_key_by_index/half/key (0.0106/0.0023/0.6522): ok
+  CHECK dry_gate_reset: a forced reset changes only W_in, W_h, W_g (changed: ['W_g', 'W_h', 'W_in']): ok
+  CHECK dry_gate_reset: ... and clears exactly their Adam state (cleared: ['W_g', 'W_h', 'W_in']); every other parameter's Adam state is untouched: ok
+  CHECK dry_gate_reset: threshold 2.0 (never fires): curve equals X's record through 2400 and a fresh arm-A run's, weights after update 2400 equal ([[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]): ok
+  CHECK dry_slow_pos: lambda = 0 equals SLOW_MEM bit for bit through 3600 steps (curves equal to a fresh SLOW_MEM run and to batch 2's record; weights equal): ok
+  CHECK dry_slow_pos: the penalty's gradient reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK dry_slow_pos: the penalty enters the training loss's backward (W_g's gradient with lambda 1 differs from lambda 0 on the same weights): ok
+  CHECK dry_slow_pos: the penalty matches routing_stats' eta_key_by_index / _by_half on the probe, at init and on a gate far from uniform (max diff 1.5e-06 < 1e-5): ok
+  all CHECKs passed (4.6 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_express
+  idea    expressibility of the header-layout routing by each gate; arm A from a 5% labelled lean
+  source  CHECK 45's gate fit; test_router_curriculum's A_nudge (positive control on the grouped layout)
+  change  (a) supervised gate fits, no training runs; (b) far_nudge: A_nudge on the header layout
+  arm far_nudge    lr 0.001  iters 3600  seeds 160-160 (1)  — arm A + the 5% labelled nudge, header layout
+                   schedule: lr 0.001 throughout
+  pairing far_nudge seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_gate_reset
+  idea    a label-free detector of position/key gate splits at step 1200; reset only the gate
+  source  restart heuristics for bad initial commitments (e.g. dead-unit / expert re-initialization in MoE training); the project's restart rule, applied to the gate alone
+  change  arm A; at 1200 (and 1200 after each reset, max 3) if eta^2 of the read gate at key positions by index, half or key >= 0.5: re-draw W_in, W_h, W_g, clear their Adam state
+  arm RESET        lr 0.001  iters 3600  seeds 160-160 (1)  — arm A + label-free gate reset (max 3)
+                   schedule: lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3)
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_slow_pos
+  idea    SLOW_MEM + a penalty on the read gate's position information (eta^2 by index and half)
+  source  batch 2-3's SLOW_MEM (failures mostly POSITION splits); invariance penalties on a representation's nuisance variable (e.g. HSIC / decorrelation penalties)
+  change  SLOW_MEM + 1.0 * (eta^2 by triple index + eta^2 by half) of the read gate at key positions, on each training batch
+  arm SLOW_POS     lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + 1.0 * position penalty on the read gate
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch
+  pairing seeds 160-179, paired with X's recorded arm A and with batch 2's SLOW_MEM on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    dry_far_express far_nudge   1 runs x   1.7 min  (3600 steps x 28.1 ms + 3 evals x 1.2 s)
+    dry_gate_reset RESET       1 runs x   1.1 min  (3600 steps x 17.1 ms + 3 evals x 1.5 s)
+    dry_slow_pos   SLOW_POS    1 runs x   1.4 min  (3600 steps x 21.5 ms + 3 evals x 1.9 s)
+    total 0.07 h of runs; makespan on 4 workers 0.03 h (worst case)
+  3 runs queued on 4 workers (1 torch thread each)
+  [  1/3]    1.0 min  dry_far_express far_nudge  seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 1.000  trans  1200  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  2/3]    1.2 min  dry_gate_reset RESET      seed 160  lr 0.001 (lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3))
+          acc 0.503  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  [  3/3]    1.3 min  dry_slow_pos   SLOW_POS   seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch)
+          acc 0.490  trans  None  VALcos 0.997  margin 0.01  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 1.3 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_express
+  idea    expressibility of the header-layout routing by each gate; arm A from a 5% labelled lean
+  source  CHECK 45's gate fit; test_router_curriculum's A_nudge (positive control on the grouped layout)
+  change  (a) supervised gate fits, no training runs; (b) far_nudge: A_nudge on the header layout
+  arm far_nudge    lr 0.001  iters 3600  seeds 160-160 (1)  — arm A + the 5% labelled nudge, header layout
+                   schedule: lr 0.001 throughout
+  pairing far_nudge seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json)
+----------------------------------------------------------------------------------------------------
+  (a) EXPRESSIBILITY: CHECK 45's recipe (400 Adam steps at lr 0.01 on the gate's parameters and the embedding, 64 sequences), FITS if argmax >= 0.99:
+    header layout:
+      A       mse 1.099e-07   argmax match 1.0000   FITS
+      EMA     mse 1.292e-05   argmax match 1.0000   FITS
+      SEL     mse 2.241e-07   argmax match 1.0000   FITS
+      LOCAL3  mse 1.388e-01   argmax match 0.7648   does not fit
+    grouped layout   (diagnostic):
+      A       mse 3.103e-07   argmax match 1.0000   FITS
+      EMA     mse 8.100e-06   argmax match 1.0000   FITS
+      SEL     mse 3.141e-07   argmax match 1.0000   FITS
+      LOCAL3  mse 5.960e-08   argmax match 1.0000   FITS
+  (b) far_nudge, per seed (ROUTED* at 1200/2400/3600/end; sep0 = the lean after the pre-fit; b2 = batch 2's far_A):
+    seed   sep0    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b2 far_A       
+     160  0.050  1.000   1200   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION
+    far_nudge DISCOVERED 1/1   bound 1/1   ROUTED*@1200 1/1   ROUTED*@end 1/1   failures {}   vs b2 far_A: far_nudge only 1, far_A only 0, McNemar p = 1
+  gates that fit the header routing: ['A', 'EMA', 'SEL']; the nudged gate (arm A's) fits
+  READING S10: the loss cannot finish the distant-cue routing even from a head start
+  DRY RUN S10 dry_far_express: the loss cannot finish the distant-cue routing even from a head start  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_gate_reset
+  idea    a label-free detector of position/key gate splits at step 1200; reset only the gate
+  source  restart heuristics for bad initial commitments (e.g. dead-unit / expert re-initialization in MoE training); the project's restart rule, applied to the gate alone
+  change  arm A; at 1200 (and 1200 after each reset, max 3) if eta^2 of the read gate at key positions by index, half or key >= 0.5: re-draw W_in, W_h, W_g, clear their Adam state
+  arm RESET        lr 0.001  iters 3600  seeds 160-160 (1)  — arm A + label-free gate reset (max 3)
+                   schedule: lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3)
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm RESET (lr 0.001; lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3))
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  0.503   None   1.000  -0.00  0.00/0.98/0.00/0.00  -/-/-/-  KEY             KEY             DISCOVERED       -/?/?/-
+  resets per run (step: eta index/half/key -> reset r):
+     160 resets 3  KEY             1200: 0.00/0.00/1.00 -> reset 1; 2400: 0.00/0.00/1.00 -> reset 2; 3600: 0.00/0.00/1.00 -> reset 3
+  paired with X's arm A (same seeds, initial parameters and batches):
+    DISCOVERED  RESET           0/1   X A  0/1   RESET only 0, A only 0, McNemar two-sided p = 1
+    BOUND       RESET           0/1   X A  0/1   RESET only 0, A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  RESET       0/1   X A  0/1   RESET only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    ROUTED*@end   RESET       0/1   X A  0/1   RESET only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    failures RESET {'KEY': 1}   X arm A {'KEY': 1}
+  outcome by number of resets: 3 resets: DISCOVERED 0/1
+  resets used: 3 over 1 runs
+  DRY RUN VERDICT dry_gate_reset: not  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_slow_pos
+  idea    SLOW_MEM + a penalty on the read gate's position information (eta^2 by index and half)
+  source  batch 2-3's SLOW_MEM (failures mostly POSITION splits); invariance penalties on a representation's nuisance variable (e.g. HSIC / decorrelation penalties)
+  change  SLOW_MEM + 1.0 * (eta^2 by triple index + eta^2 by half) of the read gate at key positions, on each training batch
+  arm SLOW_POS     lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + 1.0 * position penalty on the read gate
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch
+  pairing seeds 160-179, paired with X's recorded arm A and with batch 2's SLOW_MEM on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm SLOW_POS (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  0.490   None   0.997   0.01  0.01/0.00/0.00/0.00  -/-/-/-  OTHER           KEY             DISCOVERED       -/?/?/-
+  per seed vs batch 2's SLOW_MEM (outcome; position penalty eta^2 index/half on the last training batch before 1200 and before the end):
+     160 SLOW_POS OTHER           SLOW_MEM DISCOVERED      penalty@1200 0.02/0.00  end 0.00/0.00
+  paired with X's arm A (same seeds, initial parameters and batches):
+    DISCOVERED  SLOW_POS        0/1   X A  0/1   SLOW_POS only 0, A only 0, McNemar two-sided p = 1
+    BOUND       SLOW_POS        0/1   X A  0/1   SLOW_POS only 0, A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  SLOW_POS    0/1   X A  0/1   SLOW_POS only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    ROUTED*@end   SLOW_POS    0/1   X A  0/1   SLOW_POS only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+  paired with batch 2's SLOW_MEM: DISCOVERED SLOW_POS 0/1 vs SLOW_MEM 1/1, SLOW_POS only 0, SLOW_MEM only 1, McNemar p = 1;  ROUTED*@1200 SLOW_POS only 0, SLOW_MEM only 1, p = 1
+  failure classes: SLOW_POS {'OTHER': 1}   SLOW_MEM {}   X arm A {'KEY': 1}
+  DRY RUN VERDICT dry_slow_pos: not  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S10 far_express: the loss cannot finish the distant-cue routing even from a head start
+      header-layout fits (argmax): A 1.000, EMA 1.000, SEL 1.000, LOCAL3 0.765; far_nudge DISCOVERED 1/1
+  S11 gate_reset: not (DISCOVERED 0/1 vs X A 0/1, 0 vs 0, p = 1)
+  S12 slow_pos:   not (DISCOVERED 0/1 vs X A 0/1, 0 vs 0, p = 1); vs SLOW_MEM 1/1: 0 vs 1, p = 1
+####################################################################################################
