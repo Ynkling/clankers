@@ -1,0 +1,230 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 3: slow_mem_ext (S7), far_gates (S8), near_check (S9) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 3e70887 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S7 rule (20 new seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED vs X's arm A)
+  S8 rule per arm: promising if DISCOVERED >= 4/10; not if <= 1/10; else inconclusive (batch 2's far_A: 0/10)
+  S9 per arm: 'keeps the near case' if DISCOVERED >= X's arm A (4/10) - 1
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): slow_mem_ext, far_gates, near_check — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (49s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  (S7 runs explore_slow_mem's run path unchanged; its CHECKs:)
+  CHECK slow_mem: parameters equal arm A's (build) for the same seed: ok
+  CHECK slow_mem: run completed all 24000 updates under the stubs (24000 recorded, ok=True): ok
+  CHECK slow_mem: gate group holds exactly W_in, W_h, W_g (['W_in', 'W_h', 'W_g']): ok
+  CHECK slow_mem: other group holds every other parameter, embed.weight included (5 tensors): ok
+  CHECK slow_mem: gate group lr 0.001 at every update: ok
+  CHECK slow_mem: other group lr 0.0001 for updates 1-2400, 0.001 for 2401-24000 (update 2400: [0.001, 0.0001], 2401: [0.001, 0.001], 24000: [0.001, 0.001]): ok
+  CHECK dry_far_gates/far_EMA: every parameter shared with arm A is bitwise arm A's (new: ['theta']): ok
+  CHECK dry_far_gates/far_EMA: closed form equals the loop on inflated weights (gates far from uniform, spread 0.60; max diff 2.68e-07 < 1e-6) and stays causal there: ok
+  CHECK dry_far_gates/far_EMA: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_far_gates/far_EMA: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_far_gates/far_EMA: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK dry_far_gates/far_EMA: causal in eval: ok
+  CHECK dry_far_gates/far_EMA: initial half-lives are the log-spaced set 1..32 (max rel. diff 1.1e-07; 1.000, 1.118, ..., 32.000): ok
+  CHECK dry_far_gates/far_EMA: theta is a permutation drawn from its own generator (differs across seeds, same set): ok
+  CHECK dry_far_gates/far_SEL: every parameter shared with arm A is bitwise arm A's (new: ['W_z', 'b_z']): ok
+  CHECK dry_far_gates/far_SEL: closed form equals the loop on inflated weights (gates far from uniform, spread 0.60; max diff 4.77e-07 < 1e-6) and stays causal there: ok
+  CHECK dry_far_gates/far_SEL: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_far_gates/far_SEL: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_far_gates/far_SEL: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK dry_far_gates/far_SEL: causal in eval: ok
+  CHECK dry_far_gates/far_SEL: b_z = -1 at init: ok
+  CHECK dry_far_gates: far_A_slow: parameters equal arm A's (build on HEADER) for the same seed: ok
+  CHECK dry_far_gates: far_A_slow: run completed all 24000 updates under the stubs (24000 recorded, ok=True): ok
+  CHECK dry_far_gates: far_A_slow: gate group holds exactly W_in, W_h, W_g: ok
+  CHECK dry_far_gates: far_A_slow: other group holds every other parameter: ok
+  CHECK dry_far_gates: far_A_slow: gate group lr 0.001 at every update: ok
+  CHECK dry_far_gates: far_A_slow: other group lr 0.0001 for updates 1-2400, 0.001 after (update 2400: [0.001, 0.0001], 2401: [0.001, 0.001], 24000: [0.001, 0.001]): ok
+  (the header layout: explore_far_cue's CHECKs)
+  CHECK far_cue: every (stream, key) appears once: ok
+  CHECK far_cue: S distinct values per key: ok
+  CHECK far_cue: each query is answered by its own stream's value: ok
+  CHECK far_cue: exactly one CTX token per block; block streams a permutation: ok
+  CHECK far_cue: stream_labels = the block's stream (body), the query's stream (query): ok
+  CHECK far_cue: L = 21, qpos = [19]: ok
+  CHECK far_cue: select reads the query's KEY position and targets its value: ok
+  CHECK far_cue: stream token in a width-3 window only for each block's first pair; the query sees its CTX at t-1: ok
+  CHECK far_cue: perfect gate zeroes every cross-stream score at every layer (same-stream scores non-zero): ok
+  CHECK far_cue: header_routing_stats under the perfect gate: margin 1.0000, eta_key_by_stream 1.0000: ok
+  CHECK far_cue: far_A and far_L3 share arm A's initial parameters and vocabulary: ok
+  CHECK dry_near_check/EMA_near: every parameter shared with arm A is bitwise arm A's (new: ['theta']): ok
+  CHECK dry_near_check/EMA_near: closed form equals the loop on inflated weights (gates far from uniform, spread 0.62; max diff 2.68e-07 < 1e-6) and stays causal there: ok
+  CHECK dry_near_check/EMA_near: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_near_check/EMA_near: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_near_check/EMA_near: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK dry_near_check/EMA_near: causal in eval: ok
+  CHECK dry_near_check/EMA_near: initial half-lives are the log-spaced set 1..32 (max rel. diff 1.1e-07; 1.000, 1.118, ..., 32.000): ok
+  CHECK dry_near_check/EMA_near: theta is a permutation drawn from its own generator (differs across seeds, same set): ok
+  CHECK dry_near_check/SEL_near: every parameter shared with arm A is bitwise arm A's (new: ['W_z', 'b_z']): ok
+  CHECK dry_near_check/SEL_near: closed form equals the loop on inflated weights (gates far from uniform, spread 0.72; max diff 4.77e-07 < 1e-6) and stays causal there: ok
+  CHECK dry_near_check/SEL_near: closed form equals the explicit per-step loop, train (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_near_check/SEL_near: closed form equals the explicit per-step loop, eval (max diff 5.96e-08 < 1e-6): ok
+  CHECK dry_near_check/SEL_near: causal in train (tokens after t changed: gates <= t identical, later ones change): ok
+  CHECK dry_near_check/SEL_near: causal in eval: ok
+  CHECK dry_near_check/SEL_near: b_z = -1 at init: ok
+  all CHECKs passed (0.7 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_slow_mem_ext
+  idea    S5's slow-memory schedule, unchanged, on 20 new seeds
+  source  batch 2's S5 slow_mem (two-timescale training; the race reading)
+  change  arm A, one Adam, two groups: gate (W_in, W_h, W_g) 1e-3 throughout; the rest 1e-4 for updates 1-2400, 1e-3 after
+  arm SLOW_MEM     lr 0.001  iters 3600  seeds 180-180 (1)  — S5's SLOW_MEM, unchanged; seeds 180-199
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 180-199, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); pool 160-199 with batch 2's S5 records
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_gates
+  idea    gates with memory beyond a window on the header layout: multi-scale EMA, selective (minGRU)
+  source  multi-timescale fading memory (e.g. RetNet / S4-style decays); minGRU (Feng et al. 2024); S5's slow-memory schedule
+  change  far_EMA, far_SEL: the gate's recurrence (explore_gates); far_A_slow: S5's schedule
+  arm far_EMA      lr 0.001  iters 3600  seeds 160-160 (1)  — multi-scale EMA gate (half-lives 1..32), header layout
+                   schedule: lr 0.001 throughout
+  arm far_SEL      lr 0.001  iters 3600  seeds 160-160 (1)  — selective (minGRU-style) gate, header layout
+                   schedule: lr 0.001 throughout
+  arm far_A_slow   lr 0.001  iters 3600  seeds 160-160 (1)  — arm A + S5's schedule, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json; same shared initial parameters, same batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_near_check
+  idea    S8's EMA and selective gates on the standard grouped task (the near case)
+  source  explore_gates (multi-timescale EMA; minGRU, Feng et al. 2024)
+  change  the gate's recurrence only (explore_gates); grouped layout, arm A otherwise
+  arm EMA_near     lr 0.001  iters 3600  seeds 160-160 (1)  — multi-scale EMA gate, grouped layout
+                   schedule: lr 0.001 throughout
+  arm SEL_near     lr 0.001  iters 3600  seeds 160-160 (1)  — selective (minGRU-style) gate, grouped layout
+                   schedule: lr 0.001 throughout
+  pairing seeds 160-169, paired with X's recorded arm A (test_short_conv, lr 1e-3; same shared initial parameters and batches); X's ROUTED* at 2400 from batch 2's ref_a2400
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    dry_slow_mem_ext SLOW_MEM    1 runs x   1.2 min  (3600 steps x 19.1 ms + 3 evals x 2.1 s)
+    dry_far_gates  far_EMA     1 runs x   0.8 min  (3600 steps x 13.3 ms + 3 evals x 0.6 s)
+    dry_far_gates  far_SEL     1 runs x   1.1 min  (3600 steps x 17.3 ms + 3 evals x 1.6 s)
+    dry_far_gates  far_A_slow  1 runs x   0.9 min  (3600 steps x 14.8 ms + 3 evals x 1.1 s)
+    dry_near_check EMA_near    1 runs x   1.1 min  (3600 steps x 17.2 ms + 3 evals x 1.7 s)
+    dry_near_check SEL_near    1 runs x   1.6 min  (3600 steps x 25.3 ms + 3 evals x 2.3 s)
+    total 0.11 h of runs; makespan on 4 workers 0.03 h (worst case)
+  6 runs queued on 4 workers (1 torch thread each)
+  [  1/6]    0.9 min  dry_far_gates  far_EMA    seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 0.312  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  [  2/6]    1.0 min  dry_far_gates  far_A_slow seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+          acc 0.213  trans  None  VALcos 1.000  margin 0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  3/6]    1.2 min  dry_far_gates  far_SEL    seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 0.314  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  [  4/6]    1.2 min  dry_slow_mem_ext SLOW_MEM   seed 180  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+          acc 0.415  trans  None  VALcos 1.000  margin -0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  5/6]    1.9 min  dry_near_check EMA_near   seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 0.493  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  [  6/6]    2.5 min  dry_near_check SEL_near   seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 0.486  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 2.5 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_slow_mem_ext
+  idea    S5's slow-memory schedule, unchanged, on 20 new seeds
+  source  batch 2's S5 slow_mem (two-timescale training; the race reading)
+  change  arm A, one Adam, two groups: gate (W_in, W_h, W_g) 1e-3 throughout; the rest 1e-4 for updates 1-2400, 1e-3 after
+  arm SLOW_MEM     lr 0.001  iters 3600  seeds 180-180 (1)  — S5's SLOW_MEM, unchanged; seeds 180-199
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 180-199, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); pool 160-199 with batch 2's S5 records
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm SLOW_MEM (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     180  0.415   None   1.000  -0.00  0.00/0.00/0.57/1.00  -/-/-/-  POSITION        POSITION        POSITION         -/?/?/-
+  paired with X's arm A on the new seeds (same seeds, initial parameters and batches):
+    DISCOVERED  SLOW_MEM        0/1   X A  0/1   SLOW_MEM only 0, A only 0, McNemar two-sided p = 1
+    BOUND       SLOW_MEM        0/1   X A  0/1   SLOW_MEM only 0, A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  SLOW_MEM    0/1   X A  0/1   SLOW_MEM only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    ROUTED*@end   SLOW_MEM    0/1   X A  0/1   SLOW_MEM only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    failures SLOW_MEM {'POSITION': 1}   X arm A {'POSITION': 1}
+  POOL, seeds 160-199 (batch 2's S5: 20 runs from slow_mem_results.json; S7: 1 runs):
+    DISCOVERED  SLOW_MEM       12/21   X A  7/21   SLOW_MEM only 6, A only 1, McNemar two-sided p = 0.125
+    ROUTED*@1200  SLOW_MEM   12/21   X A  6/21   SLOW_MEM only 7, A only 1, McNemar two-sided p = 0.0703   [X A from X record]
+    failures SLOW_MEM {'POSITION': 8, 'OTHER': 1}   X arm A {'KEY': 4, 'POSITION': 9, 'OTHER': 1}   (over the 21 pool seeds run)
+  DRY RUN VERDICT dry_slow_mem_ext (20 new seeds): not  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_gates
+  idea    gates with memory beyond a window on the header layout: multi-scale EMA, selective (minGRU)
+  source  multi-timescale fading memory (e.g. RetNet / S4-style decays); minGRU (Feng et al. 2024); S5's slow-memory schedule
+  change  far_EMA, far_SEL: the gate's recurrence (explore_gates); far_A_slow: S5's schedule
+  arm far_EMA      lr 0.001  iters 3600  seeds 160-160 (1)  — multi-scale EMA gate (half-lives 1..32), header layout
+                   schedule: lr 0.001 throughout
+  arm far_SEL      lr 0.001  iters 3600  seeds 160-160 (1)  — selective (minGRU-style) gate, header layout
+                   schedule: lr 0.001 throughout
+  arm far_A_slow   lr 0.001  iters 3600  seeds 160-160 (1)  — arm A + S5's schedule, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json; same shared initial parameters, same batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; b2 columns are batch 2's far_A and far_L3 on the same seeds):
+   arm far_EMA (lr 0.001; lr 0.001 throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b2 far_A        b2 far_L3      
+     160  0.312   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        OTHER          
+   arm far_SEL (lr 0.001; lr 0.001 throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b2 far_A        b2 far_L3      
+     160  0.314   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        OTHER          
+   arm far_A_slow (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b2 far_A        b2 far_L3      
+     160  0.213   None   1.000   0.00  0.00/0.01/0.00/0.92  -/-/-/-  POSITION        POSITION        OTHER          
+  batch 2's far_A on seeds 160-169: DISCOVERED 0/10, bound 0/10
+    far_EMA    DISCOVERED 0/1   bound 0/1   ROUTED*@1200 0/1   ROUTED*@end 0/1   failures {'KEY': 1}   vs b2 far_A (DISCOVERED): far_EMA only 0, far_A only 0, McNemar p = 1
+    far_SEL    DISCOVERED 0/1   bound 0/1   ROUTED*@1200 0/1   ROUTED*@end 0/1   failures {'KEY': 1}   vs b2 far_A (DISCOVERED): far_SEL only 0, far_A only 0, McNemar p = 1
+    far_A_slow DISCOVERED 0/1   bound 0/1   ROUTED*@1200 0/1   ROUTED*@end 0/1   failures {'POSITION': 1}   vs b2 far_A (DISCOVERED): far_A_slow only 0, far_A only 0, McNemar p = 1
+  DRY RUN VERDICT dry_far_gates far_EMA: not (DISCOVERED 0/1)  [EXPLORATORY, not a result]
+  DRY RUN VERDICT dry_far_gates far_SEL: not (DISCOVERED 0/1)  [EXPLORATORY, not a result]
+  DRY RUN VERDICT dry_far_gates far_A_slow: not (DISCOVERED 0/1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_near_check
+  idea    S8's EMA and selective gates on the standard grouped task (the near case)
+  source  explore_gates (multi-timescale EMA; minGRU, Feng et al. 2024)
+  change  the gate's recurrence only (explore_gates); grouped layout, arm A otherwise
+  arm EMA_near     lr 0.001  iters 3600  seeds 160-160 (1)  — multi-scale EMA gate, grouped layout
+                   schedule: lr 0.001 throughout
+  arm SEL_near     lr 0.001  iters 3600  seeds 160-160 (1)  — selective (minGRU-style) gate, grouped layout
+                   schedule: lr 0.001 throughout
+  pairing seeds 160-169, paired with X's recorded arm A (test_short_conv, lr 1e-3; same shared initial parameters and batches); X's ROUTED* at 2400 from batch 2's ref_a2400
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm EMA_near (lr 0.001; lr 0.001 throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  0.493   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             DISCOVERED       -/-/?/-
+   arm SEL_near (lr 0.001; lr 0.001 throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  0.486   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             DISCOVERED       -/-/?/-
+  EMA_near, paired with X's arm A:
+    DISCOVERED  EMA_near        0/1   X A  0/1   EMA_near only 0, A only 0, McNemar two-sided p = 1
+    BOUND       EMA_near        0/1   X A  0/1   EMA_near only 0, A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  EMA_near    0/1   X A  0/1   EMA_near only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    ROUTED*@2400  EMA_near    0/1   X A  0/1   EMA_near only 0, A only 0, McNemar two-sided p = 1   [X A from re-run of X's arm A (explore_ref_a2400)]
+    ROUTED*@end   EMA_near    0/1   X A  0/1   EMA_near only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    failures EMA_near {'KEY': 1}   X arm A {'KEY': 1}
+  READING EMA_near: DISCOVERED 0/1 vs X's arm A 0/1 on the same seeds (threshold >= -1): keeps the near case
+  SEL_near, paired with X's arm A:
+    DISCOVERED  SEL_near        0/1   X A  0/1   SEL_near only 0, A only 0, McNemar two-sided p = 1
+    BOUND       SEL_near        0/1   X A  0/1   SEL_near only 0, A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  SEL_near    0/1   X A  0/1   SEL_near only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    ROUTED*@2400  SEL_near    0/1   X A  0/1   SEL_near only 0, A only 0, McNemar two-sided p = 1   [X A from re-run of X's arm A (explore_ref_a2400)]
+    ROUTED*@end   SEL_near    0/1   X A  0/1   SEL_near only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    failures SEL_near {'KEY': 1}   X arm A {'KEY': 1}
+  READING SEL_near: DISCOVERED 0/1 vs X's arm A 0/1 on the same seeds (threshold >= -1): keeps the near case
+  DRY RUN S9 dry_near_check EMA_near: keeps the near case (DISCOVERED 0/1)  (descriptive)  [EXPLORATORY, not a result]
+  DRY RUN S9 dry_near_check SEL_near: keeps the near case (DISCOVERED 0/1)  (descriptive)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S7 slow_mem_ext: not (DISCOVERED 0/1 vs X A 0/1, 0 vs 0, p = 1)
+     pool 160-199: DISCOVERED 12/21 vs X A 7/21 (6 vs 1, p = 0.125); ROUTED*@1200 7 vs 1 (p = 0.0703)
+  S8 far_EMA    not (DISCOVERED 0/1; batch 2's far_A 0/10)
+  S8 far_SEL    not (DISCOVERED 0/1; batch 2's far_A 0/10)
+  S8 far_A_slow not (DISCOVERED 0/1; batch 2's far_A 0/10)
+  S9 EMA_near   keeps the near case (DISCOVERED 0/1 vs X A 0/1)
+  S9 SEL_near   keeps the near case (DISCOVERED 0/1 vs X A 0/1)
+####################################################################################################
