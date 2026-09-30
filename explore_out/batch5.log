@@ -1,1 +1,27 @@
 #################### NOTE 2026-09-30 22:07:57 UTC — batch 5 runs in segments with batch 4's machinery: the first segment runs the full CHECK suite and records its head in explore_out/batch5_checks.json; each later segment (--resume, after the session's background time limit stops the previous one) runs the repro check and skips the rest only if the screen code is unchanged. Order: stall_probe, slow_hinge, far_nudge_slow. A watcher outside the repo commits and pushes explore_out/ after every saved run. (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 5: slow_hinge (S13), stall_probe (S14), far_nudge_slow (S15)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git caee403+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S13 rule (vs SLOW_MEM, 40 seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED)
+  S13 reading (160-179): 'noise floor' if ROUTED*@1200 >= 8/20 and <= 2 uncommitted failures; 'not the noise floor' if ROUTED*@1200 <= 3/20; else neither
+  S14: diagnostic; SWAP-FIXES / MEMORY-STUCK / SLOW-ONLY / NEITHER per run
+  S15 rule (vs far_nudge): promising if DISCOVERED >= 8/10; not if <= 5/10; else inconclusive
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): stall_probe, slow_hinge, far_nudge_slow — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (39s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK slow_hinge: TAU = 1.0 equals SLOW_MEM bit for bit through 3600 steps (curves = a fresh SLOW_MEM run = batch 2's record; weights equal): ok
+  CHECK slow_hinge: TAU = 0 equals S12's SLOW_POS bit for bit through 3600 steps (curves = a fresh SLOW_POS run = batch 4's record; weights equal): ok
+  CHECK slow_hinge: the logged hinge fraction is 0 with TAU = 1 (0.0) and 1 with TAU = 0 (1.0): ok
+  CHECK slow_hinge: the hinge's gradient (TAU = 0) reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK slow_hinge: with both terms below TAU = 0.2 (eta2 index 0.024, half 0.003) the hinge's gradient is exactly zero: ok
+  CHECK stall_probe: the perfect gate (maps identity and swapped) zeroes every cross-stream score at every layer, header and blocked layouts: ok
+  CHECK stall_probe: far_nudge 160 re-run to 2400 reproduces its recorded curve, and 1200 continued updates (learned gate) reproduce its recorded evaluation at 3600 ([1.0, 0.004167615901678801] vs [1.0, 0.004167615901678801]): ok
+  CHECK stall_probe: the perfect-gate and learned-gate continuations see identical batches (digests): ok
+  CHECK stall_probe: SWAP's evaluation path with the learned gate reproduces the recorded accuracy at 2400 (1.0 vs 1.0): ok
+  CHECK stall_probe: X's first 3 stalled A_blocked seeds (end margin >= 0.9, not bound) are (120, 130, 136); this batch runs (120, 130, 136): ok
+
+#################### RESTART 2026-09-30 22:15:04 UTC — the container was restarted during the first segment's CHECKs (S13's and S14's had passed; S15's were running). No run had started and no full CHECK pass was recorded, so the first segment is re-run from the start with the full CHECK suite. (EXPLORATORY, not a result) ####################
