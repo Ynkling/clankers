@@ -97,3 +97,7 @@ EXPLORATORY, NOT A RESULT — batch 5: slow_hinge (S13), stall_probe (S14), far_
   59 runs queued on 4 workers (1 torch thread each)
   [  1/59]    3.8 min  stall_probe    hdr_far_nudge seed 160  lr 0.001 (lr 0.001 throughout)
           acc 1.000  trans  1200  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
+  [  2/59]   12.5 min  stall_probe    blk_A      seed 130  lr 0.001 (lr 0.001 throughout)
+          acc 0.344  trans  None  VALcos 0.002  margin 0.99  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  3/59]   12.5 min  stall_probe    blk_A      seed 120  lr 0.001 (lr 0.001 throughout)
+          acc 0.342  trans  None  VALcos 0.001  margin 1.00  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
