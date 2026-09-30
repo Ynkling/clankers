@@ -191,24 +191,32 @@ class OldTask:
 class BindTask:
     sanity = False
     n_active = None          # test_load_curriculum's knob; set on the instance only when used
+    s_active = None          # test_stream_curriculum's knob; set on the instance only when used
 
-    def __init__(self, P, S=S_STREAMS, n_vals=N_VALS, n_q=N_Q, layout="grouped", n_active=None):
+    def __init__(self, P, S=S_STREAMS, n_vals=N_VALS, n_q=N_Q, layout="grouped", n_active=None,
+                 s_active=None):
         assert n_q <= S * P and S <= n_vals
         assert layout in LAYOUTS
         # n_active (test_load_curriculum's knob): each sequence uses n_active of the P keys.
         # None or P is the task above, unchanged (no instance attribute is set).
+        # s_active (test_stream_curriculum's knob): each sequence uses s_active of the S streams.
+        # None or S is the task above, unchanged (no instance attribute is set).
+        assert n_active is None or s_active is None, "n_active and s_active are not combined"
         A = P if n_active is None else n_active
+        Z = S if s_active is None else s_active
         assert 1 <= A <= P and n_q <= S * A
         assert A == P or layout == "grouped", "n_active is implemented for the grouped layout"
+        assert 1 <= Z <= S and n_q <= Z * P
+        assert Z == S or layout == "grouped", "s_active is implemented for the grouped layout"
         self.S, self.P, self.n_vals, self.n_q = S, P, n_vals, n_q
         self.key = f"P{P}"
         self.label = f"P={P}: new task, S={S}, n_vals={n_vals}, n_q={n_q}"
         self.vocab = S + P + n_vals
         self.ctx_tokens = tuple(range(S))
-        self.L = 3 * (S * A + n_q)
+        self.L = 3 * (Z * A + n_q)
         self.T = self.L - 1
-        self.qpos = [3 * (S * A + j) + 1 for j in range(n_q)]
-        self.info_bits = A * S * math.log2(n_vals)
+        self.qpos = [3 * (Z * A + j) + 1 for j in range(n_q)]
+        self.info_bits = A * Z * math.log2(n_vals)
         # test_router_layout's knob; "grouped" (the default) is the layout above, unchanged
         self.layout = layout
         if layout != "grouped":
@@ -217,8 +225,14 @@ class BindTask:
             self.n_active = A
             self.key = f"P{P}a{A}"
             self.label += f", n_active={A}"
+        if Z != S:
+            self.s_active = Z
+            self.key = f"S{S}P{P}s{Z}"
+            self.label += f", s_active={Z}"
 
     def make_batch(self, B, gen):
+        if self.s_active is not None:
+            return self.make_batch_streams(B, gen)
         if self.n_active is not None:
             return self.make_batch_active(B, gen)
         if self.layout != "grouped":
@@ -252,6 +266,28 @@ class BindTask:
         qs, qi = q // A, q % A
         qk = act.gather(1, qi)
         qv = vals.reshape(B, A * S).gather(1, qi * S + qs)
+        queries = torch.stack([qs, S + qk, S + P + qv], dim=-1).reshape(B, -1)
+        return torch.cat([body, queries], dim=1), qs
+
+    def make_batch_streams(self, B, gen):
+        """s_active of the S streams per sequence (test_stream_curriculum's knob): a uniformly
+        random subset of s_active distinct streams; each of the P keys gets s_active distinct
+        values; its s_active triples [CTX_s, KEY_i, VAL] are adjacent in random stream order (the
+        grouped layout), keys in random order, and the query is drawn from the s_active*P triples,
+        as in make_batch. The vocabulary stays S's."""
+        S, P, Z, nv, nq = self.S, self.P, self.s_active, self.n_vals, self.n_q
+        sact = torch.rand(B, S, generator=gen).argsort(-1)[:, :Z]            # active streams
+        vals = torch.rand(B, P, nv, generator=gen).argsort(-1)[..., :Z]    # (B,P,Z) distinct
+        korder = torch.rand(B, P, generator=gen).argsort(-1)                # key order
+        sorder = torch.rand(B, P, Z, generator=gen).argsort(-1)             # stream order
+        vg = vals.gather(1, korder.unsqueeze(-1).expand(B, P, Z)).gather(2, sorder)
+        ss = sact.unsqueeze(1).expand(B, P, Z).gather(2, sorder)
+        keys = (S + korder).unsqueeze(-1).expand(B, P, Z)
+        body = torch.stack([ss, keys, S + P + vg], dim=-1).reshape(B, -1)
+        q = torch.rand(B, Z * P, generator=gen).argsort(-1)[:, :nq]         # no replacement
+        qa, qk = q // P, q % P
+        qs = sact.gather(1, qa)
+        qv = vals.reshape(B, P * Z).gather(1, qk * Z + qa)
         queries = torch.stack([qs, S + qk, S + P + qv], dim=-1).reshape(B, -1)
         return torch.cat([body, queries], dim=1), qs
 
