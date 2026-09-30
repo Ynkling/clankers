@@ -1,0 +1,46 @@
+{
+ "meta": {
+  "arms": {
+   "FAR_NUDGE_SLOW": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "FAR_NUDGE_SLOW",
+    "label": "far_nudge + the SLOW_MEM schedule, header layout",
+    "lr": 0.001,
+    "lr_gate": 0.001,
+    "lr_rest_warm": 0.0001,
+    "mult": 8,
+    "n_ch": 2,
+    "nudge": true,
+    "prio": 1,
+    "sched": "nudge pre-fit unchanged; then gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169
+    ],
+    "warm_updates": 2400
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "edf3152+dirty",
+   "python": "3.11.15",
+   "started": "2026-09-30 22:15:06",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

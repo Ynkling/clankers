@@ -1,0 +1,250 @@
+{
+ "meta": {
+  "arms": {
+   "blk_A": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "blk_A",
+    "label": "X's test_router_layout A_blocked",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     120,
+     130,
+     136
+    ]
+   },
+   "hdr_far_A": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "hdr_far_A",
+    "label": "batch 2's far_A",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     165,
+     166
+    ]
+   },
+   "hdr_far_nudge": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "hdr_far_nudge",
+    "label": "batch 4's far_nudge (160 = control)",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     160,
+     161,
+     164,
+     165
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "edf3152+dirty",
+   "python": "3.11.15",
+   "started": "2026-09-30 22:15:06",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {
+  "hdr_far_nudge|160": {
+   "acc": 1.0,
+   "batches_identical": true,
+   "cmap": [
+    0,
+    1
+   ],
+   "cmap_identity_fallback": false,
+   "cont_learned": [
+    [
+     1200,
+     0.9853515625,
+     0.06322970986366272
+    ],
+    [
+     2400,
+     1.0,
+     0.0006467829807661474
+    ],
+    [
+     3600,
+     1.0,
+     0.0006611006101593375
+    ],
+    [
+     4800,
+     1.0,
+     0.0002556198451202363
+    ]
+   ],
+   "cont_perfect": [
+    [
+     1200,
+     1.0,
+     0.0018424325389787555
+    ],
+    [
+     2400,
+     1.0,
+     0.0008973374497145414
+    ],
+    [
+     3600,
+     1.0,
+     0.0004572330217342824
+    ],
+    [
+     4800,
+     1.0,
+     0.00023907178547233343
+    ]
+   ],
+   "cont_steps": 4800,
+   "control": true,
+   "ctx_cos": 0.9927677512168884,
+   "curve": [
+    [
+     1200,
+     0.99951171875,
+     0.12214237451553345
+    ],
+    [
+     2400,
+     1.0,
+     0.011923852376639843
+    ],
+    [
+     3600,
+     1.0,
+     0.004167615901678801
+    ]
+   ],
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.9927677512168884,
+    "eff_ch": 1.9971834045336978,
+    "eta_key_by_half": 0.0015270395030734165,
+    "eta_key_by_index": 0.0015270523378826432,
+    "eta_key_by_key": 9.341913709373623e-10,
+    "eta_key_by_stream": 0.9999997981880826,
+    "eta_val_by_half": 0.0015264850291282432,
+    "eta_val_by_index": 0.0015265586500177303,
+    "eta_val_by_key": 2.705501634786782e-09,
+    "eta_val_by_stream": 0.9999995264903485,
+    "k": 2,
+    "key_cos": 0.00029094377532601357,
+    "key_part": 0.01818852126598358,
+    "key_sep": 0.009461663663387299,
+    "margin": 0.9992011785507202,
+    "sep": 0.8611658811569214,
+    "spread": 0.923596203327179,
+    "step": "end",
+    "val_cos": 0.0006031199009157717
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.00029094377532601357,
+   "layout": "header",
+   "learned_path_acc": 1.0,
+   "learned_path_ok": true,
+   "lr": 0.001,
+   "margin_learned": 0.9992011785507202,
+   "ok": true,
+   "profile": {
+    "CTX|0": {
+     "n": 256,
+     "perfect": 1.0,
+     "read": 0.6273184418678284,
+     "write": 0.6273184418678284
+    },
+    "CTX|1": {
+     "n": 256,
+     "perfect": 0.0,
+     "read": 0.6153295040130615,
+     "write": 0.6153295040130615
+    },
+    "KEY|0": {
+     "n": 1024,
+     "perfect": 1.0,
+     "read": 0.9999008178710938,
+     "write": 0.9999008178710938
+    },
+    "KEY|1": {
+     "n": 1024,
+     "perfect": 0.0,
+     "read": 0.00020300796313676983,
+     "write": 0.00020300796313676983
+    },
+    "VAL|0": {
+     "n": 1024,
+     "perfect": 1.0,
+     "read": 0.9998226761817932,
+     "write": 0.9998226761817932
+    },
+    "VAL|1": {
+     "n": 1024,
+     "perfect": 0.0,
+     "read": 0.0004255942767485976,
+     "write": 0.0004255942767485976
+    },
+    "qCTX|0": {
+     "n": 148,
+     "perfect": 1.0,
+     "read": 0.7751747965812683,
+     "write": 0.7751747965812683
+    },
+    "qCTX|1": {
+     "n": 108,
+     "perfect": 0.0,
+     "read": 0.6173632740974426,
+     "write": 0.6173632740974426
+    },
+    "qKEY|0": {
+     "n": 148,
+     "perfect": 1.0,
+     "read": 0.9999220371246338,
+     "write": 0.9999220371246338
+    },
+    "qKEY|1": {
+     "n": 108,
+     "perfect": 0.0,
+     "read": 0.00011293590068817139,
+     "write": 0.00011293590068817139
+    }
+   },
+   "reading": "SWAP-FIXES",
+   "recorded_acc": 1.0,
+   "recorded_transition": 1200,
+   "reproduces": true,
+   "sched": "lr 0.001 throughout",
+   "secs_wall": 225.62954092025757,
+   "seed": 160,
+   "stats": [],
+   "swap_acc": 1.0,
+   "swap_loss": 0.004218497779220343,
+   "transition": 1200,
+   "val_cos": 0.0006031199009157717
+  }
+ }
+}
