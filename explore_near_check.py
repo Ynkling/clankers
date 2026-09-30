@@ -68,7 +68,6 @@ def report(store):
     c2.print_screen_header2(me)
     refs = c2.ref_runs(ec.load_store(REF_STORE))
     c2.per_seed_table2(me, store, refs=refs)
-    xa = sum(ec.discovered(ec.recorded("A")[s]) for s in SEEDS)
     out = {}
     for k in ARMS:
         print(f"  {k}, paired with X's arm A:")
@@ -76,10 +75,12 @@ def report(store):
         ec.paired_vs_recorded(store, k, SEEDS, ec.bound, label="BOUND")
         for step in (1200, 2400, "end"):
             c2.paired_routed(store, k, SEEDS, step, refs)
-        print(f"    failures {k} {ec.fail_counts(store, k, SEEDS)}   "
-              f"X arm A {ec.recorded_fail_counts('A', SEEDS)}")
+        done = [x for x in SEEDS if (r := store["runs"].get(f"{k}|{x}")) and r.get("ok")]
+        print(f"    failures {k} {ec.fail_counts(store, k, done)}   "
+              f"X arm A {ec.recorded_fail_counts('A', done)}")
+        xa = d["old"]                                     # X's arm A on the same seeds
         reading = ("keeps the near case" if d["new"] >= xa - 1 else "does not keep the near case")
-        print(f"  READING {k}: DISCOVERED {d['new']}/{d['n']} vs X's arm A {xa}/10 (threshold "
-              f">= {xa - 1}): {reading}")
+        print(f"  READING {k}: DISCOVERED {d['new']}/{d['n']} vs X's arm A {xa}/{d['n']} on the same "
+              f"seeds (threshold >= {xa - 1}): {reading}")
         out[k] = dict(d, reading=reading)
     return out

@@ -73,8 +73,9 @@ def report(store):
     ec.paired_vs_recorded(store, "SLOW_MEM", s, ec.bound, label="BOUND")
     for step in (1200, "end"):
         c2.paired_routed(store, "SLOW_MEM", s, step, {})
-    print(f"    failures SLOW_MEM {ec.fail_counts(store, 'SLOW_MEM', s)}   "
-          f"X arm A {ec.recorded_fail_counts('A', s)}")
+    s_done = [x for x in s if (r := store["runs"].get(f"SLOW_MEM|{x}")) and r.get("ok")]
+    print(f"    failures SLOW_MEM {ec.fail_counts(store, 'SLOW_MEM', s_done)}   "
+          f"X arm A {ec.recorded_fail_counts('A', s_done)}")
     # the 40-seed pool: batch 2's S5 records (160-179) and these (180-199)
     s5_store = ec.load_store(S5_STORE)
     pool = {"runs": {**{k: v for k, v in s5_store["runs"].items() if k.startswith("SLOW_MEM|")},
@@ -82,9 +83,10 @@ def report(store):
     n_s5 = sum(1 for k in s5_store["runs"] if k.startswith("SLOW_MEM|"))
     print(f"  POOL, seeds 160-199 (batch 2's S5: {n_s5} runs from {S5_STORE}_results.json; S7: "
           f"{sum(1 for k in store['runs'] if k.startswith('SLOW_MEM|'))} runs):")
-    pd = ec.paired_vs_recorded(pool, "SLOW_MEM", POOL_SEEDS, ec.discovered, label="DISCOVERED")
-    pr = c2.paired_routed(pool, "SLOW_MEM", POOL_SEEDS, 1200, {})
-    print(f"    failures SLOW_MEM {ec.fail_counts(pool, 'SLOW_MEM', POOL_SEEDS)}   "
-          f"X arm A {ec.recorded_fail_counts('A', POOL_SEEDS)}")
+    done = [x for x in POOL_SEEDS if (r := pool["runs"].get(f"SLOW_MEM|{x}")) and r.get("ok")]
+    pd = ec.paired_vs_recorded(pool, "SLOW_MEM", done, ec.discovered, label="DISCOVERED")
+    pr = c2.paired_routed(pool, "SLOW_MEM", done, 1200, {})
+    print(f"    failures SLOW_MEM {ec.fail_counts(pool, 'SLOW_MEM', done)}   "
+          f"X arm A {ec.recorded_fail_counts('A', done)}   (over the {len(done)} pool seeds run)")
     d["pool"] = dict(discovered=pd, routed1200=pr)
     return d
