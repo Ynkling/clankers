@@ -446,3 +446,77 @@ EXPLORATORY, NOT A RESULT — batch 2: kwta_warm (S4), slow_mem (S5), far_cue (S
           acc 0.531  trans  None  VALcos 0.000  margin 1.00  STREAM-PARTIAL  ROUTED* 1200/2400/end -/Y/Y
   [ 16/34]   28.2 min  far_cue        far_L3     seed 167  lr 0.001 (lr 0.001 throughout)
           acc 0.445  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+#################### RESUME 2026-09-30 03:39:58 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 2: kwta_warm (S4), slow_mem (S5), far_cue (S6), ref_a2400
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 9ad7636+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  screen rule (S4, S5): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED vs X's arm A)
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  S5 reading: (b) a race if ROUTED*@1200 b - c >= 4 and p < 0.10; (a) sparse codes if b - c <= 0; neither otherwise
+  S6: UNTESTED if far_ceil < 2/3; 'LOCAL3 survives a distant cue' if far_L3 >= far_A + 3; 'LOCAL3's gain needs the cue in view' if far_L3 <= far_A
+  order (--order): slow_mem, ref_a2400, far_cue, kwta_warm — run_jobs2 queues runs by arm priority, set in memory to 4..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (57s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch2.py differs from 6f529b5; the first segment's full CHECK output is in this log. git diff --stat 6f529b5:
+     explore_batch2.py                  |  125 +-
+     explore_out/README.md              |    1 +
+     explore_out/batch2.log             |  463 +++
+     explore_out/far_cue_results.json   | 6800 ++++++++++++++++++++++++++++++++++++
+     explore_out/kwta_warm_results.json | 2952 ++++++++++++++++
+     explore_out/ref_a2400_results.json | 2573 ++++++++++++++
+     explore_out/slow_mem_results.json  | 5748 ++++++++++++++++++++++++++++++
+     7 files changed, 18643 insertions(+), 19 deletions(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN kwta_warm
+  idea    k-WTA (16/256) only as a warm-up: through the evaluation at step 2400, dense after
+  source  batch 1's KWTA16 (FlyHash, Dasgupta et al. 2017; k-WTA, Ahmad & Hawkins 2019), which routed early but bound slowly
+  change  explore_kwta's KWTA16 model; model.k_top = None right after the evaluation at step 2400 (arm A's dense forward from update 2401)
+  arm KWTA_WARM    lr 0.001  iters 24000  seeds 160-179 (20)  — arm A + kWTA 16/256 through the evaluation at 2400, dense after
+                   schedule: lr 0.001 throughout; kWTA 16/256 for updates 1-2400 and the evaluations at 1200 and 2400; dense after
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); X's ROUTED* at 2400 from explore_ref_a2400
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_mem
+  idea    slow memory first: non-gate parameters at lr/10 for 2400 updates, the gate at full lr
+  source  the race reading of batch 1's KWTA16 (two-timescale training: fast router, slow experts); separates it from the sparse-code reading
+  change  arm A, one Adam, two groups: gate (W_in, W_h, W_g) 1e-3 throughout; the rest 1e-4 for updates 1-2400, 1e-3 after
+  arm SLOW_MEM     lr 0.001  iters 24000  seeds 160-179 (20)  — arm A; memory at lr/10 for the first 2400 updates
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); X's ROUTED* at 2400 from explore_ref_a2400
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_cue
+  idea    LOCAL3 when the stream token is a block header, out of a width-3 window for most pairs
+  source  batch 1's LOCAL3 (Mamba / H3 / RWKV local gate); a new header layout
+  change  HeaderTask: each stream's block [CTX_s, K, V, K, V, ...], blocks in random stream order, keys random within a block; queries at the end as in make_batch
+  arm far_ceil     lr 0.001  iters 24000  seeds 160-162 (3)  — perfect gate, header layout (validity)
+                   schedule: lr 0.001 throughout
+  arm far_A        lr 0.001  iters 24000  seeds 160-169 (10)  — arm A, header layout
+                   schedule: lr 0.001 throughout
+  arm far_L3       lr 0.001  iters 24000  seeds 160-169 (10)  — LOCAL3, header layout
+                   schedule: lr 0.001 throughout
+  pairing within the batch: far_A and far_L3 on seeds 160-169 (same initial parameters, same batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN ref_a2400
+  idea    reference: X's arm A through step 2400, for ROUTED* at 2400
+  source  test_short_conv's arm A (X's record)
+  change  none (a re-run with routing statistics at 1200 and 2400)
+  arm A_2400       lr 0.001  iters 2400  seeds 160-179 (20)  — X's arm A, re-run through step 2400
+                   schedule: lr 0.001 throughout
+  pairing each seed compared with X's record of the same run
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    kwta_warm      KWTA_WARM  20 runs x   9.2 min  (2400 steps x 30.2 ms + 2 evals x 1.7 s; 21600 steps x 21.1 ms + 18 evals x 0.9 s)
+    slow_mem       SLOW_MEM   20 runs x   8.8 min  (24000 steps x 21.2 ms + 20 evals x 0.9 s)
+    far_cue        far_ceil    3 runs x   5.6 min  (24000 steps x 13.3 ms + 20 evals x 0.7 s)
+    far_cue        far_A      10 runs x   7.8 min  (24000 steps x 18.9 ms + 20 evals x 0.7 s)
+    far_cue        far_L3     10 runs x   6.5 min  (24000 steps x 15.6 ms + 20 evals x 0.7 s)
+    ref_a2400      A_2400     20 runs x   0.9 min  (2400 steps x 21.6 ms + 2 evals x 0.9 s)
+    total 8.93 h of runs; makespan on 4 workers 2.24 h (worst case)
+  18 runs queued on 4 workers (1 torch thread each)
+  [  1/18]    6.5 min  far_cue        far_L3     seed 168  lr 0.001 (lr 0.001 throughout)
+          acc 0.336  trans  None  VALcos 1.000  margin 0.00  KEY  ROUTED* 1200/2400/end -/-/-
