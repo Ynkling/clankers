@@ -335,3 +335,219 @@ EXPLORATORY, NOT A RESULT — batch 5: slow_hinge (S13), stall_probe (S14), far_
           acc 1.000  trans  3600  VALcos 0.002  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [ 23/24]   17.9 min  slow_hinge     SLOW_HINGE seed 197  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
           acc 0.499  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [ 24/24]   18.2 min  far_nudge_slow FAR_NUDGE_SLOW seed 169  lr 0.001 (nudge pre-fit unchanged; then gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+          acc 1.000  trans  3600  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/Y/Y
+  batch wall clock 18.2 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_hinge
+  idea    SLOW_MEM + a hinge on the read gate's position eta^2 (zero below TAU = 0.2)
+  source  batch 4's SLOW_POS (a full eta^2 penalty sat at its sampling floor and delayed commitment); hinge / margin penalties that act only past a threshold
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] of the read gate at key positions, on each training batch
+  arm SLOW_HINGE   lr 0.001  iters 24000  seeds 160-199 (40)  — SLOW_MEM + hinge on position eta^2 (TAU 0.2)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199), X's recorded arm A, and batch 4's SLOW_POS on 160-179 (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm SLOW_HINGE (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      KEY             DISCOVERED       -/-/?/-
+     161  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY             POSITION         -/-/?/-
+     162  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     163  1.000   3600   0.007   0.99  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       -/-/?/Y
+     164  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     165  1.000   4800   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION         Y/Y/?/Y
+     166  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY             BOUND unrouted   -/-/?/-
+     167  0.517   None   1.000   0.00  0.00/0.15/0.00/0.09  -/-/-/-  OTHER           KEY             DISCOVERED       -/-/?/-
+     168  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED       -/-/?/-
+     169  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     170  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     171  0.515   None   1.000   0.00  0.00/0.00/0.00/0.01  -/-/-/-  OTHER           OTHER           BOUND unrouted   -/-/?/-
+     172  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     173  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     174  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     175  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     176  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     177  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     178  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     179  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        OTHER            -/-/?/-
+     180  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     181  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     182  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     183  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     184  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED       -/?/?/-
+     185  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      KEY             DISCOVERED       -/?/?/-
+     186  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY             BOUND unrouted   -/?/?/-
+     187  0.519   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        DISCOVERED       -/?/?/-
+     188  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY             BOUND unrouted   -/?/?/-
+     189  0.482   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             POSITION         -/?/?/-
+     190  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     191  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     192  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     193  0.402   None   1.000   0.00  0.00/0.33/0.00/0.00  -/-/-/-  OTHER           KEY             BOUND unrouted   -/?/?/-
+     194  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        BOUND unrouted   -/?/?/-
+     195  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED       -/?/?/-
+     196  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     197  0.499   None   1.000   0.00  0.00/0.03/0.03/0.14  -/-/-/-  OTHER           DISCOVERED      POSITION         Y/?/?/Y
+     198  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     199  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+  per seed: hinge-active fraction of training batches (updates 1-1200 / 1-2400 / whole run); SLOW_MEM and SLOW_POS outcomes on the same seed:
+     160 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS OTHER          
+     161 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS OTHER          
+     162 0.003 / 0.001 / 0.001   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS DISCOVERED     
+     163 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     164 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS OTHER          
+     165 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     166 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS DISCOVERED     
+     167 0.003 / 0.005 / 0.035   SLOW_HINGE OTHER           SLOW_MEM POSITION        SLOW_POS DISCOVERED     
+     168 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     169 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     170 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     171 0.001 / 0.000 / 0.001   SLOW_HINGE OTHER           SLOW_MEM OTHER           SLOW_POS OTHER          
+     172 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     173 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS OTHER          
+     174 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     175 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS DISCOVERED     
+     176 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS DISCOVERED     
+     177 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS DISCOVERED     
+     178 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     179 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS DISCOVERED     
+     180 0.001 / 0.001 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS --             
+     181 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     182 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     183 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     184 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     185 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     186 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     187 0.000 / 0.000 / 0.000   SLOW_HINGE KEY             SLOW_MEM KEY             SLOW_POS --             
+     188 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     189 0.003 / 0.002 / 0.000   SLOW_HINGE KEY             SLOW_MEM KEY             SLOW_POS --             
+     190 0.001 / 0.001 / 0.001   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS --             
+     191 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     192 0.003 / 0.001 / 0.001   SLOW_HINGE DISCOVERED      SLOW_MEM OTHER           SLOW_POS --             
+     193 0.002 / 0.002 / 0.007   SLOW_HINGE OTHER           SLOW_MEM KEY             SLOW_POS --             
+     194 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     195 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     196 0.001 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     197 0.001 / 0.002 / 0.081   SLOW_HINGE OTHER           SLOW_MEM POSITION        SLOW_POS --             
+     198 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS --             
+     199 0.002 / 0.001 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM POSITION        SLOW_POS --             
+  vs SLOW_MEM (40 seeds; S5 160-179, S7 180-199):
+    DISCOVERED    SLOW_HINGE 34/40   SLOW_MEM 24/40   SLOW_HINGE only 10, SLOW_MEM only 0, McNemar two-sided p = 0.00195
+    ROUTED*@1200  SLOW_HINGE 28/40   SLOW_MEM 23/40   SLOW_HINGE only 5, SLOW_MEM only 0, McNemar two-sided p = 0.0625
+    ROUTED*@2400  SLOW_HINGE 34/40   SLOW_MEM 24/40   SLOW_HINGE only 10, SLOW_MEM only 0, McNemar two-sided p = 0.00195
+    ROUTED*@end   SLOW_HINGE 34/40   SLOW_MEM 24/40   SLOW_HINGE only 10, SLOW_MEM only 0, McNemar two-sided p = 0.00195
+  vs X's arm A (40 seeds; X's ROUTED* at 2400 from batch 2's re-run, seeds 160-179 only):
+    DISCOVERED    SLOW_HINGE 34/40   X A 12/40   SLOW_HINGE only 23, X A only 1, McNemar two-sided p = 2.98e-06
+    ROUTED*@1200  SLOW_HINGE 28/40   X A 11/40   SLOW_HINGE only 19, X A only 2, McNemar two-sided p = 0.000221
+    ROUTED*@2400  SLOW_HINGE 18/20   X A  6/20   SLOW_HINGE only 12, X A only 0, McNemar two-sided p = 0.000488   [20 seeds without a value]
+    ROUTED*@end   SLOW_HINGE 34/40   X A 12/40   SLOW_HINGE only 23, X A only 1, McNemar two-sided p = 2.98e-06
+  vs SLOW_POS (160-179):
+    DISCOVERED    SLOW_HINGE 18/20   SLOW_POS 15/20   SLOW_HINGE only 4, SLOW_POS only 1, McNemar two-sided p = 0.375
+    ROUTED*@1200  SLOW_HINGE 15/20   SLOW_POS  0/20   SLOW_HINGE only 15, SLOW_POS only 0, McNemar two-sided p = 6.1e-05
+    ROUTED*@2400  SLOW_HINGE 18/20   SLOW_POS  1/20   SLOW_HINGE only 17, SLOW_POS only 0, McNemar two-sided p = 1.53e-05
+    ROUTED*@end   SLOW_HINGE 18/20   SLOW_POS 13/20   SLOW_HINGE only 6, SLOW_POS only 1, McNemar two-sided p = 0.125
+  failure classes (40 seeds run of 160-199): SLOW_HINGE {'OTHER': 4, 'KEY': 2}   SLOW_MEM {'POSITION': 11, 'OTHER': 2, 'KEY': 3}   X arm A {'KEY': 9, 'POSITION': 18, 'OTHER': 1}
+  failure classes (20 seeds run of 160-179): SLOW_HINGE {'OTHER': 2}   SLOW_POS {'OTHER': 5}
+  uncommitted gates (OTHER, every eta^2 < 0.1 at the end): SLOW_HINGE []; SLOW_POS [160, 164, 171, 173]; SLOW_MEM []
+  READING S13 (seeds 160-179): ROUTED*@1200 15/20, uncommitted failures 0: noise floor
+  VERDICT slow_hinge (vs SLOW_MEM, 40 seeds): promising; reading: noise floor  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN stall_probe
+  idea    why routed gates fail to bind: perfect-gate swap, continued training, gate profile
+  source  stalled runs of batches 2 and 4 (header layout) and of the main line's test_router_layout (blocked layout)
+  change  none to the runs; probes at their end states
+  arm hdr_far_nudge lr 0.001  iters 24000  seeds [160, 161, 164, 165] (4)  — batch 4's far_nudge (160 = control)
+                   schedule: lr 0.001 throughout
+  arm hdr_far_A    lr 0.001  iters 24000  seeds 165-166 (2)  — batch 2's far_A
+                   schedule: lr 0.001 throughout
+  arm blk_A        lr 0.001  iters 24000  seeds [120, 130, 136] (3)  — X's test_router_layout A_blocked
+                   schedule: lr 0.001 throughout
+  pairing each probe against its own recorded run (reproduced exactly first)
+----------------------------------------------------------------------------------------------------
+  per run (rec = recorded final accuracy; rerun reproduces its recorded curve at every evaluation; SWAP = perfect gate at the end state; continuations: accuracy at +1200/+2400/+3600/+4800):
+    hdr_far_nudge   160 (control)  rec 1.000  rerun reproduces: yes  learned-path acc 1.000 (= rec)  map stream->channel [0, 1]
+                         SWAP 1.000   perfect-gate continuation 1.00/1.00/1.00/1.00   learned-gate continuation 0.99/1.00/1.00/1.00   batches identical: True   margin (learned) 1.00   READING: SWAP-FIXES
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.63/0.62  KEY: 1.00/0.00  VAL: 1.00/0.00  qCTX: 0.78/0.62  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): CTX s0: 0.63 vs 1.00; CTX s1: 0.62 vs 0.00; qCTX s0: 0.78 vs 1.00; qCTX s1: 0.62 vs 0.00
+    hdr_far_nudge   161  rec 0.553  rerun reproduces: yes  learned-path acc 0.553 (= rec)  map stream->channel [0, 1]
+                         SWAP 0.469   perfect-gate continuation 0.55/0.54/1.00/1.00   learned-gate continuation 0.54/0.53/0.54/0.54   batches identical: True   margin (learned) 1.00   READING: MEMORY-STUCK
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.44/0.44  KEY: 0.25/0.75  VAL: 1.00/0.00  qCTX: 0.52/0.60  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): CTX s0: 0.44 vs 1.00; CTX s1: 0.44 vs 0.00; KEY s0: 0.25 vs 1.00; KEY s1: 0.75 vs 0.00; qCTX s0: 0.52 vs 1.00; qCTX s1: 0.60 vs 0.00
+    hdr_far_nudge   164  rec 0.524  rerun reproduces: yes  learned-path acc 0.524 (= rec)  map stream->channel [1, 0]
+                         SWAP 0.523   perfect-gate continuation 0.53/0.54/0.54/0.52   learned-gate continuation 0.54/0.53/0.54/0.52   batches identical: True   margin (learned) 1.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.32/0.52  KEY: 0.00/1.00  VAL: 0.00/1.00  qCTX: 0.31/0.59  qKEY: 0.00/1.00
+                         differs from perfect (> 0.1): CTX s0: 0.32 vs 0.00; CTX s1: 0.52 vs 1.00; qCTX s0: 0.31 vs 0.00; qCTX s1: 0.59 vs 1.00
+    hdr_far_nudge   165  rec 0.545  rerun reproduces: yes  learned-path acc 0.545 (= rec)  map stream->channel [0, 1]
+                         SWAP 0.543   perfect-gate continuation 0.54/0.54/0.54/0.54   learned-gate continuation 0.53/0.54/0.55/0.54   batches identical: True   margin (learned) 1.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.16/0.54  KEY: 1.00/0.00  VAL: 1.00/0.00  qCTX: 0.23/0.33  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): CTX s0: 0.16 vs 1.00; CTX s1: 0.54 vs 0.00; qCTX s0: 0.23 vs 1.00; qCTX s1: 0.33 vs 0.00
+    hdr_far_A       165  rec 0.542  rerun reproduces: yes  learned-path acc 0.542 (= rec)  map stream->channel [0, 1]
+                         SWAP 0.542   perfect-gate continuation 0.54/0.54/0.54/0.55   learned-gate continuation 0.54/0.54/0.55/0.55   batches identical: True   margin (learned) 1.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.99/0.00  KEY: 1.00/0.00  VAL: 1.00/0.00  qCTX: 0.99/0.00  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): nowhere
+    hdr_far_A       166  rec 0.531  rerun reproduces: yes  learned-path acc 0.531 (= rec)  map stream->channel [0, 1]
+                         SWAP 0.529   perfect-gate continuation 0.54/0.53/0.53/0.53   learned-gate continuation 0.53/0.54/0.54/0.53   batches identical: True   margin (learned) 1.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 1.00/0.06  KEY: 1.00/0.00  VAL: 1.00/0.00  qCTX: 1.00/0.04  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): nowhere
+    blk_A           120  rec 0.342  rerun reproduces: yes  learned-path acc 0.342 (= rec)  map stream->channel [0, 1]
+                         SWAP 0.345   perfect-gate continuation 0.33/0.34/0.33/0.32   learned-gate continuation 0.33/0.34/0.33/0.33   batches identical: True   margin (learned) 1.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.00/0.99  KEY: 0.76/0.40  VAL: 1.00/0.00  qCTX: 0.41/0.72  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): CTX s0: 0.00 vs 1.00; CTX s1: 0.99 vs 0.00; KEY s0: 0.76 vs 1.00; KEY s1: 0.40 vs 0.00; qCTX s0: 0.41 vs 1.00; qCTX s1: 0.72 vs 0.00
+    blk_A           130  rec 0.344  rerun reproduces: yes  learned-path acc 0.344 (= rec)  map stream->channel [1, 0]
+                         SWAP 0.342   perfect-gate continuation 0.32/0.34/0.34/0.33   learned-gate continuation 0.32/0.33/0.34/0.33   batches identical: True   margin (learned) 0.99   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.89/0.12  KEY: 0.26/0.72  VAL: 0.00/1.00  qCTX: 0.44/0.00  qKEY: 0.01/1.00
+                         differs from perfect (> 0.1): CTX s0: 0.89 vs 0.00; CTX s1: 0.12 vs 1.00; KEY s0: 0.26 vs 0.00; KEY s1: 0.72 vs 1.00; qCTX s0: 0.44 vs 0.00; qCTX s1: 0.00 vs 1.00
+    blk_A           136  rec 0.336  rerun reproduces: yes  learned-path acc 0.336 (= rec)  map stream->channel [1, 0]
+                         SWAP 0.344   perfect-gate continuation 0.34/0.33/0.34/0.34   learned-gate continuation 0.34/0.33/0.34/0.34   batches identical: True   margin (learned) 1.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.70/0.67  KEY: 0.01/1.00  VAL: 0.00/1.00  qCTX: 0.61/0.73  qKEY: 0.00/1.00
+                         differs from perfect (> 0.1): CTX s0: 0.70 vs 0.00; CTX s1: 0.67 vs 1.00; qCTX s0: 0.61 vs 0.00; qCTX s1: 0.73 vs 1.00
+  SUMMARY of readings (stalled runs by layout; control apart):
+    header   {'MEMORY-STUCK': 1, 'NEITHER': 4}   hdr_far_nudge 161: MEMORY-STUCK, hdr_far_nudge 164: NEITHER, hdr_far_nudge 165: NEITHER, hdr_far_A 165: NEITHER, hdr_far_A 166: NEITHER
+    blocked  {'NEITHER': 3}   blk_A 120: NEITHER, blk_A 130: NEITHER, blk_A 136: NEITHER
+    control  {'SWAP-FIXES': 1}   hdr_far_nudge 160: SWAP-FIXES
+  S14 stall_probe: diagnostic, 9/9 probes  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_nudge_slow
+  idea    the 5% labelled nudge on the header layout, trained with the SLOW_MEM schedule
+  source  batch 4's far_nudge (routed 7/10, bound 5/10) and batches 2-3's SLOW_MEM
+  change  far_nudge + SLOW_MEM's groups: gate 1e-3 throughout; everything else 1e-4 for updates 1-2400, 1e-3 after; nudge pre-fit unchanged
+  arm FAR_NUDGE_SLOW lr 0.001  iters 24000  seeds 160-169 (10)  — far_nudge + the SLOW_MEM schedule, header layout
+                   schedule: nudge pre-fit unchanged; then gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 4's far_nudge (same weights after the pre-fit, same batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; b4 = batch 4's far_nudge):
+    seed   sep0    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b4 far_nudge    b4 acc
+     160  0.050  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED       1.000
+     161  0.050  1.000   3600   0.000   1.00  1.00/0.00/0.01/0.01  Y/Y/Y/Y  DISCOVERED      STREAM-PARTIAL   0.553
+     162  0.050  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED       1.000
+     163  0.050  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED       1.000
+     164  0.050  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      STREAM-PARTIAL   0.524
+     165  0.050  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      STREAM-PARTIAL   0.545
+     166  0.050  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      BOUND unrouted   1.000
+     167  0.050  1.000   3600   0.000   1.00  1.00/0.00/0.01/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED       1.000
+     168  0.050  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION         0.228
+     169  0.050  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED       1.000
+  paired with batch 4's far_nudge:
+    DISCOVERED    FAR_NUDGE_SLOW 10/10   far_nudge  5/10   FAR_NUDGE_SLOW only 5, far_nudge only 0, McNemar two-sided p = 0.0625
+    BOUND         FAR_NUDGE_SLOW 10/10   far_nudge  6/10   FAR_NUDGE_SLOW only 4, far_nudge only 0, McNemar two-sided p = 0.125
+    ROUTED*@1200  FAR_NUDGE_SLOW  9/10   far_nudge  6/10   FAR_NUDGE_SLOW only 4, far_nudge only 1, McNemar two-sided p = 0.375
+    ROUTED*@end   FAR_NUDGE_SLOW 10/10   far_nudge  7/10   FAR_NUDGE_SLOW only 3, far_nudge only 0, McNemar two-sided p = 0.25
+    STALLS        FAR_NUDGE_SLOW  0/10   far_nudge  3/10   FAR_NUDGE_SLOW only 0, far_nudge only 3, McNemar two-sided p = 0.25
+    stalls (routed at the end or stream-partial, not bound): FAR_NUDGE_SLOW []   far_nudge [161, 164, 165]
+    failures FAR_NUDGE_SLOW {}
+  VERDICT far_nudge_slow: promising (DISCOVERED 10/10)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S13 slow_hinge: promising vs SLOW_MEM (DISCOVERED 34/40 vs 24/40, 10 vs 0, p = 0.00195); reading: noise floor
+      vs X A 34/40 vs 12/40 (23 vs 1, p = 2.98e-06); vs SLOW_POS (160-179) 18/20 vs 15/20 (4 vs 1, p = 0.375)
+  S14 control  hdr_far_nudge 160: SWAP-FIXES
+  S14 header   hdr_far_nudge 161: MEMORY-STUCK, hdr_far_nudge 164: NEITHER, hdr_far_nudge 165: NEITHER, hdr_far_A 165: NEITHER, hdr_far_A 166: NEITHER
+  S14 blocked  blk_A 120: NEITHER, blk_A 130: NEITHER, blk_A 136: NEITHER
+  S15 far_nudge_slow: promising (DISCOVERED 10/10; batch 4's far_nudge 5/10)
+####################################################################################################
