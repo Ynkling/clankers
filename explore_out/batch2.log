@@ -622,3 +622,164 @@ EXPLORATORY, NOT A RESULT — batch 2: kwta_warm (S4), slow_mem (S5), far_cue (S
           acc 1.000  trans  6000  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [  3/5]    7.6 min  kwta_warm      KWTA_WARM  seed 176  lr 0.001 (lr 0.001 throughout; kWTA 16/256 for updates 1-2400 and the evaluations at 1200 and 2400; dense after)
           acc 1.000  trans 16800  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  4/5]    9.6 min  kwta_warm      KWTA_WARM  seed 175  lr 0.001 (lr 0.001 throughout; kWTA 16/256 for updates 1-2400 and the evaluations at 1200 and 2400; dense after)
+          acc 0.537  trans  None  VALcos 0.000  margin 1.00  STREAM-PARTIAL  ROUTED* 1200/2400/end Y/Y/Y
+  [  5/5]    9.7 min  kwta_warm      KWTA_WARM  seed 177  lr 0.001 (lr 0.001 throughout; kWTA 16/256 for updates 1-2400 and the evaluations at 1200 and 2400; dense after)
+          acc 0.323  trans  None  VALcos 0.000  margin 1.00  STREAM-PARTIAL  ROUTED* 1200/2400/end Y/Y/Y
+  batch wall clock 9.7 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN ref_a2400
+  idea    reference: X's arm A through step 2400, for ROUTED* at 2400
+  source  test_short_conv's arm A (X's record)
+  change  none (a re-run with routing statistics at 1200 and 2400)
+  arm A_2400       lr 0.001  iters 2400  seeds 160-179 (20)  — X's arm A, re-run through step 2400
+                   schedule: lr 0.001 throughout
+  pairing each seed compared with X's record of the same run
+----------------------------------------------------------------------------------------------------
+  re-runs that reproduce X's record exactly (curve at 1200 and 2400, routing statistics at 1200): 20/20
+  X's arm A ROUTED* at 1200 / 2400 (re-run) / end (record), per seed: 160:--- 161:--- 162:--- 163:--Y 164:YYY 165:YYY 166:--- 167:--- 168:--- 169:YYY 170:--- 171:--- 172:--- 173:--- 174:YYY 175:--- 176:YYY 177:--- 178:YYY 179:---
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN kwta_warm
+  idea    k-WTA (16/256) only as a warm-up: through the evaluation at step 2400, dense after
+  source  batch 1's KWTA16 (FlyHash, Dasgupta et al. 2017; k-WTA, Ahmad & Hawkins 2019), which routed early but bound slowly
+  change  explore_kwta's KWTA16 model; model.k_top = None right after the evaluation at step 2400 (arm A's dense forward from update 2401)
+  arm KWTA_WARM    lr 0.001  iters 24000  seeds 160-179 (20)  — arm A + kWTA 16/256 through the evaluation at 2400, dense after
+                   schedule: lr 0.001 throughout; kWTA 16/256 for updates 1-2400 and the evaluations at 1200 and 2400; dense after
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); X's ROUTED* at 2400 from explore_ref_a2400
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm KWTA_WARM (lr 0.001; lr 0.001 throughout; kWTA 16/256 for updates 1-2400 and the evaluations at 1200 and 2400; dense after)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  0.539   None   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  STREAM-PARTIAL  KEY             DISCOVERED       -/-/?/-
+     161  1.000  15600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY             POSITION         -/-/?/-
+     162  0.291   None   1.000   0.00  0.01/0.08/0.10/0.66  -/-/-/-  POSITION        POSITION        POSITION         -/-/?/-
+     163  0.212   None   1.000  -0.00  0.00/0.00/0.53/0.97  -/-/-/-  POSITION        DISCOVERED      DISCOVERED       -/-/?/Y
+     164  0.327   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             DISCOVERED      DISCOVERED       Y/Y/?/Y
+     165  0.324   None   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  STREAM-PARTIAL  DISCOVERED      POSITION         Y/Y/?/Y
+     166  1.000   4800   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY             BOUND unrouted   -/-/?/-
+     167  0.309   None   1.000  -0.00  0.00/0.00/0.00/0.00  Y/Y/Y/-  OTHER           KEY             DISCOVERED       -/-/?/-
+     168  0.324   None   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  STREAM-PARTIAL  POSITION        DISCOVERED       -/-/?/-
+     169  0.314   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             DISCOVERED      DISCOVERED       Y/Y/?/Y
+     170  0.998   7200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     171  0.315   None   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  STREAM-PARTIAL  OTHER           BOUND unrouted   -/-/?/-
+     172  0.315   None   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  STREAM-PARTIAL  POSITION        POSITION         -/-/?/-
+     173  1.000   9600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     174  0.212   None   1.000  -0.00  0.00/0.00/0.08/0.96  -/-/-/-  POSITION        DISCOVERED      DISCOVERED       Y/Y/?/Y
+     175  0.537   None   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  STREAM-PARTIAL  POSITION        POSITION         -/-/?/-
+     176  1.000  16800   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     177  0.323   None   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  STREAM-PARTIAL  POSITION        POSITION         -/-/?/-
+     178  0.994   6000   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     179  1.000   6000   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        OTHER            -/-/?/-
+  paired with X's arm A (same seeds, initial parameters and batches):
+    DISCOVERED  KWTA_WARM       7/20   X A  7/20   KWTA_WARM only 5, A only 5, McNemar two-sided p = 1
+    BOUND       KWTA_WARM       7/20   X A  7/20   KWTA_WARM only 5, A only 5, McNemar two-sided p = 1
+    ROUTED*@1200  KWTA_WARM  15/20   X A  6/20   KWTA_WARM only 12, A only 3, McNemar two-sided p = 0.0352   [X A from X record]
+    ROUTED*@2400  KWTA_WARM  15/20   X A  6/20   KWTA_WARM only 12, A only 3, McNemar two-sided p = 0.0352   [X A from re-run of X's arm A (explore_ref_a2400)]
+    ROUTED*@end   KWTA_WARM  14/20   X A  7/20   KWTA_WARM only 11, A only 4, McNemar two-sided p = 0.118   [X A from X record]
+    failures KWTA_WARM {'STREAM-PARTIAL': 7, 'POSITION': 3, 'KEY': 2, 'OTHER': 1}   X arm A {'KEY': 4, 'POSITION': 8, 'OTHER': 1}
+    diagnostic, the switch: ROUTED* at 2400 (kWTA) 15/20; of those, ROUTED* at 3600 (first dense evaluation) 15, at the end 14, bound 7; lost by 3600: seeds []
+    diagnostic, held-out accuracy at 2400 -> 3600: 160:0.29->0.34 161:0.34->0.72 162:0.17->0.17 163:0.17->0.19 164:0.15->0.14 165:0.28->0.30 166:0.33->0.53 167:0.32->0.50 168:0.30->0.32 169:0.16->0.16 170:0.40->0.66 171:0.27->0.29 172:0.27->0.28 173:0.37->0.75 174:0.12->0.14 175:0.28->0.41 176:0.30->0.46 177:0.28->0.30 178:0.29->0.45 179:0.35->0.49
+  VERDICT kwta_warm: not  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_mem
+  idea    slow memory first: non-gate parameters at lr/10 for 2400 updates, the gate at full lr
+  source  the race reading of batch 1's KWTA16 (two-timescale training: fast router, slow experts); separates it from the sparse-code reading
+  change  arm A, one Adam, two groups: gate (W_in, W_h, W_g) 1e-3 throughout; the rest 1e-4 for updates 1-2400, 1e-3 after
+  arm SLOW_MEM     lr 0.001  iters 24000  seeds 160-179 (20)  — arm A; memory at lr/10 for the first 2400 updates
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); X's ROUTED* at 2400 from explore_ref_a2400
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm SLOW_MEM (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      KEY             DISCOVERED       -/-/?/-
+     161  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY             POSITION         -/-/?/-
+     162  0.494   None   1.000  -0.00  0.00/0.00/0.20/1.00  -/-/-/-  POSITION        POSITION        POSITION         -/-/?/-
+     163  1.000   3600   0.007   0.99  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       -/-/?/Y
+     164  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     165  1.000   4800   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION         Y/Y/?/Y
+     166  0.504   None   1.000   0.00  0.01/0.11/0.09/0.81  -/-/-/-  POSITION        KEY             BOUND unrouted   -/-/?/-
+     167  0.499   None   1.000  -0.00  0.00/0.20/0.00/0.60  -/-/-/-  POSITION        KEY             DISCOVERED       -/-/?/-
+     168  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED       -/-/?/-
+     169  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     170  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     171  0.506   None   1.000   0.00  0.00/0.00/0.00/0.01  -/-/-/-  OTHER           OTHER           BOUND unrouted   -/-/?/-
+     172  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/-/?/-
+     173  0.479   None   1.000  -0.00  0.00/0.20/0.00/0.60  -/-/-/-  POSITION        POSITION        POSITION         -/-/?/-
+     174  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     175  0.510   None   1.000  -0.01  0.00/0.00/0.18/1.00  -/-/-/-  POSITION        POSITION        POSITION         -/-/?/-
+     176  0.389   None   1.000   0.00  0.00/0.00/0.52/1.00  -/-/-/-  POSITION        DISCOVERED      DISCOVERED       Y/Y/?/Y
+     177  0.395   None   1.000   0.00  0.00/0.00/0.53/1.00  -/-/-/-  POSITION        POSITION        POSITION         -/-/?/-
+     178  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/Y/?/Y
+     179  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        OTHER            -/-/?/-
+  paired with X's arm A (same seeds, initial parameters and batches):
+    DISCOVERED  SLOW_MEM       12/20   X A  7/20   SLOW_MEM only 6, A only 1, McNemar two-sided p = 0.125
+    BOUND       SLOW_MEM       12/20   X A  7/20   SLOW_MEM only 6, A only 1, McNemar two-sided p = 0.125
+    ROUTED*@1200  SLOW_MEM   12/20   X A  6/20   SLOW_MEM only 7, A only 1, McNemar two-sided p = 0.0703   [X A from X record]
+    ROUTED*@2400  SLOW_MEM   12/20   X A  6/20   SLOW_MEM only 7, A only 1, McNemar two-sided p = 0.0703   [X A from re-run of X's arm A (explore_ref_a2400)]
+    ROUTED*@end   SLOW_MEM   12/20   X A  7/20   SLOW_MEM only 6, A only 1, McNemar two-sided p = 0.125   [X A from X record]
+    failures SLOW_MEM {'POSITION': 7, 'OTHER': 1}   X arm A {'KEY': 4, 'POSITION': 8, 'OTHER': 1}
+  READING (ROUTED* at 1200 vs X's arm A: 7 vs 1, p = 0.0703): the S5 pattern fits (b) a race
+  VERDICT slow_mem: inconclusive  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_cue
+  idea    LOCAL3 when the stream token is a block header, out of a width-3 window for most pairs
+  source  batch 1's LOCAL3 (Mamba / H3 / RWKV local gate); a new header layout
+  change  HeaderTask: each stream's block [CTX_s, K, V, K, V, ...], blocks in random stream order, keys random within a block; queries at the end as in make_batch
+  arm far_ceil     lr 0.001  iters 24000  seeds 160-162 (3)  — perfect gate, header layout (validity)
+                   schedule: lr 0.001 throughout
+  arm far_A        lr 0.001  iters 24000  seeds 160-169 (10)  — arm A, header layout
+                   schedule: lr 0.001 throughout
+  arm far_L3       lr 0.001  iters 24000  seeds 160-169 (10)  — LOCAL3, header layout
+                   schedule: lr 0.001 throughout
+  pairing within the batch: far_A and far_L3 on seeds 160-169 (same initial parameters, same batches)
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end):
+   arm far_ceil (lr 0.001; lr 0.001 throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         
+     160  1.000   1200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      
+     161  1.000   1200   0.000   1.00  1.00/0.00/0.01/0.01  Y/Y/Y/Y  DISCOVERED      
+     162  1.000   1200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      
+   arm far_A (lr 0.001; lr 0.001 throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         
+     160  0.238   None   1.000   0.00  0.00/0.00/0.99/1.00  -/-/-/-  POSITION        
+     161  0.217   None   1.000  -0.00  0.00/0.01/0.14/1.00  -/-/-/-  POSITION        
+     162  0.226   None   1.000  -0.00  0.00/0.00/0.25/0.97  -/-/-/-  POSITION        
+     163  0.225   None   1.000   0.00  0.01/0.00/0.12/0.70  -/-/-/-  POSITION        
+     164  0.405   None   1.000  -0.00  0.00/0.34/0.33/0.33  -/-/-/-  OTHER           
+     165  0.542   None   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  STREAM-PARTIAL  
+     166  0.531   None   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  STREAM-PARTIAL  
+     167  0.299   None   1.000  -0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           
+     168  0.436   None   0.997   0.04  0.00/0.37/0.20/0.24  -/-/-/-  OTHER           
+     169  0.323   None   0.997  -0.05  0.01/0.00/0.45/0.94  -/-/-/-  POSITION        
+   arm far_L3 (lr 0.001; lr 0.001 throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         
+     160  0.438   None   1.000  -0.00  0.00/0.15/0.00/0.45  -/-/-/-  OTHER           
+     161  0.439   None   1.000  -0.00  0.00/0.05/0.07/0.67  -/-/-/-  POSITION        
+     162  1.000   7200   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  BOUND unrouted  
+     163  1.000  10800   1.000  -0.00  0.00/0.88/0.00/0.05  -/-/-/-  BOUND unrouted  
+     164  0.439   None   1.000   0.00  0.00/0.04/0.10/0.70  -/-/-/-  POSITION        
+     165  0.741   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             
+     166  0.511   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             
+     167  0.445   None   1.000   0.00  0.00/0.14/0.00/0.42  -/-/-/-  OTHER           
+     168  0.336   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             
+     169  0.420   None   1.000   0.00  0.00/0.15/0.00/0.45  -/-/-/-  OTHER           
+  validity: far_ceil bound 3/3 (transitions [1200, 1200, 1200])
+    far_A   bound 0/10   discovered 0/10   ROUTED*@1200 0/10   ROUTED*@end 2/10   failures {'POSITION': 5, 'OTHER': 3, 'STREAM-PARTIAL': 2}
+    far_L3  bound 2/10   discovered 0/10   ROUTED*@1200 0/10   ROUTED*@end 0/10   failures {'OTHER': 3, 'POSITION': 2, 'KEY': 3}
+    far_L3 - far_A in bound runs: 2 - 0 = +2   (paired seeds 160-169: far_L3 only [162, 163], far_A only [])
+  READING S6: neither reading applies (far_L3 - far_A = +2)
+  S6 far_cue: neither reading applies (far_L3 - far_A = +2)  (descriptive)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S4 kwta_warm: not (DISCOVERED 7/20 vs X A 7/20, 5 vs 5, p = 1)
+  S5 slow_mem:  inconclusive (DISCOVERED 12/20 vs X A 7/20, 6 vs 1, p = 0.125); reading: (b) a race
+  S6 far_cue:   neither reading applies (far_L3 - far_A = +2)
+####################################################################################################
