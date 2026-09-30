@@ -319,3 +319,5 @@ EXPLORATORY, NOT A RESULT — batch 3: slow_mem_ext (S7), far_gates (S8), near_c
   31 runs queued on 4 workers (1 torch thread each)
   [  1/31]    5.6 min  far_gates      far_EMA    seed 167  lr 0.001 (lr 0.001 throughout)
           acc 0.328  trans  None  VALcos 1.000  margin 0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  [  2/31]    6.2 min  far_gates      far_A_slow seed 166  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+          acc 0.230  trans  None  VALcos 1.000  margin -0.00  POSITION  ROUTED* 1200/2400/end -/-/-
