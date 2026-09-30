@@ -435,3 +435,69 @@ EXPLORATORY, NOT A RESULT — batch 3: slow_mem_ext (S7), far_gates (S8), near_c
           acc 0.504  trans  None  VALcos 1.000  margin 0.00  KEY  ROUTED* 1200/2400/end -/-/-
   [ 12/16]   26.9 min  near_check     EMA_near   seed 168  lr 0.001 (lr 0.001 throughout)
           acc 0.740  trans  None  VALcos 0.600  margin 0.49  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+#################### RESUME 2026-09-30 18:32:58 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 3: slow_mem_ext (S7), far_gates (S8), near_check (S9)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git b19e5ce+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S7 rule (20 new seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED vs X's arm A)
+  S8 rule per arm: promising if DISCOVERED >= 4/10; not if <= 1/10; else inconclusive (batch 2's far_A: 0/10)
+  S9 per arm: 'keeps the near case' if DISCOVERED >= X's arm A (4/10) - 1
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): slow_mem_ext, far_gates, near_check — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (46s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch3.py differs from 82ee219, where the full CHECK suite passed (2026-09-30 16:03:15 UTC; its output is earlier in this log). git diff --stat 82ee219:
+     explore_out/README.md                 |     2 +-
+     explore_out/batch3.log                |   451 ++
+     explore_out/batch3_checks.json        |     6 +
+     explore_out/far_gates_results.json    | 13326 ++++++++++++++++++++++++++++++++
+     explore_out/near_check_results.json   |  7124 +++++++++++++++++
+     explore_out/slow_mem_ext_results.json |  5697 ++++++++++++++
+     6 files changed, 26605 insertions(+), 1 deletion(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_mem_ext
+  idea    S5's slow-memory schedule, unchanged, on 20 new seeds
+  source  batch 2's S5 slow_mem (two-timescale training; the race reading)
+  change  arm A, one Adam, two groups: gate (W_in, W_h, W_g) 1e-3 throughout; the rest 1e-4 for updates 1-2400, 1e-3 after
+  arm SLOW_MEM     lr 0.001  iters 24000  seeds 180-199 (20)  — S5's SLOW_MEM, unchanged; seeds 180-199
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 180-199, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches); pool 160-199 with batch 2's S5 records
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_gates
+  idea    gates with memory beyond a window on the header layout: multi-scale EMA, selective (minGRU)
+  source  multi-timescale fading memory (e.g. RetNet / S4-style decays); minGRU (Feng et al. 2024); S5's slow-memory schedule
+  change  far_EMA, far_SEL: the gate's recurrence (explore_gates); far_A_slow: S5's schedule
+  arm far_EMA      lr 0.001  iters 24000  seeds 160-169 (10)  — multi-scale EMA gate (half-lives 1..32), header layout
+                   schedule: lr 0.001 throughout
+  arm far_SEL      lr 0.001  iters 24000  seeds 160-169 (10)  — selective (minGRU-style) gate, header layout
+                   schedule: lr 0.001 throughout
+  arm far_A_slow   lr 0.001  iters 24000  seeds 160-169 (10)  — arm A + S5's schedule, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json; same shared initial parameters, same batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN near_check
+  idea    S8's EMA and selective gates on the standard grouped task (the near case)
+  source  explore_gates (multi-timescale EMA; minGRU, Feng et al. 2024)
+  change  the gate's recurrence only (explore_gates); grouped layout, arm A otherwise
+  arm EMA_near     lr 0.001  iters 24000  seeds 160-169 (10)  — multi-scale EMA gate, grouped layout
+                   schedule: lr 0.001 throughout
+  arm SEL_near     lr 0.001  iters 24000  seeds 160-169 (10)  — selective (minGRU-style) gate, grouped layout
+                   schedule: lr 0.001 throughout
+  pairing seeds 160-169, paired with X's recorded arm A (test_short_conv, lr 1e-3; same shared initial parameters and batches); X's ROUTED* at 2400 from batch 2's ref_a2400
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    slow_mem_ext   SLOW_MEM   20 runs x   6.7 min  (24000 steps x 16.1 ms + 20 evals x 0.8 s)
+    far_gates      far_EMA    10 runs x   5.0 min  (24000 steps x 12.1 ms + 20 evals x 0.7 s)
+    far_gates      far_SEL    10 runs x   7.1 min  (24000 steps x 16.7 ms + 20 evals x 1.1 s)
+    far_gates      far_A_slow 10 runs x   5.6 min  (24000 steps x 13.5 ms + 20 evals x 0.6 s)
+    near_check     EMA_near   10 runs x   6.2 min  (24000 steps x 14.9 ms + 20 evals x 0.8 s)
+    near_check     SEL_near   10 runs x   8.9 min  (24000 steps x 21.0 ms + 20 evals x 1.6 s)
+    total 7.73 h of runs; makespan on 4 workers 1.96 h (worst case)
+  4 runs queued on 4 workers (1 torch thread each)
+  [  1/4]    6.7 min  near_check     EMA_near   seed 169  lr 0.001 (lr 0.001 throughout)
+          acc 0.409  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
