@@ -196,3 +196,5 @@ EXPLORATORY, NOT A RESULT — batch 2: kwta_warm (S4), slow_mem (S5), far_cue (S
   70 runs queued on 4 workers (1 torch thread each)
 
 #################### STOPPED 2026-09-30 02:21:37 UTC — the resumed segment was stopped by the session's background time limit (at its 10-minute timeout, the longest allowed) after the repro check, the CHECKs and the projection, before any new run finished. Batch 2 is INCOMPLETE: 13 of 83 runs saved (KWTA_WARM 160-166, SLOW_MEM 160-165). No report or verdict has been produced. (EXPLORATORY, not a result) ####################
+
+#################### NOTE 2026-09-30 02:28:36 UTC — explore_batch2.py gained --order, --resume, --report-only and --stopped-early at 9697dec (driver only; the screen code is unchanged since 6f529b5). From here each segment runs: --resume --order slow_mem,ref_a2400,far_cue,kwta_warm. Restarts after each stop by the background time limit approved by the user; explore_out/ is pushed after every saved run. (EXPLORATORY, not a result) ####################
