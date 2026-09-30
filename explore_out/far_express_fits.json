@@ -1,0 +1,46 @@
+{
+ "banner": "EXPLORATORY, not a result",
+ "recipe": "gate_fit_k: 64 sequences (seed 11), model seed 3, 400 Adam steps at lr 0.01 on the gate parameters and embed",
+ "fits": {
+  "header|A": {
+   "mse": 1.0988880916329435e-07,
+   "argmax": 1.0,
+   "fits": true
+  },
+  "header|EMA": {
+   "mse": 1.29239660964231e-05,
+   "argmax": 1.0,
+   "fits": true
+  },
+  "header|SEL": {
+   "mse": 2.2407577660032985e-07,
+   "argmax": 1.0,
+   "fits": true
+  },
+  "header|LOCAL3": {
+   "mse": 0.13883556425571442,
+   "argmax": 0.764843761920929,
+   "fits": false
+  },
+  "grouped|A": {
+   "mse": 3.102937853327603e-07,
+   "argmax": 1.0,
+   "fits": true
+  },
+  "grouped|EMA": {
+   "mse": 8.09951961855404e-06,
+   "argmax": 1.0,
+   "fits": true
+  },
+  "grouped|SEL": {
+   "mse": 3.1414026580023346e-07,
+   "argmax": 1.0,
+   "fits": true
+  },
+  "grouped|LOCAL3": {
+   "mse": 5.959836002489283e-08,
+   "argmax": 1.0,
+   "fits": true
+  }
+ }
+}

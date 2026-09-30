@@ -274,3 +274,178 @@ EXPLORATORY, NOT A RESULT — batch 4: far_express (S10), gate_reset (S11), slow
           acc 1.000  trans  3600  VALcos 0.009  margin 0.99  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
   [  2/3]    2.0 min  slow_pos       SLOW_POS   seed 178  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch)
           acc 1.000  trans  3600  VALcos 0.002  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
+  [  3/3]    7.6 min  slow_pos       SLOW_POS   seed 173  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch)
+          acc 0.479  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 7.6 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_express
+  idea    expressibility of the header-layout routing by each gate; arm A from a 5% labelled lean
+  source  CHECK 45's gate fit; test_router_curriculum's A_nudge (positive control on the grouped layout)
+  change  (a) supervised gate fits, no training runs; (b) far_nudge: A_nudge on the header layout
+  arm far_nudge    lr 0.001  iters 24000  seeds 160-169 (10)  — arm A + the 5% labelled nudge, header layout
+                   schedule: lr 0.001 throughout
+  pairing far_nudge seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json)
+----------------------------------------------------------------------------------------------------
+  (a) EXPRESSIBILITY: CHECK 45's recipe (400 Adam steps at lr 0.01 on the gate's parameters and the embedding, 64 sequences), FITS if argmax >= 0.99:
+    header layout:
+      A       mse 1.099e-07   argmax match 1.0000   FITS
+      EMA     mse 1.292e-05   argmax match 1.0000   FITS
+      SEL     mse 2.241e-07   argmax match 1.0000   FITS
+      LOCAL3  mse 1.388e-01   argmax match 0.7648   does not fit
+    grouped layout   (diagnostic):
+      A       mse 3.103e-07   argmax match 1.0000   FITS
+      EMA     mse 8.100e-06   argmax match 1.0000   FITS
+      SEL     mse 3.141e-07   argmax match 1.0000   FITS
+      LOCAL3  mse 5.960e-08   argmax match 1.0000   FITS
+  (b) far_nudge, per seed (ROUTED* at 1200/2400/3600/end; sep0 = the lean after the pre-fit; b2 = batch 2's far_A):
+    seed   sep0    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b2 far_A       
+     160  0.050  1.000   1200   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION
+     161  0.050  0.553   None   0.000   1.00  0.25/0.00/0.00/0.01  -/-/-/-  STREAM-PARTIAL  POSITION
+     162  0.050  1.000   1200   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION
+     163  0.050  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION
+     164  0.050  0.524   None   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  STREAM-PARTIAL  OTHER
+     165  0.050  0.545   None   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  STREAM-PARTIAL  STREAM-PARTIAL
+     166  0.050  1.000  18000   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  BOUND unrouted  STREAM-PARTIAL
+     167  0.050  1.000   1200   0.000   1.00  1.00/0.00/0.01/0.01  Y/Y/Y/Y  DISCOVERED      OTHER
+     168  0.050  0.228   None   1.000   0.00  0.00/0.00/0.20/1.00  -/-/-/-  POSITION        OTHER
+     169  0.050  1.000   1200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION
+    far_nudge DISCOVERED 5/10   bound 6/10   ROUTED*@1200 6/10   ROUTED*@end 7/10   failures {'STREAM-PARTIAL': 3, 'POSITION': 1}   vs b2 far_A: far_nudge only 5, far_A only 0, McNemar p = 0.0625
+  gates that fit the header routing: ['A', 'EMA', 'SEL']; the nudged gate (arm A's) fits
+  READING S10: neither reading applies (a gate fits; far_nudge 5/10)
+  S10 far_express: neither reading applies (a gate fits; far_nudge 5/10)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_reset
+  idea    a label-free detector of position/key gate splits at step 1200; reset only the gate
+  source  restart heuristics for bad initial commitments (e.g. dead-unit / expert re-initialization in MoE training); the project's restart rule, applied to the gate alone
+  change  arm A; at 1200 (and 1200 after each reset, max 3) if eta^2 of the read gate at key positions by index, half or key >= 0.5: re-draw W_in, W_h, W_g, clear their Adam state
+  arm RESET        lr 0.001  iters 24000  seeds 160-179 (20)  — arm A + label-free gate reset (max 3)
+                   schedule: lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3)
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm RESET (lr 0.001; lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3))
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  0.505   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             DISCOVERED       -/?/?/-
+     161  0.500   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             POSITION         -/?/?/-
+     162  1.000   7200   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     163  0.958   8400   0.013   0.94  0.99/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      DISCOVERED      DISCOVERED       -/?/?/Y
+     164  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     165  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION         Y/?/?/Y
+     166  0.493   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             BOUND unrouted   -/?/?/-
+     167  0.490   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             KEY             DISCOVERED       -/?/?/-
+     168  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED       -/?/?/-
+     169  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     170  0.479   None   1.000  -0.00  0.00/0.96/0.00/0.02  -/-/-/-  KEY             POSITION        POSITION         -/?/?/-
+     171  0.502   None   1.000  -0.02  0.00/0.28/0.07/0.19  -/-/-/-  OTHER           OTHER           BOUND unrouted   -/?/?/-
+     172  0.494   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             POSITION        POSITION         -/?/?/-
+     173  0.996   3600   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     174  0.984   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     175  0.509   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        POSITION         -/?/?/-
+     176  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     177  0.475   None   1.000   0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             POSITION        POSITION         -/?/?/-
+     178  1.000   1200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     179  0.493   None   1.000   0.00  0.00/1.00/0.01/0.01  -/-/-/-  KEY             POSITION        OTHER            -/?/?/-
+  resets per run (step: eta index/half/key -> reset r):
+     160 resets 3  KEY             1200: 0.00/0.00/1.00 -> reset 1; 2400: 0.00/0.00/1.00 -> reset 2; 3600: 0.00/0.00/1.00 -> reset 3; 4800: 0.00/0.00/1.00 -> fired, no resets left
+     161 resets 0  KEY             1200: 0.18/0.02/0.49
+     162 resets 1  DISCOVERED      1200: 0.98/0.91/0.00 -> reset 1; 2400: 0.00/0.00/0.00
+     163 resets 0  DISCOVERED      1200: 0.09/0.02/0.03
+     164 resets 0  DISCOVERED      1200: 0.00/0.00/0.00
+     165 resets 0  DISCOVERED      1200: 0.01/0.00/0.00
+     166 resets 3  KEY             1200: 0.00/0.00/1.00 -> reset 1; 2400: 0.00/0.00/1.00 -> reset 2; 3600: 0.00/0.00/1.00 -> reset 3; 4800: 0.00/0.00/1.00 -> fired, no resets left
+     167 resets 3  KEY             1200: 0.01/0.00/0.96 -> reset 1; 2400: 0.01/0.00/1.00 -> reset 2; 3600: 0.01/0.00/1.00 -> reset 3; 4800: 0.01/0.00/1.00 -> fired, no resets left
+     168 resets 1  DISCOVERED      1200: 0.95/0.84/0.00 -> reset 1; 2400: 0.00/0.00/0.00
+     169 resets 0  DISCOVERED      1200: 0.01/0.00/0.00
+     170 resets 3  KEY             1200: 0.97/0.82/0.00 -> reset 1; 2400: 0.01/0.00/0.99 -> reset 2; 3600: 0.01/0.00/0.99 -> reset 3; 4800: 0.00/0.00/1.00 -> fired, no resets left
+     171 resets 0  OTHER           1200: 0.01/0.00/0.01
+     172 resets 3  KEY             1200: 0.95/0.47/0.00 -> reset 1; 2400: 0.01/0.00/1.00 -> reset 2; 3600: 0.01/0.00/1.00 -> reset 3; 4800: 0.01/0.00/1.00 -> fired, no resets left
+     173 resets 1  DISCOVERED      1200: 0.96/0.77/0.00 -> reset 1; 2400: 0.00/0.00/0.00
+     174 resets 0  DISCOVERED      1200: 0.00/0.00/0.00
+     175 resets 3  KEY             1200: 1.00/0.67/0.00 -> reset 1; 2400: 0.01/0.00/0.87 -> reset 2; 3600: 0.00/0.00/1.00 -> reset 3; 4800: 0.00/0.00/0.99 -> fired, no resets left
+     176 resets 0  DISCOVERED      1200: 0.00/0.00/0.00
+     177 resets 3  KEY             1200: 0.95/0.30/0.00 -> reset 1; 2400: 0.01/0.00/1.00 -> reset 2; 3600: 0.01/0.00/1.00 -> reset 3; 4800: 0.01/0.00/1.00 -> fired, no resets left
+     178 resets 0  DISCOVERED      1200: 0.00/0.00/0.00
+     179 resets 3  KEY             1200: 0.95/0.77/0.01 -> reset 1; 2400: 0.01/0.01/0.99 -> reset 2; 3600: 0.01/0.01/1.00 -> reset 3; 4800: 0.01/0.01/1.00 -> fired, no resets left
+  paired with X's arm A (same seeds, initial parameters and batches):
+    DISCOVERED  RESET          10/20   X A  7/20   RESET only 3, A only 0, McNemar two-sided p = 0.25
+    BOUND       RESET          10/20   X A  7/20   RESET only 3, A only 0, McNemar two-sided p = 0.25
+    ROUTED*@1200  RESET       6/20   X A  6/20   RESET only 0, A only 0, McNemar two-sided p = 1   [X A from X record]
+    ROUTED*@end   RESET      10/20   X A  7/20   RESET only 3, A only 0, McNemar two-sided p = 0.25   [X A from X record]
+    failures RESET {'KEY': 9, 'OTHER': 1}   X arm A {'KEY': 4, 'POSITION': 8, 'OTHER': 1}
+  outcome by number of resets: 0 resets: DISCOVERED 7/9   1 resets: DISCOVERED 3/3   3 resets: DISCOVERED 0/8
+  resets used: 27 over 20 runs
+  VERDICT gate_reset: inconclusive  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_pos
+  idea    SLOW_MEM + a penalty on the read gate's position information (eta^2 by index and half)
+  source  batch 2-3's SLOW_MEM (failures mostly POSITION splits); invariance penalties on a representation's nuisance variable (e.g. HSIC / decorrelation penalties)
+  change  SLOW_MEM + 1.0 * (eta^2 by triple index + eta^2 by half) of the read gate at key positions, on each training batch
+  arm SLOW_POS     lr 0.001  iters 24000  seeds 160-179 (20)  — SLOW_MEM + 1.0 * position penalty on the read gate
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch
+  pairing seeds 160-179, paired with X's recorded arm A and with batch 2's SLOW_MEM on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm SLOW_POS (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  0.505   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           KEY             DISCOVERED       -/?/?/-
+     161  0.498   None   0.999   0.00  0.00/0.06/0.00/0.00  -/-/-/-  OTHER           KEY             POSITION         -/?/?/-
+     162  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     163  1.000   7200   0.003   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       -/?/?/Y
+     164  0.495   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           DISCOVERED      DISCOVERED       Y/?/?/Y
+     165  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      DISCOVERED      POSITION         Y/?/?/Y
+     166  1.000   3600   0.004   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      KEY             BOUND unrouted   -/?/?/-
+     167  1.000   3600   0.013   0.98  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      KEY             DISCOVERED       -/?/?/-
+     168  1.000   4800   0.000   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      POSITION        DISCOVERED       -/?/?/-
+     169  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     170  1.000   4800   0.000   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     171  0.517   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           OTHER           BOUND unrouted   -/?/?/-
+     172  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     173  0.479   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           POSITION        POSITION         -/?/?/-
+     174  1.000   7200   0.071   0.88  1.00/0.00/0.00/0.00  -/-/-/-  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     175  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     176  1.000   4800   0.038   0.90  1.00/0.00/0.00/0.00  -/-/-/-  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     177  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      POSITION        POSITION         -/?/?/-
+     178  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       Y/?/?/Y
+     179  1.000   3600   0.009   0.99  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      POSITION        OTHER            -/?/?/-
+  per seed vs batch 2's SLOW_MEM (outcome; position penalty eta^2 index/half on the last training batch before 1200 and before the end):
+     160 SLOW_POS OTHER           SLOW_MEM DISCOVERED      penalty@1200 0.02/0.00  end 0.00/0.00
+     161 SLOW_POS OTHER           SLOW_MEM DISCOVERED      penalty@1200 0.03/0.00  end 0.04/0.00
+     162 SLOW_POS DISCOVERED      SLOW_MEM POSITION        penalty@1200 0.03/0.00  end 0.03/0.00
+     163 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.02/0.00  end 0.03/0.00
+     164 SLOW_POS OTHER           SLOW_MEM DISCOVERED      penalty@1200 0.02/0.00  end 0.00/0.00
+     165 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.04/0.00  end 0.03/0.00
+     166 SLOW_POS DISCOVERED      SLOW_MEM POSITION        penalty@1200 0.02/0.00  end 0.04/0.00
+     167 SLOW_POS DISCOVERED      SLOW_MEM POSITION        penalty@1200 0.02/0.00  end 0.03/0.00
+     168 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.02/0.00  end 0.04/0.00
+     169 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.03/0.00  end 0.06/0.00
+     170 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.03/0.01  end 0.07/0.00
+     171 SLOW_POS OTHER           SLOW_MEM OTHER           penalty@1200 0.03/0.00  end 0.00/0.00
+     172 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.09/0.00  end 0.06/0.00
+     173 SLOW_POS OTHER           SLOW_MEM POSITION        penalty@1200 0.02/0.00  end 0.00/0.00
+     174 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.05/0.00  end 0.04/0.00
+     175 SLOW_POS DISCOVERED      SLOW_MEM POSITION        penalty@1200 0.04/0.00  end 0.03/0.00
+     176 SLOW_POS DISCOVERED      SLOW_MEM POSITION        penalty@1200 0.05/0.00  end 0.02/0.00
+     177 SLOW_POS DISCOVERED      SLOW_MEM POSITION        penalty@1200 0.02/0.00  end 0.02/0.00
+     178 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.01/0.00  end 0.06/0.00
+     179 SLOW_POS DISCOVERED      SLOW_MEM DISCOVERED      penalty@1200 0.02/0.00  end 0.03/0.00
+  paired with X's arm A (same seeds, initial parameters and batches):
+    DISCOVERED  SLOW_POS       15/20   X A  7/20   SLOW_POS only 9, A only 1, McNemar two-sided p = 0.0215
+    BOUND       SLOW_POS       15/20   X A  7/20   SLOW_POS only 9, A only 1, McNemar two-sided p = 0.0215
+    ROUTED*@1200  SLOW_POS    0/20   X A  6/20   SLOW_POS only 0, A only 6, McNemar two-sided p = 0.0312   [X A from X record]
+    ROUTED*@end   SLOW_POS   13/20   X A  7/20   SLOW_POS only 9, A only 3, McNemar two-sided p = 0.146   [X A from X record]
+  paired with batch 2's SLOW_MEM: DISCOVERED SLOW_POS 15/20 vs SLOW_MEM 12/20, SLOW_POS only 6, SLOW_MEM only 3, McNemar p = 0.508;  ROUTED*@1200 SLOW_POS only 0, SLOW_MEM only 12, p = 0.000488
+  failure classes: SLOW_POS {'OTHER': 5}   SLOW_MEM {'POSITION': 7, 'OTHER': 1}   X arm A {'KEY': 4, 'POSITION': 8, 'OTHER': 1}
+  VERDICT slow_pos: promising  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S10 far_express: neither reading applies (a gate fits; far_nudge 5/10)
+      header-layout fits (argmax): A 1.000, EMA 1.000, SEL 1.000, LOCAL3 0.765; far_nudge DISCOVERED 5/10
+  S11 gate_reset: inconclusive (DISCOVERED 10/20 vs X A 7/20, 3 vs 0, p = 0.25)
+  S12 slow_pos:   promising (DISCOVERED 15/20 vs X A 7/20, 9 vs 1, p = 0.0215); vs SLOW_MEM 12/20: 6 vs 3, p = 0.508
+####################################################################################################
