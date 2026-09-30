@@ -1,1 +1,74 @@
 #################### NOTE 2026-09-30 19:40:22 UTC — batch 4 runs in segments with batch 3's machinery: the first segment runs the full CHECK suite and records its head in explore_out/batch4_checks.json; each later segment (--resume, after the session's background time limit stops the previous one) runs the repro check and skips the rest only if the screen code is unchanged. Order: far_express, gate_reset, slow_pos. A watcher outside the repo commits and pushes explore_out/ after every saved run. S10 (a)'s fits have no training runs and are deterministic; they are computed in the report and were already printed once by the dry run. (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 4: far_express (S10), gate_reset (S11), slow_pos (S12)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 6ac992e+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S10 readings: a gate fits (argmax >= 0.99) and far_nudge >= 7/10 -> discovery problem; a gate fits and far_nudge <= 3/10 -> the loss cannot finish it; no gate fits -> cannot express
+  S11, S12 rule: promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED vs X's arm A)
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): far_express, gate_reset, slow_pos — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (48s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK far_express: the header routing target equals the perfect gate's (one-hot of the block's stream = far_ceil's gate) on the fit batch: ok
+  CHECK far_express: fit('A') on the grouped layout reproduces CHECK 45's gate_fit_k at k=2 exactly (mse 3.103e-07 vs 3.103e-07, argmax 1.0000 vs 1.0000): ok
+  (the header layout: explore_far_cue's CHECKs)
+  CHECK far_cue: every (stream, key) appears once: ok
+  CHECK far_cue: S distinct values per key: ok
+  CHECK far_cue: each query is answered by its own stream's value: ok
+  CHECK far_cue: exactly one CTX token per block; block streams a permutation: ok
+  CHECK far_cue: stream_labels = the block's stream (body), the query's stream (query): ok
+  CHECK far_cue: L = 21, qpos = [19]: ok
+  CHECK far_cue: select reads the query's KEY position and targets its value: ok
+  CHECK far_cue: stream token in a width-3 window only for each block's first pair; the query sees its CTX at t-1: ok
+  CHECK far_cue: perfect gate zeroes every cross-stream score at every layer (same-stream scores non-zero): ok
+  CHECK far_cue: header_routing_stats under the perfect gate: margin 1.0000, eta_key_by_stream 1.0000: ok
+  CHECK far_cue: far_A and far_L3 share arm A's initial parameters and vocabulary: ok
+  CHECK gate_reset: detector inputs are ['model', 'tokens', 'task'] (no labels); with the probe's stream labels and role masks withheld it equals routing_stats' eta_key_by_index/half/key (0.0106/0.0023/0.6522): ok
+  CHECK gate_reset: a forced reset changes only W_in, W_h, W_g (changed: ['W_g', 'W_h', 'W_in']): ok
+  CHECK gate_reset: ... and clears exactly their Adam state (cleared: ['W_g', 'W_h', 'W_in']); every other parameter's Adam state is untouched: ok
+  CHECK gate_reset: threshold 2.0 (never fires): curve equals X's record through 2400 and a fresh arm-A run's, weights after update 2400 equal ([[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]): ok
+  CHECK slow_pos: lambda = 0 equals SLOW_MEM bit for bit through 3600 steps (curves equal to a fresh SLOW_MEM run and to batch 2's record; weights equal): ok
+  CHECK slow_pos: the penalty's gradient reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK slow_pos: the penalty enters the training loss's backward (W_g's gradient with lambda 1 differs from lambda 0 on the same weights): ok
+  CHECK slow_pos: the penalty matches routing_stats' eta_key_by_index / _by_half on the probe, at init and on a gate far from uniform (max diff 1.5e-06 < 1e-5): ok
+  all CHECKs passed (4.4 min)
+  recorded the full CHECK pass at 6ac992e in /home/user/clankers/explore_out/batch4_checks.json
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_express
+  idea    expressibility of the header-layout routing by each gate; arm A from a 5% labelled lean
+  source  CHECK 45's gate fit; test_router_curriculum's A_nudge (positive control on the grouped layout)
+  change  (a) supervised gate fits, no training runs; (b) far_nudge: A_nudge on the header layout
+  arm far_nudge    lr 0.001  iters 24000  seeds 160-169 (10)  — arm A + the 5% labelled nudge, header layout
+                   schedule: lr 0.001 throughout
+  pairing far_nudge seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_reset
+  idea    a label-free detector of position/key gate splits at step 1200; reset only the gate
+  source  restart heuristics for bad initial commitments (e.g. dead-unit / expert re-initialization in MoE training); the project's restart rule, applied to the gate alone
+  change  arm A; at 1200 (and 1200 after each reset, max 3) if eta^2 of the read gate at key positions by index, half or key >= 0.5: re-draw W_in, W_h, W_g, clear their Adam state
+  arm RESET        lr 0.001  iters 24000  seeds 160-179 (20)  — arm A + label-free gate reset (max 3)
+                   schedule: lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3)
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_pos
+  idea    SLOW_MEM + a penalty on the read gate's position information (eta^2 by index and half)
+  source  batch 2-3's SLOW_MEM (failures mostly POSITION splits); invariance penalties on a representation's nuisance variable (e.g. HSIC / decorrelation penalties)
+  change  SLOW_MEM + 1.0 * (eta^2 by triple index + eta^2 by half) of the read gate at key positions, on each training batch
+  arm SLOW_POS     lr 0.001  iters 24000  seeds 160-179 (20)  — SLOW_MEM + 1.0 * position penalty on the read gate
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch
+  pairing seeds 160-179, paired with X's recorded arm A and with batch 2's SLOW_MEM on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    far_express    far_nudge  10 runs x  11.2 min  (24000 steps x 27.2 ms + 20 evals x 1.0 s)
+    gate_reset     RESET      20 runs x   7.1 min  (24000 steps x 16.6 ms + 20 evals x 1.4 s)
+    slow_pos       SLOW_POS   20 runs x   8.4 min  (24000 steps x 19.7 ms + 20 evals x 1.6 s)
+    total 7.05 h of runs; makespan on 4 workers 1.81 h (worst case)
+  50 runs queued on 4 workers (1 torch thread each)
+  [  1/50]    1.0 min  far_express    far_nudge  seed 162  lr 0.001 (lr 0.001 throughout)
+          acc 1.000  trans  1200  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  2/50]    1.0 min  far_express    far_nudge  seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 1.000  trans  1200  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
