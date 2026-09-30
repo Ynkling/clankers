@@ -216,3 +216,59 @@ EXPLORATORY, NOT A RESULT — batch 4: far_express (S10), gate_reset (S11), slow
           acc 1.000  trans  4800  VALcos 0.038  margin 0.90  DISCOVERED  ROUTED* 1200/2400/end -/-/-
   [ 25/28]   28.1 min  slow_pos       SLOW_POS   seed 171  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch)
           acc 0.517  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+#################### RESUME 2026-09-30 20:55:29 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 4: far_express (S10), gate_reset (S11), slow_pos (S12)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git a124a7c+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S10 readings: a gate fits (argmax >= 0.99) and far_nudge >= 7/10 -> discovery problem; a gate fits and far_nudge <= 3/10 -> the loss cannot finish it; no gate fits -> cannot express
+  S11, S12 rule: promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED vs X's arm A)
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): far_express, gate_reset, slow_pos — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (49s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch4.py differs from 6ac992e, where the full CHECK suite passed (2026-09-30 19:45:33 UTC; its output is earlier in this log). git diff --stat 6ac992e:
+     explore_out/README.md                |    2 +-
+     explore_out/batch4.log               |  231 ++
+     explore_out/batch4_checks.json       |    6 +
+     explore_out/far_express_results.json | 2975 +++++++++++++++
+     explore_out/gate_reset_results.json  | 6875 ++++++++++++++++++++++++++++++++++
+     explore_out/slow_pos_results.json    | 5092 +++++++++++++++++++++++++
+     6 files changed, 15180 insertions(+), 1 deletion(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_express
+  idea    expressibility of the header-layout routing by each gate; arm A from a 5% labelled lean
+  source  CHECK 45's gate fit; test_router_curriculum's A_nudge (positive control on the grouped layout)
+  change  (a) supervised gate fits, no training runs; (b) far_nudge: A_nudge on the header layout
+  arm far_nudge    lr 0.001  iters 24000  seeds 160-169 (10)  — arm A + the 5% labelled nudge, header layout
+                   schedule: lr 0.001 throughout
+  pairing far_nudge seeds 160-169, paired with batch 2's far_A on the same seeds (explore_out/far_cue_results.json)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_reset
+  idea    a label-free detector of position/key gate splits at step 1200; reset only the gate
+  source  restart heuristics for bad initial commitments (e.g. dead-unit / expert re-initialization in MoE training); the project's restart rule, applied to the gate alone
+  change  arm A; at 1200 (and 1200 after each reset, max 3) if eta^2 of the read gate at key positions by index, half or key >= 0.5: re-draw W_in, W_h, W_g, clear their Adam state
+  arm RESET        lr 0.001  iters 24000  seeds 160-179 (20)  — arm A + label-free gate reset (max 3)
+                   schedule: lr 0.001 throughout; gate reset if eta^2(index/half/key) >= 0.5 at 1200 and 1200 after each reset (max 3)
+  pairing seeds 160-179, paired with X's recorded arm A (test_short_conv, lr 1e-3; same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN slow_pos
+  idea    SLOW_MEM + a penalty on the read gate's position information (eta^2 by index and half)
+  source  batch 2-3's SLOW_MEM (failures mostly POSITION splits); invariance penalties on a representation's nuisance variable (e.g. HSIC / decorrelation penalties)
+  change  SLOW_MEM + 1.0 * (eta^2 by triple index + eta^2 by half) of the read gate at key positions, on each training batch
+  arm SLOW_POS     lr 0.001  iters 24000  seeds 160-179 (20)  — SLOW_MEM + 1.0 * position penalty on the read gate
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch
+  pairing seeds 160-179, paired with X's recorded arm A and with batch 2's SLOW_MEM on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    far_express    far_nudge  10 runs x  11.3 min  (24000 steps x 27.6 ms + 20 evals x 0.7 s)
+    gate_reset     RESET      20 runs x   7.2 min  (24000 steps x 17.2 ms + 20 evals x 1.0 s)
+    slow_pos       SLOW_POS   20 runs x   7.5 min  (24000 steps x 18.0 ms + 20 evals x 0.9 s)
+    total 6.78 h of runs; makespan on 4 workers 1.73 h (worst case)
+  3 runs queued on 4 workers (1 torch thread each)
+  [  1/3]    1.9 min  slow_pos       SLOW_POS   seed 179  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * eta^2(index + half) penalty on each training batch)
+          acc 1.000  trans  3600  VALcos 0.009  margin 0.99  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
