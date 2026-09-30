@@ -184,7 +184,7 @@ def check():
     m2.train()
     gr2 = MultiBDH.forward(m2, x)[2]
     f_i, f_h = s12.pos_penalty(gr2, ec.TASK.S, ec.TASK.P)
-    below = float(f_i) < TAU and float(f_h) < TAU
+    below = float(f_i.detach()) < TAU and float(f_h.detach()) < TAU
     (F.relu(f_i - TAU) + F.relu(f_h - TAU)).backward()
     zero = all(p.grad is None or bool((p.grad == 0).all()) for p in m2.parameters())
     for nm, v in ((f"TAU = 1.0 equals SLOW_MEM bit for bit through {it} steps (curves = a fresh SLOW_MEM "
@@ -194,8 +194,8 @@ def check():
                   (f"the logged hinge fraction is 0 with TAU = 1 ({f1}) and 1 with TAU = 0 ({f0})",
                    f1 == 0.0 and f0 == 1.0),
                   (f"the hinge's gradient (TAU = 0) reaches only {sorted(got)}", reach),
-                  (f"with both terms below TAU = {TAU} (eta2 index {float(f_i):.3f}, half "
-                   f"{float(f_h):.3f}) the hinge's gradient is exactly zero", below and zero)):
+                  (f"with both terms below TAU = {TAU} (eta2 index {float(f_i.detach()):.3f}, half "
+                   f"{float(f_h.detach()):.3f}) the hinge's gradient is exactly zero", below and zero)):
         print(f"  CHECK {NAME}: {nm}: {'ok' if v else 'FAIL'}", flush=True)
         ok &= bool(v)
     return ok

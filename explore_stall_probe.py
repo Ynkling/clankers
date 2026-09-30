@@ -342,8 +342,10 @@ def check():
                    dp == dl50),
                   (f"SWAP's evaluation path with the learned gate reproduces the recorded accuracy at "
                    f"2400 ({lp[0]} vs {rec['curve'][1][1]})", lp_ok),
-                  (f"the blocked runs are X's first 3 stalled A_blocked seeds: {ARMS['blk_A']['seeds']}",
-                   ARMS["blk_A"]["seeds"] == (120, 130, 136))):
+                  (f"X's first 3 stalled A_blocked seeds (end margin >= 0.9, not bound) are "
+                   f"{blocked_stalled()}; this batch runs {ARMS['blk_A']['seeds']}",
+                   blocked_stalled() == (120, 130, 136)
+                   and ARMS["blk_A"]["seeds"] == blocked_stalled()[:len(ARMS["blk_A"]["seeds"])])):
         print(f"  CHECK {NAME}: {nm}: {'ok' if v else 'FAIL'}", flush=True)
         ok &= bool(v)
     return ok
