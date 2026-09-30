@@ -200,7 +200,7 @@ def rflags(r):
     return "/".join("Y" if routed_at(r, s) else "-" for s in ROUTE_AT)
 
 
-def per_seed_table2(screen, store, extra_recorded=("A", "A_conv")):
+def per_seed_table2(screen, store, extra_recorded=("A", "A_conv"), refs=None):
     rec = {k: recorded(k) for k in extra_recorded}
     print(f"  per seed  (ROUTED* = margin >= {ROUTE_MARGIN} and eta_key_by_stream > {ROUTE_ETA}, "
           f"at 1200/2400/3600/end" +
@@ -211,12 +211,12 @@ def per_seed_table2(screen, store, extra_recorded=("A", "A_conv")):
         print(f"    {'seed':>4} {'acc':>6} {'trans':>6} {'VALcos':>7} {'margin':>6} "
               f"{'eta key s/k/h/i':>20} {'ROUTED*':>8}  {'outcome':<15} " +
               " ".join(f"{'X ' + x:<15}" for x in extra_recorded) +
-              ("  X A ROUTED* 1200/-/-/end" if "A" in extra_recorded else ""))
+              ("  X A ROUTED* 1200/2400/3600/end" if "A" in extra_recorded else ""))
         for s in a["seeds"]:
             r = store["runs"].get(f"{k}|{s}")
             recs = " ".join(f"{tag(rec[x].get(s)):<15}" for x in extra_recorded)
-            xa = (f"  {'Y' if routed_at(rec['A'][s], EVAL_EVERY) else '-'}/?/?/"
-                  f"{'Y' if routed_at(rec['A'][s], 'end') else '-'}" if "A" in extra_recorded else "")
+            xa = ("  " + "/".join({True: "Y", False: "-", None: "?"}[x_routed(s, st, refs or {})]
+                                  for st in ROUTE_AT) if "A" in extra_recorded else "")
             if r is None or not r.get("ok"):
                 print(f"    {s:>4} {tag(r)}")
                 continue

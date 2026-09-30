@@ -134,7 +134,7 @@ def check():
 def report(store, refs):
     me = sys.modules[__name__]
     c2.print_screen_header2(me)
-    c2.per_seed_table2(me, store)
+    c2.per_seed_table2(me, store, refs=refs)
     s = ARMS["KWTA_WARM"]["seeds"]
     print("  paired with X's arm A (same seeds, initial parameters and batches):")
     d = ec.paired_vs_recorded(store, "KWTA_WARM", s, ec.discovered, label="DISCOVERED")
