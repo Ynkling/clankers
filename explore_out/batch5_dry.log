@@ -1,0 +1,230 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 5: slow_hinge (S13), stall_probe (S14), far_nudge_slow (S15) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 98b2441 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 n_vals=16 n_q=1, 1 torch thread per run
+  S13 rule (vs SLOW_MEM, 40 seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED)
+  S13 reading (160-179): 'noise floor' if ROUTED*@1200 >= 8/20 and <= 2 uncommitted failures; 'not the noise floor' if ROUTED*@1200 <= 3/20; else neither
+  S14: diagnostic; SWAP-FIXES / MEMORY-STUCK / SLOW-ONLY / NEITHER per run
+  S15 rule (vs far_nudge): promising if DISCOVERED >= 8/10; not if <= 5/10; else inconclusive
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): stall_probe, slow_hinge, far_nudge_slow — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (42s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_slow_hinge: TAU = 1.0 equals SLOW_MEM bit for bit through 3600 steps (curves = a fresh SLOW_MEM run = batch 2's record; weights equal): ok
+  CHECK dry_slow_hinge: TAU = 0 equals S12's SLOW_POS bit for bit through 3600 steps (curves = a fresh SLOW_POS run = batch 4's record; weights equal): ok
+  CHECK dry_slow_hinge: the logged hinge fraction is 0 with TAU = 1 (0.0) and 1 with TAU = 0 (1.0): ok
+  CHECK dry_slow_hinge: the hinge's gradient (TAU = 0) reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK dry_slow_hinge: with both terms below TAU = 0.2 (eta2 index 0.024, half 0.003) the hinge's gradient is exactly zero: ok
+  CHECK dry_stall_probe: the perfect gate (maps identity and swapped) zeroes every cross-stream score at every layer, header and blocked layouts: ok
+  CHECK dry_stall_probe: far_nudge 160 re-run to 2400 reproduces its recorded curve, and 1200 continued updates (learned gate) reproduce its recorded evaluation at 3600 ([1.0, 0.004167615901678801] vs [1.0, 0.004167615901678801]): ok
+  CHECK dry_stall_probe: the perfect-gate and learned-gate continuations see identical batches (digests): ok
+  CHECK dry_stall_probe: SWAP's evaluation path with the learned gate reproduces the recorded accuracy at 2400 (1.0 vs 1.0): ok
+  CHECK dry_stall_probe: X's first 3 stalled A_blocked seeds (end margin >= 0.9, not bound) are (120, 130, 136); this batch runs (120,): ok
+  CHECK dry_far_nudge_slow: weights after the nudge pre-fit equal far_nudge's bit for bit on seeds 160-169, and sep0 equals batch 4's recorded sep0 (sep0 0.050-0.050): ok
+  CHECK dry_far_nudge_slow: the run completed all 24000 updates under the stubs (24000 recorded on the two-group optimizer, ok=True): ok
+  CHECK dry_far_nudge_slow: gate group holds exactly W_in, W_h, W_g; the other group every other parameter: ok
+  CHECK dry_far_nudge_slow: gate group lr 0.001 at every update: ok
+  CHECK dry_far_nudge_slow: other group lr 0.0001 for updates 1-2400, 0.001 after (update 2400: [0.001, 0.0001], 2401: [0.001, 0.001]): ok
+  all CHECKs passed (5.5 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_slow_hinge
+  idea    SLOW_MEM + a hinge on the read gate's position eta^2 (zero below TAU = 0.2)
+  source  batch 4's SLOW_POS (a full eta^2 penalty sat at its sampling floor and delayed commitment); hinge / margin penalties that act only past a threshold
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] of the read gate at key positions, on each training batch
+  arm SLOW_HINGE   lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + hinge on position eta^2 (TAU 0.2)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199), X's recorded arm A, and batch 4's SLOW_POS on 160-179 (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_stall_probe
+  idea    why routed gates fail to bind: perfect-gate swap, continued training, gate profile
+  source  stalled runs of batches 2 and 4 (header layout) and of the main line's test_router_layout (blocked layout)
+  change  none to the runs; probes at their end states
+  arm hdr_far_nudge lr 0.001  iters 3600  seeds 160-160 (1)  — batch 4's far_nudge (160 = control)
+                   schedule: lr 0.001 throughout
+  arm hdr_far_A    lr 0.001  iters 3600  seeds 165-165 (1)  — batch 2's far_A
+                   schedule: lr 0.001 throughout
+  arm blk_A        lr 0.001  iters 3600  seeds 120-120 (1)  — X's test_router_layout A_blocked
+                   schedule: lr 0.001 throughout
+  pairing each probe against its own recorded run (reproduced exactly first)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_nudge_slow
+  idea    the 5% labelled nudge on the header layout, trained with the SLOW_MEM schedule
+  source  batch 4's far_nudge (routed 7/10, bound 5/10) and batches 2-3's SLOW_MEM
+  change  far_nudge + SLOW_MEM's groups: gate 1e-3 throughout; everything else 1e-4 for updates 1-2400, 1e-3 after; nudge pre-fit unchanged
+  arm FAR_NUDGE_SLOW lr 0.001  iters 3600  seeds 160-160 (1)  — far_nudge + the SLOW_MEM schedule, header layout
+                   schedule: nudge pre-fit unchanged; then gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 4's far_nudge (same weights after the pre-fit, same batches)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    dry_slow_hinge SLOW_HINGE  1 runs x   1.1 min  (3600 steps x 16.3 ms + 3 evals x 1.7 s)
+    dry_stall_probe hdr_far_nudge  1 runs x   5.2 min  (13200 steps x 22.9 ms + 11 evals x 0.9 s)
+    dry_stall_probe hdr_far_A   1 runs x   2.7 min  (13200 steps x 11.7 ms + 11 evals x 0.9 s)
+    dry_stall_probe blk_A       1 runs x   3.4 min  (13200 steps x 14.5 ms + 11 evals x 1.0 s)
+    dry_far_nudge_slow FAR_NUDGE_SLOW  1 runs x   1.4 min  (3600 steps x 22.1 ms + 3 evals x 0.9 s)
+    total 0.23 h of runs; makespan on 4 workers 0.09 h (worst case)
+  5 runs queued on 4 workers (1 torch thread each)
+  [  1/5]    1.0 min  dry_slow_hinge SLOW_HINGE seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+          acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  2/5]    1.3 min  dry_stall_probe hdr_far_A  seed 165  lr 0.001 (lr 0.001 throughout)
+          acc 0.520  trans  None  VALcos 0.001  margin 1.00  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/Y
+  [  3/5]    1.3 min  dry_stall_probe hdr_far_nudge seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 1.000  trans  1200  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
+  [  4/5]    1.5 min  dry_stall_probe blk_A      seed 120  lr 0.001 (lr 0.001 throughout)
+          acc 0.176  trans  None  VALcos 1.000  margin -0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  5/5]    1.8 min  dry_far_nudge_slow FAR_NUDGE_SLOW seed 160  lr 0.001 (nudge pre-fit unchanged; then gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after)
+          acc 1.000  trans  3600  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  batch wall clock 1.8 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_slow_hinge
+  idea    SLOW_MEM + a hinge on the read gate's position eta^2 (zero below TAU = 0.2)
+  source  batch 4's SLOW_POS (a full eta^2 penalty sat at its sampling floor and delayed commitment); hinge / margin penalties that act only past a threshold
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] of the read gate at key positions, on each training batch
+  arm SLOW_HINGE   lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + hinge on position eta^2 (TAU 0.2)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199), X's recorded arm A, and batch 4's SLOW_POS on 160-179 (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed  (ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9, at 1200/2400/3600/end; X columns are X's test_short_conv runs at lr 0.001):
+   arm SLOW_HINGE (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X A             X A_conv         X A ROUTED* 1200/2400/3600/end
+     160  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      KEY             DISCOVERED       -/-/?/-
+  per seed: hinge-active fraction of training batches (updates 1-1200 / 1-2400 / whole run); SLOW_MEM and SLOW_POS outcomes on the same seed:
+     160 0.000 / 0.000 / 0.000   SLOW_HINGE DISCOVERED      SLOW_MEM DISCOVERED      SLOW_POS OTHER          
+     161 not run
+     162 not run
+     163 not run
+     164 not run
+     165 not run
+     166 not run
+     167 not run
+     168 not run
+     169 not run
+     170 not run
+     171 not run
+     172 not run
+     173 not run
+     174 not run
+     175 not run
+     176 not run
+     177 not run
+     178 not run
+     179 not run
+     180 not run
+     181 not run
+     182 not run
+     183 not run
+     184 not run
+     185 not run
+     186 not run
+     187 not run
+     188 not run
+     189 not run
+     190 not run
+     191 not run
+     192 not run
+     193 not run
+     194 not run
+     195 not run
+     196 not run
+     197 not run
+     198 not run
+     199 not run
+  vs SLOW_MEM (40 seeds; S5 160-179, S7 180-199):
+    DISCOVERED    SLOW_HINGE  1/1   SLOW_MEM  1/1   SLOW_HINGE only 0, SLOW_MEM only 0, McNemar two-sided p = 1   [39 seeds without a value]
+    ROUTED*@1200  SLOW_HINGE  1/1   SLOW_MEM  1/1   SLOW_HINGE only 0, SLOW_MEM only 0, McNemar two-sided p = 1   [39 seeds without a value]
+    ROUTED*@2400  SLOW_HINGE  1/1   SLOW_MEM  1/1   SLOW_HINGE only 0, SLOW_MEM only 0, McNemar two-sided p = 1   [39 seeds without a value]
+    ROUTED*@end   SLOW_HINGE  1/1   SLOW_MEM  1/1   SLOW_HINGE only 0, SLOW_MEM only 0, McNemar two-sided p = 1   [39 seeds without a value]
+  vs X's arm A (40 seeds; X's ROUTED* at 2400 from batch 2's re-run, seeds 160-179 only):
+    DISCOVERED    SLOW_HINGE  1/1   X A  0/1   SLOW_HINGE only 1, X A only 0, McNemar two-sided p = 1   [39 seeds without a value]
+    ROUTED*@1200  SLOW_HINGE  1/1   X A  0/1   SLOW_HINGE only 1, X A only 0, McNemar two-sided p = 1   [39 seeds without a value]
+    ROUTED*@2400  SLOW_HINGE  1/1   X A  0/1   SLOW_HINGE only 1, X A only 0, McNemar two-sided p = 1   [39 seeds without a value]
+    ROUTED*@end   SLOW_HINGE  1/1   X A  0/1   SLOW_HINGE only 1, X A only 0, McNemar two-sided p = 1   [39 seeds without a value]
+  vs SLOW_POS (160-179):
+    DISCOVERED    SLOW_HINGE  1/1   SLOW_POS  0/1   SLOW_HINGE only 1, SLOW_POS only 0, McNemar two-sided p = 1   [19 seeds without a value]
+    ROUTED*@1200  SLOW_HINGE  1/1   SLOW_POS  0/1   SLOW_HINGE only 1, SLOW_POS only 0, McNemar two-sided p = 1   [19 seeds without a value]
+    ROUTED*@2400  SLOW_HINGE  1/1   SLOW_POS  0/1   SLOW_HINGE only 1, SLOW_POS only 0, McNemar two-sided p = 1   [19 seeds without a value]
+    ROUTED*@end   SLOW_HINGE  1/1   SLOW_POS  0/1   SLOW_HINGE only 1, SLOW_POS only 0, McNemar two-sided p = 1   [19 seeds without a value]
+  failure classes (1 seeds run of 160-199): SLOW_HINGE {}   SLOW_MEM {}   X arm A {'KEY': 1}
+  failure classes (1 seeds run of 160-179): SLOW_HINGE {}   SLOW_POS {'OTHER': 1}
+  uncommitted gates (OTHER, every eta^2 < 0.1 at the end): SLOW_HINGE []; SLOW_POS [160, 164, 171, 173]; SLOW_MEM []
+  READING S13 (seeds 160-179): ROUTED*@1200 1/1, uncommitted failures 0: not the noise floor
+  DRY RUN VERDICT dry_slow_hinge (vs SLOW_MEM, 40 seeds): not; reading: not the noise floor  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_stall_probe
+  idea    why routed gates fail to bind: perfect-gate swap, continued training, gate profile
+  source  stalled runs of batches 2 and 4 (header layout) and of the main line's test_router_layout (blocked layout)
+  change  none to the runs; probes at their end states
+  arm hdr_far_nudge lr 0.001  iters 3600  seeds 160-160 (1)  — batch 4's far_nudge (160 = control)
+                   schedule: lr 0.001 throughout
+  arm hdr_far_A    lr 0.001  iters 3600  seeds 165-165 (1)  — batch 2's far_A
+                   schedule: lr 0.001 throughout
+  arm blk_A        lr 0.001  iters 3600  seeds 120-120 (1)  — X's test_router_layout A_blocked
+                   schedule: lr 0.001 throughout
+  pairing each probe against its own recorded run (reproduced exactly first)
+----------------------------------------------------------------------------------------------------
+  per run (rec = recorded final accuracy; rerun reproduces its recorded curve at every evaluation; SWAP = perfect gate at the end state; continuations: accuracy at +1200/+2400/+3600/+4800):
+    hdr_far_nudge   160 (control)  rec 1.000  rerun reproduces: yes  learned-path acc 1.000 (= rec)  map stream->channel [0, 1]
+                         SWAP 1.000   perfect-gate continuation 1.00   learned-gate continuation 1.00   batches identical: True   margin (learned) 1.00   READING: SWAP-FIXES
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.63/0.62  KEY: 1.00/0.00  VAL: 1.00/0.00  qCTX: 0.78/0.62  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): CTX s0: 0.63 vs 1.00; CTX s1: 0.62 vs 0.00; qCTX s0: 0.78 vs 1.00; qCTX s1: 0.62 vs 0.00
+    hdr_far_A       165  rec 0.520  rerun reproduces: yes  learned-path acc 0.520 (= rec)  map stream->channel [0, 1]
+                         SWAP 0.517   perfect-gate continuation 0.54   learned-gate continuation 0.54   batches identical: True   margin (learned) 1.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.95/0.01  KEY: 1.00/0.00  VAL: 1.00/0.00  qCTX: 0.94/0.02  qKEY: 1.00/0.00
+                         differs from perfect (> 0.1): nowhere
+    blk_A           120  rec 0.176  rerun reproduces: yes  learned-path acc 0.176 (= rec)  map stream->channel [0, 1] (IDENTITY FALLBACK: both streams on one channel)
+                         SWAP 0.293   perfect-gate continuation 0.32   learned-gate continuation 0.19   batches identical: True   margin (learned) -0.00   READING: NEITHER
+                         gate profile, channel-0 read = write, streams 0/1: CTX: 0.05/0.11  KEY: 0.04/0.21  VAL: 0.01/0.01  qCTX: 0.00/0.00  qKEY: 0.00/0.00
+                         differs from perfect (> 0.1): CTX s0: 0.05 vs 1.00; CTX s1: 0.11 vs 0.00; KEY s0: 0.04 vs 1.00; KEY s1: 0.21 vs 0.00; VAL s0: 0.01 vs 1.00; qCTX s0: 0.00 vs 1.00; qKEY s0: 0.00 vs 1.00
+  SUMMARY of readings (stalled runs by layout; control apart):
+    header   {'NEITHER': 1}   hdr_far_A 165: NEITHER
+    blocked  {'NEITHER': 1}   blk_A 120: NEITHER
+    control  {'SWAP-FIXES': 1}   hdr_far_nudge 160: SWAP-FIXES
+  DRY RUN S14 dry_stall_probe: diagnostic, 3/3 probes  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_nudge_slow
+  idea    the 5% labelled nudge on the header layout, trained with the SLOW_MEM schedule
+  source  batch 4's far_nudge (routed 7/10, bound 5/10) and batches 2-3's SLOW_MEM
+  change  far_nudge + SLOW_MEM's groups: gate 1e-3 throughout; everything else 1e-4 for updates 1-2400, 1e-3 after; nudge pre-fit unchanged
+  arm FAR_NUDGE_SLOW lr 0.001  iters 3600  seeds 160-160 (1)  — far_nudge + the SLOW_MEM schedule, header layout
+                   schedule: nudge pre-fit unchanged; then gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after
+  pairing seeds 160-169, paired with batch 4's far_nudge (same weights after the pre-fit, same batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; b4 = batch 4's far_nudge):
+    seed   sep0    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b4 far_nudge    b4 acc
+     160  0.050  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED       1.000
+     161 not run
+     162 not run
+     163 not run
+     164 not run
+     165 not run
+     166 not run
+     167 not run
+     168 not run
+     169 not run
+  paired with batch 4's far_nudge:
+    DISCOVERED    FAR_NUDGE_SLOW  1/1   far_nudge  1/1   FAR_NUDGE_SLOW only 0, far_nudge only 0, McNemar two-sided p = 1
+    BOUND         FAR_NUDGE_SLOW  1/1   far_nudge  1/1   FAR_NUDGE_SLOW only 0, far_nudge only 0, McNemar two-sided p = 1
+    ROUTED*@1200  FAR_NUDGE_SLOW  1/1   far_nudge  1/1   FAR_NUDGE_SLOW only 0, far_nudge only 0, McNemar two-sided p = 1
+    ROUTED*@end   FAR_NUDGE_SLOW  1/1   far_nudge  1/1   FAR_NUDGE_SLOW only 0, far_nudge only 0, McNemar two-sided p = 1
+    STALLS        FAR_NUDGE_SLOW  0/1   far_nudge  0/1   FAR_NUDGE_SLOW only 0, far_nudge only 0, McNemar two-sided p = 1
+    stalls (routed at the end or stream-partial, not bound): FAR_NUDGE_SLOW []   far_nudge []
+    failures FAR_NUDGE_SLOW {}
+  DRY RUN VERDICT dry_far_nudge_slow: not (DISCOVERED 1/1)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S13 slow_hinge: not vs SLOW_MEM (DISCOVERED 1/1 vs 1/1, 0 vs 0, p = 1); reading: not the noise floor
+      vs X A 1/1 vs 0/1 (1 vs 0, p = 1); vs SLOW_POS (160-179) 1/1 vs 0/1 (1 vs 0, p = 1)
+  S14 control  hdr_far_nudge 160: SWAP-FIXES
+  S14 header   hdr_far_A 165: NEITHER
+  S14 blocked  blk_A 120: NEITHER
+  S15 far_nudge_slow: not (DISCOVERED 1/1; batch 4's far_nudge 5/10)
+####################################################################################################
