@@ -297,4 +297,5 @@ def report(store):
           f"{sum(1 for s in hard if s in new)}; 'the trigger is not needed' if easy >= {TRIG_GOOD} and hard >= "
           f"{TRIG_HARD}; 'an untimed kick costs the easy seeds' if easy <= {COST_EASY}): {rd}")
     return dict(out["slow_mem"], verdict=v, reading=rd, n_easy=n_easy, n_hard=n_hard,
+                n_easy_run=sum(1 for s in easy if s in new), n_hard_run=sum(1 for s in hard if s in new),
                 slow_hinge=out["slow_hinge"], kick=out["kick"])

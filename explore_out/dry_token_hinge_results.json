@@ -1,0 +1,494 @@
+{
+ "meta": {
+  "arms": {
+   "FAR_TOK": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "FAR_TOK",
+    "label": "far_A_slow + hinge on position and key-token eta^2 (TAU 0.2), header layout",
+    "layout": "header",
+    "lr": 0.001,
+    "lr_gate": 0.001,
+    "lr_rest_warm": 0.0001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)",
+    "seeds": [
+     160
+    ],
+    "warm_updates": 2400
+   },
+   "NEAR_TOK": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "NEAR_TOK",
+    "label": "SLOW_MEM + hinge on position and key-token eta^2 (TAU 0.2), grouped layout",
+    "layout": "grouped",
+    "lr": 0.001,
+    "lr_gate": 0.001,
+    "lr_rest_warm": 0.0001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch",
+    "seeds": [
+     160
+    ],
+    "warm_updates": 2400
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "aa6c4ff",
+   "python": "3.11.15",
+   "started": "2026-10-01 18:23:44",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {
+  "FAR_TOK|160": {
+   "acc": 0.22705078125,
+   "collapsed": false,
+   "ctx_cos": 0.999817967414856,
+   "curve": [
+    [
+     1200,
+     0.19384765625,
+     2.591801404953003
+    ],
+    [
+     2400,
+     0.2109375,
+     2.428490161895752
+    ],
+    [
+     3600,
+     0.22705078125,
+     2.2329585552215576
+    ]
+   ],
+   "discovered": false,
+   "dry": true,
+   "end": {
+    "ctx_cos": 0.999817967414856,
+    "eff_ch": 1.9999942817715848,
+    "eta_key_by_half": 0.00046360188536680874,
+    "eta_key_by_index": 0.013477203215068668,
+    "eta_key_by_key": 0.0338182317254474,
+    "eta_key_by_stream": 0.1102256057099766,
+    "eta_val_by_half": 0.00025441946139023464,
+    "eta_val_by_index": 0.018324843483568914,
+    "eta_val_by_key": 0.3218005123593509,
+    "eta_val_by_stream": 0.023838185322934725,
+    "hinge_counts": [
+     7,
+     3600
+    ],
+    "hinge_terms": [
+     1,
+     0,
+     6
+    ],
+    "k": 2,
+    "key_cos": 0.9999392628669739,
+    "key_part": 0.005036190152168274,
+    "key_sep": 0.0015041579802831013,
+    "margin": 1.654285006225109e-05,
+    "pen_last_train": [
+     0.012849236838519573,
+     0.0018498975550755858,
+     0.05343446880578995
+    ],
+    "sep": 0.00456315279006958,
+    "spread": 0.01095872838050127,
+    "step": "end",
+    "val_cos": 0.9999943971633911
+   },
+   "grad": {
+    "1": [
+     6.474077914650912,
+     17.75659932105444,
+     0.0
+    ],
+    "10": [
+     7.12221901464919e-06,
+     2.688043761135556,
+     0.0
+    ],
+    "100": [
+     6.303533816525942e-06,
+     2.052331944879299,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.9999392628669739,
+   "lr": 0.001,
+   "ok": true,
+   "params": 28096,
+   "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)",
+   "secs": 115.41532564163208,
+   "secs_wall": 115.66720676422119,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.9999427795410156,
+     "eff_ch": 1.9999945201894964,
+     "hinge_counts": [
+      0,
+      0
+     ],
+     "hinge_terms": [
+      0,
+      0,
+      0
+     ],
+     "k": 2,
+     "key_cos": 0.9999996423721313,
+     "key_part": 0.004532486200332642,
+     "key_sep": 0.0020759751399358115,
+     "pen_last_train": null,
+     "sep": 0.0009680092334747314,
+     "spread": 0.0042450567707419395,
+     "step": 0,
+     "val_cos": 0.9999998807907104
+    },
+    {
+     "ctx_cos": 0.9999473690986633,
+     "eff_ch": 1.9999951162343999,
+     "eta_key_by_half": 0.0002010692980946635,
+     "eta_key_by_index": 0.017689641870765806,
+     "eta_key_by_key": 0.017109926468520456,
+     "eta_key_by_stream": 0.07274525769113291,
+     "eta_val_by_half": 0.0004092936122119767,
+     "eta_val_by_index": 0.05701641625827498,
+     "eta_val_by_key": 0.321990025262303,
+     "eta_val_by_stream": 0.002010339413033891,
+     "hinge_counts": [
+      7,
+      1200
+     ],
+     "hinge_terms": [
+      1,
+      0,
+      6
+     ],
+     "k": 2,
+     "key_cos": 0.9999883770942688,
+     "key_part": 0.0036814212799072266,
+     "key_sep": 0.0006848722696304321,
+     "margin": 8.334172889590263e-07,
+     "pen_last_train": [
+      0.07632983475923538,
+      0.001783236744813621,
+      0.036904484033584595
+     ],
+     "sep": 0.0019484162330627441,
+     "spread": 0.005951018538326025,
+     "step": 1200,
+     "val_cos": 0.9999997615814209
+    },
+    {
+     "ctx_cos": 0.9999434947967529,
+     "eff_ch": 1.9999961891156737,
+     "eta_key_by_half": 0.0003425966035901574,
+     "eta_key_by_index": 0.020854736006498502,
+     "eta_key_by_key": 0.023959238917357146,
+     "eta_key_by_stream": 0.07577908950170831,
+     "eta_val_by_half": 0.00025677666949666433,
+     "eta_val_by_index": 0.05266061017201527,
+     "eta_val_by_key": 0.35072553818672986,
+     "eta_val_by_stream": 0.003136059877612157,
+     "hinge_counts": [
+      7,
+      2400
+     ],
+     "hinge_terms": [
+      1,
+      0,
+      6
+     ],
+     "k": 2,
+     "key_cos": 0.9999880790710449,
+     "key_part": 0.0034709423780441284,
+     "key_sep": 0.0008208254973093668,
+     "margin": 1.5337718650698662e-06,
+     "pen_last_train": [
+      0.03506840020418167,
+      0.0018243337981402874,
+      0.01848560757935047
+     ],
+     "sep": 0.0020152926445007324,
+     "spread": 0.006022169720381498,
+     "step": 2400,
+     "val_cos": 0.9999998211860657
+    },
+    {
+     "ctx_cos": 0.999817967414856,
+     "eff_ch": 1.9999942817715848,
+     "eta_key_by_half": 0.00046360188536680874,
+     "eta_key_by_index": 0.013477203215068668,
+     "eta_key_by_key": 0.0338182317254474,
+     "eta_key_by_stream": 0.1102256057099766,
+     "eta_val_by_half": 0.00025441946139023464,
+     "eta_val_by_index": 0.018324843483568914,
+     "eta_val_by_key": 0.3218005123593509,
+     "eta_val_by_stream": 0.023838185322934725,
+     "hinge_counts": [
+      7,
+      3600
+     ],
+     "hinge_terms": [
+      1,
+      0,
+      6
+     ],
+     "k": 2,
+     "key_cos": 0.9999392628669739,
+     "key_part": 0.005036190152168274,
+     "key_sep": 0.0015041579802831013,
+     "margin": 1.654285006225109e-05,
+     "pen_last_train": [
+      0.012849236838519573,
+      0.0018498975550755858,
+      0.05343446880578995
+     ],
+     "sep": 0.00456315279006958,
+     "spread": 0.01095872838050127,
+     "step": 3600,
+     "val_cos": 0.9999943971633911
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": null,
+   "val_cos": 0.9999943971633911
+  },
+  "NEAR_TOK|160": {
+   "acc": 0.47705078125,
+   "collapsed": false,
+   "ctx_cos": 0.9804316759109497,
+   "curve": [
+    [
+     1200,
+     0.189453125,
+     2.5917723178863525
+    ],
+    [
+     2400,
+     0.2333984375,
+     2.3924849033355713
+    ],
+    [
+     3600,
+     0.47705078125,
+     1.1479185819625854
+    ]
+   ],
+   "discovered": false,
+   "dry": true,
+   "end": {
+    "ctx_cos": 0.9804316759109497,
+    "eff_ch": 1.9925198158774904,
+    "eta_key_by_half": 1.65157693166673e-05,
+    "eta_key_by_index": 0.00015877910326018472,
+    "eta_key_by_key": 3.085085194846104e-05,
+    "eta_key_by_stream": 0.008409590034081482,
+    "eta_val_by_half": 3.97788771736072e-06,
+    "eta_val_by_index": 3.106661843428659e-05,
+    "eta_val_by_key": 3.8837036221939274e-05,
+    "eta_val_by_stream": 0.0033719142681090876,
+    "hinge_counts": [
+     6,
+     3600
+    ],
+    "hinge_terms": [
+     1,
+     1,
+     5
+    ],
+    "k": 2,
+    "key_cos": 0.9863923788070679,
+    "key_part": 0.08722925186157227,
+    "key_sep": 0.004683643579483032,
+    "margin": 0.006768693216145039,
+    "pen_last_train": [
+     0.003023292636498809,
+     0.00046650873264297843,
+     0.002864305628463626
+    ],
+    "sep": 0.07986791431903839,
+    "spread": 0.8742150068283081,
+    "step": "end",
+    "val_cos": 0.9944666624069214
+   },
+   "grad": {
+    "1": [
+     6.1960368749162775,
+     16.82094213473996,
+     0.0
+    ],
+    "10": [
+     9.338285609569265e-06,
+     2.6978437175731953,
+     0.0
+    ],
+    "100": [
+     5.434201782512044e-06,
+     1.5443120541359454,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.9863923788070679,
+   "lr": 0.001,
+   "ok": true,
+   "params": 28096,
+   "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch",
+   "secs": 136.76556086540222,
+   "secs_wall": 137.03602838516235,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.9999438524246216,
+     "eff_ch": 1.999995712279481,
+     "hinge_counts": [
+      0,
+      0
+     ],
+     "hinge_terms": [
+      0,
+      0,
+      0
+     ],
+     "k": 2,
+     "key_cos": 0.9999964833259583,
+     "key_part": 0.003492981195449829,
+     "key_sep": 0.0021715561548868814,
+     "pen_last_train": null,
+     "sep": 0.002162262797355652,
+     "spread": 0.004211561754345894,
+     "step": 0,
+     "val_cos": 0.9999996423721313
+    },
+    {
+     "ctx_cos": 0.9999624490737915,
+     "eff_ch": 1.9999911823413197,
+     "eta_key_by_half": 0.00014166812793563863,
+     "eta_key_by_index": 0.00684619285843448,
+     "eta_key_by_key": 0.10509659645714141,
+     "eta_key_by_stream": 0.8599837564729977,
+     "eta_val_by_half": 2.8559804798650308e-05,
+     "eta_val_by_index": 0.006306163327772849,
+     "eta_val_by_key": 0.273973299054655,
+     "eta_val_by_stream": 0.09583846272315405,
+     "hinge_counts": [
+      3,
+      1200
+     ],
+     "hinge_terms": [
+      0,
+      0,
+      3
+     ],
+     "k": 2,
+     "key_cos": 0.9998421669006348,
+     "key_part": 0.004359498620033264,
+     "key_sep": 0.0022310838103294373,
+     "margin": 1.7307233065366745e-05,
+     "pen_last_train": [
+      0.018312731757760048,
+      0.0012647146359086037,
+      0.10472473502159119
+     ],
+     "sep": 0.0051348209381103516,
+     "spread": 0.006507629528641701,
+     "step": 1200,
+     "val_cos": 0.9999934434890747
+    },
+    {
+     "ctx_cos": 0.999958872795105,
+     "eff_ch": 1.9999914207588618,
+     "eta_key_by_half": 0.0001551163922396543,
+     "eta_key_by_index": 0.006694940975841211,
+     "eta_key_by_key": 0.10969897813029897,
+     "eta_key_by_stream": 0.8503308715660216,
+     "eta_val_by_half": 2.0391500352376443e-05,
+     "eta_val_by_index": 0.005020148997543998,
+     "eta_val_by_key": 0.2602742861845093,
+     "eta_val_by_stream": 0.2566973799360924,
+     "hinge_counts": [
+      3,
+      2400
+     ],
+     "hinge_terms": [
+      0,
+      0,
+      3
+     ],
+     "k": 2,
+     "key_cos": 0.9998224973678589,
+     "key_part": 0.004397585988044739,
+     "key_sep": 0.002360279361406962,
+     "margin": 3.2794312573969364e-05,
+     "pen_last_train": [
+      0.060907334089279175,
+      0.0015257755294442177,
+      0.09501036256551743
+     ],
+     "sep": 0.005857691168785095,
+     "spread": 0.007001908496022224,
+     "step": 2400,
+     "val_cos": 0.9999775886535645
+    },
+    {
+     "ctx_cos": 0.9804316759109497,
+     "eff_ch": 1.9925198158774904,
+     "eta_key_by_half": 1.65157693166673e-05,
+     "eta_key_by_index": 0.00015877910326018472,
+     "eta_key_by_key": 3.085085194846104e-05,
+     "eta_key_by_stream": 0.008409590034081482,
+     "eta_val_by_half": 3.97788771736072e-06,
+     "eta_val_by_index": 3.106661843428659e-05,
+     "eta_val_by_key": 3.8837036221939274e-05,
+     "eta_val_by_stream": 0.0033719142681090876,
+     "hinge_counts": [
+      6,
+      3600
+     ],
+     "hinge_terms": [
+      1,
+      1,
+      5
+     ],
+     "k": 2,
+     "key_cos": 0.9863923788070679,
+     "key_part": 0.08722925186157227,
+     "key_sep": 0.004683643579483032,
+     "margin": 0.006768693216145039,
+     "pen_last_train": [
+      0.003023292636498809,
+      0.00046650873264297843,
+      0.002864305628463626
+     ],
+     "sep": 0.07986791431903839,
+     "spread": 0.8742150068283081,
+     "step": 3600,
+     "val_cos": 0.9944666624069214
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": null,
+   "val_cos": 0.9944666624069214
+  }
+ }
+}

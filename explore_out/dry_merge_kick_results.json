@@ -1,0 +1,538 @@
+{
+ "meta": {
+  "arms": {
+   "SA_A4k4": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "SA_A4k4",
+    "label": "test_scale_axes's A4k4 (X), merged pair stalled",
+    "lr": 0.001,
+    "model_kw": {
+     "conv": "layer",
+     "conv_k": 4
+    },
+    "mult": 8,
+    "n_ch": 4,
+    "part": "B",
+    "prio": 3,
+    "sched": "lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates",
+    "seeds": [
+     221
+    ],
+    "task": "P4S4"
+   },
+   "SR_A4k4": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "SR_A4k4",
+    "label": "test_stream_recipe's A4k4 (X), merged pair stalled",
+    "lr": 0.001,
+    "model_kw": {
+     "conv": "layer",
+     "conv_k": 4
+    },
+    "mult": 8,
+    "n_ch": 4,
+    "part": "B",
+    "prio": 3,
+    "sched": "lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates",
+    "seeds": [
+     247
+    ],
+    "task": "P4S4"
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "aa6c4ff",
+   "python": "3.11.15",
+   "started": "2026-10-01 18:23:44",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {
+  "SA_A4k4|221": {
+   "acc": 0.126953125,
+   "batches_identical": true,
+   "cont": 1200,
+   "control": {
+    "curve": [
+     [
+      3600,
+      0.125,
+      2.6168582439422607
+     ]
+    ],
+    "digest": "2841b0b6fa459aed5286bc5353961324d6ab2458c50cf823951026a2e3bc0595",
+    "evals": [
+     {
+      "acc": 0.125,
+      "ch_map": [
+       1,
+       1,
+       1,
+       1
+      ],
+      "shared": 4,
+      "step": 3600,
+      "stream_acc": [
+       0.11860940605401993,
+       0.11913357675075531,
+       0.15537849068641663,
+       0.10735586285591125
+      ]
+     }
+    ],
+    "kicks": [],
+    "start_equal": true,
+    "start_separate": true
+   },
+   "control_matches": true,
+   "ctx_cos": 0.9992005825042725,
+   "curve": [
+    [
+     1200,
+     0.1005859375,
+     2.7320077419281006
+    ],
+    [
+     2400,
+     0.1171875,
+     2.694366455078125
+    ],
+    [
+     3600,
+     0.126953125,
+     2.6183223724365234
+    ]
+   ],
+   "dry": true,
+   "end": {
+    "ch_map": [
+     1,
+     1,
+     1,
+     2
+    ],
+    "conv_absmean": [
+     0.9396371245384216,
+     0.1537562608718872,
+     0.06334911286830902,
+     0.08844296634197235
+    ],
+    "ctx_cos": 0.9992005825042725,
+    "eff_ch": 3.9924202498748986,
+    "eta_key_by_half": 0.0012104774392957616,
+    "eta_key_by_index": 0.41395937712489067,
+    "eta_key_by_key": 0.07109662018933258,
+    "eta_key_by_stream": 0.05013847924811835,
+    "eta_val_by_half": 0.15550970736373712,
+    "eta_val_by_index": 0.6400521509668179,
+    "eta_val_by_key": 0.024188629459358776,
+    "eta_val_by_stream": 0.03128094022082232,
+    "etak_key_by_block": 0.19064952408139227,
+    "etak_key_by_index": 0.6288433468342065,
+    "etak_key_by_key": 0.02676805964697747,
+    "etak_key_by_stream": 0.019318033193495062,
+    "etak_val_by_block": 0.11957207539829749,
+    "etak_val_by_index": 0.6479928116276975,
+    "etak_val_by_key": 0.014197160650330741,
+    "etak_val_by_stream": 0.010586222034670616,
+    "k": 4,
+    "key_cos": 0.9987583160400391,
+    "key_sep": 0.016269147396087646,
+    "margin": 0.00027647317619994283,
+    "one_to_one": false,
+    "sep": 0.01605120301246643,
+    "shared": 3,
+    "spread": 0.09450244903564453,
+    "step": "end",
+    "stream_acc": [
+     0.13087934255599976,
+     0.11732851713895798,
+     0.15139442682266235,
+     0.10934393852949142
+    ],
+    "stream_gate": [
+     [
+      0.2287,
+      0.2822,
+      0.2587,
+      0.2304
+     ],
+     [
+      0.2347,
+      0.2673,
+      0.2637,
+      0.2343
+     ],
+     [
+      0.2358,
+      0.2686,
+      0.2568,
+      0.2388
+     ],
+     [
+      0.235,
+      0.2642,
+      0.2653,
+      0.2355
+     ]
+    ],
+    "val_cos": 0.9994059205055237
+   },
+   "k": 4,
+   "key_cos": 0.9987583160400391,
+   "kick_norm_diff": 1.0234369913909049e-07,
+   "kicks": {
+    "curve": [
+     [
+      3600,
+      0.126953125,
+      2.6183223724365234
+     ]
+    ],
+    "digest": "2841b0b6fa459aed5286bc5353961324d6ab2458c50cf823951026a2e3bc0595",
+    "evals": [
+     {
+      "acc": 0.126953125,
+      "ch_map": [
+       1,
+       1,
+       1,
+       2
+      ],
+      "shared": 3,
+      "step": 3600,
+      "stream_acc": [
+       0.13087934255599976,
+       0.11732851713895798,
+       0.15139442682266235,
+       0.10934393852949142
+      ]
+     }
+    ],
+    "kicks": [
+     {
+      "grad_norm": [
+       0.001072707469575107,
+       0.01697474904358387,
+       0.013103928416967392
+      ],
+      "kick_norm": [
+       0.1072707399725914,
+       1.6974748373031616,
+       1.31039297580719
+      ],
+      "update": 3000
+     },
+     {
+      "grad_norm": [
+       0.004927521105855703,
+       0.08117591589689255,
+       0.1098087877035141
+      ],
+      "kick_norm": [
+       0.4927520751953125,
+       8.11759090423584,
+       10.980879783630371
+      ],
+      "update": 3600
+     }
+    ],
+    "start_equal": true,
+    "start_separate": true
+   },
+   "lr": 0.001,
+   "merged_pair": [
+    0,
+    1
+   ],
+   "n_kicks": 2,
+   "ok": true,
+   "opt_separate": true,
+   "opt_unchanged": true,
+   "reading": "merged",
+   "recorded_acc": 0.74072265625,
+   "recorded_end_map": [
+    1,
+    1,
+    3,
+    2
+   ],
+   "reproduces": true,
+   "rerun_curve": [
+    [
+     1200,
+     0.1005859375,
+     2.7320077419281006
+    ],
+    [
+     2400,
+     0.1171875,
+     2.694366455078125
+    ]
+   ],
+   "rerun_map": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "sched": "lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates",
+   "secs_wall": 365.97483348846436,
+   "seed": 221,
+   "split_control": null,
+   "split_kicks": null,
+   "stats": [],
+   "t0": 2400,
+   "transition": null,
+   "val_cos": 0.9994059205055237
+  },
+  "SR_A4k4|247": {
+   "acc": 0.17919921875,
+   "batches_identical": true,
+   "cont": 1200,
+   "control": {
+    "curve": [
+     [
+      3600,
+      0.3359375,
+      1.6762059926986694
+     ]
+    ],
+    "digest": "424bd316f08b4317f3ab2844edb78e1e9a90f14a21f83952871b71c459780f94",
+    "evals": [
+     {
+      "acc": 0.3359375,
+      "ch_map": [
+       1,
+       1,
+       0,
+       0
+      ],
+      "shared": 4,
+      "step": 3600,
+      "stream_acc": [
+       0.24539877474308014,
+       0.38447654247283936,
+       0.38247013092041016,
+       0.32405567169189453
+      ]
+     }
+    ],
+    "kicks": [],
+    "start_equal": true,
+    "start_separate": true
+   },
+   "control_matches": true,
+   "ctx_cos": 0.9998995065689087,
+   "curve": [
+    [
+     1200,
+     0.0966796875,
+     2.727510452270508
+    ],
+    [
+     2400,
+     0.17236328125,
+     2.406351089477539
+    ],
+    [
+     3600,
+     0.17919921875,
+     2.3111395835876465
+    ]
+   ],
+   "dry": true,
+   "end": {
+    "ch_map": [
+     1,
+     1,
+     0,
+     1
+    ],
+    "conv_absmean": [
+     0.9133164286613464,
+     0.22140474617481232,
+     0.04465888813138008,
+     0.08945798873901367
+    ],
+    "ctx_cos": 0.9998995065689087,
+    "eff_ch": 3.9992066368945163,
+    "eta_key_by_half": 0.0009614296338574336,
+    "eta_key_by_index": 0.06497082120619008,
+    "eta_key_by_key": 0.17504262296905582,
+    "eta_key_by_stream": 0.2384076008108441,
+    "eta_val_by_half": 1.9671936551106367e-05,
+    "eta_val_by_index": 0.06901503121776112,
+    "eta_val_by_key": 0.12352535561078054,
+    "eta_val_by_stream": 0.1721407121434701,
+    "etak_key_by_block": 0.003017069720924122,
+    "etak_key_by_index": 0.06525436160895615,
+    "etak_key_by_key": 0.1780736410313218,
+    "etak_key_by_stream": 0.22740647828330413,
+    "etak_val_by_block": 0.0032880793620691192,
+    "etak_val_by_index": 0.06916668441182108,
+    "etak_val_by_key": 0.1189912699299009,
+    "etak_val_by_stream": 0.1560592198716664,
+    "k": 4,
+    "key_cos": 0.999987006187439,
+    "key_sep": 0.06334816416104634,
+    "margin": 0.004066059365868568,
+    "one_to_one": false,
+    "sep": 0.0033135786652565002,
+    "shared": 3,
+    "spread": 0.11388563364744186,
+    "step": "end",
+    "stream_acc": [
+     0.14314928650856018,
+     0.19314078986644745,
+     0.20119522511959076,
+     0.17693836987018585
+    ],
+    "stream_gate": [
+     [
+      0.2299,
+      0.2646,
+      0.2532,
+      0.2523
+     ],
+     [
+      0.2254,
+      0.269,
+      0.2543,
+      0.2513
+     ],
+     [
+      0.3241,
+      0.2149,
+      0.2298,
+      0.2312
+     ],
+     [
+      0.2409,
+      0.2605,
+      0.2498,
+      0.2489
+     ]
+    ],
+    "val_cos": 0.9999156594276428
+   },
+   "k": 4,
+   "key_cos": 0.999987006187439,
+   "kick_norm_diff": 1.1702525366813749e-07,
+   "kicks": {
+    "curve": [
+     [
+      3600,
+      0.17919921875,
+      2.3111395835876465
+     ]
+    ],
+    "digest": "424bd316f08b4317f3ab2844edb78e1e9a90f14a21f83952871b71c459780f94",
+    "evals": [
+     {
+      "acc": 0.17919921875,
+      "ch_map": [
+       1,
+       1,
+       0,
+       1
+      ],
+      "shared": 3,
+      "step": 3600,
+      "stream_acc": [
+       0.14314928650856018,
+       0.19314078986644745,
+       0.20119522511959076,
+       0.17693836987018585
+      ]
+     }
+    ],
+    "kicks": [
+     {
+      "grad_norm": [
+       0.012234276160597801,
+       0.13964900374412537,
+       0.04356091469526291
+      ],
+      "kick_norm": [
+       1.223427653312683,
+       13.964899063110352,
+       4.356091022491455
+      ],
+      "update": 3000
+     },
+     {
+      "grad_norm": [
+       0.019744694232940674,
+       0.23429247736930847,
+       0.11539507657289505
+      ],
+      "kick_norm": [
+       1.9744693040847778,
+       23.429244995117188,
+       11.539507865905762
+      ],
+      "update": 3600
+     }
+    ],
+    "start_equal": true,
+    "start_separate": true
+   },
+   "lr": 0.001,
+   "merged_pair": [
+    2,
+    3
+   ],
+   "n_kicks": 2,
+   "ok": true,
+   "opt_separate": true,
+   "opt_unchanged": true,
+   "reading": "merged",
+   "recorded_acc": 0.75439453125,
+   "recorded_end_map": [
+    3,
+    1,
+    0,
+    0
+   ],
+   "reproduces": true,
+   "rerun_curve": [
+    [
+     1200,
+     0.0966796875,
+     2.727510452270508
+    ],
+    [
+     2400,
+     0.17236328125,
+     2.406351089477539
+    ]
+   ],
+   "rerun_map": [
+    0,
+    3,
+    0,
+    0
+   ],
+   "sched": "lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates",
+   "secs_wall": 367.24179697036743,
+   "seed": 247,
+   "split_control": null,
+   "split_kicks": null,
+   "stats": [],
+   "t0": 2400,
+   "transition": null,
+   "val_cos": 0.9999156594276428
+  }
+ }
+}

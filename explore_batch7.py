@@ -231,8 +231,8 @@ def main():
           f"NEAR_TOK only {n['b']} vs {n['c']}, p = {n['p']:.3g})")
     sh, kk = d20["slow_hinge"], d20["kick"]
     print(f"  S20 kick_untimed: {v20} vs SLOW_MEM (DISCOVERED {d20['new']}/{d20['n']} vs {d20['old']}/{d20['n']}, "
-          f"{d20['b']} vs {d20['c']}, p = {d20['p']:.3g}); reading: {rd20} (easy {d20['n_easy']}/20, hard "
-          f"{d20['n_hard']}/20)")
+          f"{d20['b']} vs {d20['c']}, p = {d20['p']:.3g}); reading: {rd20} (easy {d20['n_easy']}/{d20['n_easy_run']}, "
+          f"hard {d20['n_hard']}/{d20['n_hard_run']})")
     print(f"      vs SLOW_HINGE {sh['new']}/{sh['n']} vs {sh['old']}/{sh['n']} ({sh['b']} vs {sh['c']}, p = {sh['p']:.3g}); "
           f"vs S16's KICK on its seeds {kk['new']}/{kk['n']} vs {kk['old']}/{kk['n']} ({kk['b']} vs {kk['c']}, "
           f"p = {kk['p']:.3g})")

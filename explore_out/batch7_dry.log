@@ -8,3 +8,234 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
   S21 rule: 'kicks split merges' if >= 4/8 split under KICKS; 'they do not' if <= 1/8; else neither (split: the merged pair on different channels and accuracy >= 0.95 at some evaluation up to 19200)
   ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
   order (--order): merge_kick, token_hinge, kick_untimed — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (84s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_token_hinge: FAR_TOK with the key term's TAU at 1.0 equals FAR_SLOW_HINGE bit for bit through 3600 steps on seed 160 (curves = a fresh FAR_SLOW_HINGE run = the recorded run; weights equal; key term fired 0 times): ok
+  CHECK dry_token_hinge: NEAR_TOK with the key term's TAU at 1.0 equals SLOW_HINGE bit for bit through 3600 steps on seed 160 (curves = a fresh SLOW_HINGE run = the recorded run; weights equal; key term fired 0 times): ok
+  CHECK dry_token_hinge: eta2_key equals the routing statistics' eta_key_by_key on a probe batch, both layouts, at init and on a gate far from uniform (max diff 1.0e-07 < 1e-5): ok
+  CHECK dry_token_hinge: on 20 probe batches per layout the perfect gate scores below 0.1 on eta2_key (max: header 0.00e+00, grouped 0.00e+00) and a gate set by key token above 0.5 (min: header 1.0000, grouped 1.0000): ok
+  CHECK dry_token_hinge: the key term's gradient reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK dry_kick_untimed: target norms = the median over S16's 20 first kicks: W_in 0.8126, W_h 2.5223, W_g 0.4003, embed.weight 5.7174: ok
+  CHECK dry_kick_untimed: with the kick's norm set to 0 the run equals SLOW_MEM bit for bit through 3600 steps on seed 160 (curves = a fresh SLOW_MEM run = batch 2's record; weights equal; kicks logged 1 at norm 0): ok
+  CHECK dry_kick_untimed: a 1200-step run logs exactly one kick, at update 120 ([120]): ok
+  CHECK dry_kick_untimed: the logged kick norms equal the targets (max relative difference 1.8e-07 < 1e-5): ok
+  CHECK dry_kick_untimed: the exp_avg_sq log has updates [119, 121, 600] (W_g's mean exp_avg_sq 121/119 = 6.45e+07): ok
+  CHECK dry_merge_kick: the runs are the recorded A4k4 runs with exactly two streams sharing a channel at 9600 and at the end, not bound, final accuracy 0.74-0.77: stream_recipe (247, 248, 251, 258), scale_axes (221, 223, 225, 226); merged pairs {'SR 247': [2, 3], 'SR 248': [0, 2], 'SR 251': [1, 3], 'SR 258': [0, 2], 'SA 221': [0, 1], 'SA 223': [2, 3], 'SA 225': [2, 3], 'SA 226': [0, 1]}: ok
+  CHECK dry_merge_kick: test_scale_axes, test_stream_channels, test_stream_recipe load read-only from main at 520fe51 (git show; not on this branch): ok
+  CHECK dry_merge_kick: this branch's test modules that differ from main's at 520fe51: ['test_binding_capacity.py', 'test_curriculum_confirm.py'] (test_curriculum_confirm.py docstring only: True; test_binding_capacity.py: main adds the opt-in s_active knob): ok
+  CHECK dry_merge_kick: test_scale_axes.run_job (run_one) seed 221: the rerun to 1200 reproduces the record (True); CONTROL's 1200 continued updates reproduce the recorded evaluation at 2400 ([[2400, 0.1171875, 2.694366455078125]] vs [[2400, 0.1171875, 2.694366455078125]]); identical batches (True); optimizer states equal to the run's (True, True) and stored apart from it (True, True), the run's left unchanged (True); KICKS logged 2 kicks at 100x the batch gradient norm (max relative difference 2.1e-07): ok
+  CHECK dry_merge_kick: the separation test has teeth: a state loaded without a deep copy (batch 5's S14 load) shares storage with the run's optimizer (True): ok
+  CHECK dry_merge_kick: test_stream_recipe.run_attempt (plain A4k4) seed 247: the rerun to 1200 reproduces the record (True); CONTROL's 1200 continued updates reproduce the recorded evaluation at 2400 ([[2400, 0.17236328125, 2.406351089477539]] vs [[2400, 0.17236328125, 2.406351089477539]]); identical batches (True); optimizer states equal to the run's (True, True) and stored apart from it (True, True), the run's left unchanged (True); KICKS logged 2 kicks at 100x the batch gradient norm (max relative difference 1.6e-07): ok
+  all CHECKs passed (21.3 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_token_hinge
+  idea    S13's hinge plus a third term on the key token's identity (eta2_key), near and far
+  source  batch 6's S17 (blocking the position split on the header layout exposed key splits); S11 (fresh gates land in key splits)
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] of the read gate at key positions, on each training batch
+  arm FAR_TOK      lr 0.001  iters 3600  seeds 160-160 (1)  — far_A_slow + hinge on position and key-token eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm NEAR_TOK     lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + hinge on position and key-token eta^2 (TAU 0.2), grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch
+  pairing FAR_TOK seeds 160-169 with S17's FAR_SLOW_HINGE and batch 3's far_A_slow; NEAR_TOK seeds 160-179 with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_kick_untimed
+  idea    one Gaussian kick at update 120, sized as S16's median first kick, with no trigger
+  source  batch 6's S16 (random kicks on the hinge's batches did about as well as the hinge); Adam's response to a single large gradient
+  change  SLOW_MEM + one Gaussian tensor added to the .grad of W_in, W_h, W_g, embed.weight at update 120, each at the median norm of S16's first kicks on that tensor
+  arm KICK120      lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + one Gaussian kick at update 120 (S16's median first-kick norms)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 / S7), SLOW_HINGE (S13), and on S16's 20 seeds with KICK (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_merge_kick
+  idea    large gate kicks (100x the batch gradient, every 600 updates) on S=4 runs with two streams merged
+  source  the main line's S=4, k=4 runs (merges at 9600: 10 of 22 split later); batch 6's S16 (a kick's size, not its direction, did most of the hinge's work)
+  change  none to the recorded runs up to 9600; then 9600 updates twice from that state: CONTROL plain, KICKS with a Gaussian kick of 100x the gradient norm on W_in, W_h, W_g every 600 updates
+  arm SR_A4k4      lr 0.001  iters 3600  seeds 247-247 (1)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  arm SA_A4k4      lr 0.001  iters 3600  seeds 221-221 (1)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  pairing each run's KICKS against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    dry_token_hinge FAR_TOK     1 runs x   1.6 min  (3600 steps x 25.5 ms + 3 evals x 1.3 s)
+    dry_token_hinge NEAR_TOK    1 runs x   2.1 min  (3600 steps x 33.7 ms + 3 evals x 1.8 s)
+    dry_kick_untimed KICK120     1 runs x   2.1 min  (3600 steps x 33.1 ms + 3 evals x 1.9 s)
+    dry_merge_kick SR_A4k4     1 runs x   4.3 min  (3600 steps x 65.7 ms + 3 evals x 6.5 s)
+    dry_merge_kick SA_A4k4     1 runs x   4.4 min  (3600 steps x 69.1 ms + 3 evals x 6.0 s)
+    total 0.24 h of runs; makespan on 4 workers 0.07 h (worst case)
+  5 runs queued on 4 workers (1 torch thread each)
+  [  1/5]    1.9 min  dry_token_hinge FAR_TOK    seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+          acc 0.227  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  2/5]    2.3 min  dry_token_hinge NEAR_TOK   seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch)
+          acc 0.477  trans  None  VALcos 0.994  margin 0.01  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  3/5]    4.1 min  dry_kick_untimed KICK120    seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174))
+          acc 1.000  trans  3600  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/Y/Y
+  [  4/5]    6.1 min  dry_merge_kick SA_A4k4    seed 221  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates)
+          acc 0.127  trans  None  VALcos 0.999  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  5/5]    6.1 min  dry_merge_kick SR_A4k4    seed 247  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates)
+          acc 0.179  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 6.1 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_token_hinge
+  idea    S13's hinge plus a third term on the key token's identity (eta2_key), near and far
+  source  batch 6's S17 (blocking the position split on the header layout exposed key splits); S11 (fresh gates land in key splits)
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] of the read gate at key positions, on each training batch
+  arm FAR_TOK      lr 0.001  iters 3600  seeds 160-160 (1)  — far_A_slow + hinge on position and key-token eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm NEAR_TOK     lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + hinge on position and key-token eta^2 (TAU 0.2), grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch
+  pairing FAR_TOK seeds 160-169 with S17's FAR_SLOW_HINGE and batch 3's far_A_slow; NEAR_TOK seeds 160-179 with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; hinge on = training batches with that term above TAU):
+   arm FAR_TOK (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         S17 FAR_SLOW_H  b3 far_A_slow    hinge on: index/half/key/any of batches
+     160  0.227   None   1.000   0.00  0.11/0.03/0.00/0.01  -/-/-/-  OTHER           KEY             POSITION               1/0/6/7 of 3600
+   arm NEAR_TOK (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         S13 SLOW_HINGE  X A              hinge on: index/half/key/any of batches
+     160  0.477   None   0.994   0.01  0.01/0.00/0.00/0.00  -/-/-/-  OTHER           DISCOVERED      KEY                    1/1/5/6 of 3600
+  FAR_TOK (header layout), 1 seeds:
+   paired with S17's FAR_SLOW_HINGE:
+    DISCOVERED    FAR_TOK  0/1   FAR_SLOW_HINGE  0/1   FAR_TOK only 0, FAR_SLOW_HINGE only 0, McNemar two-sided p = 1
+    BOUND         FAR_TOK  0/1   FAR_SLOW_HINGE  0/1   FAR_TOK only 0, FAR_SLOW_HINGE only 0, McNemar two-sided p = 1
+    ROUTED*@1200  FAR_TOK  0/1   FAR_SLOW_HINGE  0/1   FAR_TOK only 0, FAR_SLOW_HINGE only 0, McNemar two-sided p = 1
+    ROUTED*@end   FAR_TOK  0/1   FAR_SLOW_HINGE  0/1   FAR_TOK only 0, FAR_SLOW_HINGE only 0, McNemar two-sided p = 1
+   paired with batch 3's far_A_slow:
+    DISCOVERED    FAR_TOK  0/1   far_A_slow  0/1   FAR_TOK only 0, far_A_slow only 0, McNemar two-sided p = 1
+    STALLS        FAR_TOK  0/1   far_A_slow  0/1   FAR_TOK only 0, far_A_slow only 0, McNemar two-sided p = 1
+    failures FAR_TOK {'OTHER': 1}   FAR_SLOW_HINGE {'KEY': 1}   far_A_slow {'POSITION': 1}
+    stalls (routed at the end or stream-partial, not bound): FAR_TOK []
+    hinge firings (batches): index 1, half 0, key 6, any 7 of 3600; runs with the term on at least once: index 1, half 0, key 1 of 1
+  NEAR_TOK (grouped layout), 1 seeds:
+   paired with S13's SLOW_HINGE:
+    DISCOVERED    NEAR_TOK  0/1   SLOW_HINGE  1/1   NEAR_TOK only 0, SLOW_HINGE only 1, McNemar two-sided p = 1
+    ROUTED*@1200  NEAR_TOK  0/1   SLOW_HINGE  1/1   NEAR_TOK only 0, SLOW_HINGE only 1, McNemar two-sided p = 1
+    ROUTED*@end   NEAR_TOK  0/1   SLOW_HINGE  1/1   NEAR_TOK only 0, SLOW_HINGE only 1, McNemar two-sided p = 1
+   paired with X's arm A:
+    DISCOVERED    NEAR_TOK  0/1   X A  0/1   NEAR_TOK only 0, X A only 0, McNemar two-sided p = 1
+    failures NEAR_TOK {'OTHER': 1}   SLOW_HINGE {}   X arm A {'KEY': 1}
+    hinge firings (batches): index 1, half 1, key 5, any 6 of 3600; runs with the term on at least once: index 1, half 1, key 1 of 1
+  RULE FAR_TOK (DISCOVERED 0/1; promising >= 4/10, not <= 1/10): not
+  RULE NEAR_TOK (DISCOVERED 0/1; 'keeps the near case' >= 16/20, 'costs the near case' <= 13/20): costs the near case
+  DRY RUN VERDICT dry_token_hinge FAR_TOK: not (DISCOVERED 0/1)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_token_hinge NEAR_TOK: costs the near case (DISCOVERED 0/1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_kick_untimed
+  idea    one Gaussian kick at update 120, sized as S16's median first kick, with no trigger
+  source  batch 6's S16 (random kicks on the hinge's batches did about as well as the hinge); Adam's response to a single large gradient
+  change  SLOW_MEM + one Gaussian tensor added to the .grad of W_in, W_h, W_g, embed.weight at update 120, each at the median norm of S16's first kicks on that tensor
+  arm KICK120      lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + one Gaussian kick at update 120 (S16's median first-kick norms)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 / S7), SLOW_HINGE (S13), and on S16's 20 seeds with KICK (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; group: easy = S13's hinge never fired, hard = it fired; W_g exp_avg_sq = mean Adam second moment of W_g after updates 119/121/600/2400/4800):
+    seed  grp    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_MEM        SLOW_HINGE      S16 KICK        W_g exp_avg_sq 119/121/600/2400/4800
+     160 easy  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              3.9e-14/2.5e-06/1.5e-06/1.8e-06/--
+     161 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     162 hard not run                                                                POSITION        DISCOVERED      DISCOVERED     
+     163 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     164 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     165 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     166 hard not run                                                                POSITION        DISCOVERED      DISCOVERED     
+     167 hard not run                                                                POSITION        OTHER           KEY            
+     168 hard not run                                                                DISCOVERED      DISCOVERED      DISCOVERED     
+     169 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     170 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     171 hard not run                                                                OTHER           OTHER           STREAM-PARTIAL 
+     172 hard not run                                                                DISCOVERED      DISCOVERED      DISCOVERED     
+     173 hard not run                                                                POSITION        DISCOVERED      POSITION       
+     174 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     175 hard not run                                                                POSITION        DISCOVERED      DISCOVERED     
+     176 hard not run                                                                POSITION        DISCOVERED      DISCOVERED     
+     177 hard not run                                                                POSITION        DISCOVERED      DISCOVERED     
+     178 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     179 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     180 hard not run                                                                POSITION        DISCOVERED      DISCOVERED     
+     181 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     182 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     183 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     184 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     185 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     186 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     187 hard not run                                                                KEY             KEY             KEY            
+     188 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     189 hard not run                                                                KEY             KEY             KEY            
+     190 hard not run                                                                POSITION        DISCOVERED      POSITION       
+     191 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     192 hard not run                                                                OTHER           DISCOVERED      DISCOVERED     
+     193 hard not run                                                                KEY             OTHER           OTHER          
+     194 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     195 hard not run                                                                DISCOVERED      DISCOVERED      DISCOVERED     
+     196 hard not run                                                                DISCOVERED      DISCOVERED      POSITION       
+     197 hard not run                                                                POSITION        OTHER           DISCOVERED     
+     198 easy not run                                                                DISCOVERED      DISCOVERED      --             
+     199 hard not run                                                                POSITION        DISCOVERED      DISCOVERED     
+  vs SLOW_MEM, 1 seeds (the rule):
+    DISCOVERED    KICK120  1/1   SLOW_MEM  1/1   KICK120 only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+    ROUTED*@1200  KICK120  0/1   SLOW_MEM  1/1   KICK120 only 0, SLOW_MEM only 1, McNemar two-sided p = 1
+   easy (S13's hinge never fired), 1 seeds:
+    DISCOVERED    KICK120  1/1   SLOW_MEM  1/1   KICK120 only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+    ROUTED*@1200  KICK120  0/1   SLOW_MEM  1/1   KICK120 only 0, SLOW_MEM only 1, McNemar two-sided p = 1
+   hard (S13's hinge fired), 0 seeds:
+    DISCOVERED    KICK120  0/0   SLOW_MEM  0/0   KICK120 only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+    ROUTED*@1200  KICK120  0/0   SLOW_MEM  0/0   KICK120 only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+  vs SLOW_HINGE, 1 seeds:
+    DISCOVERED    KICK120  1/1   SLOW_HINGE  1/1   KICK120 only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    ROUTED*@1200  KICK120  0/1   SLOW_HINGE  1/1   KICK120 only 0, SLOW_HINGE only 1, McNemar two-sided p = 1
+  vs S16's KICK, its 0 seeds:
+    DISCOVERED    KICK120  0/0   KICK  0/0   KICK120 only 0, KICK only 0, McNemar two-sided p = 1
+    ROUTED*@1200  KICK120  0/0   KICK  0/0   KICK120 only 0, KICK only 0, McNemar two-sided p = 1
+  failure classes (1 seeds): KICK120 {}   SLOW_MEM {}   SLOW_HINGE {}
+  Adam's second moment, median over seeds of the mean exp_avg_sq after each update (ratio to update 119):
+    W_in  119: 2.31e-15 (x1) [n 1]   121: 6.44e-07 (x2.79e+08) [n 1]   600: 3.99e-07 (x1.73e+08) [n 1]   2400: 1.97e-07 (x8.53e+07) [n 1]   4800: -- [n 0]
+    W_h   119: 6.84e-16 (x1) [n 1]   121: 6.21e-06 (x9.08e+09) [n 1]   600: 3.84e-06 (x5.62e+09) [n 1]   2400: 3.33e-05 (x4.87e+10) [n 1]   4800: -- [n 0]
+    W_g   119: 3.88e-14 (x1) [n 1]   121: 2.50e-06 (x6.45e+07) [n 1]   600: 1.55e-06 (x3.99e+07) [n 1]   2400: 1.77e-06 (x4.57e+07) [n 1]   4800: -- [n 0]
+  READING S20 (easy 1/1, hard 0/0; 'the trigger is not needed' if easy >= 18 and hard >= 10; 'an untimed kick costs the easy seeds' if easy <= 16): an untimed kick costs the easy seeds
+  DRY RUN VERDICT dry_kick_untimed (vs SLOW_MEM, 40 seeds): not; reading: an untimed kick costs the easy seeds  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_merge_kick
+  idea    large gate kicks (100x the batch gradient, every 600 updates) on S=4 runs with two streams merged
+  source  the main line's S=4, k=4 runs (merges at 9600: 10 of 22 split later); batch 6's S16 (a kick's size, not its direction, did most of the hinge's work)
+  change  none to the recorded runs up to 9600; then 9600 updates twice from that state: CONTROL plain, KICKS with a Gaussian kick of 100x the gradient norm on W_in, W_h, W_g every 600 updates
+  arm SR_A4k4      lr 0.001  iters 3600  seeds 247-247 (1)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  arm SA_A4k4      lr 0.001  iters 3600  seeds 221-221 (1)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  pairing each run's KICKS against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  per run (map = stream -> channel at each evaluation, as acc:map; '|' = the merged pair on different channels; continuations from 9600 to 19200):
+    SR_A4k4   247  merged pair streams [2, 3] (recorded end map [3, 1, 0, 0], rec acc 0.754; map at 2400 [0, 3, 0, 0])
+                   rerun to 2400 reproduces: yes; CONTROL = record to 3600: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 2, max norm diff 1.2e-07
+                   CONTROL 0.34:1100
+                           at 3600: acc 0.336, per stream 0.25/0.38/0.38/0.32, merged pair on channels [0, 0]
+                   KICKS   0.18:1101|
+                           at 3600: acc 0.179, per stream 0.14/0.19/0.20/0.18, merged pair on channels [0, 1]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 1.2e-02/1.4e-01/4.4e-02, at the last 2.0e-02/2.3e-01/1.2e-01
+                   READING: KICKS merged; CONTROL merged
+    SA_A4k4   221  merged pair streams [0, 1] (recorded end map [1, 1, 3, 2], rec acc 0.741; map at 2400 [1, 1, 1, 1])
+                   rerun to 2400 reproduces: yes; CONTROL = record to 3600: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 2, max norm diff 1.0e-07
+                   CONTROL 0.12:1111
+                           at 3600: acc 0.125, per stream 0.12/0.12/0.16/0.11, merged pair on channels [1, 1]
+                   KICKS   0.13:1112
+                           at 3600: acc 0.127, per stream 0.13/0.12/0.15/0.11, merged pair on channels [1, 1]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 1.1e-03/1.7e-02/1.3e-02, at the last 4.9e-03/8.1e-02/1.1e-01
+                   READING: KICKS merged; CONTROL merged
+  SPLIT under KICKS 0/2; under CONTROL 0/2
+  RULE S21 ('kicks split merges' if >= 4/8 split under KICKS, 'they do not' if <= 1/8): they do not
+  DRY RUN READING dry_merge_kick: they do not (split under KICKS 0/2; CONTROL 0/2)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S19 token_hinge FAR_TOK: not (DISCOVERED 0/1; S17's FAR_SLOW_HINGE 0/1, FAR_TOK only 0 vs 0, p = 1)
+  S19 token_hinge NEAR_TOK: costs the near case (DISCOVERED 0/1; S13's SLOW_HINGE 1/1, NEAR_TOK only 0 vs 1, p = 1)
+  S20 kick_untimed: not vs SLOW_MEM (DISCOVERED 1/1 vs 1/1, 0 vs 0, p = 1); reading: an untimed kick costs the easy seeds (easy 1/20, hard 0/20)
+      vs SLOW_HINGE 1/1 vs 1/1 (0 vs 0, p = 1); vs S16's KICK on its seeds 0/0 vs 0/0 (0 vs 0, p = 1)
+  S21 merge_kick: they do not (split under KICKS 0/2; under CONTROL 0/2)
+####################################################################################################
