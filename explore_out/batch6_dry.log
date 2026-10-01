@@ -24,3 +24,42 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
   CHECK dry_far_slow_hinge: the hinge's gradient (TAU = 0) reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
   CHECK dry_far_slow_hinge: with both terms below TAU = 0.2 (eta2 index 0.037, half 0.001) the hinge's gradient is exactly zero: ok
   NOTE dry_far_slow_hinge (arithmetic, not a check): on a training batch of 32 the perfect gate's eta2_index = eta2_half = 4 (m - 1/2)^2 (m = share of sequences whose first block is stream 0's); it exceeds TAU = 0.2 with probability 0.0070 per batch (exact binomial; 11/2000 = 0.0055 on sampled batches). The hinge also fires, now and then, on a routed gate.
+  CHECK dry_stuck_memory: the runs are S14's 8 stalled runs, each reproduced in S14 ([('blk_A', 120), ('hdr_far_A', 165), ('hdr_far_nudge', 161)]): ok
+  CHECK dry_stuck_memory: the breakdown's bookkeeping on synthetic answers, header and blocked layouts (true values: accuracy 1; the other stream's values: accuracy 0, other-stream share 1; the located pair holds the query's value; blocks and positions partition the queries): ok
+  CHECK dry_stuck_memory: the breakdown's overall accuracy equals evaluate's (learned gate) and S14's SWAP path's (perfect gate) on untrained models of both layouts: ok
+  CHECK dry_stuck_memory: the long continuation's code equals S14's continue_run (far_nudge 160 re-run to 1200, reproducing its record, then 1200 perfect-gate updates: curves [[1200, 1.0, 0.01191485021263361]] vs [[1200, 1.0, 0.01191485021263361]], batch digests equal: True; S14's run given a copy of the optimizer): ok
+  CHECK dry_stuck_memory: continue_long leaves the run's optimizer state unchanged; S14's continue_run changes the optimizer it is given (batch 5's S14 bug, shown: its learned-gate control started from the state its perfect-gate continuation left): ok
+  all CHECKs passed (8.6 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_kick_control
+  idea    S13's hinge replaced by a random kick of the same size, on the batches where it would fire
+  source  batch 5's S13 (a few hinge firings flipped POSITION failures to DISCOVERED); random-direction controls for a gradient intervention
+  change  SLOW_MEM; on each batch where S13's hinge would be nonzero (at most N_s per seed), add to W_in, W_h, W_g, embed.weight a Gaussian tensor scaled to the hinge gradient's norm on that tensor; the hinge's own gradient is not applied
+  arm KICK         lr 0.001  iters 3600  seeds 162-162 (1)  — SLOW_MEM + random kicks sized as S13's hinge gradient (at most N_s per seed)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + on a batch where S13's hinge (TAU 0.2) would fire, a Gaussian tensor of the hinge gradient's norm added to W_in, W_h, W_g, embed.weight's .grad (at most N_s kicks per seed)
+  pairing the 20 seeds where S13's hinge fired, paired with SLOW_HINGE (S13) and SLOW_MEM (S5 / S7) on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_slow_hinge
+  idea    S13's SLOW_HINGE on the header layout, no nudge (label-free)
+  source  batch 5's S13 (the hinge turned SLOW_MEM's POSITION failures into discoveries); batch 3's far_A_slow (0/10, 8 POSITION)
+  change  far_A_slow + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] of the read gate at the header layout's KEY positions, on each training batch
+  arm FAR_SLOW_HINGE lr 0.001  iters 3600  seeds 160-160 (1)  — far_A_slow + hinge on position eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] at the header KEY positions on each training batch
+  pairing seeds 160-169, paired with batch 3's far_A_slow and batch 2's far_A (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_stuck_memory
+  idea    what the stalled routed runs answer (block order, key position, the other stream's value), and a long perfect-gate run
+  source  batch 5's S14 (the stalls are not in the gate) and S15 (SLOW_MEM's schedule prevents them)
+  change  none to the runs; probes at their end states
+  arm hdr_far_nudge lr 0.001  iters 3600  seeds 161-161 (1)  — batch 4's far_nudge
+                   schedule: lr 0.001 throughout
+  arm hdr_far_A    lr 0.001  iters 3600  seeds 165-165 (1)  — batch 2's far_A
+                   schedule: lr 0.001 throughout
+  arm blk_A        lr 0.001  iters 3600  seeds 120-120 (1)  — X's test_router_layout A_blocked
+                   schedule: lr 0.001 throughout
+  pairing each probe against its own recorded run (reproduced exactly first) and S14's probes
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    dry_kick_control KICK        1 runs x   1.7 min  (3600 steps x 25.9 ms + 3 evals x 2.3 s)
