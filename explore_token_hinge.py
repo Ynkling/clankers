@@ -105,15 +105,17 @@ KPOS_OF = {"header": KPOS_FAR, "grouped": KPOS_NEAR}
 
 
 def key_penalty(gr, x, kpos, S, P):
-    """eta^2 of gr[..., 0] at kpos grouped by the key token there (x = the input tokens)."""
+    """eta^2 of gr[..., 0] at kpos grouped by the key token there (x = the input tokens). The
+    group means are taken of the centred values (p - mu): the same quantity, without float32
+    cancellation between two means near 0.5 when the gate is near uniform."""
     p = gr[:, kpos, 0]                                                  # (B, n)
     key = x[:, kpos] - S                                                # (B, n) in 0..P-1
     oh = F.one_hot(key, P).to(p.dtype)                                  # (B, n, P)
-    mu = p.mean()
-    tot = ((p - mu) ** 2).sum() + EPS
+    d = p - p.mean()
+    tot = (d ** 2).sum() + EPS
     cnt = oh.sum((0, 1))
-    mean_k = (p.unsqueeze(-1) * oh).sum((0, 1)) / cnt.clamp(min=1)
-    between = (cnt * (mean_k - mu) ** 2).sum()
+    dev_k = (d.unsqueeze(-1) * oh).sum((0, 1)) / cnt.clamp(min=1)
+    between = (cnt * dev_k ** 2).sum()
     return between / tot
 
 
