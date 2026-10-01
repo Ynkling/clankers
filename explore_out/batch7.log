@@ -78,3 +78,58 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
           acc 0.751  trans  None  VALcos 0.004  margin 0.83  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
 
 #################### RESTART 2026-10-01 22:43:50 UTC — the container was restarted during the first segment (4 of 78 runs saved: S21 SA_A4k4 221, 223, 225, 226; the 4 SR_A4k4 runs in flight were lost and re-run). The next segment resumes with --resume: the repro check runs, the rest of the CHECK suite is skipped only if the screen code is unchanged since the recorded full pass. (EXPLORATORY, not a result) ####################
+#################### RESUME 2026-10-01 22:44:40 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), merge_kick (S21)
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git 4cd8818+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S21: rerun to 9600, then 9600 continued updates twice), task P=4 S=2 n_vals=16 n_q=1 (S21: task_for(4, 4), k=4, conv), 1 torch thread per run
+  S19 rule: FAR_TOK promising if DISCOVERED >= 4/10, not if <= 1/10, else inconclusive; NEAR_TOK 'keeps the near case' if >= 16/20, 'costs the near case' if <= 13/20, else neither
+  S20 rule (vs SLOW_MEM, 40 seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED); reading: 'the trigger is not needed' if easy >= 18/20 and hard >= 10/20; 'an untimed kick costs the easy seeds' if easy <= 16/20; else neither
+  S21 rule: 'kicks split merges' if >= 4/8 split under KICKS; 'they do not' if <= 1/8; else neither (split: the merged pair on different channels and accuracy >= 0.95 at some evaluation up to 19200)
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): merge_kick, token_hinge, kick_untimed — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (85s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch7.py differs from 9a51dbe, where the full CHECK suite passed (2026-10-01 21:56:42 UTC; its output is earlier in this log). git diff --stat 9a51dbe:
+     explore_out/README.md                 |    2 +-
+     explore_out/batch7.log                |   82 +
+     explore_out/batch7_checks.json        |    6 +
+     explore_out/kick_untimed_results.json |   75 +
+     explore_out/merge_kick_results.json   | 3360 +++++++++++++++++++++++++++++++++
+     explore_out/token_hinge_results.json  |   85 +
+     6 files changed, 3609 insertions(+), 1 deletion(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN token_hinge
+  idea    S13's hinge plus a third term on the key token's identity (eta2_key), near and far
+  source  batch 6's S17 (blocking the position split on the header layout exposed key splits); S11 (fresh gates land in key splits)
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] of the read gate at key positions, on each training batch
+  arm FAR_TOK      lr 0.001  iters 24000  seeds 160-169 (10)  — far_A_slow + hinge on position and key-token eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm NEAR_TOK     lr 0.001  iters 24000  seeds 160-179 (20)  — SLOW_MEM + hinge on position and key-token eta^2 (TAU 0.2), grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch
+  pairing FAR_TOK seeds 160-169 with S17's FAR_SLOW_HINGE and batch 3's far_A_slow; NEAR_TOK seeds 160-179 with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN kick_untimed
+  idea    one Gaussian kick at update 120, sized as S16's median first kick, with no trigger
+  source  batch 6's S16 (random kicks on the hinge's batches did about as well as the hinge); Adam's response to a single large gradient
+  change  SLOW_MEM + one Gaussian tensor added to the .grad of W_in, W_h, W_g, embed.weight at update 120, each at the median norm of S16's first kicks on that tensor
+  arm KICK120      lr 0.001  iters 24000  seeds 160-199 (40)  — SLOW_MEM + one Gaussian kick at update 120 (S16's median first-kick norms)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 / S7), SLOW_HINGE (S13), and on S16's 20 seeds with KICK (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN merge_kick
+  idea    large gate kicks (100x the batch gradient, every 600 updates) on S=4 runs with two streams merged
+  source  the main line's S=4, k=4 runs (merges at 9600: 10 of 22 split later); batch 6's S16 (a kick's size, not its direction, did most of the hinge's work)
+  change  none to the recorded runs up to 9600; then 9600 updates twice from that state: CONTROL plain, KICKS with a Gaussian kick of 100x the gradient norm on W_in, W_h, W_g every 600 updates
+  arm SR_A4k4      lr 0.001  iters 28800  seeds [247, 248, 251, 258] (4)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  arm SA_A4k4      lr 0.001  iters 28800  seeds [221, 223, 225, 226] (4)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  pairing each run's KICKS against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    token_hinge    FAR_TOK    10 runs x  11.0 min  (24000 steps x 26.2 ms + 20 evals x 1.7 s)
