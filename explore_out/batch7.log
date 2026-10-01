@@ -11,3 +11,56 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (74s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK token_hinge: FAR_TOK with the key term's TAU at 1.0 equals FAR_SLOW_HINGE bit for bit through 3600 steps on seed 160 (curves = a fresh FAR_SLOW_HINGE run = the recorded run; weights equal; key term fired 0 times): ok
+  CHECK token_hinge: NEAR_TOK with the key term's TAU at 1.0 equals SLOW_HINGE bit for bit through 3600 steps on seed 160 (curves = a fresh SLOW_HINGE run = the recorded run; weights equal; key term fired 0 times): ok
+  CHECK token_hinge: eta2_key equals the routing statistics' eta_key_by_key on a probe batch, both layouts, at init and on a gate far from uniform (max diff 1.0e-07 < 1e-5): ok
+  CHECK token_hinge: on 20 probe batches per layout the perfect gate scores below 0.1 on eta2_key (max: header 0.00e+00, grouped 0.00e+00) and a gate set by key token above 0.5 (min: header 1.0000, grouped 1.0000): ok
+  CHECK token_hinge: the key term's gradient reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK kick_untimed: target norms = the median over S16's 20 first kicks: W_in 0.8126, W_h 2.5223, W_g 0.4003, embed.weight 5.7174: ok
+  CHECK kick_untimed: with the kick's norm set to 0 the run equals SLOW_MEM bit for bit through 3600 steps on seed 160 (curves = a fresh SLOW_MEM run = batch 2's record; weights equal; kicks logged 1 at norm 0): ok
+  CHECK kick_untimed: a 1200-step run logs exactly one kick, at update 120 ([120]): ok
+  CHECK kick_untimed: the logged kick norms equal the targets (max relative difference 1.8e-07 < 1e-5): ok
+  CHECK kick_untimed: the exp_avg_sq log has updates [119, 121, 600] (W_g's mean exp_avg_sq 121/119 = 6.45e+07): ok
+  CHECK merge_kick: the runs are the recorded A4k4 runs with exactly two streams sharing a channel at 9600 and at the end, not bound, final accuracy 0.74-0.77: stream_recipe (247, 248, 251, 258), scale_axes (221, 223, 225, 226); merged pairs {'SR 247': [2, 3], 'SR 248': [0, 2], 'SR 251': [1, 3], 'SR 258': [0, 2], 'SA 221': [0, 1], 'SA 223': [2, 3], 'SA 225': [2, 3], 'SA 226': [0, 1]}: ok
+  CHECK merge_kick: test_scale_axes, test_stream_channels, test_stream_recipe load read-only from main at 520fe51 (git show; not on this branch): ok
+  CHECK merge_kick: this branch's test modules that differ from main's at 520fe51: ['test_binding_capacity.py', 'test_curriculum_confirm.py'] (test_curriculum_confirm.py docstring only: True; test_binding_capacity.py: main adds the opt-in s_active knob): ok
+  CHECK merge_kick: test_scale_axes.run_job (run_one) seed 221: the rerun to 1200 reproduces the record (True); CONTROL's 1200 continued updates reproduce the recorded evaluation at 2400 ([[2400, 0.1171875, 2.694366455078125]] vs [[2400, 0.1171875, 2.694366455078125]]); identical batches (True); optimizer states equal to the run's (True, True) and stored apart from it (True, True), the run's left unchanged (True); KICKS logged 2 kicks at 100x the batch gradient norm (max relative difference 2.1e-07): ok
+  CHECK merge_kick: the separation test has teeth: a state loaded without a deep copy (batch 5's S14 load) shares storage with the run's optimizer (True): ok
+  CHECK merge_kick: test_stream_recipe.run_attempt (plain A4k4) seed 247: the rerun to 1200 reproduces the record (True); CONTROL's 1200 continued updates reproduce the recorded evaluation at 2400 ([[2400, 0.17236328125, 2.406351089477539]] vs [[2400, 0.17236328125, 2.406351089477539]]); identical batches (True); optimizer states equal to the run's (True, True) and stored apart from it (True, True), the run's left unchanged (True); KICKS logged 2 kicks at 100x the batch gradient norm (max relative difference 1.6e-07): ok
+  all CHECKs passed (15.8 min)
+  recorded the full CHECK pass at 9a51dbe in /home/user/clankers/explore_out/batch7_checks.json
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN token_hinge
+  idea    S13's hinge plus a third term on the key token's identity (eta2_key), near and far
+  source  batch 6's S17 (blocking the position split on the header layout exposed key splits); S11 (fresh gates land in key splits)
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] of the read gate at key positions, on each training batch
+  arm FAR_TOK      lr 0.001  iters 24000  seeds 160-169 (10)  — far_A_slow + hinge on position and key-token eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm NEAR_TOK     lr 0.001  iters 24000  seeds 160-179 (20)  — SLOW_MEM + hinge on position and key-token eta^2 (TAU 0.2), grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch
+  pairing FAR_TOK seeds 160-169 with S17's FAR_SLOW_HINGE and batch 3's far_A_slow; NEAR_TOK seeds 160-179 with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN kick_untimed
+  idea    one Gaussian kick at update 120, sized as S16's median first kick, with no trigger
+  source  batch 6's S16 (random kicks on the hinge's batches did about as well as the hinge); Adam's response to a single large gradient
+  change  SLOW_MEM + one Gaussian tensor added to the .grad of W_in, W_h, W_g, embed.weight at update 120, each at the median norm of S16's first kicks on that tensor
+  arm KICK120      lr 0.001  iters 24000  seeds 160-199 (40)  — SLOW_MEM + one Gaussian kick at update 120 (S16's median first-kick norms)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 / S7), SLOW_HINGE (S13), and on S16's 20 seeds with KICK (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN merge_kick
+  idea    large gate kicks (100x the batch gradient, every 600 updates) on S=4 runs with two streams merged
+  source  the main line's S=4, k=4 runs (merges at 9600: 10 of 22 split later); batch 6's S16 (a kick's size, not its direction, did most of the hinge's work)
+  change  none to the recorded runs up to 9600; then 9600 updates twice from that state: CONTROL plain, KICKS with a Gaussian kick of 100x the gradient norm on W_in, W_h, W_g every 600 updates
+  arm SR_A4k4      lr 0.001  iters 28800  seeds [247, 248, 251, 258] (4)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  arm SA_A4k4      lr 0.001  iters 28800  seeds [221, 223, 225, 226] (4)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  pairing each run's KICKS against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    token_hinge    FAR_TOK    10 runs x   8.3 min  (24000 steps x 19.8 ms + 20 evals x 1.0 s)
+    token_hinge    NEAR_TOK   20 runs x  11.4 min  (24000 steps x 26.9 ms + 20 evals x 1.9 s)
+    kick_untimed   KICK120    40 runs x   9.8 min  (24000 steps x 23.0 ms + 20 evals x 1.7 s)
