@@ -109,9 +109,9 @@ STREAM-PARTIAL 1 (SLOW_HINGE OTHER 4, KEY 2; SLOW_MEM POSITION 11, KEY 3, OTHER 
 S17: 9 KEY splits and 1 bound by a key split (166); far_A_slow's 8 POSITION failures are gone, replaced by KEY
 splits. The hinge fired on 65 of 224400 training batches (1-22 per run).
 
-S18 stuck_memory (diagnostic): no run reads "recency" or "primacy"; with the learned gate the stalled header runs
-answer 0.51-0.57 in both blocks and at every key position (blocked: 0.32-0.36), and 6-8% of wrong answers are the
-other stream's value (1/15 = 0.067 for a uniformly drawn wrong value). 24000 perfect-gate updates: far_nudge 161
-"slow" (1.00 from +3600; its learned gate answers the first key of each block 1.000, the others 0.36-0.48); the
-other 7 "basin" (header 0.51-0.56, blocked 0.32-0.35 throughout). Extra: S14's learned-gate control redone with the
+S18 stuck_memory (diagnostic): no run reads "recency" or "primacy". With the learned gate the stalled header runs
+answer 0.51-0.57 in either block (blocked: 0.32-0.36) and 0.50-0.57 at each key position (blocked: 0.31-0.39),
+except far_nudge 161, which answers the first key of each block 1.000 and the others 0.36-0.45; 6-8% of wrong
+answers are the other stream's value (1/15 = 0.067 for a uniformly drawn wrong value). 24000 perfect-gate updates:
+far_nudge 161 "slow" (1.00 from +3600); the other 7 "basin" (header 0.51-0.56, blocked 0.32-0.35 throughout). Extra: S14's learned-gate control redone with the
 run's own optimizer state leaves every S14 reading unchanged (far_nudge 161 MEMORY-STUCK; the rest NEITHER).
