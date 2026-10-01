@@ -1,0 +1,36 @@
+{
+ "meta": {
+  "arms": {
+   "KICK": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "KICK",
+    "label": "SLOW_MEM + random kicks sized as S13's hinge gradient (at most N_s per seed)",
+    "lr": 0.001,
+    "lr_gate": 0.001,
+    "lr_rest_warm": 0.0001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + on a batch where S13's hinge (TAU 0.2) would fire, a Gaussian tensor of the hinge gradient's norm added to W_in, W_h, W_g, embed.weight's .grad (at most N_s kicks per seed)",
+    "seeds": [
+     162
+    ],
+    "warm_updates": 2400
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "8407985",
+   "python": "3.11.15",
+   "started": "2026-10-01 04:06:56",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

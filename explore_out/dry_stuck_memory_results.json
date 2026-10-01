@@ -1,0 +1,65 @@
+{
+ "meta": {
+  "arms": {
+   "blk_A": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "blk_A",
+    "label": "X's test_router_layout A_blocked",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     120
+    ]
+   },
+   "hdr_far_A": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "hdr_far_A",
+    "label": "batch 2's far_A",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     165
+    ]
+   },
+   "hdr_far_nudge": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "hdr_far_nudge",
+    "label": "batch 4's far_nudge",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     161
+    ]
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "8407985",
+   "python": "3.11.15",
+   "started": "2026-10-01 04:06:56",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
