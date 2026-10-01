@@ -8,3 +8,6 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
   S21 rule: 'kicks split merges' if >= 4/8 split under KICKS; 'they do not' if <= 1/8; else neither (split: the merged pair on different channels and accuracy >= 0.95 at some evaluation up to 19200)
   ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
   order (--order): merge_kick, token_hinge, kick_untimed — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (74s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
