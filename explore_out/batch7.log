@@ -76,3 +76,5 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
           acc 0.757  trans  None  VALcos 0.004  margin 0.81  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [  4/78]   25.1 min  merge_kick     SA_A4k4    seed 225  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates)
           acc 0.751  trans  None  VALcos 0.004  margin 0.83  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+
+#################### RESTART 2026-10-01 22:43:50 UTC — the container was restarted during the first segment (4 of 78 runs saved: S21 SA_A4k4 221, 223, 225, 226; the 4 SR_A4k4 runs in flight were lost and re-run). The next segment resumes with --resume: the repro check runs, the rest of the CHECK suite is skipped only if the screen code is unchanged since the recorded full pass. (EXPLORATORY, not a result) ####################
