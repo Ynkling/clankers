@@ -17,3 +17,10 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
   CHECK dry_kick_control: each logged kick's norm equals the hinge gradient's it replaced (random KICK, seed 162, 1200 steps: 3 kicks, max relative norm difference 2.0e-07 < 1e-5; max |cos(kick, hinge gradient)| 0.15): ok
   CHECK dry_kick_control: the kick enters .grad exactly: grad with a kick - grad without = the kick on W_in, W_h, W_g, embed.weight (max abs diff 3.0e-08; largest |kick| or |task gradient| 2.6e-01); every other parameter's gradient bitwise unchanged: ok
   CHECK dry_kick_control: the budget stops the kicks (budget 2, hinge firing on 5 batches: kicks 2, would fire 5): ok
+  CHECK dry_far_slow_hinge: TAU = 1.0 equals far_A_slow bit for bit through 3600 steps (curves = a fresh far_A_slow run = batch 3's record; weights equal; hinge fraction 0.0): ok
+  CHECK dry_far_slow_hinge: the penalty equals header_routing_stats' eta_key_by_index / _by_half on a probe batch, at init and on a gate far from uniform (max diff 5.3e-07 < 1e-5); at the grouped layout's positions it equals explore_slow_pos.pos_penalty bit for bit: ok
+  CHECK dry_far_slow_hinge: key positions [1, 3, 5, 7, 10, 12, 14, 16] (pairs in order of appearance; half = block): ok
+  CHECK dry_far_slow_hinge: on 20 probe batches of the header layout the perfect gate scores below 0.1 on both terms (max 0.0198) and a gate set by block scores above 0.5 on eta2_half (min 1.0000): ok
+  CHECK dry_far_slow_hinge: the hinge's gradient (TAU = 0) reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK dry_far_slow_hinge: with both terms below TAU = 0.2 (eta2 index 0.037, half 0.001) the hinge's gradient is exactly zero: ok
+  NOTE dry_far_slow_hinge (arithmetic, not a check): on a training batch of 32 the perfect gate's eta2_index = eta2_half = 4 (m - 1/2)^2 (m = share of sequences whose first block is stream 0's); it exceeds TAU = 0.2 with probability 0.0070 per batch (exact binomial; 11/2000 = 0.0055 on sampled batches). The hinge also fires, now and then, on a routed gate.
