@@ -1,0 +1,85 @@
+{
+ "meta": {
+  "arms": {
+   "FAR_TOK": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "FAR_TOK",
+    "label": "far_A_slow + hinge on position and key-token eta^2 (TAU 0.2), header layout",
+    "layout": "header",
+    "lr": 0.001,
+    "lr_gate": 0.001,
+    "lr_rest_warm": 0.0001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169
+    ],
+    "warm_updates": 2400
+   },
+   "NEAR_TOK": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "NEAR_TOK",
+    "label": "SLOW_MEM + hinge on position and key-token eta^2 (TAU 0.2), grouped layout",
+    "layout": "grouped",
+    "lr": 0.001,
+    "lr_gate": 0.001,
+    "lr_rest_warm": 0.0001,
+    "mult": 8,
+    "n_ch": 2,
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169,
+     170,
+     171,
+     172,
+     173,
+     174,
+     175,
+     176,
+     177,
+     178,
+     179
+    ],
+    "warm_updates": 2400
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "df03a49+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-01 21:39:40",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
