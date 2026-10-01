@@ -68,3 +68,11 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
     merge_kick     SA_A4k4     4 runs x  24.6 min  (28800 steps x 47.1 ms + 24 evals x 5.0 s)
     total 14.92 h of runs; makespan on 4 workers 3.80 h (worst case)
   78 runs queued on 4 workers (1 torch thread each)
+  [  1/78]   25.1 min  merge_kick     SA_A4k4    seed 226  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates)
+          acc 0.743  trans  None  VALcos 1.000  margin 0.82  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  2/78]   25.1 min  merge_kick     SA_A4k4    seed 221  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates)
+          acc 0.759  trans  None  VALcos 1.000  margin 0.79  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  3/78]   25.1 min  merge_kick     SA_A4k4    seed 223  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates)
+          acc 0.757  trans  None  VALcos 0.004  margin 0.81  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  4/78]   25.1 min  merge_kick     SA_A4k4    seed 225  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates)
+          acc 0.751  trans  None  VALcos 0.004  margin 0.83  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
