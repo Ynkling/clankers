@@ -171,3 +171,5 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
           acc 1.000  trans 20400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
   [ 16/74]   49.6 min  token_hinge    FAR_TOK    seed 165  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
           acc 1.000  trans 12000  VALcos 0.738  margin 0.01  BOUND unrouted  ROUTED* 1200/2400/end -/-/-
+  [ 17/74]   50.2 min  token_hinge    FAR_TOK    seed 166  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+          acc 1.000  trans  7200  VALcos 0.246  margin 0.04  DISCOVERED  ROUTED* 1200/2400/end -/-/-
