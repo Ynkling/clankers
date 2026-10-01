@@ -8,3 +8,6 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
   S18: diagnostic; per run 'recency' (learned gate: last-block >= 0.9, first-block <= 0.2) / 'primacy' (the reverse) / neither, and 'slow' (perfect-gate continuation >= 0.95) / 'basin'
   ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
   order (--order): stuck_memory, kick_control, far_slow_hinge — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (57s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
