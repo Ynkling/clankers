@@ -77,3 +77,124 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
           acc 0.498  trans  None  VALcos 0.000  margin 1.00  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [  4/5]    2.3 min  dry_stuck_memory blk_A      seed 120  lr 0.001 (lr 0.001 throughout)
           acc 0.176  trans  None  VALcos 1.000  margin -0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  5/5]    2.6 min  dry_far_slow_hinge FAR_SLOW_HINGE seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] at the header KEY positions on each training batch)
+          acc 0.503  trans  None  VALcos 1.000  margin 0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 2.6 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_kick_control
+  idea    S13's hinge replaced by a random kick of the same size, on the batches where it would fire
+  source  batch 5's S13 (a few hinge firings flipped POSITION failures to DISCOVERED); random-direction controls for a gradient intervention
+  change  SLOW_MEM; on each batch where S13's hinge would be nonzero (at most N_s per seed), add to W_in, W_h, W_g, embed.weight a Gaussian tensor scaled to the hinge gradient's norm on that tensor; the hinge's own gradient is not applied
+  arm KICK         lr 0.001  iters 3600  seeds 162-162 (1)  — SLOW_MEM + random kicks sized as S13's hinge gradient (at most N_s per seed)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + on a batch where S13's hinge (TAU 0.2) would fire, a Gaussian tensor of the hinge gradient's norm added to W_in, W_h, W_g, embed.weight's .grad (at most N_s kicks per seed)
+  pairing the 20 seeds where S13's hinge fired, paired with SLOW_HINGE (S13) and SLOW_MEM (S5 / S7) on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; N_s = S13's hinge firings on the seed = the kick budget; kicks = kicks used; fires = batches where the hinge would have fired in this run; first = update of the first kick):
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_HINGE      SLOW_MEM         N_s kicks fires  first norm diff
+     162  0.485   None   1.000   0.00  0.00/0.07/0.73/0.93  -/-/-/-  POSITION        DISCOVERED      POSITION           3     3  2592    104   2.0e-07
+  vs SLOW_HINGE (S13; the hinge's own direction), 1 seeds:
+    DISCOVERED    KICK  0/1   SLOW_HINGE  1/1   KICK only 0, SLOW_HINGE only 1, McNemar two-sided p = 1
+    ROUTED*@1200  KICK  0/1   SLOW_HINGE  0/1   KICK only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+  vs SLOW_MEM (no kick), 1 seeds:
+    DISCOVERED    KICK  0/1   SLOW_MEM  0/1   KICK only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+    ROUTED*@1200  KICK  0/1   SLOW_MEM  0/1   KICK only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+  failure classes (1 seeds): KICK {'POSITION': 1}   SLOW_HINGE {}   SLOW_MEM {'POSITION': 1}
+  kicks used per seed (budget N_s): 162: 3/3
+  kicks in updates 1-1200: 162: 3
+  READING S16 (KICK DISCOVERED 0/1; 'the direction matters' if <= 7/20, 'a kick of that size suffices' if >= 12/20): the direction matters
+  DRY RUN READING dry_kick_control (KICK DISCOVERED 0/1): the direction matters  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_slow_hinge
+  idea    S13's SLOW_HINGE on the header layout, no nudge (label-free)
+  source  batch 5's S13 (the hinge turned SLOW_MEM's POSITION failures into discoveries); batch 3's far_A_slow (0/10, 8 POSITION)
+  change  far_A_slow + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] of the read gate at the header layout's KEY positions, on each training batch
+  arm FAR_SLOW_HINGE lr 0.001  iters 3600  seeds 160-160 (1)  — far_A_slow + hinge on position eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] at the header KEY positions on each training batch
+  pairing seeds 160-169, paired with batch 3's far_A_slow and batch 2's far_A (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; b3 = batch 3's far_A_slow, b2 = batch 2's far_A; hinge = fraction of training batches with the hinge on, updates 1-1200 / 1-2400 / whole run, and the count):
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b3 far_A_slow   b2 far_A                          hinge
+     160  0.503   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        POSITION        0.001/0.000/0.000     1/3600
+     161 not run                                                                KEY             POSITION       
+     162 not run                                                                POSITION        POSITION       
+     163 not run                                                                POSITION        POSITION       
+     164 not run                                                                STREAM-PARTIAL  OTHER          
+     165 not run                                                                POSITION        STREAM-PARTIAL 
+     166 not run                                                                POSITION        STREAM-PARTIAL 
+     167 not run                                                                POSITION        OTHER          
+     168 not run                                                                POSITION        OTHER          
+     169 not run                                                                POSITION        POSITION       
+  paired with far_A_slow:
+    DISCOVERED    FAR_SLOW_HINGE  0/1   far_A_slow  0/1   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+    BOUND         FAR_SLOW_HINGE  0/1   far_A_slow  0/1   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+    ROUTED*@1200  FAR_SLOW_HINGE  0/1   far_A_slow  0/1   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+    ROUTED*@end   FAR_SLOW_HINGE  0/1   far_A_slow  0/1   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+    STALLS        FAR_SLOW_HINGE  0/1   far_A_slow  0/1   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+  paired with far_A:
+    DISCOVERED    FAR_SLOW_HINGE  0/1   far_A  0/1   FAR_SLOW_HINGE only 0, far_A only 0, McNemar two-sided p = 1
+    BOUND         FAR_SLOW_HINGE  0/1   far_A  0/1   FAR_SLOW_HINGE only 0, far_A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  FAR_SLOW_HINGE  0/1   far_A  0/1   FAR_SLOW_HINGE only 0, far_A only 0, McNemar two-sided p = 1
+    ROUTED*@end   FAR_SLOW_HINGE  0/1   far_A  0/1   FAR_SLOW_HINGE only 0, far_A only 0, McNemar two-sided p = 1
+    STALLS        FAR_SLOW_HINGE  0/1   far_A  0/1   FAR_SLOW_HINGE only 0, far_A only 0, McNemar two-sided p = 1
+    stalls (routed at the end or stream-partial, not bound): FAR_SLOW_HINGE []   far_A_slow []   far_A []
+    failures FAR_SLOW_HINGE {'KEY': 1}   far_A_slow {'POSITION': 1}   far_A {'POSITION': 1}
+    hinge firings: 1/1 runs fired at least once; total 1 of 3600 training batches
+  DRY RUN VERDICT dry_far_slow_hinge: not (DISCOVERED 0/1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_stuck_memory
+  idea    what the stalled routed runs answer (block order, key position, the other stream's value), and a long perfect-gate run
+  source  batch 5's S14 (the stalls are not in the gate) and S15 (SLOW_MEM's schedule prevents them)
+  change  none to the runs; probes at their end states
+  arm hdr_far_nudge lr 0.001  iters 3600  seeds 161-161 (1)  — batch 4's far_nudge
+                   schedule: lr 0.001 throughout
+  arm hdr_far_A    lr 0.001  iters 3600  seeds 165-165 (1)  — batch 2's far_A
+                   schedule: lr 0.001 throughout
+  arm blk_A        lr 0.001  iters 3600  seeds 120-120 (1)  — X's test_router_layout A_blocked
+                   schedule: lr 0.001 throughout
+  pairing each probe against its own recorded run (reproduced exactly first) and S14's probes
+----------------------------------------------------------------------------------------------------
+  per run (rec = recorded final accuracy; (a) on the held-out batch, 2048 queries; (b) 24000 perfect-gate updates from the end state, accuracy every 1200):
+    hdr_far_nudge   161  rec 0.498  rerun reproduces: yes  map stream->channel [0, 1]  breakdown = evaluation: learned yes, perfect yes
+                         (a) learned gate:  overall 0.498  first-block 0.480 (n 973)  last-block 0.514 (n 1075)  key position 0-3 0.807/0.376/0.364/0.443  wrong 1028: other stream's value 0.068
+                             by block x key position: first 0.81/0.33/0.33/0.44  last 0.80/0.41/0.39/0.45
+                         (a) perfect gate:  overall 0.328  first-block 0.321 (n 973)  last-block 0.335 (n 1075)  key position 0-3 0.170/0.453/0.360/0.334  wrong 1376: other stream's value 0.065
+                             by block x key position: first 0.17/0.45/0.36/0.33  last 0.17/0.46/0.36/0.34
+                         (b) perfect-gate continuation: 0.54   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.543  first-block 0.547 (n 973)  last-block 0.540 (n 1075)  key position 0-3 1.000/0.349/0.374/0.445  wrong 936: other stream's value 0.066
+                         (c) extra, S14's learned-gate continuation corrected: 0.49; S14 reading with it: NEITHER; run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    hdr_far_A       165  rec 0.520  rerun reproduces: yes  map stream->channel [0, 1]  breakdown = evaluation: learned yes, perfect yes
+                         (a) learned gate:  overall 0.520  first-block 0.501 (n 973)  last-block 0.537 (n 1075)  key position 0-3 0.547/0.478/0.461/0.589  wrong 984: other stream's value 0.068
+                             by block x key position: first 0.53/0.42/0.42/0.61  last 0.56/0.52/0.50/0.57
+                         (a) perfect gate:  overall 0.517  first-block 0.498 (n 973)  last-block 0.534 (n 1075)  key position 0-3 0.545/0.473/0.457/0.589  wrong 989: other stream's value 0.068
+                             by block x key position: first 0.53/0.42/0.41/0.61  last 0.55/0.52/0.50/0.57
+                         (b) perfect-gate continuation: 0.54   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.538  first-block 0.515 (n 973)  last-block 0.559 (n 1075)  key position 0-3 0.611/0.504/0.461/0.574  wrong 946: other stream's value 0.075
+                         (c) extra, S14's learned-gate continuation corrected: 0.55; S14 reading with it: NEITHER; run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    blk_A           120  rec 0.176  rerun reproduces: yes  map stream->channel [0, 1] (IDENTITY FALLBACK)  breakdown = evaluation: learned yes, perfect yes
+                         (a) learned gate:  overall 0.176  first-block 0.176 (n 973)  last-block 0.176 (n 1075)  key position 0-3 0.188/0.186/0.149/0.181  wrong 1688: other stream's value 0.235
+                             by block x key position: first 0.16/0.20/0.14/0.20  last 0.22/0.17/0.15/0.16
+                         (a) perfect gate:  overall 0.293  first-block 0.284 (n 973)  last-block 0.301 (n 1075)  key position 0-3 0.398/0.302/0.236/0.238  wrong 1448: other stream's value 0.083
+                             by block x key position: first 0.34/0.33/0.25/0.22  last 0.45/0.28/0.22/0.25
+                         (b) perfect-gate continuation: 0.32   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.319  first-block 0.319 (n 973)  last-block 0.320 (n 1075)  key position 0-3 0.293/0.316/0.331/0.336  wrong 1394: other stream's value 0.075
+                         (c) extra, S14's learned-gate continuation corrected: 0.19; S14 reading with it: NEITHER; run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+  SUMMARY of readings (by layout):
+    header   hdr_far_nudge 161: neither; basin, hdr_far_A 165: neither; basin
+    blocked  blk_A 120: neither; basin
+  DRY RUN S18 dry_stuck_memory: diagnostic, 3/3 probes  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S16 kick_control: the direction matters (KICK DISCOVERED 0/1; SLOW_HINGE 1/1, KICK only 0 vs SLOW_HINGE only 1, p = 1; SLOW_MEM 0/1, KICK only 0 vs SLOW_MEM only 0, p = 1)
+  S17 far_slow_hinge: not (DISCOVERED 0/1; batch 3's far_A_slow 0/10, batch 2's far_A 0/10)
+  S18 header   hdr_far_nudge 161: neither; basin, hdr_far_A 165: neither; basin
+  S18 blocked  blk_A 120: neither; basin
+####################################################################################################
