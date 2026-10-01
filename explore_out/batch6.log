@@ -65,3 +65,8 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
   PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
     kick_control   KICK       20 runs x   9.7 min  (24000 steps x 23.3 ms + 20 evals x 0.9 s)
     far_slow_hinge FAR_SLOW_HINGE 10 runs x   8.0 min  (24000 steps x 19.4 ms + 20 evals x 0.7 s)
+    stuck_memory   hdr_far_nudge  3 runs x  26.3 min  (48000 steps x 32.2 ms + 40 evals x 0.7 s)
+    stuck_memory   hdr_far_A   2 runs x  13.5 min  (48000 steps x 16.3 ms + 40 evals x 0.7 s)
+    stuck_memory   blk_A       3 runs x  18.9 min  (48000 steps x 22.9 ms + 40 evals x 0.9 s)
+    total 7.26 h of runs; makespan on 4 workers 1.87 h (worst case)
+  38 runs queued on 4 workers (1 torch thread each)
