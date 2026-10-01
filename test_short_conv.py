@@ -279,9 +279,11 @@ def conv_grad_norms(m):
 
 
 # ── Worker-side ──────────────────────────────────────────────────────────────
-def run_job(sp):
-    return run_one(ARM[sp["arm"]], sp["seed"], sp["iters"], task=TASK, stats_fn=conv_stats,
-                   grad_fn=conv_grad_norms)
+def run_job(sp, recipe=None):
+    """recipe(kw) -> kw rewrites run_one's keyword arguments (test_slow_start's knob); None =
+    unchanged."""
+    kw = dict(task=TASK, stats_fn=conv_stats, grad_fn=conv_grad_norms)
+    return run_one(ARM[sp["arm"]], sp["seed"], sp["iters"], **(kw if recipe is None else recipe(kw)))
 
 
 def spec(key, seed, iters):

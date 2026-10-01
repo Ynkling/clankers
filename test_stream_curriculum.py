@@ -312,13 +312,14 @@ def sc_stats(at_steps):
 
 
 # ── Runs ─────────────────────────────────────────────────────────────────────
-def run_sc(a, seed, sched, decide=None, abandon=False, keep=None):
+def run_sc(a, seed, sched, decide=None, abandon=False, keep=None, recipe=None):
     """One run of arm a from `seed` on test_stream_recipe's run path, on task_for(4, 8) (its held-
     out set, probe and statistics). Curriculum arms (a["cur"]) train on each stage's batches
     (task_at), count the early stop only after t2, and check() evaluates the current stage's set
     at every evaluation up to t2; at t_check it gives decide(step, stage-1 accuracy), and with
     abandon=True a failing attempt stops there (trr.Abandon). D8 (cur False) trains on all 8
-    streams from step 1 with the usual early stop."""
+    streams from step 1 with the usual early stop. recipe(kw) -> kw rewrites run_one's keyword
+    arguments (test_slow_start's knob); None = unchanged."""
     t1, t2, ee, tc = sched["t1"], sched["t2"], sched["eval_every"], sched["t_check"]
     cur = a["cur"]
     decide = trr.make_decide(tc, sched["a_check"]) if decide is None else decide
@@ -340,8 +341,9 @@ def run_sc(a, seed, sched, decide=None, abandon=False, keep=None):
                 raise trr.Abandon(f"stage-1 held-out accuracy {acc:.4f} at step {step}")
 
     run_kw = (dict(task_at=lambda step: STAGE[stage_of(sched, step)], early_stop_after=t2) if cur else None)
-    rec = run_one(a, seed, sched["total"], ee, check=check, keep=keep, task=TASK48, stats_fn=sc_stats((t1, t2)),
-                  grad_fn=conv_grad_norms, lr=LR, builder=tsr.builder_for(a), grad_steps=grad_sc(sched), run_kw=run_kw)
+    kw = dict(check=check, keep=keep, task=TASK48, stats_fn=sc_stats((t1, t2)), grad_fn=conv_grad_norms, lr=LR,
+              builder=tsr.builder_for(a), grad_steps=grad_sc(sched), run_kw=run_kw)
+    rec = run_one(a, seed, sched["total"], ee, **(kw if recipe is None else recipe(kw)))
     rec.update(curve_stage=info["curve_stage"], acc_check=info.get("acc_check"), passed=info.get("passed"))
     if rec["ok"]:
         rec["transition_full"] = rec["transition"]

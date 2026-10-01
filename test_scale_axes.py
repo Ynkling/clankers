@@ -334,10 +334,13 @@ def fail_class_k(r):
 
 
 # ── Jobs ─────────────────────────────────────────────────────────────────────
-def run_job(sp):
+def run_job(sp, recipe=None):
+    """recipe(kw) -> kw rewrites run_one's keyword arguments (test_slow_start's knob); None =
+    unchanged."""
     a = ARM[sp["arm"]]
-    return run_one(a, sp["seed"], sp["iters"], task=TASKS[a["task"]], stats_fn=scale_stats,
-                   grad_fn=conv_grad_norms, lr=LR, builder=builder_for(a))
+    kw = dict(task=TASKS[a["task"]], stats_fn=scale_stats, grad_fn=conv_grad_norms, lr=LR,
+              builder=builder_for(a))
+    return run_one(a, sp["seed"], sp["iters"], **(kw if recipe is None else recipe(kw)))
 
 
 def spec(key, seed, iters):
