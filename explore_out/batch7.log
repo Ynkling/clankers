@@ -133,3 +133,9 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
 ----------------------------------------------------------------------------------------------------
   PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
     token_hinge    FAR_TOK    10 runs x  11.0 min  (24000 steps x 26.2 ms + 20 evals x 1.7 s)
+    token_hinge    NEAR_TOK   20 runs x  12.5 min  (24000 steps x 29.2 ms + 20 evals x 2.5 s)
+    kick_untimed   KICK120    40 runs x  12.2 min  (24000 steps x 28.6 ms + 20 evals x 2.3 s)
+    merge_kick     SR_A4k4     4 runs x  30.1 min  (28800 steps x 57.5 ms + 24 evals x 6.1 s)
+    merge_kick     SA_A4k4     4 runs x  28.9 min  (28800 steps x 55.4 ms + 24 evals x 5.9 s)
+    total 18.09 h of runs; makespan on 4 workers 4.61 h (worst case)
+  74 runs queued on 4 workers (1 torch thread each)
