@@ -1,0 +1,10 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), merge_kick (S21) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git 7dadd6c | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S21: rerun to 9600, then 9600 continued updates twice), task P=4 S=2 n_vals=16 n_q=1 (S21: task_for(4, 4), k=4, conv), 1 torch thread per run
+  S19 rule: FAR_TOK promising if DISCOVERED >= 4/10, not if <= 1/10, else inconclusive; NEAR_TOK 'keeps the near case' if >= 16/20, 'costs the near case' if <= 13/20, else neither
+  S20 rule (vs SLOW_MEM, 40 seeds): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive (DISCOVERED); reading: 'the trigger is not needed' if easy >= 18/20 and hard >= 10/20; 'an untimed kick costs the easy seeds' if easy <= 16/20; else neither
+  S21 rule: 'kicks split merges' if >= 4/8 split under KICKS; 'they do not' if <= 1/8; else neither (split: the merged pair on different channels and accuracy >= 0.95 at some evaluation up to 19200)
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): merge_kick, token_hinge, kick_untimed — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
