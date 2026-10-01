@@ -11,3 +11,9 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (63s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_kick_control: the seeds are the 20 on which S13's hinge fired (N_s from slow_hinge_results.json): [162, 166, 167, 168, 171, 172, 173, 175, 176, 177, 180, 187, 189, 190, 192, 193, 195, 196, 197, 199]; budgets [3, 1, 834, 1, 34, 1, 1, 1, 1, 1, 2, 2, 11, 3, 3, 179, 1, 1, 1938, 2]: ok
+  CHECK dry_kick_control: N_s = 0 equals SLOW_MEM bit for bit through 3600 steps on seed 162 (curves = a fresh SLOW_MEM run = batch 2's record; weights equal; the hinge would have fired on 3497 batches, kicks used 0): ok
+  CHECK dry_kick_control: the kick path with the hinge's own gradient on seed 162 vs S13's SLOW_HINGE: not bit-identical; largest curve difference through 3600 steps |acc| 0.00977, |loss| 0.0161; outcome DISCOVERED trans 3600 vs S13 DISCOVERED trans 3600 (kicks used 3 of budget 3, would fire 3); the batch continues only if the outcome matches: ok
+  CHECK dry_kick_control: each logged kick's norm equals the hinge gradient's it replaced (random KICK, seed 162, 1200 steps: 3 kicks, max relative norm difference 2.0e-07 < 1e-5; max |cos(kick, hinge gradient)| 0.15): ok
+  CHECK dry_kick_control: the kick enters .grad exactly: grad with a kick - grad without = the kick on W_in, W_h, W_g, embed.weight (max abs diff 3.0e-08; largest |kick| or |task gradient| 2.6e-01); every other parameter's gradient bitwise unchanged: ok
+  CHECK dry_kick_control: the budget stops the kicks (budget 2, hinge firing on 5 batches: kicks 2, would fire 5): ok
