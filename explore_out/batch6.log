@@ -104,3 +104,5 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
           acc 0.874  trans  None  VALcos 0.316  margin 0.79  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [ 17/38]   42.3 min  kick_control   KICK       seed 177  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + on a batch where S13's hinge (TAU 0.2) would fire, a Gaussian tensor of the hinge gradient's norm added to W_in, W_h, W_g, embed.weight's .grad (at most N_s kicks per seed))
           acc 1.000  trans  3600  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/Y/Y
+  [ 18/38]   44.2 min  kick_control   KICK       seed 180  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + on a batch where S13's hinge (TAU 0.2) would fire, a Gaussian tensor of the hinge gradient's norm added to W_in, W_h, W_g, embed.weight's .grad (at most N_s kicks per seed))
+          acc 1.000  trans  3600  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/Y/Y
