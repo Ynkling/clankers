@@ -144,3 +144,190 @@ EXPLORATORY, NOT A RESULT — batch 6: kick_control (S16), far_slow_hinge (S17),
           acc 0.495  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
   [ 37/38]   76.0 min  far_slow_hinge FAR_SLOW_HINGE seed 168  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] at the header KEY positions on each training batch)
           acc 0.289  trans  None  VALcos 1.000  margin 0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  [ 38/38]   78.9 min  far_slow_hinge FAR_SLOW_HINGE seed 169  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] at the header KEY positions on each training batch)
+          acc 0.646  trans  None  VALcos 1.000  margin -0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 78.9 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN kick_control
+  idea    S13's hinge replaced by a random kick of the same size, on the batches where it would fire
+  source  batch 5's S13 (a few hinge firings flipped POSITION failures to DISCOVERED); random-direction controls for a gradient intervention
+  change  SLOW_MEM; on each batch where S13's hinge would be nonzero (at most N_s per seed), add to W_in, W_h, W_g, embed.weight a Gaussian tensor scaled to the hinge gradient's norm on that tensor; the hinge's own gradient is not applied
+  arm KICK         lr 0.001  iters 24000  seeds [162, 166, 167, 168, 171, 172, 173, 175, 176, 177, 180, 187, 189, 190, 192, 193, 195, 196, 197, 199] (20)  — SLOW_MEM + random kicks sized as S13's hinge gradient (at most N_s per seed)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + on a batch where S13's hinge (TAU 0.2) would fire, a Gaussian tensor of the hinge gradient's norm added to W_in, W_h, W_g, embed.weight's .grad (at most N_s kicks per seed)
+  pairing the 20 seeds where S13's hinge fired, paired with SLOW_HINGE (S13) and SLOW_MEM (S5 / S7) on the same seeds (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; N_s = S13's hinge firings on the seed = the kick budget; kicks = kicks used; fires = batches where the hinge would have fired in this run; first = update of the first kick):
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_HINGE      SLOW_MEM         N_s kicks fires  first norm diff
+     162  1.000   4800   0.011   0.97  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      DISCOVERED      POSITION           3     3  3123    104   2.0e-07
+     166  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION           1     1   595    155   0.0e+00
+     167  0.507   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             OTHER           POSITION         834    31    31    100   1.8e-07
+     168  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED         1     1    72    138   0.0e+00
+     171  0.874   None   0.316   0.79  0.60/0.20/0.00/0.00  -/-/-/-  STREAM-PARTIAL  OTHER           OTHER             34     6     6    132   1.7e-07
+     172  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED         1     1     1   3572   1.3e-07
+     173  0.480   None   1.000   0.00  0.00/0.20/0.00/0.60  -/-/-/-  POSITION        DISCOVERED      POSITION           1     1 21861    126   7.3e-08
+     175  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION           1     1     9     49   9.4e-08
+     176  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION           1     1   185    133   1.1e-07
+     177  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION           1     1     2     50   1.3e-07
+     180  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION           2     2  1112    141   8.8e-08
+     187  0.400   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             KEY                2     2     3   2267   1.1e-07
+     189  0.500   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             KEY               11    11    44    153   1.6e-07
+     190  0.503   None   1.000  -0.01  0.00/0.00/0.23/0.99  -/-/-/-  POSITION        DISCOVERED      POSITION           3     3 22405    107   1.2e-07
+     192  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      OTHER              3     3  1518    155   1.1e-07
+     193  0.511   None   1.000  -0.00  0.02/0.05/0.02/0.12  -/-/-/-  OTHER           OTHER           KEY              179   179   958    117   2.0e-07
+     195  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED         1     1     7    151   9.1e-08
+     196  0.488   None   1.000  -0.01  0.00/0.00/0.18/1.00  -/-/-/-  POSITION        DISCOVERED      DISCOVERED         1     1 23816    164   6.7e-08
+     197  1.000   4800   0.020   0.95  1.00/0.00/0.00/0.01  -/-/-/Y  DISCOVERED      OTHER           POSITION        1938   506   506    110   2.3e-07
+     199  1.000   4800   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      POSITION           2     2  1076    126   1.2e-07
+  vs SLOW_HINGE (S13; the hinge's own direction), 20 seeds:
+    DISCOVERED    KICK 12/20   SLOW_HINGE 14/20   KICK only 1, SLOW_HINGE only 3, McNemar two-sided p = 0.625
+    ROUTED*@1200  KICK  4/20   SLOW_HINGE  8/20   KICK only 0, SLOW_HINGE only 4, McNemar two-sided p = 0.125
+  vs SLOW_MEM (no kick), 20 seeds:
+    DISCOVERED    KICK 12/20   SLOW_MEM  4/20   KICK only 9, SLOW_MEM only 1, McNemar two-sided p = 0.0215
+    ROUTED*@1200  KICK  4/20   SLOW_MEM  3/20   KICK only 1, SLOW_MEM only 0, McNemar two-sided p = 1
+  failure classes (20 seeds): KICK {'KEY': 3, 'STREAM-PARTIAL': 1, 'POSITION': 3, 'OTHER': 1}   SLOW_HINGE {'OTHER': 4, 'KEY': 2}   SLOW_MEM {'POSITION': 11, 'OTHER': 2, 'KEY': 3}
+  kicks used per seed (budget N_s): 162: 3/3, 166: 1/1, 167: 31/834, 168: 1/1, 171: 6/34, 172: 1/1, 173: 1/1, 175: 1/1, 176: 1/1, 177: 1/1, 180: 2/2, 187: 2/2, 189: 11/11, 190: 3/3, 192: 3/3, 193: 179/179, 195: 1/1, 196: 1/1, 197: 506/1938, 199: 2/2
+  kicks in updates 1-1200: 162: 3, 166: 1, 167: 24, 168: 1, 171: 6, 172: 0, 173: 1, 175: 1, 176: 1, 177: 1, 180: 2, 187: 0, 189: 11, 190: 3, 192: 3, 193: 179, 195: 1, 196: 1, 197: 434, 199: 2
+  READING S16 (KICK DISCOVERED 12/20; 'the direction matters' if <= 7/20, 'a kick of that size suffices' if >= 12/20): a kick of that size suffices
+  READING kick_control (KICK DISCOVERED 12/20): a kick of that size suffices  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_slow_hinge
+  idea    S13's SLOW_HINGE on the header layout, no nudge (label-free)
+  source  batch 5's S13 (the hinge turned SLOW_MEM's POSITION failures into discoveries); batch 3's far_A_slow (0/10, 8 POSITION)
+  change  far_A_slow + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] of the read gate at the header layout's KEY positions, on each training batch
+  arm FAR_SLOW_HINGE lr 0.001  iters 24000  seeds 160-169 (10)  — far_A_slow + hinge on position eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] at the header KEY positions on each training batch
+  pairing seeds 160-169, paired with batch 3's far_A_slow and batch 2's far_A (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; b3 = batch 3's far_A_slow, b2 = batch 2's far_A; hinge = fraction of training batches with the hinge on, updates 1-1200 / 1-2400 / whole run, and the count):
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         b3 far_A_slow   b2 far_A                          hinge
+     160  0.489   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        POSITION        0.001/0.000/0.000     1/24000
+     161  0.622   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             POSITION        0.001/0.001/0.001    22/24000
+     162  0.514   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             POSITION        POSITION        0.001/0.000/0.000     1/24000
+     163  0.477   None   1.000   0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             POSITION        POSITION        0.001/0.000/0.000     3/24000
+     164  0.503   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             STREAM-PARTIAL  OTHER           0.002/0.001/0.000     7/24000
+     165  0.485   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             POSITION        STREAM-PARTIAL  0.001/0.000/0.000     1/24000
+     166  0.977   6000   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  BOUND unrouted  POSITION        STREAM-PARTIAL  0.002/0.001/0.001    10/8400
+     167  0.495   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        OTHER           0.001/0.001/0.000     8/24000
+     168  0.289   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             POSITION        OTHER           0.002/0.001/0.000     3/24000
+     169  0.646   None   1.000  -0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             POSITION        POSITION        0.002/0.002/0.000     9/24000
+  paired with far_A_slow:
+    DISCOVERED    FAR_SLOW_HINGE  0/10   far_A_slow  0/10   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+    BOUND         FAR_SLOW_HINGE  1/10   far_A_slow  0/10   FAR_SLOW_HINGE only 1, far_A_slow only 0, McNemar two-sided p = 1
+    ROUTED*@1200  FAR_SLOW_HINGE  0/10   far_A_slow  0/10   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+    ROUTED*@end   FAR_SLOW_HINGE  0/10   far_A_slow  0/10   FAR_SLOW_HINGE only 0, far_A_slow only 0, McNemar two-sided p = 1
+    STALLS        FAR_SLOW_HINGE  0/10   far_A_slow  1/10   FAR_SLOW_HINGE only 0, far_A_slow only 1, McNemar two-sided p = 1
+  paired with far_A:
+    DISCOVERED    FAR_SLOW_HINGE  0/10   far_A  0/10   FAR_SLOW_HINGE only 0, far_A only 0, McNemar two-sided p = 1
+    BOUND         FAR_SLOW_HINGE  1/10   far_A  0/10   FAR_SLOW_HINGE only 1, far_A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  FAR_SLOW_HINGE  0/10   far_A  0/10   FAR_SLOW_HINGE only 0, far_A only 0, McNemar two-sided p = 1
+    ROUTED*@end   FAR_SLOW_HINGE  0/10   far_A  2/10   FAR_SLOW_HINGE only 0, far_A only 2, McNemar two-sided p = 0.5
+    STALLS        FAR_SLOW_HINGE  0/10   far_A  2/10   FAR_SLOW_HINGE only 0, far_A only 2, McNemar two-sided p = 0.5
+    stalls (routed at the end or stream-partial, not bound): FAR_SLOW_HINGE []   far_A_slow [164]   far_A [165, 166]
+    failures FAR_SLOW_HINGE {'KEY': 9}   far_A_slow {'POSITION': 8, 'KEY': 1, 'STREAM-PARTIAL': 1}   far_A {'POSITION': 5, 'OTHER': 3, 'STREAM-PARTIAL': 2}
+    hinge firings: 10/10 runs fired at least once; total 65 of 224400 training batches
+  VERDICT far_slow_hinge: not (DISCOVERED 0/10)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN stuck_memory
+  idea    what the stalled routed runs answer (block order, key position, the other stream's value), and a long perfect-gate run
+  source  batch 5's S14 (the stalls are not in the gate) and S15 (SLOW_MEM's schedule prevents them)
+  change  none to the runs; probes at their end states
+  arm hdr_far_nudge lr 0.001  iters 24000  seeds [161, 164, 165] (3)  — batch 4's far_nudge
+                   schedule: lr 0.001 throughout
+  arm hdr_far_A    lr 0.001  iters 24000  seeds 165-166 (2)  — batch 2's far_A
+                   schedule: lr 0.001 throughout
+  arm blk_A        lr 0.001  iters 24000  seeds [120, 130, 136] (3)  — X's test_router_layout A_blocked
+                   schedule: lr 0.001 throughout
+  pairing each probe against its own recorded run (reproduced exactly first) and S14's probes
+----------------------------------------------------------------------------------------------------
+  per run (rec = recorded final accuracy; (a) on the held-out batch, 2048 queries; (b) 24000 perfect-gate updates from the end state, accuracy every 1200):
+    hdr_far_nudge   161  rec 0.553  rerun reproduces: yes  map stream->channel [0, 1]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.553  first-block 0.535 (n 973)  last-block 0.568 (n 1075)  key position 0-3 1.000/0.398/0.364/0.447  wrong 916: other stream's value 0.061
+                             by block x key position: first 1.00/0.36/0.36/0.41  last 1.00/0.43/0.37/0.48
+                         (a) perfect gate:  overall 0.469  first-block 0.454 (n 973)  last-block 0.482 (n 1075)  key position 0-3 0.711/0.457/0.386/0.326  wrong 1088: other stream's value 0.059
+                             by block x key position: first 0.72/0.45/0.39/0.27  last 0.70/0.47/0.39/0.38
+                         (b) perfect-gate continuation: 0.55 0.54 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00   first >= 0.95: +3600
+                             after (b), perfect gate (extra): overall 1.000  first-block 1.000 (n 973)  last-block 1.000 (n 1075)  key position 0-3 1.000/1.000/1.000/1.000  wrong 0: other stream's value --
+                         (c) extra, S14's learned-gate continuation corrected: 0.55/0.54/0.54/0.55 (batch 5's: 0.54/0.53/0.54/0.54); S14 reading with it: MEMORY-STUCK (batch 5's: MEMORY-STUCK); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; slow (>= 0.95 at +3600)
+    hdr_far_nudge   164  rec 0.524  rerun reproduces: yes  map stream->channel [1, 0]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.524  first-block 0.541 (n 973)  last-block 0.510 (n 1075)  key position 0-3 0.529/0.543/0.498/0.528  wrong 974: other stream's value 0.078
+                             by block x key position: first 0.54/0.61/0.52/0.50  last 0.52/0.49/0.48/0.56
+                         (a) perfect gate:  overall 0.523  first-block 0.539 (n 973)  last-block 0.510 (n 1075)  key position 0-3 0.529/0.543/0.494/0.528  wrong 976: other stream's value 0.079
+                             by block x key position: first 0.54/0.61/0.51/0.50  last 0.52/0.49/0.48/0.56
+                         (b) perfect-gate continuation: 0.53 0.54 0.54 0.52 0.51 0.52 0.52 0.52 0.53 0.53 0.52 0.54 0.53 0.52 0.53 0.52 0.54 0.53 0.51 0.53   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.530  first-block 0.549 (n 973)  last-block 0.513 (n 1075)  key position 0-3 0.518/0.549/0.488/0.564  wrong 963: other stream's value 0.082
+                         (c) extra, S14's learned-gate continuation corrected: 0.53/0.53/0.53/0.53 (batch 5's: 0.54/0.53/0.54/0.52); S14 reading with it: NEITHER (batch 5's: NEITHER); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    hdr_far_nudge   165  rec 0.545  rerun reproduces: yes  map stream->channel [0, 1]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.545  first-block 0.532 (n 973)  last-block 0.557 (n 1075)  key position 0-3 0.562/0.543/0.516/0.560  wrong 931: other stream's value 0.077
+                             by block x key position: first 0.55/0.53/0.46/0.59  last 0.58/0.56/0.57/0.53
+                         (a) perfect gate:  overall 0.543  first-block 0.527 (n 973)  last-block 0.557 (n 1075)  key position 0-3 0.561/0.541/0.512/0.558  wrong 936: other stream's value 0.079
+                             by block x key position: first 0.53/0.52/0.46/0.59  last 0.58/0.56/0.56/0.53
+                         (b) perfect-gate continuation: 0.54 0.54 0.54 0.54 0.54 0.54 0.55 0.54 0.54 0.56 0.56 0.54 0.55 0.54 0.54 0.56 0.55 0.54 0.54 0.55   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.548  first-block 0.531 (n 973)  last-block 0.563 (n 1075)  key position 0-3 0.523/0.547/0.541/0.579  wrong 926: other stream's value 0.073
+                         (c) extra, S14's learned-gate continuation corrected: 0.54/0.54/0.55/0.54 (batch 5's: 0.53/0.54/0.55/0.54); S14 reading with it: NEITHER (batch 5's: NEITHER); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    hdr_far_A       165  rec 0.542  rerun reproduces: yes  map stream->channel [0, 1]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.542  first-block 0.532 (n 973)  last-block 0.550 (n 1075)  key position 0-3 0.549/0.539/0.510/0.568  wrong 939: other stream's value 0.076
+                             by block x key position: first 0.53/0.53/0.46/0.60  last 0.57/0.54/0.55/0.53
+                         (a) perfect gate:  overall 0.542  first-block 0.532 (n 973)  last-block 0.550 (n 1075)  key position 0-3 0.549/0.539/0.510/0.568  wrong 939: other stream's value 0.076
+                             by block x key position: first 0.53/0.53/0.46/0.60  last 0.57/0.54/0.55/0.53
+                         (b) perfect-gate continuation: 0.54 0.54 0.54 0.55 0.55 0.54 0.55 0.53 0.54 0.55 0.55 0.54 0.56 0.56 0.54 0.56 0.54 0.54 0.54 0.55   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.548  first-block 0.536 (n 973)  last-block 0.558 (n 1075)  key position 0-3 0.562/0.531/0.525/0.572  wrong 926: other stream's value 0.073
+                         (c) extra, S14's learned-gate continuation corrected: 0.54/0.55/0.54/0.55 (batch 5's: 0.54/0.54/0.55/0.55); S14 reading with it: NEITHER (batch 5's: NEITHER); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    hdr_far_A       166  rec 0.531  rerun reproduces: yes  map stream->channel [0, 1]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.531  first-block 0.539 (n 973)  last-block 0.525 (n 1075)  key position 0-3 0.549/0.500/0.519/0.555  wrong 960: other stream's value 0.070
+                             by block x key position: first 0.51/0.54/0.56/0.55  last 0.58/0.47/0.48/0.56
+                         (a) perfect gate:  overall 0.529  first-block 0.539 (n 973)  last-block 0.521 (n 1075)  key position 0-3 0.549/0.496/0.519/0.551  wrong 964: other stream's value 0.068
+                             by block x key position: first 0.51/0.54/0.56/0.55  last 0.58/0.46/0.48/0.56
+                         (b) perfect-gate continuation: 0.54 0.53 0.53 0.53 0.54 0.53 0.53 0.53 0.54 0.53 0.55 0.55 0.54 0.54 0.54 0.53 0.53 0.55 0.53 0.52   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.525  first-block 0.527 (n 973)  last-block 0.523 (n 1075)  key position 0-3 0.496/0.555/0.531/0.519  wrong 973: other stream's value 0.067
+                         (c) extra, S14's learned-gate continuation corrected: 0.54/0.53/0.53/0.53 (batch 5's: 0.53/0.54/0.54/0.53); S14 reading with it: NEITHER (batch 5's: NEITHER); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    blk_A           120  rec 0.342  rerun reproduces: yes  map stream->channel [0, 1]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.342  first-block 0.337 (n 973)  last-block 0.347 (n 1075)  key position 0-3 0.334/0.320/0.328/0.385  wrong 1347: other stream's value 0.078
+                             by block x key position: first 0.32/0.32/0.31/0.40  last 0.35/0.32/0.34/0.37
+                         (a) perfect gate:  overall 0.345  first-block 0.342 (n 973)  last-block 0.347 (n 1075)  key position 0-3 0.367/0.333/0.322/0.357  wrong 1342: other stream's value 0.071
+                             by block x key position: first 0.35/0.34/0.32/0.36  last 0.38/0.33/0.32/0.35
+                         (b) perfect-gate continuation: 0.33 0.34 0.33 0.32 0.34 0.33 0.33 0.32 0.32 0.32 0.35 0.33 0.35 0.33 0.35 0.33 0.33 0.32 0.32 0.33   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.333  first-block 0.349 (n 973)  last-block 0.318 (n 1075)  key position 0-3 0.312/0.322/0.324/0.372  wrong 1366: other stream's value 0.070
+                         (c) extra, S14's learned-gate continuation corrected: 0.33/0.34/0.33/0.33 (batch 5's: 0.33/0.34/0.33/0.33); S14 reading with it: NEITHER (batch 5's: NEITHER); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    blk_A           130  rec 0.344  rerun reproduces: yes  map stream->channel [1, 0]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.344  first-block 0.323 (n 973)  last-block 0.364 (n 1075)  key position 0-3 0.312/0.355/0.339/0.370  wrong 1343: other stream's value 0.081
+                             by block x key position: first 0.31/0.32/0.32/0.34  last 0.32/0.38/0.36/0.40
+                         (a) perfect gate:  overall 0.342  first-block 0.328 (n 973)  last-block 0.354 (n 1075)  key position 0-3 0.330/0.353/0.324/0.360  wrong 1348: other stream's value 0.076
+                             by block x key position: first 0.32/0.33/0.32/0.34  last 0.34/0.37/0.33/0.38
+                         (b) perfect-gate continuation: 0.32 0.34 0.34 0.33 0.34 0.34 0.33 0.34 0.32 0.34 0.34 0.34 0.35 0.34 0.33 0.35 0.34 0.34 0.34 0.33   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.333  first-block 0.348 (n 973)  last-block 0.318 (n 1075)  key position 0-3 0.307/0.310/0.339/0.372  wrong 1367: other stream's value 0.072
+                         (c) extra, S14's learned-gate continuation corrected: 0.33/0.33/0.33/0.34 (batch 5's: 0.32/0.33/0.34/0.33); S14 reading with it: NEITHER (batch 5's: NEITHER); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+    blk_A           136  rec 0.336  rerun reproduces: yes  map stream->channel [1, 0]  breakdown = evaluation: learned yes, perfect yes; (b)'s first 4800 updates = S14's: yes
+                         (a) learned gate:  overall 0.336  first-block 0.338 (n 973)  last-block 0.334 (n 1075)  key position 0-3 0.322/0.341/0.333/0.347  wrong 1360: other stream's value 0.077
+                             by block x key position: first 0.33/0.35/0.35/0.32  last 0.32/0.33/0.32/0.37
+                         (a) perfect gate:  overall 0.344  first-block 0.349 (n 973)  last-block 0.339 (n 1075)  key position 0-3 0.326/0.349/0.341/0.358  wrong 1344: other stream's value 0.071
+                             by block x key position: first 0.34/0.37/0.35/0.35  last 0.32/0.33/0.33/0.37
+                         (b) perfect-gate continuation: 0.34 0.33 0.34 0.34 0.33 0.33 0.33 0.35 0.33 0.33 0.34 0.35 0.33 0.34 0.33 0.33 0.32 0.32 0.33 0.34   first >= 0.95: never
+                             after (b), perfect gate (extra): overall 0.337  first-block 0.336 (n 973)  last-block 0.338 (n 1075)  key position 0-3 0.334/0.327/0.312/0.374  wrong 1358: other stream's value 0.071
+                         (c) extra, S14's learned-gate continuation corrected: 0.34/0.34/0.34/0.34 (batch 5's: 0.34/0.33/0.34/0.34); S14 reading with it: NEITHER (batch 5's: NEITHER); run's optimizer unchanged by (b), (c): yes
+                         READING: neither; basin
+  SUMMARY of readings (by layout):
+    header   hdr_far_nudge 161: neither; slow, hdr_far_nudge 164: neither; basin, hdr_far_nudge 165: neither; basin, hdr_far_A 165: neither; basin, hdr_far_A 166: neither; basin
+    blocked  blk_A 120: neither; basin, blk_A 130: neither; basin, blk_A 136: neither; basin
+  EXTRA, S14's readings with the corrected learned-gate control (batch 5's -> corrected): hdr_far_nudge 161: MEMORY-STUCK -> MEMORY-STUCK, hdr_far_nudge 164: NEITHER -> NEITHER, hdr_far_nudge 165: NEITHER -> NEITHER, hdr_far_A 165: NEITHER -> NEITHER, hdr_far_A 166: NEITHER -> NEITHER, blk_A 120: NEITHER -> NEITHER, blk_A 130: NEITHER -> NEITHER, blk_A 136: NEITHER -> NEITHER
+  S18 stuck_memory: diagnostic, 8/8 probes  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S16 kick_control: a kick of that size suffices (KICK DISCOVERED 12/20; SLOW_HINGE 14/20, KICK only 1 vs SLOW_HINGE only 3, p = 0.625; SLOW_MEM 4/20, KICK only 9 vs SLOW_MEM only 1, p = 0.0215)
+  S17 far_slow_hinge: not (DISCOVERED 0/10; batch 3's far_A_slow 0/10, batch 2's far_A 0/10)
+  S18 header   hdr_far_nudge 161: neither; slow, hdr_far_nudge 164: neither; basin, hdr_far_nudge 165: neither; basin, hdr_far_A 165: neither; basin, hdr_far_A 166: neither; basin
+  S18 blocked  blk_A 120: neither; basin, blk_A 130: neither; basin, blk_A 136: neither; basin
+  S18 extra (S14 corrected): hdr_far_nudge 161: MEMORY-STUCK -> MEMORY-STUCK, hdr_far_nudge 164: NEITHER -> NEITHER, hdr_far_nudge 165: NEITHER -> NEITHER, hdr_far_A 165: NEITHER -> NEITHER, hdr_far_A 166: NEITHER -> NEITHER, blk_A 120: NEITHER -> NEITHER, blk_A 130: NEITHER -> NEITHER, blk_A 136: NEITHER -> NEITHER
+####################################################################################################
