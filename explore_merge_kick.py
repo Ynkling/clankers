@@ -49,8 +49,8 @@ CHECKS: before the batch: the 8 runs are the derived list; the main modules load
 the shared modules differ from main's only as stated; the machinery on one run of each path (a
 rerun to 1200 reproduces the record; CONTROL's 1200 continued updates reproduce the recorded
 evaluation at 2400; KICKS logs 2 kicks at 100x the batch gradient norm; identical batches; the
-continuations start from equal, separately stored optimizer states, and the run's optimizer is left
-unchanged). In each job: the rerun reproduces its recorded curve to 9600; CONTROL reproduces it to
+continuations start from optimizer states equal to the run's, stored apart from it, and the run's
+optimizer is left unchanged; a load without a deep copy, as in batch 5's S14, is caught). In each job: the rerun reproduces its recorded curve to 9600; CONTROL reproduces it to
 19200; the continuations see identical batches (digests) and start from equal, separately stored
 optimizer states; every kick's norm equals 100x the batch gradient norm.
 """
@@ -236,15 +236,17 @@ def ptrs(opt):
             if torch.is_tensor(v)}
 
 
-def continuation(m0, opt0, rng0, seed, t0, steps, kicks, data, probe, lr):
+def continuation(m0, opt0, rng0, seed, t0, steps, kicks, data, probe, lr, ref):
     """onset_run's step, line for line, from (m0, opt0, rng0), on deep copies; with kicks, every
-    KICK_EVERY updates a Gaussian kick of KICK_MULT x the batch gradient norm on W_in, W_h, W_g."""
-    snap = opt_state(opt0)
+    KICK_EVERY updates a Gaussian kick of KICK_MULT x the batch gradient norm on W_in, W_h, W_g.
+    ref: the run's optimizer state snapshotted before any continuation. The copy's state must equal
+    it and share no storage with the run's optimizer (alive throughout); the two continuations never
+    coexist, so they cannot share storage with each other."""
     m = copy.deepcopy(m0)
     m.train()
     opt = torch.optim.Adam(m.parameters(), lr=lr)
     opt.load_state_dict(copy.deepcopy(opt0.state_dict()))
-    start = dict(equal=same_state(snap, opt_state(opt)), ptrs=ptrs(opt))
+    start = dict(equal=same_state(ref, opt_state(opt)), separate=not (ptrs(opt) & ptrs(opt0)))
     g = torch.Generator()
     g.set_state(rng0.get_state())
     named = dict(m.named_parameters())
@@ -276,7 +278,7 @@ def continuation(m0, opt0, rng0, seed, t0, steps, kicks, data, probe, lr):
             evals.append(dict(step=t0 + step, acc=acc, ch_map=rk["ch_map"], shared=rk["shared"],
                               stream_acc=tsa.stream_acc(m, TASK, data)))
     return dict(curve=curve, evals=evals, digest=dig.hexdigest(), kicks=klog, start_equal=start["equal"],
-                ptrs=start["ptrs"]), m
+                start_separate=start["separate"]), m
 
 
 def kick_diff(klog):
@@ -305,19 +307,19 @@ def run_job(arm, seed):
     want1 = [c for c in rec0["curve"] if t0 < c[0] <= t0 + cont]
     rec, m, opt, rng = rerun(arm, seed, t0)
     data, probe = eval_batch(TASK), probe_batch(TASK, seed)
-    snap, src_ptrs = opt_state(opt), ptrs(opt)
-    ctrl, _ = continuation(m, opt, rng, seed, t0, cont, False, data, probe, a["lr"])
-    kick, mk = continuation(m, opt, rng, seed, t0, cont, True, data, probe, a["lr"])
+    snap = opt_state(opt)
+    ctrl, _ = continuation(m, opt, rng, seed, t0, cont, False, data, probe, a["lr"], snap)
+    kick, mk = continuation(m, opt, rng, seed, t0, cont, True, data, probe, a["lr"], snap)
     end = tsa.scale_stats(mk, TASK, probe, "end")
     out = dict(ok=True, seed=seed, k=4, dry=dry, t0=t0, cont=cont, merged_pair=pair,
                recorded_end_map=rec0["end"]["ch_map"], recorded_acc=rec0["acc"],
                rerun_curve=rec["curve"], rerun_map=(stat_at(rec, t0) or {}).get("ch_map"),
                reproduces=rec["curve"] == want0,
-               control=dict(ctrl, ptrs=None), kicks=dict(kick, ptrs=None),
+               control=ctrl, kicks=kick,
                control_matches=ctrl["curve"] == want1 and len(want1) == len(ctrl["curve"]),
                batches_identical=ctrl["digest"] == kick["digest"],
-               opt_separate=(ctrl["start_equal"] and kick["start_equal"] and not (ctrl["ptrs"] & kick["ptrs"])
-                             and not (ctrl["ptrs"] & src_ptrs) and not (kick["ptrs"] & src_ptrs)),
+               opt_separate=(ctrl["start_equal"] and kick["start_equal"] and ctrl["start_separate"]
+                             and kick["start_separate"]),
                opt_unchanged=same_state(snap, opt_state(opt)),
                n_kicks=len(kick["kicks"]), kick_norm_diff=kick_diff(kick["kicks"]),
                split_control=split_at(ctrl["evals"], pair), split_kicks=split_at(kick["evals"], pair))
@@ -372,21 +374,29 @@ def check():
         t0, cont = EVAL_EVERY, EVAL_EVERY
         rec, m, opt, rng = rerun(arm, seed, t0)
         data, probe = eval_batch(TASK), probe_batch(TASK, seed)
-        snap, sp = opt_state(opt), ptrs(opt)
-        ctrl, _ = continuation(m, opt, rng, seed, t0, cont, False, data, probe, ARMS[arm]["lr"])
-        kick, _ = continuation(m, opt, rng, seed, t0, cont, True, data, probe, ARMS[arm]["lr"])
+        snap = opt_state(opt)
+        ctrl, _ = continuation(m, opt, rng, seed, t0, cont, False, data, probe, ARMS[arm]["lr"], snap)
+        kick, _ = continuation(m, opt, rng, seed, t0, cont, True, data, probe, ARMS[arm]["lr"], snap)
         want0 = [c for c in rec0["curve"] if c[0] <= t0]
         want1 = [c for c in rec0["curve"] if t0 < c[0] <= t0 + cont]
         good = (rec["curve"] == want0 and ctrl["curve"] == want1 and ctrl["digest"] == kick["digest"]
-                and ctrl["start_equal"] and kick["start_equal"] and not (ctrl["ptrs"] & kick["ptrs"])
-                and not ((ctrl["ptrs"] | kick["ptrs"]) & sp) and same_state(snap, opt_state(opt))
+                and ctrl["start_equal"] and kick["start_equal"] and ctrl["start_separate"]
+                and kick["start_separate"] and same_state(snap, opt_state(opt))
                 and len(kick["kicks"]) == cont // KICK_EVERY and kick_diff(kick["kicks"]) < 1e-5)
         rows.append((f"{SRC[arm]['path']} seed {seed}: the rerun to {t0} reproduces the record "
                      f"({rec['curve'] == want0}); CONTROL's {cont} continued updates reproduce the recorded evaluation "
-                     f"at {t0 + cont} ({ctrl['curve']} vs {want1}); identical batches; equal, separately stored "
-                     f"optimizer states, the run's left unchanged; KICKS logged {len(kick['kicks'])} kicks at "
+                     f"at {t0 + cont} ({ctrl['curve']} vs {want1}); identical batches ({ctrl['digest'] == kick['digest']}); "
+                     f"optimizer states equal to the run's ({ctrl['start_equal']}, {kick['start_equal']}) and stored apart "
+                     f"from it ({ctrl['start_separate']}, {kick['start_separate']}), the run's left unchanged "
+                     f"({same_state(snap, opt_state(opt))}); KICKS logged {len(kick['kicks'])} kicks at "
                      f"{KICK_MULT:g}x the batch gradient norm (max relative difference {kick_diff(kick['kicks']):.1e})",
                      good))
+        if arm == "SA_A4k4":
+            shared = torch.optim.Adam(m.parameters(), lr=ARMS[arm]["lr"])
+            shared.load_state_dict(opt.state_dict())                    # S14's load: shares the tensors
+            teeth = bool(ptrs(shared) & ptrs(opt))
+            rows.append(("the separation test has teeth: a state loaded without a deep copy (batch 5's S14 "
+                         f"load) shares storage with the run's optimizer ({teeth})", teeth))
     for nm, v in rows:
         print(f"  CHECK {NAME}: {nm}: {'ok' if v else 'FAIL'}", flush=True)
         ok &= bool(v)
