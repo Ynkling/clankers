@@ -142,3 +142,77 @@ EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), me
           acc 0.775  trans  None  VALcos 0.602  margin 0.51  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [ 34/78]   98.9 min  far_tok_check  NEAR_TOK_LATE seed 172  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401)
           acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+#################### RESUME 2026-10-02 17:46:18 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), merge_split (S24)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 756d6f3+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly; slow arms at 0.0001 for updates 1-2400 on every non-gate parameter), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S24: rerun to 9600, then 9600 continued updates three times), task P=4 S=2 n_vals=16 n_q=1 (S24: task_for(4, 4), k=4, conv), 1 torch thread per run
+  lr read for far_tok_check FAR_TOK_NEW: 0.001
+  lr read for far_tok_check FAR_TOK_LATE: 0.001
+  lr read for far_tok_check NEAR_TOK_LATE: 0.001
+  lr read for far_single B_FAR: 0.001
+  lr read for far_single B_FAR_SLOW: 0.001
+  lr read for merge_split SR_A4k4: 0.001
+  lr read for merge_split SA_A4k4: 0.001
+  S22 rules: FAR_TOK_NEW 'replicates' if DISCOVERED >= 4/10 and ROUTED*@end >= 2/10, 'does not' if DISCOVERED <= 1/10, else neither; FAR_TOK_LATE vs FAR_TOK (ROUTED*@end) 'the late start helps' if b - c >= 4 and McNemar p < 0.1, 'it costs' if c - b >= 4, else neither; NEAR_TOK_LATE 'routing returns' if ROUTED*@1200 >= 10/20 and DISCOVERED >= 16/20
+  S23 rule: 'header binding needs the partition' if B_FAR and B_FAR_SLOW each bind <= 1/10; 'a single channel binds the header layout' if either binds >= 3/10; else neither
+  S24 rules: 'splitting un-merges' if SPLIT >= 4/8 and NOISE <= 1/8; 'noise suffices' if NOISE >= 4/8; 'neither works' if SPLIT <= 1/8 (split: the merged pair on different channels and accuracy >= 0.95 at some evaluation up to 19200); 'the gate state tells the merged streams apart' if merged ratio >= 0.5 x non-merged in >= 6/8
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): merge_split, far_tok_check, far_single — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (64s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch8.py differs from 8f9dec4, where the full CHECK suite passed (2026-10-02 16:03:36 UTC; its output is earlier in this log). git diff --stat 8f9dec4:
+     explore_out/README.md                  |     2 +-
+     explore_out/batch8.log                 |   146 +
+     explore_out/batch8_checks.json         |     6 +
+     explore_out/far_single_results.json    |    70 +
+     explore_out/far_tok_check_results.json | 62743 +++++++++++++++++++++++++++++++
+     explore_out/merge_split_results.json   | 14210 +++++++
+     6 files changed, 77176 insertions(+), 1 deletion(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_tok_check
+  idea    S19's FAR_TOK on fresh seeds, and the key-token term started late (from update 2401)
+  source  batch 7's S19 (FAR_TOK 6/10 DISCOVERED, 3/10 routed; NEAR_TOK's key term fired at the start and delayed routing)
+  change  FAR_TOK_NEW: S19's FAR_TOK on seeds 170-179; FAR_TOK_LATE / NEAR_TOK_LATE: the key term only from update 2401, the position terms from update 1
+  arm FAR_TOK_NEW  lr 0.001  iters 24000  seeds 170-179 (10)  — S19's FAR_TOK on fresh seeds, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm FAR_TOK_LATE lr 0.001  iters 24000  seeds 160-179 (20)  — FAR_TOK with the key term from update 2401, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401
+  arm NEAR_TOK_LATE lr 0.001  iters 24000  seeds 160-179 (20)  — NEAR_TOK with the key term from update 2401, grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401
+  pairing FAR_TOK_LATE seeds 160-179 with FAR_TOK (S19 160-169, FAR_TOK_NEW 170-179); NEAR_TOK_LATE seeds 160-179 with S19's NEAR_TOK and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_single
+  idea    the missing control: a single channel (no gate, no partition) on the header layout
+  source  batch 7's S19 (FAR_TOK bound 9/10 on the header layout, 3 of them with every eta^2 near 0)
+  change  test_short_conv's arm B (k = 1, gate 'none') on the header layout; B_FAR_SLOW with the slow schedule
+  arm B_FAR        lr 0.001  iters 24000  seeds 160-169 (10)  — plain single channel (arm B), header layout
+                   schedule: lr 0.001 throughout
+  arm B_FAR_SLOW   lr 0.001  iters 24000  seeds 160-169 (10)  — arm B with the slow schedule, header layout
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  pairing seeds 160-169, printed beside S19's FAR_TOK, batch 3's far_A_slow and batch 2's far_A (same batches; the initial parameters differ: k = 1 has no gate)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN merge_split
+  idea    break the symmetry of a merged pair's read-gate rows: copy the busiest channel's W_g row to the idlest, plus noise
+  source  batch 7's S21 (merged pairs have identical gates: a symmetric point the task gradient cannot leave; 100x kicks split 0/8)
+  change  none to the recorded runs up to 9600; then 9600 updates three ways: CONTROL; SPLIT (W_g[c0] = W_g[c*] + noise, W_g[c*] + noise, W_g's Adam state reset); NOISE (the same noise, no copy, same reset)
+  arm SR_A4k4      lr 0.001  iters 38400  seeds [247, 248, 251, 258] (4)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  arm SA_A4k4      lr 0.001  iters 38400  seeds [221, 223, 225, 226] (4)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  pairing each run's SPLIT and NOISE against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    far_tok_check  FAR_TOK_NEW 10 runs x   9.1 min  (24000 steps x 22.2 ms + 20 evals x 0.8 s)
+    far_tok_check  FAR_TOK_LATE 20 runs x   9.4 min  (24000 steps x 22.9 ms + 20 evals x 0.8 s)
+    far_tok_check  NEAR_TOK_LATE 20 runs x  10.5 min  (24000 steps x 25.4 ms + 20 evals x 1.0 s)
+    far_single     B_FAR      10 runs x   6.8 min  (24000 steps x 16.4 ms + 20 evals x 0.6 s)
+    far_single     B_FAR_SLOW 10 runs x   7.0 min  (24000 steps x 17.0 ms + 20 evals x 0.6 s)
+    merge_split    SR_A4k4     4 runs x  34.2 min  (38400 steps x 51.4 ms + 32 evals x 2.4 s)
+    merge_split    SA_A4k4     4 runs x  35.8 min  (38400 steps x 53.8 ms + 32 evals x 2.4 s)
+    total 15.11 h of runs; makespan on 4 workers 3.82 h (worst case)
+  44 runs queued on 4 workers (1 torch thread each)
