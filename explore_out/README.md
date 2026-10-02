@@ -20,7 +20,7 @@ for a pre-registered test.
 | `batch6.log` (S16 kick_control, S17 far_slow_hinge, S18 stuck_memory) | batch 6, code of git 8407985 (the full CHECK pass recorded at 254c6cf in `batch6_checks.json`), 1 thread per run; complete (38/38 runs) in one segment (78.9 min of runs after 9.1 min of CHECKs; repro check bit-identical to X). Reports, readings, verdicts and SUMMARY at the end. |
 | `batch7_dry_check_failed.log` | batch 7's first labelled DRY RUN (git 7dadd6c): stopped by a CHECK before any run. S19's eta2_key matched the routing statistics' eta_key_by_key only to 2.4e-5 (tolerance 1e-5): float32 cancellation between two group means near 0.5 at init. The penalty now centres the values first (same quantity; agreement <= 1.4e-7); the dry run was repeated. |
 | `batch7_dry.log`, `dry_<screen>_results.json` (S19 token_hinge, S20 kick_untimed, S21 merge_kick) | batch 7's labelled DRY RUN (git aa6c4ff): every CHECK passed, 1 seed per arm, runs capped at 3600 steps (S21: rerun to 2400, continuations 1200). It exercises the code; its numbers are not for interpretation. After it, S20's summary line was corrected to print each group's run count (it printed /20); nothing else changed. |
-| `batch7.log` (S19 token_hinge, S20 kick_untimed, S21 merge_kick) | batch 7, code of git cea4756, 1 thread per run. **IN PROGRESS: 75 of 78 runs saved (merge_kick 8, token_hinge 30, kick_untimed 37).** Run in segments, each resumed after the session's background time limit stops it; queue order merge_kick, token_hinge, kick_untimed; pushed after every saved run. No report or verdict until the SUMMARY at the end of the log. |
+| `batch7.log` (S19 token_hinge, S20 kick_untimed, S21 merge_kick) | batch 7, code of git cea4756 (the full CHECK pass recorded at 9a51dbe in `batch7_checks.json`), 1 thread per run, Xeon @ 2.80GHz this session; complete (78/78 runs). The first segment ran the full CHECK suite (15.8 min) and saved 4 runs; the container was then restarted (RESTART note; the 4 runs in flight were re-run); the second segment saved 69 and was stopped by the session's background time limit; the third saved the last 5. Repro check bit-identical to X in every segment; later segments skipped the rest of the CHECK suite, the screen code being unchanged. S21's main-branch modules and records were read from 520fe51 (git show), not added to this branch. Reports, readings, verdicts and SUMMARY at the end. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -118,3 +118,29 @@ except far_nudge 161, which answers the first key of each block 1.000 and the ot
 answers are the other stream's value (1/15 = 0.067 for a uniformly drawn wrong value). 24000 perfect-gate updates:
 far_nudge 161 "slow" (1.00 from +3600); the other 7 "basin" (header 0.51-0.56, blocked 0.32-0.35 throughout). Extra: S14's learned-gate control redone with the
 run's own optimizer state leaves every S14 reading unchanged (far_nudge 161 MEMORY-STUCK; the rest NEITHER).
+
+## Batch 7 verdicts (rules fixed before any run)
+
+| screen | outcome | reference | cand. only / ref only | McNemar p | verdict / reading |
+|---|---|---|---|---|---|
+| S19 token_hinge FAR_TOK (header layout, seeds 160-169) | DISCOVERED 6/10 | S17 FAR_SLOW_HINGE 0/10 | 6 / 0 | 0.031 | promising (>= 4/10) |
+| S19 token_hinge NEAR_TOK (grouped, seeds 160-179) | DISCOVERED 19/20 | S13 SLOW_HINGE 18/20 | 2 / 1 | 1 | "keeps the near case" (>= 16/20) |
+| S20 kick_untimed (KICK120, seeds 160-199) | DISCOVERED 27/40 | SLOW_MEM 24/40 | 6 / 3 | 0.51 | inconclusive; reading "neither" (easy 18/20, hard 9/20) |
+| S21 merge_kick (8 merged S=4 runs) | split under KICKS 0/8 | CONTROL 0/8 | | | "they do not" (<= 1/8) |
+
+S19 FAR_TOK: of the 6 DISCOVERED (bound, VAL cos < 0.5), 3 route by stream at keys and values (ROUTED* at the end:
+163, 164, 168; 168 reached 0.956 at the last evaluation, 24000); 166 and 167 separate the streams at value positions only
+(eta^2 by stream at keys 0.00-0.01, at values 0.97-0.99; margin 0.04 and 0.77); 160 partly (0.37 / 0.54, margin 0.55).
+Counting full stream routing alone, FAR_TOK is 3/10 (S17 0/10). 3 more bound without stream routing (161, 162, 165);
+1 OTHER. The first label-free bindings with stream routing on the header layout in this branch. The key term fired on
+5-10 batches per run. NEAR_TOK: ROUTED*@1200 0/20 vs SLOW_HINGE 15/20 (0 / 15, p = 6e-05): the key term fired on 1-9 batches
+in every run (SLOW_HINGE's hinge never fired on 10 of these 20 seeds) and the routing came later (transitions 3600-6000).
+
+S20: vs SLOW_HINGE 27/40 vs 34/40 (0 / 7, p = 0.016); vs S16's KICK on its 20 seeds 9/20 vs 12/20 (0 / 3, p = 0.25); the
+untimed kick lost 2 easy seeds (186 POSITION, 191 KEY) and ROUTED*@1200 on the easy seeds fell to 12/20 (SLOW_MEM 20/20).
+Adam's second moment of the gate tensors jumped x1e7-1e9 at the kick and stayed x7e6 (W_g) at update 2400.
+
+S21: every in-job check passed (each rerun reproduced its record to 9600; CONTROL reproduced it to 19200; identical batches;
+separate optimizer states; 16 kicks per run at 100x the batch gradient norm). The stream -> channel maps under KICKS stayed
+those of CONTROL at every evaluation (one unmerged stream of SR 248 moved channel). CONTROL 0/8 is by construction (the
+runs were chosen as merged to the end and CONTROL reproduces the record).
