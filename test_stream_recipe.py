@@ -340,11 +340,13 @@ def wilson(k, n, z=1.959963984540054):
 
 
 # ── Runs: one attempt, and a trial ───────────────────────────────────────────
-def run_attempt(a, seed, sched, decide=None, abandon=False, keep=None):
+def run_attempt(a, seed, sched, decide=None, abandon=False, keep=None, recipe=None):
     """One run of arm a from `seed` on test_stream_channels' run path, on the arm's task, with the
     early-stop streak counted only after t_check. check(): at each evaluation up to t_check the
     held-out accuracy is read (test_router_reliability.run_attempt's recipe); at t_check,
-    decide(step, acc); with abandon=True a failing attempt stops there (trr.Abandon)."""
+    decide(step, acc); with abandon=True a failing attempt stops there (trr.Abandon).
+    recipe(kw) -> kw rewrites run_one's keyword arguments (test_slow_start's knob); None =
+    unchanged."""
     task = TASKS[a["task"]]
     tc = sched["t_check"]
     decide = trr.make_decide(tc, sched["a_check"]) if decide is None else decide
@@ -361,9 +363,9 @@ def run_attempt(a, seed, sched, decide=None, abandon=False, keep=None):
             if abandon and not info["passed"]:
                 raise trr.Abandon(f"held-out accuracy {acc:.4f} at step {step}")
 
-    rec = run_one(a, seed, sched["total"], sched["eval_every"], check=check, keep=keep, task=task,
-                  stats_fn=scale_stats, grad_fn=conv_grad_norms, lr=LR, builder=builder_for(a),
-                  run_kw=dict(early_stop_after=tc))
+    kw = dict(check=check, keep=keep, task=task, stats_fn=scale_stats, grad_fn=conv_grad_norms, lr=LR,
+              builder=builder_for(a), run_kw=dict(early_stop_after=tc))
+    rec = run_one(a, seed, sched["total"], sched["eval_every"], **(kw if recipe is None else recipe(kw)))
     rec.update(early=info["early"], acc_check=info.get("acc_check"), passed=info.get("passed"))
     return rec
 

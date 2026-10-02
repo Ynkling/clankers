@@ -146,6 +146,44 @@ OUTPUT AND LOGISTICS. Parallel single-thread workers; the wall clock is projecte
 (worst case). Results persist atomically to stream_curriculum_results.json (gitignored; copied into
 results/X/ after the run). Flags: --workers, --force, --results, --also (a second machine's file,
 for pooled counts).
+
+RESULT (full run, 41/41 records complete, no failures; torch 2.14.0, Intel Xeon @ 2.80GHz, 4 workers
+x 1 thread; machine X after its container moved to a new host (earlier X results were written on
+the 2.10GHz part; the inherited pairing CHECKs 72 and 85 reproduce their recorded runs exactly
+and fail only on that CPU label); commit ffdf0aa; 360.7 min after verification; no --also file.)
+  Drop rule: at the first start the projection was 14.44 h, so D8 was cut to seeds 260-265 (13.29 h)
+  and then SC8 and SC8_R to 260-275 (11.21 h). That start was killed by a container restart during
+  the SC8_ceil runs (nothing recorded); the resumed start printed 12.18 h for the uncut design and
+  kept the recorded decision, as designed.
+  VALID: SC8_ceil bound 3/3 (all at 10800, the first stage-3 evaluation); the k=16 gate fits the
+  perfect 8-way routing (argmax 1.0000, mse 2.9e-06).
+  C1 THE CURRICULUM MAKES EIGHT STREAMS LEARNABLE: NOT SHOWN. On seeds 260-265, SC8 3/6 vs D8 0/6;
+     SC8 only 3, D8 only 0; one-sided McNemar p = 0.125 (Fisher alongside, all SC8 6/16 vs D8 0/6:
+     p = 0.107).
+  C2 RELIABLE WITH RESTARTS: MINORITY. SC8_R bound 7/16 (26 attempts, 10 of them the reused SC8 run).
+  C3 ROUTING TRANSFERS ACROSS STREAM COUNT: UNTESTABLE. None of the 22 distinct SC8 / SC8_R runs was
+     ROUTED on the 8-stream set at step 4800 (0 vs 22 runs; 7 of the 22 bound).
+  The pre-registered reading: C1 NOT SHOWN: "the stream curriculum does not rescue eight streams at
+  this size."
+
+  Diagnostics (not part of the verdict):
+  - Descriptively the curriculum is not inert: D8 bound 0/6, every run at chance (0.08-0.10 at the
+    end; all streams on one channel in five runs, on three in one), while SC8 bound 6/16 and SC8_R 7/16. With D8 cut to 6
+    seeds the most C1 could reach with the observed 3 vs 0 split was p = 0.125.
+  - Transfer: no curriculum run was routed at 4800 (8-stream accuracy at 4800 median 0.21, range
+    0.10-0.44). Routing appeared in stage 2: at 9600 the eventual binders were at 0.68-0.95 (median
+    0.77) and the rest at 0.11-0.80 (SC8 median 0.33). Every binder bound at 10800 or 12000, the first or
+    second stage-3 evaluation; no run bound later in stage 3.
+  - The stage-1 check (0.6 on the 2-stream set at 2400) missed no binder: SC8 passed 10/16, 6 of
+    which bound; the 6 that failed it never bound (four POSITION collapses near 0.12, two merges).
+    Restarts replaced the collapses: in SC8_R all four of those seeds passed a later attempt, but only
+    s266 then bound; s263, s268 and s273 ended as merges. Passing runs that failed were all merges
+    (2 or 3 streams sharing, at 0.48-0.89). For reference, 0.6 on the 4-stream set at 7200 passed 11,
+    6 bound, missed 0.
+  - Three binders ended without a one-to-one map, every stream at 1.00 (s260: two pairs sharing,
+    s269: six streams on channel 9, s270: four on each of two channels).
+  - The switch to 4 streams hits the gate hard: gate gradient norm at step 4801 median 3.8 (step 100:
+    9e-7); at 9601 median 0.97.
 """
 
 import argparse
@@ -274,13 +312,14 @@ def sc_stats(at_steps):
 
 
 # ── Runs ─────────────────────────────────────────────────────────────────────
-def run_sc(a, seed, sched, decide=None, abandon=False, keep=None):
+def run_sc(a, seed, sched, decide=None, abandon=False, keep=None, recipe=None):
     """One run of arm a from `seed` on test_stream_recipe's run path, on task_for(4, 8) (its held-
     out set, probe and statistics). Curriculum arms (a["cur"]) train on each stage's batches
     (task_at), count the early stop only after t2, and check() evaluates the current stage's set
     at every evaluation up to t2; at t_check it gives decide(step, stage-1 accuracy), and with
     abandon=True a failing attempt stops there (trr.Abandon). D8 (cur False) trains on all 8
-    streams from step 1 with the usual early stop."""
+    streams from step 1 with the usual early stop. recipe(kw) -> kw rewrites run_one's keyword
+    arguments (test_slow_start's knob); None = unchanged."""
     t1, t2, ee, tc = sched["t1"], sched["t2"], sched["eval_every"], sched["t_check"]
     cur = a["cur"]
     decide = trr.make_decide(tc, sched["a_check"]) if decide is None else decide
@@ -302,8 +341,9 @@ def run_sc(a, seed, sched, decide=None, abandon=False, keep=None):
                 raise trr.Abandon(f"stage-1 held-out accuracy {acc:.4f} at step {step}")
 
     run_kw = (dict(task_at=lambda step: STAGE[stage_of(sched, step)], early_stop_after=t2) if cur else None)
-    rec = run_one(a, seed, sched["total"], ee, check=check, keep=keep, task=TASK48, stats_fn=sc_stats((t1, t2)),
-                  grad_fn=conv_grad_norms, lr=LR, builder=tsr.builder_for(a), grad_steps=grad_sc(sched), run_kw=run_kw)
+    kw = dict(check=check, keep=keep, task=TASK48, stats_fn=sc_stats((t1, t2)), grad_fn=conv_grad_norms, lr=LR,
+              builder=tsr.builder_for(a), grad_steps=grad_sc(sched), run_kw=run_kw)
+    rec = run_one(a, seed, sched["total"], ee, **(kw if recipe is None else recipe(kw)))
     rec.update(curve_stage=info["curve_stage"], acc_check=info.get("acc_check"), passed=info.get("passed"))
     if rec["ok"]:
         rec["transition_full"] = rec["transition"]
