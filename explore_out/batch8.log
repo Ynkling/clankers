@@ -90,3 +90,5 @@ EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), me
           acc 1.000  trans 13200  VALcos 0.000  margin 0.99  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
   [  8/78]   66.5 min  merge_split    SR_A4k4    seed 248  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset)
           acc 1.000  trans 15600  VALcos 0.000  margin 0.98  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
+  [  9/78]   68.1 min  far_tok_check  NEAR_TOK_LATE seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401)
+          acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
