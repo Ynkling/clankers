@@ -162,7 +162,7 @@ S22: the key term was above TAU on the first training batches of all 50 runs (et
 0.58); in FAR_TOK_NEW it fired at update 1 in 9/10 runs. FAR_TOK_LATE and NEAR_TOK_LATE are FAR_SLOW_HINGE and SLOW_HINGE bit
 for bit through update 2400 (CHECKed), so their ROUTED*@1200 are those arms' by construction. In FAR_TOK_LATE, 17 of 20 runs
 were in a key split at 2400 (eta_key_by_key 0.60-1.00; S17's FAR_SLOW_HINGE ended KEY 9/10); the late key term then fired
-3-5000 times and 10/20 ended OTHER near 0.5 (FAR_TOK 3/20). In NEAR_TOK_LATE the key term fired after 2400 in 2 runs only (167,
+3-5000 times (0 in 175, routed by stream at 2400) and 10/20 ended OTHER near 0.5 (FAR_TOK 3/20). In NEAR_TOK_LATE the key term fired after 2400 in 2 runs only (167,
 171, OTHER in both arms); outcome tags and transitions equal SLOW_HINGE's on all 20 seeds: "routing returns" because the late
 key term is silent on the grouped layout, not because it helps.
 
@@ -177,7 +177,7 @@ optimizer states; W_g's Adam step restarted at 1; rows as specified; the run's s
 the shared channel in 8/8; c0 the spare channel in 7/8 (SR 248: stream 3's channel, the spare not being the least-used over all
 positions). SPLIT split 1200-8400 updates after the operation, every run to 1.000 with each stream on its own channel; NOISE
 split 223 only (at 12000), CONTROL none. At 9600 the merged streams' gate states were nearly identical (ratio 0.005-0.041 vs
-0.70-1.41 for the non-merged pair; read gates at values equal to two decimals); after SPLIT their ratio was 1.13-1.54 at
+0.70-1.41 for the non-merged pair; the pair's mean read gates at values within 0.01 of each other); after SPLIT their ratio was 1.13-1.54 at
 19200 (CONTROL 0.012-0.028). Reading: the copy makes the shared and the idle channel's logits nearly tie (row distance 1.96-3.32
 -> 0.24-0.40), so the small differences in h decide the channel and the task gradient can grow them; noise of the same size
 without the tie (row distance unchanged) did not, in 7 of 8.
