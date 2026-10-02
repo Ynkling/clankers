@@ -22,7 +22,7 @@ for a pre-registered test.
 | `batch7_dry.log`, `dry_<screen>_results.json` (S19 token_hinge, S20 kick_untimed, S21 merge_kick) | batch 7's labelled DRY RUN (git aa6c4ff): every CHECK passed, 1 seed per arm, runs capped at 3600 steps (S21: rerun to 2400, continuations 1200). It exercises the code; its numbers are not for interpretation. After it, S20's summary line was corrected to print each group's run count (it printed /20); nothing else changed. |
 | `batch7.log` (S19 token_hinge, S20 kick_untimed, S21 merge_kick) | batch 7, code of git cea4756 (the full CHECK pass recorded at 9a51dbe in `batch7_checks.json`), 1 thread per run; complete (78/78 runs). The first segment ran the full CHECK suite (15.8 min) and saved 4 runs; the container was then restarted (RESTART note; the 4 runs in flight were re-run); the second segment saved 69 and was stopped by the session's background time limit; the third saved the last 5. Repro check bit-identical to X in every segment; later segments skipped the rest of the CHECK suite, the screen code being unchanged. The first segment ran on a Xeon @ 2.10GHz, the later two (and both dry runs) on a Xeon @ 2.80GHz; the repro check was bit-identical to X on both, and every S21 rerun reproduced its recorded curve on either. (The RESUME line after the RESTART note carries the driver's fixed text, 'stopped by the session's background time limit'; that stop was the container restart.) S21's main-branch modules and records were read from 520fe51 (git show), not added to this branch. Reports, readings, verdicts and SUMMARY at the end. |
 | `batch8_dry.log`, `dry_<screen>_results.json` (S22 far_tok_check, S23 far_single, S24 merge_split) | batch 8's labelled DRY RUN (git d15eb62, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (17.1 min), 1 seed per arm, runs capped at 3600 steps (S24: rerun to 2400, continuations 1200). It exercises the code; its numbers are not for interpretation. After it, S24's report and the driver's S24 line take the continuation steps from the run records (they printed 9600 to 19200 in the dry run, where the continuations ran 2400 to 3600); print only, nothing else changed. |
-| `batch8.log` (S22 far_tok_check, S23 far_single, S24 merge_split) | batch 8, code of git 572a00d, 1 thread per run. **IN PROGRESS: 78 of 78 runs saved (merge_split 8, far_tok_check 50, far_single 20).** Run in segments, each resumed after the session's background time limit stops it; queue order merge_split, far_tok_check, far_single; pushed after every saved run. No report or verdict until the SUMMARY at the end of the log. |
+| `batch8.log` (S22 far_tok_check, S23 far_single, S24 merge_split) | batch 8, code of git 572a00d (the full CHECK pass recorded at 8f9dec4 in `batch8_checks.json`; the banners' git f5a4d1b+dirty and 756d6f3+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (78/78 runs). The first segment ran the full CHECK suite (16.5 min) and saved 34 runs before the session's background time limit stopped it; the second (RESUME) saved the other 44. Repro check bit-identical to X in both segments; the second skipped the rest of the CHECK suite, the screen code being unchanged. Both segments ran on a Xeon @ 2.10GHz. S24's main-branch modules and records were read from 520fe51 (git show), not added to this branch. Reports, readings and SUMMARY at the end. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -146,3 +146,38 @@ S21: every in-job check passed (each rerun reproduced its record to 9600; CONTRO
 separate optimizer states; 16 kicks per run at 100x the batch gradient norm). The stream -> channel maps under KICKS stayed
 those of CONTROL at every evaluation (one unmerged stream of SR 248 moved channel). CONTROL 0/8 is by construction (the
 runs were chosen as merged to the end and CONTROL reproduces the record).
+
+## Batch 8 verdicts (rules fixed before any run)
+
+| screen | outcome | reference | cand. only / ref only | McNemar p | reading / verdict |
+|---|---|---|---|---|---|
+| S22 FAR_TOK_NEW (header, seeds 170-179) | DISCOVERED 4/10, ROUTED*@end 4/10 (BOUND 7/10) | S19 FAR_TOK on 160-169: 6/10, 3/10 | | | "replicates" (>= 4/10 and >= 2/10); pooled 20 seeds DISCOVERED 10/20, ROUTED*@end 7/20 |
+| S22 FAR_TOK_LATE vs FAR_TOK (header, 160-179) | ROUTED*@end 3/20 (DISCOVERED 3/20, BOUND 9/20) | FAR_TOK 7/20 (10/20, 16/20) | 2 / 6 (0 / 7, 1 / 8) | 0.29 (0.016, 0.039) | "it costs" (c - b = 4) |
+| S22 NEAR_TOK_LATE (grouped, 160-179) | ROUTED*@1200 15/20, DISCOVERED 18/20 | S19 NEAR_TOK 0/20, 19/20; S13 SLOW_HINGE 15/20, 18/20 | vs SLOW_HINGE 0 / 0, 0 / 0 | 1 | "routing returns" (>= 10/20 and >= 16/20) |
+| S23 far_single (k = 1, header, 160-169) | BOUND: B_FAR 3/10, B_FAR_SLOW 7/10 | batch 3 far_A_slow 0/10, S19 FAR_TOK 9/10 | B_FAR_SLOW vs B_FAR 5 / 1 | 0.22 | "a single channel binds the header layout" (>= 3/10) |
+| S24 merge_split (8 merged S=4 runs) | split by 19200: SPLIT 8/8 | NOISE 1/8, CONTROL 0/8 | | | "splitting un-merges" (SPLIT >= 4/8, NOISE <= 1/8) |
+| S24 gate state at 9600 | merged ratio >= 0.5 x non-merged in 0/8 | | | | rule not met |
+
+S22: the key term was above TAU on the first training batches of all 50 runs (eta2_key after 0 updates 0.05-0.96, median
+0.58); in FAR_TOK_NEW it fired at update 1 in 9/10 runs. FAR_TOK_LATE and NEAR_TOK_LATE are FAR_SLOW_HINGE and SLOW_HINGE bit
+for bit through update 2400 (CHECKed), so their ROUTED*@1200 are those arms' by construction. In FAR_TOK_LATE, 17 of 20 runs
+were in a key split at 2400 (eta_key_by_key 0.60-1.00; S17's FAR_SLOW_HINGE ended KEY 9/10); the late key term then fired
+3-5000 times and 10/20 ended OTHER near 0.5 (FAR_TOK 3/20). In NEAR_TOK_LATE the key term fired after 2400 in 2 runs only (167,
+171, OTHER in both arms); outcome tags and transitions equal SLOW_HINGE's on all 20 seeds: "routing returns" because the late
+key term is silent on the grouped layout, not because it helps.
+
+S23: B_FAR bound late (161, 162, 167; transitions 20400-24000), B_FAR_SLOW at 6000-19200 (160-166). On the header layout a
+single channel binds without any partition, so a header-layout BOUND is not evidence of routing (k = 1 cannot be DISCOVERED:
+VAL cos is 1 by construction). On the same seeds and batches the slow schedule binds 7/10 with k = 1 and 0/10 with arm A's
+2-channel gate (batch 3's far_A_slow, POSITION 8/10). FAR_TOK's 3 'bound with every eta^2 near 0' runs (S19: 161, 162, 165)
+are consistent with single-channel binding.
+
+S24: every in-job check passed (reruns to 9600 and CONTROL to 19200 reproduce the records; identical batches; separate
+optimizer states; W_g's Adam step restarted at 1; rows as specified; the run's state unchanged; recomputed gate exact). c* was
+the shared channel in 8/8; c0 the spare channel in 7/8 (SR 248: stream 3's channel, the spare not being the least-used over all
+positions). SPLIT split 1200-8400 updates after the operation, every run to 1.000 with each stream on its own channel; NOISE
+split 223 only (at 12000), CONTROL none. At 9600 the merged streams' gate states were nearly identical (ratio 0.005-0.041 vs
+0.70-1.41 for the non-merged pair; read gates at values equal to two decimals); after SPLIT their ratio was 1.13-1.54 at
+19200 (CONTROL 0.012-0.028). Reading: the copy makes the shared and the idle channel's logits nearly tie (row distance 1.96-3.32
+-> 0.24-0.40), so the small differences in h decide the channel and the task gradient can grow them; noise of the same size
+without the tie (row distance unchanged) did not, in 7 of 8.
