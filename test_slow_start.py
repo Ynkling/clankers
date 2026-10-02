@@ -345,17 +345,25 @@ def eta2_hinge(gr, S, P, eps=EPS):
     return between_idx / tot, between_half / tot
 
 
+def stage_S(T, P):
+    """The streams in a batch of input length T with one query: T = 3*(S*P + 1) - 1 (a curriculum
+    stage's s_active; test_recipe_scope)."""
+    return ((T + 1) // 3 - 1) // P
+
+
 def attach_hinge(m, S, P, tau, lam, state):
     """The hinge on model m (a forward hook): on every training forward (training mode, gradients
     on), lam * [relu(eta2_index - tau) + relu(eta2_half - tau)] enters the loss through Inject;
-    state counts the training batches and those with either term > 0, per EVAL_EVERY updates."""
+    state counts the training batches and those with either term > 0, per EVAL_EVERY updates.
+    S=None (test_recipe_scope's knob): each batch's own stream count, stage_S(its length, P), so
+    on a curriculum stage the groups are that stage's key positions."""
     state.update(n=0, fired=0, windows=[], last=None)
 
     def hook(mod, args, out):
         if not (mod.training and torch.is_grad_enabled()):
             return None
         logits, sat, gr, gw = out
-        e_i, e_h = eta2_hinge(gr, S, P)
+        e_i, e_h = eta2_hinge(gr, S if S is not None else stage_S(gr.shape[1], P), P)
         h_i, h_h = F.relu(e_i - tau), F.relu(e_h - tau)
         w = state["n"] // EVAL_EVERY
         state["n"] += 1
@@ -408,9 +416,11 @@ def extra_stats(model, task, probe, step, base, state):
     return out
 
 
-def make_recipe(slow, tau, warm=WARM, warm_lr=LR_WARM, lam=LAMBDA, keep=None):
+def make_recipe(slow, tau, warm=WARM, warm_lr=LR_WARM, lam=LAMBDA, keep=None, stage=False):
     """recipe(kw) -> kw for a run path's run_one call, and its state. slow: SLOW's groups and lr
-    switch; tau (None = no hinge): HINGE's hook; every arm: extra_stats; keep: run_one's keep."""
+    switch; tau (None = no hinge): HINGE's hook; every arm: extra_stats; keep: run_one's keep.
+    stage=True (test_recipe_scope's knob): the hinge takes each batch's stream count from its
+    length (attach_hinge with S=None), for a curriculum's stages; False = unchanged."""
     state = {}
 
     def recipe(kw):
@@ -424,7 +434,7 @@ def make_recipe(slow, tau, warm=WARM, warm_lr=LR_WARM, lam=LAMBDA, keep=None):
 
                 def make():
                     m = mk()
-                    attach_hinge(m, task.S, task.P, tau, lam, state)
+                    attach_hinge(m, None if stage else task.S, task.P, tau, lam, state)
                     return m
                 return make
             kw["builder"] = builder
