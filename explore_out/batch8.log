@@ -302,3 +302,255 @@ EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), me
           acc 0.751  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
   [ 43/44]   59.6 min  far_single     B_FAR      seed 169  lr 0.001 (lr 0.001 throughout)
           acc 0.375  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
+  [ 44/44]   60.4 min  far_single     B_FAR_SLOW seed 169  lr 0.001 (every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+          acc 0.308  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 60.4 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_tok_check
+  idea    S19's FAR_TOK on fresh seeds, and the key-token term started late (from update 2401)
+  source  batch 7's S19 (FAR_TOK 6/10 DISCOVERED, 3/10 routed; NEAR_TOK's key term fired at the start and delayed routing)
+  change  FAR_TOK_NEW: S19's FAR_TOK on seeds 170-179; FAR_TOK_LATE / NEAR_TOK_LATE: the key term only from update 2401, the position terms from update 1
+  arm FAR_TOK_NEW  lr 0.001  iters 24000  seeds 170-179 (10)  — S19's FAR_TOK on fresh seeds, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm FAR_TOK_LATE lr 0.001  iters 24000  seeds 160-179 (20)  — FAR_TOK with the key term from update 2401, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401
+  arm NEAR_TOK_LATE lr 0.001  iters 24000  seeds 160-179 (20)  — NEAR_TOK with the key term from update 2401, grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401
+  pairing FAR_TOK_LATE seeds 160-179 with FAR_TOK (S19 160-169, FAR_TOK_NEW 170-179); NEAR_TOK_LATE seeds 160-179 with S19's NEAR_TOK and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; logs: eta2_key after 0/1/10/100 updates, the updates of the applied key firings, and in the late arms the updates where the key term was above TAU but off):
+   arm FAR_TOK_NEW (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome           logs
+     170  1.000   8400   0.002   1.00  1.00/0.00/0.01/0.01  -/-/-/Y  DISCOVERED        eta2_key@0/1/10/100 0.38/0.23/0.13/0.03; key fired 4x at [1, 2, 15, 82]
+     171  1.000   8400   1.000   0.00  0.00/0.02/0.00/0.00  -/-/-/-  BOUND unrouted    eta2_key@0/1/10/100 0.55/0.14/0.04/0.12; key fired 22x at [1, 15, 105, 217, 309, 3027]...
+     172  0.857   None   0.267   0.74  0.63/0.00/0.00/0.00  -/-/-/-  STREAM-PARTIAL    eta2_key@0/1/10/100 0.43/0.19/0.11/0.03; key fired 8x at [1, 12, 601, 615, 616, 1390]...
+     173  0.770   None   0.809   0.23  0.40/0.15/0.00/0.01  -/-/-/-  OTHER             eta2_key@0/1/10/100 0.78/0.61/0.09/0.07; key fired 705x at [1, 2, 3, 4, 19, 183]...
+     174  1.000  15600   0.625   0.36  0.73/0.13/0.00/0.00  -/-/-/-  BOUND unrouted    eta2_key@0/1/10/100 0.47/0.13/0.09/0.05; key fired 185x at [1, 17, 2625, 2628, 2629, 7745]...
+     175  1.000   6000   0.001   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED        eta2_key@0/1/10/100 0.58/0.45/0.04/0.05; key fired 7x at [1, 2, 3, 27, 642, 724]...
+     176  0.521   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER             eta2_key@0/1/10/100 0.10/0.04/0.03/0.09; key fired 13x at [17, 41, 103, 140, 141, 234]...
+     177  1.000   4800   0.001   1.00  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED        eta2_key@0/1/10/100 0.55/0.30/0.19/0.06; key fired 4x at [1, 2, 12, 30]
+     178  1.000   8400   0.856   0.01  0.29/0.00/0.00/0.07  -/-/-/-  BOUND unrouted    eta2_key@0/1/10/100 0.37/0.11/0.02/0.06; key fired 4x at [1, 27, 3515, 3521]
+     179  1.000   6000   0.018   0.96  1.00/0.00/0.02/0.02  -/-/-/Y  DISCOVERED        eta2_key@0/1/10/100 0.42/0.34/0.08/0.15; key fired 135x at [1, 2, 3, 126, 3220, 3230]...
+   arm FAR_TOK_LATE (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         FAR_TOK         S17 FAR_SLOW_H   logs
+     160  1.000   6000   0.005   1.00  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      DISCOVERED      KEY              eta2_key@0/1/10/100 0.64/0.69/0.26/0.53; key fired 6x at [2401, 2402, 2403, 2406, 2407, 2408]; above TAU while off 2399x (first [1, 2, 3], last [2400])
+     161  1.000  12000   1.000   0.00  0.02/0.09/0.09/0.33  -/-/-/-  BOUND unrouted  BOUND unrouted  KEY              eta2_key@0/1/10/100 0.83/0.82/0.72/0.65; key fired 7x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2400x (first [1, 2, 3], last [2400])
+     162  0.500   None   1.000   0.00  0.00/0.24/0.00/0.01  -/-/-/-  OTHER           BOUND unrouted  KEY              eta2_key@0/1/10/100 0.79/0.75/0.81/0.92; key fired 5000x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2398x (first [1, 2, 3], last [2400])
+     163  0.998  18000   1.000  -0.00  0.00/0.17/0.07/0.16  -/-/-/-  BOUND unrouted  DISCOVERED      KEY              eta2_key@0/1/10/100 0.16/0.11/0.37/0.61; key fired 5000x at [2401, 2402, 2522, 3251, 3487, 3499]...; above TAU while off 2398x (first [3, 4, 5], last [2400])
+     164  0.998   7200   1.000  -0.01  0.02/0.00/0.00/0.00  -/-/-/-  BOUND unrouted  DISCOVERED      KEY              eta2_key@0/1/10/100 0.66/0.72/0.71/0.82; key fired 3x at [2401, 2402, 2403]; above TAU while off 2400x (first [1, 2, 3], last [2400])
+     165  0.496   None   1.000   0.00  0.00/0.16/0.03/0.07  -/-/-/-  OTHER           BOUND unrouted  KEY              eta2_key@0/1/10/100 0.76/0.79/0.87/0.88; key fired 3029x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2382x (first [1, 2, 3], last [2400])
+     166  1.000   4800   0.008   0.99  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      DISCOVERED      BOUND unrouted   eta2_key@0/1/10/100 0.62/0.71/0.65/0.89; key fired 6x at [2401, 2402, 2403, 2519, 2690, 3927]; above TAU while off 2400x (first [1, 2, 3], last [2400])
+     167  0.463   None   1.000  -0.00  0.01/0.17/0.01/0.10  -/-/-/-  OTHER           DISCOVERED      KEY              eta2_key@0/1/10/100 0.70/0.74/0.79/0.87; key fired 1705x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2394x (first [1, 2, 3], last [2400])
+     168  0.284   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           DISCOVERED      KEY              eta2_key@0/1/10/100 0.66/0.63/0.64/0.93; key fired 5x at [2401, 8942, 8943, 18935, 23740]; above TAU while off 2112x (first [1, 2, 3], last [2400])
+     169  0.531   None   1.000   0.00  0.03/0.07/0.05/0.08  -/-/-/-  OTHER           OTHER           KEY              eta2_key@0/1/10/100 0.71/0.58/0.15/0.53; key fired 647x at [2401, 2402, 2403, 2404, 2405, 9717]...; above TAU while off 2380x (first [1, 2, 3], last [2400])
+     170  0.775   None   0.602   0.51  1.00/0.00/0.01/0.01  -/-/-/-  STREAM-PARTIAL  DISCOVERED      not run          eta2_key@0/1/10/100 0.38/0.46/0.71/0.92; key fired 15x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2349x (first [1, 2, 3], last [2400])
+     171  1.000   6000   1.000   0.00  0.01/0.00/0.00/0.00  -/-/-/-  BOUND unrouted  BOUND unrouted  not run          eta2_key@0/1/10/100 0.55/0.33/0.64/0.75; key fired 7x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2400x (first [1, 2, 3], last [2400])
+     172  1.000  19200   1.000  -0.00  0.00/0.16/0.02/0.13  -/-/-/-  BOUND unrouted  STREAM-PARTIAL  not run          eta2_key@0/1/10/100 0.43/0.40/0.51/0.17; key fired 5000x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2296x (first [1, 2, 3], last [2400])
+     173  0.508   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           OTHER           not run          eta2_key@0/1/10/100 0.78/0.78/0.90/0.91; key fired 6x at [2401, 2402, 2403, 2404, 2405, 2406]; above TAU while off 2380x (first [1, 2, 3], last [2400])
+     174  1.000  12000   0.999   0.01  0.00/0.06/0.03/0.05  -/-/-/-  BOUND unrouted  BOUND unrouted  not run          eta2_key@0/1/10/100 0.47/0.30/0.65/0.76; key fired 13x at [2401, 2402, 2404, 3003, 3005, 10068]...; above TAU while off 2400x (first [1, 2, 3], last [2400])
+     175  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      not run          eta2_key@0/1/10/100 0.58/0.56/0.60/0.43; key fired 0x at []; above TAU while off 1341x (first [1, 2, 3], last [1350])
+     176  0.522   None   0.999   0.03  0.00/0.02/0.00/0.00  -/-/-/-  OTHER           OTHER           not run          eta2_key@0/1/10/100 0.10/0.04/0.03/0.37; key fired 7x at [2401, 2402, 2403, 2404, 2457, 2597]...; above TAU while off 2384x (first [17, 18, 19], last [2400])
+     177  0.491   None   1.000   0.00  0.01/0.07/0.02/0.11  -/-/-/-  OTHER           DISCOVERED      not run          eta2_key@0/1/10/100 0.55/0.50/0.82/0.23; key fired 9x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2359x (first [1, 2, 3], last [2400])
+     178  0.499   None   1.000   0.01  0.00/0.12/0.00/0.09  -/-/-/-  OTHER           BOUND unrouted  not run          eta2_key@0/1/10/100 0.37/0.28/0.54/0.89; key fired 2342x at [2401, 2473, 2518, 2871, 3026, 3073]...; above TAU while off 2400x (first [1, 2, 3], last [2400])
+     179  0.514   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           DISCOVERED      not run          eta2_key@0/1/10/100 0.42/0.49/0.42/0.80; key fired 113x at [2401, 2402, 2403, 2404, 2405, 2406]...; above TAU while off 2358x (first [1, 2, 3], last [2400])
+   arm NEAR_TOK_LATE (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         S19 NEAR_TOK    S13 SLOW_HINGE   logs
+     160  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      OTHER           DISCOVERED       eta2_key@0/1/10/100 0.80/0.76/0.80/0.22; key fired 0x at []; above TAU while off 110x (first [1, 2, 3], last [128])
+     161  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.88/0.86/0.44/0.13; key fired 0x at []; above TAU while off 96x (first [1, 2, 3], last [97])
+     162  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.84/0.84/0.84/0.18; key fired 0x at []; above TAU while off 1639x (first [1, 2, 3], last [2224])
+     163  1.000   3600   0.007   0.99  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.28/0.12/0.10/0.03; key fired 0x at []; above TAU while off 5x (first [1, 20, 21], last [23])
+     164  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.91/0.91/0.92/0.44; key fired 0x at []; above TAU while off 126x (first [1, 2, 3], last [126])
+     165  1.000   4800   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.96/0.97/0.94/0.35; key fired 0x at []; above TAU while off 113x (first [1, 2, 3], last [114])
+     166  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.81/0.82/0.88/0.83; key fired 0x at []; above TAU while off 935x (first [1, 2, 3], last [951])
+     167  0.512   None   1.000   0.00  0.02/0.03/0.00/0.10  -/-/-/-  OTHER           DISCOVERED      OTHER            eta2_key@0/1/10/100 0.86/0.86/0.95/0.84; key fired 51x at [2407, 2442, 11892, 11894, 11898, 11902]...; above TAU while off 2211x (first [1, 2, 3], last [2383])
+     168  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.69/0.68/0.85/0.52; key fired 0x at []; above TAU while off 960x (first [1, 2, 3], last [960])
+     169  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.96/0.94/0.97/0.42; key fired 0x at []; above TAU while off 122x (first [1, 2, 3], last [122])
+     170  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.54/0.48/0.38/0.12; key fired 0x at []; above TAU while off 33x (first [1, 2, 3], last [47])
+     171  0.508   None   1.000   0.00  0.00/0.00/0.00/0.01  -/-/-/-  OTHER           DISCOVERED      OTHER            eta2_key@0/1/10/100 0.32/0.39/0.67/0.82; key fired 3x at [2541, 2542, 2674]; above TAU while off 1542x (first [1, 2, 3], last [2234])
+     172  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.52/0.46/0.57/0.76; key fired 0x at []; above TAU while off 156x (first [1, 2, 3], last [157])
+     173  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.84/0.84/0.86/0.95; key fired 0x at []; above TAU while off 675x (first [1, 2, 3], last [676])
+     174  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.80/0.82/0.50/0.06; key fired 0x at []; above TAU while off 43x (first [1, 2, 3], last [86])
+     175  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.43/0.48/0.30/0.37; key fired 0x at []; above TAU while off 1646x (first [1, 2, 3], last [1708])
+     176  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.05/0.06/0.05/0.79; key fired 0x at []; above TAU while off 686x (first [46, 47, 48], last [749])
+     177  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.71/0.74/0.90/0.80; key fired 0x at []; above TAU while off 1975x (first [1, 2, 3], last [1975])
+     178  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.33/0.24/0.29/0.11; key fired 0x at []; above TAU while off 71x (first [1, 2, 3], last [88])
+     179  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED       eta2_key@0/1/10/100 0.85/0.86/0.71/0.06; key fired 0x at []; above TAU while off 81x (first [1, 2, 3], last [81])
+  FAR_TOK_NEW (seeds 170-179): DISCOVERED 4/10, ROUTED*@end 4/10, BOUND 7/10; failures {'STREAM-PARTIAL': 1, 'OTHER': 2}; with S19's 160-169: DISCOVERED 10/20, ROUTED*@end 7/20
+  FAR_TOK_LATE vs FAR_TOK (20 seeds; FAR_TOK = S19 on 160-169, FAR_TOK_NEW on 170-179):
+    ROUTED*@end   FAR_TOK_LATE  3/20   FAR_TOK  7/20   FAR_TOK_LATE only 2, FAR_TOK only 6, McNemar two-sided p = 0.289
+    DISCOVERED    FAR_TOK_LATE  3/20   FAR_TOK 10/20   FAR_TOK_LATE only 0, FAR_TOK only 7, McNemar two-sided p = 0.0156
+    BOUND         FAR_TOK_LATE  9/20   FAR_TOK 16/20   FAR_TOK_LATE only 1, FAR_TOK only 8, McNemar two-sided p = 0.0391
+    ROUTED*@1200  FAR_TOK_LATE  0/20   FAR_TOK  0/20   FAR_TOK_LATE only 0, FAR_TOK only 0, McNemar two-sided p = 1
+    failures FAR_TOK_LATE {'OTHER': 10, 'STREAM-PARTIAL': 1}   FAR_TOK {'OTHER': 3, 'STREAM-PARTIAL': 1}
+    hinge firings (batches): index 6368, half 336, key 39923, any 45579 of 374400; runs with the term on at least once: index 20, half 10, key 19 of 20
+  NEAR_TOK_LATE (20 seeds):
+   paired with S19's NEAR_TOK:
+    ROUTED*@1200  NEAR_TOK_LATE 15/20   NEAR_TOK  0/20   NEAR_TOK_LATE only 15, NEAR_TOK only 0, McNemar two-sided p = 6.1e-05
+    DISCOVERED    NEAR_TOK_LATE 18/20   NEAR_TOK 19/20   NEAR_TOK_LATE only 1, NEAR_TOK only 2, McNemar two-sided p = 1
+   paired with S13's SLOW_HINGE:
+    ROUTED*@1200  NEAR_TOK_LATE 15/20   SLOW_HINGE 15/20   NEAR_TOK_LATE only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    DISCOVERED    NEAR_TOK_LATE 18/20   SLOW_HINGE 18/20   NEAR_TOK_LATE only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    failures NEAR_TOK_LATE {'OTHER': 2}   NEAR_TOK {'OTHER': 1}   SLOW_HINGE {'OTHER': 2}
+    hinge firings (batches): index 5644, half 1, key 54, any 5692 of 148800; runs with the term on at least once: index 10, half 1, key 2 of 20
+  eta2_key on the first training batch (0 updates), all 50 runs: min 0.052, median 0.580, max 0.960; runs with the key term above TAU in updates 1-1200 (applied or not): 50/50
+  RULE FAR_TOK_NEW (DISCOVERED 4/10, ROUTED*@end 4/10; 'replicates' if DISCOVERED >= 4 and ROUTED*@end >= 2, 'does not' if DISCOVERED <= 1): replicates
+  RULE FAR_TOK_LATE vs FAR_TOK (ROUTED*@end 2 vs 6, p = 0.289; 'the late start helps' if b - c >= 4 and p < 0.1, 'it costs' if c - b >= 4): it costs
+  RULE NEAR_TOK_LATE (ROUTED*@1200 15/20, DISCOVERED 18/20; 'routing returns' if >= 10/20 and >= 16/20): routing returns
+  READING far_tok_check FAR_TOK_NEW: replicates (DISCOVERED 4/10, ROUTED*@end 4/10)  [EXPLORATORY, not a result]
+  READING far_tok_check FAR_TOK_LATE vs FAR_TOK: it costs (ROUTED*@end 3/20 vs 7/20, 2 vs 6, p = 0.289)  [EXPLORATORY, not a result]
+  READING far_tok_check NEAR_TOK_LATE: routing returns (ROUTED*@1200 15/20, DISCOVERED 18/20)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_single
+  idea    the missing control: a single channel (no gate, no partition) on the header layout
+  source  batch 7's S19 (FAR_TOK bound 9/10 on the header layout, 3 of them with every eta^2 near 0)
+  change  test_short_conv's arm B (k = 1, gate 'none') on the header layout; B_FAR_SLOW with the slow schedule
+  arm B_FAR        lr 0.001  iters 24000  seeds 160-169 (10)  — plain single channel (arm B), header layout
+                   schedule: lr 0.001 throughout
+  arm B_FAR_SLOW   lr 0.001  iters 24000  seeds 160-169 (10)  — arm B with the slow schedule, header layout
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  pairing seeds 160-169, printed beside S19's FAR_TOK, batch 3's far_A_slow and batch 2's far_A (same batches; the initial parameters differ: k = 1 has no gate)
+----------------------------------------------------------------------------------------------------
+  per seed (acc at 2400/4800/12000 and at the last evaluation; transition = the bound step):
+   arm B_FAR (lr 0.001; lr 0.001 throughout)
+    seed   acc@2400/4800/12000  acc end  stopped  trans  outcome  S19 FAR_TOK     b3 far_A_slow   b2 far_A       
+     160     0.199/0.287/0.330    0.326    24000   None  unbound  DISCOVERED      POSITION        POSITION       
+     161     0.208/0.270/0.624    0.981    24000  24000  BOUND    BOUND unrouted  KEY             POSITION       
+     162     0.199/0.289/0.340    1.000    22800  20400  BOUND    BOUND unrouted  POSITION        POSITION       
+     163     0.188/0.287/0.334    0.328    24000   None  unbound  DISCOVERED      POSITION        POSITION       
+     164     0.180/0.219/0.320    0.701    24000   None  unbound  DISCOVERED      STREAM-PARTIAL  OTHER          
+     165     0.198/0.255/0.323    0.472    24000   None  unbound  BOUND unrouted  POSITION        STREAM-PARTIAL 
+     166     0.192/0.244/0.336    0.322    24000   None  unbound  DISCOVERED      POSITION        STREAM-PARTIAL 
+     167     0.194/0.243/0.660    0.994    22800  20400  BOUND    DISCOVERED      POSITION        OTHER          
+     168     0.174/0.190/0.207    0.319    24000   None  unbound  DISCOVERED      POSITION        OTHER          
+     169     0.167/0.220/0.322    0.375    24000   None  unbound  OTHER           POSITION        POSITION       
+   arm B_FAR_SLOW (lr 0.001; every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+    seed   acc@2400/4800/12000  acc end  stopped  trans  outcome  S19 FAR_TOK     b3 far_A_slow   b2 far_A       
+     160     0.209/0.389/0.527    1.000    21600  19200  BOUND    DISCOVERED      POSITION        POSITION       
+     161        0.223/0.373/--    1.000     9600   7200  BOUND    BOUND unrouted  KEY             POSITION       
+     162     0.212/0.343/1.000    0.999    13200  10800  BOUND    BOUND unrouted  POSITION        POSITION       
+     163        0.218/0.439/--    1.000    10800   8400  BOUND    DISCOVERED      POSITION        POSITION       
+     164     0.217/0.363/1.000    1.000    13200  10800  BOUND    DISCOVERED      STREAM-PARTIAL  OTHER          
+     165     0.233/0.315/1.000    0.980    14400  12000  BOUND    BOUND unrouted  POSITION        STREAM-PARTIAL 
+     166        0.218/0.346/--    0.995     8400   6000  BOUND    DISCOVERED      POSITION        STREAM-PARTIAL 
+     167     0.251/0.304/0.508    0.496    24000   None  unbound  DISCOVERED      POSITION        OTHER          
+     168     0.220/0.297/0.533    0.751    24000   None  unbound  DISCOVERED      POSITION        OTHER          
+     169     0.205/0.245/0.322    0.308    24000   None  unbound  OTHER           POSITION        POSITION       
+  B_FAR: BOUND 3/10; final acc min 0.319, median 0.472, max 1.000
+  B_FAR_SLOW: BOUND 7/10; final acc min 0.308, median 0.999, max 1.000
+  B_FAR_SLOW vs B_FAR (paired, BOUND): B_FAR_SLOW only 5, B_FAR only 1, McNemar p = 0.219
+  S19 FAR_TOK: BOUND 9/10 on these seeds
+  b3 far_A_slow: BOUND 0/10 on these seeds
+  b2 far_A: BOUND 0/10 on these seeds
+  RULE (B_FAR 3/10, B_FAR_SLOW 7/10 BOUND; 'needs the partition' if each <= 1/10, 'a single channel binds' if either >= 3/10): a single channel binds the header layout
+  READING far_single: a single channel binds the header layout (BOUND B_FAR 3/10, B_FAR_SLOW 7/10)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN merge_split
+  idea    break the symmetry of a merged pair's read-gate rows: copy the busiest channel's W_g row to the idlest, plus noise
+  source  batch 7's S21 (merged pairs have identical gates: a symmetric point the task gradient cannot leave; 100x kicks split 0/8)
+  change  none to the recorded runs up to 9600; then 9600 updates three ways: CONTROL; SPLIT (W_g[c0] = W_g[c*] + noise, W_g[c*] + noise, W_g's Adam state reset); NOISE (the same noise, no copy, same reset)
+  arm SR_A4k4      lr 0.001  iters 38400  seeds [247, 248, 251, 258] (4)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  arm SA_A4k4      lr 0.001  iters 38400  seeds [221, 223, 225, 226] (4)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  pairing each run's SPLIT and NOISE against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  per run (map = stream -> channel at each evaluation, as acc:map; '|' = the merged pair on different channels; continuations from 9600 to 19200; gate state at the start of the continuations: ratio = ||h_a - h_b|| / mean ||h|| at value positions, cos = cos(W_g[r1] - W_g[r2], h_a - h_b)):
+    SR_A4k4   247  merged pair streams [2, 3] (recorded end map [3, 1, 0, 0], rec acc 0.754; map at 9600 [3, 1, 0, 0]; c* 0, c0 2, mass [0.46042, 0.22242, 0.04251, 0.27465])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [2, 3] ratio 0.020, cos rows [0, 2] -0.200 (max |cos| 0.288); non-merged [0, 1] ratio 1.228, cos rows [3, 1] +0.899 (max |cos| 0.899); mean ||h|| 3.923; read gates at values s0:0.00/0.00/0.01/0.99 s1:0.00/1.00/0.00/0.00 s2:0.99/0.00/0.01/0.00 s3:0.99/0.00/0.01/0.00
+                   CONTROL 0.77:3100 0.75:3100 0.76:3100 0.74:3100 0.75:3100 0.75:3100 0.76:3100 0.74:3100
+                           at 19200: acc 0.743, per stream 1.00/1.00/0.45/0.50, merged pair on channels [0, 0], merged ratio 0.018
+                   SPLIT   0.76:3100 0.75:3100 0.76:3100 0.74:3100 0.75:3100 0.76:3100 1.00:3120| 1.00:3120|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [2, 0], merged ratio 1.256; op: noise sd 3.14e-02, ||W_g[c*] - W_g[c0]|| 1.960 -> 0.260
+                   NOISE   0.76:3100 0.76:3100 0.75:3100 0.74:3100 0.76:3100 0.75:3100 0.76:3100 0.74:3100
+                           at 19200: acc 0.742, per stream 1.00/1.00/0.45/0.50, merged pair on channels [0, 0], merged ratio 0.031; op: noise sd 3.14e-02, ||W_g[c*] - W_g[c0]|| 1.960 -> 1.962
+                   READING: CONTROL merged; SPLIT split (at 18000); NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+    SR_A4k4   248  merged pair streams [0, 2] (recorded end map [1, 0, 1, 3], rec acc 0.762; map at 9600 [1, 0, 1, 3]; c* 1, c0 3, mass [0.24651, 0.39982, 0.18346, 0.17021])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [0, 2] ratio 0.005, cos rows [1, 2] -0.023 (max |cos| 0.423); non-merged [1, 3] ratio 0.703, cos rows [0, 3] +0.836 (max |cos| 0.836); mean ||h|| 4.831; read gates at values s0:0.00/0.99/0.01/0.00 s1:0.99/0.00/0.00/0.00 s2:0.00/0.99/0.01/0.00 s3:0.00/0.00/0.49/0.51
+                   CONTROL 0.76:1013 0.75:1013 0.75:1013 0.75:1013 0.76:1013 0.76:1013 0.76:1013 0.76:1013
+                           at 19200: acc 0.756, per stream 0.49/1.00/0.50/1.00, merged pair on channels [1, 1], merged ratio 0.013
+                   SPLIT   0.77:1012 0.75:1012 0.75:1012 0.75:1012 1.00:1032| 1.00:1032| 1.00:1032| 1.00:1032|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [1, 3], merged ratio 1.188; op: noise sd 4.44e-02, ||W_g[c*] - W_g[c0]|| 3.319 -> 0.395
+                   NOISE   0.76:1013 0.75:1013 0.75:1013 0.75:1013 0.75:1013 0.75:1013 0.75:1013 0.76:1013
+                           at 19200: acc 0.759, per stream 0.50/1.00/0.50/1.00, merged pair on channels [1, 1], merged ratio 0.015; op: noise sd 4.44e-02, ||W_g[c*] - W_g[c0]|| 3.319 -> 3.392
+                   READING: CONTROL merged; SPLIT split (at 15600); NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+    SR_A4k4   251  merged pair streams [1, 3] (recorded end map [1, 0, 3, 0], rec acc 0.751; map at 9600 [1, 0, 3, 0]; c* 0, c0 2, mass [0.46385, 0.2015, 0.11717, 0.21748])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [1, 3] ratio 0.023, cos rows [0, 2] -0.231 (max |cos| 0.551); non-merged [0, 2] ratio 1.179, cos rows [1, 3] +0.862 (max |cos| 0.862); mean ||h|| 3.984; read gates at values s0:0.00/1.00/0.00/0.00 s1:0.95/0.00/0.04/0.01 s2:0.00/0.00/0.01/0.99 s3:0.95/0.00/0.04/0.01
+                   CONTROL 0.74:1030 0.75:1030 0.75:1030 0.75:1030 0.74:1030 0.74:1030 0.75:1030 0.73:1030
+                           at 19200: acc 0.729, per stream 1.00/0.49/1.00/0.46, merged pair on channels [0, 0], merged ratio 0.012
+                   SPLIT   0.73:1030 0.75:1030 1.00:1230| 1.00:1230| 1.00:1230| 1.00:1230| 1.00:1230| 1.00:1230|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [2, 0], merged ratio 1.539; op: noise sd 3.92e-02, ||W_g[c*] - W_g[c0]|| 2.566 -> 0.323
+                   NOISE   0.73:1030 0.75:1030 0.75:1030 0.75:1030 0.74:1030 0.74:1030 0.75:1030 0.74:1030
+                           at 19200: acc 0.740, per stream 1.00/0.50/1.00/0.49, merged pair on channels [0, 0], merged ratio 0.010; op: noise sd 3.92e-02, ||W_g[c*] - W_g[c0]|| 2.566 -> 2.615
+                   READING: CONTROL merged; SPLIT split (at 13200); NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+    SR_A4k4   258  merged pair streams [0, 2] (recorded end map [0, 2, 0, 1], rec acc 0.769; map at 9600 [0, 2, 0, 1]; c* 0, c0 3, mass [0.40905, 0.28267, 0.18874, 0.11953])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [0, 2] ratio 0.017, cos rows [0, 3] -0.395 (max |cos| 0.395); non-merged [1, 3] ratio 0.961, cos rows [2, 1] +0.853 (max |cos| 0.853); mean ||h|| 4.254; read gates at values s0:0.96/0.00/0.00/0.04 s1:0.00/0.00/1.00/0.00 s2:0.96/0.00/0.00/0.04 s3:0.00/1.00/0.00/0.00
+                   CONTROL 0.78:0201 0.75:0201 0.77:0201 0.76:0201 0.76:0201 0.76:0201 0.75:0201 0.77:0201
+                           at 19200: acc 0.767, per stream 0.53/1.00/0.51/1.00, merged pair on channels [0, 0], merged ratio 0.028
+                   SPLIT   0.78:0201 0.76:0201 1.00:0231| 1.00:0231| 1.00:0231| 1.00:0231| 1.00:0231| 1.00:0231|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [0, 3], merged ratio 1.469; op: noise sd 3.94e-02, ||W_g[c*] - W_g[c0]|| 2.380 -> 0.319
+                   NOISE   0.79:0201 0.76:0201 0.76:0201 0.76:0201 0.76:0201 0.76:0201 0.75:0201 0.76:0201
+                           at 19200: acc 0.758, per stream 0.50/1.00/0.50/1.00, merged pair on channels [0, 0], merged ratio 0.032; op: noise sd 3.94e-02, ||W_g[c*] - W_g[c0]|| 2.380 -> 2.319
+                   READING: CONTROL merged; SPLIT split (at 13200); NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+    SA_A4k4   221  merged pair streams [0, 1] (recorded end map [1, 1, 3, 2], rec acc 0.741; map at 9600 [1, 1, 3, 2]; c* 1, c0 0, mass [0.06431, 0.52616, 0.16895, 0.24058])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [0, 1] ratio 0.041, cos rows [1, 0] +0.143 (max |cos| 0.696); non-merged [2, 3] ratio 1.414, cos rows [3, 2] +0.748 (max |cos| 0.748); mean ||h|| 3.991; read gates at values s0:0.01/0.99/0.00/0.00 s1:0.01/0.99/0.01/0.00 s2:0.00/0.00/0.00/1.00 s3:0.12/0.00/0.88/0.00
+                   CONTROL 0.75:1132 0.75:1132 0.74:1132 0.74:1132 0.74:1132 0.75:1132 0.74:1132 0.75:1132
+                           at 19200: acc 0.755, per stream 0.53/0.51/1.00/1.00, merged pair on channels [1, 1], merged ratio 0.019
+                   SPLIT   1.00:0132| 1.00:0132| 1.00:0132| 1.00:0132| 1.00:0132| 1.00:0132| 1.00:0132| 1.00:0132|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [0, 1], merged ratio 1.310; op: noise sd 3.24e-02, ||W_g[c*] - W_g[c0]|| 2.864 -> 0.240
+                   NOISE   0.75:1132 0.75:1132 0.75:1132 0.75:1132 0.74:1132 0.75:1132 0.75:1132 0.76:1132
+                           at 19200: acc 0.762, per stream 0.54/0.52/1.00/1.00, merged pair on channels [1, 1], merged ratio 0.028; op: noise sd 3.24e-02, ||W_g[c*] - W_g[c0]|| 2.864 -> 2.863
+                   READING: CONTROL merged; SPLIT split (at 10800); NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+    SA_A4k4   223  merged pair streams [2, 3] (recorded end map [3, 2, 1, 1], rec acc 0.738; map at 9600 [3, 2, 1, 1]; c* 1, c0 0, mass [0.01963, 0.53508, 0.15574, 0.28955])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [2, 3] ratio 0.024, cos rows [1, 0] +0.639 (max |cos| 0.710); non-merged [0, 1] ratio 1.052, cos rows [3, 2] +0.850 (max |cos| 0.850); mean ||h|| 4.226; read gates at values s0:0.00/0.00/0.01/0.99 s1:0.01/0.01/0.98/0.01 s2:0.00/0.99/0.00/0.00 s3:0.00/0.99/0.01/0.00
+                   CONTROL 0.75:3211 0.76:3211 0.75:3211 0.74:3211 0.76:3211 0.75:3211 0.75:3211 0.76:3211
+                           at 19200: acc 0.760, per stream 1.00/1.00/0.53/0.50, merged pair on channels [1, 1], merged ratio 0.013
+                   SPLIT   1.00:3201| 1.00:3201| 1.00:3201| 1.00:3201| 1.00:3201| 1.00:3201| 1.00:3201| 1.00:3201|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [0, 1], merged ratio 1.134; op: noise sd 3.68e-02, ||W_g[c*] - W_g[c0]|| 2.442 -> 0.272
+                   NOISE   0.75:3211 1.00:3210| 1.00:3210| 1.00:3210| 1.00:3210| 1.00:3210| 1.00:3210| 1.00:3210|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [1, 0], merged ratio 1.024; op: noise sd 3.68e-02, ||W_g[c*] - W_g[c0]|| 2.442 -> 2.386
+                   READING: CONTROL merged; SPLIT split (at 10800); NOISE split (at 12000); gate state merged ratio >= 0.5 x non-merged: no
+    SA_A4k4   225  merged pair streams [2, 3] (recorded end map [3, 0, 2, 2], rec acc 0.749; map at 9600 [3, 0, 2, 2]; c* 2, c0 1, mass [0.33163, 0.06058, 0.43683, 0.17097])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [2, 3] ratio 0.040, cos rows [2, 1] +0.571 (max |cos| 0.737); non-merged [0, 1] ratio 1.037, cos rows [3, 0] +0.865 (max |cos| 0.865); mean ||h|| 4.662; read gates at values s0:0.01/0.01/0.00/0.99 s1:0.98/0.02/0.00/0.00 s2:0.00/0.00/0.99/0.01 s3:0.00/0.00/0.99/0.01
+                   CONTROL 0.76:3022 0.75:3022 0.75:3022 0.77:3022 0.76:3022 0.75:3022 0.76:3022 0.75:3022
+                           at 19200: acc 0.753, per stream 1.00/1.00/0.51/0.48, merged pair on channels [2, 2], merged ratio 0.022
+                   SPLIT   0.77:3011 1.00:3012| 1.00:3012| 1.00:3012| 1.00:3012| 1.00:3012| 1.00:3012| 1.00:3012|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [1, 2], merged ratio 1.297; op: noise sd 3.56e-02, ||W_g[c*] - W_g[c0]|| 2.536 -> 0.352
+                   NOISE   0.76:3022 0.76:3022 0.75:3022 0.77:3022 0.77:3022 0.75:3022 0.76:3022 0.75:3022
+                           at 19200: acc 0.749, per stream 1.00/1.00/0.50/0.48, merged pair on channels [2, 2], merged ratio 0.010; op: noise sd 3.56e-02, ||W_g[c*] - W_g[c0]|| 2.536 -> 2.477
+                   READING: CONTROL merged; SPLIT split (at 12000); NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+    SA_A4k4   226  merged pair streams [0, 1] (recorded end map [0, 0, 1, 3], rec acc 0.750; map at 9600 [0, 0, 1, 3]; c* 0, c0 2, mass [0.40643, 0.23894, 0.12484, 0.22979])
+                   rerun reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 9600: merged [0, 1] ratio 0.035, cos rows [0, 2] +0.405 (max |cos| 0.503); non-merged [2, 3] ratio 0.996, cos rows [1, 3] +0.804 (max |cos| 0.804); mean ||h|| 4.114; read gates at values s0:0.92/0.00/0.08/0.00 s1:0.91/0.00/0.09/0.00 s2:0.00/1.00/0.00/0.00 s3:0.00/0.00/0.00/1.00
+                   CONTROL 0.75:0013 0.74:0013 0.74:0013 0.76:0013 0.74:0013 0.74:0013 0.76:0013 0.74:0013
+                           at 19200: acc 0.738, per stream 0.48/0.49/1.00/1.00, merged pair on channels [0, 0], merged ratio 0.017
+                   SPLIT   0.75:0013 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [0, 2], merged ratio 1.507; op: noise sd 4.38e-02, ||W_g[c*] - W_g[c0]|| 2.280 -> 0.326
+                   NOISE   0.75:0013 0.74:0013 0.74:0013 0.75:0013 0.74:0013 0.75:0013 0.77:0013 0.74:0013
+                           at 19200: acc 0.742, per stream 0.50/0.49/1.00/1.00, merged pair on channels [0, 0], merged ratio 0.030; op: noise sd 4.38e-02, ||W_g[c*] - W_g[c0]|| 2.280 -> 2.236
+                   READING: CONTROL merged; SPLIT split (at 12000); NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+  SPLIT 8/8, NOISE 1/8, CONTROL 0/8 split by 19200
+  RULE S24 ('splitting un-merges' if SPLIT >= 4/8 and NOISE <= 1/8; 'noise suffices' if NOISE >= 4/8; 'neither works' if SPLIT <= 1/8): splitting un-merges
+  RULE S24 gate state (merged ratio >= 0.5 x non-merged in 0/8; needs >= 6/8): rule not met
+  READING merge_split: splitting un-merges (split by the end of the continuations: SPLIT 8/8, NOISE 1/8, CONTROL 0/8)  [EXPLORATORY, not a result]
+  READING merge_split gate state: rule not met (merged ratio >= 0.5 x non-merged in 0/8)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S22 far_tok_check FAR_TOK_NEW: replicates (DISCOVERED 4/10, ROUTED*@end 4/10)
+  S22 far_tok_check FAR_TOK_LATE vs FAR_TOK: it costs (ROUTED*@end 3/20 vs 7/20, 2 vs 6, p = 0.289)
+  S22 far_tok_check NEAR_TOK_LATE: routing returns (ROUTED*@1200 15/20, DISCOVERED 18/20)
+  S23 far_single: a single channel binds the header layout (BOUND B_FAR 3/10, B_FAR_SLOW 7/10)
+  S24 merge_split: splitting un-merges (SPLIT 8/8, NOISE 1/8, CONTROL 0/8); gate state: rule not met (0/8)
+####################################################################################################
