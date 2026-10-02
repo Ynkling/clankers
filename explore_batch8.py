@@ -237,7 +237,7 @@ def main():
     d24 = s24.report(ec.load_store(s24.NAME))
     v24, _ = status(s24, "; ".join(d24["rule"]))
     v24g, _ = status(s24, d24["gate_rule"])
-    print(f"  {tagp}READING {s24.NAME}: {v24} (split by {s24.T0 + s24.T_CONT}: SPLIT {d24['split']}/{d24['n']}, NOISE "
+    print(f"  {tagp}READING {s24.NAME}: {v24} (split by the end of the continuations: SPLIT {d24['split']}/{d24['n']}, NOISE "
           f"{d24['noise']}/{d24['n']}, CONTROL {d24['control']}/{d24['n']})  [{ec.BANNER}]")
     print(f"  {tagp}READING {s24.NAME} gate state: {v24g} (merged ratio >= {s24.GATE_REL} x non-merged in "
           f"{d24['gate_runs']}/{d24['n']})  [{ec.BANNER}]\n")

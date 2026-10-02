@@ -1,0 +1,233 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), merge_split (S24) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git d15eb62 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly; slow arms at 0.0001 for updates 1-2400 on every non-gate parameter), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S24: rerun to 9600, then 9600 continued updates three times), task P=4 S=2 n_vals=16 n_q=1 (S24: task_for(4, 4), k=4, conv), 1 torch thread per run
+  lr read for dry_far_tok_check FAR_TOK_NEW: 0.001
+  lr read for dry_far_tok_check FAR_TOK_LATE: 0.001
+  lr read for dry_far_tok_check NEAR_TOK_LATE: 0.001
+  lr read for dry_far_single B_FAR: 0.001
+  lr read for dry_far_single B_FAR_SLOW: 0.001
+  lr read for dry_merge_split SR_A4k4: 0.001
+  lr read for dry_merge_split SA_A4k4: 0.001
+  S22 rules: FAR_TOK_NEW 'replicates' if DISCOVERED >= 4/10 and ROUTED*@end >= 2/10, 'does not' if DISCOVERED <= 1/10, else neither; FAR_TOK_LATE vs FAR_TOK (ROUTED*@end) 'the late start helps' if b - c >= 4 and McNemar p < 0.1, 'it costs' if c - b >= 4, else neither; NEAR_TOK_LATE 'routing returns' if ROUTED*@1200 >= 10/20 and DISCOVERED >= 16/20
+  S23 rule: 'header binding needs the partition' if B_FAR and B_FAR_SLOW each bind <= 1/10; 'a single channel binds the header layout' if either binds >= 3/10; else neither
+  S24 rules: 'splitting un-merges' if SPLIT >= 4/8 and NOISE <= 1/8; 'noise suffices' if NOISE >= 4/8; 'neither works' if SPLIT <= 1/8 (split: the merged pair on different channels and accuracy >= 0.95 at some evaluation up to 19200); 'the gate state tells the merged streams apart' if merged ratio >= 0.5 x non-merged in >= 6/8
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): merge_split, far_tok_check, far_single — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (65s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_far_tok_check: FAR_TOK_NEW's code path equals S19's: seed 160 to 3600 reproduces S19's FAR_TOK record (True); its logs: 6 key firings = the key hinge count 6, early eta2_key at updates 0/1/10/100 0.641/0.444/0.133/0.018: ok
+  CHECK dry_far_tok_check: FAR_TOK_LATE equals FAR_SLOW_HINGE bit for bit through update 2400 on seed 160 (curves = a fresh FAR_SLOW_HINGE run = the recorded run; weights after update 2400 equal); no key firing applied (the key term was above TAU on 2399 batches, first [1, 2, 3, 4, 5]): ok
+  CHECK dry_far_tok_check: NEAR_TOK_LATE equals SLOW_HINGE bit for bit through update 2400 on seed 160 (curves = a fresh SLOW_HINGE run = the recorded run; weights after update 2400 equal); no key firing applied (the key term was above TAU on 110 batches, first [1, 2, 3, 4, 5]): ok
+  CHECK dry_far_single: B_FAR's model is k = 1 with gate 'none' and no gate parameters (parameters: ['decoder', 'embed.weight', 'encoder', 'encoder_v', 'lm_head']): ok
+  CHECK dry_far_single: with the slow schedule's low lr set to 0.001, B_FAR_SLOW equals B_FAR bit for bit (curves and weights, seed 160, 3600 steps): ok
+  CHECK dry_far_single: B_FAR_SLOW's optimizer: lr [0.0001] at update 1, [0.0001] at 2400, [0.001] at 2401, [0.001] at 3600 (3600 steps seen); its curve differs from B_FAR's (True): ok
+  CHECK dry_merge_split: the runs are S21's derived list (stream_recipe (247, 248, 251, 258), scale_axes (221, 223, 225, 226)): ok
+  CHECK dry_merge_split: test_scale_axes.run_job (run_one) seed 221: rerun to 1200 reproduces the record (True); CONTROL's 1200 updates reproduce the recorded evaluation at 2400 ([[2400, 0.1171875, 2.694366455078125]] vs [[2400, 0.1171875, 2.694366455078125]]); identical batches in the 3 continuations (True); start states equal to the run's (W_g's absent for SPLIT/NOISE) and stored apart from it (True); W_g's Adam step after the first update CONTROL/SPLIT/NOISE [[1201.0, 1201.0], [1.0, 1201.0], [1.0, 1201.0]] (W_g, another) (True); the run's optimizer and model unchanged (True); W_g rows after the operation match the spec (True; c* 1, c0 0, mass [0.20547, 0.32286, 0.24777, 0.2239], noise sd 1.62e-02); recomputed gate = model's (max diff 0.0e+00): ok
+  CHECK dry_merge_split: test_stream_recipe.run_attempt (plain A4k4) seed 247: rerun to 1200 reproduces the record (True); CONTROL's 1200 updates reproduce the recorded evaluation at 2400 ([[2400, 0.17236328125, 2.406351089477539]] vs [[2400, 0.17236328125, 2.406351089477539]]); identical batches in the 3 continuations (True); start states equal to the run's (W_g's absent for SPLIT/NOISE) and stored apart from it (True); W_g's Adam step after the first update CONTROL/SPLIT/NOISE [[1201.0, 1201.0], [1.0, 1201.0], [1.0, 1201.0]] (W_g, another) (True); the run's optimizer and model unchanged (True); W_g rows after the operation match the spec (True; c* 0, c0 1, mass [0.28612, 0.23108, 0.23914, 0.24365], noise sd 1.62e-02); recomputed gate = model's (max diff 0.0e+00): ok
+  all CHECKs passed (17.1 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_tok_check
+  idea    S19's FAR_TOK on fresh seeds, and the key-token term started late (from update 2401)
+  source  batch 7's S19 (FAR_TOK 6/10 DISCOVERED, 3/10 routed; NEAR_TOK's key term fired at the start and delayed routing)
+  change  FAR_TOK_NEW: S19's FAR_TOK on seeds 170-179; FAR_TOK_LATE / NEAR_TOK_LATE: the key term only from update 2401, the position terms from update 1
+  arm FAR_TOK_NEW  lr 0.001  iters 3600  seeds 170-170 (1)  — S19's FAR_TOK on fresh seeds, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm FAR_TOK_LATE lr 0.001  iters 3600  seeds 160-160 (1)  — FAR_TOK with the key term from update 2401, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401
+  arm NEAR_TOK_LATE lr 0.001  iters 3600  seeds 160-160 (1)  — NEAR_TOK with the key term from update 2401, grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401
+  pairing FAR_TOK_LATE seeds 160-179 with FAR_TOK (S19 160-169, FAR_TOK_NEW 170-179); NEAR_TOK_LATE seeds 160-179 with S19's NEAR_TOK and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_single
+  idea    the missing control: a single channel (no gate, no partition) on the header layout
+  source  batch 7's S19 (FAR_TOK bound 9/10 on the header layout, 3 of them with every eta^2 near 0)
+  change  test_short_conv's arm B (k = 1, gate 'none') on the header layout; B_FAR_SLOW with the slow schedule
+  arm B_FAR        lr 0.001  iters 3600  seeds 160-160 (1)  — plain single channel (arm B), header layout
+                   schedule: lr 0.001 throughout
+  arm B_FAR_SLOW   lr 0.001  iters 3600  seeds 160-160 (1)  — arm B with the slow schedule, header layout
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  pairing seeds 160-169, printed beside S19's FAR_TOK, batch 3's far_A_slow and batch 2's far_A (same batches; the initial parameters differ: k = 1 has no gate)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_merge_split
+  idea    break the symmetry of a merged pair's read-gate rows: copy the busiest channel's W_g row to the idlest, plus noise
+  source  batch 7's S21 (merged pairs have identical gates: a symmetric point the task gradient cannot leave; 100x kicks split 0/8)
+  change  none to the recorded runs up to 9600; then 9600 updates three ways: CONTROL; SPLIT (W_g[c0] = W_g[c*] + noise, W_g[c*] + noise, W_g's Adam state reset); NOISE (the same noise, no copy, same reset)
+  arm SR_A4k4      lr 0.001  iters 3600  seeds 247-247 (1)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  arm SA_A4k4      lr 0.001  iters 3600  seeds 221-221 (1)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  pairing each run's SPLIT and NOISE against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    dry_far_tok_check FAR_TOK_NEW  1 runs x   1.2 min  (3600 steps x 19.4 ms + 3 evals x 1.2 s)
+    dry_far_tok_check FAR_TOK_LATE  1 runs x   1.5 min  (3600 steps x 23.2 ms + 3 evals x 1.4 s)
+    dry_far_tok_check NEAR_TOK_LATE  1 runs x   1.5 min  (3600 steps x 23.4 ms + 3 evals x 1.8 s)
+    dry_far_single B_FAR       1 runs x   0.9 min  (3600 steps x 14.6 ms + 3 evals x 0.6 s)
+    dry_far_single B_FAR_SLOW  1 runs x   0.9 min  (3600 steps x 14.4 ms + 3 evals x 0.6 s)
+    dry_merge_split SR_A4k4     1 runs x   3.1 min  (3600 steps x 46.8 ms + 3 evals x 5.8 s)
+    dry_merge_split SA_A4k4     1 runs x   3.2 min  (3600 steps x 48.0 ms + 3 evals x 5.9 s)
+    total 0.20 h of runs; makespan on 4 workers 0.05 h (worst case)
+  7 runs queued on 4 workers (1 torch thread each)
+  [  1/7]    1.3 min  dry_far_tok_check FAR_TOK_LATE seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401)
+          acc 0.316  trans  None  VALcos 0.318  margin 0.46  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  2/7]    1.7 min  dry_far_tok_check NEAR_TOK_LATE seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401)
+          acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  3/7]    2.6 min  dry_far_single B_FAR      seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 0.230  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
+  [  4/7]    2.6 min  dry_far_tok_check FAR_TOK_NEW seed 170  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+          acc 0.239  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  5/7]    3.5 min  dry_far_single B_FAR_SLOW seed 160  lr 0.001 (every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+          acc 0.241  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
+  [  6/7]    5.6 min  dry_merge_split SA_A4k4    seed 221  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset)
+          acc 0.125  trans  None  VALcos 0.999  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  7/7]    5.6 min  dry_merge_split SR_A4k4    seed 247  lr 0.001 (lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset)
+          acc 0.188  trans  None  VALcos 0.999  margin 0.00  KEY  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 5.6 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_tok_check
+  idea    S19's FAR_TOK on fresh seeds, and the key-token term started late (from update 2401)
+  source  batch 7's S19 (FAR_TOK 6/10 DISCOVERED, 3/10 routed; NEAR_TOK's key term fired at the start and delayed routing)
+  change  FAR_TOK_NEW: S19's FAR_TOK on seeds 170-179; FAR_TOK_LATE / NEAR_TOK_LATE: the key term only from update 2401, the position terms from update 1
+  arm FAR_TOK_NEW  lr 0.001  iters 3600  seeds 170-170 (1)  — S19's FAR_TOK on fresh seeds, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm FAR_TOK_LATE lr 0.001  iters 3600  seeds 160-160 (1)  — FAR_TOK with the key term from update 2401, header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401
+  arm NEAR_TOK_LATE lr 0.001  iters 3600  seeds 160-160 (1)  — NEAR_TOK with the key term from update 2401, grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401
+  pairing FAR_TOK_LATE seeds 160-179 with FAR_TOK (S19 160-169, FAR_TOK_NEW 170-179); NEAR_TOK_LATE seeds 160-179 with S19's NEAR_TOK and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; logs: eta2_key after 0/1/10/100 updates, the updates of the applied key firings, and in the late arms the updates where the key term was above TAU but off):
+   arm FAR_TOK_NEW (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome           logs
+     170  0.239   None   1.000   0.00  0.08/0.01/0.01/0.02  -/-/-/-  OTHER             eta2_key@0/1/10/100 0.38/0.23/0.13/0.03; key fired 4x at [1, 2, 15, 82]
+   arm FAR_TOK_LATE (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         FAR_TOK         S17 FAR_SLOW_H   logs
+     160  0.316   None   0.318   0.46  0.87/0.00/0.00/0.00  -/-/-/-  STREAM-PARTIAL  DISCOVERED      KEY              eta2_key@0/1/10/100 0.64/0.69/0.26/0.53; key fired 6x at [2401, 2402, 2403, 2406, 2407, 2408]; above TAU while off 2399x (first [1, 2, 3], last [2400])
+   arm NEAR_TOK_LATE (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         S19 NEAR_TOK    S13 SLOW_HINGE   logs
+     160  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      OTHER           DISCOVERED       eta2_key@0/1/10/100 0.80/0.76/0.80/0.22; key fired 0x at []; above TAU while off 110x (first [1, 2, 3], last [128])
+  FAR_TOK_NEW (seeds 170-179): DISCOVERED 0/1, ROUTED*@end 0/1, BOUND 0/1; failures {'OTHER': 1}; with S19's 160-169: DISCOVERED 6/11, ROUTED*@end 3/11
+  FAR_TOK_LATE vs FAR_TOK (1 seeds; FAR_TOK = S19 on 160-169, FAR_TOK_NEW on 170-179):
+    ROUTED*@end   FAR_TOK_LATE  0/1   FAR_TOK  0/1   FAR_TOK_LATE only 0, FAR_TOK only 0, McNemar two-sided p = 1
+    DISCOVERED    FAR_TOK_LATE  0/1   FAR_TOK  1/1   FAR_TOK_LATE only 0, FAR_TOK only 1, McNemar two-sided p = 1
+    BOUND         FAR_TOK_LATE  0/1   FAR_TOK  1/1   FAR_TOK_LATE only 0, FAR_TOK only 1, McNemar two-sided p = 1
+    ROUTED*@1200  FAR_TOK_LATE  0/1   FAR_TOK  0/1   FAR_TOK_LATE only 0, FAR_TOK only 0, McNemar two-sided p = 1
+    failures FAR_TOK_LATE {'STREAM-PARTIAL': 1}   FAR_TOK {}
+    hinge firings (batches): index 2, half 0, key 6, any 8 of 3600; runs with the term on at least once: index 1, half 0, key 1 of 1
+  NEAR_TOK_LATE (1 seeds):
+   paired with S19's NEAR_TOK:
+    ROUTED*@1200  NEAR_TOK_LATE  1/1   NEAR_TOK  0/1   NEAR_TOK_LATE only 1, NEAR_TOK only 0, McNemar two-sided p = 1
+    DISCOVERED    NEAR_TOK_LATE  1/1   NEAR_TOK  0/1   NEAR_TOK_LATE only 1, NEAR_TOK only 0, McNemar two-sided p = 1
+   paired with S13's SLOW_HINGE:
+    ROUTED*@1200  NEAR_TOK_LATE  1/1   SLOW_HINGE  1/1   NEAR_TOK_LATE only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    DISCOVERED    NEAR_TOK_LATE  1/1   SLOW_HINGE  1/1   NEAR_TOK_LATE only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    failures NEAR_TOK_LATE {}   NEAR_TOK {'OTHER': 1}   SLOW_HINGE {}
+    hinge firings (batches): index 0, half 0, key 0, any 0 of 3600; runs with the term on at least once: index 0, half 0, key 0 of 1
+  eta2_key on the first training batch (0 updates), all 3 runs: min 0.380, median 0.641, max 0.798; runs with the key term above TAU in updates 1-1200 (applied or not): 3/3
+  RULE FAR_TOK_NEW (DISCOVERED 0/1, ROUTED*@end 0/1; 'replicates' if DISCOVERED >= 4 and ROUTED*@end >= 2, 'does not' if DISCOVERED <= 1): does not
+  RULE FAR_TOK_LATE vs FAR_TOK (ROUTED*@end 0 vs 0, p = 1; 'the late start helps' if b - c >= 4 and p < 0.1, 'it costs' if c - b >= 4): neither
+  RULE NEAR_TOK_LATE (ROUTED*@1200 1/1, DISCOVERED 1/1; 'routing returns' if >= 10/20 and >= 16/20): rule not met
+  DRY RUN READING dry_far_tok_check FAR_TOK_NEW: does not (DISCOVERED 0/1, ROUTED*@end 0/1)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_far_tok_check FAR_TOK_LATE vs FAR_TOK: neither (ROUTED*@end 0/1 vs 0/1, 0 vs 0, p = 1)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_far_tok_check NEAR_TOK_LATE: rule not met (ROUTED*@1200 1/1, DISCOVERED 1/1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_single
+  idea    the missing control: a single channel (no gate, no partition) on the header layout
+  source  batch 7's S19 (FAR_TOK bound 9/10 on the header layout, 3 of them with every eta^2 near 0)
+  change  test_short_conv's arm B (k = 1, gate 'none') on the header layout; B_FAR_SLOW with the slow schedule
+  arm B_FAR        lr 0.001  iters 3600  seeds 160-160 (1)  — plain single channel (arm B), header layout
+                   schedule: lr 0.001 throughout
+  arm B_FAR_SLOW   lr 0.001  iters 3600  seeds 160-160 (1)  — arm B with the slow schedule, header layout
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  pairing seeds 160-169, printed beside S19's FAR_TOK, batch 3's far_A_slow and batch 2's far_A (same batches; the initial parameters differ: k = 1 has no gate)
+----------------------------------------------------------------------------------------------------
+  per seed (acc at 2400/4800/12000 and at the last evaluation; transition = the bound step):
+   arm B_FAR (lr 0.001; lr 0.001 throughout)
+    seed   acc@2400/4800/12000  acc end  stopped  trans  outcome  S19 FAR_TOK     b3 far_A_slow   b2 far_A       
+     160           0.199/--/--    0.230     3600   None  unbound  DISCOVERED      POSITION        POSITION       
+     161 not run                                            BOUND unrouted  KEY             POSITION       
+     162 not run                                            BOUND unrouted  POSITION        POSITION       
+     163 not run                                            DISCOVERED      POSITION        POSITION       
+     164 not run                                            DISCOVERED      STREAM-PARTIAL  OTHER          
+     165 not run                                            BOUND unrouted  POSITION        STREAM-PARTIAL 
+     166 not run                                            DISCOVERED      POSITION        STREAM-PARTIAL 
+     167 not run                                            DISCOVERED      POSITION        OTHER          
+     168 not run                                            DISCOVERED      POSITION        OTHER          
+     169 not run                                            OTHER           POSITION        POSITION       
+   arm B_FAR_SLOW (lr 0.001; every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+    seed   acc@2400/4800/12000  acc end  stopped  trans  outcome  S19 FAR_TOK     b3 far_A_slow   b2 far_A       
+     160           0.209/--/--    0.241     3600   None  unbound  DISCOVERED      POSITION        POSITION       
+     161 not run                                            BOUND unrouted  KEY             POSITION       
+     162 not run                                            BOUND unrouted  POSITION        POSITION       
+     163 not run                                            DISCOVERED      POSITION        POSITION       
+     164 not run                                            DISCOVERED      STREAM-PARTIAL  OTHER          
+     165 not run                                            BOUND unrouted  POSITION        STREAM-PARTIAL 
+     166 not run                                            DISCOVERED      POSITION        STREAM-PARTIAL 
+     167 not run                                            DISCOVERED      POSITION        OTHER          
+     168 not run                                            DISCOVERED      POSITION        OTHER          
+     169 not run                                            OTHER           POSITION        POSITION       
+  B_FAR: BOUND 0/1; final acc min 0.230, median 0.230, max 0.230
+  B_FAR_SLOW: BOUND 0/1; final acc min 0.241, median 0.241, max 0.241
+  B_FAR_SLOW vs B_FAR (paired, BOUND): B_FAR_SLOW only 0, B_FAR only 0, McNemar p = 1
+  S19 FAR_TOK: BOUND 9/10 on these seeds
+  b3 far_A_slow: BOUND 0/10 on these seeds
+  b2 far_A: BOUND 0/10 on these seeds
+  RULE (B_FAR 0/1, B_FAR_SLOW 0/1 BOUND; 'needs the partition' if each <= 1/10, 'a single channel binds' if either >= 3/10): header binding needs the partition
+  DRY RUN READING dry_far_single: header binding needs the partition (BOUND B_FAR 0/1, B_FAR_SLOW 0/1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_merge_split
+  idea    break the symmetry of a merged pair's read-gate rows: copy the busiest channel's W_g row to the idlest, plus noise
+  source  batch 7's S21 (merged pairs have identical gates: a symmetric point the task gradient cannot leave; 100x kicks split 0/8)
+  change  none to the recorded runs up to 9600; then 9600 updates three ways: CONTROL; SPLIT (W_g[c0] = W_g[c*] + noise, W_g[c*] + noise, W_g's Adam state reset); NOISE (the same noise, no copy, same reset)
+  arm SR_A4k4      lr 0.001  iters 3600  seeds 247-247 (1)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  arm SA_A4k4      lr 0.001  iters 3600  seeds 221-221 (1)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain; SPLIT W_g[c0] = W_g[c*] + noise and W_g[c*] + noise (std 0.1 x std(W_g[c*])), W_g's Adam state reset; NOISE the same noise without the copy, same reset
+  pairing each run's SPLIT and NOISE against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  per run (map = stream -> channel at each evaluation, as acc:map; '|' = the merged pair on different channels; continuations from 9600 to 19200; gate state at the start of the continuations: ratio = ||h_a - h_b|| / mean ||h|| at value positions, cos = cos(W_g[r1] - W_g[r2], h_a - h_b)):
+    SR_A4k4   247  merged pair streams [2, 3] (recorded end map [3, 1, 0, 0], rec acc 0.754; map at 2400 [0, 3, 0, 0]; c* 0, c0 1, mass [0.26135, 0.24369, 0.24587, 0.2491])
+                   rerun reproduces: yes; CONTROL = record to 3600: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 2400: merged [2, 3] ratio 0.168, cos rows [0, 1] +0.058 (max |cos| 0.077); non-merged [0, 1] ratio 0.030, cos rows [0, 3] +0.140 (max |cos| 0.140); mean ||h|| 4.149; read gates at values s0:0.25/0.25/0.25/0.25 s1:0.25/0.25/0.25/0.25 s2:0.27/0.24/0.24/0.24 s3:0.26/0.25/0.25/0.25
+                   CONTROL 0.34:1100
+                           at 3600: acc 0.336, per stream 0.25/0.38/0.38/0.32, merged pair on channels [0, 0], merged ratio 0.228
+                   SPLIT   0.19:0300
+                           at 3600: acc 0.188, per stream 0.16/0.20/0.20/0.19, merged pair on channels [0, 0], merged ratio 0.196; op: noise sd 1.69e-02, ||W_g[c*] - W_g[c0]|| 1.582 -> 0.139
+                   NOISE   0.20:0200
+                           at 3600: acc 0.196, per stream 0.16/0.20/0.21/0.21, merged pair on channels [0, 0], merged ratio 0.129; op: noise sd 1.69e-02, ||W_g[c*] - W_g[c0]|| 1.582 -> 1.581
+                   READING: CONTROL merged; SPLIT merged; NOISE merged; gate state merged ratio >= 0.5 x non-merged: yes
+    SA_A4k4   221  merged pair streams [0, 1] (recorded end map [1, 1, 3, 2], rec acc 0.741; map at 2400 [1, 1, 1, 1]; c* 1, c0 3, mass [0.24251, 0.28012, 0.24239, 0.23498])
+                   rerun reproduces: yes; CONTROL = record to 3600: yes; batches identical: yes; start states equal and separate: yes; W_g Adam reset: yes; rows as spec: yes; run unchanged: yes; gate recompute: yes
+                   at 2400: merged [0, 1] ratio 0.041, cos rows [1, 0] +0.470 (max |cos| 0.470); non-merged [2, 3] ratio 0.089, cos rows [1, 0] -0.016 (max |cos| 0.048); mean ||h|| 3.944; read gates at values s0:0.24/0.29/0.24/0.23 s1:0.25/0.27/0.24/0.24 s2:0.25/0.28/0.24/0.24 s3:0.25/0.28/0.24/0.23
+                   CONTROL 0.12:1111
+                           at 3600: acc 0.125, per stream 0.12/0.12/0.16/0.11, merged pair on channels [1, 1], merged ratio 0.063
+                   SPLIT   0.12:1111
+                           at 3600: acc 0.125, per stream 0.13/0.12/0.14/0.12, merged pair on channels [1, 1], merged ratio 0.060; op: noise sd 1.18e-02, ||W_g[c*] - W_g[c0]|| 0.918 -> 0.087
+                   NOISE   0.13:1111
+                           at 3600: acc 0.130, per stream 0.14/0.13/0.13/0.12, merged pair on channels [1, 1], merged ratio 0.056; op: noise sd 1.18e-02, ||W_g[c*] - W_g[c0]|| 0.918 -> 0.897
+                   READING: CONTROL merged; SPLIT merged; NOISE merged; gate state merged ratio >= 0.5 x non-merged: no
+  SPLIT 0/2, NOISE 0/2, CONTROL 0/2 split by 19200
+  RULE S24 ('splitting un-merges' if SPLIT >= 4/8 and NOISE <= 1/8; 'noise suffices' if NOISE >= 4/8; 'neither works' if SPLIT <= 1/8): neither works
+  RULE S24 gate state (merged ratio >= 0.5 x non-merged in 1/2; needs >= 6/8): rule not met
+  DRY RUN READING dry_merge_split: neither works (split by 19200: SPLIT 0/2, NOISE 0/2, CONTROL 0/2)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_merge_split gate state: rule not met (merged ratio >= 0.5 x non-merged in 1/2)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S22 far_tok_check FAR_TOK_NEW: does not (DISCOVERED 0/1, ROUTED*@end 0/1)
+  S22 far_tok_check FAR_TOK_LATE vs FAR_TOK: neither (ROUTED*@end 0/1 vs 0/1, 0 vs 0, p = 1)
+  S22 far_tok_check NEAR_TOK_LATE: rule not met (ROUTED*@1200 1/1, DISCOVERED 1/1)
+  S23 far_single: header binding needs the partition (BOUND B_FAR 0/1, B_FAR_SLOW 0/1)
+  S24 merge_split: neither works (SPLIT 0/2, NOISE 0/2, CONTROL 0/2); gate state: rule not met (1/2)
+####################################################################################################
+exit 0

@@ -1,0 +1,235 @@
+{
+ "meta": {
+  "arms": {
+   "B_FAR": {
+    "g2r": false,
+    "gate": "none",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "B_FAR",
+    "label": "plain single channel (arm B), header layout",
+    "layout": "header",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 1,
+    "prio": 1,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     160
+    ]
+   },
+   "B_FAR_SLOW": {
+    "g2r": false,
+    "gate": "none",
+    "h_gate": null,
+    "iters": 3600,
+    "key": "B_FAR_SLOW",
+    "label": "arm B with the slow schedule, header layout",
+    "layout": "header",
+    "lr": 0.001,
+    "lr_low": 0.0001,
+    "mult": 8,
+    "n_ch": 1,
+    "prio": 1,
+    "sched": "every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)",
+    "seeds": [
+     160
+    ]
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "d15eb62",
+   "python": "3.11.15",
+   "started": "2026-10-02 15:20:40",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {
+  "B_FAR_SLOW|160": {
+   "acc": 0.24072265625,
+   "collapsed": false,
+   "ctx_cos": 1.0,
+   "curve": [
+    [
+     1200,
+     0.19677734375,
+     2.5904226303100586
+    ],
+    [
+     2400,
+     0.20947265625,
+     2.4259703159332275
+    ],
+    [
+     3600,
+     0.24072265625,
+     2.2084670066833496
+    ]
+   ],
+   "discovered": false,
+   "dry": true,
+   "end": {
+    "ctx_cos": 1.0,
+    "k": 1,
+    "key_cos": 1.0,
+    "step": "end",
+    "val_cos": 1.0
+   },
+   "grad": {
+    "1": [
+     0.0,
+     3.077390980218868,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.6496908322410175,
+     0.0
+    ],
+    "100": [
+     0.0,
+     2.0843480372936924,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 1,
+   "key_cos": 1.0,
+   "lr": 0.001,
+   "ok": true,
+   "params": 25984,
+   "sched": "every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)",
+   "secs": 56.3796546459198,
+   "secs_wall": 56.414806604385376,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 0,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 1200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 2400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 3600,
+     "val_cos": 1.0
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": null,
+   "val_cos": 1.0
+  },
+  "B_FAR|160": {
+   "acc": 0.23046875,
+   "collapsed": false,
+   "ctx_cos": 1.0,
+   "curve": [
+    [
+     1200,
+     0.1708984375,
+     2.4773590564727783
+    ],
+    [
+     2400,
+     0.19873046875,
+     2.3929688930511475
+    ],
+    [
+     3600,
+     0.23046875,
+     2.2748513221740723
+    ]
+   ],
+   "discovered": false,
+   "dry": true,
+   "end": {
+    "ctx_cos": 1.0,
+    "k": 1,
+    "key_cos": 1.0,
+    "step": "end",
+    "val_cos": 1.0
+   },
+   "grad": {
+    "1": [
+     0.0,
+     3.077390980218868,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.4498220046729589,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.7097863893073824,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 1,
+   "key_cos": 1.0,
+   "lr": 0.001,
+   "ok": true,
+   "params": 25984,
+   "sched": "lr 0.001 throughout",
+   "secs": 56.52072477340698,
+   "secs_wall": 56.55388689041138,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 0,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 1200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 2400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 3600,
+     "val_cos": 1.0
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": null,
+   "val_cos": 1.0
+  }
+ }
+}

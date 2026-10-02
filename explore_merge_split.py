@@ -391,8 +391,10 @@ def ev_str(evals, pair):
 def report(store):
     me = sys.modules[__name__]
     c2.print_screen_header2(me)
+    done = [r for r in store["runs"].values() if r.get("ok")]
+    t0, t1 = (done[0]["t0"], done[0]["t0"] + done[0]["cont"]) if done else (T0, T0 + T_CONT)
     print(f"  per run (map = stream -> channel at each evaluation, as acc:map; '|' = the merged pair on different "
-          f"channels; continuations from {T0} to {T0 + T_CONT}; gate state at the start of the continuations: "
+          f"channels; continuations from {t0} to {t1}; gate state at the start of the continuations: "
           f"ratio = ||h_a - h_b|| / mean ||h|| at value positions, cos = cos(W_g[r1] - W_g[r2], h_a - h_b)):")
     n = {k: 0 for k in KINDS}
     n_done, n_gate = 0, 0
@@ -442,7 +444,7 @@ def report(store):
     rd = readings(n["SPLIT"], n["NOISE"])
     gr = gate_reading(n_gate)
     print(f"  SPLIT {n['SPLIT']}/{n_done}, NOISE {n['NOISE']}/{n_done}, CONTROL {n['CONTROL']}/{n_done} split by "
-          f"{T0 + T_CONT}")
+          f"{t1}")
     print(f"  RULE S24 ('splitting un-merges' if SPLIT >= {SPLIT_MIN}/8 and NOISE <= {NOT_MAX}/8; 'noise suffices' if "
           f"NOISE >= {SPLIT_MIN}/8; 'neither works' if SPLIT <= {NOT_MAX}/8): {'; '.join(rd)}")
     print(f"  RULE S24 gate state (merged ratio >= {GATE_REL} x non-merged in {n_gate}/{n_done}; needs >= {GATE_RUNS}/8): {gr}")
