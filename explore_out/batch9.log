@@ -319,3 +319,7 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
     total 18.21 h of runs; makespan on 4 workers 4.60 h (worst case)
   PROJECTION NOTE: the projection above times S25's arms under Adam; measured here (50 steps of arm A, 1 thread) 24.8 ms/step under MUON vs 20.1 ms/step under Adam (x1.23); S25's worst case scales by that factor
   57 runs queued on 4 workers (1 torch thread each)
+  [  1/57]    9.3 min  far_p8         B_FAR8_SLOW seed 163  lr 0.001 (every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+          acc 0.231  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
+  [  2/57]    9.4 min  far_p8         B_FAR8_SLOW seed 162  lr 0.001 (every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+          acc 0.200  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
