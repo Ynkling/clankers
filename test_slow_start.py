@@ -159,6 +159,43 @@ RUNTIME
 OUTPUT
 Per-seed raw values first, then counts, pairing, claims, readings, diagnostics and curves.
 Results: slow_start_results.json (gitignored; X's copy in results/X/).
+
+RESULT (X, test commit 9c5939e; results/X/slow_start_results.json)
+Run conditions:
+- 110/110 records, none failed; 383.4 min of training after verification, 4 workers x 1 thread.
+- The first start (2.10GHz host, 2026-10-02 01:08) recorded its drop decision (projection 6.69 h:
+  nothing dropped) and was then killed by a container restart before any run finished. The
+  resumed start (2.80GHz host, 05:21) re-ran the whole verification, kept the recorded decision
+  (its own projection was 10.54 h) and ran every run. Every recorded file paired by reproduction
+  on both hosts (CHECK 110); all CHECKs passed on both.
+- CHECK 112 (informative): SLOW0 reproduces the screens' SLOW_MEM (seed 160) and HINGE0 their
+  SLOW_HINGE where the hinge never fired (seed 160); on seed 162 (3 firings in both) the curves
+  differ slightly (0.2153 vs 0.2158 at 1200), as expected: the pooled statistic equals the
+  screens' channel-0 one only up to float rounding.
+Claims:
+- H0   HINGE0 19/20 vs A0 8/20, 11 vs 0, p = 0.00049: SHOWN.
+- HA   HINGE8 20/20 vs DIRECT8 13/20, 7 vs 0, p = 0.0078: SHOWN.
+- HB   HINGE4k16 17/20 vs A4k16 12/20, 7 vs 2, p = 0.090: NOT SHOWN.
+- S0   SLOW0 15/20 vs A0 8/20, 9 vs 2, p = 0.033: SHOWN.
+- H0S  HINGE0 19/20 vs SLOW0 15/20, 4 vs 0, p = 0.0625: NOT SHOWN.
+- Bands: HINGE0 RELIABLE (19/20), HINGE8 RELIABLE (20/20), HINGE4k16 MAJORITY (17/20).
+- Readings: "the screen replicates on fresh seeds"; "it carries to eight keys only".
+- Part C: 4 of 10 HINGE_D8 runs end collapsed: "it does not". None bound (D8 0/6 recorded here).
+Diagnostics (not part of the verdict):
+- Part 0 failures: A0 9 POSITION, 2 KEY, 1 STREAM-PARTIAL; SLOW0 4 POSITION, 1 OTHER; HINGE0 one
+  OTHER (s287, the only run where the hinge kept firing: 950 batches). HINGE0's hinge never fired
+  on 11/20 seeds and at most twice on the others; ROUTED* at 1200: A0 8, SLOW0 15, HINGE0 14.
+- HINGE8 bound all 20, including the 5 POSITION and 2 STREAM-PARTIAL failures of the recorded
+  DIRECT8 (17 by step 4800; s222, s223, s237 later). It fired on 12/20 runs, median once.
+- HINGE4k16: 15 BOUND ROUTED, 2 bound without a one-to-one map, 2 merges, 1 one-to-one partial;
+  no non-stream failure (A4k16 had 4: 2 POSITION, 1 KEY, 1 OTHER). Discordant pairs 7 vs 2: it
+  lost s242 (partial) and s243 (merge), which A4k16 bound late (18000, 16800).
+- HINGE_D8: no binder; 6 of 10 ended above chance as merges or partial routes (0.16-0.47, best
+  s265 at 0.47 with two streams near 0.9), against D8's flat 0.08-0.10; the hinge fired 3-83
+  times per run, mostly after step 2400.
+- The label-free check at 1200 (any eta2 by index, half or key >= 0.5) flagged 8 A0 and 5 SLOW0
+  runs, none of which discovered; under HINGE it flagged 1/20 (Part 0) and 1/20 (Part A), and
+  those runs bound.
 """
 
 import argparse
