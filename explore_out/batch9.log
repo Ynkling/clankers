@@ -147,3 +147,7 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
           acc 0.999  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [ 15/111]   40.0 min  muon_recipe    MUON_HINGE seed 163  lr 0.001 (Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
           acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [ 16/111]   41.6 min  muon_recipe    MUON_A     seed 165  lr 0.001 (Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout)
+          acc 0.993  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [ 17/111]   41.9 min  muon_recipe    MUON_HINGE seed 164  lr 0.001 (Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+          acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
