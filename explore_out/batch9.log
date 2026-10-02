@@ -108,3 +108,12 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
   PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
     muon_recipe    MUON_A     20 runs x   8.0 min  (24000 steps x 19.4 ms + 20 evals x 0.8 s)
     muon_recipe    MUON_HINGE 20 runs x   8.9 min  (24000 steps x 21.4 ms + 20 evals x 0.9 s)
+    gate_langevin  LANGEVIN   40 runs x   9.1 min  (24000 steps x 22.1 ms + 20 evals x 0.9 s)
+    zloss_merge    SR_A4k4     4 runs x  14.9 min  (19200 steps x 43.7 ms + 16 evals x 3.4 s)
+    zloss_merge    SA_A4k4     4 runs x  15.0 min  (19200 steps x 44.2 ms + 16 evals x 3.2 s)
+    far_p8         FAR8_CEIL   3 runs x   9.8 min  (24000 steps x 23.5 ms + 20 evals x 1.3 s)
+    far_p8         B_FAR8_SLOW 10 runs x   9.7 min  (24000 steps x 23.4 ms + 20 evals x 1.0 s)
+    far_p8         FAR_TOK8   10 runs x  13.8 min  (24000 steps x 33.4 ms + 20 evals x 1.4 s)
+    total 18.13 h of runs; makespan on 4 workers 4.59 h (worst case)
+  PROJECTION NOTE: the projection above times S25's arms under Adam; measured here (50 steps of arm A, 1 thread) 27.9 ms/step under MUON vs 20.9 ms/step under Adam (x1.34); S25's worst case scales by that factor
+  111 runs queued on 4 workers (1 torch thread each)

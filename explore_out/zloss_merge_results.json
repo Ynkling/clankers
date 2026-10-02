@@ -1,0 +1,69 @@
+{
+ "meta": {
+  "arms": {
+   "SA_A4k4": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 19200,
+    "key": "SA_A4k4",
+    "label": "test_scale_axes's A4k4 (X), merged pair stalled",
+    "lr": 0.001,
+    "model_kw": {
+     "conv": "layer",
+     "conv_k": 4
+    },
+    "mult": 8,
+    "n_ch": 4,
+    "part": "B",
+    "prio": 4,
+    "sched": "lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2",
+    "seeds": [
+     221,
+     223,
+     225,
+     226
+    ],
+    "task": "P4S4",
+    "z_weight": 0.001
+   },
+   "SR_A4k4": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "iters": 19200,
+    "key": "SR_A4k4",
+    "label": "test_stream_recipe's A4k4 (X), merged pair stalled",
+    "lr": 0.001,
+    "model_kw": {
+     "conv": "layer",
+     "conv_k": 4
+    },
+    "mult": 8,
+    "n_ch": 4,
+    "part": "B",
+    "prio": 4,
+    "sched": "lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2",
+    "seeds": [
+     247,
+     248,
+     251,
+     258
+    ],
+    "task": "P4S4",
+    "z_weight": 0.001
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "49834e4+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-02 21:01:46",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
