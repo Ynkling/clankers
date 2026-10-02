@@ -1,0 +1,17 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), merge_split (S24)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git f5a4d1b+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly; slow arms at 0.0001 for updates 1-2400 on every non-gate parameter), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S24: rerun to 9600, then 9600 continued updates three times), task P=4 S=2 n_vals=16 n_q=1 (S24: task_for(4, 4), k=4, conv), 1 torch thread per run
+  lr read for far_tok_check FAR_TOK_NEW: 0.001
+  lr read for far_tok_check FAR_TOK_LATE: 0.001
+  lr read for far_tok_check NEAR_TOK_LATE: 0.001
+  lr read for far_single B_FAR: 0.001
+  lr read for far_single B_FAR_SLOW: 0.001
+  lr read for merge_split SR_A4k4: 0.001
+  lr read for merge_split SA_A4k4: 0.001
+  S22 rules: FAR_TOK_NEW 'replicates' if DISCOVERED >= 4/10 and ROUTED*@end >= 2/10, 'does not' if DISCOVERED <= 1/10, else neither; FAR_TOK_LATE vs FAR_TOK (ROUTED*@end) 'the late start helps' if b - c >= 4 and McNemar p < 0.1, 'it costs' if c - b >= 4, else neither; NEAR_TOK_LATE 'routing returns' if ROUTED*@1200 >= 10/20 and DISCOVERED >= 16/20
+  S23 rule: 'header binding needs the partition' if B_FAR and B_FAR_SLOW each bind <= 1/10; 'a single channel binds the header layout' if either binds >= 3/10; else neither
+  S24 rules: 'splitting un-merges' if SPLIT >= 4/8 and NOISE <= 1/8; 'noise suffices' if NOISE >= 4/8; 'neither works' if SPLIT <= 1/8 (split: the merged pair on different channels and accuracy >= 0.95 at some evaluation up to 19200); 'the gate state tells the merged streams apart' if merged ratio >= 0.5 x non-merged in >= 6/8
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): merge_split, far_tok_check, far_single — run_jobs2 queues runs by arm priority, set in memory to 3..1 in this order (the screen files are unchanged)
