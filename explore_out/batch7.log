@@ -342,3 +342,247 @@ EXPLORATORY, NOT A RESULT — batch 7: token_hinge (S19), kick_untimed (S20), me
           acc 1.000  trans  2400  VALcos 0.002  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [  2/5]    4.7 min  kick_untimed   KICK120    seed 199  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174))
           acc 1.000  trans  2400  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  3/5]   11.5 min  kick_untimed   KICK120    seed 193  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174))
+          acc 0.416  trans  None  VALcos 1.000  margin -0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  4/5]   11.5 min  kick_untimed   KICK120    seed 197  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174))
+          acc 0.489  trans  None  VALcos 1.000  margin 0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  5/5]   11.5 min  kick_untimed   KICK120    seed 196  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174))
+          acc 0.491  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 11.5 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN token_hinge
+  idea    S13's hinge plus a third term on the key token's identity (eta2_key), near and far
+  source  batch 6's S17 (blocking the position split on the header layout exposed key splits); S11 (fresh gates land in key splits)
+  change  SLOW_MEM + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] of the read gate at key positions, on each training batch
+  arm FAR_TOK      lr 0.001  iters 24000  seeds 160-169 (10)  — far_A_slow + hinge on position and key-token eta^2 (TAU 0.2), header layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions)
+  arm NEAR_TOK     lr 0.001  iters 24000  seeds 160-179 (20)  — SLOW_MEM + hinge on position and key-token eta^2 (TAU 0.2), grouped layout
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch
+  pairing FAR_TOK seeds 160-169 with S17's FAR_SLOW_HINGE and batch 3's far_A_slow; NEAR_TOK seeds 160-179 with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; hinge on = training batches with that term above TAU):
+   arm FAR_TOK (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         S17 FAR_SLOW_H  b3 far_A_slow    hinge on: index/half/key/any of batches
+     160  0.998  21600   0.397   0.55  0.37/0.00/0.00/0.00  -/-/-/-  DISCOVERED      KEY             POSITION              70/20/7/77 of 24000
+     161  1.000   9600   0.993  -0.01  0.04/0.00/0.00/0.02  -/-/-/-  BOUND unrouted  KEY             KEY                   73/0/8/81 of 12000
+     162  0.976   9600   1.000  -0.00  0.00/0.00/0.00/0.00  -/-/-/-  BOUND unrouted  KEY             POSITION              64/52/9/71 of 12000
+     163  1.000  20400   0.000   1.00  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      KEY             POSITION             147/133/5/152 of 22800
+     164  1.000   6000   0.007   0.99  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      KEY             STREAM-PARTIAL        31/28/7/38 of 8400
+     165  1.000  12000   0.738   0.01  0.29/0.00/0.00/0.00  -/-/-/-  BOUND unrouted  KEY             POSITION              20/2/8/25 of 14400
+     166  1.000   7200   0.246   0.04  0.00/0.00/0.00/0.00  -/-/-/-  DISCOVERED      BOUND unrouted  POSITION              33/1/8/41 of 9600
+     167  1.000   9600   0.140   0.77  0.01/0.00/0.00/0.00  -/-/-/-  DISCOVERED      KEY             POSITION              48/0/10/57 of 12000
+     168  0.956  24000   0.000   1.00  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      KEY             POSITION             146/136/7/152 of 24000
+     169  0.530   None   1.000   0.00  0.06/0.00/0.00/0.00  -/-/-/-  OTHER           KEY             POSITION              28/9/7/35 of 24000
+   arm NEAR_TOK (lr 0.001; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         S13 SLOW_HINGE  X A              hinge on: index/half/key/any of batches
+     160  0.502   None   1.000  -0.00  0.00/0.00/0.00/0.00  -/-/-/-  OTHER           DISCOVERED      KEY                    1/1/5/6 of 24000
+     161  1.000   3600   0.004   0.99  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      KEY                    1/0/5/6 of 6000
+     162  1.000   3600   0.036   0.93  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      DISCOVERED      POSITION               8/0/6/14 of 6000
+     163  1.000   4800   0.007   0.99  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED             0/0/4/4 of 7200
+     164  1.000   3600   0.007   0.99  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED             1/0/6/7 of 6000
+     165  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED             1/0/8/9 of 6000
+     166  1.000   3600   0.018   0.96  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      DISCOVERED      KEY                    2/0/9/11 of 6000
+     167  1.000   4800   0.028   0.95  1.00/0.00/0.00/0.01  -/-/-/Y  DISCOVERED      OTHER           KEY                   15/0/9/24 of 7200
+     168  1.000   4800   0.003   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      POSITION               1/0/4/5 of 7200
+     169  1.000   6000   0.060   0.89  1.00/0.00/0.00/0.01  -/-/-/-  DISCOVERED      DISCOVERED      DISCOVERED             2/1/8/10 of 8400
+     170  0.999   4800   0.000   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      POSITION               1/0/5/6 of 7200
+     171  1.000   3600   0.015   0.97  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      OTHER           OTHER                  4/0/3/7 of 6000
+     172  1.000   4800   0.016   0.96  1.00/0.00/0.00/0.01  -/-/-/Y  DISCOVERED      DISCOVERED      POSITION               2/0/5/7 of 7200
+     173  1.000   3600   0.006   0.99  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      POSITION               0/0/7/7 of 6000
+     174  1.000   3600   0.003   1.00  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED             0/0/6/6 of 6000
+     175  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      DISCOVERED      POSITION               1/0/2/3 of 6000
+     176  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED             0/0/1/1 of 6000
+     177  1.000   3600   0.013   0.97  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      DISCOVERED      POSITION               2/0/6/8 of 6000
+     178  1.000   3600   0.005   0.99  1.00/0.00/0.00/0.00  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED             2/0/3/5 of 6000
+     179  1.000   3600   0.051   0.92  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      DISCOVERED      POSITION               7/0/8/15 of 6000
+  FAR_TOK (header layout), 10 seeds:
+   paired with S17's FAR_SLOW_HINGE:
+    DISCOVERED    FAR_TOK  6/10   FAR_SLOW_HINGE  0/10   FAR_TOK only 6, FAR_SLOW_HINGE only 0, McNemar two-sided p = 0.0312
+    BOUND         FAR_TOK  9/10   FAR_SLOW_HINGE  1/10   FAR_TOK only 8, FAR_SLOW_HINGE only 0, McNemar two-sided p = 0.00781
+    ROUTED*@1200  FAR_TOK  0/10   FAR_SLOW_HINGE  0/10   FAR_TOK only 0, FAR_SLOW_HINGE only 0, McNemar two-sided p = 1
+    ROUTED*@end   FAR_TOK  3/10   FAR_SLOW_HINGE  0/10   FAR_TOK only 3, FAR_SLOW_HINGE only 0, McNemar two-sided p = 0.25
+   paired with batch 3's far_A_slow:
+    DISCOVERED    FAR_TOK  6/10   far_A_slow  0/10   FAR_TOK only 6, far_A_slow only 0, McNemar two-sided p = 0.0312
+    STALLS        FAR_TOK  0/10   far_A_slow  1/10   FAR_TOK only 0, far_A_slow only 1, McNemar two-sided p = 1
+    failures FAR_TOK {'OTHER': 1}   FAR_SLOW_HINGE {'KEY': 9}   far_A_slow {'POSITION': 8, 'KEY': 1, 'STREAM-PARTIAL': 1}
+    stalls (routed at the end or stream-partial, not bound): FAR_TOK []
+    hinge firings (batches): index 660, half 381, key 76, any 729 of 163200; runs with the term on at least once: index 10, half 8, key 10 of 10
+  NEAR_TOK (grouped layout), 20 seeds:
+   paired with S13's SLOW_HINGE:
+    DISCOVERED    NEAR_TOK 19/20   SLOW_HINGE 18/20   NEAR_TOK only 2, SLOW_HINGE only 1, McNemar two-sided p = 1
+    ROUTED*@1200  NEAR_TOK  0/20   SLOW_HINGE 15/20   NEAR_TOK only 0, SLOW_HINGE only 15, McNemar two-sided p = 6.1e-05
+    ROUTED*@end   NEAR_TOK 18/20   SLOW_HINGE 18/20   NEAR_TOK only 2, SLOW_HINGE only 2, McNemar two-sided p = 1
+   paired with X's arm A:
+    DISCOVERED    NEAR_TOK 19/20   X A  7/20   NEAR_TOK only 12, X A only 0, McNemar two-sided p = 0.000488
+    failures NEAR_TOK {'OTHER': 1}   SLOW_HINGE {'OTHER': 2}   X arm A {'KEY': 4, 'POSITION': 8, 'OTHER': 1}
+    hinge firings (batches): index 51, half 2, key 110, any 161 of 146400; runs with the term on at least once: index 16, half 2, key 20 of 20
+  RULE FAR_TOK (DISCOVERED 6/10; promising >= 4/10, not <= 1/10): promising
+  RULE NEAR_TOK (DISCOVERED 19/20; 'keeps the near case' >= 16/20, 'costs the near case' <= 13/20): keeps the near case
+  VERDICT token_hinge FAR_TOK: promising (DISCOVERED 6/10)  [EXPLORATORY, not a result]
+  READING token_hinge NEAR_TOK: keeps the near case (DISCOVERED 19/20)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN kick_untimed
+  idea    one Gaussian kick at update 120, sized as S16's median first kick, with no trigger
+  source  batch 6's S16 (random kicks on the hinge's batches did about as well as the hinge); Adam's response to a single large gradient
+  change  SLOW_MEM + one Gaussian tensor added to the .grad of W_in, W_h, W_g, embed.weight at update 120, each at the median norm of S16's first kicks on that tensor
+  arm KICK120      lr 0.001  iters 24000  seeds 160-199 (40)  — SLOW_MEM + one Gaussian kick at update 120 (S16's median first-kick norms)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + one Gaussian tensor on W_in, W_h, W_g, embed.weight's .grad at update 120 (norms 0.8126, 2.5223, 0.4003, 5.7174)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 / S7), SLOW_HINGE (S13), and on S16's 20 seeds with KICK (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end; group: easy = S13's hinge never fired, hard = it fired; W_g exp_avg_sq = mean Adam second moment of W_g after updates 119/121/600/2400/4800):
+    seed  grp    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_MEM        SLOW_HINGE      S16 KICK        W_g exp_avg_sq 119/121/600/2400/4800
+     160 easy  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              3.9e-14/2.5e-06/1.5e-06/1.8e-06/1.7e-07
+     161 easy  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              6.1e-14/2.5e-06/1.5e-06/1.2e-06/1.3e-07
+     162 hard  0.490   None   1.000  -0.00  0.00/0.00/0.20/1.00  -/-/-/-  POSITION        POSITION        DISCOVERED      DISCOVERED      1.2e-10/2.5e-06/2.2e-06/1.0e-05/2.1e-04
+     163 easy  1.000   4800   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              1.5e-11/2.5e-06/2.3e-06/1.0e-06/2.4e-07
+     164 easy  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              5.2e-14/2.5e-06/1.5e-06/1.6e-06/3.0e-07
+     165 easy  0.997   3600   0.002   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              1.1e-13/2.5e-06/1.5e-06/8.4e-07/4.1e-07
+     166 hard  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED      DISCOVERED      1.2e-14/2.5e-06/1.5e-06/1.1e-06/1.1e-07
+     167 hard  0.508   None   1.000   0.00  0.00/0.20/0.00/0.59  -/-/-/-  POSITION        POSITION        OTHER           KEY             8.1e-12/2.5e-06/1.8e-06/2.0e-05/2.6e-04
+     168 hard  1.000   3600   0.002   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      DISCOVERED      1.7e-13/2.5e-06/1.5e-06/1.2e-06/5.2e-07
+     169 easy  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              1.7e-13/2.5e-06/1.5e-06/1.3e-06/1.3e-07
+     170 easy  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              2.7e-12/2.5e-06/2.2e-06/9.6e-07/1.0e-07
+     171 hard  0.748   None   0.602   0.51  0.25/0.50/0.00/0.01  -/-/-/-  STREAM-PARTIAL  OTHER           OTHER           STREAM-PARTIAL  7.6e-14/2.5e-06/1.5e-06/2.5e-06/7.5e-06
+     172 hard  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.01  -/-/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      DISCOVERED      3.0e-14/2.5e-06/1.5e-06/3.0e-06/1.8e-06
+     173 hard  0.483   None   1.000   0.00  0.00/0.20/0.00/0.60  -/-/-/-  POSITION        POSITION        DISCOVERED      POSITION        2.4e-12/2.5e-06/1.6e-06/5.4e-06/4.4e-05
+     174 easy  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              7.4e-12/2.5e-06/2.2e-06/2.5e-06/2.1e-06
+     175 hard  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED      DISCOVERED      1.0e-13/2.5e-06/1.5e-06/2.0e-06/2.2e-07
+     176 hard  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED      DISCOVERED      4.2e-14/2.5e-06/1.5e-06/1.5e-06/2.0e-07
+     177 hard  0.403   None   1.000  -0.00  0.00/0.00/0.23/1.00  -/-/-/-  POSITION        POSITION        DISCOVERED      DISCOVERED      6.9e-12/2.5e-06/1.7e-06/1.6e-05/3.5e-04
+     178 easy  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              3.9e-12/2.5e-06/2.3e-06/9.7e-07/1.2e-07
+     179 easy  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              7.0e-12/2.5e-06/2.4e-06/9.0e-07/1.1e-07
+     180 hard  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED      DISCOVERED      4.8e-14/2.5e-06/1.5e-06/1.3e-06/1.3e-07
+     181 easy  0.993   2400   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              3.0e-13/2.5e-06/1.6e-06/2.0e-06/2.4e-07
+     182 easy  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              6.1e-14/2.5e-06/1.5e-06/9.6e-07/9.7e-08
+     183 easy  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              2.6e-13/2.5e-06/1.5e-06/7.4e-07/7.5e-08
+     184 easy  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              1.8e-13/2.5e-06/1.5e-06/1.1e-06/1.3e-07
+     185 easy  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              1.2e-13/2.5e-06/1.5e-06/1.4e-06/1.6e-07
+     186 easy  0.400   None   1.000   0.00  0.00/0.20/0.00/0.60  -/-/-/-  POSITION        DISCOVERED      DISCOVERED      --              2.9e-13/2.5e-06/1.5e-06/1.5e-06/1.3e-06
+     187 hard  0.515   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             KEY             KEY             8.5e-13/2.5e-06/1.6e-06/9.6e-06/3.0e-06
+     188 easy  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              9.9e-14/2.5e-06/1.5e-06/6.9e-07/7.4e-08
+     189 hard  0.482   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             KEY             KEY             2.2e-13/2.5e-06/1.5e-06/7.5e-06/2.4e-06
+     190 hard  0.499   None   1.000  -0.01  0.00/0.00/0.20/0.99  -/-/-/-  POSITION        POSITION        DISCOVERED      POSITION        3.5e-12/2.5e-06/1.6e-06/1.7e-05/2.0e-04
+     191 easy  0.509   None   1.000   0.00  0.00/1.00/0.00/0.01  -/-/-/-  KEY             DISCOVERED      DISCOVERED      --              8.4e-14/2.5e-06/1.5e-06/2.5e-06/3.9e-06
+     192 hard  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  -/Y/Y/Y  DISCOVERED      OTHER           DISCOVERED      DISCOVERED      4.3e-14/2.5e-06/1.5e-06/1.0e-06/1.5e-06
+     193 hard  0.416   None   1.000  -0.00  0.00/0.21/0.00/0.59  -/-/-/-  POSITION        KEY             OTHER           OTHER           3.1e-13/2.5e-06/1.6e-06/2.4e-06/7.1e-05
+     194 easy  1.000   3600   0.003   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              2.1e-13/2.5e-06/1.5e-06/1.2e-06/2.5e-07
+     195 hard  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  -/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      DISCOVERED      2.8e-13/2.5e-06/1.5e-06/1.3e-06/1.5e-07
+     196 hard  0.491   None   1.000   0.00  0.00/0.34/0.00/0.33  -/-/-/-  OTHER           DISCOVERED      DISCOVERED      POSITION        2.5e-14/2.5e-06/1.5e-06/2.1e-06/3.1e-05
+     197 hard  0.489   None   1.000   0.00  0.00/0.20/0.00/0.60  -/-/-/-  POSITION        POSITION        OTHER           DISCOVERED      4.0e-13/2.5e-06/1.5e-06/1.4e-06/4.6e-05
+     198 easy  1.000   2400   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED      --              2.3e-09/2.5e-06/2.4e-06/6.8e-07/9.8e-08
+     199 hard  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION        DISCOVERED      DISCOVERED      2.6e-13/2.5e-06/1.6e-06/8.8e-07/9.2e-08
+  vs SLOW_MEM, 40 seeds (the rule):
+    DISCOVERED    KICK120 27/40   SLOW_MEM 24/40   KICK120 only 6, SLOW_MEM only 3, McNemar two-sided p = 0.508
+    ROUTED*@1200  KICK120 13/40   SLOW_MEM 23/40   KICK120 only 1, SLOW_MEM only 11, McNemar two-sided p = 0.00635
+   easy (S13's hinge never fired), 20 seeds:
+    DISCOVERED    KICK120 18/20   SLOW_MEM 20/20   KICK120 only 0, SLOW_MEM only 2, McNemar two-sided p = 0.5
+    ROUTED*@1200  KICK120 12/20   SLOW_MEM 20/20   KICK120 only 0, SLOW_MEM only 8, McNemar two-sided p = 0.00781
+   hard (S13's hinge fired), 20 seeds:
+    DISCOVERED    KICK120  9/20   SLOW_MEM  4/20   KICK120 only 6, SLOW_MEM only 1, McNemar two-sided p = 0.125
+    ROUTED*@1200  KICK120  1/20   SLOW_MEM  3/20   KICK120 only 1, SLOW_MEM only 3, McNemar two-sided p = 0.625
+  vs SLOW_HINGE, 40 seeds:
+    DISCOVERED    KICK120 27/40   SLOW_HINGE 34/40   KICK120 only 0, SLOW_HINGE only 7, McNemar two-sided p = 0.0156
+    ROUTED*@1200  KICK120 13/40   SLOW_HINGE 28/40   KICK120 only 0, SLOW_HINGE only 15, McNemar two-sided p = 6.1e-05
+  vs S16's KICK, its 20 seeds:
+    DISCOVERED    KICK120  9/20   KICK 12/20   KICK120 only 0, KICK only 3, McNemar two-sided p = 0.25
+    ROUTED*@1200  KICK120  1/20   KICK  4/20   KICK120 only 1, KICK only 4, McNemar two-sided p = 0.375
+  failure classes (40 seeds): KICK120 {'POSITION': 8, 'STREAM-PARTIAL': 1, 'KEY': 3, 'OTHER': 1}   SLOW_MEM {'POSITION': 11, 'OTHER': 2, 'KEY': 3}   SLOW_HINGE {'OTHER': 4, 'KEY': 2}
+  Adam's second moment, median over seeds of the mean exp_avg_sq after each update (ratio to update 119):
+    W_in  119: 1.17e-14 (x1) [n 40]   121: 6.44e-07 (x5.51e+07) [n 40]   600: 3.99e-07 (x3.41e+07) [n 40]   2400: 2.25e-07 (x1.93e+07) [n 40]   4800: 5.21e-08 (x4.46e+06) [n 40]
+    W_h   119: 6.03e-15 (x1) [n 40]   121: 6.21e-06 (x1.03e+09) [n 40]   600: 3.84e-06 (x6.38e+08) [n 40]   2400: 2.39e-05 (x3.96e+09) [n 40]   4800: 9.80e-06 (x1.63e+09) [n 40]
+    W_g   119: 2.14e-13 (x1) [n 40]   121: 2.50e-06 (x1.17e+07) [n 40]   600: 1.55e-06 (x7.24e+06) [n 40]   2400: 1.42e-06 (x6.64e+06) [n 40]   4800: 2.43e-07 (x1.14e+06) [n 40]
+  READING S20 (easy 18/20, hard 9/20; 'the trigger is not needed' if easy >= 18 and hard >= 10; 'an untimed kick costs the easy seeds' if easy <= 16): neither
+  VERDICT kick_untimed (vs SLOW_MEM, 40 seeds): inconclusive; reading: neither  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN merge_kick
+  idea    large gate kicks (100x the batch gradient, every 600 updates) on S=4 runs with two streams merged
+  source  the main line's S=4, k=4 runs (merges at 9600: 10 of 22 split later); batch 6's S16 (a kick's size, not its direction, did most of the hinge's work)
+  change  none to the recorded runs up to 9600; then 9600 updates twice from that state: CONTROL plain, KICKS with a Gaussian kick of 100x the gradient norm on W_in, W_h, W_g every 600 updates
+  arm SR_A4k4      lr 0.001  iters 28800  seeds [247, 248, 251, 258] (4)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  arm SA_A4k4      lr 0.001  iters 28800  seeds [221, 223, 225, 226] (4)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: CONTROL plain, KICKS + Gaussian kick of 100x the batch gradient norm on W_in, W_h, W_g every 600 updates
+  pairing each run's KICKS against its own CONTROL (same state at 9600, same batches) and its recorded curve
+----------------------------------------------------------------------------------------------------
+  per run (map = stream -> channel at each evaluation, as acc:map; '|' = the merged pair on different channels; continuations from 9600 to 19200):
+    SR_A4k4   247  merged pair streams [2, 3] (recorded end map [3, 1, 0, 0], rec acc 0.754; map at 9600 [3, 1, 0, 0])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 1.7e-07
+                   CONTROL 0.77:3100 0.75:3100 0.76:3100 0.74:3100 0.75:3100 0.75:3100 0.76:3100 0.74:3100
+                           at 19200: acc 0.743, per stream 1.00/1.00/0.45/0.50, merged pair on channels [0, 0]
+                   KICKS   0.76:3100 0.75:3100 0.76:3100 0.74:3100 0.75:3100 0.75:3100 0.76:3100 0.74:3100
+                           at 19200: acc 0.743, per stream 1.00/1.00/0.45/0.51, merged pair on channels [0, 0]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 8.1e-03/3.3e-02/3.4e-02, at the last 7.9e-03/3.8e-02/5.1e-02
+                   READING: KICKS merged; CONTROL merged
+    SR_A4k4   248  merged pair streams [0, 2] (recorded end map [1, 0, 1, 3], rec acc 0.762; map at 9600 [1, 0, 1, 3])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 2.5e-07
+                   CONTROL 0.76:1013 0.75:1013 0.75:1013 0.75:1013 0.76:1013 0.76:1013 0.76:1013 0.76:1013
+                           at 19200: acc 0.756, per stream 0.49/1.00/0.50/1.00, merged pair on channels [1, 1]
+                   KICKS   0.76:1013 0.75:1013 0.75:1013 0.74:1013 0.75:1013 0.76:1013 0.76:1012 0.76:1012
+                           at 19200: acc 0.759, per stream 0.51/1.00/0.49/1.00, merged pair on channels [1, 1]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 1.1e-02/5.1e-02/3.0e-02, at the last 8.8e-03/2.8e-02/2.1e-02
+                   READING: KICKS merged; CONTROL merged
+    SR_A4k4   251  merged pair streams [1, 3] (recorded end map [1, 0, 3, 0], rec acc 0.751; map at 9600 [1, 0, 3, 0])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 1.7e-07
+                   CONTROL 0.74:1030 0.75:1030 0.75:1030 0.75:1030 0.74:1030 0.74:1030 0.75:1030 0.73:1030
+                           at 19200: acc 0.729, per stream 1.00/0.49/1.00/0.46, merged pair on channels [0, 0]
+                   KICKS   0.74:1030 0.75:1030 0.75:1030 0.75:1030 0.74:1030 0.73:1030 0.75:1030 0.73:1030
+                           at 19200: acc 0.734, per stream 1.00/0.49/1.00/0.48, merged pair on channels [0, 0]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 1.6e-02/8.8e-02/4.6e-02, at the last 1.2e-02/4.5e-02/4.2e-02
+                   READING: KICKS merged; CONTROL merged
+    SR_A4k4   258  merged pair streams [0, 2] (recorded end map [0, 2, 0, 1], rec acc 0.769; map at 9600 [0, 2, 0, 1])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 1.8e-07
+                   CONTROL 0.78:0201 0.75:0201 0.77:0201 0.76:0201 0.76:0201 0.76:0201 0.75:0201 0.77:0201
+                           at 19200: acc 0.767, per stream 0.53/1.00/0.51/1.00, merged pair on channels [0, 0]
+                   KICKS   0.79:0201 0.75:0201 0.76:0201 0.76:0201 0.75:0201 0.76:0201 0.75:0201 0.77:0201
+                           at 19200: acc 0.774, per stream 0.52/1.00/0.54/1.00, merged pair on channels [0, 0]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 8.9e-03/3.5e-02/6.3e-02, at the last 1.2e-02/5.6e-02/1.8e-01
+                   READING: KICKS merged; CONTROL merged
+    SA_A4k4   221  merged pair streams [0, 1] (recorded end map [1, 1, 3, 2], rec acc 0.741; map at 9600 [1, 1, 3, 2])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 2.2e-07
+                   CONTROL 0.75:1132 0.75:1132 0.74:1132 0.74:1132 0.74:1132 0.75:1132 0.74:1132 0.75:1132
+                           at 19200: acc 0.755, per stream 0.53/0.51/1.00/1.00, merged pair on channels [1, 1]
+                   KICKS   0.75:1132 0.75:1132 0.75:1132 0.74:1132 0.74:1132 0.74:1132 0.74:1132 0.76:1132
+                           at 19200: acc 0.759, per stream 0.54/0.51/1.00/1.00, merged pair on channels [1, 1]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 3.8e-03/1.6e-02/4.5e-03, at the last 1.8e-02/1.0e-01/9.8e-02
+                   READING: KICKS merged; CONTROL merged
+    SA_A4k4   223  merged pair streams [2, 3] (recorded end map [3, 2, 1, 1], rec acc 0.738; map at 9600 [3, 2, 1, 1])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 1.4e-07
+                   CONTROL 0.75:3211 0.76:3211 0.75:3211 0.74:3211 0.76:3211 0.75:3211 0.75:3211 0.76:3211
+                           at 19200: acc 0.760, per stream 1.00/1.00/0.53/0.50, merged pair on channels [1, 1]
+                   KICKS   0.75:3211 0.75:3211 0.74:3211 0.74:3211 0.76:3211 0.75:3211 0.75:3211 0.76:3211
+                           at 19200: acc 0.757, per stream 1.00/1.00/0.52/0.49, merged pair on channels [1, 1]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 5.3e-03/2.9e-02/1.2e-02, at the last 3.4e-03/8.6e-03/4.8e-03
+                   READING: KICKS merged; CONTROL merged
+    SA_A4k4   225  merged pair streams [2, 3] (recorded end map [3, 0, 2, 2], rec acc 0.749; map at 9600 [3, 0, 2, 2])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 1.8e-07
+                   CONTROL 0.76:3022 0.75:3022 0.75:3022 0.77:3022 0.76:3022 0.75:3022 0.76:3022 0.75:3022
+                           at 19200: acc 0.753, per stream 1.00/1.00/0.51/0.48, merged pair on channels [2, 2]
+                   KICKS   0.76:3022 0.75:3022 0.75:3022 0.77:3022 0.77:3022 0.75:3022 0.75:3022 0.75:3022
+                           at 19200: acc 0.751, per stream 1.00/1.00/0.51/0.48, merged pair on channels [2, 2]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 5.0e-03/5.1e-02/1.5e-02, at the last 2.3e-03/1.0e-02/5.4e-03
+                   READING: KICKS merged; CONTROL merged
+    SA_A4k4   226  merged pair streams [0, 1] (recorded end map [0, 0, 1, 3], rec acc 0.750; map at 9600 [0, 0, 1, 3])
+                   rerun to 9600 reproduces: yes; CONTROL = record to 19200: yes; batches identical: yes; optimizer states equal and separate: yes (run's unchanged: yes); kicks 16, max norm diff 1.7e-07
+                   CONTROL 0.75:0013 0.74:0013 0.74:0013 0.76:0013 0.74:0013 0.74:0013 0.76:0013 0.74:0013
+                           at 19200: acc 0.738, per stream 0.48/0.49/1.00/1.00, merged pair on channels [0, 0]
+                   KICKS   0.75:0013 0.75:0013 0.75:0013 0.76:0013 0.74:0013 0.74:0013 0.76:0013 0.74:0013
+                           at 19200: acc 0.743, per stream 0.50/0.49/1.00/1.00, merged pair on channels [0, 0]
+                   KICKS' batch gradient norms W_in/W_h/W_g at the first kick 7.3e-03/3.3e-02/2.2e-02, at the last 8.4e-03/3.7e-02/1.5e-02
+                   READING: KICKS merged; CONTROL merged
+  SPLIT under KICKS 0/8; under CONTROL 0/8
+  RULE S21 ('kicks split merges' if >= 4/8 split under KICKS, 'they do not' if <= 1/8): they do not
+  READING merge_kick: they do not (split under KICKS 0/8; CONTROL 0/8)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S19 token_hinge FAR_TOK: promising (DISCOVERED 6/10; S17's FAR_SLOW_HINGE 0/10, FAR_TOK only 6 vs 0, p = 0.0312)
+  S19 token_hinge NEAR_TOK: keeps the near case (DISCOVERED 19/20; S13's SLOW_HINGE 18/20, NEAR_TOK only 2 vs 1, p = 1)
+  S20 kick_untimed: inconclusive vs SLOW_MEM (DISCOVERED 27/40 vs 24/40, 6 vs 3, p = 0.508); reading: neither (easy 18/20, hard 9/20)
+      vs SLOW_HINGE 27/40 vs 34/40 (0 vs 7, p = 0.0156); vs S16's KICK on its seeds 9/20 vs 12/20 (0 vs 3, p = 0.25)
+  S21 merge_kick: they do not (split under KICKS 0/8; under CONTROL 0/8)
+####################################################################################################
