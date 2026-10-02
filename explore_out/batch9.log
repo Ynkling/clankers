@@ -368,3 +368,97 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
   [ 24/57]   53.0 min  gate_langevin  LANGEVIN   seed 168  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400))
           acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
 #################### RESTART 2026-10-02 23:57:02 UTC — the container was restarted during the second segment (84 of 117 runs saved, the 6 lr-selection runs included; the S26 LANGEVIN runs in flight were lost and re-run; LANGEVIN seeds saved: [160, 161, 162, 163, 164, 165, 168]). The next segment resumes with --resume: the repro check runs, the rest of the CHECK suite is skipped if the screen code is unchanged (EXPLORATORY, not a result) ####################
+#################### RESUME 2026-10-02 23:57:54 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), zloss_merge (S27), far_p8 (S28)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 5326564+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly to every Adam group; S25's Muon groups at the selected Muon lr; slow arms' warm-up groups at a tenth), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S27: rerun to 9600, then 9600 continued updates), tasks: S25/S26 P=4 S=2 grouped; S27 task_for(4, 4), k=4, conv; S28 header layout P=8 (L 37); 1 torch thread per run
+  lr read for muon_recipe MUON_A: 0.001 (Adam groups; the Muon lr is selected below)
+  lr read for muon_recipe MUON_HINGE: 0.001 (Adam groups; the Muon lr is selected below)
+  lr read for gate_langevin LANGEVIN: 0.001
+  lr read for zloss_merge SR_A4k4: 0.001
+  lr read for zloss_merge SA_A4k4: 0.001
+  lr read for far_p8 FAR8_CEIL: 0.001
+  lr read for far_p8 B_FAR8_SLOW: 0.001
+  lr read for far_p8 FAR_TOK8: 0.001
+  S25 rule: 'the recipe survives Muon' if MUON_HINGE DISCOVERED >= 15/20, 'it does not' if <= 10/20, else neither; UNTESTED if no Muon lr binds the perfect gate on both seeds
+  S26 rule (vs SLOW_MEM, 40 seeds, DISCOVERED): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive
+  S27 rule: 'z-loss un-merges' if >= 4/8 split by 19200, 'it does not' if <= 1/8, else neither (split: the merged pair on different channels and accuracy >= 0.95)
+  S28 rules: 'P=8 header needs the partition' if FAR8_CEIL >= 2/3 and B_FAR8_SLOW <= 2/10, else 'it does not'; FAR_TOK8 'promising' if ROUTED*@end >= 4/10 and the first reading holds
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): zloss_merge, muon_recipe, far_p8, gate_langevin — run_jobs2 queues runs by arm priority, set in memory to 4..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (52s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch9.py differs from 49834e4, where the full CHECK suite passed (2026-10-02 21:20:20 UTC; its output is earlier in this log). git diff --stat 49834e4:
+     explore_out/README.md                      |     2 +-
+     explore_out/batch9.log                     |   394 +
+     explore_out/batch9_checks.json             |     6 +
+     explore_out/far_p8_results.json            | 11815 +++++++++++++++++++++++++
+     explore_out/gate_langevin_results.json     |  1670 ++++
+     explore_out/muon_recipe_lrsel_results.json |  1065 +++
+     explore_out/muon_recipe_results.json       | 12504 +++++++++++++++++++++++++++
+     explore_out/zloss_merge_results.json       |  6078 +++++++++++++
+     8 files changed, 33533 insertions(+), 1 deletion(-)
+  S25 LR SELECTION (EXPLORATORY, not a result): perfect gate under MUON, Muon lr [0.005, 0.01, 0.02], seeds [160, 161], 6000 steps, Adam lr 0.001 on the embedding; 0 runs to do (6 stored)
+    Muon lr 0.005  seed 160: BOUND at 1200 (acc 1.000)  seed 161: BOUND at 1200 (acc 0.994)
+    Muon lr 0.01   seed 160: unbound (acc 0.764)  seed 161: BOUND at 1200 (acc 0.997)
+    Muon lr 0.02   seed 160: unbound (acc 0.511)  seed 161: unbound (acc 0.743)
+  S25 LR CHOICE: smallest lr at which every seed binds: 0.005
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_recipe
+  idea    arm A and the HINGE recipe with Muon (orthogonalized momentum) in place of Adam
+  source  Muon (Jordan et al.; torch.optim.Muon): no per-weight second moment; batches 6-7 (Adam's sign-like step and inflated second moment under the hinge)
+  change  Muon on every 2-D weight (per head slice of 3-D), Adam 1e-3 on the embedding; MUON_HINGE: S13's hinge, the slow phase scaling every non-gate lr by 0.1 for updates 1-2400
+  arm MUON_A       lr 0.001  iters 24000  seeds 160-179 (20)  — arm A under Muon (Adam 1e-3 on the embedding)
+                   schedule: Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout
+  arm MUON_HINGE   lr 0.001  iters 24000  seeds 160-179 (20)  — S13's SLOW_HINGE recipe under Muon
+                   schedule: Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-179: MUON_A with X's recorded arm A, MUON_HINGE with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_langevin
+  idea    Langevin-style noise on the gate's weights, decaying to 0 at update 2400, on SLOW_MEM (no hinge)
+  source  Muon meets Tamed Langevin (arXiv 2610.02158): noise for saddle escape; batches 6-7 (the hinge's effect partly runs through Adam's sign-like step)
+  change  SLOW_MEM + after each optimizer step t < 2400, N(0, sigma_t^2) on every element of W_in, W_h, W_g, sigma_t = 0.01 x init std x (1 - t/2400)
+  arm LANGEVIN     lr 0.001  iters 24000  seeds 160-199 (40)  — SLOW_MEM + decaying Gaussian noise on W_in, W_h, W_g (updates 1-2399)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199) and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN zloss_merge
+  idea    a router z-loss (ST-MoE) on the gate's logits from 9600, on S=4 runs with two streams merged
+  source  ST-MoE's router z-loss; batch 8's S24 (SPLIT un-merged 8/8 by bringing the spare channel's logit level with the shared one)
+  change  none to the recorded runs up to 9600; then 9600 updates with + 1e-3 x mean over positions of (logsumexp of the gate logits)^2
+  arm SR_A4k4      lr 0.001  iters 19200  seeds [247, 248, 251, 258] (4)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  arm SA_A4k4      lr 0.001  iters 19200  seeds [221, 223, 225, 226] (4)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  pairing each run against S24's recorded CONTROL, SPLIT and NOISE (same state at 9600, same batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_p8
+  idea    the header layout at P=8: does it need the partition, and does FAR_TOK route there?
+  source  batch 8's S23 (one channel binds the P=4 header layout); the main line (one channel bound 0/24 on the grouped layout at P=8)
+  change  HeaderTask(P=8): perfect gate (validity), single channel with the slow schedule, S19's FAR_TOK
+  arm FAR8_CEIL    lr 0.001  iters 24000  seeds 160-162 (3)  — perfect gate, header layout P=8 (validity)
+                   schedule: lr 0.001 throughout
+  arm B_FAR8_SLOW  lr 0.001  iters 24000  seeds 160-169 (10)  — single channel (arm B), slow schedule, header layout P=8
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  arm FAR_TOK8     lr 0.001  iters 24000  seeds 160-169 (10)  — S19's FAR_TOK, header layout P=8 (16 KEY positions)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions, P=8)
+  pairing seeds 160-169; S23's and S19/S22's P=4 header outcomes printed by seed number only (a different task, different batches)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    muon_recipe    MUON_A     20 runs x   6.8 min  (24000 steps x 15.6 ms + 20 evals x 1.6 s)
+    muon_recipe    MUON_HINGE 20 runs x   6.7 min  (24000 steps x 15.6 ms + 20 evals x 1.3 s)
+    gate_langevin  LANGEVIN   40 runs x   5.9 min  (24000 steps x 14.1 ms + 20 evals x 0.8 s)
+    zloss_merge    SR_A4k4     4 runs x  10.6 min  (19200 steps x 29.9 ms + 16 evals x 4.0 s)
+    zloss_merge    SA_A4k4     4 runs x   9.9 min  (19200 steps x 28.1 ms + 16 evals x 3.2 s)
+    far_p8         FAR8_CEIL   3 runs x   6.4 min  (24000 steps x 14.9 ms + 20 evals x 1.2 s)
+    far_p8         B_FAR8_SLOW 10 runs x   6.0 min  (24000 steps x 14.2 ms + 20 evals x 1.1 s)
+    far_p8         FAR_TOK8   10 runs x   9.3 min  (24000 steps x 21.8 ms + 20 evals x 1.8 s)
+    total 12.67 h of runs; makespan on 4 workers 3.21 h (worst case)
+  PROJECTION NOTE: the projection above times S25's arms under Adam; measured here (50 steps of arm A, 1 thread) 34.8 ms/step under MUON vs 15.3 ms/step under Adam (x2.28); S25's worst case scales by that factor
+  33 runs queued on 4 workers (1 torch thread each)
