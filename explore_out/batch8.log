@@ -252,3 +252,5 @@ EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), me
           acc 0.522  trans  None  VALcos 0.999  margin 0.03  OTHER  ROUTED* 1200/2400/end -/-/-
   [ 18/44]   26.1 min  far_tok_check  NEAR_TOK_LATE seed 178  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch; the key term only from update 2401)
           acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [ 19/44]   26.7 min  far_tok_check  FAR_TOK_NEW seed 178  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions))
+          acc 1.000  trans  8400  VALcos 0.856  margin 0.01  BOUND unrouted  ROUTED* 1200/2400/end -/-/-
