@@ -216,3 +216,5 @@ EXPLORATORY, NOT A RESULT — batch 8: far_tok_check (S22), far_single (S23), me
     merge_split    SA_A4k4     4 runs x  35.8 min  (38400 steps x 53.8 ms + 32 evals x 2.4 s)
     total 15.11 h of runs; makespan on 4 workers 3.82 h (worst case)
   44 runs queued on 4 workers (1 torch thread each)
+  [  1/44]    7.5 min  far_tok_check  FAR_TOK_LATE seed 172  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions); the key term only from update 2401)
+          acc 1.000  trans 19200  VALcos 1.000  margin -0.00  BOUND unrouted  ROUTED* 1200/2400/end -/-/-
