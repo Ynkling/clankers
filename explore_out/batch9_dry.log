@@ -20,3 +20,322 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (61s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_gate_langevin: with sigma = 0 LANGEVIN equals SLOW_MEM bit for bit (seed 160, 3600 steps; curves = a fresh SLOW_MEM run = S5's record; weights equal): ok
+  CHECK dry_gate_langevin: the noise added at updates 1, 1200, 2399 is sigma_t x the unit draw, per tensor: W_in@1 sigma 9.96e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.015]; W_h@1 sigma 9.67e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.009]; W_g@1 sigma 1.03e-03 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.196]; W_in@1200 sigma 4.98e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 0.982]; W_h@1200 sigma 4.84e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 0.990]; W_g@1200 sigma 5.17e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.053]; W_in@2399 sigma 4.15e-07 std(added)/(sigma x std(unit)) 0.9989 [one draw: std(added)/sigma 0.990]; W_h@2399 sigma 4.03e-07 std(added)/(sigma x std(unit)) 1.0001 [one draw: std(added)/sigma 0.973]; W_g@2399 sigma 4.31e-07 std(added)/(sigma x std(unit)) 1.0076 [one draw: std(added)/sigma 0.870]: ok
+  CHECK dry_gate_langevin: the unit draws have std 1 within 2% per tensor shape, pooled over 200 draws: W_in 1.0012, W_h 1.0018, W_g 1.0049: ok
+  CHECK dry_gate_langevin: nothing is added from update 2400 (the hook's change to W_in, W_h, W_g at updates 2400 and 2401 is exactly 0 and no draw is made; the run took 2401 optimizer steps): ok
+  CHECK dry_far_p8: P=8 header task: every (stream, key) appears once: ok
+  CHECK dry_far_p8: P=8 header task: S distinct values per key: ok
+  CHECK dry_far_p8: P=8 header task: each query is answered by its own stream's value: ok
+  CHECK dry_far_p8: P=8 header task: exactly one CTX token per block; block streams a permutation: ok
+  CHECK dry_far_p8: P=8 header task: stream_labels = the block's stream (body), the query's stream (query): ok
+  CHECK dry_far_p8: P=8 header task: L = 37, qpos = [35], vocab = 26: ok
+  CHECK dry_far_p8: P=8 header task: select reads the query's KEY position and targets its value: ok
+  CHECK dry_far_p8: P=8 header task: the perfect gate zeroes every cross-stream score at every layer (3 layers; same-stream scores non-zero): ok
+  CHECK dry_far_p8: P=8 header task: header_routing_stats under the perfect gate: margin 1.0000, eta_key_by_stream 1.0000: ok
+  CHECK dry_far_p8: FAR8_CEIL's run path with the P=4 header task reproduces the far_ceil record (seed 160, to 3600; 3 evaluations): ok
+  CHECK dry_far_p8: B_FAR8_SLOW's run path with the P=4 header task reproduces the B_FAR_SLOW record (seed 160, to 3600; 3 evaluations): ok
+  CHECK dry_far_p8: FAR_TOK8's run path with the P=4 header task reproduces the FAR_TOK record (seed 160, to 3600; 3 evaluations): ok
+  CHECK dry_far_p8: FAR_TOK8's hinge reads the 16 KEY positions [1, 3, 5, 7, 9, 11, 13, 15, 18, 20, 22, 24, 26, 28, 30, 32] with (S, P) = (2, 8): ok
+  CHECK dry_zloss_merge: the runs are S21's derived list (stream_recipe (247, 248, 251, 258), scale_axes (221, 223, 225, 226)): ok
+  CHECK dry_zloss_merge: test_scale_axes.run_job (run_one) seed 221: rerun to 1200 reproduces the record (True); with weight 0 the continuation equals S24's CONTROL continuation bit for bit over 1200 updates (curves [[2400, 0.1171875, 2.694366455078125]] vs [[2400, 0.1171875, 2.694366455078125]], maps, digest, weights: True); with weight 0.001 the weights differ on the same batches (True; probe mean lse^2 2.960 -> 1.470, CONTROL 2.166); start states equal and separate (True): ok
+  CHECK dry_zloss_merge: test_stream_recipe.run_attempt (plain A4k4) seed 247: rerun to 1200 reproduces the record (True); with weight 0 the continuation equals S24's CONTROL continuation bit for bit over 1200 updates (curves [[2400, 0.17236328125, 2.406351089477539]] vs [[2400, 0.17236328125, 2.406351089477539]], maps, digest, weights: True); with weight 0.001 the weights differ on the same batches (True; probe mean lse^2 2.109 -> 6.342, CONTROL 1.978); start states equal and separate (True): ok
+  CHECK dry_zloss_merge: the z-loss gradient reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK dry_zloss_merge: softmax of the recomputed logits equals the model's read gate (max diff 0.0e+00): ok
+  CHECK dry_muon_recipe: the optimizer groups cover every parameter exactly once: MUON_A [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight'])]; MUON_HINGE [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight'])]; ceiling [('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight'])]: ok
+  CHECK dry_muon_recipe: SliceMuon equals torch.optim.Muon (weight decay 0) bit for bit on 2-D weights (3 shapes, 5 steps): ok
+  CHECK dry_muon_recipe: the swap reaches onset_run: with every parameter in Adam groups the MuonAdam path reproduces X's arm A record (seed 160, 2400 steps; 1 optimizer built): [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]] vs [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]: ok
+  CHECK dry_muon_recipe: MUON_HINGE's lrs per group [('gate', 'muon'), ('rest', 'muon'), ('rest', 'adam')]: update 1 [0.005, 0.0005, 0.0001], 2400 [0.005, 0.0005, 0.0001], 2401 [0.005, 0.005, 0.001] (2401 updates, forward and evaluation stubbed): ok
+  CHECK dry_muon_recipe: with the hinge's TAU at 1.0, MUON_HINGE equals a MUON run with the slow schedule alone bit for bit (seed 160, 1200 steps, Muon lr 0.005; curves [[1200, 0.8056640625, 1.0763039588928223]] vs [[1200, 0.8056640625, 1.0763039588928223]]; weights equal; hinge on [0, 1200]): ok
+  CHECK dry_muon_recipe: Muon's update on the probe (Gaussian 32 x 256, seed 0) after Newton-Schulz has all singular values within [0.5, 1.5]: min 0.6835, max 1.0490 (not asserted, other Gaussian shapes: (256, 32) [0.680, 1.055]; (32, 32) [0.405, 1.189]; (2, 32) [1.052, 1.127]; (32, 22) [0.683, 1.135]): ok
+  all CHECKs passed (18.4 min)
+  S25 LR SELECTION (EXPLORATORY, not a result): perfect gate under MUON, Muon lr [0.005, 0.01, 0.02], seeds [160], 3600 steps, Adam lr 0.001 on the embedding; 3 runs to do (0 stored)
+  [lrsel 1/3]   1.4 min  Muon lr 0.005 seed 160 (Adam lr 0.001, 3600 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
+  [lrsel 2/3]   1.4 min  Muon lr 0.01 seed 160 (Adam lr 0.001, 3600 steps): acc 0.757  trans  None  VALcos 0.000  margin 1.00  STREAM-PARTIAL
+  [lrsel 3/3]   1.4 min  Muon lr 0.02 seed 160 (Adam lr 0.001, 3600 steps): acc 0.527  trans  None  VALcos 0.000  margin 1.00  STREAM-PARTIAL
+    Muon lr 0.005  seed 160: BOUND at 1200 (acc 1.000)
+    Muon lr 0.01   seed 160: unbound (acc 0.757)
+    Muon lr 0.02   seed 160: unbound (acc 0.527)
+  S25 LR CHOICE: smallest lr at which every seed binds: 0.005
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_muon_recipe
+  idea    arm A and the HINGE recipe with Muon (orthogonalized momentum) in place of Adam
+  source  Muon (Jordan et al.; torch.optim.Muon): no per-weight second moment; batches 6-7 (Adam's sign-like step and inflated second moment under the hinge)
+  change  Muon on every 2-D weight (per head slice of 3-D), Adam 1e-3 on the embedding; MUON_HINGE: S13's hinge, the slow phase scaling every non-gate lr by 0.1 for updates 1-2400
+  arm MUON_A       lr 0.001  iters 3600  seeds 160-160 (1)  — arm A under Muon (Adam 1e-3 on the embedding)
+                   schedule: Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout
+  arm MUON_HINGE   lr 0.001  iters 3600  seeds 160-160 (1)  — S13's SLOW_HINGE recipe under Muon
+                   schedule: Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-179: MUON_A with X's recorded arm A, MUON_HINGE with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_gate_langevin
+  idea    Langevin-style noise on the gate's weights, decaying to 0 at update 2400, on SLOW_MEM (no hinge)
+  source  Muon meets Tamed Langevin (arXiv 2610.02158): noise for saddle escape; batches 6-7 (the hinge's effect partly runs through Adam's sign-like step)
+  change  SLOW_MEM + after each optimizer step t < 2400, N(0, sigma_t^2) on every element of W_in, W_h, W_g, sigma_t = 0.01 x init std x (1 - t/2400)
+  arm LANGEVIN     lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + decaying Gaussian noise on W_in, W_h, W_g (updates 1-2399)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199) and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_zloss_merge
+  idea    a router z-loss (ST-MoE) on the gate's logits from 9600, on S=4 runs with two streams merged
+  source  ST-MoE's router z-loss; batch 8's S24 (SPLIT un-merged 8/8 by bringing the spare channel's logit level with the shared one)
+  change  none to the recorded runs up to 9600; then 9600 updates with + 1e-3 x mean over positions of (logsumexp of the gate logits)^2
+  arm SR_A4k4      lr 0.001  iters 3600  seeds 247-247 (1)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  arm SA_A4k4      lr 0.001  iters 3600  seeds 221-221 (1)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  pairing each run against S24's recorded CONTROL, SPLIT and NOISE (same state at 9600, same batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_p8
+  idea    the header layout at P=8: does it need the partition, and does FAR_TOK route there?
+  source  batch 8's S23 (one channel binds the P=4 header layout); the main line (one channel bound 0/24 on the grouped layout at P=8)
+  change  HeaderTask(P=8): perfect gate (validity), single channel with the slow schedule, S19's FAR_TOK
+  arm FAR8_CEIL    lr 0.001  iters 3600  seeds 160-160 (1)  — perfect gate, header layout P=8 (validity)
+                   schedule: lr 0.001 throughout
+  arm B_FAR8_SLOW  lr 0.001  iters 3600  seeds 160-160 (1)  — single channel (arm B), slow schedule, header layout P=8
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  arm FAR_TOK8     lr 0.001  iters 3600  seeds 160-160 (1)  — S19's FAR_TOK, header layout P=8 (16 KEY positions)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions, P=8)
+  pairing seeds 160-169; S23's and S19/S22's P=4 header outcomes printed by seed number only (a different task, different batches)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; 100 timed steps per model, 1 thread, this machine):
+    dry_muon_recipe MUON_A      1 runs x   1.4 min  (3600 steps x 22.9 ms + 3 evals x 0.8 s)
+    dry_muon_recipe MUON_HINGE  1 runs x   1.4 min  (3600 steps x 23.0 ms + 3 evals x 0.8 s)
+    dry_gate_langevin LANGEVIN    1 runs x   1.3 min  (3600 steps x 21.6 ms + 3 evals x 0.8 s)
+    dry_zloss_merge SR_A4k4     1 runs x   3.0 min  (3600 steps x 46.0 ms + 3 evals x 4.2 s)
+    dry_zloss_merge SA_A4k4     1 runs x   3.0 min  (3600 steps x 45.7 ms + 3 evals x 4.3 s)
+    dry_far_p8     FAR8_CEIL   1 runs x   1.6 min  (3600 steps x 24.8 ms + 3 evals x 2.0 s)
+    dry_far_p8     B_FAR8_SLOW  1 runs x   1.5 min  (3600 steps x 23.4 ms + 3 evals x 1.7 s)
+    dry_far_p8     FAR_TOK8    1 runs x   2.0 min  (3600 steps x 32.2 ms + 3 evals x 1.9 s)
+    total 0.25 h of runs; makespan on 4 workers 0.07 h (worst case)
+  PROJECTION NOTE: the projection above times S25's arms under Adam; measured here (50 steps of arm A, 1 thread) 25.4 ms/step under MUON vs 22.4 ms/step under Adam (x1.13); S25's worst case scales by that factor
+  8 runs queued on 4 workers (1 torch thread each)
+  [  1/8]    1.7 min  dry_muon_recipe MUON_A     seed 160  lr 0.001 (Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout)
+          acc 0.372  trans  None  VALcos 1.000  margin -0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  2/8]    1.7 min  dry_muon_recipe MUON_HINGE seed 160  lr 0.001 (Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+          acc 0.999  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  3/8]    3.2 min  dry_far_p8     B_FAR8_SLOW seed 160  lr 0.001 (every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+          acc 0.150  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
+  [  4/8]    3.2 min  dry_far_p8     FAR8_CEIL  seed 160  lr 0.001 (lr 0.001 throughout)
+          acc 0.205  trans  None  VALcos 0.000  margin 1.00  STREAM-PARTIAL  ROUTED* 1200/2400/end Y/Y/Y
+  [  5/8]    3.4 min  dry_zloss_merge SA_A4k4    seed 221  lr 0.001 (lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2)
+          acc 0.125  trans  None  VALcos 0.995  margin 0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [  6/8]    3.4 min  dry_zloss_merge SR_A4k4    seed 247  lr 0.001 (lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2)
+          acc 0.182  trans  None  VALcos 1.000  margin -0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  7/8]    4.6 min  dry_gate_langevin LANGEVIN   seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400))
+          acc 1.000  trans  2400  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [  8/8]    5.2 min  dry_far_p8     FAR_TOK8   seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions, P=8))
+          acc 0.158  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 5.2 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_muon_recipe
+  idea    arm A and the HINGE recipe with Muon (orthogonalized momentum) in place of Adam
+  source  Muon (Jordan et al.; torch.optim.Muon): no per-weight second moment; batches 6-7 (Adam's sign-like step and inflated second moment under the hinge)
+  change  Muon on every 2-D weight (per head slice of 3-D), Adam 1e-3 on the embedding; MUON_HINGE: S13's hinge, the slow phase scaling every non-gate lr by 0.1 for updates 1-2400
+  arm MUON_A       lr 0.001  iters 3600  seeds 160-160 (1)  — arm A under Muon (Adam 1e-3 on the embedding)
+                   schedule: Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout
+  arm MUON_HINGE   lr 0.001  iters 3600  seeds 160-160 (1)  — S13's SLOW_HINGE recipe under Muon
+                   schedule: Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-179: MUON_A with X's recorded arm A, MUON_HINGE with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  LR selection (perfect gate under MUON, 3600 steps, seeds [160]):
+    Muon lr 0.005  seed 160: BOUND at 1200 (acc 1.000)
+    Muon lr 0.01   seed 160: unbound (acc 0.757)
+    Muon lr 0.02   seed 160: unbound (acc 0.527)
+    choice: smallest lr at which every seed binds: 0.005
+  Muon lr in the records: [0.005]
+   arm MUON_A (lr 0.001; Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X arm A          gate |dW| 1-2400 med/max  hinge on of n
+     160  0.372   None   1.000  -0.00  0.00/0.00/0.91/1.00  -/-/-/-  POSITION        KEY                     3.00e-02/3.47e-02             --
+     161 not run                                                                KEY            
+     162 not run                                                                POSITION       
+     163 not run                                                                DISCOVERED     
+     164 not run                                                                DISCOVERED     
+     165 not run                                                                DISCOVERED     
+     166 not run                                                                KEY            
+     167 not run                                                                KEY            
+     168 not run                                                                POSITION       
+     169 not run                                                                DISCOVERED     
+     170 not run                                                                POSITION       
+     171 not run                                                                OTHER          
+     172 not run                                                                POSITION       
+     173 not run                                                                POSITION       
+     174 not run                                                                DISCOVERED     
+     175 not run                                                                POSITION       
+     176 not run                                                                DISCOVERED     
+     177 not run                                                                POSITION       
+     178 not run                                                                DISCOVERED     
+     179 not run                                                                POSITION       
+   MUON_A vs X arm A, 1 seeds:
+    DISCOVERED    MUON_A  0/1   X arm A  0/1   MUON_A only 0, X arm A only 0, McNemar two-sided p = 1
+    BOUND         MUON_A  0/1   X arm A  0/1   MUON_A only 0, X arm A only 0, McNemar two-sided p = 1
+    ROUTED*@1200  MUON_A  0/1   X arm A  0/1   MUON_A only 0, X arm A only 0, McNemar two-sided p = 1
+    failures MUON_A {'POSITION': 1}   X arm A {'KEY': 1}
+    gate update norm per step, updates 1-2400: median over runs of the per-run median 3.00e-02, of the per-run max 3.47e-02
+   arm MUON_HINGE (lr 0.001; Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_HINGE       gate |dW| 1-2400 med/max  hinge on of n
+     160  0.999   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.83e-02/3.28e-02      2 of 3600
+     161 not run                                                                DISCOVERED     
+     162 not run                                                                DISCOVERED     
+     163 not run                                                                DISCOVERED     
+     164 not run                                                                DISCOVERED     
+     165 not run                                                                DISCOVERED     
+     166 not run                                                                DISCOVERED     
+     167 not run                                                                OTHER          
+     168 not run                                                                DISCOVERED     
+     169 not run                                                                DISCOVERED     
+     170 not run                                                                DISCOVERED     
+     171 not run                                                                OTHER          
+     172 not run                                                                DISCOVERED     
+     173 not run                                                                DISCOVERED     
+     174 not run                                                                DISCOVERED     
+     175 not run                                                                DISCOVERED     
+     176 not run                                                                DISCOVERED     
+     177 not run                                                                DISCOVERED     
+     178 not run                                                                DISCOVERED     
+     179 not run                                                                DISCOVERED     
+   MUON_HINGE vs SLOW_HINGE, 1 seeds:
+    DISCOVERED    MUON_HINGE  1/1   SLOW_HINGE  1/1   MUON_HINGE only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    BOUND         MUON_HINGE  1/1   SLOW_HINGE  1/1   MUON_HINGE only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    ROUTED*@1200  MUON_HINGE  1/1   SLOW_HINGE  1/1   MUON_HINGE only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    failures MUON_HINGE {}   SLOW_HINGE {}
+    hinge firings: 2 batches in total; runs with the hinge on at least once 1/1; per run [2]
+    gate update norm per step, updates 1-2400: median over runs of the per-run median 2.83e-02, of the per-run max 3.28e-02
+  RULE S25 (MUON_HINGE DISCOVERED 1/1; 'the recipe survives Muon' if >= 15/20, 'it does not' if <= 10/20): it does not
+  DRY RUN READING dry_muon_recipe: it does not (Muon lr 0.005; MUON_HINGE DISCOVERED 1/1 vs SLOW_HINGE 1/1, 0 vs 0, p = 1; MUON_A 0/1 vs X arm A 0/1, 0 vs 0, p = 1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_gate_langevin
+  idea    Langevin-style noise on the gate's weights, decaying to 0 at update 2400, on SLOW_MEM (no hinge)
+  source  Muon meets Tamed Langevin (arXiv 2610.02158): noise for saddle escape; batches 6-7 (the hinge's effect partly runs through Adam's sign-like step)
+  change  SLOW_MEM + after each optimizer step t < 2400, N(0, sigma_t^2) on every element of W_in, W_h, W_g, sigma_t = 0.01 x init std x (1 - t/2400)
+  arm LANGEVIN     lr 0.001  iters 3600  seeds 160-160 (1)  — SLOW_MEM + decaying Gaussian noise on W_in, W_h, W_g (updates 1-2399)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199) and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end):
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_MEM        SLOW_HINGE     
+     160  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     161 not run                                                                DISCOVERED      DISCOVERED     
+     162 not run                                                                POSITION        DISCOVERED     
+     163 not run                                                                DISCOVERED      DISCOVERED     
+     164 not run                                                                DISCOVERED      DISCOVERED     
+     165 not run                                                                DISCOVERED      DISCOVERED     
+     166 not run                                                                POSITION        DISCOVERED     
+     167 not run                                                                POSITION        OTHER          
+     168 not run                                                                DISCOVERED      DISCOVERED     
+     169 not run                                                                DISCOVERED      DISCOVERED     
+     170 not run                                                                DISCOVERED      DISCOVERED     
+     171 not run                                                                OTHER           OTHER          
+     172 not run                                                                DISCOVERED      DISCOVERED     
+     173 not run                                                                POSITION        DISCOVERED     
+     174 not run                                                                DISCOVERED      DISCOVERED     
+     175 not run                                                                POSITION        DISCOVERED     
+     176 not run                                                                POSITION        DISCOVERED     
+     177 not run                                                                POSITION        DISCOVERED     
+     178 not run                                                                DISCOVERED      DISCOVERED     
+     179 not run                                                                DISCOVERED      DISCOVERED     
+     180 not run                                                                POSITION        DISCOVERED     
+     181 not run                                                                DISCOVERED      DISCOVERED     
+     182 not run                                                                DISCOVERED      DISCOVERED     
+     183 not run                                                                DISCOVERED      DISCOVERED     
+     184 not run                                                                DISCOVERED      DISCOVERED     
+     185 not run                                                                DISCOVERED      DISCOVERED     
+     186 not run                                                                DISCOVERED      DISCOVERED     
+     187 not run                                                                KEY             KEY            
+     188 not run                                                                DISCOVERED      DISCOVERED     
+     189 not run                                                                KEY             KEY            
+     190 not run                                                                POSITION        DISCOVERED     
+     191 not run                                                                DISCOVERED      DISCOVERED     
+     192 not run                                                                OTHER           DISCOVERED     
+     193 not run                                                                KEY             OTHER          
+     194 not run                                                                DISCOVERED      DISCOVERED     
+     195 not run                                                                DISCOVERED      DISCOVERED     
+     196 not run                                                                DISCOVERED      DISCOVERED     
+     197 not run                                                                POSITION        OTHER          
+     198 not run                                                                DISCOVERED      DISCOVERED     
+     199 not run                                                                POSITION        DISCOVERED     
+  vs SLOW_MEM, 1 seeds (the rule):
+    DISCOVERED    LANGEVIN  1/1   SLOW_MEM  1/1   LANGEVIN only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+    BOUND         LANGEVIN  1/1   SLOW_MEM  1/1   LANGEVIN only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+    ROUTED*@1200  LANGEVIN  1/1   SLOW_MEM  1/1   LANGEVIN only 0, SLOW_MEM only 0, McNemar two-sided p = 1
+  vs SLOW_HINGE, 1 seeds:
+    DISCOVERED    LANGEVIN  1/1   SLOW_HINGE  1/1   LANGEVIN only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+    ROUTED*@1200  LANGEVIN  1/1   SLOW_HINGE  1/1   LANGEVIN only 0, SLOW_HINGE only 0, McNemar two-sided p = 1
+  failure classes (1 seeds): LANGEVIN {}   SLOW_MEM {}   SLOW_HINGE {}
+  RULE S26 (vs SLOW_MEM, DISCOVERED 0 vs 0, p = 1; promising if b - c >= 4 and p < 0.1, not if b - c <= 0): not
+  DRY RUN VERDICT dry_gate_langevin (vs SLOW_MEM, 40 seeds): not (DISCOVERED 1/1 vs 1/1, 0 vs 0, p = 1; vs SLOW_HINGE 1/1 vs 1/1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_zloss_merge
+  idea    a router z-loss (ST-MoE) on the gate's logits from 9600, on S=4 runs with two streams merged
+  source  ST-MoE's router z-loss; batch 8's S24 (SPLIT un-merged 8/8 by bringing the spare channel's logit level with the shared one)
+  change  none to the recorded runs up to 9600; then 9600 updates with + 1e-3 x mean over positions of (logsumexp of the gate logits)^2
+  arm SR_A4k4      lr 0.001  iters 3600  seeds 247-247 (1)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  arm SA_A4k4      lr 0.001  iters 3600  seeds 221-221 (1)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  pairing each run against S24's recorded CONTROL, SPLIT and NOISE (same state at 9600, same batches)
+----------------------------------------------------------------------------------------------------
+  per run (map = stream -> channel at each evaluation, as acc:map; '|' = the merged pair on different channels; continuation from 2400 to 3600; S24's CONTROL / SPLIT / NOISE split steps from its record; z = probe mean (logsumexp)^2, logits = each channel's mean gate logit over all positions):
+    SR_A4k4   247  merged pair streams [2, 3] (recorded end map [3, 1, 0, 0], rec acc 0.754; map at 2400 [0, 3, 0, 0])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.18:0300
+                           at 3600: acc 0.182, per stream 0.15/0.18/0.20/0.20, merged pair on channels [0, 0]; z 1.978 -> 1.961; logits [0.0331, -0.0218, -0.0086, 0.0006] -> [0.0357, -0.0265, -0.0128, -0.0015]; max |logit| 1.06 -> 0.99
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT merged, NOISE merged
+    SA_A4k4   221  merged pair streams [0, 1] (recorded end map [1, 1, 3, 2], rec acc 0.741; map at 2400 [1, 1, 1, 1])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.13:1111
+                           at 3600: acc 0.125, per stream 0.13/0.12/0.14/0.12, merged pair on channels [1, 1]; z 2.166 -> 1.603; logits [-0.0222, 0.0839, -0.0083, -0.0506] -> [-0.365, 0.2392, -0.3439, -0.3346]; max |logit| 1.32 -> 1.26
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT merged, NOISE merged
+  split by 3600: ZLOSS 0/2; S24's records on these runs: CONTROL 0, SPLIT 0, NOISE 0 of 2
+  RULE S27 ('z-loss un-merges' if >= 4/8 split, 'it does not' if <= 1/8): it does not
+  DRY RUN READING dry_zloss_merge: it does not (split by the end of the continuation: ZLOSS 0/2; S24 on these runs CONTROL 0, SPLIT 0, NOISE 0)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_far_p8
+  idea    the header layout at P=8: does it need the partition, and does FAR_TOK route there?
+  source  batch 8's S23 (one channel binds the P=4 header layout); the main line (one channel bound 0/24 on the grouped layout at P=8)
+  change  HeaderTask(P=8): perfect gate (validity), single channel with the slow schedule, S19's FAR_TOK
+  arm FAR8_CEIL    lr 0.001  iters 3600  seeds 160-160 (1)  — perfect gate, header layout P=8 (validity)
+                   schedule: lr 0.001 throughout
+  arm B_FAR8_SLOW  lr 0.001  iters 3600  seeds 160-160 (1)  — single channel (arm B), slow schedule, header layout P=8
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  arm FAR_TOK8     lr 0.001  iters 3600  seeds 160-160 (1)  — S19's FAR_TOK, header layout P=8 (16 KEY positions)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions, P=8)
+  pairing seeds 160-169; S23's and S19/S22's P=4 header outcomes printed by seed number only (a different task, different batches)
+----------------------------------------------------------------------------------------------------
+  FAR8_CEIL (validity): seed 160 unbound (acc 0.205)
+  per seed (acc at 2400/4800/12000; P=4 columns: the same seed number on the P=4 header task, S23's B_FAR_SLOW and S19/S22's FAR_TOK):
+    seed  B_FAR8_SLOW acc@2400/4800/12000    end  trans outcome  P=4 B_FAR_SLOW  | FAR_TOK8 acc  trans  VALcos margin      eta key s/k/h/i  ROUTED* outcome             hinge i/h/k/any of n P=4 FAR_TOK    
+     160                      0.154/--/--  0.150   None unbound  BOUND           |  0.158   None   1.000   0.00  0.00/0.01/0.00/0.07  -/-/-/- OTHER                    3/0/4/6 of 3600 DISCOVERED     
+     161                          not run                        BOUND           | not run                                                                                                  BOUND unrouted 
+     162                          not run                        BOUND           | not run                                                                                                  BOUND unrouted 
+     163                          not run                        BOUND           | not run                                                                                                  DISCOVERED     
+     164                          not run                        BOUND           | not run                                                                                                  DISCOVERED     
+     165                          not run                        BOUND           | not run                                                                                                  BOUND unrouted 
+     166                          not run                        BOUND           | not run                                                                                                  DISCOVERED     
+     167                          not run                        unbound         | not run                                                                                                  DISCOVERED     
+     168                          not run                        unbound         | not run                                                                                                  DISCOVERED     
+     169                          not run                        unbound         | not run                                                                                                  OTHER          
+  FAR8_CEIL BOUND 0/1; B_FAR8_SLOW BOUND 0/1 (P=4 B_FAR_SLOW on these seeds 7/10)
+  FAR_TOK8: DISCOVERED 0/1, ROUTED*@end 0/1, BOUND 0/1, ROUTED*@1200 0/1; failures {'OTHER': 1}
+    hinge firings (batches): index 3, half 0, key 4, any 6 of 3600; runs with the term on at least once: index 1, half 0, key 1 of 1
+  RULE S28 (FAR8_CEIL 0/1, B_FAR8_SLOW 0/1; 'P=8 header needs the partition' if >= 2/3 and <= 2/10): it does not
+  RULE S28 FAR_TOK8 (ROUTED*@end 0/1; 'promising' if >= 4/10 and the first reading holds): not promising
+  DRY RUN READING dry_far_p8: it does not (FAR8_CEIL 0/1, B_FAR8_SLOW 0/1); FAR_TOK8: not promising (DISCOVERED 0/1, ROUTED*@end 0/1)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S25 muon_recipe: it does not (Muon lr 0.005; MUON_HINGE 1/1 vs SLOW_HINGE 1/1; MUON_A 0/1 vs X arm A 0/1)
+  S26 gate_langevin: not (DISCOVERED 1/1 vs SLOW_MEM 1/1, 0 vs 0, p = 1; vs SLOW_HINGE 1/1 vs 1/1)
+  S27 zloss_merge: it does not (ZLOSS 0/2; S24 SPLIT 0, NOISE 0, CONTROL 0)
+  S28 far_p8: it does not (FAR8_CEIL 0/1, B_FAR8_SLOW 0/1); FAR_TOK8 not promising (DISCOVERED 0/1, ROUTED*@end 0/1)
+####################################################################################################
+exit 0

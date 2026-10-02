@@ -1,0 +1,494 @@
+{
+ "meta": {
+  "arm": "ceiling",
+  "candidates": [
+   0.005,
+   0.01,
+   0.02
+  ],
+  "dry": true,
+  "iters": 3600,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "779d9b6+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-02 20:53:40",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  },
+  "seeds": [
+   160
+  ]
+ },
+ "runs": {
+  "0.005|160": {
+   "acc": 0.99951171875,
+   "collapsed": false,
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.9951171875,
+     0.02177414856851101
+    ],
+    [
+     2400,
+     0.9990234375,
+     0.0029048786964267492
+    ],
+    [
+     3600,
+     0.99951171875,
+     0.0025014164857566357
+    ]
+   ],
+   "discovered": true,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.999895698400752,
+    "eta_key_by_half": 0.0,
+    "eta_key_by_index": 0.0063629150390625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0,
+    "eta_val_by_index": 0.0063629150390625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.017353862524032593,
+    "key_sep": 0.01095431794722875,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "gate_upd": null,
+   "grad": {
+    "1": [
+     0.0,
+     3.342514754685767,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.932900499084521,
+     0.0
+    ],
+    "100": [
+     0.0,
+     6.347976422964972,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": 0.005,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 25984,
+   "secs": 81.5234694480896,
+   "secs_wall": 81.67270350456238,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0063629150390625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0063629150390625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": 1200,
+   "val_cos": 0.0
+  },
+  "0.01|160": {
+   "acc": 0.7568359375,
+   "collapsed": false,
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.76123046875,
+     0.5126751661300659
+    ],
+    [
+     2400,
+     0.76708984375,
+     0.4273587465286255
+    ],
+    [
+     3600,
+     0.7568359375,
+     0.4042072296142578
+    ]
+   ],
+   "discovered": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.999895698400752,
+    "eta_key_by_half": 0.0,
+    "eta_key_by_index": 0.0063629150390625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0,
+    "eta_val_by_index": 0.0063629150390625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.017353862524032593,
+    "key_sep": 0.01095431794722875,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "gate_upd": null,
+   "grad": {
+    "1": [
+     0.0,
+     3.342514754685767,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.7574786314201092,
+     0.0
+    ],
+    "100": [
+     0.0,
+     10.979769342132933,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": 0.01,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.01,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 25984,
+   "secs": 82.52065563201904,
+   "secs_wall": 82.67853498458862,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0063629150390625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0063629150390625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": null,
+   "val_cos": 0.0
+  },
+  "0.02|160": {
+   "acc": 0.52734375,
+   "collapsed": false,
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.5283203125,
+     1.1097711324691772
+    ],
+    [
+     2400,
+     0.53759765625,
+     0.9271434545516968
+    ],
+    [
+     3600,
+     0.52734375,
+     0.9048627018928528
+    ]
+   ],
+   "discovered": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.999895698400752,
+    "eta_key_by_half": 0.0,
+    "eta_key_by_index": 0.0063629150390625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0,
+    "eta_val_by_index": 0.0063629150390625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.017353862524032593,
+    "key_sep": 0.01095431794722875,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "gate_upd": null,
+   "grad": {
+    "1": [
+     0.0,
+     3.342514754685767,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.8382946223053471,
+     0.0
+    ],
+    "100": [
+     0.0,
+     10.829796624889417,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": 0.02,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.02,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 25984,
+   "secs": 82.57263660430908,
+   "secs_wall": 82.73120641708374,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0063629150390625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0063629150390625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999895698400752,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.017353862524032593,
+     "key_sep": 0.01095431794722875,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": null,
+   "val_cos": 0.0
+  }
+ }
+}

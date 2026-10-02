@@ -1,0 +1,485 @@
+{
+ "meta": {
+  "arms": {
+   "MUON_A": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "hinge": false,
+    "iters": 3600,
+    "key": "MUON_A",
+    "label": "arm A under Muon (Adam 1e-3 on the embedding)",
+    "lr": 0.001,
+    "mult": 8,
+    "muon_lr": 0.005,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout",
+    "seeds": [
+     160
+    ],
+    "slow": false
+   },
+   "MUON_HINGE": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "hinge": true,
+    "iters": 3600,
+    "key": "MUON_HINGE",
+    "label": "S13's SLOW_HINGE recipe under Muon",
+    "lr": 0.001,
+    "mult": 8,
+    "muon_lr": 0.005,
+    "n_ch": 2,
+    "prio": 3,
+    "sched": "Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch",
+    "seeds": [
+     160
+    ],
+    "slow": true
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "a2b0e06",
+   "python": "3.11.15",
+   "started": "2026-10-02 20:34:14",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {
+  "MUON_A|160": {
+   "acc": 0.37158203125,
+   "collapsed": false,
+   "ctx_cos": 0.9999944567680359,
+   "curve": [
+    [
+     1200,
+     0.23583984375,
+     2.161696434020996
+    ],
+    [
+     2400,
+     0.30810546875,
+     1.6614218950271606
+    ],
+    [
+     3600,
+     0.37158203125,
+     1.2714030742645264
+    ]
+   ],
+   "discovered": false,
+   "dry": true,
+   "end": {
+    "ctx_cos": 0.9999944567680359,
+    "eff_ch": 1.6869070547550857,
+    "eta_key_by_half": 0.91342444296531,
+    "eta_key_by_index": 0.9999900938662245,
+    "eta_key_by_key": 0.0014965377849310106,
+    "eta_key_by_stream": 3.984225495116913e-07,
+    "eta_val_by_half": 0.14527293327171345,
+    "eta_val_by_index": 0.9978873416602665,
+    "eta_val_by_key": 0.001097916259098315,
+    "eta_val_by_stream": 0.0014743115928129158,
+    "k": 2,
+    "key_cos": 0.9995080828666687,
+    "key_part": 0.04579778015613556,
+    "key_sep": 0.02379881093899409,
+    "margin": -0.0031818642746657133,
+    "sep": 0.004347488284111023,
+    "spread": 0.8727193474769592,
+    "step": "end",
+    "val_cos": 0.9999845623970032
+   },
+   "gate_upd": {
+    "first": [
+     0.020530907437205315,
+     0.019392654299736023,
+     0.022490479052066803
+    ],
+    "last": 0.030839476734399796,
+    "max": 0.034703388810157776,
+    "median": 0.02999427542090416,
+    "n": 2400
+   },
+   "grad": {
+    "1": [
+     4.5962458286858484e-06,
+     3.68384236440337,
+     0.0
+    ],
+    "10": [
+     3.1758727952961893e-06,
+     1.8866149289332406,
+     0.0
+    ],
+    "100": [
+     0.00015656809685405263,
+     2.9098622730441703,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.9995080828666687,
+   "lr": 0.001,
+   "muon_lr": 0.005,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "W_in",
+      "W_h",
+      "W_g"
+     ],
+     "tag": "gate"
+    },
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 28096,
+   "sched": "Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout",
+   "secs": 99.45471620559692,
+   "secs_wall": 99.62929344177246,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.9999438524246216,
+     "eff_ch": 1.999995712279481,
+     "k": 2,
+     "key_cos": 0.9999964833259583,
+     "key_part": 0.003492981195449829,
+     "key_sep": 0.0021715561548868814,
+     "sep": 0.002162262797355652,
+     "spread": 0.004211561754345894,
+     "step": 0,
+     "val_cos": 0.9999996423721313
+    },
+    {
+     "ctx_cos": 0.9999995231628418,
+     "eff_ch": 1.6475940896180552,
+     "eta_key_by_half": 0.9641791572470487,
+     "eta_key_by_index": 0.9989634476249283,
+     "eta_key_by_key": 0.002853149515698782,
+     "eta_key_by_stream": 9.793332000034546e-05,
+     "eta_val_by_half": 0.1715055217229941,
+     "eta_val_by_index": 0.8901149698567192,
+     "eta_val_by_key": 0.016489031246774383,
+     "eta_val_by_stream": 0.000531388213654197,
+     "k": 2,
+     "key_cos": 0.9999581575393677,
+     "key_part": 0.13889603316783905,
+     "key_sep": 0.030317877729733784,
+     "margin": 3.536418080329895e-05,
+     "sep": 0.0004547014832496643,
+     "spread": 0.8679015636444092,
+     "step": 1200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 0.9999129772186279,
+     "eff_ch": 1.6016992613211294,
+     "eta_key_by_half": 0.9956271389016627,
+     "eta_key_by_index": 0.9999873830582443,
+     "eta_key_by_key": 0.0020979850525194256,
+     "eta_key_by_stream": 2.350491421397749e-08,
+     "eta_val_by_half": 0.14652601067421991,
+     "eta_val_by_index": 0.9978063347758259,
+     "eta_val_by_key": 0.0012065040790146368,
+     "eta_val_by_stream": 0.0014389481001207114,
+     "k": 2,
+     "key_cos": 0.9996479749679565,
+     "key_part": 0.0782492607831955,
+     "key_sep": 0.026200118164221447,
+     "margin": -0.0014938546810299158,
+     "sep": 0.0002813860774040222,
+     "spread": 0.9462656378746033,
+     "step": 2400,
+     "val_cos": 0.9999966621398926
+    },
+    {
+     "ctx_cos": 0.9999944567680359,
+     "eff_ch": 1.6869070547550857,
+     "eta_key_by_half": 0.91342444296531,
+     "eta_key_by_index": 0.9999900938662245,
+     "eta_key_by_key": 0.0014965377849310106,
+     "eta_key_by_stream": 3.984225495116913e-07,
+     "eta_val_by_half": 0.14527293327171345,
+     "eta_val_by_index": 0.9978873416602665,
+     "eta_val_by_key": 0.001097916259098315,
+     "eta_val_by_stream": 0.0014743115928129158,
+     "k": 2,
+     "key_cos": 0.9995080828666687,
+     "key_part": 0.04579778015613556,
+     "key_sep": 0.02379881093899409,
+     "margin": -0.0031818642746657133,
+     "sep": 0.004347488284111023,
+     "spread": 0.8727193474769592,
+     "step": 3600,
+     "val_cos": 0.9999845623970032
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": null,
+   "val_cos": 0.9999845623970032
+  },
+  "MUON_HINGE|160": {
+   "acc": 0.99853515625,
+   "collapsed": false,
+   "ctx_cos": 0.650566816329956,
+   "curve": [
+    [
+     1200,
+     0.7890625,
+     1.1213159561157227
+    ],
+    [
+     2400,
+     0.99951171875,
+     0.024212270975112915
+    ],
+    [
+     3600,
+     0.99853515625,
+     0.006285627838224173
+    ]
+   ],
+   "discovered": true,
+   "dry": true,
+   "end": {
+    "ctx_cos": 0.650566816329956,
+    "eff_ch": 1.9998946255733856,
+    "eta_key_by_half": 8.805072103715618e-15,
+    "eta_key_by_index": 0.006362906597913851,
+    "eta_key_by_key": 3.172246406883076e-14,
+    "eta_key_by_stream": 0.9999999999988654,
+    "eta_val_by_half": 3.025580018492107e-18,
+    "eta_val_by_index": 0.006362918564056888,
+    "eta_val_by_key": 7.399212930455514e-15,
+    "eta_val_by_stream": 0.9999999999999154,
+    "hinge_counts": [
+     2,
+     3600
+    ],
+    "k": 2,
+    "key_cos": 4.938787583341764e-07,
+    "key_part": 0.017353728413581848,
+    "key_sep": 0.010954432189464569,
+    "margin": 0.9999988079071045,
+    "pos_pen_last_train": [
+     0.09082033485174179,
+     2.3092664323191674e-14
+    ],
+    "sep": 0.494571328163147,
+    "spread": 0.9732177257537842,
+    "step": "end",
+    "val_cos": 2.33667364568646e-07
+   },
+   "gate_upd": {
+    "first": [
+     0.020530907437205315,
+     0.01932740956544876,
+     0.02181713655591011
+    ],
+    "last": 0.03047855757176876,
+    "max": 0.03279927372932434,
+    "median": 0.028316939249634743,
+    "n": 2400
+   },
+   "grad": {
+    "1": [
+     4.5962458286858484e-06,
+     3.68384236440337,
+     0.0
+    ],
+    "10": [
+     9.009024813330718e-06,
+     2.978220120138811,
+     0.0
+    ],
+    "100": [
+     3.331130713278857e-05,
+     2.4362128356009207,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 4.938787583341764e-07,
+   "lr": 0.001,
+   "muon_lr": 0.005,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "W_in",
+      "W_h",
+      "W_g"
+     ],
+     "tag": "gate"
+    },
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 28096,
+   "sched": "Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch",
+   "secs": 100.84666705131531,
+   "secs_wall": 100.9914448261261,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.9999438524246216,
+     "eff_ch": 1.999995712279481,
+     "hinge_counts": [
+      0,
+      0
+     ],
+     "k": 2,
+     "key_cos": 0.9999964833259583,
+     "key_part": 0.003492981195449829,
+     "key_sep": 0.0021715561548868814,
+     "pos_pen_last_train": null,
+     "sep": 0.002162262797355652,
+     "spread": 0.004211561754345894,
+     "step": 0,
+     "val_cos": 0.9999996423721313
+    },
+    {
+     "ctx_cos": 0.9802467823028564,
+     "eff_ch": 1.9999887981674611,
+     "eta_key_by_half": 3.944210992315269e-10,
+     "eta_key_by_index": 0.0063745868727111184,
+     "eta_key_by_key": 2.8317899104409142e-08,
+     "eta_key_by_stream": 0.9999984699490326,
+     "eta_val_by_half": 9.552185804287037e-10,
+     "eta_val_by_index": 0.006367709992357299,
+     "eta_val_by_key": 1.219532179597452e-07,
+     "eta_val_by_stream": 0.9999991296600247,
+     "hinge_counts": [
+      2,
+      1200
+     ],
+     "k": 2,
+     "key_cos": 0.0012227242114022374,
+     "key_part": 0.017403393983840942,
+     "key_sep": 0.011044551928838095,
+     "margin": 0.9974790811538696,
+     "pos_pen_last_train": [
+      0.02345799282193184,
+      6.73850641952356e-10
+     ],
+     "sep": 0.6187256574630737,
+     "spread": 0.8842598795890808,
+     "step": 1200,
+     "val_cos": 0.00044510644511319697
+    },
+    {
+     "ctx_cos": 0.9141076803207397,
+     "eff_ch": 1.9980313974126167,
+     "eta_key_by_half": 2.8925099098437402e-08,
+     "eta_key_by_index": 0.006374806979539741,
+     "eta_key_by_key": 4.889501388486486e-08,
+     "eta_key_by_stream": 0.9999959819788123,
+     "eta_val_by_half": 1.2288205963048213e-05,
+     "eta_val_by_index": 0.005840482911862574,
+     "eta_val_by_key": 1.2603756725675636e-05,
+     "eta_val_by_stream": 0.9975784806702844,
+     "hinge_counts": [
+      2,
+      2400
+     ],
+     "k": 2,
+     "key_cos": 0.000516854168381542,
+     "key_part": 0.017541036009788513,
+     "key_sep": 0.011074682076772055,
+     "margin": 0.9922608137130737,
+     "pos_pen_last_train": [
+      0.0693572387099266,
+      1.8877779339732115e-08
+     ],
+     "sep": 0.5780977010726929,
+     "spread": 0.9050846695899963,
+     "step": 2400,
+     "val_cos": 0.004757139831781387
+    },
+    {
+     "ctx_cos": 0.650566816329956,
+     "eff_ch": 1.9998946255733856,
+     "eta_key_by_half": 8.805072103715618e-15,
+     "eta_key_by_index": 0.006362906597913851,
+     "eta_key_by_key": 3.172246406883076e-14,
+     "eta_key_by_stream": 0.9999999999988654,
+     "eta_val_by_half": 3.025580018492107e-18,
+     "eta_val_by_index": 0.006362918564056888,
+     "eta_val_by_key": 7.399212930455514e-15,
+     "eta_val_by_stream": 0.9999999999999154,
+     "hinge_counts": [
+      2,
+      3600
+     ],
+     "k": 2,
+     "key_cos": 4.938787583341764e-07,
+     "key_part": 0.017353728413581848,
+     "key_sep": 0.010954432189464569,
+     "margin": 0.9999988079071045,
+     "pos_pen_last_train": [
+      0.09082033485174179,
+      2.3092664323191674e-14
+     ],
+     "sep": 0.494571328163147,
+     "spread": 0.9732177257537842,
+     "step": 3600,
+     "val_cos": 2.33667364568646e-07
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": 2400,
+   "val_cos": 2.33667364568646e-07
+  }
+ }
+}

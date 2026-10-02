@@ -271,6 +271,9 @@ def report(store):
     s19.firings(tk)
     rp = reading_part(nc, nb)
     rt = "promising" if nr >= TOK_MIN and rp == "P=8 header needs the partition" else "not promising"
+    if nc < CEIL_MIN:
+        print(f"  NOTE: the validity arm FAR8_CEIL bound {nc}/{len(ce)} (< {CEIL_MIN}/3): the perfect gate does not bind "
+              f"this task within {ARMS['FAR8_CEIL']['iters']} steps, so 'it does not' below says nothing about the partition")
     print(f"  RULE S28 (FAR8_CEIL {nc}/{len(ce)}, B_FAR8_SLOW {nb}/{len(bsl)}; 'P=8 header needs the partition' if "
           f">= {CEIL_MIN}/3 and <= {BSLOW_MAX}/10): {rp}")
     print(f"  RULE S28 FAR_TOK8 (ROUTED*@end {nr}/{len(tk)}; 'promising' if >= {TOK_MIN}/10 and the first reading "
