@@ -335,3 +335,5 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
           acc 0.217  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
   [  8/57]   22.2 min  far_p8         FAR_TOK8   seed 164  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions, P=8))
           acc 0.259  trans  None  VALcos 0.419  margin 0.54  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  9/57]   30.8 min  far_p8         B_FAR8_SLOW seed 166  lr 0.001 (every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at))
+          acc 0.242  trans  None  VALcos 1.000  margin --  unbound  ROUTED* 1200/2400/end -/-/-
