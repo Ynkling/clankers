@@ -1,0 +1,56 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), zloss_merge (S27), far_p8 (S28)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 49834e4+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly to every Adam group; S25's Muon groups at the selected Muon lr; slow arms' warm-up groups at a tenth), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S27: rerun to 9600, then 9600 continued updates), tasks: S25/S26 P=4 S=2 grouped; S27 task_for(4, 4), k=4, conv; S28 header layout P=8 (L 37); 1 torch thread per run
+  lr read for muon_recipe MUON_A: 0.001 (Adam groups; the Muon lr is selected below)
+  lr read for muon_recipe MUON_HINGE: 0.001 (Adam groups; the Muon lr is selected below)
+  lr read for gate_langevin LANGEVIN: 0.001
+  lr read for zloss_merge SR_A4k4: 0.001
+  lr read for zloss_merge SA_A4k4: 0.001
+  lr read for far_p8 FAR8_CEIL: 0.001
+  lr read for far_p8 B_FAR8_SLOW: 0.001
+  lr read for far_p8 FAR_TOK8: 0.001
+  S25 rule: 'the recipe survives Muon' if MUON_HINGE DISCOVERED >= 15/20, 'it does not' if <= 10/20, else neither; UNTESTED if no Muon lr binds the perfect gate on both seeds
+  S26 rule (vs SLOW_MEM, 40 seeds, DISCOVERED): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive
+  S27 rule: 'z-loss un-merges' if >= 4/8 split by 19200, 'it does not' if <= 1/8, else neither (split: the merged pair on different channels and accuracy >= 0.95)
+  S28 rules: 'P=8 header needs the partition' if FAR8_CEIL >= 2/3 and B_FAR8_SLOW <= 2/10, else 'it does not'; FAR_TOK8 'promising' if ROUTED*@end >= 4/10 and the first reading holds
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): zloss_merge, muon_recipe, far_p8, gate_langevin — run_jobs2 queues runs by arm priority, set in memory to 4..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (55s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK gate_langevin: with sigma = 0 LANGEVIN equals SLOW_MEM bit for bit (seed 160, 3600 steps; curves = a fresh SLOW_MEM run = S5's record; weights equal): ok
+  CHECK gate_langevin: the noise added at updates 1, 1200, 2399 is sigma_t x the unit draw, per tensor: W_in@1 sigma 9.96e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.015]; W_h@1 sigma 9.67e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.009]; W_g@1 sigma 1.03e-03 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.196]; W_in@1200 sigma 4.98e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 0.982]; W_h@1200 sigma 4.84e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 0.990]; W_g@1200 sigma 5.17e-04 std(added)/(sigma x std(unit)) 1.0000 [one draw: std(added)/sigma 1.053]; W_in@2399 sigma 4.15e-07 std(added)/(sigma x std(unit)) 0.9989 [one draw: std(added)/sigma 0.990]; W_h@2399 sigma 4.03e-07 std(added)/(sigma x std(unit)) 1.0001 [one draw: std(added)/sigma 0.973]; W_g@2399 sigma 4.31e-07 std(added)/(sigma x std(unit)) 1.0076 [one draw: std(added)/sigma 0.870]: ok
+  CHECK gate_langevin: the unit draws have std 1 within 2% per tensor shape, pooled over 200 draws: W_in 1.0012, W_h 1.0018, W_g 1.0049: ok
+  CHECK gate_langevin: nothing is added from update 2400 (the hook's change to W_in, W_h, W_g at updates 2400 and 2401 is exactly 0 and no draw is made; the run took 2401 optimizer steps): ok
+  CHECK far_p8: P=8 header task: every (stream, key) appears once: ok
+  CHECK far_p8: P=8 header task: S distinct values per key: ok
+  CHECK far_p8: P=8 header task: each query is answered by its own stream's value: ok
+  CHECK far_p8: P=8 header task: exactly one CTX token per block; block streams a permutation: ok
+  CHECK far_p8: P=8 header task: stream_labels = the block's stream (body), the query's stream (query): ok
+  CHECK far_p8: P=8 header task: L = 37, qpos = [35], vocab = 26: ok
+  CHECK far_p8: P=8 header task: select reads the query's KEY position and targets its value: ok
+  CHECK far_p8: P=8 header task: the perfect gate zeroes every cross-stream score at every layer (3 layers; same-stream scores non-zero): ok
+  CHECK far_p8: P=8 header task: header_routing_stats under the perfect gate: margin 1.0000, eta_key_by_stream 1.0000: ok
+  CHECK far_p8: FAR8_CEIL's run path with the P=4 header task reproduces the far_ceil record (seed 160, to 3600; 3 evaluations): ok
+  CHECK far_p8: B_FAR8_SLOW's run path with the P=4 header task reproduces the B_FAR_SLOW record (seed 160, to 3600; 3 evaluations): ok
+  CHECK far_p8: FAR_TOK8's run path with the P=4 header task reproduces the FAR_TOK record (seed 160, to 3600; 3 evaluations): ok
+  CHECK far_p8: FAR_TOK8's hinge reads the 16 KEY positions [1, 3, 5, 7, 9, 11, 13, 15, 18, 20, 22, 24, 26, 28, 30, 32] with (S, P) = (2, 8): ok
+  CHECK zloss_merge: the runs are S21's derived list (stream_recipe (247, 248, 251, 258), scale_axes (221, 223, 225, 226)): ok
+  CHECK zloss_merge: test_scale_axes.run_job (run_one) seed 221: rerun to 1200 reproduces the record (True); with weight 0 the continuation equals S24's CONTROL continuation bit for bit over 1200 updates (curves [[2400, 0.1171875, 2.694366455078125]] vs [[2400, 0.1171875, 2.694366455078125]], maps, digest, weights: True); with weight 0.001 the weights differ on the same batches (True; probe mean lse^2 2.960 -> 1.470, CONTROL 2.166); start states equal and separate (True): ok
+  CHECK zloss_merge: test_stream_recipe.run_attempt (plain A4k4) seed 247: rerun to 1200 reproduces the record (True); with weight 0 the continuation equals S24's CONTROL continuation bit for bit over 1200 updates (curves [[2400, 0.17236328125, 2.406351089477539]] vs [[2400, 0.17236328125, 2.406351089477539]], maps, digest, weights: True); with weight 0.001 the weights differ on the same batches (True; probe mean lse^2 2.109 -> 6.342, CONTROL 1.978); start states equal and separate (True): ok
+  CHECK zloss_merge: the z-loss gradient reaches only ['W_g', 'W_h', 'W_in', 'embed.weight']: ok
+  CHECK zloss_merge: softmax of the recomputed logits equals the model's read gate (max diff 0.0e+00): ok
+  CHECK muon_recipe: the optimizer groups cover every parameter exactly once: MUON_A [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight'])]; MUON_HINGE [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight'])]; ceiling [('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight'])]: ok
+  CHECK muon_recipe: SliceMuon equals torch.optim.Muon (weight decay 0) bit for bit on 2-D weights (3 shapes, 5 steps): ok
+  CHECK muon_recipe: the swap reaches onset_run: with every parameter in Adam groups the MuonAdam path reproduces X's arm A record (seed 160, 2400 steps; 1 optimizer built): [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]] vs [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]: ok
+  CHECK muon_recipe: MUON_HINGE's lrs per group [('gate', 'muon'), ('rest', 'muon'), ('rest', 'adam')]: update 1 [0.005, 0.0005, 0.0001], 2400 [0.005, 0.0005, 0.0001], 2401 [0.005, 0.005, 0.001] (2401 updates, forward and evaluation stubbed): ok
+  CHECK muon_recipe: with the hinge's TAU at 1.0, MUON_HINGE equals a MUON run with the slow schedule alone bit for bit (seed 160, 1200 steps, Muon lr 0.005; curves [[1200, 0.8056640625, 1.0763039588928223]] vs [[1200, 0.8056640625, 1.0763039588928223]]; weights equal; hinge on [0, 1200]): ok
+  CHECK muon_recipe: Muon's update on the probe (Gaussian 32 x 256, seed 0) after Newton-Schulz has all singular values within [0.5, 1.5]: min 0.6835, max 1.0490 (not asserted, other Gaussian shapes: (256, 32) [0.680, 1.055]; (32, 32) [0.405, 1.189]; (2, 32) [1.052, 1.127]; (32, 22) [0.683, 1.135]): ok
+  all CHECKs passed (17.6 min)
+  recorded the full CHECK pass at 49834e4 in /home/user/clankers/explore_out/batch9_checks.json
+  S25 LR SELECTION (EXPLORATORY, not a result): perfect gate under MUON, Muon lr [0.005, 0.01, 0.02], seeds [160, 161], 6000 steps, Adam lr 0.001 on the embedding; 6 runs to do (0 stored)
+  [lrsel 1/6]   1.3 min  Muon lr 0.01 seed 161 (Adam lr 0.001, 6000 steps): acc 0.997  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
+  [lrsel 2/6]   1.3 min  Muon lr 0.005 seed 161 (Adam lr 0.001, 6000 steps): acc 0.994  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
+  [lrsel 3/6]   1.4 min  Muon lr 0.005 seed 160 (Adam lr 0.001, 6000 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
