@@ -17,3 +17,6 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
   S28 rules: 'P=8 header needs the partition' if FAR8_CEIL >= 2/3 and B_FAR8_SLOW <= 2/10, else 'it does not'; FAR_TOK8 'promising' if ROUTED*@end >= 4/10 and the first reading holds
   ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
   order (--order): zloss_merge, muon_recipe, far_p8, gate_langevin — run_jobs2 queues runs by arm priority, set in memory to 4..1 in this order (the screen files are unchanged)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (61s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
