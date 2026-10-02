@@ -1,0 +1,19 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), zloss_merge (S27), far_p8 (S28) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git a2b0e06 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: lr = test_channel_binding.SUB_LR = 0.001 (passed explicitly to every Adam group; S25's Muon groups at the selected Muon lr; slow arms' warm-up groups at a tenth), MAX_ITERS = test_short_conv.MAX_ITERS = 24000 (S27: rerun to 9600, then 9600 continued updates), tasks: S25/S26 P=4 S=2 grouped; S27 task_for(4, 4), k=4, conv; S28 header layout P=8 (L 37); 1 torch thread per run
+  lr read for dry_muon_recipe MUON_A: 0.001 (Adam groups; the Muon lr is selected below)
+  lr read for dry_muon_recipe MUON_HINGE: 0.001 (Adam groups; the Muon lr is selected below)
+  lr read for dry_gate_langevin LANGEVIN: 0.001
+  lr read for dry_zloss_merge SR_A4k4: 0.001
+  lr read for dry_zloss_merge SA_A4k4: 0.001
+  lr read for dry_far_p8 FAR8_CEIL: 0.001
+  lr read for dry_far_p8 B_FAR8_SLOW: 0.001
+  lr read for dry_far_p8 FAR_TOK8: 0.001
+  S25 rule: 'the recipe survives Muon' if MUON_HINGE DISCOVERED >= 15/20, 'it does not' if <= 10/20, else neither; UNTESTED if no Muon lr binds the perfect gate on both seeds
+  S26 rule (vs SLOW_MEM, 40 seeds, DISCOVERED): promising if b - c >= 4 and McNemar p < 0.1; not if b - c <= 0; else inconclusive
+  S27 rule: 'z-loss un-merges' if >= 4/8 split by 19200, 'it does not' if <= 1/8, else neither (split: the merged pair on different channels and accuracy >= 0.95)
+  S28 rules: 'P=8 header needs the partition' if FAR8_CEIL >= 2/3 and B_FAR8_SLOW <= 2/10, else 'it does not'; FAR_TOK8 'promising' if ROUTED*@end >= 4/10 and the first reading holds
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order (--order): zloss_merge, muon_recipe, far_p8, gate_langevin — run_jobs2 queues runs by arm priority, set in memory to 4..1 in this order (the screen files are unchanged)
