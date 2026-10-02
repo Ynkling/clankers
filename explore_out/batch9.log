@@ -133,3 +133,5 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
           acc 0.734  trans  None  VALcos 0.008  margin 0.74  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [  8/111]   34.0 min  zloss_merge    SR_A4k4    seed 258  lr 0.001 (lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2)
           acc 0.769  trans  None  VALcos 0.005  margin 0.69  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  9/111]   35.5 min  muon_recipe    MUON_A     seed 161  lr 0.001 (Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout)
+          acc 1.000  trans  1200  VALcos 0.007  margin 0.99  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
