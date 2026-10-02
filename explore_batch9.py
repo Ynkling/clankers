@@ -50,7 +50,8 @@ S25's singular-value range is the last CHECK)
 - repro: X's arm A, seed 160, 2400 steps, bit-identical to X's record (in every segment).
 - S25: groups cover every parameter once; SliceMuon = torch.optim.Muon on 2-D weights; the Muon/Adam
   swap reaches onset_run (all-Adam reproduces X's arm A); the slow schedule's lrs; TAU 1.0: MUON_HINGE
-  = MUON with the slow schedule alone (1200 steps); Newton-Schulz singular values within [0.7, 1.3].
+  = MUON with the slow schedule alone (1200 steps); Newton-Schulz singular values within [0.5, 1.5]
+  (pre-registered [0.7, 1.3]; widened by the user after the first dry run measured [0.6835, 1.0490]).
 - S26: sigma 0 = SLOW_MEM bit for bit (3600 steps); the noise's std per tensor = sigma_t (2%) at
   updates 1, 1200, 2399; zero from 2400.
 - S27: weight 0 = CONTROL bit for bit (1200 updates); the z-loss gradient reaches only the gate and

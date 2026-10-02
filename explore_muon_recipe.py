@@ -53,8 +53,11 @@ reaches onset_run: with every parameter in an Adam group the MuonAdam path repro
 optimizer log through its real run path, forward and evaluation stubbed); with the hinge's TAU at
 1.0, MUON_HINGE equals a MUON run with the slow schedule alone bit for bit (curves and weights, 1200
 steps); Muon's update on a probe matrix (Gaussian, the encoder head slice's shape 32 x 256, generator
-seed 0) has all singular values within [0.7, 1.3] after Newton-Schulz (scaled as implemented: torch's
-Frobenius normalisation, before the lr and its adjustment).
+seed 0) has all singular values within [0.5, 1.5] after Newton-Schulz (scaled as implemented: torch's
+Frobenius normalisation, before the lr and its adjustment). The pre-registered range was [0.7, 1.3];
+the first dry run (explore_out/batch9_dry_check_failed.log) measured [0.6835, 1.0490]: these
+coefficients map 1 to 0.70 and 1.05 to 0.68 by design. Widened to [0.5, 1.5], the range Keller Jordan
+gives for them (S' ~ Uniform(0.5, 1.5)), by the user's decision before any run.
 """
 
 import contextlib
@@ -99,7 +102,7 @@ LRSEL_ITERS = 6000
 WARM = 2400
 SLOW_SCALE = 0.1
 LOG_UPD = 2400
-SV_LO, SV_HI = 0.7, 1.3
+SV_LO, SV_HI = 0.5, 1.5                    # pre-registered 0.7, 1.3; widened by the user after the first dry run
 SEEDS = tuple(range(160, 180))
 SURVIVES, FAILS = 15, 10
 CEIL = tsc._BASE["ceiling"]
