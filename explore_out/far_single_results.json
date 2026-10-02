@@ -1,0 +1,70 @@
+{
+ "meta": {
+  "arms": {
+   "B_FAR": {
+    "g2r": false,
+    "gate": "none",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "B_FAR",
+    "label": "plain single channel (arm B), header layout",
+    "layout": "header",
+    "lr": 0.001,
+    "mult": 8,
+    "n_ch": 1,
+    "prio": 1,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169
+    ]
+   },
+   "B_FAR_SLOW": {
+    "g2r": false,
+    "gate": "none",
+    "h_gate": null,
+    "iters": 24000,
+    "key": "B_FAR_SLOW",
+    "label": "arm B with the slow schedule, header layout",
+    "layout": "header",
+    "lr": 0.001,
+    "lr_low": 0.0001,
+    "mult": 8,
+    "n_ch": 1,
+    "prio": 1,
+    "sched": "every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)",
+    "seeds": [
+     160,
+     161,
+     162,
+     163,
+     164,
+     165,
+     166,
+     167,
+     168,
+     169
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "f5a4d1b+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-02 15:46:06",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
