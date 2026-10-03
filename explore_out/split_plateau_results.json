@@ -1,0 +1,86 @@
+{
+ "meta": {
+  "arms": {
+   "SPLIT4k4_M": {
+    "cfg": "a",
+    "iters": 28800,
+    "key": "SPLIT4k4_M",
+    "label": "S33's A_HINGE + the trigger (S=4, P=4, k=4, conv)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 1,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244,
+     245,
+     246,
+     247,
+     248,
+     249
+    ]
+   },
+   "SPLIT_D8_A": {
+    "cfg": "b",
+    "iters": 43200,
+    "key": "SPLIT_D8_A",
+    "label": "main's HINGE_D8 + the trigger (S=8, P=4, k=16, conv; Adam)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "SPLIT_D8_M": {
+    "cfg": "b",
+    "iters": 43200,
+    "key": "SPLIT_D8_M",
+    "label": "S33's D8_HINGE + the trigger (S=8, P=4, k=16, conv)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "fcb4a27+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-03 18:24:44",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
