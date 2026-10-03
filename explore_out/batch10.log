@@ -352,3 +352,5 @@ EXPLORATORY, NOT A RESULT — batch 10: muon_slow (S32), muon_scale (S33)
           acc 0.389  trans  None  VALcos 0.000  margin 0.48  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [  4/36]   43.0 min  muon_scale     D8_HINGE   seed 262  lr 0.001 (Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels))
           acc 0.102  trans  None  VALcos 0.988  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  5/36]   84.5 min  muon_scale     D8_SLOW    seed 264  lr 0.001 (Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after)
+          acc 0.362  trans  None  VALcos 1.000  margin 0.25  OTHER  ROUTED* 1200/2400/end -/-/-
