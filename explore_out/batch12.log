@@ -156,3 +156,5 @@ EXPLORATORY, NOT A RESULT — batch 12: split_plateau (S36)
   16 runs queued on 4 workers (1 torch thread each), submitted in waves: SPLIT_D8_A|264 SPLIT_D8_M|264 SPLIT_D8_A|265 SPLIT_D8_M|265 SPLIT4k4_M|246 SPLIT4k4_M|247 SPLIT4k4_M|248 SPLIT4k4_M|249 SPLIT_D8_A|266 SPLIT_D8_M|266 SPLIT_D8_A|267 SPLIT_D8_M|267 SPLIT_D8_A|268 SPLIT_D8_M|268 SPLIT_D8_A|269 SPLIT_D8_M|269
   [  1/16]   74.2 min  split_plateau  SPLIT_D8_A seed 264  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
           acc 0.092  trans  None  VALcos 0.990  margin 0.00  KEY  splits 12
+  [  2/16]   74.9 min  split_plateau  SPLIT_D8_A seed 265  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
+          acc 0.490  trans  None  VALcos 0.000  margin 0.31  STREAM-PARTIAL  splits 7
