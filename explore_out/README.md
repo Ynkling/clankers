@@ -25,7 +25,7 @@ for a pre-registered test.
 | `batch8.log` (S22 far_tok_check, S23 far_single, S24 merge_split) | batch 8, code of git 572a00d (the full CHECK pass recorded at 8f9dec4 in `batch8_checks.json`; the banners' git f5a4d1b+dirty and 756d6f3+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (78/78 runs). The first segment ran the full CHECK suite (16.5 min) and saved 34 runs before the session's background time limit stopped it; the second (RESUME) saved the other 44. Repro check bit-identical to X in both segments; the second skipped the rest of the CHECK suite, the screen code being unchanged. Both segments ran on a Xeon @ 2.10GHz. S24's main-branch modules and records were read from 520fe51 (git show), not added to this branch. Reports, readings and SUMMARY at the end. |
 | `batch9_dry_check_failed.log` | batch 9's first labelled DRY RUN (git 0a318be, Intel Xeon @ 2.10GHz): the repro check bit-identical; every CHECK of S26, S28 and S27 passed, and S25's first five; stopped by S25's last CHECK (run last on purpose): the Newton-Schulz output of torch's Muon (coefficients 3.4445, -4.775, 2.0315, 5 steps, bf16) on the 32 x 256 Gaussian probe has singular values in [0.6835, 1.0490], below the pre-registered [0.7, 1.3] (these coefficients map 1 to 0.70 and 1.05 to 0.68 by design; Keller Jordan's note gives S' ~ Uniform(0.5, 1.5)). No run was made. The range is the spec's; it awaits a decision. |
 | `batch9_dry.log`, `dry_<screen>_results.json`, `dry_muon_recipe_lrsel_results.json` (S25 muon_recipe, S26 gate_langevin, S27 zloss_merge, S28 far_p8) | batch 9's labelled DRY RUN, second attempt (git a2b0e06, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (18.4 min; S25's singular-value range [0.5, 1.5], widened from the pre-registered [0.7, 1.3] by the user's decision after the first attempt), S25's lr selection shortened (seed 160, 3600 steps; Muon lr 0.005 bound, 0.01 and 0.02 did not), 1 seed per arm, runs capped at 3600 steps (S27: rerun to 2400, continuation 1200). It exercises the code; its numbers are not for interpretation. After it, S28's report prints a note when the validity arm FAR8_CEIL binds fewer than 2/3 (print only; the reading is unchanged). |
-| `batch9.log` (S25 muon_recipe, S26 gate_langevin, S27 zloss_merge, S28 far_p8) | batch 9, code of git d0c31ce, 1 thread per run. **IN PROGRESS: 116 of 117 runs saved, the 6 lr-selection runs included (muon_recipe_lrsel 6, zloss_merge 8, muon_recipe 40, far_p8 23, gate_langevin 39).** Run in segments, each resumed after the session's background time limit stops it; S25 lr selection first, then queue order zloss_merge, muon_recipe, far_p8, gate_langevin; pushed after every saved run. No report or verdict until the SUMMARY at the end of the log. |
+| `batch9.log`, `muon_recipe_lrsel_results.json` (S25 muon_recipe, S26 gate_langevin, S27 zloss_merge, S28 far_p8) | batch 9, code of git d0c31ce (the full CHECK pass recorded at 49834e4 in `batch9_checks.json`; the banners' git 49834e4+dirty, c789cd8+dirty and 5326564+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (117/117 runs: 6 S25 lr-selection runs and 111 screen runs). Segment 1 ran the full CHECK suite (17.6 min) and the lr selection (Muon lr 0.005) and saved 60 before the background time limit; segment 2 (RESUME) saved 24 before the container was restarted (RESTART note; the S26 runs in flight were lost and re-run); segment 3 (RESUME) saved the last 33. Repro check bit-identical to X in every segment; later segments skipped the rest of the CHECK suite, the screen code being unchanged, and reused the stored lr selection. All on a Xeon @ 2.10GHz. S27's main-branch modules and records were read from 520fe51 (git show), not added to this branch. Reports, readings and SUMMARY at the end. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -184,3 +184,35 @@ split 223 only (at 12000), CONTROL none. At 9600 the merged streams' gate states
 19200 (CONTROL 0.012-0.028). Reading: the copy makes the shared and the idle channel's logits nearly tie (row distance 1.96-3.32
 -> 0.24-0.40), so the small differences in h decide the channel and the task gradient can grow them; noise of the same size
 without the tie (row distance unchanged) did not, in 7 of 8.
+
+## Batch 9 verdicts (rules fixed before any run; S25's singular-value CHECK range widened by the user after the first dry run)
+
+| screen | outcome | reference | cand. only / ref only | McNemar p | reading / verdict |
+|---|---|---|---|---|---|
+| S25 MUON_HINGE (Muon lr 0.005, seeds 160-179) | DISCOVERED 20/20 (ROUTED*@1200 20/20) | S13 SLOW_HINGE 18/20 (15/20) | 2 / 0 (5 / 0) | 0.5 (0.0625) | "the recipe survives Muon" (>= 15/20) |
+| S25 MUON_A (Muon lr 0.005, seeds 160-179) | DISCOVERED 9/20 | X arm A 7/20 | 4 / 2 | 0.69 | (descriptive) |
+| S26 gate_langevin (seeds 160-199) | DISCOVERED 27/40 (ROUTED*@1200 23/40) | SLOW_MEM 24/40 (23/40) | 4 / 1 | 0.375 | inconclusive |
+| S26 vs SLOW_HINGE | 27/40 | SLOW_HINGE 34/40 | 0 / 7 | 0.016 | (printed) |
+| S27 zloss_merge (8 merged S=4 runs) | split by 19200: 2/8 (225, 226) | S24 SPLIT 8/8, NOISE 1/8, CONTROL 0/8 | | | "neither" (2 is between 1 and 4) |
+| S28 far_p8 (header layout, P=8) | FAR8_CEIL BOUND 0/3; B_FAR8_SLOW 0/10 | | | | "it does not" by the rule, but the validity arm failed: no answer |
+| S28 FAR_TOK8 (seeds 160-169) | DISCOVERED 0/10, ROUTED*@end 2/10 | | | | "not promising" |
+
+S25: the lr selection (perfect gate under Muon, 6000 steps) bound both seeds at 0.005 only (0.01: one seed stalled at
+0.76; 0.02: both stalled). Under Muon the HINGE recipe routed by 1200 in all 20 runs (transition 1200-2400 in 19, 10800 in
+166, where the hinge fired 281 times; it fired 0-4 times in the others, never in 6). Muon alone (MUON_A) did not fix arm A:
+its 11 failures are all position splits (X's arm A: 8 POSITION, 4 KEY, 1 OTHER). The gate's update norm per step over
+updates 1-2400 was 2.3e-2 to 3.2e-2 (per-run medians), max 2.9e-2 to 3.6e-2. Every MUON run used Muon lr 0.005; weight
+decay 0; lm_head under Muon (a 2-D weight), the embedding under Adam.
+
+S26: LANGEVIN gained 175, 176, 177, 180 (SLOW_MEM: position splits; here DISCOVERED late, transitions 4800-9600) and lost
+186 (DISCOVERED -> KEY). Below SLOW_HINGE on every seed where they differ (0 vs 7).
+
+S27: every in-job check passed (reruns reproduce to 9600; the continuation's batches equal S24's recorded CONTROL batches;
+optimizer state equal and separate). The z-loss did what it is built to do: the probe's mean (logsumexp)^2 fell from
+23-46 at 9600 to 0.002-0.18 by 19200 in every run, all channels' mean logits pushed down together (to -1.9 to -5.0); the
+merged pair stayed on one channel in 6 of 8 (accuracy 0.73-0.77), and 226 (at 10800) and 225 (at 16800) split to 1.000.
+
+S28: the perfect gate did not bind the P=8 header layout in 24000 steps (final accuracy 0.871, 0.858, 0.547), so the
+validity arm failed and the screen cannot say whether P=8 needs the partition. The single channel with the slow schedule
+stayed at 0.20-0.24 (10/10). FAR_TOK8 routed by stream in 163 and 167 (VAL cos 0.00, margin 1.00) and reached 0.79-0.81
+by 24000, close to the perfect gate's 0.86-0.87: on this task the memory, not the routing, is the limit within the budget.

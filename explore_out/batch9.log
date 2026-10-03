@@ -526,3 +526,245 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
           acc 0.391  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
   [ 32/33]   30.8 min  gate_langevin  LANGEVIN   seed 197  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400))
           acc 0.491  trans  None  VALcos 1.000  margin 0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  [ 33/33]   32.5 min  gate_langevin  LANGEVIN   seed 199  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400))
+          acc 0.490  trans  None  VALcos 1.000  margin -0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 32.5 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_recipe
+  idea    arm A and the HINGE recipe with Muon (orthogonalized momentum) in place of Adam
+  source  Muon (Jordan et al.; torch.optim.Muon): no per-weight second moment; batches 6-7 (Adam's sign-like step and inflated second moment under the hinge)
+  change  Muon on every 2-D weight (per head slice of 3-D), Adam 1e-3 on the embedding; MUON_HINGE: S13's hinge, the slow phase scaling every non-gate lr by 0.1 for updates 1-2400
+  arm MUON_A       lr 0.001  iters 24000  seeds 160-179 (20)  — arm A under Muon (Adam 1e-3 on the embedding)
+                   schedule: Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout
+  arm MUON_HINGE   lr 0.001  iters 24000  seeds 160-179 (20)  — S13's SLOW_HINGE recipe under Muon
+                   schedule: Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  pairing seeds 160-179: MUON_A with X's recorded arm A, MUON_HINGE with S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  LR selection (perfect gate under MUON, 6000 steps, seeds [160, 161]):
+    Muon lr 0.005  seed 160: BOUND at 1200 (acc 1.000)  seed 161: BOUND at 1200 (acc 0.994)
+    Muon lr 0.01   seed 160: unbound (acc 0.764)  seed 161: BOUND at 1200 (acc 0.997)
+    Muon lr 0.02   seed 160: unbound (acc 0.511)  seed 161: unbound (acc 0.743)
+    choice: smallest lr at which every seed binds: 0.005
+  Muon lr in the records: [0.005]
+   arm MUON_A (lr 0.001; Muon lr 0.005 (selected) on every 2-D weight, Adam 0.001 on the embedding, throughout)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         X arm A          gate |dW| 1-2400 med/max  hinge on of n
+     160  0.496   None   1.000   0.03  0.00/0.00/0.56/1.00  -/-/-/-  POSITION        KEY                     3.00e-02/3.47e-02             --
+     161  1.000   1200   0.007   0.99  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY                     2.65e-02/3.30e-02             --
+     162  0.505   None   1.000  -0.00  0.00/0.00/0.17/1.00  -/-/-/-  POSITION        POSITION                2.88e-02/3.46e-02             --
+     163  0.995   2400   0.002   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.72e-02/3.28e-02             --
+     164  0.999   1200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.80e-02/3.32e-02             --
+     165  0.993   1200   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.58e-02/3.30e-02             --
+     166  0.997   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      KEY                     2.76e-02/3.26e-02             --
+     167  0.502   None   1.000   0.00  0.00/0.00/0.38/1.00  -/-/-/-  POSITION        KEY                     2.99e-02/3.56e-02             --
+     168  0.497   None   1.000  -0.03  0.00/0.00/0.03/1.00  -/-/-/-  POSITION        POSITION                2.92e-02/3.49e-02             --
+     169  0.487   None   1.000   0.00  0.00/0.00/0.40/1.00  -/-/-/-  POSITION        DISCOVERED              3.14e-02/3.53e-02             --
+     170  1.000   1200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      POSITION                2.66e-02/3.23e-02             --
+     171  0.508   None   1.000   0.00  0.00/0.00/0.31/1.00  -/-/-/-  POSITION        OTHER                   2.85e-02/3.43e-02             --
+     172  0.397   None   1.000   0.00  0.00/0.00/0.33/1.00  -/-/-/-  POSITION        POSITION                3.12e-02/3.47e-02             --
+     173  0.395   None   1.000   0.00  0.00/0.00/0.47/1.00  -/-/-/-  POSITION        POSITION                3.06e-02/3.53e-02             --
+     174  0.508   None   1.000  -0.01  0.00/0.00/0.41/1.00  -/-/-/-  POSITION        DISCOVERED              3.10e-02/3.53e-02             --
+     175  1.000   1200   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      POSITION                2.57e-02/3.25e-02             --
+     176  0.998   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.46e-02/3.08e-02             --
+     177  0.495   None   1.000   0.00  0.00/0.00/0.36/1.00  -/-/-/-  POSITION        POSITION                3.19e-02/3.53e-02             --
+     178  0.994   1200   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.73e-02/3.27e-02             --
+     179  0.479   None   1.000   0.00  0.00/0.00/0.30/1.00  -/-/-/-  POSITION        POSITION                3.19e-02/3.53e-02             --
+   MUON_A vs X arm A, 20 seeds:
+    DISCOVERED    MUON_A  9/20   X arm A  7/20   MUON_A only 4, X arm A only 2, McNemar two-sided p = 0.688
+    BOUND         MUON_A  9/20   X arm A  7/20   MUON_A only 4, X arm A only 2, McNemar two-sided p = 0.688
+    ROUTED*@1200  MUON_A  9/20   X arm A  6/20   MUON_A only 5, X arm A only 2, McNemar two-sided p = 0.453
+    failures MUON_A {'POSITION': 11}   X arm A {'KEY': 4, 'POSITION': 8, 'OTHER': 1}
+    gate update norm per step, updates 1-2400: median over runs of the per-run median 2.87e-02, of the per-run max 3.45e-02
+   arm MUON_HINGE (lr 0.001; Muon lr 0.005 (selected): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_HINGE       gate |dW| 1-2400 med/max  hinge on of n
+     160  0.997   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.83e-02/3.28e-02      2 of 4800
+     161  0.998   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.66e-02/3.11e-02      1 of 4800
+     162  0.998   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.54e-02/3.00e-02      2 of 4800
+     163  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.62e-02/3.14e-02      2 of 4800
+     164  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.71e-02/3.19e-02      1 of 4800
+     165  0.999   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.47e-02/2.93e-02      0 of 4800
+     166  0.997  10800   0.001   1.00  0.99/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.53e-02/3.12e-02   281 of 13200
+     167  0.995   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      OTHER                   2.39e-02/2.93e-02      4 of 4800
+     168  0.999   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.52e-02/2.95e-02      0 of 4800
+     169  0.988   1200   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.34e-02/2.92e-02      0 of 3600
+     170  0.995   2400   0.009   0.99  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.53e-02/2.99e-02      0 of 4800
+     171  0.995   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      OTHER                   2.46e-02/2.99e-02      1 of 4800
+     172  0.999   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.71e-02/3.23e-02      1 of 4800
+     173  0.998   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.44e-02/2.92e-02      3 of 4800
+     174  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.71e-02/3.14e-02      0 of 4800
+     175  0.997   1200   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.80e-02/3.22e-02      1 of 3600
+     176  1.000   1200   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.54e-02/3.08e-02      2 of 3600
+     177  0.999   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.59e-02/3.08e-02      1 of 4800
+     178  0.995   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.62e-02/3.05e-02      1 of 4800
+     179  0.997   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED              2.66e-02/3.22e-02      0 of 4800
+   MUON_HINGE vs SLOW_HINGE, 20 seeds:
+    DISCOVERED    MUON_HINGE 20/20   SLOW_HINGE 18/20   MUON_HINGE only 2, SLOW_HINGE only 0, McNemar two-sided p = 0.5
+    BOUND         MUON_HINGE 20/20   SLOW_HINGE 18/20   MUON_HINGE only 2, SLOW_HINGE only 0, McNemar two-sided p = 0.5
+    ROUTED*@1200  MUON_HINGE 20/20   SLOW_HINGE 15/20   MUON_HINGE only 5, SLOW_HINGE only 0, McNemar two-sided p = 0.0625
+    failures MUON_HINGE {}   SLOW_HINGE {'OTHER': 2}
+    hinge firings: 303 batches in total; runs with the hinge on at least once 14/20; per run [2, 1, 2, 2, 1, 0, 281, 4, 0, 0, 0, 1, 1, 3, 0, 1, 2, 1, 1, 0]
+    gate update norm per step, updates 1-2400: median over runs of the per-run median 2.57e-02, of the per-run max 3.08e-02
+  RULE S25 (MUON_HINGE DISCOVERED 20/20; 'the recipe survives Muon' if >= 15/20, 'it does not' if <= 10/20): the recipe survives Muon
+  READING muon_recipe: the recipe survives Muon (Muon lr 0.005; MUON_HINGE DISCOVERED 20/20 vs SLOW_HINGE 18/20, 2 vs 0, p = 0.5; MUON_A 9/20 vs X arm A 7/20, 4 vs 2, p = 0.688)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_langevin
+  idea    Langevin-style noise on the gate's weights, decaying to 0 at update 2400, on SLOW_MEM (no hinge)
+  source  Muon meets Tamed Langevin (arXiv 2610.02158): noise for saddle escape; batches 6-7 (the hinge's effect partly runs through Adam's sign-like step)
+  change  SLOW_MEM + after each optimizer step t < 2400, N(0, sigma_t^2) on every element of W_in, W_h, W_g, sigma_t = 0.01 x init std x (1 - t/2400)
+  arm LANGEVIN     lr 0.001  iters 24000  seeds 160-199 (40)  — SLOW_MEM + decaying Gaussian noise on W_in, W_h, W_g (updates 1-2399)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400)
+  pairing seeds 160-199, paired with SLOW_MEM (S5 160-179, S7 180-199) and S13's SLOW_HINGE (same initial parameters and batches)
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 1200/2400/3600/end):
+    seed    acc  trans  VALcos margin      eta key s/k/h/i  ROUTED*  outcome         SLOW_MEM        SLOW_HINGE     
+     160  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     161  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     162  0.490   None   1.000  -0.00  0.00/0.04/0.10/0.67  -/-/-/-  POSITION        POSITION        DISCOVERED     
+     163  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     164  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     165  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     166  0.503   None   1.000  -0.00  0.00/0.02/0.01/0.04  -/-/-/-  OTHER           POSITION        DISCOVERED     
+     167  0.506   None   1.000   0.00  0.01/0.03/0.12/0.84  -/-/-/-  POSITION        POSITION        OTHER          
+     168  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     169  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     170  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     171  0.505   None   1.000   0.00  0.00/0.00/0.00/0.01  -/-/-/-  OTHER           OTHER           OTHER          
+     172  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     173  0.488   None   1.000  -0.00  0.00/0.20/0.00/0.60  -/-/-/-  POSITION        POSITION        DISCOVERED     
+     174  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     175  1.000   4800   0.022   0.95  1.00/0.00/0.00/0.01  -/-/-/Y  DISCOVERED      POSITION        DISCOVERED     
+     176  1.000   4800   0.017   0.97  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      POSITION        DISCOVERED     
+     177  1.000   6000   0.026   0.93  1.00/0.00/0.00/0.01  -/-/-/Y  DISCOVERED      POSITION        DISCOVERED     
+     178  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     179  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     180  1.000   9600   0.003   1.00  1.00/0.00/0.00/0.00  -/-/-/Y  DISCOVERED      POSITION        DISCOVERED     
+     181  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     182  1.000   3600   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     183  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     184  1.000   3600   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     185  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.01  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     186  0.413   None   1.000   0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             DISCOVERED      DISCOVERED     
+     187  0.522   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             KEY            
+     188  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     189  0.385   None   1.000  -0.00  0.00/1.00/0.00/0.00  -/-/-/-  KEY             KEY             KEY            
+     190  0.490   None   1.000  -0.00  0.00/0.00/0.00/1.00  -/-/-/-  POSITION        POSITION        DISCOVERED     
+     191  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     192  0.511   None   1.000  -0.00  0.00/0.47/0.01/0.05  -/-/-/-  OTHER           OTHER           DISCOVERED     
+     193  0.391   None   1.000   0.00  0.00/0.17/0.03/0.49  -/-/-/-  OTHER           KEY             OTHER          
+     194  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     195  1.000   2400   0.000   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     196  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     197  0.491   None   1.000   0.00  0.00/0.00/0.18/0.99  -/-/-/-  POSITION        POSITION        OTHER          
+     198  1.000   2400   0.001   1.00  1.00/0.00/0.00/0.00  Y/Y/Y/Y  DISCOVERED      DISCOVERED      DISCOVERED     
+     199  0.490   None   1.000  -0.00  0.00/0.00/0.33/1.00  -/-/-/-  POSITION        POSITION        DISCOVERED     
+  vs SLOW_MEM, 40 seeds (the rule):
+    DISCOVERED    LANGEVIN 27/40   SLOW_MEM 24/40   LANGEVIN only 4, SLOW_MEM only 1, McNemar two-sided p = 0.375
+    BOUND         LANGEVIN 27/40   SLOW_MEM 24/40   LANGEVIN only 4, SLOW_MEM only 1, McNemar two-sided p = 0.375
+    ROUTED*@1200  LANGEVIN 23/40   SLOW_MEM 23/40   LANGEVIN only 1, SLOW_MEM only 1, McNemar two-sided p = 1
+  vs SLOW_HINGE, 40 seeds:
+    DISCOVERED    LANGEVIN 27/40   SLOW_HINGE 34/40   LANGEVIN only 0, SLOW_HINGE only 7, McNemar two-sided p = 0.0156
+    ROUTED*@1200  LANGEVIN 23/40   SLOW_HINGE 28/40   LANGEVIN only 1, SLOW_HINGE only 6, McNemar two-sided p = 0.125
+  failure classes (40 seeds): LANGEVIN {'POSITION': 6, 'OTHER': 4, 'KEY': 3}   SLOW_MEM {'POSITION': 11, 'OTHER': 2, 'KEY': 3}   SLOW_HINGE {'OTHER': 4, 'KEY': 2}
+  RULE S26 (vs SLOW_MEM, DISCOVERED 4 vs 1, p = 0.375; promising if b - c >= 4 and p < 0.1, not if b - c <= 0): inconclusive
+  VERDICT gate_langevin (vs SLOW_MEM, 40 seeds): inconclusive (DISCOVERED 27/40 vs 24/40, 4 vs 1, p = 0.375; vs SLOW_HINGE 27/40 vs 34/40)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN zloss_merge
+  idea    a router z-loss (ST-MoE) on the gate's logits from 9600, on S=4 runs with two streams merged
+  source  ST-MoE's router z-loss; batch 8's S24 (SPLIT un-merged 8/8 by bringing the spare channel's logit level with the shared one)
+  change  none to the recorded runs up to 9600; then 9600 updates with + 1e-3 x mean over positions of (logsumexp of the gate logits)^2
+  arm SR_A4k4      lr 0.001  iters 19200  seeds [247, 248, 251, 258] (4)  — test_stream_recipe's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  arm SA_A4k4      lr 0.001  iters 19200  seeds [221, 223, 225, 226] (4)  — test_scale_axes's A4k4 (X), merged pair stalled
+                   schedule: lr 0.001 throughout; from 9600: + 0.001 x mean over positions of (logsumexp of the gate logits)^2
+  pairing each run against S24's recorded CONTROL, SPLIT and NOISE (same state at 9600, same batches)
+----------------------------------------------------------------------------------------------------
+  per run (map = stream -> channel at each evaluation, as acc:map; '|' = the merged pair on different channels; continuation from 9600 to 19200; S24's CONTROL / SPLIT / NOISE split steps from its record; z = probe mean (logsumexp)^2, logits = each channel's mean gate logit over all positions):
+    SR_A4k4   247  merged pair streams [2, 3] (recorded end map [3, 1, 0, 0], rec acc 0.754; map at 9600 [3, 1, 0, 0])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.76:3100 0.76:3100 0.75:3100 0.74:3100 0.75:3100 0.76:3100 0.76:3100 0.74:3100
+                           at 19200: acc 0.742, per stream 1.00/1.00/0.46/0.49, merged pair on channels [0, 0]; z 29.379 -> 0.098; logits [0.9354, -2.4002, 0.3041, 1.3308] -> [-2.635, -4.9868, -2.8369, -3.9002]; max |logit| 8.57 -> 7.88
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT split at 18000, NOISE merged
+    SR_A4k4   248  merged pair streams [0, 2] (recorded end map [1, 0, 1, 3], rec acc 0.762; map at 9600 [1, 0, 1, 3])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.77:1013 0.74:1013 0.75:1013 0.75:1013 0.74:1013 0.75:1013 0.76:1013 0.76:1013
+                           at 19200: acc 0.761, per stream 0.50/1.00/0.51/1.00, merged pair on channels [1, 1]; z 45.546 -> 0.082; logits [-2.4272, 1.4414, 0.251, 0.5508] -> [-4.7609, -3.1947, -3.3526, -3.381]; max |logit| 11.21 -> 8.58
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT split at 15600, NOISE merged
+    SR_A4k4   251  merged pair streams [1, 3] (recorded end map [1, 0, 3, 0], rec acc 0.751; map at 9600 [1, 0, 3, 0])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.75:1030 0.74:1030 0.76:1030 0.75:1030 0.74:1030 0.74:1030 0.75:1030 0.73:1030
+                           at 19200: acc 0.734, per stream 1.00/0.50/1.00/0.47, merged pair on channels [0, 0]; z 36.125 -> 0.165; logits [0.5657, -1.5718, 0.663, 1.0767] -> [-2.9524, -3.3706, -2.2466, -3.3807]; max |logit| 9.82 -> 7.15
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT split at 13200, NOISE merged
+    SR_A4k4   258  merged pair streams [0, 2] (recorded end map [0, 2, 0, 1], rec acc 0.769; map at 9600 [0, 2, 0, 1])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.78:0201 0.76:0201 0.75:0201 0.76:0201 0.75:0201 0.76:0201 0.75:0201 0.77:0201
+                           at 19200: acc 0.769, per stream 0.52/1.00/0.53/1.00, merged pair on channels [0, 0]; z 39.028 -> 0.088; logits [1.2244, 1.5432, -3.2777, 0.4176] -> [-3.2123, -3.49, -3.903, -2.5994]; max |logit| 10.54 -> 7.47
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT split at 13200, NOISE merged
+    SA_A4k4   221  merged pair streams [0, 1] (recorded end map [1, 1, 3, 2], rec acc 0.741; map at 9600 [1, 1, 3, 2])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.75:1132 0.75:1132 0.74:1132 0.74:1132 0.74:1132 0.74:1132 0.75:1132 0.76:1132
+                           at 19200: acc 0.755, per stream 0.53/0.51/1.00/1.00, merged pair on channels [1, 1]; z 23.357 -> 0.103; logits [0.2455, 0.8137, 0.398, -1.8249] -> [-2.5234, -2.5431, -4.3164, -4.4728]; max |logit| 8.71 -> 8.93
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT split at 10800, NOISE merged
+    SA_A4k4   223  merged pair streams [2, 3] (recorded end map [3, 2, 1, 1], rec acc 0.738; map at 9600 [3, 2, 1, 1])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.75:3211 0.75:3211 0.75:3211 0.75:3211 0.76:3211 0.75:3211 0.75:3211 0.77:3211
+                           at 19200: acc 0.767, per stream 1.00/1.00/0.52/0.53, merged pair on channels [1, 1]; z 27.196 -> 0.176; logits [-0.2203, 1.3808, -0.3884, -1.5189] -> [-2.3091, -2.3301, -3.6561, -4.2388]; max |logit| 8.70 -> 8.09
+                   READING: ZLOSS merged; S24: CONTROL merged, SPLIT split at 10800, NOISE split at 12000
+    SA_A4k4   225  merged pair streams [2, 3] (recorded end map [3, 0, 2, 2], rec acc 0.749; map at 9600 [3, 0, 2, 2])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   0.76:3022 0.75:3022 0.75:3022 0.77:3022 0.76:3022 1.00:3012| 1.00:3012| 1.00:3012|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [1, 2]; z 26.164 -> 0.120; logits [-0.4677, -0.2434, 0.79, 0.2379] -> [-3.3797, -1.8848, -4.3676, -3.8373]; max |logit| 8.74 -> 8.68
+                   READING: ZLOSS split (at 16800); S24: CONTROL merged, SPLIT split at 12000, NOISE merged
+    SA_A4k4   226  merged pair streams [0, 1] (recorded end map [0, 0, 1, 3], rec acc 0.750; map at 9600 [0, 0, 1, 3])
+                   rerun reproduces: yes; start state equal and separate: yes; run unchanged: yes; batches as S24's: yes
+                   ZLOSS   1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213| 1.00:0213|
+                           at 19200: acc 1.000, per stream 1.00/1.00/1.00/1.00, merged pair on channels [0, 2]; z 46.278 -> 0.002; logits [0.9185, -1.7007, 0.0745, 0.979] -> [-3.4292, -3.6132, -3.1456, -3.9402]; max |logit| 10.99 -> 8.54
+                   READING: ZLOSS split (at 10800); S24: CONTROL merged, SPLIT split at 12000, NOISE merged
+  split by 19200: ZLOSS 2/8; S24's records on these runs: CONTROL 0, SPLIT 8, NOISE 1 of 8
+  RULE S27 ('z-loss un-merges' if >= 4/8 split, 'it does not' if <= 1/8): neither
+  READING zloss_merge: neither (split by the end of the continuation: ZLOSS 2/8; S24 on these runs CONTROL 0, SPLIT 8, NOISE 1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN far_p8
+  idea    the header layout at P=8: does it need the partition, and does FAR_TOK route there?
+  source  batch 8's S23 (one channel binds the P=4 header layout); the main line (one channel bound 0/24 on the grouped layout at P=8)
+  change  HeaderTask(P=8): perfect gate (validity), single channel with the slow schedule, S19's FAR_TOK
+  arm FAR8_CEIL    lr 0.001  iters 24000  seeds 160-162 (3)  — perfect gate, header layout P=8 (validity)
+                   schedule: lr 0.001 throughout
+  arm B_FAR8_SLOW  lr 0.001  iters 24000  seeds 160-169 (10)  — single channel (arm B), slow schedule, header layout P=8
+                   schedule: every parameter at 0.0001 for updates 1-2400, 0.001 after (onset_run's lr_at)
+  arm FAR_TOK8     lr 0.001  iters 24000  seeds 160-169 (10)  — S19's FAR_TOK, header layout P=8 (16 KEY positions)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2) + relu(eta2_key - 0.2)] at the key positions on each training batch (header KEY positions, P=8)
+  pairing seeds 160-169; S23's and S19/S22's P=4 header outcomes printed by seed number only (a different task, different batches)
+----------------------------------------------------------------------------------------------------
+  FAR8_CEIL (validity): seed 160 unbound (acc 0.871); seed 161 unbound (acc 0.858); seed 162 unbound (acc 0.547)
+  per seed (acc at 2400/4800/12000; P=4 columns: the same seed number on the P=4 header task, S23's B_FAR_SLOW and S19/S22's FAR_TOK):
+    seed  B_FAR8_SLOW acc@2400/4800/12000    end  trans outcome  P=4 B_FAR_SLOW  | FAR_TOK8 acc  trans  VALcos margin      eta key s/k/h/i  ROUTED* outcome             hinge i/h/k/any of n P=4 FAR_TOK    
+     160                0.154/0.151/0.196  0.232   None unbound  BOUND           |  0.276   None   0.575   0.48  0.60/0.00/0.00/0.00  -/-/-/- STREAM-PARTIAL      80/21/17/96 of 24000 DISCOVERED     
+     161                0.155/0.144/0.189  0.216   None unbound  BOUND           |  0.250   None   1.000  -0.00  0.00/0.02/0.00/0.06  -/-/-/- OTHER                 5/0/58/63 of 24000 BOUND unrouted 
+     162                0.154/0.156/0.206  0.200   None unbound  BOUND           |  0.304   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/- OTHER                47/35/6/53 of 24000 BOUND unrouted 
+     163                0.165/0.156/0.205  0.231   None unbound  BOUND           |  0.792   None   0.000   1.00  1.00/0.00/0.00/0.00  -/-/-/Y STREAM-PARTIAL     115/99/9/124 of 24000 DISCOVERED     
+     164                0.157/0.150/0.207  0.214   None unbound  BOUND           |  0.259   None   0.419   0.54  0.60/0.09/0.00/0.01  -/-/-/- STREAM-PARTIAL      53/24/20/71 of 24000 DISCOVERED     
+     165                0.161/0.154/0.209  0.217   None unbound  BOUND           |  0.275   None   1.000   0.03  0.00/0.16/0.00/0.15  -/-/-/- OTHER            223/10/122/328 of 24000 BOUND unrouted 
+     166                0.142/0.143/0.199  0.242   None unbound  BOUND           |  0.221   None   1.000   0.00  0.00/0.00/0.00/0.00  -/-/-/- OTHER                 45/3/9/54 of 24000 DISCOVERED     
+     167                0.149/0.152/0.201  0.203   None unbound  unbound         |  0.812   None   0.001   1.00  1.00/0.00/0.00/0.00  -/-/-/Y STREAM-PARTIAL       90/69/9/99 of 24000 DISCOVERED     
+     168                0.158/0.162/0.210  0.232   None unbound  unbound         |  0.237   None   1.000   0.00  0.00/0.02/0.00/0.02  -/-/-/- OTHER                16/0/61/76 of 24000 DISCOVERED     
+     169                0.157/0.160/0.184  0.210   None unbound  unbound         |  0.223   None   1.000  -0.00  0.00/0.00/0.00/0.00  -/-/-/- OTHER                 7/0/39/46 of 24000 OTHER          
+  FAR8_CEIL BOUND 0/3; B_FAR8_SLOW BOUND 0/10 (P=4 B_FAR_SLOW on these seeds 7/10)
+  FAR_TOK8: DISCOVERED 0/10, ROUTED*@end 2/10, BOUND 0/10, ROUTED*@1200 0/10; failures {'STREAM-PARTIAL': 4, 'OTHER': 6}
+    hinge firings (batches): index 681, half 261, key 350, any 1010 of 240000; runs with the term on at least once: index 10, half 7, key 10 of 10
+  NOTE: the validity arm FAR8_CEIL bound 0/3 (< 2/3): the perfect gate does not bind this task within 24000 steps, so 'it does not' below says nothing about the partition
+  RULE S28 (FAR8_CEIL 0/3, B_FAR8_SLOW 0/10; 'P=8 header needs the partition' if >= 2/3 and <= 2/10): it does not
+  RULE S28 FAR_TOK8 (ROUTED*@end 2/10; 'promising' if >= 4/10 and the first reading holds): not promising
+  READING far_p8: it does not (FAR8_CEIL 0/3, B_FAR8_SLOW 0/10); FAR_TOK8: not promising (DISCOVERED 0/10, ROUTED*@end 2/10)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S25 muon_recipe: the recipe survives Muon (Muon lr 0.005; MUON_HINGE 20/20 vs SLOW_HINGE 18/20; MUON_A 9/20 vs X arm A 7/20)
+  S26 gate_langevin: inconclusive (DISCOVERED 27/40 vs SLOW_MEM 24/40, 4 vs 1, p = 0.375; vs SLOW_HINGE 27/40 vs 34/40)
+  S27 zloss_merge: neither (ZLOSS 2/8; S24 SPLIT 8, NOISE 1, CONTROL 0)
+  S28 far_p8: it does not (FAR8_CEIL 0/3, B_FAR8_SLOW 0/10); FAR_TOK8 not promising (DISCOVERED 0/10, ROUTED*@end 2/10)
+####################################################################################################
