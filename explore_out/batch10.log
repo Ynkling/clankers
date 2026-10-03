@@ -49,3 +49,41 @@ EXPLORATORY, NOT A RESULT — batch 10: muon_slow (S32), muon_scale (S33)
   [valid a 0.005 seed 240]   5.0 min  (Adam lr 0.001, 28800 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
   [valid a 0.005 seed 241]   5.0 min  (Adam lr 0.001, 28800 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
   [valid b 0.005 seed 260]   8.6 min  (Adam lr 0.001, 28800 steps): acc 0.981  trans  4800  VALcos 0.000  margin 1.00  DISCOVERED
+  [valid b 0.005 seed 261]   9.8 min  (Adam lr 0.001, 28800 steps): acc 0.990  trans  6000  VALcos 0.000  margin 1.00  DISCOVERED
+    config a Muon lr 0.005  seed 240: BOUND at 1200 (acc 1.000)  seed 241: BOUND at 1200 (acc 1.000)
+    config b Muon lr 0.005  seed 260: BOUND at 4800 (acc 0.981)  seed 261: BOUND at 6000 (acc 0.990)
+  S33 LR CHOICE config a: smallest lr at which both seeds bind (S25's rule): 0.005
+  S33 LR CHOICE config b: smallest lr at which both seeds bind (S25's rule): 0.005
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_slow
+  idea    S25's MUON_HINGE without the hinge (MUON_SLOW): is the hinge still needed under Muon?
+  source  batch 9's S25 (MUON_HINGE 20/20, stream-routed at 1200 on every seed; the hinge fired 0-4 times on 19 seeds); Muon has no per-weight second moment
+  change  S25's MUON_HINGE without the hinge; extra routing evaluations at updates 300, 600, 900
+  arm MUON_SLOW    lr 0.001  iters 24000  seeds 160-199 (40)  — S25's MUON_HINGE without the hinge
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after
+  arm MUON_HINGE   lr 0.001  iters 24000  seeds 180-199 (20)  — S25's MUON_HINGE, new seeds
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  arm MUON_HINGE_S25 lr 0.001  iters 24000  seeds 160-179 (20)  — S25's MUON_HINGE runs re-run to their recorded stop, for the logs only
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + the hinge; to S25's recorded stop step
+  pairing seeds 160-199: MUON_SLOW with MUON_HINGE (S25's runs on 160-179, new runs on 180-199) and with SLOW_MEM (S5 160-179, S7 180-199); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_scale
+  idea    S25's Muon recipe (MUON_SLOW, MUON_HINGE) in the main line's configurations: S=4 k=4, and S=8 k=16
+  source  batch 9's S25 (MUON_HINGE 20/20 at S=2, stream-routed at 1200 on every seed); the main line's HINGE binds 0/10 at S=8 (the coarse split)
+  change  main's run paths at 9c5939e (child process) with S25's optimizer groups: gate on Muon at the Muon lr; other weights on Muon; embedding and conv on Adam 1e-3; non-gate groups x0.1 for updates 1-2400
+  arm A_SLOW       lr 0.001  iters 28800  seeds 240-249 (10)  — MUON_SLOW (S=4, P=4, k=4, conv)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after
+  arm A_HINGE      lr 0.001  iters 28800  seeds 240-249 (10)  — MUON_HINGE (S=4, P=4, k=4, conv)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels)
+  arm D8_SLOW      lr 0.001  iters 28800  seeds 260-269 (10)  — MUON_SLOW (S=8, P=4, k=16, conv, 8 streams from step 1)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after
+  arm D8_HINGE     lr 0.001  iters 28800  seeds 260-269 (10)  — MUON_HINGE (S=8, P=4, k=16, conv, 8 streams from step 1)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels)
+  pairing (a) seeds 240-249 with X's recorded A4k4 (stream_recipe); (b) seeds 260-269 with X's recorded HINGE_D8 (slow_start at b8c6007); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+  S32 PROJECTION (worst case: every run to its iters; S25's recorded runs here: 25.5 ms/step MUON_A, 26.5 ms/step MUON_HINGE, evaluations included):
+    muon_slow      MUON_SLOW       40 runs,  6.79 h (max 10.2 min per run)
+    muon_slow      MUON_HINGE      20 runs,  3.53 h (max 10.6 min per run)
+    muon_slow      MUON_HINGE_S25  20 runs,  0.74 h (max  5.8 min per run)
+    S32 total 11.06 h of runs; makespan on 4 workers 2.77 h
