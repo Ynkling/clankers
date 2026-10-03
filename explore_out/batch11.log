@@ -105,3 +105,5 @@ EXPLORATORY, NOT A RESULT — batch 11: hinge_window (S34), muon_k16 (S35)
           acc 0.997  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [ 20/100]   40.4 min  hinge_window   ADAM_H2400 seed 160  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on updates 1-2400 only)
           acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [ 21/100]   41.0 min  muon_k16       MUON_HINGE16 seed 252  lr 0.001 (Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels))
+          acc 0.947  trans  None  VALcos 0.000  margin 0.69  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
