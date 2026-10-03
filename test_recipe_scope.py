@@ -114,6 +114,36 @@ RUNTIME
 OUTPUT
 Per-seed raw values first, then counts, pairing, claims, readings, diagnostics and curves.
 Results: recipe_scope_results.json (gitignored; X's copy in results/X/).
+
+RESULT (X, test commit a429af9; results/X/recipe_scope_results.json)
+Run conditions:
+- 56/56 records, none failed; 266.2 min of training after verification, 4 workers x 1 thread.
+- Four starts. The first (2.80GHz host) died in a container restart during the inherited CHECKs;
+  the second (2.80GHz) passed verification, recorded its drop decision (projection 6.39 h:
+  nothing cut) and died right after training began, before any run finished; the third (2.10GHz
+  host) died during the inherited CHECKs; the fourth (2.80GHz, started 2026-10-03 02:50, detached
+  with setsid) re-ran the whole verification, kept the recorded decision (its projection 6.51 h)
+  and ran every run. Every start that reached CHECK 118 paired all four files by reproduction.
+Claims:
+- Q1 HONLY0 12/20 vs A0 8/20, 6 vs 2, p = 0.14: NOT SHOWN.
+- Q2 HINGE0 19/20 vs HONLY0 12/20, 8 vs 1, p = 0.020: SHOWN.
+- Q3 HONLY4k16 16/20 vs A4k16 12/20, 6 vs 2, p = 0.14: NOT SHOWN.
+- Q4 HINGE4k16 17/20 vs HONLY4k16 16/20, 4 vs 3, p = 0.50: NOT SHOWN.
+- Q5 SC8_H 8/16 vs SC8 6/16, 6 vs 4, p = 0.38: NOT SHOWN.
+- Band: SC8_H MAJORITY (8/16).
+- Reading: "both parts are needed" (Q2 SHOWN).
+Diagnostics (not part of the verdict):
+- HONLY0's failures: 5 KEY, 2 OTHER, and 1 bound with VAL cos >= 0.5; no POSITION (A0: 9 POSITION,
+  2 KEY, 1 STREAM-PARTIAL). The hinge alone removes the position splits, and without the slow
+  phase key splits take their place; HINGE0's only failure is the OTHER of s287.
+- HONLY4k16: 15 BOUND ROUTED, 1 bound without a one-to-one map, 2 merges, 2 non-stream OTHER; no
+  POSITION or KEY. Beside HINGE4k16 17/20 the slow phase adds little at four streams here (4 vs 3).
+- SC8_H: no collapse (SC8 had 4 position collapses), but 7 merges and 1 KEY; it bound later
+  (median 18000 vs 10800). At 4800, 9 of 16 SC8_H gates held the 8-stream probe in two
+  channels of four. Stalls at the end with the streams in exactly 2 groups: SC8_H 3, SC8 0; in 4
+  groups: SC8_H 1, SC8 3.
+- The hinge fired on every HONLY4k16 and SC8_H run and on 16/20 HONLY0 runs, at most 19 times in
+  Part 0 and 13 in Part B; SC8_H fired up to 391 times (median 3).
 """
 
 import argparse
