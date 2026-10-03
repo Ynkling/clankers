@@ -109,3 +109,5 @@ EXPLORATORY, NOT A RESULT — batch 12: split_plateau (S36)
           acc 0.702  trans  None  VALcos 0.116  margin 0.78  STREAM-PARTIAL  splits 5
   [  6/24]  100.8 min  split_plateau  SPLIT4k4_M seed 241  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
           acc 0.768  trans  None  VALcos 0.011  margin 0.76  STREAM-PARTIAL  splits 7
+  [  7/24]  104.1 min  split_plateau  SPLIT4k4_M seed 244  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
+          acc 0.489  trans  None  VALcos 0.000  margin 0.57  STREAM-PARTIAL  splits 5
