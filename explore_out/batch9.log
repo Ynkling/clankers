@@ -474,3 +474,5 @@ EXPLORATORY, NOT A RESULT — batch 9: muon_recipe (S25), gate_langevin (S26), z
           acc 0.503  trans  None  VALcos 1.000  margin -0.00  OTHER  ROUTED* 1200/2400/end -/-/-
   [  6/33]    8.4 min  gate_langevin  LANGEVIN   seed 171  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400))
           acc 0.505  trans  None  VALcos 1.000  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  7/33]    8.6 min  gate_langevin  LANGEVIN   seed 174  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + N(0, sigma_t^2) on W_in, W_h, W_g after each step t < 2400, sigma_t = 0.01 x init std x (1 - t/2400))
+          acc 1.000  trans  3600  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
