@@ -204,6 +204,15 @@ its 11 failures are all position splits (X's arm A: 8 POSITION, 4 KEY, 1 OTHER).
 updates 1-2400 was 2.3e-2 to 3.2e-2 (per-run medians), max 2.9e-2 to 3.6e-2. Every MUON run used Muon lr 0.005; weight
 decay 0; lm_head under Muon (a 2-D weight), the embedding under Adam.
 
+S25 note (added with batch 10, from `muon_recipe_results.json`): hinge firings per MUON_HINGE seed (training batches
+with a term above TAU): 160 2, 161 1, 162 2, 163 2, 164 1, 165 0, 166 281, 167 4, 168 0, 169 0, 170 0, 171 1, 172 1,
+173 3, 174 0, 175 1, 176 2, 177 1, 178 1, 179 0 — 0-4 on 19 seeds (never on 165, 168, 169, 170, 174, 179), 281 on 166,
+which was already stream-routed at 1200. At the first evaluation (1200), eta2 of the read gate at key positions by stream
+was 1.00 on all 20 MUON_HINGE seeds (by index 0.001-0.009). Every MUON_A run was decided by 1200: stream-routed (eta2 by
+stream 1.00 on 161, 163-166, 170, 175, 176, 178) or position-split (eta2 by index 0.98-1.00 on the other 11). The gate's
+update norm, max/median per seed over updates 1-2400: MUON_HINGE 1.149-1.243, MUON_A 1.105-1.278 (below 1.15 on MUON_A
+169, 172, 174, 177, 179 and MUON_HINGE 175, so batch 10's "1.15-1.3 on every seed" is approximate).
+
 S26: LANGEVIN gained 175, 176, 177, 180 (SLOW_MEM: position splits; here DISCOVERED late, transitions 4800-9600) and lost
 186 (DISCOVERED -> KEY). Below SLOW_HINGE on every seed where they differ (0 vs 7).
 
