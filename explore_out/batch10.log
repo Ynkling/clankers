@@ -1,0 +1,50 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 10: muon_slow (S32), muon_scale (S33)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git cc87382+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: S32 lr = test_channel_binding.SUB_LR = 0.001 (Adam on the embedding; Muon lr 0.005; slow phase x0.1 for updates 1-2400), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 grouped; 1 torch thread per run
+  S33 recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; MAX_ITERS 28800 / TOTAL 28800; schedules {'t_check': 4800, 'a_check': 0.4, 'total': 28800, 'eval_every': 1200} (a), {'t1': 4800, 't2': 9600, 'total': 28800, 'eval_every': 1200, 't_check': 2400, 'a_check': 0.6} (b)
+    parameters a|SLOW: decoder (256, 32), encoder (1, 32, 256), encoder_v (1, 32, 256), lm_head (32, 24), W_in (32, 32), W_h (32, 32), W_g (4, 32), embed.weight (24, 32), short_conv.conv_w (32, 4)
+    parameters a|CEIL: decoder (256, 32), encoder (1, 32, 256), encoder_v (1, 32, 256), lm_head (32, 24), embed.weight (24, 32), short_conv.conv_w (32, 4)
+    parameters b|SLOW: decoder (256, 32), encoder (1, 32, 256), encoder_v (1, 32, 256), lm_head (32, 28), W_in (32, 32), W_h (32, 32), W_g (16, 32), embed.weight (28, 32), short_conv.conv_w (32, 4)
+    parameters b|CEIL: decoder (256, 32), encoder (1, 32, 256), encoder_v (1, 32, 256), lm_head (32, 28), embed.weight (28, 32), short_conv.conv_w (32, 4)
+  lr read for muon_slow MUON_SLOW: 0.001 (Adam groups); Muon lr 0.005
+  lr read for muon_slow MUON_HINGE: 0.001 (Adam groups); Muon lr 0.005
+  lr read for muon_slow MUON_HINGE_S25: 0.001 (Adam groups); Muon lr 0.005
+  lr read for muon_scale A_SLOW: 0.001 (Adam groups); Muon lr from the validity runs
+  lr read for muon_scale A_HINGE: 0.001 (Adam groups); Muon lr from the validity runs
+  lr read for muon_scale D8_SLOW: 0.001 (Adam groups); Muon lr from the validity runs
+  lr read for muon_scale D8_HINGE: 0.001 (Adam groups); Muon lr from the validity runs
+  S32 readings: 'the hinge is unnecessary under Muon' if MUON_SLOW DISCOVERED >= 37/40 and b - c <= 1; 'the hinge matters under Muon' if b - c >= 4 and p < 0.1; otherwise neither (b = MUON_HINGE-only, c = MUON_SLOW-only, exact McNemar two-sided)
+  S33 readings: (a) 'promising at four streams' if the better Muon arm binds >= 8/10; (b) 'breaks the coarse split' if an arm binds >= 3 runs or its median number of distinct channels at the end is >= 6; UNTESTED configurations get no reading
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  order: muon_slow, muon_scale — run_jobs2 queues runs by arm priority (S32 first; within S33, (b) before (a), the longer runs first)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (36s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK muon_slow: with the extra evaluations, MUON_HINGE|160 equals S25's recorded run bit for bit through 2400 (curve True; statistics at 1200 and 2400 True): ok
+  CHECK muon_slow: the extra evaluations are logged at updates [300, 600, 900] (ROUTED* 300: False, 600: False, 900: True): ok
+  CHECK muon_slow: the firing log has one entry per counted firing ([194, 195] vs hinge counts [2, 2400]): ok
+  CHECK muon_slow: with the hinge's TAU at 1.0, MUON_HINGE equals MUON_SLOW bit for bit (seed 160, 1200 steps; curves [[1200, 0.8056640625, 1.0763039588928223]] vs [[1200, 0.8056640625, 1.0763039588928223]]; weights equal; hinge on [0, 1200]): ok
+  CHECK muon_scale: config a SLOW: the groups cover every parameter exactly once [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_scale: config a HINGE: the groups cover every parameter exactly once [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_scale: config a CEIL: the groups cover every parameter exactly once [('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_scale: config b SLOW: the groups cover every parameter exactly once [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_scale: config b HINGE: the groups cover every parameter exactly once [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_scale: config b CEIL: the groups cover every parameter exactly once [('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_scale: config a SLOW: lrs per group [('gate', 'muon'), ('rest', 'muon'), ('rest', 'adam')] at update 1 [0.005, 0.0005, 0.0001], 2400 [0.005, 0.0005, 0.0001], 2401 [0.005, 0.005, 0.001] (2401 updates): ok
+  CHECK muon_scale: config a HINGE: lrs per group [('gate', 'muon'), ('rest', 'muon'), ('rest', 'adam')] at update 1 [0.005, 0.0005, 0.0001], 2400 [0.005, 0.0005, 0.0001], 2401 [0.005, 0.005, 0.001] (2401 updates): ok
+  CHECK muon_scale: config b SLOW: lrs per group [('gate', 'muon'), ('rest', 'muon'), ('rest', 'adam')] at update 1 [0.005, 0.0005, 0.0001], 2400 [0.005, 0.0005, 0.0001], 2401 [0.005, 0.005, 0.001] (2401 updates): ok
+  CHECK muon_scale: config b HINGE: lrs per group [('gate', 'muon'), ('rest', 'muon'), ('rest', 'adam')] at update 1 [0.005, 0.0005, 0.0001], 2400 [0.005, 0.0005, 0.0001], 2401 [0.005, 0.005, 0.001] (2401 updates): ok
+  CHECK muon_scale: config a: the perfect gate zeroes every cross-stream score at every layer (max |cross| per layer [0.0, 0.0, 0.0]; max |same-stream| [5.4383, 5.39, 5.8016]): ok
+  CHECK muon_scale: config b: the perfect gate zeroes every cross-stream score at every layer (max |cross| per layer [0.0, 0.0, 0.0]; max |same-stream| [5.8193, 7.0994, 7.6905]): ok
+  CHECK muon_scale: config b: test_slow_start's HINGE recipe (Adam) on run_sc reproduces X's HINGE_D8|260 through 1200 (curve [[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]; statistics at 1200 True): ok
+  CHECK muon_scale: config a: run_attempt (recipe None) reproduces X's A4k4|240 through 1200 (curve [[1200, 0.09130859375, 2.738024950027466]] vs [[1200, 0.09130859375, 2.738024950027466]]): ok
+  CHECK muon_scale: config a: with the hinge's TAU at 1.0, MUON_HINGE equals MUON_SLOW bit for bit (seed 240, 1200 steps, Muon lr 0.005; curves [[1200, 0.2880859375, 2.410649538040161]] vs [[1200, 0.2880859375, 2.410649538040161]]; weights equal; hinge fired 0): ok
+  CHECK muon_scale: child at 9c5939e (4.5 min); served from main: test_binding_capacity, test_curriculum_confirm, test_short_conv, test_scale_axes, test_slow_start, test_stream_channels, test_stream_curriculum, test_stream_recipe
+  CHECK muon_scale: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (6.0 min)
+  recorded the full CHECK pass at cc87382 in /home/user/clankers/explore_out/batch10_checks.json
+  S33 VALIDITY (EXPLORATORY, not a result): the perfect gate under MUON (no slow phase), Muon lr 0.005, then 0.0025, then 0.01 while fewer than 2 bind; seeds (a) [240, 241], (b) [260, 261]; 28800 steps; Adam lr 0.001 on the embedding and conv
+  [valid a 0.005 seed 240]   5.0 min  (Adam lr 0.001, 28800 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
+  [valid a 0.005 seed 241]   5.0 min  (Adam lr 0.001, 28800 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
