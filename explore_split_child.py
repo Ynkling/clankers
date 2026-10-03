@@ -233,10 +233,11 @@ def synthetic(p):
                     st_ok &= (torch.equal(v, s0[id(q)][k]) if torch.is_tensor(v) else v == s0[id(q)][k])
         wst = o_w.state.get(m.W_g) or {}
         zero_ok = bool(wst) and all(bool((v == 0).all()) for v in wst.values() if torch.is_tensor(v))
+        sd_ok = res["noise_sd"] == float(NOISE_REL * W0[cs].std())          # the same float32 computation
         rows.append((f"{kind}: on a synthetic gate (masses {[round(float(v), 3) for v in ms]}; c* {cs}, c0 {c0}) the operation "
-                     f"sets W_g[c0] = W_g[c*] + n2 and W_g[c*] = W_g[c*] + n1 (noise sd {res['noise_sd']:.4g} = 0.1 x "
-                     f"std(W_g[c*]) {0.1 * float(W0[cs].std()):.4g}) and leaves the other {W.shape[0] - 2} rows unchanged",
-                     rows_ok and abs(res["noise_sd"] - 0.1 * float(W0[cs].std())) < 1e-12))
+                     f"sets W_g[c0] = W_g[c*] + n2 and W_g[c*] = W_g[c*] + n1 and leaves the other {W.shape[0] - 2} rows "
+                     f"unchanged (rows {rows_ok}); noise sd {res['noise_sd']:.6g} = 0.1 x std(W_g[c*]) in float32 ({sd_ok})",
+                     rows_ok and sd_ok))
         rows.append((f"{kind}: every other parameter and every other optimizer state unchanged", others_ok and st_ok))
         rows.append((f"{kind}: after the split W_g's {'Muon momentum' if kind == 'muon' else 'Adam state'} is zero "
                      f"({sorted(wst)} zeroed: {res['state_zeroed']})", zero_ok))
