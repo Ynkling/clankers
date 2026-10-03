@@ -1,0 +1,117 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 12: split_plateau (S36) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git f714c03 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; Muon lr 0.005 (S33's validity choice {'a': 0.005, 'b': 0.005}); schedules {'t_check': 4800, 'a_check': 0.4, 'total': 28800, 'eval_every': 1200} (a, total 28800), {'t1': 4800, 't2': 9600, 'total': 28800, 'eval_every': 1200, 't_check': 2400, 'a_check': 0.6} (b, total set to 43200); 1 torch thread per run
+  lr read for dry_split_plateau SPLIT4k4_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_split_plateau SPLIT_D8_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_split_plateau SPLIT_D8_A: 0.001 (Adam groups)
+  S36 readings: (a) 'the split fixes four-stream merges under Muon' if SPLIT4k4_M binds >= 8/10, 'it does not' if <= 5/10, otherwise neither; (b) per arm 'it breaks the eight-stream stall' if >= 3/10 bind by 43200, otherwise 'it does not' (BOUND at 28800 printed, the paired outcome)
+  queue order: the (b) arms' 43200-step runs first (arm priority), then (a)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (59s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_split_plateau: SPLIT4k4_M with the accuracy threshold at 0 equals A_HINGE|240 bit for bit through 7200 (curve True; statistics at [0, 1200, 2400, 3600, 4800, 6000, 7200] True; the trigger measured at [(2400, 0.719, False), (4800, 0.688, False), (7200, 0.688, False)]): ok
+  CHECK dry_split_plateau: SPLIT_D8_M with the accuracy threshold at 0 equals D8_HINGE|260 bit for bit through 7200 (curve True; statistics at [0, 1200, 2400, 3600, 4800, 6000, 7200] True; the trigger measured at [(2400, 0.078, False), (4800, 0.125, False), (7200, 0.109, False)]): ok
+  CHECK dry_split_plateau: SPLIT_D8_A with the accuracy threshold at 0 equals X HINGE_D8|260 bit for bit through 7200 (curve True; statistics at [0, 1200, 2400, 3600, 4800, 6000, 7200] True; the trigger measured at [(2400, 0.031, False), (4800, 0.062, False), (7200, 0.062, False)]): ok
+  CHECK dry_split_plateau: muon: on a synthetic gate (masses [0.062, 0.062, 0.063, 0.063, 0.061, 0.061, 0.065, 0.063, 0.063, 0.061, 0.059, 0.063, 0.065, 0.066, 0.065, 0.06]; c* 13, c0 10) the operation sets W_g[c0] = W_g[c*] + n2 and W_g[c*] = W_g[c*] + n1 and leaves the other 14 rows unchanged (rows True); noise sd 0.239579 = 0.1 x std(W_g[c*]) in float32 (True): ok
+  CHECK dry_split_plateau: muon: every other parameter and every other optimizer state unchanged: ok
+  CHECK dry_split_plateau: muon: after the split W_g's Muon momentum is zero (['momentum_buffer'] zeroed: ['momentum_buffer']): ok
+  CHECK dry_split_plateau: adam: on a synthetic gate (masses [0.062, 0.062, 0.063, 0.063, 0.061, 0.061, 0.065, 0.063, 0.063, 0.061, 0.059, 0.063, 0.065, 0.066, 0.065, 0.06]; c* 13, c0 10) the operation sets W_g[c0] = W_g[c*] + n2 and W_g[c*] = W_g[c*] + n1 and leaves the other 14 rows unchanged (rows True); noise sd 0.239579 = 0.1 x std(W_g[c*]) in float32 (True): ok
+  CHECK dry_split_plateau: adam: every other parameter and every other optimizer state unchanged: ok
+  CHECK dry_split_plateau: adam: after the split W_g's Adam state is zero (['exp_avg', 'exp_avg_sq', 'step'] zeroed: ['step', 'exp_avg', 'exp_avg_sq']): ok
+  CHECK dry_split_plateau: with the thresholds forced (accuracy < 1.01, rise < 10) SPLIT4k4_M|241 splits at [4800] (c* 1 -> c0 2; channels [2, 3, 0, 0] -> [3, 3, 0, 0]; W_g state zeroed ['momentum_buffer']) and runs on to 6000 (curve [6000, 0.49853515625, 0.8443267941474915]): ok
+  CHECK dry_split_plateau: children at 9c5939e (14.0 min); the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (14.0 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_split_plateau
+  idea    a label-free plateau trigger that applies S24's SPLIT to merged or stalled multi-stream runs
+  source  batch 8's S24 (SPLIT un-merged 8/8 merged runs); batch 10's S33 (Muon keeps merges at S=4 k=4; the coarse split at S=8)
+  change  every 2400 updates from 4800: if probe accuracy < 0.95 and rose < 0.02, W_g[idlest] <- W_g[busiest] + noise (both rows, 0.1 std), W_g's optimizer state reset
+  arm SPLIT4k4_M   lr 0.001  iters 3600  seeds 240-240 (1)  — S33's A_HINGE + the trigger (S=4, P=4, k=4, conv)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  arm SPLIT_D8_M   lr 0.001  iters 3600  seeds 260-260 (1)  — S33's D8_HINGE + the trigger (S=8, P=4, k=16, conv)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  arm SPLIT_D8_A   lr 0.001  iters 3600  seeds 260-260 (1)  — main's HINGE_D8 + the trigger (S=8, P=4, k=16, conv; Adam)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  pairing (a) 240-249 with S33's A_HINGE; (b) 260-269 with S33's D8_HINGE (Muon) and X's recorded HINGE_D8 (Adam); same initial parameters and batches until the first split
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; pool-load timing: the median interval between optimizer steps, one child per arm at once (SPLIT_D8_M twice), 1 thread each, this machine):
+    dry_split_plateau SPLIT4k4_M   1 runs x   3.3 min  (3600 steps x 49.7 ms + 3 evals x 6.9 s)
+    dry_split_plateau SPLIT_D8_M   1 runs x   6.4 min  (3600 steps x 102.6 ms + 3 evals x 5.6 s)
+    dry_split_plateau SPLIT_D8_A   1 runs x   6.2 min  (3600 steps x 98.2 ms + 3 evals x 5.5 s)
+    total 0.27 h of runs; makespan on 4 workers 0.11 h (worst case)
+  RUNTIME RULE: projected makespan 0.11 h <= 9 h: no cut (dry run: not stored)
+  3 runs queued on 4 workers (1 torch thread each)
+  [  1/3]    3.6 min  dry_split_plateau SPLIT4k4_M seed 240  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
+          acc 0.750  trans  None  VALcos 1.000  margin 0.79  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  2/3]    6.8 min  dry_split_plateau SPLIT_D8_A seed 260  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
+          acc 0.066  trans  None  VALcos 0.999  margin -0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  3/3]    6.9 min  dry_split_plateau SPLIT_D8_M seed 260  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
+          acc 0.083  trans  None  VALcos 0.999  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 6.9 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_split_plateau
+  idea    a label-free plateau trigger that applies S24's SPLIT to merged or stalled multi-stream runs
+  source  batch 8's S24 (SPLIT un-merged 8/8 merged runs); batch 10's S33 (Muon keeps merges at S=4 k=4; the coarse split at S=8)
+  change  every 2400 updates from 4800: if probe accuracy < 0.95 and rose < 0.02, W_g[idlest] <- W_g[busiest] + noise (both rows, 0.1 std), W_g's optimizer state reset
+  arm SPLIT4k4_M   lr 0.001  iters 3600  seeds 240-240 (1)  — S33's A_HINGE + the trigger (S=4, P=4, k=4, conv)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  arm SPLIT_D8_M   lr 0.001  iters 3600  seeds 260-260 (1)  — S33's D8_HINGE + the trigger (S=8, P=4, k=16, conv)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  arm SPLIT_D8_A   lr 0.001  iters 3600  seeds 260-260 (1)  — main's HINGE_D8 + the trigger (S=8, P=4, k=16, conv; Adam)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  pairing (a) 240-249 with S33's A_HINGE; (b) 260-269 with S33's D8_HINGE (Muon) and X's recorded HINGE_D8 (Adam); same initial parameters and batches until the first split
+----------------------------------------------------------------------------------------------------
+  ARM SPLIT4k4_M (S33's A_HINGE + the trigger (S=4, P=4, k=4, conv)); seeds 240-240 (1); paired with A_HINGE
+    seed | SPLIT4k4_M                 trans   acc B28800 splits ch end     per ch | A_HINGE                    trans ch end
+     240 | MERGED (2 share)            None 0.750      -      0      3      2+1+1 | MERGED (2 share)            None      3
+  SPLIT4k4_M vs A_HINGE (paired):
+    BOUND@28800  SPLIT4k4_M 0/1  A_HINGE 0/1  SPLIT4k4_M only 0, A_HINGE only 0, McNemar two-sided p = 1 (printed)
+    BOUND@3600   SPLIT4k4_M 0/1  A_HINGE 0/1  SPLIT4k4_M only 0, A_HINGE only 0, McNemar two-sided p = 1 (printed)
+  SPLIT4k4_M checks per run (step: probe acc, '*' = split c*->c0; masses at each check):
+    240: 2400:0.719
+          2400 acc 0.719 no    c*  3 c0  1 masses [0.24 0.12 0.21 0.43]
+  SPLIT4k4_M splits per run: {240: 0} (total 0; runs with a split 0/1)
+  SPLIT4k4_M distinct channels holding the 4 streams (labelled: routing_k's ch_map on the run's probe) before -> right after -> at the next check, per split:
+  SPLIT4k4_M HARM (held-out accuracy 2400 updates after a split > 0.05 below the value at it): 0/1 runs {}
+  READING S36 SPLIT4k4_M: it does not (BOUND 0/1; >= 8 fixes, <= 5 not)
+  ARM SPLIT_D8_M (S33's D8_HINGE + the trigger (S=8, P=4, k=16, conv)); seeds 260-260 (1); paired with D8_HINGE
+    seed | SPLIT_D8_M                 trans   acc B28800 splits ch end     per ch | D8_HINGE                   trans ch end
+     260 | non-stream OTHER            None 0.083      -      0      3      6+1+1 | non-stream OTHER            None      3
+  SPLIT_D8_M vs D8_HINGE (paired):
+    BOUND@28800  SPLIT_D8_M 0/1  D8_HINGE 0/1  SPLIT_D8_M only 0, D8_HINGE only 0, McNemar two-sided p = 1 (printed)
+    BOUND@3600   SPLIT_D8_M 0/1  D8_HINGE 0/1  SPLIT_D8_M only 0, D8_HINGE only 0, McNemar two-sided p = 1 (printed)
+  SPLIT_D8_M checks per run (step: probe acc, '*' = split c*->c0; masses at each check):
+    260: 2400:0.078
+          2400 acc 0.078 no    c*  9 c0  0 masses [0.06 0.06 0.06 0.06 0.06 0.06 0.06 0.06 0.07 0.07 0.06 0.06 0.06 0.06 0.06 0.07]
+  SPLIT_D8_M splits per run: {260: 0} (total 0; runs with a split 0/1)
+  SPLIT_D8_M distinct channels holding the 8 streams (labelled: routing_k's ch_map on the run's probe) before -> right after -> at the next check, per split:
+  SPLIT_D8_M HARM (held-out accuracy 2400 updates after a split > 0.05 below the value at it): 0/1 runs {}
+  READING S36 SPLIT_D8_M: it does not (BOUND by 3600 0/1, at 28800 0/1; >= 3 needed)
+  ARM SPLIT_D8_A (main's HINGE_D8 + the trigger (S=8, P=4, k=16, conv; Adam)); seeds 260-260 (1); paired with X HINGE_D8
+    seed | SPLIT_D8_A                 trans   acc B28800 splits ch end     per ch | X HINGE_D8                 trans ch end
+     260 | non-stream OTHER            None 0.066      -      0      1          8 | non-stream OTHER            None      2
+  SPLIT_D8_A vs X HINGE_D8 (paired):
+    BOUND@28800  SPLIT_D8_A 0/1  X HINGE_D8 0/1  SPLIT_D8_A only 0, X HINGE_D8 only 0, McNemar two-sided p = 1 (printed)
+    BOUND@3600   SPLIT_D8_A 0/1  X HINGE_D8 0/1  SPLIT_D8_A only 0, X HINGE_D8 only 0, McNemar two-sided p = 1 (printed)
+  SPLIT_D8_A checks per run (step: probe acc, '*' = split c*->c0; masses at each check):
+    260: 2400:0.031
+          2400 acc 0.031 no    c*  8 c0 13 masses [0.04 0.02 0.03 0.12 0.07 0.03 0.02 0.06 0.29 0.05 0.10 0.03 0.06 0.02 0.02 0.06]
+  SPLIT_D8_A splits per run: {260: 0} (total 0; runs with a split 0/1)
+  SPLIT_D8_A distinct channels holding the 8 streams (labelled: routing_k's ch_map on the run's probe) before -> right after -> at the next check, per split:
+  SPLIT_D8_A HARM (held-out accuracy 2400 updates after a split > 0.05 below the value at it): 0/1 runs {}
+  READING S36 SPLIT_D8_A: it does not (BOUND by 3600 0/1, at 28800 0/1; >= 3 needed)
+  DRY RUN READING dry_split_plateau SPLIT4k4_M: it does not (BOUND 0/1; >= 8 fixes, <= 5 not)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_split_plateau SPLIT_D8_M: it does not (BOUND by 3600 0/1, at 28800 0/1; >= 3 needed)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_split_plateau SPLIT_D8_A: it does not (BOUND by 3600 0/1, at 28800 0/1; >= 3 needed)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S36 SPLIT4k4_M: it does not (BOUND 0/1; >= 8 fixes, <= 5 not) (BOUND 0/1, at 28800 0/1 vs A_HINGE 0/1; splits 0; HARM 0 runs)
+  S36 SPLIT_D8_M: it does not (BOUND by 3600 0/1, at 28800 0/1; >= 3 needed) (BOUND 0/1, at 28800 0/1 vs D8_HINGE 0/1; splits 0; HARM 0 runs)
+  S36 SPLIT_D8_A: it does not (BOUND by 3600 0/1, at 28800 0/1; >= 3 needed) (BOUND 0/1, at 28800 0/1 vs X HINGE_D8 0/1; splits 0; HARM 0 runs)
+####################################################################################################

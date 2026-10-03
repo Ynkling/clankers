@@ -29,7 +29,9 @@ CHECKS (before any run, after the repro check; any failure stops the batch)
 SEQUENCE: repro check; CHECKs; the projection with pool-load timing (batch 10's method: one timing child
 per arm at once, SPLIT_D8_M twice, so 4 processes; the median interval between optimizer steps); RUNTIME
 RULE: if the projected worst-case makespan is over 9 h, SPLIT_D8_A is cut to 260-264 (stored); then one
-pool, the (b) arms' 43200-step runs queued first.
+pool, the runs submitted in waves of one per worker: (b) runs (43200 steps, ~77 min), then (a) runs (28800
+steps, ~27 min), alternately, so that a 2-hour segment ends a wave of (a) runs rather than losing a wave of
+(b) runs in flight (submission order only; every run is the same whatever its order).
 SEGMENTS: batches 4-11's machinery (--resume against explore_out/batch12_checks.json, --report-only,
 --stopped-early, --dry); a watcher outside this file pushes every saved run.
 
@@ -125,6 +127,43 @@ def projection(workers, dry):
     return ms
 
 
+def run_jobs_waves(workers, pv):
+    """explore_common2.run_jobs2 (the same stores, worker, records and log lines) with the submission order in
+    waves: `workers` (b) runs, then `workers` (a) runs, alternately."""
+    import multiprocessing as mp
+    from concurrent.futures import ProcessPoolExecutor, as_completed
+    st = ec.load_store(s36.NAME)
+    st["meta"].setdefault("provenance", pv or ec.provenance())
+    st["meta"]["dry"] = c2.DRY["on"]
+    st["meta"]["arms"] = {k: {kk: vv for kk, vv in a.items() if kk != "seeds"} | {"seeds": list(a["seeds"]),
+                                                                                  "sched": c2.sched(a)}
+                          for k, a in s36.ARMS.items()}
+    ec.save_store(s36.NAME, st)
+    todo = [dict(screen=s36.__name__, name=s36.NAME, arm=k, seed=seed, prio=a.get("prio", 1))
+            for k, a in s36.ARMS.items() for seed in a["seeds"] if f"{k}|{seed}" not in st["runs"]]
+    long_ = sorted((j for j in todo if s36.ARMS[j["arm"]]["cfg"] == "b"), key=lambda j: (j["seed"], j["arm"]))
+    short = sorted((j for j in todo if s36.ARMS[j["arm"]]["cfg"] == "a"), key=lambda j: j["seed"])
+    jobs = []
+    while long_ or short:
+        jobs += long_[:workers] + short[:workers]
+        long_, short = long_[workers:], short[workers:]
+    print(f"  {len(jobs)} runs queued on {workers} workers (1 torch thread each), submitted in waves: "
+          + " ".join(f"{j['arm']}|{j['seed']}" for j in jobs), flush=True)
+    if not jobs:
+        return
+    t0 = time.time()
+    with ProcessPoolExecutor(max_workers=workers, mp_context=mp.get_context("fork"), initializer=ec._worker_init) as ex:
+        futs = [ex.submit(c2._worker2, j) for j in jobs]
+        for n, f in enumerate(as_completed(futs), 1):
+            job, rec = f.result()
+            st["runs"][f"{job['arm']}|{job['seed']}"] = rec
+            ec.save_store(job["name"], st)
+            print(f"  [{n:>3}/{len(jobs)}] {(time.time() - t0) / 60:6.1f} min  {job['name']:<14} {job['arm']:<10} seed "
+                  f"{job['seed']}  lr {rec['lr']:g} ({rec['sched']})\n          "
+                  f"{ec.line(rec) if rec.get('ok') else 'FAILED ' + str(rec.get('error'))}  splits {rec.get('splits')}",
+                  flush=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--workers", type=int, default=ec.WORKERS)
@@ -188,7 +227,7 @@ def main():
             c2.print_screen_header2(s)
         projection(args.workers, args.dry)
         t0 = time.time()
-        c2.run_jobs2(SCREENS, workers=args.workers, pv=pv)
+        run_jobs_waves(args.workers, pv)
         print(f"  batch wall clock {(time.time() - t0) / 60:.1f} min (this segment)")
     else:
         print("  REPORT ONLY: from the saved runs (no repro check, CHECKs or runs in this call)")
