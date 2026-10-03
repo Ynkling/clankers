@@ -574,3 +574,163 @@ EXPLORATORY, NOT A RESULT — batch 10: muon_slow (S32), muon_scale (S33)
           acc 0.757  trans  None  VALcos 1.000  margin 0.75  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [ 13/14]   60.0 min  muon_scale     A_SLOW     seed 249  lr 0.001 (Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after)
           acc 0.777  trans  None  VALcos 0.000  margin 0.74  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [ 14/14]   61.0 min  muon_scale     A_HINGE    seed 249  lr 0.001 (Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels))
+          acc 0.777  trans  None  VALcos 0.000  margin 0.74  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 61.0 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_slow
+  idea    S25's MUON_HINGE without the hinge (MUON_SLOW): is the hinge still needed under Muon?
+  source  batch 9's S25 (MUON_HINGE 20/20, stream-routed at 1200 on every seed; the hinge fired 0-4 times on 19 seeds); Muon has no per-weight second moment
+  change  S25's MUON_HINGE without the hinge; extra routing evaluations at updates 300, 600, 900
+  arm MUON_SLOW    lr 0.001  iters 24000  seeds 160-199 (40)  — S25's MUON_HINGE without the hinge
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after
+  arm MUON_HINGE   lr 0.001  iters 24000  seeds 180-199 (20)  — S25's MUON_HINGE, new seeds
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch
+  arm MUON_HINGE_S25 lr 0.001  iters 24000  seeds 160-179 (20)  — S25's MUON_HINGE runs re-run to their recorded stop, for the logs only
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + the hinge; to S25's recorded stop step
+  pairing seeds 160-199: MUON_SLOW with MUON_HINGE (S25's runs on 160-179, new runs on 180-199) and with SLOW_MEM (S5 160-179, S7 180-199); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+  per seed (ROUTED* at 300/600/900/1200 as Y/-; MUON_HINGE 160-179 = S25's runs, re-run here for the logs and checked against S25's curve):
+    seed | MUON_SLOW       R*300-1200    acc  trans | MUON_HINGE      R*300-1200  trans firings at updates                  =S25 | SLOW_MEM        SLOW_HINGE     
+     160 | DISCOVERED            --YY  0.993   2400 | DISCOVERED            --YY   2400 [194, 195]                           yes | DISCOVERED      DISCOVERED     
+     161 | DISCOVERED            --YY  0.999   2400 | DISCOVERED            --YY   2400 [494]                                yes | DISCOVERED      DISCOVERED     
+     162 | POSITION              ----  0.494   None | DISCOVERED            --YY   2400 [134, 149]                           yes | POSITION        DISCOVERED     
+     163 | DISCOVERED            --YY  0.998   2400 | DISCOVERED            --YY   2400 [161, 270]                           yes | DISCOVERED      DISCOVERED     
+     164 | DISCOVERED            --YY  0.999   2400 | DISCOVERED            --YY   2400 [234]                                yes | DISCOVERED      DISCOVERED     
+     165 | DISCOVERED            --YY  0.999   2400 | DISCOVERED            --YY   2400 none                                 yes | DISCOVERED      DISCOVERED     
+     166 | POSITION              ----  0.503   None | DISCOVERED            --YY  10800 [95, 97, 204, 256, 4261, 4324, ... (281)]   yes | POSITION        DISCOVERED     
+     167 | POSITION              ----  0.504   None | DISCOVERED            --YY   2400 [123, 153, 273, 507]                 yes | POSITION        OTHER          
+     168 | DISCOVERED            --YY  0.999   2400 | DISCOVERED            --YY   2400 none                                 yes | DISCOVERED      DISCOVERED     
+     169 | DISCOVERED            --YY  0.988   1200 | DISCOVERED            --YY   1200 none                                 yes | DISCOVERED      DISCOVERED     
+     170 | DISCOVERED            --YY  0.995   2400 | DISCOVERED            --YY   2400 none                                 yes | DISCOVERED      DISCOVERED     
+     171 | DISCOVERED            --YY  0.991   1200 | DISCOVERED            --YY   2400 [265]                                yes | OTHER           OTHER          
+     172 | DISCOVERED            --YY  0.999   2400 | DISCOVERED            --YY   2400 [3572]                               yes | DISCOVERED      DISCOVERED     
+     173 | POSITION              ----  0.484   None | DISCOVERED            --YY   2400 [71, 130, 217]                       yes | POSITION        DISCOVERED     
+     174 | DISCOVERED            --YY  1.000   2400 | DISCOVERED            --YY   2400 none                                 yes | DISCOVERED      DISCOVERED     
+     175 | DISCOVERED            --YY  1.000   1200 | DISCOVERED            --YY   1200 [129]                                yes | POSITION        DISCOVERED     
+     176 | DISCOVERED            ----  1.000   2400 | DISCOVERED            --YY   1200 [150, 217]                           yes | POSITION        DISCOVERED     
+     177 | POSITION              ----  0.505   None | DISCOVERED            --YY   2400 [50]                                 yes | POSITION        DISCOVERED     
+     178 | DISCOVERED            --YY  0.997   4800 | DISCOVERED            --YY   2400 [364]                                yes | DISCOVERED      DISCOVERED     
+     179 | DISCOVERED            --YY  0.997   2400 | DISCOVERED            --YY   2400 none                                 yes | DISCOVERED      DISCOVERED     
+     180 | DISCOVERED            --YY  0.996   2400 | DISCOVERED            --YY   2400 [162, 1459]                           -- | POSITION        DISCOVERED     
+     181 | DISCOVERED            --YY  0.993   1200 | DISCOVERED            --YY   1200 none                                  -- | DISCOVERED      DISCOVERED     
+     182 | DISCOVERED            --YY  1.000   4800 | DISCOVERED            --YY   2400 [150]                                 -- | DISCOVERED      DISCOVERED     
+     183 | DISCOVERED            ----  0.999   2400 | DISCOVERED            --YY   1200 [167, 210, 212, 274, 549]             -- | DISCOVERED      DISCOVERED     
+     184 | DISCOVERED            --YY  0.998   6000 | DISCOVERED            --YY   2400 [229]                                 -- | DISCOVERED      DISCOVERED     
+     185 | DISCOVERED            --YY  0.992   1200 | DISCOVERED            --YY   1200 none                                  -- | DISCOVERED      DISCOVERED     
+     186 | DISCOVERED            --YY  0.969   2400 | DISCOVERED            --YY   2400 none                                  -- | DISCOVERED      DISCOVERED     
+     187 | DISCOVERED            --YY  0.997   1200 | DISCOVERED            --YY   1200 [258, 259]                            -- | KEY             KEY            
+     188 | DISCOVERED            --YY  0.991   1200 | DISCOVERED            --YY   2400 [237, 345, 346]                       -- | DISCOVERED      DISCOVERED     
+     189 | DISCOVERED            --YY  0.997   1200 | DISCOVERED            --YY   1200 none                                  -- | KEY             KEY            
+     190 | DISCOVERED            ---Y  0.999   2400 | DISCOVERED            --YY   2400 [144, 175, 285, 290, 4204]            -- | POSITION        DISCOVERED     
+     191 | KEY                   ----  0.518   None | KEY                   ----   None [2360, 10398, 16091]                  -- | DISCOVERED      DISCOVERED     
+     192 | DISCOVERED            --YY  1.000   2400 | DISCOVERED            --YY   2400 [174]                                 -- | OTHER           DISCOVERED     
+     193 | DISCOVERED            --YY  0.996   2400 | DISCOVERED            --YY   2400 [392]                                 -- | KEY             OTHER          
+     194 | POSITION              ----  0.493   None | DISCOVERED            --YY   2400 [142, 219]                            -- | DISCOVERED      DISCOVERED     
+     195 | DISCOVERED            --YY  0.999   1200 | DISCOVERED            --YY   1200 [103]                                 -- | DISCOVERED      DISCOVERED     
+     196 | POSITION              ----  0.479   None | DISCOVERED            --YY   2400 [168]                                 -- | DISCOVERED      DISCOVERED     
+     197 | POSITION              ----  0.501   None | DISCOVERED            --YY   2400 [125, 182, 186, 243, 346]             -- | POSITION        OTHER          
+     198 | DISCOVERED            --YY  0.993   1200 | DISCOVERED            --YY   1200 none                                  -- | DISCOVERED      DISCOVERED     
+     199 | DISCOVERED            ---Y  0.996   2400 | DISCOVERED            ---Y   2400 [86, 255, 423]                        -- | POSITION        DISCOVERED     
+  MUON_HINGE 160-179 re-runs reproduce S25's curves: 20/20
+  MUON_HINGE vs MUON_SLOW (40 seeds; the rule):
+    DISCOVERED    MUON_HINGE 39/40   MUON_SLOW 31/40   MUON_HINGE only 8, MUON_SLOW only 0, McNemar two-sided p = 0.00781
+    BOUND         MUON_HINGE 39/40   MUON_SLOW 31/40   MUON_HINGE only 8, MUON_SLOW only 0, McNemar two-sided p = 0.00781
+    ROUTED*@300   MUON_HINGE  0/40   MUON_SLOW  0/40   MUON_HINGE only 0, MUON_SLOW only 0, McNemar two-sided p = 1
+    ROUTED*@600   MUON_HINGE  0/40   MUON_SLOW  0/40   MUON_HINGE only 0, MUON_SLOW only 0, McNemar two-sided p = 1
+    ROUTED*@900   MUON_HINGE 38/40   MUON_SLOW 27/40   MUON_HINGE only 11, MUON_SLOW only 0, McNemar two-sided p = 0.000977
+    ROUTED*@1200  MUON_HINGE 39/40   MUON_SLOW 29/40   MUON_HINGE only 10, MUON_SLOW only 0, McNemar two-sided p = 0.00195
+  MUON_SLOW vs SLOW_MEM (Adam), 160-199:
+    DISCOVERED    MUON_SLOW 31/40   SLOW_MEM 24/40   MUON_SLOW only 10, SLOW_MEM only 3, McNemar two-sided p = 0.0923
+    ROUTED*@1200  MUON_SLOW 29/40   SLOW_MEM 23/40   MUON_SLOW only 9, SLOW_MEM only 3, McNemar two-sided p = 0.146
+  MUON_HINGE vs SLOW_HINGE (Adam), 160-199 (printed):
+    DISCOVERED    MUON_HINGE 39/40   SLOW_HINGE 34/40   MUON_HINGE only 6, SLOW_HINGE only 1, McNemar two-sided p = 0.125
+  ROUTED* at 300/600/900/1200: MUON_SLOW 0/0/27/29 of 40; MUON_HINGE 0/0/38/39 of 40
+  failure classes: MUON_SLOW {'POSITION': 8, 'KEY': 1}   MUON_HINGE {'KEY': 1}   SLOW_MEM {'POSITION': 11, 'OTHER': 2, 'KEY': 3}
+  MUON_HINGE hinge firings: 339 in total; runs with at least one 29/40; firings by update 300/600/900/1200/after: 47/9/0/0/283
+  RULE S32 (MUON_SLOW DISCOVERED 31/40; MUON_HINGE only 8, MUON_SLOW only 0, p = 0.00781; 'unnecessary' if MUON_SLOW >= 37/40 and b - c <= 1, 'matters' if b - c >= 4 and p < 0.1): the hinge matters under Muon
+  READING muon_slow: the hinge matters under Muon (MUON_HINGE DISCOVERED 39/40 vs MUON_SLOW 31/40, 8 vs 0, p = 0.00781; MUON_SLOW vs SLOW_MEM 31/40 vs 24/40)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_scale
+  idea    S25's Muon recipe (MUON_SLOW, MUON_HINGE) in the main line's configurations: S=4 k=4, and S=8 k=16
+  source  batch 9's S25 (MUON_HINGE 20/20 at S=2, stream-routed at 1200 on every seed); the main line's HINGE binds 0/10 at S=8 (the coarse split)
+  change  main's run paths at 9c5939e (child process) with S25's optimizer groups: gate on Muon at the Muon lr; other weights on Muon; embedding and conv on Adam 1e-3; non-gate groups x0.1 for updates 1-2400
+  arm A_SLOW       lr 0.001  iters 28800  seeds 240-249 (10)  — MUON_SLOW (S=4, P=4, k=4, conv)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after
+  arm A_HINGE      lr 0.001  iters 28800  seeds 240-249 (10)  — MUON_HINGE (S=4, P=4, k=4, conv)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels)
+  arm D8_SLOW      lr 0.001  iters 28800  seeds 260-269 (10)  — MUON_SLOW (S=8, P=4, k=16, conv, 8 streams from step 1)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after
+  arm D8_HINGE     lr 0.001  iters 28800  seeds 260-269 (10)  — MUON_HINGE (S=8, P=4, k=16, conv, 8 streams from step 1)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels)
+  pairing (a) seeds 240-249 with X's recorded A4k4 (stream_recipe); (b) seeds 260-269 with X's recorded HINGE_D8 (slow_start at b8c6007); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+    validity config a (S=4, P=4, k=4, conv): Muon lr 0.005 seed 240 BOUND at 1200 (acc 1.000); Muon lr 0.005 seed 241 BOUND at 1200 (acc 1.000) -> smallest lr at which both seeds bind (S25's rule): 0.005
+    validity config b (S=8, P=4, k=16, conv, 8 streams from step 1): Muon lr 0.005 seed 260 BOUND at 4800 (acc 0.981); Muon lr 0.005 seed 261 BOUND at 6000 (acc 0.990) -> smallest lr at which both seeds bind (S25's rule): 0.005
+  CONFIG (a) S=4, P=4, k=4, conv; Muon lr 0.005; seeds 240-249 (10)
+    seed | X A4k4                             | MUON_SLOW                  trans   acc ch 4800/9600/end  per ch end | MUON_HINGE                 trans   acc ch 4800/9600/end  per ch end fired
+     240 | non-stream POSITION     None   1/1/1 | BOUND ROUTED               13200 1.000            3/3/4     1+1+1+1 | MERGED (2 share)            None 0.736            3/3/3       2+1+1     3
+     241 | BOUND ROUTED            8400   3/4/4 | MERGED (2 share)            None 0.499            2/2/2         2+2 | MERGED (2 share)            None 0.769            3/3/3       2+1+1     2
+     242 | BOUND ROUTED           18000   2/3/4 | MERGED (2 share)            None 0.740            2/3/3       2+1+1 | BOUND ROUTED                2400 0.993            4/4/4     1+1+1+1     5
+     243 | non-stream POSITION     None   1/1/1 | MERGED (2 share)            None 0.738            3/3/3       2+1+1 | MERGED (2 share)            None 0.763            3/3/3       2+1+1     3
+     244 | MERGED (3 share)        None   2/2/2 | MERGED (2 share)            None 0.499            2/2/2         2+2 | MERGED (2 share)            None 0.497            2/2/2         2+2     3
+     245 | non-stream POSITION     None   1/1/1 | BOUND ROUTED                4800 1.000            4/4/4     1+1+1+1 | BOUND NOT routed           27600 0.998            2/2/2         2+2     1
+     246 | BOUND ROUTED            4800   4/4/4 | non-stream POSITION         None 0.252            1/1/1           4 | BOUND ROUTED                2400 1.000            4/4/4     1+1+1+1     1
+     247 | MERGED (2 share)        None   3/3/3 | MERGED (2 share)            None 0.738            3/3/3       2+1+1 | MERGED (2 share)            None 0.757            3/3/3       2+1+1     3
+     248 | MERGED (2 share)        None   3/3/3 | BOUND ROUTED                2400 1.000            4/4/4     1+1+1+1 | BOUND ROUTED                2400 1.000            4/4/4     1+1+1+1     0
+     249 | BOUND ROUTED           24000   1/2/4 | MERGED (2 share)            None 0.777            3/3/3       2+1+1 | MERGED (2 share)            None 0.777            3/3/3       2+1+1     0
+  A_SLOW (MUON_SLOW) vs X A4k4:
+    BOUND  A_SLOW 3/10  X A4k4 4/10  A_SLOW only 3, X A4k4 only 4, McNemar two-sided p = 1 (printed)
+    merged at the end (two streams on one channel): 7/10 [241, 242, 243, 244, 246, 247, 249]; outcomes {'BOUND ROUTED': 3, 'MERGED (2 share)': 6, 'non-stream POSITION': 1}
+    distinct channels holding the 4 streams at 4800: [3, 2, 2, 3, 2, 4, 1, 3, 4, 3] (median 3.0); streams per channel ['2+1+1', '2+2', '3+1', '2+1+1', '2+2', '1+1+1+1', '4', '2+1+1', '1+1+1+1', '2+1+1']
+    distinct channels holding the 4 streams at 9600: [3, 2, 3, 3, 2, 4, 1, 3, 4, 3] (median 3.0); streams per channel ['2+1+1', '2+2', '2+1+1', '2+1+1', '2+2', '1+1+1+1', '4', '2+1+1', '1+1+1+1', '2+1+1']
+    distinct channels holding the 4 streams at end: [4, 2, 3, 3, 2, 4, 1, 3, 4, 3] (median 3.0); streams per channel ['1+1+1+1', '2+2', '2+1+1', '2+1+1', '2+2', '1+1+1+1', '4', '2+1+1', '1+1+1+1', '2+1+1']
+  A_HINGE (MUON_HINGE) vs X A4k4:
+    BOUND  A_HINGE 4/10  X A4k4 4/10  A_HINGE only 2, X A4k4 only 2, McNemar two-sided p = 1 (printed)
+    merged at the end (two streams on one channel): 7/10 [240, 241, 243, 244, 245, 247, 249]; outcomes {'MERGED (2 share)': 6, 'BOUND ROUTED': 3, 'BOUND NOT routed': 1}
+    distinct channels holding the 4 streams at 4800: [3, 3, 4, 3, 2, 2, 4, 3, 4, 3] (median 3.0); streams per channel ['2+1+1', '2+1+1', '1+1+1+1', '2+1+1', '2+2', '2+2', '1+1+1+1', '2+1+1', '1+1+1+1', '2+1+1']
+    distinct channels holding the 4 streams at 9600: [3, 3, 4, 3, 2, 2, 4, 3, 4, 3] (median 3.0); streams per channel ['2+1+1', '2+1+1', '1+1+1+1', '2+1+1', '2+2', '2+2', '1+1+1+1', '2+1+1', '1+1+1+1', '2+1+1']
+    distinct channels holding the 4 streams at end: [3, 3, 4, 3, 2, 2, 4, 3, 4, 3] (median 3.0); streams per channel ['2+1+1', '2+1+1', '1+1+1+1', '2+1+1', '2+2', '2+2', '1+1+1+1', '2+1+1', '1+1+1+1', '2+1+1']
+    hinge firings (training batches with a term above TAU, of all): {240: [3, 28800], 241: [2, 28800], 242: [5, 8400], 243: [3, 28800], 244: [3, 28800], 245: [1, 28800], 246: [1, 8400], 247: [3, 28800], 248: [0, 8400], 249: [0, 28800]}
+    X A4k4: BOUND 4/10; distinct channels at the end [1, 4, 4, 1, 2, 1, 4, 3, 3, 4] (median 3.0); outcomes ['non-stream POSITION', 'BOUND ROUTED', 'BOUND ROUTED', 'non-stream POSITION', 'MERGED (3 share)', 'non-stream POSITION', 'BOUND ROUTED', 'MERGED (2 share)', 'MERGED (2 share)', 'BOUND ROUTED']
+  READING S33 (a): not promising at four streams (better Muon arm A_HINGE 4/10; >= 8/10 needed)
+  CONFIG (b) S=8, P=4, k=16, conv, 8 streams from step 1; Muon lr 0.005; seeds 260-269 (10)
+    seed | X HINGE_D8                         | MUON_SLOW                  trans   acc ch 4800/9600/end  per ch end | MUON_HINGE                 trans   acc ch 4800/9600/end  per ch end fired
+     260 | non-stream OTHER        None   1/2/2 | non-stream POSITION         None 0.110            1/1/1           8 | non-stream OTHER            None 0.099            2/1/3       5+2+1   159
+     261 | non-stream OTHER        None   2/1/1 | non-stream OTHER            None 0.097            1/1/1           8 | MERGED (6 share)            None 0.184            1/2/2         6+2   111
+     262 | MERGED (4 share)        None   1/1/3 | non-stream OTHER            None 0.102            1/3/1           8 | non-stream OTHER            None 0.102            1/1/5   3+2+1+1+1   250
+     263 | non-stream OTHER        None   1/4/2 | non-stream OTHER            None 0.099            1/1/1           8 | MERGED (4 share)            None 0.389            3/3/3       4+2+2     2
+     264 | non-stream OTHER        None   2/1/3 | non-stream OTHER            None 0.362            3/3/3       5+2+1 | non-stream OTHER            None 0.112            1/1/3       6+1+1   153
+     265 | MERGED (4 share)        None   1/1/4 | non-stream OTHER            None 0.237            2/2/2         7+1 | non-stream OTHER            None 0.237            2/2/2         7+1     0
+     266 | non-stream OTHER        None   2/1/1 | non-stream POSITION         None 0.095            1/1/1           8 | MERGED (5 share)            None 0.158            1/1/2         5+3    35
+     267 | MERGED (6 share)        None   4/2/2 | non-stream OTHER            None 0.108            1/1/1           8 | non-stream OTHER            None 0.116            1/1/1           8    50
+     268 | non-stream OTHER        None   1/1/1 | non-stream OTHER            None 0.202            2/2/2         5+3 | non-stream OTHER            None 0.204            2/2/2         5+3    77
+     269 | MERGED (3 share)        None   1/2/3 | non-stream OTHER            None 0.153            1/1/1           8 | non-stream OTHER            None 0.108            1/1/1           8    41
+  D8_SLOW (MUON_SLOW) vs X HINGE_D8:
+    BOUND  D8_SLOW 0/10  X HINGE_D8 0/10  D8_SLOW only 0, X HINGE_D8 only 0, McNemar two-sided p = 1 (printed)
+    merged at the end (two streams on one channel): 10/10 [260, 261, 262, 263, 264, 265, 266, 267, 268, 269]; outcomes {'non-stream POSITION': 2, 'non-stream OTHER': 8}
+    distinct channels holding the 8 streams at 4800: [1, 1, 1, 1, 3, 2, 1, 1, 2, 1] (median 1.0); streams per channel ['8', '8', '8', '8', '5+2+1', '7+1', '8', '8', '5+3', '8']
+    distinct channels holding the 8 streams at 9600: [1, 1, 3, 1, 3, 2, 1, 1, 2, 1] (median 1.0); streams per channel ['8', '8', '4+2+2', '8', '5+2+1', '7+1', '8', '8', '5+3', '8']
+    distinct channels holding the 8 streams at end: [1, 1, 1, 1, 3, 2, 1, 1, 2, 1] (median 1.0); streams per channel ['8', '8', '8', '8', '5+2+1', '7+1', '8', '8', '5+3', '8']
+  D8_HINGE (MUON_HINGE) vs X HINGE_D8:
+    BOUND  D8_HINGE 0/10  X HINGE_D8 0/10  D8_HINGE only 0, X HINGE_D8 only 0, McNemar two-sided p = 1 (printed)
+    merged at the end (two streams on one channel): 10/10 [260, 261, 262, 263, 264, 265, 266, 267, 268, 269]; outcomes {'non-stream OTHER': 7, 'MERGED (6 share)': 1, 'MERGED (4 share)': 1, 'MERGED (5 share)': 1}
+    distinct channels holding the 8 streams at 4800: [2, 1, 1, 3, 1, 2, 1, 1, 2, 1] (median 1.0); streams per channel ['7+1', '8', '8', '4+2+2', '8', '7+1', '8', '8', '5+3', '8']
+    distinct channels holding the 8 streams at 9600: [1, 2, 1, 3, 1, 2, 1, 1, 2, 1] (median 1.0); streams per channel ['8', '6+2', '8', '4+2+2', '8', '7+1', '8', '8', '5+3', '8']
+    distinct channels holding the 8 streams at end: [3, 2, 5, 3, 3, 2, 2, 1, 2, 1] (median 2.0); streams per channel ['5+2+1', '6+2', '3+2+1+1+1', '4+2+2', '6+1+1', '7+1', '5+3', '8', '5+3', '8']
+    hinge firings (training batches with a term above TAU, of all): {260: [159, 28800], 261: [111, 28800], 262: [250, 28800], 263: [2, 28800], 264: [153, 28800], 265: [0, 28800], 266: [35, 28800], 267: [50, 28800], 268: [77, 28800], 269: [41, 28800]}
+    X HINGE_D8: BOUND 0/10; distinct channels at the end [2, 1, 3, 2, 3, 4, 1, 2, 1, 3] (median 2.0); outcomes ['non-stream OTHER', 'non-stream OTHER', 'MERGED (4 share)', 'non-stream OTHER', 'non-stream OTHER', 'MERGED (4 share)', 'non-stream OTHER', 'MERGED (6 share)', 'non-stream OTHER', 'MERGED (3 share)']
+  READING S33 (b): does not break the coarse split (D8_SLOW BOUND 0/10, median distinct channels at the end 1.0; D8_HINGE BOUND 0/10, median distinct channels at the end 2.0; X HINGE_D8 median 2.0; >= 3 bound or median >= 6)
+  READING muon_scale (a): not promising at four streams (better Muon arm A_HINGE 4/10; >= 8/10 needed)  [EXPLORATORY, not a result]
+  READING muon_scale (b): does not break the coarse split (D8_SLOW BOUND 0/10, median distinct channels at the end 1.0; D8_HINGE BOUND 0/10, median distinct channels at the end 2.0; X HINGE_D8 median 2.0; >= 3 bound or median >= 6)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S32 muon_slow: the hinge matters under Muon (MUON_SLOW 31/40 vs MUON_HINGE 39/40 DISCOVERED; MUON_SLOW vs SLOW_MEM 31/40 vs 24/40)
+  S33 muon_scale (a, Muon lr 0.005): not promising at four streams (better Muon arm A_HINGE 4/10; >= 8/10 needed)
+  S33 muon_scale (b, Muon lr 0.005): does not break the coarse split (D8_SLOW BOUND 0/10, median distinct channels at the end 1.0; D8_HINGE BOUND 0/10, median distinct channels at the end 2.0; X HINGE_D8 median 2.0; >= 3 bound or median >= 6)
+####################################################################################################
