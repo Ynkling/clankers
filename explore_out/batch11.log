@@ -1,0 +1,60 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 11: hinge_window (S34), muon_k16 (S35)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 55e35c7+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe: S34 lr = test_channel_binding.SUB_LR = 0.001 (MUON_H2400: Adam on the embedding, Muon lr 0.005, slow phase x0.1 for updates 1-2400; ADAM_H2400: gate 0.001 throughout, the rest 0.0001 for updates 1-2400), MAX_ITERS = test_short_conv.MAX_ITERS = 24000, task P=4 S=2 grouped; hinge LAMBDA 1.0, TAU 0.2, window updates 1-2400; 1 torch thread per run
+  S35 recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; MAX_ITERS 28800; schedule {'t_check': 4800, 'a_check': 0.4, 'total': 28800, 'eval_every': 1200}
+    parameters HINGE: decoder (256, 32), encoder (1, 32, 256), encoder_v (1, 32, 256), lm_head (32, 24), W_in (32, 32), W_h (32, 32), W_g (16, 32), embed.weight (24, 32), short_conv.conv_w (32, 4)
+    parameters CEIL: decoder (256, 32), encoder (1, 32, 256), encoder_v (1, 32, 256), lm_head (32, 24), embed.weight (24, 32), short_conv.conv_w (32, 4)
+  lr read for hinge_window MUON_H2400: 0.001 (Adam groups); Muon lr 0.005
+  lr read for hinge_window ADAM_H2400: 0.001 (Adam groups)
+  lr read for muon_k16 MUON_HINGE16: 0.001 (Adam groups); Muon lr from the validity runs
+  S34 readings (per optimizer; DISCOVERED; b = full hinge only, c = window only): 'an early window suffices' if b - c <= 1; 'the late hinge matters' if b - c >= 4 and p < 0.1; otherwise neither. Description: 'directional kick' if the median ratio >= 100 and the Muon momentum's cosine stays >= 0.5 for a median of >= 50 updates
+  S35 readings (BOUND; b = HINGE4k16 only, c = MUON_HINGE16 only): 'the Muon recipe carries to four streams at k=16' if MUON_HINGE16 >= 16/20 (>= 8/10 if cut) and b - c <= 1; 'worse under Muon' if b - c >= 4 and p < 0.1; otherwise neither; UNTESTED if no Muon lr binds the perfect gate on both seeds
+  ROUTED* = margin >= 0.9 and eta_key_by_stream > 0.9
+  queue order: muon_k16, hinge_window — run_jobs2 queues runs by arm priority (S35's 28800-step runs first, then S34's)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (43s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK hinge_window: MUON_H2400 with the window end at 24000 equals S25's MUON_HINGE|160 bit for bit through 2400 (curve True; statistics at 1200 and 2400 True; diagnostics on): ok
+  CHECK hinge_window: MUON_H2400: one diagnostic row per firing (firings [194, 195]; ratios [2654.7, 418.9]; cosine below 0.5 after [96, 95] updates): ok
+  CHECK hinge_window: ADAM_H2400 with the window end at 24000 equals S13's SLOW_HINGE|160 bit for bit through 2400 (curve True; statistics at 1200 and 2400 True; diagnostics on): ok
+  CHECK hinge_window: ADAM_H2400: one diagnostic row per firing (firings []; ratios []): ok
+  CHECK hinge_window: MUON_H2400 with the window end at 0 equals MUON_SLOW|160 bit for bit through 1200 (curves [[1200, 0.8056640625, 1.0763039588928223]] = a fresh MUON_SLOW run = S32's record; weights equal; firings []): ok
+  CHECK hinge_window: ADAM_H2400 with the window end at 0 equals SLOW_MEM|160 bit for bit through 1200 (curves [[1200, 0.4501953125, 2.190796375274658]] = a fresh SLOW_MEM run = S5's record; weights equal; firings []): ok
+  CHECK hinge_window: MUON_H2400 with the window end at 2400: the hinge's weight at updates [1, 2399, 2400, 2401] is [1.0, 1.0, 1.0, 0.0] (1.0 at 2400, 0 at 2401): ok
+  CHECK hinge_window: ADAM_H2400 with the window end at 2400: the hinge's weight at updates [1, 2399, 2400, 2401] is [1.0, 1.0, 1.0, 0.0] (1.0 at 2400, 0 at 2401): ok
+  CHECK muon_k16: path: test_slow_start's HINGE recipe (Adam) on run_attempt with A4k16 reproduces X's HINGE4k16|240 through 1200 (curve [[1200, 0.18896484375, 2.678753614425659]] vs [[1200, 0.18896484375, 2.678753614425659]]; statistics at 1200 True): ok
+  CHECK muon_k16: HINGE: the groups cover every parameter exactly once [('gate', 'muon', ['W_in', 'W_h', 'W_g']), ('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_k16: CEIL: the groups cover every parameter exactly once [('rest', 'muon', ['decoder', 'encoder', 'encoder_v', 'lm_head']), ('rest', 'adam', ['embed.weight', 'short_conv.conv_w'])]: ok
+  CHECK muon_k16: MUON_HINGE16: lrs per group [('gate', 'muon'), ('rest', 'muon'), ('rest', 'adam')] at update 1 [0.005, 0.0005, 0.0001], 2400 [0.005, 0.0005, 0.0001], 2401 [0.005, 0.005, 0.001] (2401 updates): ok
+  CHECK muon_k16: the firing log (TAU 0, 60 steps): 60 entries, updates [1, 2, 3]...[59, 60]; the hinge counted 60 of 60: ok
+  CHECK muon_k16: the perfect gate (ceiling4k16) zeroes every cross-stream score at every layer (max |cross| per layer [0.0, 0.0, 0.0]; max |same-stream| [5.4383, 5.39, 5.8016]): ok
+  CHECK muon_k16: child at 9c5939e (1.3 min); the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (6.2 min)
+  recorded the full CHECK pass at 55e35c7 in /home/user/clankers/explore_out/batch11_checks.json
+  S35 VALIDITY (EXPLORATORY, not a result): the perfect gate (ceiling4k16) under MUON (no slow phase), Muon lr 0.005, then 0.0025, then 0.01 while fewer than 2 bind; seeds [240, 241]; 28800 steps; Adam lr 0.001 on the embedding and conv
+  [valid 0.005 seed 240]   4.9 min  (Adam lr 0.001, 28800 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
+  [valid 0.005 seed 241]   4.9 min  (Adam lr 0.001, 28800 steps): acc 1.000  trans  1200  VALcos 0.000  margin 1.00  DISCOVERED
+    Muon lr 0.005  seed 240: BOUND at 1200 (acc 1.000)  seed 241: BOUND at 1200 (acc 1.000)
+  S35 LR CHOICE: smallest lr at which both seeds bind (S25's rule): 0.005
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN hinge_window
+  idea    the hinge only during the slow phase (updates 1-2400), under Muon and under Adam
+  source  batch 10's S32 (the hinge matters under Muon; it fired at updates 50-168 on the rescued seeds, late firings on 5 seeds); S13 (SLOW_HINGE under Adam, firing timing not logged)
+  change  S13's hinge with weight 1.0 on updates 1-2400 and 0 after (not injected), in MUON_HINGE and SLOW_HINGE
+  arm MUON_H2400   lr 0.001  iters 24000  seeds 160-199 (40)  — S25's MUON_HINGE with the hinge on updates 1-2400 only
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on updates 1-2400 only
+  arm ADAM_H2400   lr 0.001  iters 24000  seeds 160-199 (40)  — S13's SLOW_HINGE with the hinge on updates 1-2400 only
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on updates 1-2400 only
+  pairing seeds 160-199: MUON_H2400 with MUON_HINGE (S25 160-179, S32 180-199) and MUON_SLOW (S32); ADAM_H2400 with SLOW_HINGE (S13) and SLOW_MEM (S5 160-179, S7 180-199); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_k16
+  idea    S33's MUON_HINGE in the main line's working four-stream configuration: S=4, P=4, k=16
+  source  batch 10's S33 (Muon did not break the merges at k=4; 0/10 at S=8); X's HINGE4k16 17/20 at k=16 under Adam
+  change  main's run path at 9c5939e (child process), A4k16 with S25's optimizer groups and the main line's hinge (S33's MUON_HINGE)
+  arm MUON_HINGE16 lr 0.001  iters 28800  seeds 240-259 (20)  — S33's MUON_HINGE at S=4, P=4, k=16, conv (A4k16's path)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels)
+  pairing seeds 240-259 with X's recorded HINGE4k16 (slow_start at b8c6007) and A4k16 (stream_recipe); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
