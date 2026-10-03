@@ -263,3 +263,142 @@ EXPLORATORY, NOT A RESULT — batch 11: hinge_window (S34), muon_k16 (S35)
           acc 0.998  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [ 99/100]   87.6 min  hinge_window   ADAM_H2400 seed 199  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on updates 1-2400 only)
           acc 1.000  trans  2400  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [100/100]   91.6 min  hinge_window   ADAM_H2400 seed 197  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on updates 1-2400 only)
+          acc 0.488  trans  None  VALcos 1.000  margin 0.00  POSITION  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 91.6 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN hinge_window
+  idea    the hinge only during the slow phase (updates 1-2400), under Muon and under Adam
+  source  batch 10's S32 (the hinge matters under Muon; it fired at updates 50-168 on the rescued seeds, late firings on 5 seeds); S13 (SLOW_HINGE under Adam, firing timing not logged)
+  change  S13's hinge with weight 1.0 on updates 1-2400 and 0 after (not injected), in MUON_HINGE and SLOW_HINGE
+  arm MUON_H2400   lr 0.001  iters 24000  seeds 160-199 (40)  — S25's MUON_HINGE with the hinge on updates 1-2400 only
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on updates 1-2400 only
+  arm ADAM_H2400   lr 0.001  iters 24000  seeds 160-199 (40)  — S13's SLOW_HINGE with the hinge on updates 1-2400 only
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on updates 1-2400 only
+  pairing seeds 160-199: MUON_H2400 with MUON_HINGE (S25 160-179, S32 180-199) and MUON_SLOW (S32); ADAM_H2400 with SLOW_HINGE (S13) and SLOW_MEM (S5 160-179, S7 180-199); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+  per seed (firings = training batches with a hinge term above TAU 0.2; 'after' = would-fire updates after 2400, weight 0; full-hinge firings: S32's logs (MUON); S13's hinge count (ADAM, timing not logged)):
+    seed | MUON_H2400  trans firings                    after | MUON_HINGE  >2400 | MUON_SLOW   || ADAM_H2400  trans firings                    after | SLOW_HINGE  count | SLOW_MEM   
+     160 | DISCOVERED   2400 [194, 195]                     0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     161 | DISCOVERED   2400 [494]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     162 | DISCOVERED   2400 [134, 149]                     0 | DISCOVERED      0 | POSITION    || DISCOVERED   3600 [104, 110, 111]                0 | DISCOVERED      3 | POSITION   
+     163 | DISCOVERED   2400 [161, 270]                     0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     164 | DISCOVERED   2400 [234]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     165 | DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   4800 none                           0 | DISCOVERED      0 | DISCOVERED 
+     166 | OTHER        None [95, 97, 204, 256]          5295 | DISCOVERED    277 | POSITION    || DISCOVERED   2400 [155]                          0 | DISCOVERED      1 | POSITION   
+     167 | DISCOVERED   2400 [123, 153, 273, 507]           0 | DISCOVERED      0 | POSITION    || POSITION     None [100, 507, 1034, 2047, ... (13)] 21214 | OTHER         834 | POSITION   
+     168 | DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 [138]                          0 | DISCOVERED      1 | DISCOVERED 
+     169 | DISCOVERED   1200 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     170 | DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     171 | DISCOVERED   2400 [265]                          0 | DISCOVERED      0 | DISCOVERED  || KEY          None [132]                        230 | OTHER          34 | OTHER      
+     172 | DISCOVERED   2400 none                           1 | DISCOVERED      1 | DISCOVERED  || DISCOVERED   2400 none                           1 | DISCOVERED      1 | DISCOVERED 
+     173 | DISCOVERED   2400 [71, 130, 217]                 0 | DISCOVERED      0 | POSITION    || DISCOVERED   2400 [126]                          0 | DISCOVERED      1 | POSITION   
+     174 | DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     175 | DISCOVERED   1200 [129]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 [49]                           0 | DISCOVERED      1 | POSITION   
+     176 | DISCOVERED   1200 [150, 217]                     0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 [133]                          0 | DISCOVERED      1 | POSITION   
+     177 | DISCOVERED   2400 [50]                           0 | DISCOVERED      0 | POSITION    || DISCOVERED   3600 [50]                           0 | DISCOVERED      1 | POSITION   
+     178 | DISCOVERED   2400 [364]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     179 | DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     180 | DISCOVERED   2400 [162, 1459]                    0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 [141, 1459]                    0 | DISCOVERED      2 | POSITION   
+     181 | DISCOVERED   1200 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     182 | DISCOVERED   2400 [150]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     183 | DISCOVERED   1200 [167, 210, 212, 274, ... (5)]     0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     184 | DISCOVERED   2400 [229]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     185 | DISCOVERED   1200 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     186 | DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   3600 none                           0 | DISCOVERED      0 | DISCOVERED 
+     187 | DISCOVERED   1200 [258, 259]                     0 | DISCOVERED      0 | DISCOVERED  || KEY          None [2267]                         1 | KEY             2 | KEY        
+     188 | DISCOVERED   2400 [237, 345, 346]                0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     189 | DISCOVERED   1200 none                           0 | DISCOVERED      0 | DISCOVERED  || KEY          None [153, 154, 210, 371]           7 | KEY            11 | KEY        
+     190 | DISCOVERED   2400 [144, 175, 285, 290]           1 | DISCOVERED      1 | DISCOVERED  || DISCOVERED   2400 [107, 1682]                    1 | DISCOVERED      3 | POSITION   
+     191 | KEY          None [2360]                         2 | KEY             2 | KEY         || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     192 | DISCOVERED   2400 [174]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 [155, 167, 168]                0 | DISCOVERED      3 | OTHER      
+     193 | DISCOVERED   2400 [392]                          0 | DISCOVERED      0 | DISCOVERED  || POSITION     None [117, 925, 1399, 2049, ... (5)] 21344 | OTHER         179 | KEY        
+     194 | DISCOVERED   2400 [142, 219]                     0 | DISCOVERED      0 | POSITION    || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     195 | DISCOVERED   1200 [103]                          0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 [151]                          0 | DISCOVERED      1 | DISCOVERED 
+     196 | DISCOVERED   2400 [168]                          0 | DISCOVERED      0 | POSITION    || DISCOVERED   2400 [164]                          0 | DISCOVERED      1 | DISCOVERED 
+     197 | DISCOVERED   2400 [125, 182, 186, 243, ... (5)]     0 | DISCOVERED      0 | POSITION    || POSITION     None [110, 2227, 2341, 2383]    21509 | OTHER        1938 | POSITION   
+     198 | DISCOVERED   1200 none                           0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 none                           0 | DISCOVERED      0 | DISCOVERED 
+     199 | DISCOVERED   2400 [86, 255, 423]                 0 | DISCOVERED      0 | DISCOVERED  || DISCOVERED   2400 [126, 250]                     0 | DISCOVERED      2 | POSITION   
+  MUON: MUON_HINGE (full hinge) vs MUON_H2400 (window; the rule):
+    DISCOVERED    MUON_HINGE 39/40   MUON_H2400 38/40   MUON_HINGE only 1, MUON_H2400 only 0, McNemar two-sided p = 1
+    BOUND         MUON_HINGE 39/40   MUON_H2400 38/40   MUON_HINGE only 1, MUON_H2400 only 0, McNemar two-sided p = 1
+    ROUTED*@1200  MUON_HINGE 39/40   MUON_H2400 39/40   MUON_HINGE only 0, MUON_H2400 only 0, McNemar two-sided p = 1
+  MUON: MUON_H2400 vs MUON_SLOW (no hinge; printed):
+    DISCOVERED    MUON_H2400 38/40   MUON_SLOW 31/40   MUON_H2400 only 7, MUON_SLOW only 0, McNemar two-sided p = 0.0156
+    seeds where the window and the full hinge differ (DISCOVERED): [166]; identical curves 36/40
+    failure classes: MUON_H2400 {'OTHER': 1, 'KEY': 1}   MUON_HINGE {'KEY': 1}   MUON_SLOW {'POSITION': 8, 'KEY': 1}
+    MUON_H2400 firings: 58 in 28/40 runs; by update 300/600/900/1200/2400/after: 47/9/0/0/2/0; would-fire after 2400 (weight 0), per seed: {166: 5295, 172: 1, 190: 1, 191: 2}
+    MUON_H2400 at its 58 firings: hinge-gradient norm on the gate median 1.939, task-gradient norm median 0.002914; ratio median 849.6, range 0.1547 - 9.668e+04; ratio >= 100 at 37/58 firings
+  RULE S34 MUON (MUON_HINGE only 1, MUON_H2400 only 0, p = 1; 'suffices' if b - c <= 1, 'matters' if b - c >= 4 and p < 0.1): an early window suffices
+  ADAM: SLOW_HINGE (full hinge) vs ADAM_H2400 (window; the rule):
+    DISCOVERED    SLOW_HINGE 34/40   ADAM_H2400 34/40   SLOW_HINGE only 0, ADAM_H2400 only 0, McNemar two-sided p = 1
+    BOUND         SLOW_HINGE 34/40   ADAM_H2400 34/40   SLOW_HINGE only 0, ADAM_H2400 only 0, McNemar two-sided p = 1
+    ROUTED*@1200  SLOW_HINGE 28/40   ADAM_H2400 28/40   SLOW_HINGE only 0, ADAM_H2400 only 0, McNemar two-sided p = 1
+  ADAM: ADAM_H2400 vs SLOW_MEM (no hinge; printed):
+    DISCOVERED    ADAM_H2400 34/40   SLOW_MEM 24/40   ADAM_H2400 only 10, SLOW_MEM only 0, McNemar two-sided p = 0.00195
+    seeds where the window and the full hinge differ (DISCOVERED): []; identical curves 32/40
+    failure classes: ADAM_H2400 {'POSITION': 3, 'KEY': 3}   SLOW_HINGE {'OTHER': 4, 'KEY': 2}   SLOW_MEM {'POSITION': 11, 'OTHER': 2, 'KEY': 3}
+    ADAM_H2400 firings: 48 in 19/40 runs; by update 300/600/900/1200/2400/after: 25/2/0/2/19/0; would-fire after 2400 (weight 0), per seed: {167: 21214, 171: 230, 172: 1, 187: 1, 189: 7, 190: 1, 193: 21344, 197: 21509}
+    ADAM_H2400 at its 48 firings: hinge-gradient norm on the gate median 1.184, task-gradient norm median 0.001651; ratio median 725.8, range 0.5351 - 2.039e+05; ratio >= 100 at 28/48 firings
+  RULE S34 ADAM (SLOW_HINGE only 0, ADAM_H2400 only 0, p = 1; 'suffices' if b - c <= 1, 'matters' if b - c >= 4 and p < 0.1): an early window suffices
+  MUON_H2400 cosine of W_g's momentum with each firing's hinge gradient (58 firings): median updates until below 0.5 = 59.0 (1 censored at 200); per firing [96, 95, 0, 15, 82, 78, 4, 36, 109, 107, 52, 72, 30, 96, 43, 8, 49, 59, 87, 89, 83, 67, 68, 135, 0, 79, 0, 107, 93, 0, 0, 42, 0, 78, 33, 27, 37, 45, 44, 31, 90, 16, 0, 2, 80, 200, 77, 52, 98, 98, 57, 114, 109, 53, 59, 108, 64, 46]; median cosine at offsets 0: 0.997, 1: 0.997, 5: 0.996, 10: 0.995, 25: 0.993, 50: 0.849, 100: 0.201, 200: 0.175
+  DESCRIPTION S34 (median ratio 849.6 vs 100; median updates until the cosine is below 0.5: 59.0 vs 50): directional kick
+  READING hinge_window (MUON): an early window suffices (full only 1, window only 0, p = 1; window 38/40 vs full 39/40 DISCOVERED; window vs no hinge 38/40 vs 31/40)  [EXPLORATORY, not a result]
+  READING hinge_window (ADAM): an early window suffices (full only 0, window only 0, p = 1; window 34/40 vs full 34/40 DISCOVERED; window vs no hinge 34/40 vs 24/40)  [EXPLORATORY, not a result]
+  DESCRIPTION hinge_window: directional kick  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN muon_k16
+  idea    S33's MUON_HINGE in the main line's working four-stream configuration: S=4, P=4, k=16
+  source  batch 10's S33 (Muon did not break the merges at k=4; 0/10 at S=8); X's HINGE4k16 17/20 at k=16 under Adam
+  change  main's run path at 9c5939e (child process), A4k16 with S25's optimizer groups and the main line's hinge (S33's MUON_HINGE)
+  arm MUON_HINGE16 lr 0.001  iters 28800  seeds 240-259 (20)  — S33's MUON_HINGE at S=4, P=4, k=16, conv (A4k16's path)
+                   schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels)
+  pairing seeds 240-259 with X's recorded HINGE4k16 (slow_start at b8c6007) and A4k16 (stream_recipe); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+    validity (ceiling4k16): Muon lr 0.005 seed 240 BOUND at 1200 (acc 1.000); Muon lr 0.005 seed 241 BOUND at 1200 (acc 1.000) -> smallest lr at which both seeds bind (S25's rule): 0.005
+  per seed (ch = distinct channels holding the 4 streams at 4800/9600/end; X HINGE4k16's firings per 1200-update window, its timing within windows not logged):
+    seed | MUON_HINGE16               trans   acc      ch   per ch firings at updates             | X HINGE4k16                trans      ch fired | X A4k16                    trans
+     240 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [556]                          | BOUND ROUTED                3600   4/4/4     0 | BOUND ROUTED                4800
+     241 | BOUND ROUTED                2400 0.996   4/4/4  1+1+1+1 [229, 295]                     | MERGED (2 share)            None   2/3/3     1 | non-stream POSITION         None
+     242 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [239, 350, 361, 639]           | STREAM-PARTIAL one-to-one   None   2/3/4    27 | BOUND ROUTED               18000
+     243 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [114, 115, 177]                | MERGED (2 share)            None   2/2/3    32 | BOUND ROUTED               16800
+     244 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [192, 193]                     | BOUND ROUTED                7200   3/4/4     4 | non-stream OTHER            None
+     245 | MERGED (2 share)            None 0.767   3/3/3    2+1+1 none                           | BOUND ROUTED               21600   1/1/4     8 | MERGED (3 share)            None
+     246 | BOUND ROUTED                3600 0.997   4/4/4  1+1+1+1 [138]                          | BOUND NOT routed            8400   1/1/1    99 | BOUND ROUTED                2400
+     247 | BOUND ROUTED                3600 0.997   4/4/4  1+1+1+1 [215, 287]                     | BOUND ROUTED               10800   1/3/4     7 | non-stream POSITION         None
+     248 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [370]                          | BOUND ROUTED                6000   3/4/4    14 | non-stream KEY              None
+     249 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 none                           | BOUND ROUTED               12000   1/3/4    12 | BOUND ROUTED               22800
+     250 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 none                           | BOUND ROUTED                4800   4/4/4     0 | BOUND ROUTED               10800
+     251 | BOUND ROUTED                2400 0.999   4/4/4  1+1+1+1 [196, 237]                     | BOUND ROUTED               21600   2/2/4    65 | BOUND ROUTED                3600
+     252 | MERGED (2 share)            None 0.947   3/3/3    2+1+1 [503]                          | BOUND ROUTED                4800   4/4/4     3 | BOUND ROUTED               10800
+     253 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [210, 277, 354, 464]           | BOUND ROUTED                4800   4/4/4     2 | BOUND ROUTED                6000
+     254 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [177, 235]                     | BOUND ROUTED                4800   4/4/4     1 | MERGED (3 share)            None
+     255 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 none                           | BOUND ROUTED                7200   3/4/4     2 | BOUND ROUTED                7200
+     256 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [153]                          | BOUND ROUTED               15600   1/1/4    12 | MERGED (3 share)            None
+     257 | BOUND ROUTED                2400 0.997   4/4/4  1+1+1+1 [349]                          | BOUND ROUTED                7200   2/4/4     1 | BOUND ROUTED                4800
+     258 | BOUND ROUTED                2400 1.000   4/4/4  1+1+1+1 [294, 360, 362, 391]           | BOUND ROUTED                4800   4/4/4     2 | BOUND ROUTED                6000
+     259 | MERGED (2 share)            None 0.762   3/3/3    2+1+1 [217, 266]                     | BOUND NOT routed            8400   1/2/2    88 | MERGED (2 share)            None
+  MUON_HINGE16 vs X HINGE4k16 (the rule):
+    BOUND  MUON_HINGE16 17/20  X HINGE4k16 17/20  MUON_HINGE16 only 3, X HINGE4k16 only 3, McNemar two-sided p = 1
+  MUON_HINGE16 vs X A4k16 (printed):
+    BOUND  MUON_HINGE16 17/20  X A4k16 12/20  MUON_HINGE16 only 6, X A4k16 only 1, McNemar two-sided p = 0.125
+    merged at the end (two streams on one channel): 3/20 [245, 252, 259]; outcomes {'BOUND ROUTED': 17, 'MERGED (2 share)': 3}; X HINGE4k16 on these seeds {'BOUND ROUTED': 15, 'MERGED (2 share)': 2, 'STREAM-PARTIAL one-to-one': 1, 'BOUND NOT routed': 2}
+    distinct channels at 4800: [4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 3] (median 4.0); streams per channel ['1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1']; X HINGE4k16 [4, 2, 2, 2, 3, 1, 1, 1, 3, 1, 4, 2, 4, 4, 4, 3, 1, 2, 4, 1] (median 2.0)
+    distinct channels at 9600: [4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 3] (median 4.0); streams per channel ['1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1']; X HINGE4k16 [4, 3, 3, 2, 4, 1, 1, 3, 4, 3, 4, 2, 4, 4, 4, 4, 1, 4, 4, 2] (median 3.5)
+    distinct channels at end: [4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 3, 4, 4, 4, 4, 4, 4, 3] (median 4.0); streams per channel ['1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '1+1+1+1', '2+1+1']; X HINGE4k16 [4, 3, 4, 3, 4, 4, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2] (median 4.0)
+    MUON_HINGE16 firings: 33 in 16/20 runs; by update 300/600/1200/2400/4800/after: 21/11/1/0/0/0; per seed {seed: (count, first, last)}: {240: (1, 556, 556), 241: (2, 229, 295), 242: (4, 239, 639), 243: (3, 114, 177), 244: (2, 192, 193), 245: 0, 246: (1, 138, 138), 247: (2, 215, 287), 248: (1, 370, 370), 249: 0, 250: 0, 251: (2, 196, 237), 252: (1, 503, 503), 253: (4, 210, 464), 254: (2, 177, 235), 255: 0, 256: (1, 153, 153), 257: (1, 349, 349), 258: (4, 294, 391), 259: (2, 217, 266)}
+    X HINGE4k16 firings per seed (count): {240: 0, 241: 1, 242: 27, 243: 32, 244: 4, 245: 8, 246: 99, 247: 7, 248: 14, 249: 12, 250: 0, 251: 65, 252: 3, 253: 2, 254: 1, 255: 2, 256: 12, 257: 1, 258: 2, 259: 88}
+  RULE S35 (MUON_HINGE16 BOUND 17/20; HINGE4k16 only 3, MUON_HINGE16 only 3, p = 1; 'carries' if >= 16/20 and b - c <= 1, 'worse' if b - c >= 4 and p < 0.1): the Muon recipe carries to four streams at k=16
+  READING muon_k16: the Muon recipe carries to four streams at k=16 (Muon lr 0.005; MUON_HINGE16 BOUND 17/20 vs X HINGE4k16 17/20, 3 vs 3, p = 1; vs X A4k16 12/20)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S34 hinge_window (MUON): an early window suffices (window 38/40 vs full hinge 39/40 DISCOVERED, 1 vs 0, p = 1; median hinge/task gradient ratio at firings 849.6)
+  S34 hinge_window (ADAM): an early window suffices (window 34/40 vs full hinge 34/40 DISCOVERED, 0 vs 0, p = 1; median hinge/task gradient ratio at firings 725.8)
+  S34 description: directional kick (median updates until the Muon momentum's cosine is below 0.5: 59.0, 1 of 58 censored)
+  S35 muon_k16 (Muon lr 0.005): the Muon recipe carries to four streams at k=16 (MUON_HINGE16 17/20 vs X HINGE4k16 17/20 BOUND)
+####################################################################################################

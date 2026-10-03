@@ -29,7 +29,7 @@ for a pre-registered test.
 | `batch10_dry.log`, `dry_<screen>_results.json`, `dry_muon_scale_valid_results.json` (S32 muon_slow, S33 muon_scale) | batch 10's labelled DRY RUN (git 3305b5f, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (6.0 min; S33's in the child process on main's modules at 9c5939e, 4.5 min), S33's validity shortened (1 seed, 3600 steps: (a) Muon lr 0.005 bound at 1200; (b) 0.005 unbound at 0.893, 0.0025 bound at 3600), 1 seed per arm, runs capped at 3600 steps. It exercises the code; its numbers are not for interpretation. After it, before any real run: S33's projection timing changed. It had timed each arm alone as the difference of a 120- and a 20-step run, which underestimated the pool's per-step time (A_SLOW 22 ms projected vs about 35-40 ms per step in the dry run's pool) and gave negative values when the arms were timed at once; it now takes the median interval between optimizer steps, one child per arm running at once (32.5 / 33.7 ms for (a), 70.8 / 71.5 ms for (b) on the check). X's per-seed channel columns now use the Muon arms' rule for runs that stopped early. Runs, CHECKs and readings unchanged. |
 | `batch10.log`, `muon_scale_valid_results.json` (S32 muon_slow, S33 muon_scale) | batch 10, code of git d16ec61 (the full CHECK pass recorded at cc87382 in `batch10_checks.json`; the banners' git cc87382+dirty, 334e1f1+dirty, 4321801+dirty and c877544+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (124/124 runs: 4 S33 validity runs, 80 S32 runs, 40 S33 runs). Segment 1 ran the full CHECK suite (6.0 min), S33's validity (Muon lr 0.005 bound both seeds in both configurations) and the projection (S33 worst case 5.06 h on 4 workers: no cut, stored), and saved 84 runs before the background time limit; segments 2-4 (RESUME) saved 8, 14 and 14 (runs in flight at each stop were lost and re-run). Repro check bit-identical to X in every segment; later segments skipped the rest of the CHECK suite, the screen code being unchanged, and reused the stored validity choice and cut decision. All on a Xeon @ 2.10GHz. S33 ran every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, git show, read-only; nothing added to this branch). Reports, readings and SUMMARY at the end. |
 | `batch11_dry.log`, `dry_<screen>_results.json`, `dry_muon_k16_valid_results.json` (S34 hinge_window, S35 muon_k16) | batch 11's labelled DRY RUN (git 05ff5f9, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (5.9 min; S35's in the child process on main's modules at 9c5939e), S35's validity shortened (seed 240, 3600 steps: Muon lr 0.005 bound at 1200), the projection with pool-load timing (19.1 / 16.3 ms per step for S34's Muon / Adam arms, 37.1 ms for S35), 1 seed per arm, runs capped at 3600 steps. It exercises the code; its numbers are not for interpretation (S34's 'identical curves 0/1' is the 3600-step cap: the window runs equal the full-hinge records through 3600). After it, before any real run, report formatting only: the gradient ratios printed to 4 significant digits with the count of firings at ratio >= 100, and S35's outcome columns widened. Runs, CHECKs and readings unchanged. |
-| `batch11.log` (S34 hinge_window, S35 muon_k16) | batch 11, code of git 9f47868, 1 thread per run. **IN PROGRESS: 101 of 102 runs saved (hinge_window 79/80, muon_k16 validity 2, muon_k16 20/20).** Run in segments, each resumed after the session's background time limit stops it; S35's validity first, then S35's runs, then S34's; pushed after every saved run. No report or reading until the SUMMARY at the end of the log. |
+| `batch11.log`, `muon_k16_valid_results.json` (S34 hinge_window, S35 muon_k16) | batch 11, code of git 9f47868 (the full CHECK pass recorded at 55e35c7 in `batch11_checks.json`; the banner's git 55e35c7+dirty is the watcher's explore_out commit on top of it, the screen code unchanged), 1 thread per run; complete (102/102 runs: 2 S35 validity runs, 80 S34 runs, 20 S35 runs) in one segment (91.6 min of runs): the repro check bit-identical to X, the full CHECK suite (6.2 min), S35's validity (Muon lr 0.005 bound both seeds at 1200), the projection (batch worst case 4.34 h on 4 workers: no cut, stored). All on a Xeon @ 2.10GHz. S35 ran every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, read-only). Reports, readings and SUMMARY at the end. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -253,3 +253,31 @@ not stop the merges. Two streams shared a channel at the end in 7/10 runs of eac
 bound or exceeded 0.39 accuracy. Without the hinge, Muon put all 8 streams on one channel in 7/10 runs (median 1 channel at
 the end, below X's HINGE_D8 at 2). With the hinge (0-250 firings per run) the median was 2, as X's: the coarse split is
 unchanged. S31 was to matter if S33 (a) still merges under Muon; it does.
+
+## Batch 11 verdicts (rules fixed before any run; S31 dropped, S29 and S30 deferred)
+
+| screen | outcome | reference | full only / window only (ref only / cand. only) | McNemar p | reading / verdict |
+|---|---|---|---|---|---|
+| S34 MUON_H2400 (Muon lr 0.005, seeds 160-199) | DISCOVERED 38/40 | MUON_HINGE (full hinge) 39/40 | 1 / 0 | 1 | "an early window suffices" (b - c <= 1) |
+| S34 MUON_H2400 vs MUON_SLOW | 38/40 | MUON_SLOW 31/40 | (0 / 7) | 0.016 | (printed) |
+| S34 ADAM_H2400 (seeds 160-199) | DISCOVERED 34/40 | SLOW_HINGE (full hinge) 34/40 | 0 / 0 | 1 | "an early window suffices" (b - c <= 1) |
+| S34 ADAM_H2400 vs SLOW_MEM | 34/40 | SLOW_MEM 24/40 | (0 / 10) | 0.002 | (printed) |
+| S34 firing diagnostics | Muon: median hinge/task gradient ratio 850 (>= 100 at 37/58 firings), W_g momentum cosine >= 0.5 for a median 59 updates | Adam: median ratio 726 (28/48) | | | "directional kick" (median ratio >= 100, median >= 50 updates) |
+| S35 MUON_HINGE16 (S=4, P=4, k=16, Muon lr 0.005, seeds 240-259) | BOUND 17/20 (15 at 2400, 2 at 3600) | X HINGE4k16 17/20 (3600-21600, median 7200) | 3 / 3 | 1 | "the Muon recipe carries to four streams at k=16" (>= 16/20, b - c <= 1) |
+| S35 vs X A4k16 | 17/20 | X A4k16 12/20 | (1 / 6) | 0.125 | (printed) |
+
+S34: under Muon the window and the full hinge differ on one seed: 166, where the full hinge fired 277 times after 2400 and
+bound at 10800; with the window the run ended OTHER, its hinge terms above TAU on 5295 updates after 2400 (weight 0). 36/40
+window runs have curves identical to the full-hinge runs (the full hinge never fired after 2400 there). Under Adam the
+DISCOVERED outcomes are identical (32/40 identical curves); the 4 seeds where SLOW_HINGE fired late (167, 171, 193, 197: 34-
+1938 firings, all ending OTHER) failed with the window too, as POSITION (167, 193, 197) and KEY (171), the terms above TAU on
+21214-21509 updates after 2400 in the three position splits. Firing timing, which S13 did not log: under Adam 25 of 48 firings
+fell in updates 1-300, 19 in 1201-2400 (Muon: 47 and 2 of 58); on the 10 seeds the window rescued from SLOW_MEM the first firing
+was at update 49-155. At the firings the hinge's gradient on the gate was a median ~800x the task's (range 0.15x to 2e5x);
+under Muon, W_g's momentum stayed aligned with a firing's hinge gradient (cosine >= 0.5) for a median 59 updates (0 to > 200).
+
+S35: at k=16 the Muon recipe binds as often as the main line's HINGE (17/20 each; 3 vs 3) and earlier: 15 of 17 at 2400, 2
+at 3600 (X's HINGE4k16: 3600-21600, median 7200). All 17 are BOUND ROUTED with one stream per channel from 4800; the 3
+failures (245, 252, 259) are merges of two streams held from 4800 to the end. The hinge fired 33 times in 16 runs, all by
+update 1200 (X's HINGE4k16: 380 firings in 18 runs over its windows). The perfect gate bound at Muon lr 0.005 on both seeds at
+1200. Faster binding at an equal rate is a candidate for a pre-registered test on the main branch.
