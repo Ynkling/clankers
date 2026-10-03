@@ -79,6 +79,7 @@ VALID_SEEDS = {"a": (240, 241), "b": (260, 261)}
 PROMISING_A, BREAK_N, BREAK_MED = 8, 3, 6
 CUT_H = 10.0
 CUT_SEEDS = tuple(range(260, 265))
+TIME_STEPS = {"a": 400, "b": 200}            # about the same wall time per arm under load
 STEPS_DIAG = (4800, 9600, "end")
 CFG = {"a": dict(label="S=4, P=4, k=4, conv", S=4, x_key="A4k4", x_name="X A4k4"),
        "b": dict(label="S=8, P=4, k=16, conv, 8 streams from step 1", S=8, x_key="HINGE_D8", x_name="X HINGE_D8")}
@@ -225,19 +226,22 @@ def projection(workers, dry=False):
     """S33's runs alone, worst case (every run to its iters). Over CUT_H h: (b) cut to 260-264 (stored)."""
     st = ec.load_store(valid_name())
     which = [[a["cfg"], a["kind"]] for a in ARMS.values()]
-    t = child("timing", dict(mlr=VALID_LRS[0], which=which))
+    with ThreadPoolExecutor(max_workers=len(which)) as ex:          # one child per arm at once: the pool's load
+        t = {k: v for r in ex.map(lambda w: child("timing", dict(mlr=VALID_LRS[0], which=[w], steps=TIME_STEPS)), which)
+             for k, v in r.items()}
     durs, total = [], 0.0
     rows = []
     for k, a in ARMS.items():
-        ts, te = t[f"{a['cfg']}|{a['kind']}"]
+        ts, te, _ = t[f"{a['cfg']}|{a['kind']}"]
         per = a["iters"] * ts + (a["iters"] // EVAL_EVERY) * te
         n = len(a["seeds"])
         durs += [per] * n
         total += per * n
         rows.append((k, n, per, ts, te))
     ms = c2.makespan(durs, workers)
-    print(f"  S33 PROJECTION (worst case: every run to its iters; MuonAdam timed in the child, the difference of "
-          f"120- and 20-step runs, 1 thread, this machine):")
+    print(f"  S33 PROJECTION (worst case: every run to its iters; MuonAdam timed in the child: the median "
+          f"interval between optimizer steps over {TIME_STEPS['a']} (a) / {TIME_STEPS['b']} (b) steps, one child per arm running at once ({len(which)} processes, the pool's load), "
+          f"1 thread each, this machine):")
     for k, n, per, ts, te in rows:
         print(f"    {NAME:<14} {k:<10} {n:>2} runs x {per / 60:5.1f} min  ({ARMS[k]['iters']} steps x {ts * 1e3:.1f} ms "
               f"+ {ARMS[k]['iters'] // EVAL_EVERY} evals x {te:.1f} s)")
@@ -372,8 +376,9 @@ def report(store):
             + (" fired" if ARMS[k]["kind"] == "HINGE" else "") for k in arms))
         for s in allseeds:
             x = xr.get(s)
+            xp = dict(end=dict(ch_map=x["end_map"]), maps=x["maps"], stopped_at=x.get("stopped_at")) if x else None
             xs = (f"{x['outcome']:<22} {str(x['transition']):>5} "
-                  f"{'/'.join(str(distinct(m)) if m else '--' for m in (x['maps'].get('4800'), x['maps'].get('9600'), x['end_map'])):>7}"
+                  f"{'/'.join(str(distinct(map_at(xp, t))) if map_at(xp, t) else '--' for t in STEPS_DIAG):>7}"
                   if x else f"{'--':<34}")
             cells = []
             for k in arms:
@@ -409,7 +414,8 @@ def report(store):
                 print(f"    hinge firings (training batches with a term above TAU, of all): {fired}")
             res[k] = dict(d, n_run=len(rs), bound=sum(b.values()), median_end=med, distinct_end=xs, merged=len(mg),
                           complete=len(rs) == len(ARMS[k]["seeds"]))
-        xmed, xds = median_distinct([dict(end=dict(ch_map=x["end_map"]), maps=x["maps"]) for x in xr.values()])
+        xmed, xds = median_distinct([dict(end=dict(ch_map=x["end_map"]), maps=x["maps"], stopped_at=x.get("stopped_at"))
+                                     for x in xr.values()])
         print(f"    {CFG[c]['x_name']}: BOUND {sum(xb.values())}/{len(xb)}; distinct channels at the end {xds} "
               f"(median {xmed}); outcomes {[x['outcome'] for _, x in sorted(xr.items())]}")
         if STATE["untested"].get(c):

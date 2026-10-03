@@ -223,20 +223,27 @@ def checks(p):
 
 # ── timing and recorded summaries ────────────────────────────────────────────
 def timing(p):
-    """Seconds per training step (MuonAdam, the arm's recipe; the difference of a short and a longer run,
-    so that building and the step-0 and end statistics cancel) and seconds per evaluation, per (cfg, kind)."""
+    """Seconds per training step under MuonAdam with the arm's recipe: the median interval between consecutive
+    Muon steps over one run of p["steps"][cfg] steps (no evaluation inside; robust to the start-up of other
+    processes), and seconds per evaluation (held-out set and the run path's statistics), per (cfg, kind)."""
+    import torch.optim.optimizer as topt
     out = {}
-    n1, n2 = p.get("steps", (20, 120))
     for cfg, kind in p["which"]:
         a = cfg_arm(cfg, kind)
-        ts = []
-        for n in (n1, n2):
+        stamps = []
+
+        def post(opt, args, kwargs):
+            if isinstance(opt, s25.SliceMuon):
+                stamps.append(time.perf_counter())
+        h = topt.register_optimizer_step_post_hook(post)
+        try:
             holder = {}
             rc, _ = make_rc(kind, p["mlr"], holder)
-            t0 = time.time()
             with s25.muon_in_onset_run(holder):
-                path(cfg, a, 0, n, rc, eval_every=10 ** 9)
-            ts.append(time.time() - t0)
+                path(cfg, a, 0, p["steps"][cfg], rc, eval_every=10 ** 9)
+        finally:
+            h.remove()
+        d = sorted(y - x for x, y in zip(stamps, stamps[1:]))
         task = cfg_task(cfg)
         m = tsr.builder_for(a)(a, 0)()
         data, probe = eval_batch(task), probe_batch(task, 0)
@@ -244,7 +251,7 @@ def timing(p):
         tbo.evaluate(m, task, data)
         sf = tsa.scale_stats if cfg == "a" else tscur.sc_stats((tscur.T1, tscur.T2))
         sf(m, task, probe, 1200)
-        out[f"{cfg}|{kind}"] = [(ts[1] - ts[0]) / (n2 - n1), time.time() - t0]
+        out[f"{cfg}|{kind}"] = [d[len(d) // 2], time.time() - t0, len(d) + 1]
     return out
 
 
@@ -272,5 +279,6 @@ def recorded_summary(p):
             except Exception as e:
                 oc = f"n/a ({type(e).__name__})"
             out[f"{key}|{s}"] = dict(bound=r.get("transition") is not None, transition=r.get("transition"),
-                                     acc=r.get("acc"), outcome=oc, maps=maps_of(r), end_map=r["end"].get("ch_map"))
+                                     acc=r.get("acc"), outcome=oc, maps=maps_of(r), end_map=r["end"].get("ch_map"),
+                                     stopped_at=r.get("stopped_at"))
     return out

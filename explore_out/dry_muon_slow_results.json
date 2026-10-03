@@ -1,0 +1,834 @@
+{
+ "meta": {
+  "arms": {
+   "MUON_HINGE": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "hinge": true,
+    "iters": 3600,
+    "key": "MUON_HINGE",
+    "label": "S25's MUON_HINGE, new seeds",
+    "lr": 0.001,
+    "mult": 8,
+    "muon_lr": 0.005,
+    "n_ch": 2,
+    "prio": 21,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch",
+    "seeds": [
+     180
+    ],
+    "slow": true
+   },
+   "MUON_HINGE_S25": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "hinge": true,
+    "iters": 3600,
+    "key": "MUON_HINGE_S25",
+    "label": "S25's MUON_HINGE runs re-run to their recorded stop, for the logs only",
+    "lr": 0.001,
+    "mult": 8,
+    "muon_lr": 0.005,
+    "n_ch": 2,
+    "prio": 21,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + the hinge; to S25's recorded stop step",
+    "seeds": [
+     160
+    ],
+    "slow": true
+   },
+   "MUON_SLOW": {
+    "g2r": false,
+    "gate": "recurrent",
+    "h_gate": null,
+    "hinge": false,
+    "iters": 3600,
+    "key": "MUON_SLOW",
+    "label": "S25's MUON_HINGE without the hinge",
+    "lr": 0.001,
+    "mult": 8,
+    "muon_lr": 0.005,
+    "n_ch": 2,
+    "prio": 21,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after",
+    "seeds": [
+     160
+    ],
+    "slow": true
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "3305b5f",
+   "python": "3.11.15",
+   "started": "2026-10-03 02:49:25",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {
+  "MUON_HINGE_S25|160": {
+   "acc": 0.99853515625,
+   "collapsed": false,
+   "ctx_cos": 0.650566816329956,
+   "curve": [
+    [
+     1200,
+     0.7890625,
+     1.1213159561157227
+    ],
+    [
+     2400,
+     0.99951171875,
+     0.024212270975112915
+    ],
+    [
+     3600,
+     0.99853515625,
+     0.006285627838224173
+    ]
+   ],
+   "discovered": true,
+   "dry": true,
+   "early_evals": {
+    "300": {
+     "eta_key_by_half": 0.00010331467981176803,
+     "eta_key_by_index": 0.0050394519358949764,
+     "eta_key_by_key": 0.006262900379658455,
+     "eta_key_by_stream": 0.6139472459498834,
+     "eta_val_by_half": 2.731594813845806e-06,
+     "eta_val_by_index": 0.005180838399227744,
+     "eta_val_by_key": 0.029206706535605496,
+     "eta_val_by_stream": 0.5725420425483873,
+     "margin": 0.008201195858418941
+    },
+    "600": {
+     "eta_key_by_half": 2.7978995559503528e-05,
+     "eta_key_by_index": 0.0060543473855149445,
+     "eta_key_by_key": 0.004400062189920215,
+     "eta_key_by_stream": 0.9577743763129996,
+     "eta_val_by_half": 3.141103537962159e-07,
+     "eta_val_by_index": 0.006638706274040061,
+     "eta_val_by_key": 0.002635812033366288,
+     "eta_val_by_stream": 0.9860838295466872,
+     "margin": 0.5397409200668335
+    },
+    "900": {
+     "eta_key_by_half": 3.215232029118702e-07,
+     "eta_key_by_index": 0.006425204933654283,
+     "eta_key_by_key": 5.96056814358462e-06,
+     "eta_key_by_stream": 0.9996732554984936,
+     "eta_val_by_half": 9.578493804003182e-09,
+     "eta_val_by_index": 0.006384241579318008,
+     "eta_val_by_key": 1.7042295391641379e-06,
+     "eta_val_by_stream": 0.999995048281139,
+     "margin": 0.9753009080886841
+    }
+   },
+   "end": {
+    "ctx_cos": 0.650566816329956,
+    "eff_ch": 1.9998946255733856,
+    "eta_key_by_half": 8.805072103715618e-15,
+    "eta_key_by_index": 0.006362906597913851,
+    "eta_key_by_key": 3.172246406883076e-14,
+    "eta_key_by_stream": 0.9999999999988654,
+    "eta_val_by_half": 3.025580018492107e-18,
+    "eta_val_by_index": 0.006362918564056888,
+    "eta_val_by_key": 7.399212930455514e-15,
+    "eta_val_by_stream": 0.9999999999999154,
+    "fired_at": [
+     194,
+     195
+    ],
+    "hinge_counts": [
+     2,
+     3600
+    ],
+    "k": 2,
+    "key_cos": 4.938787583341764e-07,
+    "key_part": 0.017353728413581848,
+    "key_sep": 0.010954432189464569,
+    "margin": 0.9999988079071045,
+    "pos_pen_last_train": [
+     0.09082033485174179,
+     2.3092664323191674e-14
+    ],
+    "sep": 0.494571328163147,
+    "spread": 0.9732177257537842,
+    "step": "end",
+    "val_cos": 2.33667364568646e-07
+   },
+   "gate_upd": {
+    "max": 0.03279927372932434,
+    "median": 0.028316939249634743,
+    "n": 2400
+   },
+   "grad": {
+    "1": [
+     4.5962458286858484e-06,
+     3.68384236440337,
+     0.0
+    ],
+    "10": [
+     9.009024813330718e-06,
+     2.978220120138811,
+     0.0
+    ],
+    "100": [
+     3.331130713278857e-05,
+     2.4362128356009207,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 4.938787583341764e-07,
+   "lr": 0.001,
+   "muon_lr": 0.005,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "W_in",
+      "W_h",
+      "W_g"
+     ],
+     "tag": "gate"
+    },
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 28096,
+   "s25_curve_equal": true,
+   "s25_stopped_at": 4800,
+   "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + the hinge; to S25's recorded stop step",
+   "secs": 73.08991742134094,
+   "secs_wall": 73.29545044898987,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.9999438524246216,
+     "eff_ch": 1.999995712279481,
+     "hinge_counts": [
+      0,
+      0
+     ],
+     "k": 2,
+     "key_cos": 0.9999964833259583,
+     "key_part": 0.003492981195449829,
+     "key_sep": 0.0021715561548868814,
+     "pos_pen_last_train": null,
+     "sep": 0.002162262797355652,
+     "spread": 0.004211561754345894,
+     "step": 0,
+     "val_cos": 0.9999996423721313
+    },
+    {
+     "ctx_cos": 0.9802467823028564,
+     "eff_ch": 1.9999887981674611,
+     "eta_key_by_half": 3.944210992315269e-10,
+     "eta_key_by_index": 0.0063745868727111184,
+     "eta_key_by_key": 2.8317899104409142e-08,
+     "eta_key_by_stream": 0.9999984699490326,
+     "eta_val_by_half": 9.552185804287037e-10,
+     "eta_val_by_index": 0.006367709992357299,
+     "eta_val_by_key": 1.219532179597452e-07,
+     "eta_val_by_stream": 0.9999991296600247,
+     "hinge_counts": [
+      2,
+      1200
+     ],
+     "k": 2,
+     "key_cos": 0.0012227242114022374,
+     "key_part": 0.017403393983840942,
+     "key_sep": 0.011044551928838095,
+     "margin": 0.9974790811538696,
+     "pos_pen_last_train": [
+      0.02345799282193184,
+      6.73850641952356e-10
+     ],
+     "sep": 0.6187256574630737,
+     "spread": 0.8842598795890808,
+     "step": 1200,
+     "val_cos": 0.00044510644511319697
+    },
+    {
+     "ctx_cos": 0.9141076803207397,
+     "eff_ch": 1.9980313974126167,
+     "eta_key_by_half": 2.8925099098437402e-08,
+     "eta_key_by_index": 0.006374806979539741,
+     "eta_key_by_key": 4.889501388486486e-08,
+     "eta_key_by_stream": 0.9999959819788123,
+     "eta_val_by_half": 1.2288205963048213e-05,
+     "eta_val_by_index": 0.005840482911862574,
+     "eta_val_by_key": 1.2603756725675636e-05,
+     "eta_val_by_stream": 0.9975784806702844,
+     "hinge_counts": [
+      2,
+      2400
+     ],
+     "k": 2,
+     "key_cos": 0.000516854168381542,
+     "key_part": 0.017541036009788513,
+     "key_sep": 0.011074682076772055,
+     "margin": 0.9922608137130737,
+     "pos_pen_last_train": [
+      0.0693572387099266,
+      1.8877779339732115e-08
+     ],
+     "sep": 0.5780977010726929,
+     "spread": 0.9050846695899963,
+     "step": 2400,
+     "val_cos": 0.004757139831781387
+    },
+    {
+     "ctx_cos": 0.650566816329956,
+     "eff_ch": 1.9998946255733856,
+     "eta_key_by_half": 8.805072103715618e-15,
+     "eta_key_by_index": 0.006362906597913851,
+     "eta_key_by_key": 3.172246406883076e-14,
+     "eta_key_by_stream": 0.9999999999988654,
+     "eta_val_by_half": 3.025580018492107e-18,
+     "eta_val_by_index": 0.006362918564056888,
+     "eta_val_by_key": 7.399212930455514e-15,
+     "eta_val_by_stream": 0.9999999999999154,
+     "hinge_counts": [
+      2,
+      3600
+     ],
+     "k": 2,
+     "key_cos": 4.938787583341764e-07,
+     "key_part": 0.017353728413581848,
+     "key_sep": 0.010954432189464569,
+     "margin": 0.9999988079071045,
+     "pos_pen_last_train": [
+      0.09082033485174179,
+      2.3092664323191674e-14
+     ],
+     "sep": 0.494571328163147,
+     "spread": 0.9732177257537842,
+     "step": 3600,
+     "val_cos": 2.33667364568646e-07
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": 2400,
+   "val_cos": 2.33667364568646e-07
+  },
+  "MUON_HINGE|180": {
+   "acc": 0.9921875,
+   "collapsed": false,
+   "ctx_cos": 0.9478722810745239,
+   "curve": [
+    [
+     1200,
+     0.751953125,
+     1.175673007965088
+    ],
+    [
+     2400,
+     1.0,
+     0.020517319440841675
+    ],
+    [
+     3600,
+     0.9921875,
+     0.04621963948011398
+    ]
+   ],
+   "discovered": true,
+   "dry": true,
+   "early_evals": {
+    "300": {
+     "eta_key_by_half": 0.00033079368591302,
+     "eta_key_by_index": 0.00628299699318894,
+     "eta_key_by_key": 0.13955558719854066,
+     "eta_key_by_stream": 0.406972604685242,
+     "eta_val_by_half": 0.0004199737565438273,
+     "eta_val_by_index": 0.005061388368754041,
+     "eta_val_by_key": 0.15114305239692882,
+     "eta_val_by_stream": 0.47012852189907295,
+     "margin": 0.014977145940065384
+    },
+    "600": {
+     "eta_key_by_half": 3.055004331272645e-05,
+     "eta_key_by_index": 0.004107373591951049,
+     "eta_key_by_key": 0.008839300598567683,
+     "eta_key_by_stream": 0.9733279990676506,
+     "eta_val_by_half": 1.945714890314744e-05,
+     "eta_val_by_index": 0.003946946862095102,
+     "eta_val_by_key": 0.0013866491636835914,
+     "eta_val_by_stream": 0.9968263133896085,
+     "margin": 0.6829043626785278
+    },
+    "900": {
+     "eta_key_by_half": 1.325271468650456e-07,
+     "eta_key_by_index": 0.003574580314240327,
+     "eta_key_by_key": 2.3264386189791696e-06,
+     "eta_key_by_stream": 0.9999890544452767,
+     "eta_val_by_half": 2.8184021314698064e-09,
+     "eta_val_by_index": 0.003543898985126743,
+     "eta_val_by_key": 1.378960864163188e-05,
+     "eta_val_by_stream": 0.999945236524091,
+     "margin": 0.9859580397605896
+    }
+   },
+   "end": {
+    "ctx_cos": 0.9478722810745239,
+    "eff_ch": 1.9998782948278646,
+    "eta_key_by_half": 2.7011008987269735e-12,
+    "eta_key_by_index": 0.003571862135275119,
+    "eta_key_by_key": 1.9127385932016107e-09,
+    "eta_key_by_stream": 0.999999847440805,
+    "eta_val_by_half": 1.483099175743803e-09,
+    "eta_val_by_index": 0.003220929033499557,
+    "eta_val_by_key": 0.00021150853497154017,
+    "eta_val_by_stream": 0.9950525743837466,
+    "fired_at": [
+     162,
+     1459
+    ],
+    "hinge_counts": [
+     2,
+     3600
+    ],
+    "k": 2,
+    "key_cos": 0.00012877912377007306,
+    "key_part": 0.007802784442901611,
+    "key_sep": 0.004895818730195363,
+    "margin": 0.9808260798454285,
+    "pos_pen_last_train": [
+     0.05079791694879532,
+     6.09846478871745e-11
+    ],
+    "sep": 0.7045956254005432,
+    "spread": 0.9636487364768982,
+    "step": "end",
+    "val_cos": 0.01948612742125988
+   },
+   "gate_upd": {
+    "max": 0.030777985230088234,
+    "median": 0.025606741197407246,
+    "n": 2400
+   },
+   "grad": {
+    "1": [
+     5.4622278806413245e-06,
+     2.725309636084232,
+     0.0
+    ],
+    "10": [
+     9.13300427442762e-06,
+     2.092802402653686,
+     0.0
+    ],
+    "100": [
+     7.667945347289502e-05,
+     3.4753512040370356,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.00012877912377007306,
+   "lr": 0.001,
+   "muon_lr": 0.005,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "W_in",
+      "W_h",
+      "W_g"
+     ],
+     "tag": "gate"
+    },
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 28096,
+   "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch",
+   "secs": 72.38670301437378,
+   "secs_wall": 72.55963897705078,
+   "seed": 180,
+   "stats": [
+    {
+     "ctx_cos": 0.9999963045120239,
+     "eff_ch": 1.9999988117167662,
+     "hinge_counts": [
+      0,
+      0
+     ],
+     "k": 2,
+     "key_cos": 0.9999854564666748,
+     "key_part": 0.0043735504150390625,
+     "key_sep": 0.002791325251261393,
+     "pos_pen_last_train": null,
+     "sep": 0.00024609267711639404,
+     "spread": 0.0033047932665795088,
+     "step": 0,
+     "val_cos": 0.999998927116394
+    },
+    {
+     "ctx_cos": 0.8871533870697021,
+     "eff_ch": 1.9998512361488945,
+     "eta_key_by_half": 4.324821667999142e-07,
+     "eta_key_by_index": 0.0035707308452576506,
+     "eta_key_by_key": 3.3978335620678997e-06,
+     "eta_key_by_stream": 0.9999537346106546,
+     "eta_val_by_half": 3.19441880746175e-11,
+     "eta_val_by_index": 0.003557403533055822,
+     "eta_val_by_key": 2.189164145406076e-06,
+     "eta_val_by_stream": 0.999992231256354,
+     "hinge_counts": [
+      1,
+      1200
+     ],
+     "k": 2,
+     "key_cos": 0.006301830522716045,
+     "key_part": 0.00832715630531311,
+     "key_sep": 0.005021718641122182,
+     "margin": 0.9933732151985168,
+     "pos_pen_last_train": [
+      0.020479261875152588,
+      4.819535206479486e-07
+     ],
+     "sep": 0.5663692951202393,
+     "spread": 0.9097048044204712,
+     "step": 1200,
+     "val_cos": 0.0016198470257222652
+    },
+    {
+     "ctx_cos": 0.7371334433555603,
+     "eff_ch": 1.9991165005461784,
+     "eta_key_by_half": 1.369162509234758e-06,
+     "eta_key_by_index": 0.004144185314324019,
+     "eta_key_by_key": 9.51143181254726e-06,
+     "eta_key_by_stream": 0.9994769465779001,
+     "eta_val_by_half": 2.988360597604883e-08,
+     "eta_val_by_index": 0.003672582215238886,
+     "eta_val_by_key": 5.761407739510017e-06,
+     "eta_val_by_stream": 0.9999706559911146,
+     "hinge_counts": [
+      2,
+      2400
+     ],
+     "k": 2,
+     "key_cos": 0.013165355660021305,
+     "key_part": 0.014731884002685547,
+     "key_sep": 0.0035521239042282104,
+     "margin": 0.994533896446228,
+     "pos_pen_last_train": [
+      0.019124476239085197,
+      1.740520565363113e-05
+     ],
+     "sep": 0.5132798552513123,
+     "spread": 0.9127354025840759,
+     "step": 2400,
+     "val_cos": 0.0027405465953052044
+    },
+    {
+     "ctx_cos": 0.9478722810745239,
+     "eff_ch": 1.9998782948278646,
+     "eta_key_by_half": 2.7011008987269735e-12,
+     "eta_key_by_index": 0.003571862135275119,
+     "eta_key_by_key": 1.9127385932016107e-09,
+     "eta_key_by_stream": 0.999999847440805,
+     "eta_val_by_half": 1.483099175743803e-09,
+     "eta_val_by_index": 0.003220929033499557,
+     "eta_val_by_key": 0.00021150853497154017,
+     "eta_val_by_stream": 0.9950525743837466,
+     "hinge_counts": [
+      2,
+      3600
+     ],
+     "k": 2,
+     "key_cos": 0.00012877912377007306,
+     "key_part": 0.007802784442901611,
+     "key_sep": 0.004895818730195363,
+     "margin": 0.9808260798454285,
+     "pos_pen_last_train": [
+      0.05079791694879532,
+      6.09846478871745e-11
+     ],
+     "sep": 0.7045956254005432,
+     "spread": 0.9636487364768982,
+     "step": 3600,
+     "val_cos": 0.01948612742125988
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": 2400,
+   "val_cos": 0.01948612742125988
+  },
+  "MUON_SLOW|160": {
+   "acc": 0.95947265625,
+   "collapsed": false,
+   "ctx_cos": 0.6217539310455322,
+   "curve": [
+    [
+     1200,
+     0.8056640625,
+     1.0763039588928223
+    ],
+    [
+     2400,
+     0.9892578125,
+     0.06653422117233276
+    ],
+    [
+     3600,
+     0.95947265625,
+     0.33849066495895386
+    ]
+   ],
+   "discovered": true,
+   "dry": true,
+   "early_evals": {
+    "300": {
+     "eta_key_by_half": 9.463695244386027e-06,
+     "eta_key_by_index": 0.002536065451041383,
+     "eta_key_by_key": 0.035871825773938444,
+     "eta_key_by_stream": 0.6934154407407693,
+     "eta_val_by_half": 0.0007651235286227696,
+     "eta_val_by_index": 0.01076304868493645,
+     "eta_val_by_key": 0.028851586146892528,
+     "eta_val_by_stream": 0.536510812433663,
+     "margin": 0.018868694081902504
+    },
+    "600": {
+     "eta_key_by_half": 1.122136567416388e-05,
+     "eta_key_by_index": 0.005594797192100209,
+     "eta_key_by_key": 0.0017984155874978293,
+     "eta_key_by_stream": 0.986242458822065,
+     "eta_val_by_half": 2.016896538190397e-08,
+     "eta_val_by_index": 0.006386217355070134,
+     "eta_val_by_key": 0.0006201471185027493,
+     "eta_val_by_stream": 0.9966976258711854,
+     "margin": 0.7275463342666626
+    },
+    "900": {
+     "eta_key_by_half": 5.09540749318157e-07,
+     "eta_key_by_index": 0.006316873806441267,
+     "eta_key_by_key": 9.79002413227012e-06,
+     "eta_key_by_stream": 0.9999087924141875,
+     "eta_val_by_half": 4.399051017681239e-09,
+     "eta_val_by_index": 0.006380695699741223,
+     "eta_val_by_key": 3.596611448079132e-06,
+     "eta_val_by_stream": 0.9999898767388159,
+     "margin": 0.9849988222122192
+    }
+   },
+   "end": {
+    "ctx_cos": 0.6217539310455322,
+    "eff_ch": 1.9981239340018802,
+    "eta_key_by_half": 1.4763058914434322e-09,
+    "eta_key_by_index": 0.006346205087753666,
+    "eta_key_by_key": 4.095307638548114e-09,
+    "eta_key_by_stream": 0.9999992750018065,
+    "eta_val_by_half": 0.0003002984146979426,
+    "eta_val_by_index": 0.008283686644015284,
+    "eta_val_by_key": 0.0033464367359742567,
+    "eta_val_by_stream": 0.9276038273785929,
+    "k": 2,
+    "key_cos": 0.0001543490361655131,
+    "key_part": 0.01740407943725586,
+    "key_sep": 0.010968387126922607,
+    "margin": 0.9225537180900574,
+    "sep": 0.46159541606903076,
+    "spread": 0.9498924612998962,
+    "step": "end",
+    "val_cos": 0.08598700910806656
+   },
+   "gate_upd": {
+    "max": 0.03131139278411865,
+    "median": 0.02646814938634634,
+    "n": 2400
+   },
+   "grad": {
+    "1": [
+     4.5962458286858484e-06,
+     3.68384236440337,
+     0.0
+    ],
+    "10": [
+     9.009024813330718e-06,
+     2.978220120138811,
+     0.0
+    ],
+    "100": [
+     3.331130713278857e-05,
+     2.4362128356009207,
+     0.0
+    ]
+   },
+   "iters": 3600,
+   "k": 2,
+   "key_cos": 0.0001543490361655131,
+   "lr": 0.001,
+   "muon_lr": 0.005,
+   "n_opts_built": 1,
+   "ok": true,
+   "opt_groups": [
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "W_in",
+      "W_h",
+      "W_g"
+     ],
+     "tag": "gate"
+    },
+    {
+     "kind": "muon",
+     "lr_end": 0.005,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head"
+     ],
+     "tag": "rest"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "embed.weight"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "params": 28096,
+   "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after",
+   "secs": 71.11352133750916,
+   "secs_wall": 71.31595706939697,
+   "seed": 160,
+   "stats": [
+    {
+     "ctx_cos": 0.9999438524246216,
+     "eff_ch": 1.999995712279481,
+     "k": 2,
+     "key_cos": 0.9999964833259583,
+     "key_part": 0.003492981195449829,
+     "key_sep": 0.0021715561548868814,
+     "sep": 0.002162262797355652,
+     "spread": 0.004211561754345894,
+     "step": 0,
+     "val_cos": 0.9999996423721313
+    },
+    {
+     "ctx_cos": 0.9878354072570801,
+     "eff_ch": 1.9995362142462876,
+     "eta_key_by_half": 4.8737300432605925e-12,
+     "eta_key_by_index": 0.0063810804049625885,
+     "eta_key_by_key": 1.9141779067556503e-07,
+     "eta_key_by_stream": 0.9999887464743649,
+     "eta_val_by_half": 2.788433212898637e-10,
+     "eta_val_by_index": 0.006373462502570497,
+     "eta_val_by_key": 6.279842034571102e-07,
+     "eta_val_by_stream": 0.9999952784624088,
+     "k": 2,
+     "key_cos": 0.002232546219602227,
+     "key_part": 0.01749187707901001,
+     "key_sep": 0.011206949750582377,
+     "margin": 0.994811475276947,
+     "sep": 0.6257505416870117,
+     "spread": 0.8196763396263123,
+     "step": 1200,
+     "val_cos": 0.0008956831879913807
+    },
+    {
+     "ctx_cos": 0.9999474287033081,
+     "eff_ch": 1.9997093926765834,
+     "eta_key_by_half": 5.891378265124492e-08,
+     "eta_key_by_index": 0.006361463742737167,
+     "eta_key_by_key": 3.0023673552645417e-07,
+     "eta_key_by_stream": 0.9999866932288647,
+     "eta_val_by_half": 1.4545271217260532e-08,
+     "eta_val_by_index": 0.006376647304947793,
+     "eta_val_by_key": 5.4477065991836296e-08,
+     "eta_val_by_stream": 0.9999979308447375,
+     "k": 2,
+     "key_cos": 0.0018302237149327993,
+     "key_part": 0.017125800251960754,
+     "key_sep": 0.011143709222475687,
+     "margin": 0.9975767135620117,
+     "sep": 0.6513583660125732,
+     "spread": 0.8773850202560425,
+     "step": 2400,
+     "val_cos": 0.000480181653983891
+    },
+    {
+     "ctx_cos": 0.6217539310455322,
+     "eff_ch": 1.9981239340018802,
+     "eta_key_by_half": 1.4763058914434322e-09,
+     "eta_key_by_index": 0.006346205087753666,
+     "eta_key_by_key": 4.095307638548114e-09,
+     "eta_key_by_stream": 0.9999992750018065,
+     "eta_val_by_half": 0.0003002984146979426,
+     "eta_val_by_index": 0.008283686644015284,
+     "eta_val_by_key": 0.0033464367359742567,
+     "eta_val_by_stream": 0.9276038273785929,
+     "k": 2,
+     "key_cos": 0.0001543490361655131,
+     "key_part": 0.01740407943725586,
+     "key_sep": 0.010968387126922607,
+     "margin": 0.9225537180900574,
+     "sep": 0.46159541606903076,
+     "spread": 0.9498924612998962,
+     "step": 3600,
+     "val_cos": 0.08598700910806656
+    }
+   ],
+   "stopped_at": 3600,
+   "transition": 2400,
+   "val_cos": 0.08598700910806656
+  }
+ }
+}
