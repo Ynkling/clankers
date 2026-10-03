@@ -202,3 +202,7 @@ EXPLORATORY, NOT A RESULT — batch 10: muon_slow (S32), muon_scale (S33)
           acc 0.998  trans  6000  VALcos 0.000  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
   [ 53/120]   29.2 min  muon_slow      MUON_SLOW  seed 187  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after)
           acc 0.997  trans  1200  VALcos 0.007  margin 0.99  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [ 54/120]   29.4 min  muon_slow      MUON_SLOW  seed 186  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after)
+          acc 0.969  trans  2400  VALcos 0.039  margin 0.96  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
+  [ 55/120]   29.6 min  muon_slow      MUON_HINGE seed 186  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on the embedding 0.0001 for 1-2400, 0.001 after; + 1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)] on each training batch)
+          acc 0.969  trans  2400  VALcos 0.039  margin 0.96  DISCOVERED  ROUTED* 1200/2400/end Y/Y/Y
