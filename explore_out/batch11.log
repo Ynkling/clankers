@@ -58,3 +58,10 @@ EXPLORATORY, NOT A RESULT — batch 11: hinge_window (S34), muon_k16 (S35)
                    schedule: Muon lr 0.005 (validity): gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge (1.0 x [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)], pooled over channels)
   pairing seeds 240-259 with X's recorded HINGE4k16 (slow_start at b8c6007) and A4k16 (stream_recipe); same initial parameters and batches
 ----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; pool-load timing: the median interval between optimizer steps, one process per arm at once (S34 x2, S35 x2), 1 thread each, this machine):
+    hinge_window   MUON_H2400   40 runs x   8.4 min  (24000 steps x 20.3 ms + 20 evals x 0.9 s)
+    hinge_window   ADAM_H2400   40 runs x   7.5 min  (24000 steps x 18.0 ms + 20 evals x 0.8 s)
+    muon_k16       MUON_HINGE16 20 runs x  20.4 min  (28800 steps x 40.7 ms + 24 evals x 2.1 s)
+    total 17.37 h of runs; batch makespan on 4 workers 4.34 h (worst case)
+  RUNTIME RULE: projected batch makespan 4.34 h <= 9 h: no cut (stored)
+  100 runs queued on 4 workers (1 torch thread each)
