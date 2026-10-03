@@ -44,3 +44,7 @@ EXPLORATORY, NOT A RESULT — batch 12: split_plateau (S36)
     total 30.34 h of runs; makespan on 4 workers 7.79 h (worst case)
   RUNTIME RULE: projected makespan 7.79 h <= 9 h: no cut (stored)
   30 runs queued on 4 workers (1 torch thread each), submitted in waves: SPLIT_D8_A|260 SPLIT_D8_M|260 SPLIT_D8_A|261 SPLIT_D8_M|261 SPLIT4k4_M|240 SPLIT4k4_M|241 SPLIT4k4_M|242 SPLIT4k4_M|243 SPLIT_D8_A|262 SPLIT_D8_M|262 SPLIT_D8_A|263 SPLIT_D8_M|263 SPLIT4k4_M|244 SPLIT4k4_M|245 SPLIT4k4_M|246 SPLIT4k4_M|247 SPLIT_D8_A|264 SPLIT_D8_M|264 SPLIT_D8_A|265 SPLIT_D8_M|265 SPLIT4k4_M|248 SPLIT4k4_M|249 SPLIT_D8_A|266 SPLIT_D8_M|266 SPLIT_D8_A|267 SPLIT_D8_M|267 SPLIT_D8_A|268 SPLIT_D8_M|268 SPLIT_D8_A|269 SPLIT_D8_M|269
+  [  1/30]   78.5 min  split_plateau  SPLIT_D8_A seed 260  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
+          acc 0.259  trans  None  VALcos 1.000  margin 0.19  OTHER  splits 11
+  [  2/30]   78.6 min  split_plateau  SPLIT_D8_A seed 261  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
+          acc 0.113  trans  None  VALcos 1.000  margin 0.00  OTHER  splits 12
