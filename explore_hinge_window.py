@@ -438,9 +438,11 @@ def report(store):
               f"update 300/600/900/1200/2400/after: {bins(fa)}; would-fire after {WINDOW} (weight 0), per seed: {wa}")
         fd = [d_ for r in win.values() for d_ in (r["end"].get("firing_diag") or [])]
         ratios = [d_["ratio"] for d_ in fd]
-        print(f"    {lw} at its {len(fd)} firings: hinge-gradient norm on the gate median {med([d_['hinge'] for d_ in fd])}, "
-              f"task-gradient norm median {med([d_['task'] for d_ in fd])}; ratio median {med(ratios)}, range "
-              f"{(min(ratios), max(ratios)) if ratios else '--'}")
+        f3 = lambda x: "--" if x is None else f"{x:.4g}"
+        print(f"    {lw} at its {len(fd)} firings: hinge-gradient norm on the gate median {f3(med([d_['hinge'] for d_ in fd]))}, "
+              f"task-gradient norm median {f3(med([d_['task'] for d_ in fd]))}; ratio median {f3(med(ratios))}, range "
+              f"{(f3(min(ratios)) + ' - ' + f3(max(ratios))) if ratios else '--'}; ratio >= {KICK_RATIO:g} at "
+              f"{sum(1 for x in ratios if x >= KICK_RATIO)}/{len(ratios)} firings")
         rd = reading(d)
         print(f"  RULE S34 {opt} ({lf} only {d['b']}, {lw} only {d['c']}, p = {d['p']:.3g}; 'suffices' if b - c <= "
               f"{SUFFICES_D}, 'matters' if b - c >= {MATTERS_D} and p < {MATTERS_P}): {rd}")
@@ -456,7 +458,7 @@ def report(store):
           f"until below {COS_THR} = {bmed} ({cens} censored at {COS_SPAN}); per firing {below}; median cosine at offsets "
           + ", ".join(f"{k}: {'--' if v is None else f'{v:.3f}'}" for k, v in cos_med.items()))
     lab = "directional kick" if kick else "not a directional kick"
-    print(f"  DESCRIPTION S34 (median ratio {rmed} vs {KICK_RATIO:g}; median updates until the cosine is below {COS_THR}: "
+    print(f"  DESCRIPTION S34 (median ratio {'--' if rmed is None else f'{rmed:.4g}'} vs {KICK_RATIO:g}; median updates until the cosine is below {COS_THR}: "
           f"{bmed} vs {KICK_SPAN}): {lab}")
     out.update(kick=lab, cos_below_median=bmed, censored=cens, n_tracks=len(tr))
     return out

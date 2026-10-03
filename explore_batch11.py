@@ -68,6 +68,10 @@ DRY_ITERS = 3600
 CHECKS_RECORD = os.path.join(ec.OUT_DIR, "batch11_checks.json")
 
 
+def fmt_ratio(x):
+    return "--" if x is None else f"{x:.4g}"
+
+
 def git(*a):
     return subprocess.run(["git", "-C", HERE, *a], capture_output=True, text=True, check=True).stdout
 
@@ -275,7 +279,7 @@ def main():
         dd = d34[opt]
         print(f"  S34 hinge_window ({opt}): {v34[opt]} (window {dd['old']}/{dd['n']} vs full hinge {dd['new']}/{dd['n']} "
               f"DISCOVERED, {dd['b']} vs {dd['c']}, p = {dd['p']:.3g}; median hinge/task gradient ratio at firings "
-              f"{dd['ratio_median']})")
+              f"{fmt_ratio(dd['ratio_median'])})")
     print(f"  S34 description: {k34} (median updates until the Muon momentum's cosine is below {s34.COS_THR}: "
           f"{d34['cos_below_median']}, {d34['censored']} of {d34['n_tracks']} censored)")
     print(f"  S35 muon_k16 (Muon lr {d35['mlr']}{', cut to 240-249' if d35['cut'] else ''}): {v35} (MUON_HINGE16 "

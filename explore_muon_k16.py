@@ -271,7 +271,7 @@ def report(store):
     print(f"  per seed (ch = distinct channels holding the 4 streams at 4800/9600/end; X HINGE4k16's firings per "
           f"{EVAL_EVERY}-update window, its timing within windows not logged):")
     print(f"    {'seed':>4} | {'MUON_HINGE16':<26} {'trans':>5} {'acc':>5} {'ch':>7} {'per ch':>8} {'firings at updates':<30} | "
-          f"{'X HINGE4k16':<22} {'trans':>5} {'ch':>7} {'fired':>5} | {'X A4k16':<22} {'trans':>5}")
+          f"{'X HINGE4k16':<26} {'trans':>5} {'ch':>7} {'fired':>5} | {'X A4k16':<26} {'trans':>5}")
     for s in SEEDS:
         r = got.get(s)
         if r is None:
@@ -283,11 +283,11 @@ def report(store):
             c1 = (f"{r['outcome']:<26} {str(r['transition']):>5} {r['acc']:5.3f} {dd:>7} "
                   f"{s33.per_channel(s33.map_at(r, 'end')):>8} {fs:<30}")
         x = xh.get(s)
-        c2_ = (f"{x['outcome']:<22} {str(x['transition']):>5} "
+        c2_ = (f"{x['outcome']:<26} {str(x['transition']):>5} "
                f"{'/'.join(str(s33.distinct(s33.map_at(_xrec(x), t))) if s33.map_at(_xrec(x), t) else '--' for t in STEPS_DIAG):>7} "
-               f"{(x['hs_hinge'] or ['--'])[0]:>5}" if x else f"{'--':<42}")
+               f"{(x['hs_hinge'] or ['--'])[0]:>5}" if x else f"{'--':<46}")
         y = xa.get(s)
-        c3 = f"{y['outcome']:<22} {str(y['transition']):>5}" if y else "--"
+        c3 = f"{y['outcome']:<26} {str(y['transition']):>5}" if y else "--"
         print(f"    {s:>4} | {c1} | {c2_} | {c3}")
     b16 = {s: ec.bound(r) for s, r in got.items()}
     print("  MUON_HINGE16 vs X HINGE4k16 (the rule):")
