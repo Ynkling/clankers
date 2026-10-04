@@ -120,3 +120,5 @@ EXPLORATORY, NOT A RESULT — batch 13: split_target (S37), gate_state (S38)
           acc 1.000  trans 12000  VALcos 0.998  margin 0.00  BOUND unrouted  ROUTED* 1200/2400/end -/-/-
   [ 27/50]   85.1 min  split_target   HINGE4k4_A seed 248  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
           acc 1.000  trans 15600  VALcos 0.966  margin 0.38  BOUND unrouted  ROUTED* 1200/2400/end -/-/-
+  [ 28/50]   93.7 min  gate_state     A_HINGE_M  seed 240  lr 0.001 (S33's A_HINGE recipe)
+          acc 0.726  trans  None  VALcos 1.000  margin 0.70  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
