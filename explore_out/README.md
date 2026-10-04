@@ -36,7 +36,7 @@ for a pre-registered test.
 | `batch13_dry.log`, `dry_<screen>_results.json` (S37 split_target, S38 gate_state) | batch 13's labelled DRY RUN (git 346adbf, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (10.7 min, child processes on main's modules at 9c5939e: the trigger-off equalities through 7200, KEYMASS on the synthetic 2+1+1 gate, the four reruns through 2400 with the recomputed read gate exact, the decoder 1.0 / 0.1275 on the synthetic sets), the projection with pool-load timing, 1 seed per arm, runs capped at 3600 steps (no check reaches 4800, so no split and no S38 measurement at 4800). It exercises the code; its numbers are not for interpretation. |
 | `batch13.log`, `split_target_runtime_results.json` (S37 split_target, S38 gate_state) | batch 13, code of git c2b30dc (the full CHECK pass recorded at b2981bd in `batch13_checks.json`; the banners' git b2981bd+dirty and b981809+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (50/50 runs: 30 S37, 20 S38) in 2 segments: segment 1 ran the full CHECK suite (11.3 min) and the projection (4.14 h on 4 workers: no cut, stored) and saved 33 runs; segment 2 (RESUME) saved the last 17. Repro check bit-identical to X in both segments; segment 2 skipped the rest of the CHECK suite, the screen code being unchanged. Every S38 rerun reproduced its recorded curve through 9600 (20/20). All on a Xeon @ 2.10GHz; every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, read-only). Reports, readings and SUMMARY at the end. |
 | `batch14_dry.log`, `dry_<screen>_results.json` (S39 gate_memory, S40 gate_prev) | batch 14's labelled DRY RUN (git 93c2755, Intel Xeon @ 2.10GHz, torch 2.14.0): the repro check bit-identical, every CHECK passed (4.8 min, child processes on main's modules at 9c5939e: S40's shared parameters bitwise equal at update 0, W_prev (32, 32) std 0.1008 vs W_in's 0.0985; the gate input at key positions decodes the stream at 1.000 with GATE_PREV and 0.125 without; the optimizer groups cover every parameter once with W_prev in the gate group; with W_prev fixed at 0 and excluded, D8_PREV_M = S33's D8_HINGE|260 and D8_PREV_A = X's HINGE_D8|260 bit for bit through 1200; S39's four reruns with every measurement reproduce their records through 1200, the recomputed read gate exact, the decoder 1.0 / 0.1275 on the synthetic sets; the served modules), the projection with pool-load timing, 1 seed per arm, runs capped at 2400 steps (S40 probes at 1200 and 2400 only). It exercises the code; its numbers are not for interpretation. After it, one report-only change: S40's table also prints the decodability of the gate input W_in v_t + W_prev v_(t-1) at key positions (already recorded by the run). |
-| `batch14.log` (S39 gate_memory, S40 gate_prev) | batch 14, code of git 07ccfb7, 1 thread per run. **IN PROGRESS: 39 of 40 runs saved (gate_prev 19, gate_memory 20).** Run in segments, each resumed after the session's background time limit stops it; the first 4 S40 runs, then S39's, then the rest of S40's; pushed after every saved run. No report, reading or label until the SUMMARY at the end of the log. |
+| `batch14.log`, `gate_prev_runtime_results.json` (S39 gate_memory, S40 gate_prev) | batch 14, code of git 07ccfb7 (the screen code is unchanged since; the full CHECK pass recorded at 0ce53bf in `batch14_checks.json`; the banners' git 7105374+dirty, 01753bb+dirty and d3621c3+dirty are the watcher's explore_out commits on top of it), 1 thread per run; complete (40/40 runs: 20 S40, 20 S39) in 3 segments: segment 1 ran the full CHECK suite (4.5 min) and the projection (4.20 h on 4 workers: no cut, stored) and saved 24 runs (4 S40, all 20 S39); segment 2 (RESUME) saved 8 and segment 3 (RESUME) the last 8, all S40 (the 4 S40 runs in flight at each stop were re-run from the start). Repro check bit-identical to X in all three segments; segments 2 and 3 skipped the rest of the CHECK suite, the screen code being unchanged. Every S39 rerun reproduced its recorded curve through 2400 (20/20). All on a Xeon @ 2.10GHz; every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, read-only). Reports, readings, labels and SUMMARY at the end. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -342,3 +342,44 @@ S38: at S=8 the gate state h at the key positions carries almost nothing about t
 merged runs) and 1.00 (k=16, Muon) at 4800. The gate input (the key's embedding) is at chance in every configuration, as it
 should be. At S=8 h at a block's first key decodes slightly above its last key (median 0.19 vs 0.13 and 0.14 at 4800);
 at S=4 they decode alike. Every rerun reproduced its recorded curve through 9600.
+
+## Batch 14 verdicts (rules fixed before any run)
+
+| screen / arm | outcome | paired reference | cand. only / ref only | McNemar p | reading / label / verdict |
+|---|---|---|---|---|---|
+| S40 D8_PREV_M (S33's D8_HINGE + GATE_PREV, Muon; S=8, P=4, k=16, seeds 260-269) | BOUND ROUTED 0/10 (9 MERGED, 3-4 share; 1 non-stream OTHER) | S33 D8_HINGE 0/10 (7 non-stream OTHER, 3 MERGED) | 0 / 0 | 1 | "it does not" (0/10); verdict: not |
+| S40 D8_PREV_A (X's HINGE_D8 + GATE_PREV, Adam; seeds 260-269) | BOUND ROUTED 0/10 (7 MERGED, 2-6 share; 3 non-stream OTHER) | X HINGE_D8 0/10 (6 non-stream OTHER, 4 MERGED) | 0 / 0 | 1 | "it does not" (0/10); verdict: not |
+| S39 D8_HINGE_M (S33's D8_HINGE, Muon, S=8, 260-264) | median stream decodability of h at key positions: 0.91 at update 0, 0.39 at 400, 0.18 at 600, 0.13 at 2400 (chance 0.125) | | | | "formed, then lost" |
+| S39 D8_SLOW_M (S33's D8_SLOW, no hinge) | 0.91 at 0, 0.51 at 400, 0.26 at 600, 0.15 at 1200, 0.14 at 2400 | | | | "formed, then lost" |
+| S39 HINGE_D8_A (X's HINGE_D8, Adam) | 0.91 at 0, 0.79 at 400, 0.50 at 600-800, 0.24 at 1200, 0.14 at 2400 | | | | "formed, then lost" |
+| S39 A_HINGE_M (S33's A_HINGE, Muon, S=4, k=4, 240-244) | 0.95 at 0, lowest 0.54 at 300, 0.83 at 2400 (chance 0.25) | | | | "partial" (reference) |
+
+S39: at S=8 the stream is in the gate state at the key positions from the start: with the initial weights (W_in, W_h at 0.1
+scale) h at a key still carries the stream token one step back (median 0.91 at update 0, every configuration; S=4: 0.95). So
+the "formed" half of the label is met by the initialization, not by training: training does not build this memory, it
+removes it. The loss coincides with the recurrent term outgrowing the input term before the tanh: the median norm of
+W_h h_(t-1) at key positions goes from 0.04 to 0.20 at 400 and 1.91 at 600 under Muon with the hinge (2.28 at 600 without
+it), and from 0.06 at 400 to 0.32 at 1200 and 3.66 at 1600 under Adam, reaching 5-7 by 2400, while W_in v_t stays at 0.06-0.34
+(at S=4, k=4 W_h h_(t-1) reaches 2.27 at 2400 while W_in v_t at the stream-token positions grows to 0.55, and the stream stays
+decodable). By 2400 h at the stream-token position itself no longer decodes its own token (median 0.14-0.16 at S=8), so the
+gate state has stopped reflecting its input, not just the previous one. It is mostly not saturation: the median fraction of h units with |h| > 0.95 at key
+positions at 2400 is 0.05-0.15 (one run higher: D8_SLOW_M 262, 0.57). The read gate stays close to uniform at key positions at S=8 (entropy 2.0-2.7 nats of log 16 = 2.77;
+S=4: 0.06 of 1.39). The hinge only brings the loss forward: D8_HINGE_M and D8_SLOW_M measure identically through 200 in all five
+seeds (through 400 in 260 and 261), then 0.39 vs 0.51 at 400 and 0.18 vs 0.26 at 600, and alike from 1200 (0.15). The exceptions match
+S38: D8_HINGE_M 263 stays at 0.39-0.73 from 300 (0.48 at 2400); D8_SLOW_M 264 drops to chance at 600 and comes back to 0.70 by 2400;
+HINGE_D8_A 261 keeps 0.50-0.55 from 1200, 262 holds 0.81-0.94 to 1200 and is at chance from 1600.
+
+S40: GATE_PREV puts the stream back into the gate state, but not one stream per channel. The gate input
+W_in v_t + W_prev v_(t-1) at key positions decodes the stream at 0.97-1.00 (median) throughout under Muon and at 0.75-0.94
+under Adam (265 loses it: 0.12-0.53), and h at key positions decodes it at a median 0.53 / 0.64 / 0.56 at 2400 / 4800 / 9600
+under Muon (S38's D8_HINGE: 0.13 at 4800) and 0.57 / 0.34 / 0.29 / 0.53 at 1200-9600 under Adam. The failure moved from
+non-stream to merged: the 8 streams end on 3-4 channels in 9/10 Muon runs (maps 3+3+2, 4+2+2, 3+2+2+1, 4+3+1; 267 5+3) and on
+1-5 channels under Adam (266: all eight on one), where S33's D8_HINGE and X's HINGE_D8 ended non-stream OTHER in 7/10 and 6/10. No run bound in either
+arm, so both readings are "it does not". The hinge fired in 0-103 of 28800 training batches per run. From the saved records
+(rec["acc"], not part of the report's readings): the final held-out accuracy is higher than the paired run's in 9/10 Muon
+pairs (median 0.36 vs 0.14) and 6/10 Adam pairs (0.30 vs 0.20).
+
+Taken together (exploratory): at S=8 the gate loses the one-token memory early because its recurrent drive swamps the input,
+and handing it the previous token directly (S40) restores the stream in the gate state and turns non-stream runs into merged
+ones, but does not get eight streams onto eight channels by 28800 under either optimizer. Nothing here is handed back as
+promising.
