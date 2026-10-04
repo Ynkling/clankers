@@ -32,7 +32,7 @@ for a pre-registered test.
 | `batch11.log`, `muon_k16_valid_results.json` (S34 hinge_window, S35 muon_k16) | batch 11, code of git 9f47868 (the full CHECK pass recorded at 55e35c7 in `batch11_checks.json`; the banner's git 55e35c7+dirty is the watcher's explore_out commit on top of it, the screen code unchanged), 1 thread per run; complete (102/102 runs: 2 S35 validity runs, 80 S34 runs, 20 S35 runs) in one segment (91.6 min of runs): the repro check bit-identical to X, the full CHECK suite (6.2 min), S35's validity (Muon lr 0.005 bound both seeds at 1200), the projection (batch worst case 4.34 h on 4 workers: no cut, stored). All on a Xeon @ 2.10GHz. S35 ran every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, read-only). Reports, readings and SUMMARY at the end. |
 | `batch12_dry_check_failed.log` (S36 split_plateau) | batch 12's first labelled DRY RUN (git 9e32a46): stopped at the CHECKs. One CHECK failed, in the check's own code: the synthetic-gate test compared the noise scale (0.1 x std(W_g[c*]), computed in float32 by the operation) with a float64 recomputation at a tolerance of 1e-12 (difference 3e-9); the rows themselves were exact (verified separately: W_g[c0], W_g[c*] and the other 14 rows bit for bit). Every other CHECK passed, among them the three bit-for-bit equalities through 7200 with the threshold at 0. Fixed in f714c03 (the scale recomputed in float32; rows and scale reported separately) before any real run. |
 | `batch12_dry.log`, `dry_split_plateau_results.json` (S36 split_plateau) | batch 12's labelled DRY RUN, second attempt (git f714c03, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (14.0 min, child processes on main's modules at 9c5939e), the projection with pool-load timing (49.7 ms per step for (a), 102.6 / 98.2 ms for SPLIT_D8_M / SPLIT_D8_A), 1 seed per arm, runs capped at 3600 steps (no check reaches 4800, so no split; the operation is exercised by the CHECKs). It exercises the code; its numbers are not for interpretation. After it, before any real run: the driver submits the runs in waves of 4 (b) runs then 4 (a) runs (submission order only), so a 2-hour segment ends on a wave of short runs rather than losing a wave of 43200-step runs in flight. Runs, CHECKs and readings unchanged. |
-| `batch12.log` (S36 split_plateau) | batch 12, code of git faa1926, 1 thread per run. **IN PROGRESS: 28 of 30 runs saved (SPLIT_D8_M 8, SPLIT_D8_A 10, SPLIT4k4_M 10).** Run in segments, each resumed after the session's background time limit stops it; the 43200-step (b) runs first; pushed after every saved run. No report or reading until the SUMMARY at the end of the log. |
+| `batch12.log`, `split_plateau_runtime_results.json` (S36 split_plateau) | batch 12, code of git faa1926 (the full CHECK pass recorded at fcb4a27 in `batch12_checks.json`; the banners' git fcb4a27+dirty, ae40635+dirty, e9e9c4e+dirty, e3d76a1+dirty and 6739017+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (30/30 runs) in 5 segments: segment 1 ran the full CHECK suite (13.6 min) and the projection (7.79 h on 4 workers: no cut, stored) and saved 6 runs; segments 2-5 (RESUME) saved 8, 8, 4 and 4, the runs submitted in waves of 4 (b) then 4 (a) runs (runs in flight at a stop were lost and re-run). Repro check bit-identical to X in every segment; later segments skipped the rest of the CHECK suite, the screen code being unchanged, and reused the stored cut decision. All on a Xeon @ 2.10GHz; every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, read-only). Reports, readings and SUMMARY at the end (the per-check masses are in the log). |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -284,3 +284,24 @@ at 3600 (X's HINGE4k16: 3600-21600, median 7200). All 17 are BOUND ROUTED with o
 failures (245, 252, 259) are merges of two streams held from 4800 to the end. The hinge fired 33 times in 16 runs, all by
 update 1200 (X's HINGE4k16: 380 firings in 18 runs over its windows). The perfect gate bound at Muon lr 0.005 on both seeds at
 1200. Faster binding at an equal rate is a candidate for a pre-registered test on the main branch.
+
+## Batch 12 verdicts (rules fixed before any run; one CHECK's own tolerance fixed after the first dry run)
+
+| arm | outcome | paired reference | cand. only / ref only | McNemar p | reading / verdict |
+|---|---|---|---|---|---|
+| S36 SPLIT4k4_M (S=4, k=4, Muon, seeds 240-249) | BOUND 5/10 | S33 A_HINGE 4/10 | 2 / 1 | 1 | "it does not" (<= 5/10) |
+| S36 SPLIT_D8_M (S=8, k=16, Muon, 260-269, 43200 steps) | BOUND 0/10 (at 28800 0/10) | S33 D8_HINGE 0/10 | 0 / 0 | 1 | "it does not" (>= 3/10 needed) |
+| S36 SPLIT_D8_A (S=8, k=16, Adam, 260-269, 43200 steps) | BOUND 0/10 (at 28800 0/10) | X HINGE_D8 0/10 | 0 / 0 | 1 | "it does not" (>= 3/10 needed) |
+
+S36 (a): the trigger fired at 31 of 62 checks in 7 of 10 runs. Two runs were rescued by their first split: 240 (split at
+4800, 2+1+1 -> 1+1+1+1 by 7200, bound at 7200) and 247 (split at 7200, bound at 8400); one was lost: 245 (A_HINGE bound, not
+routed, at 27600; with the trigger 6 splits and two merged pairs, 2+2, at the end). In the 5 runs that stayed merged the
+trigger fired 5-7 times each; the splits moved streams between the 2+1+1 and 2+2 patterns without separating a merged pair,
+and in 3 of them (241, 243, 249) the held-out accuracy fell from ~0.75 to 0.35-0.51 within 2400 updates of a split (HARM)
+before returning to the plateau.
+
+S36 (b): the trigger fired at 98 and 97 of 160 checks (every run split 7-12 times); no run bound by 43200 under Muon or Adam,
+the best final accuracy was 0.49 in each arm, and no split was followed by a HARM drop (the accuracy was already near chance).
+The streams stayed on 1-3 channels (median at the end: SPLIT_D8_M 3, SPLIT_D8_A 2, as X's HINGE_D8 2); a split's new
+channel rarely held a stream by the next check: copying the busiest row to the idlest does not break the coarse split.
+Verdict: not promising in either configuration.
