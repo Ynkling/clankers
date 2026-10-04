@@ -196,19 +196,23 @@ def report(store):
         print(f"    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:")
         print("      " + "  ".join(f"{s}: " + ", ".join((lambda h: '--' if h is None else f'{h[0]}/{h[1]}')(hinge_at(r, t))
                                                       for t in (2400, 4800, 9600, "end")) for s, r in sorted(rs.items())))
-        print(f"    S38's decodability of the stream from h (with the W_prev term), at key (stream-token) positions; chance 0.125:")
-        print(f"    {'seed':>4} | " + " | ".join(f"{t:>5}: key  (str)" for t in AT))
+        print(f"    S38's decodability of the stream from h (with the W_prev term), at key (stream-token) positions [and from the "
+              f"gate input W_in v_t + W_prev v_(t-1) at key positions, printed]; chance 0.125:")
+        print(f"    {'seed':>4} | " + " | ".join(f"{t:>5}: key  (str)  [inp]" for t in AT))
         for s, r in sorted(rs.items()):
             dd = r.get("decode") or {}
             print(f"    {s:>4} | " + " | ".join(
-                f"{'':>5}  {fmt((dd.get(str(t)) or {}).get('h_key'))} ({fmt((dd.get(str(t)) or {}).get('h_stream'))})" for t in AT))
+                f"{'':>5}  {fmt((dd.get(str(t)) or {}).get('h_key'))} ({fmt((dd.get(str(t)) or {}).get('h_stream'))}) "
+                f"[{fmt((dd.get(str(t)) or {}).get('u_key'))}]" for t in AT))
         meds = {}
         for t in AT:
             vk = [r["decode"][str(t)]["h_key"] for r in rs.values() if str(t) in (r.get("decode") or {})]
             vs = [r["decode"][str(t)]["h_stream"] for r in rs.values() if str(t) in (r.get("decode") or {})]
-            meds[str(t)] = (statistics.median(vk) if vk else None, statistics.median(vs) if vs else None, len(vk))
-        print(f"    medians: " + "; ".join(f"{t}: key {fmt(k).strip()}, stream-token {fmt(v).strip()} ({n} runs)"
-                                         for t, (k, v, n) in meds.items()))
+            vu = [r["decode"][str(t)]["u_key"] for r in rs.values() if str(t) in (r.get("decode") or {})]
+            meds[str(t)] = (statistics.median(vk) if vk else None, statistics.median(vs) if vs else None, len(vk),
+                            statistics.median(vu) if vu else None)
+        print(f"    medians: " + "; ".join(f"{t}: key {fmt(k).strip()}, stream-token {fmt(v).strip()}, [gate input at key "
+                                         f"{fmt(u).strip()}] ({n} runs)" for t, (k, v, n, u) in meds.items()))
         nb = sum(br.values())
         n = len(rs)
         rd = ("the look-back breaks the eight-stream stall" if nb >= BREAK_N else "it does not" if nb <= NOT_N else "neither") + \

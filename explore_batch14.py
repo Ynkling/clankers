@@ -307,7 +307,7 @@ def main():
         dd = d40[arm]
         md = dd["decode_medians"]
         print(f"  S40 gate_prev {arm}: {v40[arm]}; failure classes {dd['classes']}; median decodability of h at key positions "
-              + ", ".join(f"{t} {('--' if k is None else f'{k:.2f}')}" for t, (k, _, _) in md.items()))
+              + ", ".join(f"{t} {('--' if k is None else f'{k:.2f}')}" for t, (k, _, _, _) in md.items()))
     for conf in s39.ARMS:
         dk = d39[conf]["dec_key"]
         print(f"  S39 gate_memory {conf}: {v39[conf]}; median decodability of h at key positions "

@@ -76,3 +76,177 @@ EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40) — D
           acc 0.082  trans  None  VALcos 1.000  margin 0.00  OTHER  outcome non-stream OTHER
   [  5/6]    6.2 min  dry_gate_memory D8_SLOW_M  seed 260  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400)
           acc 0.088  trans  None  VALcos 1.000  margin -0.00  POSITION  reproduces its record True
+  [  6/6]    8.3 min  dry_gate_memory HINGE_D8_A seed 260  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge)
+          acc 0.069  trans  None  VALcos 1.000  margin -0.00  OTHER  reproduces its record True
+  batch wall clock 8.3 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_gate_prev
+  idea    GATE_PREV: the recurrent gate also reads the previous token's embedding (W_prev v_(t-1) in its pre-activation)
+  source  batch 13's S38 (at S=8 the gate state does not carry the stream at key positions; the stream token is the token right before every key)
+  change  pre-activation W_in v_t + W_prev v_(t-1) + W_h h_(t-1), v_(-1) = 0; W_prev ~ N(0, 0.1^2) from its own generator; W_prev in the gate group; nothing else
+  arm D8_PREV_M    lr 0.001  iters 2400  seeds 260-260 (1)  — S33's D8_HINGE + GATE_PREV (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm D8_PREV_A    lr 0.001  iters 2400  seeds 260-260 (1)  — X's HINGE_D8 + GATE_PREV (Adam)
+                   schedule: gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  pairing seeds 260-269: D8_PREV_M with S33's D8_HINGE, D8_PREV_A with X's HINGE_D8; every shared parameter's initial value and the batch stream are the paired run's
+----------------------------------------------------------------------------------------------------
+  ARM D8_PREV_M (S33's D8_HINGE + GATE_PREV (Muon)), seeds 260-260 (1); paired with S33 D8_HINGE
+    seed | D8_PREV_M                trans  stop ch@4800 ch@9600  ch@end  hinge fired/batches at end | S33 D8_HINGE            
+     260 | non-stream OTHER          None  2400   5+2+1   5+2+1   5+2+1                     13/2400 | non-stream OTHER        
+    BOUND ROUTED  D8_PREV_M 0/1  S33_D8_HINGE 0/1  D8_PREV_M only 0, S33_D8_HINGE only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: D8_PREV_M {'non-stream OTHER': 1}; S33 D8_HINGE {'non-stream OTHER': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:3 (5+2+1)
+      at  9600: 260:3 (5+2+1)
+      at   end: 260:3 (5+2+1)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 13/2400, --, --, 13/2400
+    S38's decodability of the stream from h (with the W_prev term), at key (stream-token) positions; chance 0.125:
+    seed |  1200: key  (str) |  2400: key  (str) |  4800: key  (str) |  9600: key  (str)
+     260 |         0.18 ( 0.16) |         0.17 ( 0.16) |          --  (  -- ) |          --  (  -- )
+    medians: 1200: key 0.18, stream-token 0.16 (1 runs); 2400: key 0.17, stream-token 0.16 (1 runs); 4800: key --, stream-token -- (0 runs); 9600: key --, stream-token -- (0 runs)
+  READING S40 D8_PREV_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)
+  ARM D8_PREV_A (X's HINGE_D8 + GATE_PREV (Adam)), seeds 260-260 (1); paired with X HINGE_D8
+    seed | D8_PREV_A                trans  stop ch@4800 ch@9600  ch@end  hinge fired/batches at end | X HINGE_D8              
+     260 | non-stream OTHER          None  2400     7+1     7+1     7+1                      6/2400 | non-stream OTHER        
+    BOUND ROUTED  D8_PREV_A 0/1  X_HINGE_D8 0/1  D8_PREV_A only 0, X_HINGE_D8 only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: D8_PREV_A {'non-stream OTHER': 1}; X HINGE_D8 {'non-stream OTHER': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:2 (7+1)
+      at  9600: 260:2 (7+1)
+      at   end: 260:2 (7+1)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 6/2400, --, --, 6/2400
+    S38's decodability of the stream from h (with the W_prev term), at key (stream-token) positions; chance 0.125:
+    seed |  1200: key  (str) |  2400: key  (str) |  4800: key  (str) |  9600: key  (str)
+     260 |         0.58 ( 0.53) |         0.15 ( 0.14) |          --  (  -- ) |          --  (  -- )
+    medians: 1200: key 0.58, stream-token 0.53 (1 runs); 2400: key 0.15, stream-token 0.14 (1 runs); 4800: key --, stream-token -- (0 runs); 9600: key --, stream-token -- (0 runs)
+  READING S40 D8_PREV_A: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)
+  DRY RUN READING dry_gate_prev D8_PREV_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_gate_prev D8_PREV_A: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_gate_memory
+  idea    descriptive: does the gate state form a one-token memory of the stream in updates 0-2400, and keep it?
+  source  batch 13's S38 (S=8 h decodability at chance at 4800; HINGE_D8 262 at 0.81 at 1200, 0.13 at 2400); S33; X
+  change  none to the runs (reruns to 2400); labelled decoders of h, the pre-tanh terms' norms, saturation, read-gate entropy and distinct channels at 11 updates
+  arm D8_HINGE_M   lr 0.001  iters 2400  seeds 260-260 (1)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 2400
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  arm D8_SLOW_M    lr 0.001  iters 2400  seeds 260-260 (1)  — rerun of S33's D8_SLOW (Muon, S=8, k=16, no hinge) to 2400
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400
+  arm HINGE_D8_A   lr 0.001  iters 2400  seeds 260-260 (1)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 2400
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
+  arm A_HINGE_M    lr 0.001  iters 2400  seeds 240-240 (1)  — rerun of S33's A_HINGE (Muon, S=4, k=4) to 2400, a reference
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  pairing each rerun against its recorded run (the curve must reproduce through 2400)
+----------------------------------------------------------------------------------------------------
+  CONFIG D8_HINGE_M (rerun of S33's D8_HINGE (Muon, S=8, k=16) to 2400); chance 0.125; reruns reproduce their records through 2400: 1/1
+    per seed, decodability of h at key positions (stream-token positions) by update:
+    seed |           0          50         100         200         300         400         600         800        1200        1600        2400
+     260 | 0.82 (1.00) 0.76 (1.00) 0.80 (1.00) 0.70 (0.99) 0.55 (0.85) 0.60 (0.90) 0.16 (0.17) 0.15 (0.16) 0.13 (0.17) 0.14 (0.14) 0.13 (0.13)
+    per seed, distinct channels holding the streams (value-position map) by update:
+     260 |    5    3    4    3    3    1    1    1    1    2    1   map at 2400: [9, 9, 9, 9, 9, 9, 9, 9]
+    medians over the seeds (norms: median over positions and sequences; sat = fraction of h units with |h| > 0.95; H(gr) in nats, log k = 2.773):
+    update  n | dec h@stream   dec h@key |Win v|@str  |Wh h|@str |Win v|@key  |Wh h|@key     sat@key    sat body   H(gr)@key    distinct
+         0  1 |       1.000       0.824       0.068       0.041       0.073       0.042       0.000       0.000       2.773           5
+        50  1 |       1.000       0.765       0.066       0.043       0.069       0.045       0.000       0.000       2.773           3
+       100  1 |       1.000       0.805       0.065       0.057       0.073       0.060       0.000       0.000       2.773           4
+       200  1 |       0.985       0.703       0.069       0.073       0.080       0.075       0.000       0.000       2.772           3
+       300  1 |       0.845       0.554       0.072       0.145       0.078       0.144       0.000       0.000       2.772           3
+       400  1 |       0.904       0.598       0.074       0.171       0.098       0.165       0.000       0.000       2.771           1
+       600  1 |       0.170       0.159       0.114       3.693       0.122       3.691       0.003       0.003       2.482           1
+       800  1 |       0.159       0.148       0.122       4.080       0.116       4.072       0.016       0.016       2.562           1
+      1200  1 |       0.168       0.132       0.142       6.101       0.129       6.102       0.080       0.080       2.545           1
+      1600  1 |       0.142       0.136       0.133       7.598       0.150       7.605       0.139       0.139       2.599           2
+      2400  1 |       0.130       0.127       0.156       8.808       0.127       8.823       0.187       0.187       2.635           1
+  LABEL S39 D8_HINGE_M: formed, then lost (median dec h@key: max up to 1200 0.824, at 2400 0.127, max overall 0.824; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)
+  CONFIG D8_SLOW_M (rerun of S33's D8_SLOW (Muon, S=8, k=16, no hinge) to 2400); chance 0.125; reruns reproduce their records through 2400: 1/1
+    per seed, decodability of h at key positions (stream-token positions) by update:
+    seed |           0          50         100         200         300         400         600         800        1200        1600        2400
+     260 | 0.82 (1.00) 0.76 (1.00) 0.80 (1.00) 0.70 (0.99) 0.55 (0.85) 0.60 (0.90) 0.31 (0.54) 0.27 (0.46) 0.23 (0.44) 0.23 (0.23) 0.14 (0.13)
+    per seed, distinct channels holding the streams (value-position map) by update:
+     260 |    5    3    4    3    3    1    1    1    1    1    1   map at 2400: [9, 9, 9, 9, 9, 9, 9, 9]
+    medians over the seeds (norms: median over positions and sequences; sat = fraction of h units with |h| > 0.95; H(gr) in nats, log k = 2.773):
+    update  n | dec h@stream   dec h@key |Win v|@str  |Wh h|@str |Win v|@key  |Wh h|@key     sat@key    sat body   H(gr)@key    distinct
+         0  1 |       1.000       0.824       0.068       0.041       0.073       0.042       0.000       0.000       2.773           5
+        50  1 |       1.000       0.765       0.066       0.043       0.069       0.045       0.000       0.000       2.773           3
+       100  1 |       1.000       0.805       0.065       0.057       0.073       0.060       0.000       0.000       2.773           4
+       200  1 |       0.985       0.703       0.069       0.073       0.080       0.075       0.000       0.000       2.772           3
+       300  1 |       0.845       0.554       0.072       0.145       0.078       0.144       0.000       0.000       2.772           3
+       400  1 |       0.904       0.598       0.074       0.171       0.098       0.165       0.000       0.000       2.771           1
+       600  1 |       0.542       0.307       0.087       2.290       0.138       2.276       0.000       0.000       2.588           1
+       800  1 |       0.461       0.274       0.094       1.750       0.155       2.081       0.000       0.000       2.607           1
+      1200  1 |       0.443       0.229       0.121       3.659       0.187       3.726       0.039       0.051       2.638           1
+      1600  1 |       0.227       0.226       0.159       5.036       0.251       5.333       0.091       0.088       2.694           1
+      2400  1 |       0.133       0.135       0.226       6.801       0.300       6.935       0.152       0.137       2.630           1
+  LABEL S39 D8_SLOW_M: formed, then lost (median dec h@key: max up to 1200 0.824, at 2400 0.135, max overall 0.824; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)
+  CONFIG HINGE_D8_A (rerun of X's HINGE_D8 (Adam, S=8, k=16) to 2400); chance 0.125; reruns reproduce their records through 2400: 1/1
+    per seed, decodability of h at key positions (stream-token positions) by update:
+    seed |           0          50         100         200         300         400         600         800        1200        1600        2400
+     260 | 0.82 (1.00) 0.81 (1.00) 0.83 (1.00) 0.82 (1.00) 0.76 (0.99) 0.48 (0.71) 0.50 (0.75) 0.51 (0.73) 0.24 (0.45) 0.31 (0.48) 0.16 (0.22)
+    per seed, distinct channels holding the streams (value-position map) by update:
+     260 |    5    5    5    3    3    4    2    2    4    3    1   map at 2400: [8, 8, 8, 8, 8, 8, 8, 8]
+    medians over the seeds (norms: median over positions and sequences; sat = fraction of h units with |h| > 0.95; H(gr) in nats, log k = 2.773):
+    update  n | dec h@stream   dec h@key |Win v|@str  |Wh h|@str |Win v|@key  |Wh h|@key     sat@key    sat body   H(gr)@key    distinct
+         0  1 |       1.000       0.824       0.068       0.041       0.073       0.042       0.000       0.000       2.773           5
+        50  1 |       1.000       0.809       0.067       0.042       0.074       0.043       0.000       0.000       2.773           5
+       100  1 |       1.000       0.826       0.068       0.045       0.074       0.047       0.000       0.000       2.773           5
+       200  1 |       1.000       0.819       0.069       0.055       0.085       0.056       0.000       0.000       2.772           3
+       300  1 |       0.993       0.757       0.069       0.071       0.098       0.069       0.000       0.000       2.772           3
+       400  1 |       0.706       0.475       0.080       0.128       0.133       0.131       0.000       0.000       2.771           4
+       600  1 |       0.752       0.504       0.093       0.136       0.173       0.137       0.000       0.000       2.770           2
+       800  1 |       0.730       0.508       0.095       0.151       0.201       0.144       0.000       0.000       2.766           2
+      1200  1 |       0.450       0.244       0.100       0.311       0.233       0.316       0.000       0.000       2.758           4
+      1600  1 |       0.478       0.311       0.108       0.314       0.292       0.234       0.000       0.000       2.715           3
+      2400  1 |       0.224       0.162       0.163       5.101       0.320       5.080       0.055       0.060       1.716           1
+  LABEL S39 HINGE_D8_A: formed, then lost (median dec h@key: max up to 1200 0.826, at 2400 0.162, max overall 0.826; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)
+  CONFIG A_HINGE_M (rerun of S33's A_HINGE (Muon, S=4, k=4) to 2400, a reference); chance 0.250; reruns reproduce their records through 2400: 1/1
+    per seed, decodability of h at key positions (stream-token positions) by update:
+    seed |           0          50         100         200         300         400         600         800        1200        1600        2400
+     240 | 1.00 (1.00) 0.99 (1.00) 0.99 (1.00) 0.89 (1.00) 0.53 (0.62) 0.44 (0.47) 0.61 (0.66) 0.72 (0.56) 0.90 (0.85) 0.90 (0.81) 0.77 (0.82)
+    per seed, distinct channels holding the streams (value-position map) by update:
+     240 |    1    2    2    2    2    2    2    2    3    3    3   map at 2400: [3, 3, 2, 0]
+    medians over the seeds (norms: median over positions and sequences; sat = fraction of h units with |h| > 0.95; H(gr) in nats, log k = 1.386):
+    update  n | dec h@stream   dec h@key |Win v|@str  |Wh h|@str |Win v|@key  |Wh h|@key     sat@key    sat body   H(gr)@key    distinct
+         0  1 |       1.000       0.998       0.058       0.042       0.063       0.045       0.000       0.000       1.386           1
+        50  1 |       1.000       0.995       0.060       0.043       0.062       0.048       0.000       0.000       1.386           2
+       100  1 |       1.000       0.995       0.055       0.045       0.058       0.053       0.000       0.000       1.386           2
+       200  1 |       0.998       0.886       0.064       0.079       0.061       0.101       0.000       0.000       1.386           2
+       300  1 |       0.621       0.530       0.084       0.262       0.074       0.312       0.000       0.000       1.368           2
+       400  1 |       0.469       0.440       0.105       0.703       0.091       0.716       0.000       0.000       1.290           2
+       600  1 |       0.656       0.610       0.141       0.522       0.126       0.578       0.000       0.000       1.270           2
+       800  1 |       0.564       0.719       0.209       0.850       0.131       0.910       0.000       0.000       0.929           2
+      1200  1 |       0.846       0.898       0.456       0.698       0.126       1.665       0.000       0.000       0.179           3
+      1600  1 |       0.812       0.904       0.528       0.678       0.132       1.802       0.000       0.000       0.053           3
+      2400  1 |       0.816       0.771       0.577       0.608       0.161       1.635       0.000       0.000       0.063           3
+  LABEL S39 A_HINGE_M: partial (median dec h@key: max up to 1200 0.998, at 2400 0.771, max overall 0.998; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)
+  HINGE vs NO HINGE (S=8, Muon; medians over seeds 260-264): D8_HINGE_M | D8_SLOW_M
+    update |   dec h@key dec h@stream |Win v|@key  |Wh h|@key     sat@key   H(gr)@key    distinct |   dec h@key dec h@stream |Win v|@key  |Wh h|@key     sat@key   H(gr)@key    distinct
+         0 |       0.824       1.000       0.073       0.042       0.000       2.773           5 |       0.824       1.000       0.073       0.042       0.000       2.773           5
+        50 |       0.765       1.000       0.069       0.045       0.000       2.773           3 |       0.765       1.000       0.069       0.045       0.000       2.773           3
+       100 |       0.805       1.000       0.073       0.060       0.000       2.773           4 |       0.805       1.000       0.073       0.060       0.000       2.773           4
+       200 |       0.703       0.985       0.080       0.075       0.000       2.772           3 |       0.703       0.985       0.080       0.075       0.000       2.772           3
+       300 |       0.554       0.845       0.078       0.144       0.000       2.772           3 |       0.554       0.845       0.078       0.144       0.000       2.772           3
+       400 |       0.598       0.904       0.098       0.165       0.000       2.771           1 |       0.598       0.904       0.098       0.165       0.000       2.771           1
+       600 |       0.159       0.170       0.122       3.691       0.003       2.482           1 |       0.307       0.542       0.138       2.276       0.000       2.588           1
+       800 |       0.148       0.159       0.116       4.072       0.016       2.562           1 |       0.274       0.461       0.155       2.081       0.000       2.607           1
+      1200 |       0.132       0.168       0.129       6.102       0.080       2.545           1 |       0.229       0.443       0.187       3.726       0.039       2.638           1
+      1600 |       0.136       0.142       0.150       7.605       0.139       2.599           2 |       0.226       0.227       0.251       5.333       0.091       2.694           1
+      2400 |       0.127       0.130       0.127       8.823       0.187       2.635           1 |       0.135       0.133       0.300       6.935       0.152       2.630           1
+  DRY RUN LABEL dry_gate_memory D8_HINGE_M: formed, then lost (median dec h@key: max up to 1200 0.824, at 2400 0.127, max overall 0.824; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)  [EXPLORATORY, not a result]
+  DRY RUN LABEL dry_gate_memory D8_SLOW_M: formed, then lost (median dec h@key: max up to 1200 0.824, at 2400 0.135, max overall 0.824; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)  [EXPLORATORY, not a result]
+  DRY RUN LABEL dry_gate_memory HINGE_D8_A: formed, then lost (median dec h@key: max up to 1200 0.826, at 2400 0.162, max overall 0.826; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)  [EXPLORATORY, not a result]
+  DRY RUN LABEL dry_gate_memory A_HINGE_M: partial (median dec h@key: max up to 1200 0.998, at 2400 0.771, max overall 0.998; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  S40 gate_prev D8_PREV_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not); failure classes {'non-stream OTHER': 1}; median decodability of h at key positions 1200 0.18, 2400 0.17, 4800 --, 9600 --
+  S40 gate_prev D8_PREV_A: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not); failure classes {'non-stream OTHER': 1}; median decodability of h at key positions 1200 0.58, 2400 0.15, 4800 --, 9600 --
+  S39 gate_memory D8_HINGE_M: formed, then lost (median dec h@key: max up to 1200 0.824, at 2400 0.127, max overall 0.824; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout); median decodability of h at key positions 0 0.82, 50 0.76, 100 0.80, 200 0.70, 300 0.55, 400 0.60, 600 0.16, 800 0.15, 1200 0.13, 1600 0.14, 2400 0.13
+  S39 gate_memory D8_SLOW_M: formed, then lost (median dec h@key: max up to 1200 0.824, at 2400 0.135, max overall 0.824; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout); median decodability of h at key positions 0 0.82, 50 0.76, 100 0.80, 200 0.70, 300 0.55, 400 0.60, 600 0.31, 800 0.27, 1200 0.23, 1600 0.23, 2400 0.14
+  S39 gate_memory HINGE_D8_A: formed, then lost (median dec h@key: max up to 1200 0.826, at 2400 0.162, max overall 0.826; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout); median decodability of h at key positions 0 0.82, 50 0.81, 100 0.83, 200 0.82, 300 0.76, 400 0.48, 600 0.50, 800 0.51, 1200 0.24, 1600 0.31, 2400 0.16
+  S39 gate_memory A_HINGE_M: partial (median dec h@key: max up to 1200 0.998, at 2400 0.771, max overall 0.998; formed = >= 0.5 by 1200, lost = <= 0.25 at 2400, never = < 0.25 throughout); median decodability of h at key positions 0 1.00, 50 0.99, 100 0.99, 200 0.89, 300 0.53, 400 0.44, 600 0.61, 800 0.72, 1200 0.90, 1600 0.90, 2400 0.77
+####################################################################################################
