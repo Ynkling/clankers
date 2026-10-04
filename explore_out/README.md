@@ -335,7 +335,8 @@ KEYMASS over all merged checks (34/40 vs 30/40).
 
 S38: at S=8 the gate state h at the key positions carries almost nothing about the stream, under Muon and Adam alike (median
 0.13 and 0.14 at 4800, chance 0.125), although the stream's CTX token is the token just before each key. Exceptions: D8_HINGE_M
-263 (about 0.5 throughout) and HINGE_D8_A 260-262 (up to 0.81 at 1200 for 262, falling to chance by 2400). At S=4 the same
-decoder reads the stream from h at 0.84 (k=4, Muon; 0.5-0.86 in the merged runs) and 1.00 (k=16, Muon) at 4800. The gate input
-(the key's embedding) is at chance in every configuration, as it should be, and h at the first and the last key of a block
-decode alike. Every rerun reproduced its recorded curve through 9600.
+263 (about 0.5 throughout), HINGE_D8_A 260 (rising to 0.54 by 9600), 261 (0.47-0.56 to 4800, chance at 9600) and 262 (0.81 at
+1200, chance from 2400). At S=4 the same decoder reads the stream from h at 0.84 (k=4, Muon; 0.63-0.85 at 4800 in the four
+merged runs) and 1.00 (k=16, Muon) at 4800. The gate input (the key's embedding) is at chance in every configuration, as it
+should be. At S=8 h at a block's first key decodes slightly above its last key (median 0.19 vs 0.13 at 4800 in both arms);
+at S=4 they decode alike. Every rerun reproduced its recorded curve through 9600.
