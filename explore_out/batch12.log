@@ -170,3 +170,44 @@ EXPLORATORY, NOT A RESULT — batch 12: split_plateau (S36)
           acc 1.000  trans  8400  VALcos 0.000  margin 1.00  DISCOVERED  splits 1
   [  8/16]  101.7 min  split_plateau  SPLIT4k4_M seed 249  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset))
           acc 0.773  trans  None  VALcos 0.000  margin 0.74  STREAM-PARTIAL  splits 6
+#################### RESUME 2026-10-04 00:25:22 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 12: split_plateau (S36)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git e3d76a1+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; Muon lr 0.005 (S33's validity choice {'a': 0.005, 'b': 0.005}); schedules {'t_check': 4800, 'a_check': 0.4, 'total': 28800, 'eval_every': 1200} (a, total 28800), {'t1': 4800, 't2': 9600, 'total': 28800, 'eval_every': 1200, 't_check': 2400, 'a_check': 0.6} (b, total set to 43200); 1 torch thread per run
+  lr read for split_plateau SPLIT4k4_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for split_plateau SPLIT_D8_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for split_plateau SPLIT_D8_A: 0.001 (Adam groups)
+  S36 readings: (a) 'the split fixes four-stream merges under Muon' if SPLIT4k4_M binds >= 8/10, 'it does not' if <= 5/10, otherwise neither; (b) per arm 'it breaks the eight-stream stall' if >= 3/10 bind by 43200, otherwise 'it does not' (BOUND at 28800 printed, the paired outcome)
+  queue order: the (b) arms' 43200-step runs first (arm priority), then (a)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (53s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch12.py differs from fcb4a27, where the full CHECK suite passed (2026-10-03 18:39:18 UTC; its output is earlier in this log). git diff --stat fcb4a27:
+     explore_out/README.md                          |      2 +-
+     explore_out/batch12.log                        |    187 +
+     explore_out/batch12_checks.json                |      6 +
+     explore_out/split_plateau_results.json         | 133352 ++++++++++++++++++++++
+     explore_out/split_plateau_runtime_results.json |     20 +
+     5 files changed, 133566 insertions(+), 1 deletion(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN split_plateau
+  idea    a label-free plateau trigger that applies S24's SPLIT to merged or stalled multi-stream runs
+  source  batch 8's S24 (SPLIT un-merged 8/8 merged runs); batch 10's S33 (Muon keeps merges at S=4 k=4; the coarse split at S=8)
+  change  every 2400 updates from 4800: if probe accuracy < 0.95 and rose < 0.02, W_g[idlest] <- W_g[busiest] + noise (both rows, 0.1 std), W_g's optimizer state reset
+  arm SPLIT4k4_M   lr 0.001  iters 28800  seeds 240-249 (10)  — S33's A_HINGE + the trigger (S=4, P=4, k=4, conv)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  arm SPLIT_D8_M   lr 0.001  iters 43200  seeds 260-269 (10)  — S33's D8_HINGE + the trigger (S=8, P=4, k=16, conv)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  arm SPLIT_D8_A   lr 0.001  iters 43200  seeds 260-269 (10)  — main's HINGE_D8 + the trigger (S=8, P=4, k=16, conv; Adam)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02 -> S24's SPLIT, W_g state reset)
+  pairing (a) 240-249 with S33's A_HINGE; (b) 260-269 with S33's D8_HINGE (Muon) and X's recorded HINGE_D8 (Adam); same initial parameters and batches until the first split
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; pool-load timing: the median interval between optimizer steps, one child per arm at once (SPLIT_D8_M twice), 1 thread each, this machine):
+    split_plateau  SPLIT4k4_M  10 runs x  25.0 min  (28800 steps x 48.8 ms + 24 evals x 4.0 s)
+    split_plateau  SPLIT_D8_M  10 runs x  73.8 min  (43200 steps x 97.9 ms + 36 evals x 5.5 s)
+    split_plateau  SPLIT_D8_A  10 runs x  69.4 min  (43200 steps x 92.0 ms + 36 evals x 5.3 s)
+    total 28.04 h of runs; makespan on 4 workers 7.18 h (worst case)
+  RUNTIME RULE (stored 2026-10-03 18:39:57 UTC: makespan 7.79 h on 4 workers): no cut
+  8 runs queued on 4 workers (1 torch thread each), submitted in waves: SPLIT_D8_A|266 SPLIT_D8_M|266 SPLIT_D8_A|267 SPLIT_D8_M|267 SPLIT_D8_A|268 SPLIT_D8_M|268 SPLIT_D8_A|269 SPLIT_D8_M|269
