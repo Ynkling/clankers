@@ -86,3 +86,5 @@ EXPLORATORY, NOT A RESULT — batch 13: split_target (S37), gate_state (S38)
           acc 1.000  trans  4800  VALcos 0.003  margin 0.98  DISCOVERED  ROUTED* 1200/2400/end -/-/Y
   [ 10/50]   25.9 min  split_target   HINGE4k4_A seed 243  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
           acc 1.000  trans  7200  VALcos 0.101  margin 0.62  DISCOVERED  ROUTED* 1200/2400/end -/-/-
+  [ 11/50]   27.1 min  split_target   SPLITK_A   seed 243  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset)
+          acc 1.000  trans  7200  VALcos 0.101  margin 0.62  DISCOVERED  ROUTED* 1200/2400/end -/-/-
