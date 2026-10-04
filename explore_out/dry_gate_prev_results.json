@@ -1,0 +1,43 @@
+{
+ "meta": {
+  "arms": {
+   "D8_PREV_A": {
+    "iters": 2400,
+    "key": "D8_PREV_A",
+    "label": "X's HINGE_D8 + GATE_PREV (Adam)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260
+    ]
+   },
+   "D8_PREV_M": {
+    "iters": 2400,
+    "key": "D8_PREV_M",
+    "label": "S33's D8_HINGE + GATE_PREV (Muon)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260
+    ]
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "93c2755",
+   "python": "3.11.15",
+   "started": "2026-10-04 16:11:36",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

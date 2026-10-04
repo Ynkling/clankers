@@ -56,3 +56,13 @@ EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40) — D
                    schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
   pairing each rerun against its recorded run (the curve must reproduce through 2400)
 ----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; pool-load timing: the median interval between optimizer steps, one child per arm at once, two rounds of 4 (the slower of an arm's two timings), 1 thread each, this machine):
+    dry_gate_prev  D8_PREV_M    1 runs x   4.1 min  (2400 steps x 96.2 ms + 2 evals x 5.8 s + 4 probes x 0.8 s)
+    dry_gate_prev  D8_PREV_A    1 runs x   4.0 min  (2400 steps x 92.7 ms + 2 evals x 5.6 s + 4 probes x 1.0 s)
+    dry_gate_memory D8_HINGE_M   1 runs x   3.8 min  (2400 steps x 86.9 ms + 2 evals x 6.1 s + 11 measurements x 0.8 s)
+    dry_gate_memory D8_SLOW_M    1 runs x   3.9 min  (2400 steps x 88.7 ms + 2 evals x 5.8 s + 11 measurements x 0.9 s)
+    dry_gate_memory HINGE_D8_A   1 runs x   3.8 min  (2400 steps x 87.3 ms + 2 evals x 5.4 s + 11 measurements x 0.9 s)
+    dry_gate_memory A_HINGE_M    1 runs x   1.8 min  (2400 steps x 42.1 ms + 2 evals x 2.2 s + 11 measurements x 0.3 s)
+    total 0.36 h of runs; makespan on 4 workers 0.13 h (worst case)
+  RUNTIME RULE: projected makespan 0.13 h <= 9 h: no cut (dry run: not stored)
+  6 runs queued on 4 workers (1 torch thread each), submitted in this order: D8_PREV_A|260 D8_PREV_M|260 A_HINGE_M|240 D8_HINGE_M|260 D8_SLOW_M|260 HINGE_D8_A|260
