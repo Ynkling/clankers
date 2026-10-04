@@ -14,3 +14,11 @@ EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40) — D
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (46s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_gate_prev: at update 0 every parameter shared with the paired run is bitwise equal (9 parameters; W_prev (32, 32), std 0.1008 vs W_in's 0.0985; class PrevBDH): ok
+  CHECK dry_gate_prev: the gate's input at key positions (W_in v_t + W_prev v_(t-1)) decodes the stream at update 0 at 1.000 with GATE_PREV (>= 0.9) and W_in v_t alone at 0.125 without it (chance 0.125, within 0.05): ok
+  CHECK dry_gate_prev: muon: the optimizer groups cover every parameter once, W_prev in the gate group ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_gate_prev: adam: the optimizer groups cover every parameter once, W_prev in the gate group ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_gate_prev: with W_prev fixed at 0 and excluded, the Muon groups are S33's (names True): ok
+  CHECK dry_gate_prev: D8_PREV_M with W_prev fixed at 0 and excluded from the optimizer equals S33's D8_HINGE|260 bit for bit through 1200 (curves [[1200, 0.0703125, 2.9915246963500977]] vs [[1200, 0.0703125, 2.9915246963500977]]; statistics at [0, 1200] True; groups [{'tag': 'gate', 'kind': 'muon', 'names': ['W_in', 'W_h', 'W_g']}, {'tag': 'rest', 'kind': 'muon', 'names': ['decoder', 'encoder', 'encoder_v', 'lm_head']}, {'tag': 'rest', 'kind': 'adam', 'names': ['embed.weight', 'short_conv.conv_w']}]): ok
+  CHECK dry_gate_prev: D8_PREV_A with W_prev fixed at 0 and excluded from the optimizer equals X's HINGE_D8|260 bit for bit through 1200 (curves [[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]; statistics at [0, 1200] True; groups [{'names': ['W_in', 'W_h', 'W_g']}, {'names': ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight', 'short_conv.conv_w']}]): ok
+  CHECK dry_gate_prev: children at 9c5939e (2.3 min)
