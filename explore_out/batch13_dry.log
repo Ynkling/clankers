@@ -1,0 +1,191 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 13: split_target (S37), gate_state (S38) — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 346adbf | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; Muon lr 0.005 (S33's validity choice {'a': 0.005, 'b': 0.005}); S37 28800 steps, S38 reruns to 9600; 1 torch thread per run
+  lr read for dry_split_target SPLITK_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_split_target HINGE4k4_A: 0.001 (Adam groups)
+  lr read for dry_split_target SPLITK_A: 0.001 (Adam groups)
+  lr read for dry_gate_state D8_HINGE_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_gate_state HINGE_D8_A: 0.001 (Adam groups)
+  lr read for dry_gate_state A_HINGE_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_gate_state HINGE16_M: 0.001 (Adam groups); Muon lr 0.005
+  S37 readings (per optimizer): 'the targeted split fixes four-stream merges' if >= 8/10 bind, 'it does not' if <= 5/10, otherwise neither
+  S38 readings (S=8, at 4800, median over 5 seeds of the stream decodability from h at key positions): 'the eight-stream gate state does not carry the stream' if < 0.5; 'it does' if >= 0.9; otherwise 'partial'
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (71s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_split_target: SPLITK_M with the trigger off equals S33's A_HINGE|240 bit for bit through 7200 (curve True; statistics at [0, 1200, 2400, 3600, 4800, 6000, 7200] True; the trigger measured at [(2400, False), (4800, False), (7200, False)]): ok
+  CHECK dry_split_target: SPLITK_A with the trigger off equals HINGE4k4_A|240 (a fresh run) bit for bit through 7200 (curves [[1200, 0.11962890625, 2.7629148960113525], [2400, 0.24267578125, 2.4801230430603027], [3600, 1.0, 0.044073354452848434], [4800, 1.0, 0.009487747214734554], [6000, 1.0, 0.003875546855852008], [7200, 1.0, 0.0018494247924536467]] vs [[1200, 0.11962890625, 2.7629148960113525], [2400, 0.24267578125, 2.4801230430603027], [3600, 1.0, 0.044073354452848434], [4800, 1.0, 0.009487747214734554], [6000, 1.0, 0.003875546855852008], [7200, 1.0, 0.0018494247924536467]]; statistics at [0, 1200, 2400, 3600, 4800, 6000, 7200] True; the trigger measured at [(2400, False), (4800, False), (7200, False)]): ok
+  CHECK dry_split_target: on a synthetic gate whose key-position map is 2+1+1 ([2, 2, 0, 1]; channel 3 empty at key positions, 0.85 of the mass elsewhere) KEYMASS picks c* 2, c0 3 (key masses [0.246, 0.264, 0.469, 0.02]): the shared channel and the empty one; the all-position rule picks c* 3, c0 0 (masses [0.113, 0.119, 0.184, 0.584]), a mistarget: ok
+  CHECK dry_split_target: children at 9c5939e (6.2 min); the modules served from main are exactly the test modules that differ between this branch and 9c5939e: ok
+  CHECK dry_gate_state: D8_HINGE_M|260 rerun reproduces its record through 2400 ([[1200, 0.0703125, 2.9915246963500977], [2400, 0.07470703125, 2.853668212890625]] vs [[1200, 0.0703125, 2.9915246963500977], [2400, 0.07470703125, 2.853668212890625]]); probes at ['1200', '2400']; the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_state: HINGE_D8_A|260 rerun reproduces its record through 2400 ([[1200, 0.0615234375, 2.8093132972717285], [2400, 0.06884765625, 2.783939838409424]] vs [[1200, 0.0615234375, 2.8093132972717285], [2400, 0.06884765625, 2.783939838409424]]); probes at ['1200', '2400']; the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_state: A_HINGE_M|240 rerun reproduces its record through 2400 ([[1200, 0.36376953125, 2.240008592605591], [2400, 0.73876953125, 0.6320656538009644]] vs [[1200, 0.36376953125, 2.240008592605591], [2400, 0.73876953125, 0.6320656538009644]]); probes at ['1200', '2400']; the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_state: HINGE16_M|240 rerun reproduces its record through 2400 ([[1200, 0.46826171875, 2.056608200073242], [2400, 1.0, 0.05968524143099785]] vs [[1200, 0.46826171875, 2.056608200073242], [2400, 1.0, 0.05968524143099785]]); probes at ['1200', '2400']; the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_state: the decoder scores 1.0000 on a synthetic separable set (8 classes, 4000 points) and 0.1275 with shuffled labels (chance 0.1250; within 0.05: True): ok
+  CHECK dry_gate_state: children at 9c5939e (4.5 min)
+  all CHECKs passed (10.7 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_split_target
+  idea    S36's split targeted by the read-gate mass at the hinge's key positions (KEYMASS), at most 2 per run
+  source  batch 12's S36 (the all-position target was wrong in half the splits: an empty channel can carry the largest mass); S24 (SPLIT un-merged 8/8 Adam runs at k=4)
+  change  S36's trigger, c* / c0 = the largest / smallest mean read-gate mass at key positions, <= 2 splits, >= 4800 updates apart; S24's operation
+  arm SPLITK_M     lr 0.001  iters 3600  seeds 240-240 (1)  — S33's A_HINGE + trigger + KEYMASS (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset
+  arm HINGE4k4_A   lr 0.001  iters 3600  seeds 240-240 (1)  — main's A4k4 + test_slow_start's HINGE recipe (Adam), run here
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  arm SPLITK_A     lr 0.001  iters 3600  seeds 240-240 (1)  — HINGE4k4_A + trigger + KEYMASS (Adam)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset
+  pairing seeds 240-249: SPLITK_M with S33's A_HINGE and S36's SPLIT4k4_M; SPLITK_A with HINGE4k4_A (run here); same initial parameters and batches until the first split
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_gate_state
+  idea    descriptive: is the stream decodable from the gate state h at key positions, at S=8 vs S=4?
+  source  batch 12's S36 (splits at S=8 copied channels onto empty ones and never bound); S33, S35, X's HINGE_D8
+  change  none to the runs (reruns to 9600); labelled nearest-class-mean decoders on h and on the gate input
+  arm D8_HINGE_M   lr 0.001  iters 3600  seeds 260-260 (1)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 9600
+                   schedule: S33's D8_HINGE recipe
+  arm HINGE_D8_A   lr 0.001  iters 3600  seeds 260-260 (1)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 9600
+                   schedule: test_slow_start's HINGE recipe
+  arm A_HINGE_M    lr 0.001  iters 3600  seeds 240-240 (1)  — rerun of S33's A_HINGE (Muon, S=4, k=4) to 9600
+                   schedule: S33's A_HINGE recipe
+  arm HINGE16_M    lr 0.001  iters 3600  seeds 240-240 (1)  — rerun of S35's MUON_HINGE16 (Muon, S=4, k=16) to 9600
+                   schedule: S35's MUON_HINGE16 recipe
+  pairing each rerun against its recorded run (the curve must reproduce through 9600)
+----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; pool-load timing: the median interval between optimizer steps, one child per arm at once, two rounds of 4, 1 thread each, this machine):
+    dry_split_target SPLITK_M     1 runs x   3.1 min  (3600 steps x 50.0 ms + 3 evals x 2.6 s)
+    dry_split_target HINGE4k4_A   1 runs x   2.8 min  (3600 steps x 45.1 ms + 3 evals x 2.7 s)
+    dry_split_target SPLITK_A     1 runs x   2.9 min  (3600 steps x 45.9 ms + 3 evals x 2.5 s)
+    dry_gate_state D8_HINGE_M   1 runs x   6.5 min  (3600 steps x 102.4 ms + 3 evals x 5.8 s + 4 probes x 0.8 s)
+    dry_gate_state HINGE_D8_A   1 runs x   6.1 min  (3600 steps x 96.5 ms + 3 evals x 5.6 s + 4 probes x 0.8 s)
+    dry_gate_state A_HINGE_M    1 runs x   3.0 min  (3600 steps x 47.2 ms + 3 evals x 2.6 s + 4 probes x 0.4 s)
+    dry_gate_state HINGE16_M    1 runs x   3.0 min  (3600 steps x 47.7 ms + 3 evals x 2.6 s + 4 probes x 0.3 s)
+    total 0.46 h of runs; makespan on 4 workers 0.15 h (worst case)
+  RUNTIME RULE: projected makespan 0.15 h <= 9 h: no cut (dry run: not stored)
+  7 runs queued on 4 workers (1 torch thread each)
+  [  1/7]    3.4 min  dry_split_target HINGE4k4_A seed 240  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
+          acc 1.000  trans  3600  VALcos 0.103  margin 0.81  DISCOVERED  ROUTED* 1200/2400/end -/-/-
+  [  2/7]    3.4 min  dry_split_target SPLITK_A   seed 240  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset)
+          acc 1.000  trans  3600  VALcos 0.103  margin 0.81  DISCOVERED  ROUTED* 1200/2400/end -/-/-
+  [  3/7]    3.5 min  dry_split_target SPLITK_M   seed 240  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset)
+          acc 0.750  trans  None  VALcos 1.000  margin 0.79  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  4/7]    3.5 min  dry_gate_state A_HINGE_M  seed 240  lr 0.001 (S33's A_HINGE recipe)
+          acc 0.750  trans  None  VALcos 1.000  margin 0.79  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
+  [  5/7]    6.8 min  dry_gate_state HINGE16_M  seed 240  lr 0.001 (S35's MUON_HINGE16 recipe)
+          acc 0.987  trans  2400  VALcos 0.000  margin 0.97  DISCOVERED  ROUTED* 1200/2400/end -/-/-
+  [  6/7]   10.0 min  dry_gate_state HINGE_D8_A seed 260  lr 0.001 (test_slow_start's HINGE recipe)
+          acc 0.066  trans  None  VALcos 0.999  margin -0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [  7/7]   10.1 min  dry_gate_state D8_HINGE_M seed 260  lr 0.001 (S33's D8_HINGE recipe)
+          acc 0.083  trans  None  VALcos 0.999  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 10.1 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_split_target
+  idea    S36's split targeted by the read-gate mass at the hinge's key positions (KEYMASS), at most 2 per run
+  source  batch 12's S36 (the all-position target was wrong in half the splits: an empty channel can carry the largest mass); S24 (SPLIT un-merged 8/8 Adam runs at k=4)
+  change  S36's trigger, c* / c0 = the largest / smallest mean read-gate mass at key positions, <= 2 splits, >= 4800 updates apart; S24's operation
+  arm SPLITK_M     lr 0.001  iters 3600  seeds 240-240 (1)  — S33's A_HINGE + trigger + KEYMASS (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset
+  arm HINGE4k4_A   lr 0.001  iters 3600  seeds 240-240 (1)  — main's A4k4 + test_slow_start's HINGE recipe (Adam), run here
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  arm SPLITK_A     lr 0.001  iters 3600  seeds 240-240 (1)  — HINGE4k4_A + trigger + KEYMASS (Adam)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset
+  pairing seeds 240-249: SPLITK_M with S33's A_HINGE and S36's SPLIT4k4_M; SPLITK_A with HINGE4k4_A (run here); same initial parameters and batches until the first split
+----------------------------------------------------------------------------------------------------
+    seed | SPLITK_M               trans spl      ch | A_HINGE            | S36 SPLIT4k4_M     || SPLITK_A               trans spl      ch | HINGE4k4_A             trans      ch | X A4k4              
+     240 | MERGED (2 share)        None   0   2+1+1 | MERGED (2 share)   | BOUND ROUTED       || BOUND ROUTED            3600   0 1+1+1+1 | BOUND ROUTED            3600 1+1+1+1 | unbound             
+     241 | not run                                  | MERGED (2 share)   | MERGED (2 share)   || not run                                  | not run                              | BOUND               
+     242 | not run                                  | BOUND ROUTED       | BOUND ROUTED       || not run                                  | not run                              | BOUND               
+     243 | not run                                  | MERGED (2 share)   | MERGED (2 share)   || not run                                  | not run                              | unbound             
+     244 | not run                                  | MERGED (2 share)   | MERGED (2 share)   || not run                                  | not run                              | unbound             
+     245 | not run                                  | BOUND NOT routed   | MERGED (2 share)   || not run                                  | not run                              | unbound             
+     246 | not run                                  | BOUND ROUTED       | BOUND ROUTED       || not run                                  | not run                              | BOUND               
+     247 | not run                                  | MERGED (2 share)   | BOUND ROUTED       || not run                                  | not run                              | unbound             
+     248 | not run                                  | BOUND ROUTED       | BOUND ROUTED       || not run                                  | not run                              | unbound             
+     249 | not run                                  | MERGED (2 share)   | MERGED (2 share)   || not run                                  | not run                              | BOUND               
+  SPLITK_M vs S33's A_HINGE and vs S36's SPLIT4k4_M (paired):
+    BOUND  SPLITK_M 0/1  A_HINGE 0/1  SPLITK_M only 0, A_HINGE only 0, McNemar two-sided p = 1 (printed)
+    BOUND  SPLITK_M 0/1  SPLIT4k4_M 1/1  SPLITK_M only 0, SPLIT4k4_M only 1, McNemar two-sided p = 1 (printed)
+  SPLITK_A vs HINGE4k4_A (paired):
+    BOUND  SPLITK_A 1/1  HINGE4k4_A 1/1  SPLITK_A only 0, HINGE4k4_A only 0, McNemar two-sided p = 1 (printed)
+  HINGE4k4_A vs X's A4k4 (printed):
+    BOUND  HINGE4k4_A 1/1  X A4k4 0/1  HINGE4k4_A only 1, X A4k4 only 0, McNemar two-sided p = 1 (printed)
+  SPLITK_M checks per run (step: probe acc; E eligible, F fired, B blocked by the cap; KEYMASS c*->c0 / all-position c*->c0; labelled map before; +/- = copies a >= 2-stream channel onto an empty one):
+    240: splits 0
+          2400 acc 0.719 . key 3->1 +  all 3->1 +  map [3, 3, 2, 0] (2+1+1)  key masses [0.25 0.01 0.25 0.50]  all [0.24 0.12 0.21 0.43]
+  SPLITK_M labelled targeting accuracy (copies a >= 2-stream channel onto an empty one): over the 0 fired splits KEYMASS 0/0, the all-position rule (at the same checks) 0/0; over the 1 checks whose labelled map has a shared and an empty channel KEYMASS 1/1, all-position 1/1
+  SPLITK_M HARM (held-out accuracy 2400 updates after a split > 0.05 below the value at it): 0/1 runs {}
+  SPLITK_A checks per run (step: probe acc; E eligible, F fired, B blocked by the cap; KEYMASS c*->c0 / all-position c*->c0; labelled map before; +/- = copies a >= 2-stream channel onto an empty one):
+    240: splits 0
+          2400 acc 0.328 . key 0->3 +  all 0->3 +  map [0, 0, 2, 2] (2+2)  key masses [0.45 0.09 0.41 0.05]  all [0.46 0.09 0.41 0.05]
+  SPLITK_A labelled targeting accuracy (copies a >= 2-stream channel onto an empty one): over the 0 fired splits KEYMASS 0/0, the all-position rule (at the same checks) 0/0; over the 1 checks whose labelled map has a shared and an empty channel KEYMASS 1/1, all-position 1/1
+  SPLITK_A HARM (held-out accuracy 2400 updates after a split > 0.05 below the value at it): 0/1 runs {}
+  READING S37 MUON (SPLITK_M): it does not (BOUND 0/1; >= 8 fixes, <= 5 not)
+  READING S37 ADAM (SPLITK_A): it does not (BOUND 1/1; >= 8 fixes, <= 5 not)
+  DRY RUN READING dry_split_target (MUON): it does not (BOUND 0/1; >= 8 fixes, <= 5 not)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_split_target (ADAM): it does not (BOUND 1/1; >= 8 fixes, <= 5 not)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)] SCREEN dry_gate_state
+  idea    descriptive: is the stream decodable from the gate state h at key positions, at S=8 vs S=4?
+  source  batch 12's S36 (splits at S=8 copied channels onto empty ones and never bound); S33, S35, X's HINGE_D8
+  change  none to the runs (reruns to 9600); labelled nearest-class-mean decoders on h and on the gate input
+  arm D8_HINGE_M   lr 0.001  iters 3600  seeds 260-260 (1)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 9600
+                   schedule: S33's D8_HINGE recipe
+  arm HINGE_D8_A   lr 0.001  iters 3600  seeds 260-260 (1)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 9600
+                   schedule: test_slow_start's HINGE recipe
+  arm A_HINGE_M    lr 0.001  iters 3600  seeds 240-240 (1)  — rerun of S33's A_HINGE (Muon, S=4, k=4) to 9600
+                   schedule: S33's A_HINGE recipe
+  arm HINGE16_M    lr 0.001  iters 3600  seeds 240-240 (1)  — rerun of S35's MUON_HINGE16 (Muon, S=4, k=16) to 9600
+                   schedule: S35's MUON_HINGE16 recipe
+  pairing each rerun against its recorded run (the curve must reproduce through 9600)
+----------------------------------------------------------------------------------------------------
+  CONFIG D8_HINGE_M (rerun of S33's D8_HINGE (Muon, S=8, k=16) to 9600); chance 0.125; reruns reproduce their records through 9600: 1/1
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     260 non-stream OTHER          3600 |         0.14  0.12  0.17  0.14 |         0.13  0.12  0.11  0.14 |          --    --    --    --  |          --    --    --    -- 
+    median at  1200 (1 runs): h at key positions  0.14, gate input  0.12, h at the block's first key  0.17, at its last key  0.14
+    median at  2400 (1 runs): h at key positions  0.13, gate input  0.12, h at the block's first key  0.11, at its last key  0.14
+    median at  4800 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+    median at  9600 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+  READING S38 D8_HINGE_M: no measurement at 4800
+  CONFIG HINGE_D8_A (rerun of X's HINGE_D8 (Adam, S=8, k=16) to 9600); chance 0.125; reruns reproduce their records through 9600: 1/1
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     260 non-stream OTHER          3600 |         0.23  0.12  0.27  0.27 |         0.16  0.12  0.14  0.12 |          --    --    --    --  |          --    --    --    -- 
+    median at  1200 (1 runs): h at key positions  0.23, gate input  0.12, h at the block's first key  0.27, at its last key  0.27
+    median at  2400 (1 runs): h at key positions  0.16, gate input  0.12, h at the block's first key  0.14, at its last key  0.12
+    median at  4800 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+    median at  9600 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+  READING S38 HINGE_D8_A: no measurement at 4800
+  CONFIG A_HINGE_M (rerun of S33's A_HINGE (Muon, S=4, k=4) to 9600); chance 0.250; reruns reproduce their records through 9600: 1/1
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     240 MERGED (2 share)          3600 |         0.90  0.25  0.93  0.87 |         0.80  0.25  0.77  0.77 |          --    --    --    --  |          --    --    --    -- 
+    median at  1200 (1 runs): h at key positions  0.90, gate input  0.25, h at the block's first key  0.93, at its last key  0.87
+    median at  2400 (1 runs): h at key positions  0.80, gate input  0.25, h at the block's first key  0.77, at its last key  0.77
+    median at  4800 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+    median at  9600 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+  S38 A_HINGE_M (S=4, printed alongside): median h_key at 4800 --
+  CONFIG HINGE16_M (rerun of S35's MUON_HINGE16 (Muon, S=4, k=16) to 9600); chance 0.250; reruns reproduce their records through 9600: 1/1
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     240 BOUND ROUTED              3600 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |          --    --    --    --  |          --    --    --    -- 
+    median at  1200 (1 runs): h at key positions  1.00, gate input  0.25, h at the block's first key  1.00, at its last key  1.00
+    median at  2400 (1 runs): h at key positions  1.00, gate input  0.25, h at the block's first key  1.00, at its last key  1.00
+    median at  4800 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+    median at  9600 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+  S38 HINGE16_M (S=4, printed alongside): median h_key at 4800 --
+  DRY RUN READING dry_gate_state D8_HINGE_M: no measurement at 4800  [EXPLORATORY, not a result]
+  DRY RUN READING dry_gate_state HINGE_D8_A: no measurement at 4800  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 3600 steps; exercises the code, not for interpretation)
+  S37 split_target (MUON): it does not (BOUND 0/1; >= 8 fixes, <= 5 not) (KEYMASS targeting on the fired splits 0/0, the all-position rule 0/0; HARM 0 runs)
+  S37 split_target (ADAM): it does not (BOUND 1/1; >= 8 fixes, <= 5 not) (KEYMASS targeting on the fired splits 0/0, the all-position rule 0/0; HARM 0 runs)
+  S37 HINGE4k4_A (Adam, k=4, no trigger): BOUND 1/1
+  S38 gate_state D8_HINGE_M: no measurement at 4800
+  S38 gate_state HINGE_D8_A: no measurement at 4800
+  S38 gate_state A_HINGE_M: printed alongside (median h_key at 4800 --)
+  S38 gate_state HINGE16_M: printed alongside (median h_key at 4800 --)
+####################################################################################################
