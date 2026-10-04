@@ -1,0 +1,85 @@
+{
+ "meta": {
+  "arms": {
+   "A_HINGE_M": {
+    "S": 4,
+    "iters": 2400,
+    "key": "A_HINGE_M",
+    "label": "rerun of S33's A_HINGE (Muon, S=4, k=4) to 2400, a reference",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "prio": 1,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244
+    ]
+   },
+   "D8_HINGE_M": {
+    "S": 8,
+    "iters": 2400,
+    "key": "D8_HINGE_M",
+    "label": "rerun of S33's D8_HINGE (Muon, S=8, k=16) to 2400",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "prio": 1,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "D8_SLOW_M": {
+    "S": 8,
+    "iters": 2400,
+    "key": "D8_SLOW_M",
+    "label": "rerun of S33's D8_SLOW (Muon, S=8, k=16, no hinge) to 2400",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "prio": 1,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "HINGE_D8_A": {
+    "S": 8,
+    "iters": 2400,
+    "key": "HINGE_D8_A",
+    "label": "rerun of X's HINGE_D8 (Adam, S=8, k=16) to 2400",
+    "lr": 0.001,
+    "muon_lr": null,
+    "prio": 1,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "7105374+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-04 16:28:00",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
