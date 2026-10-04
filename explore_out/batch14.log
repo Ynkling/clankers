@@ -129,3 +129,40 @@ EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40)
   lr read for gate_memory A_HINGE_M: 0.001 (Adam groups); Muon lr 0.005
   S40 readings (per arm, BOUND ROUTED at 28800): 'the look-back breaks the eight-stream stall' if >= 3/10; 'it does not' if 0/10; otherwise neither
   S39 labels (per configuration, median decodability of h at key positions): 'formed, then lost' if >= 0.5 at some evaluation up to 1200 and <= 0.25 at 2400; 'never formed' if < 0.25 at every evaluation; otherwise 'partial'
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (44s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch14.py differs from 0ce53bf, where the full CHECK suite passed (2026-10-04 16:33:23 UTC; its output is earlier in this log). git diff --stat 0ce53bf:
+     explore_out/README.md                      |     2 +-
+     explore_out/batch14.log                    |   119 +
+     explore_out/batch14_checks.json            |     6 +
+     explore_out/gate_memory_results.json       | 20006 ++++++++++++++++++++++
+     explore_out/gate_prev_results.json         | 24718 +++++++++++++++++++++++++++
+     explore_out/gate_prev_runtime_results.json |    20 +
+     6 files changed, 44870 insertions(+), 1 deletion(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_prev
+  idea    GATE_PREV: the recurrent gate also reads the previous token's embedding (W_prev v_(t-1) in its pre-activation)
+  source  batch 13's S38 (at S=8 the gate state does not carry the stream at key positions; the stream token is the token right before every key)
+  change  pre-activation W_in v_t + W_prev v_(t-1) + W_h h_(t-1), v_(-1) = 0; W_prev ~ N(0, 0.1^2) from its own generator; W_prev in the gate group; nothing else
+  arm D8_PREV_M    lr 0.001  iters 28800  seeds 260-269 (10)  — S33's D8_HINGE + GATE_PREV (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm D8_PREV_A    lr 0.001  iters 28800  seeds 260-269 (10)  — X's HINGE_D8 + GATE_PREV (Adam)
+                   schedule: gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  pairing seeds 260-269: D8_PREV_M with S33's D8_HINGE, D8_PREV_A with X's HINGE_D8; every shared parameter's initial value and the batch stream are the paired run's
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_memory
+  idea    descriptive: does the gate state form a one-token memory of the stream in updates 0-2400, and keep it?
+  source  batch 13's S38 (S=8 h decodability at chance at 4800; HINGE_D8 262 at 0.81 at 1200, 0.13 at 2400); S33; X
+  change  none to the runs (reruns to 2400); labelled decoders of h, the pre-tanh terms' norms, saturation, read-gate entropy and distinct channels at 11 updates
+  arm D8_HINGE_M   lr 0.001  iters 2400  seeds 260-264 (5)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 2400
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  arm D8_SLOW_M    lr 0.001  iters 2400  seeds 260-264 (5)  — rerun of S33's D8_SLOW (Muon, S=8, k=16, no hinge) to 2400
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400
+  arm HINGE_D8_A   lr 0.001  iters 2400  seeds 260-264 (5)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 2400
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
+  arm A_HINGE_M    lr 0.001  iters 2400  seeds 240-244 (5)  — rerun of S33's A_HINGE (Muon, S=4, k=4) to 2400, a reference
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  pairing each rerun against its recorded run (the curve must reproduce through 2400)
+----------------------------------------------------------------------------------------------------
