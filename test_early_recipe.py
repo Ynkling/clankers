@@ -123,6 +123,39 @@ RUNTIME
 OUTPUT
 Per-seed raw values first, then validity, counts, claims, readings, diagnostics and curves.
 Results: early_recipe_results.json (gitignored; X's copy in results/X/).
+
+RESULT (X, test commit 9f25dc8; results/X/early_recipe_results.json)
+Run conditions:
+- 108/108 records, none failed; 159.3 min of training after verification, 4 workers x 1 thread,
+  one start (2.80GHz host, started 2026-10-04 06:26, detached with setsid).
+- Every CHECK passed (inherited 1-119, own 120-128). CHECKs 122-123 compare with the screens' own
+  code (831c485) run on this machine (the user's decision): both IDENTICAL. The screens' recorded
+  runs, written on the 2.10GHz host, differ (Muon's bf16 Newton-Schulz follows the host's oneDNN
+  path) and are printed, not asserted. Every record: 2.80GHz, gemm:jit:bf16, NS fingerprint
+  f209ef7b8c61.
+- Drop rule: projection 10.62 h > 10 h, so Part B was cut to seeds 340-351 (projection 8.35 h).
+  Part A ran all 40 seeds.
+- Validity: CEIL_A 2/2 and CEIL_B 2/2 bound -> both parts VALID.
+Claims:
+- E1 WIN_M 40/40 vs SLOW_M 36/40 DISCOVERED, 4 vs 0, p = 0.0625: NOT SHOWN.
+- E2 bound by 4800: WIN16_M 10/12 vs WIN16_A 6/12, 5 vs 1, p = 0.11: NOT SHOWN.
+- Bands: WIN_M RELIABLE (40/40), WIN16_A MAJORITY (10/12), WIN16_M RELIABLE (11/12).
+- Reading: none applies.
+- Printed, not claims: BOUND WIN16_M 11/12 vs WIN16_A 10/12 (2 vs 1, p = 0.5); median transition
+  SLOW_M 2400, WIN_M 2400, WIN16_A 4800 [3600, 25200], WIN16_M 2400 [2400, 6000].
+Diagnostics (not part of the verdict):
+- SLOW_M's 4 failures are all POSITION (s304, s314, s320, s332); WIN_M discovered on each of them,
+  and on those four seeds the hinge fired early (updates 88-230) at hinge/task ratios 603-50566.
+- The hinge fired on 19/40 WIN_M runs (first firing 137 [59, 242], last at 358), 8/12 WIN16_A
+  (first 342 [248, 427], last 2303) and 12/12 WIN16_M (first 331 [140, 546], last 761).
+  Hinge/task gradient-norm ratio over every firing: WIN_M 3385.6 [7.1, 57759.7], WIN16_A 81.5
+  [12.1, 638188.6], WIN16_M 36.3 [8.6, 110420.5].
+- Would-fires after the window: WIN_M 2 runs (1 update each), WIN16_A 4 runs (8394 updates, 8384
+  of them on s351, which bound at 20400), WIN16_M none.
+- WIN16_A failures: s342 non-stream OTHER (3 streams on one channel throughout), s343
+  STREAM-PARTIAL one-to-one (all 4 on one channel through 9600, split by the end). WIN16_M's one
+  failure, s345, MERGED (2 share) from 4800 on. At 4800, 11/12 WIN16_M gates held the 4 streams on
+  4 distinct channels; WIN16_A 6/12.
 """
 
 import argparse
