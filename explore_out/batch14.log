@@ -115,3 +115,17 @@ EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40)
           acc 0.146  trans  None  VALcos 1.000  margin 0.16  OTHER  reproduces its record True
   [ 24/40]   68.8 min  gate_memory    HINGE_D8_A seed 264  lr 0.001 (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge)
           acc 0.069  trans  None  VALcos 0.998  margin 0.00  OTHER  reproduces its record True
+#################### RESUME 2026-10-04 18:28:08 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 01753bb+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; Muon lr 0.005 (S33's validity choice {'a': 0.005, 'b': 0.005}); S40 28800 steps, S39 reruns to 2400; 1 torch thread per run
+  lr read for gate_prev D8_PREV_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for gate_prev D8_PREV_A: 0.001 (Adam groups)
+  lr read for gate_memory D8_HINGE_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for gate_memory D8_SLOW_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for gate_memory HINGE_D8_A: 0.001 (Adam groups)
+  lr read for gate_memory A_HINGE_M: 0.001 (Adam groups); Muon lr 0.005
+  S40 readings (per arm, BOUND ROUTED at 28800): 'the look-back breaks the eight-stream stall' if >= 3/10; 'it does not' if 0/10; otherwise neither
+  S39 labels (per configuration, median decodability of h at key positions): 'formed, then lost' if >= 0.5 at some evaluation up to 1200 and <= 0.25 at 2400; 'never formed' if < 0.25 at every evaluation; otherwise 'partial'
