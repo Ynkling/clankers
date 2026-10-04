@@ -34,7 +34,7 @@ for a pre-registered test.
 | `batch12_dry.log`, `dry_split_plateau_results.json` (S36 split_plateau) | batch 12's labelled DRY RUN, second attempt (git f714c03, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (14.0 min, child processes on main's modules at 9c5939e), the projection with pool-load timing (49.7 ms per step for (a), 102.6 / 98.2 ms for SPLIT_D8_M / SPLIT_D8_A), 1 seed per arm, runs capped at 3600 steps (no check reaches 4800, so no split; the operation is exercised by the CHECKs). It exercises the code; its numbers are not for interpretation. After it, before any real run: the driver submits the runs in waves of 4 (b) runs then 4 (a) runs (submission order only), so a 2-hour segment ends on a wave of short runs rather than losing a wave of 43200-step runs in flight. Runs, CHECKs and readings unchanged. |
 | `batch12.log`, `split_plateau_runtime_results.json` (S36 split_plateau) | batch 12, code of git faa1926 (the full CHECK pass recorded at fcb4a27 in `batch12_checks.json`; the banners' git fcb4a27+dirty, ae40635+dirty, e9e9c4e+dirty, e3d76a1+dirty and 6739017+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (30/30 runs) in 5 segments: segment 1 ran the full CHECK suite (13.6 min) and the projection (7.79 h on 4 workers: no cut, stored) and saved 6 runs; segments 2-5 (RESUME) saved 8, 8, 4 and 4, the runs submitted in waves of 4 (b) then 4 (a) runs (runs in flight at a stop were lost and re-run). Repro check bit-identical to X in every segment; later segments skipped the rest of the CHECK suite, the screen code being unchanged, and reused the stored cut decision. All on a Xeon @ 2.10GHz; every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, read-only). Reports, readings and SUMMARY at the end (the per-check masses are in the log). |
 | `batch13_dry.log`, `dry_<screen>_results.json` (S37 split_target, S38 gate_state) | batch 13's labelled DRY RUN (git 346adbf, Intel Xeon @ 2.10GHz): the repro check bit-identical, every CHECK passed (10.7 min, child processes on main's modules at 9c5939e: the trigger-off equalities through 7200, KEYMASS on the synthetic 2+1+1 gate, the four reruns through 2400 with the recomputed read gate exact, the decoder 1.0 / 0.1275 on the synthetic sets), the projection with pool-load timing, 1 seed per arm, runs capped at 3600 steps (no check reaches 4800, so no split and no S38 measurement at 4800). It exercises the code; its numbers are not for interpretation. |
-| `batch13.log` (S37 split_target, S38 gate_state) | batch 13, code of git 346adbf, 1 thread per run. **IN PROGRESS: 50 of 50 runs saved (split_target 30, gate_state 20).** Run in segments, each resumed after the session's background time limit stops it; S37's runs first; pushed after every saved run. No report or reading until the SUMMARY at the end of the log. |
+| `batch13.log`, `split_target_runtime_results.json` (S37 split_target, S38 gate_state) | batch 13, code of git c2b30dc (the full CHECK pass recorded at b2981bd in `batch13_checks.json`; the banners' git b2981bd+dirty and b981809+dirty are the watcher's explore_out commits on top of it, the screen code unchanged), 1 thread per run; complete (50/50 runs: 30 S37, 20 S38) in 2 segments: segment 1 ran the full CHECK suite (11.3 min) and the projection (4.14 h on 4 workers: no cut, stored) and saved 33 runs; segment 2 (RESUME) saved the last 17. Repro check bit-identical to X in both segments; segment 2 skipped the rest of the CHECK suite, the screen code being unchanged. Every S38 rerun reproduced its recorded curve through 9600 (20/20). All on a Xeon @ 2.10GHz; every run in a child process on the main line's modules at 9c5939e (`explore_main9c`, read-only). Reports, readings and SUMMARY at the end. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -307,3 +307,35 @@ the best final accuracy was 0.49 in each arm, and no split was followed by a HAR
 The streams stayed on 1-3 channels (median at the end: SPLIT_D8_M 3, SPLIT_D8_A 2, as X's HINGE_D8 2); a split's new
 channel rarely held a stream by the next check: copying the busiest row to the idlest does not break the coarse split.
 Verdict: not promising in either configuration.
+
+## Batch 13 verdicts (rules fixed before any run)
+
+| screen / arm | outcome | paired reference | cand. only / ref only | McNemar p | reading / verdict |
+|---|---|---|---|---|---|
+| S37 SPLITK_M (S=4, k=4, Muon, seeds 240-249) | BOUND 6/10 | S33 A_HINGE 4/10; S36 SPLIT4k4_M 5/10 | 3 / 1; 1 / 0 | 0.625; 1 | "neither" (6 is between 5 and 8) |
+| S37 HINGE4k4_A (Adam, main's HINGE recipe at k=4, run here) | BOUND 7/10 (5 routed, 2 not routed) | X A4k4 4/10 | 5 / 2 | 0.45 | (baseline, printed) |
+| S37 SPLITK_A (Adam) | BOUND 9/10 (6 routed, 3 not routed) | HINGE4k4_A 7/10 | 2 / 0 | 0.5 | "the targeted split fixes four-stream merges" (>= 8/10) |
+| S37 targeting (fired splits; checks with a shared and an empty channel) | KEYMASS: Muon 10/11, 49/51; Adam 7/8, 30/40 | all-position rule at the same checks: Muon 5/11, 29/51; Adam 6/8, 34/40 | | | (printed) |
+| S38 D8_HINGE_M (Muon, S=8, k=16, 260-264) | stream from h at key positions, median at 4800: 0.13 (chance 0.125) | gate input 0.12 | | | "the eight-stream gate state does not carry the stream" |
+| S38 HINGE_D8_A (Adam, S=8, k=16, 260-264) | median at 4800: 0.14 | gate input 0.12 | | | "the eight-stream gate state does not carry the stream" |
+| S38 A_HINGE_M (Muon, S=4, k=4, 240-244) | median at 4800: 0.84 (chance 0.25) | gate input 0.25 | | | (printed alongside) |
+| S38 HINGE16_M (Muon, S=4, k=16, 240-244) | median at 4800: 1.00 | gate input 0.25 | | | (printed alongside) |
+
+S37, Muon: KEYMASS targeted 10 of 11 splits correctly (S36's all-position rule would have targeted 5 of them). The first split
+rescued 3 runs (240 and 241 at 4800, 247 at 7200, the last one mistargeted onto a singleton channel and bound anyway), as S36
+rescued 240 and 247; 241 is new. The 4 runs that stayed merged (243, 249: 2+1+1; 244, 245: two pairs, 2+2) took both their
+splits, correctly targeted, from 7200 on, and the map did not change; 245 was lost against A_HINGE (bound, not routed, at 27600
+there). No HARM in either arm (the cap kept the splits to 2 per run).
+
+S37, Adam: the reading holds by the rule, but most of it is the baseline: main's HINGE recipe at k=4 binds 7/10 here without
+any split (X's plain A4k4: 4/10). The split added 246 (bound, not routed) and 247 (routed); on 241 and 245 both arms bound
+(SPLITK_A at 12000 and 8400, HINGE4k4_A at 10800 and 8400), and 249 failed in both. Three of SPLITK_A's 9 are bound but not
+routed (243, 246, 248; 248 with all four streams on one channel). Under Adam the all-position rule targeted slightly better than
+KEYMASS over all merged checks (34/40 vs 30/40).
+
+S38: at S=8 the gate state h at the key positions carries almost nothing about the stream, under Muon and Adam alike (median
+0.13 and 0.14 at 4800, chance 0.125), although the stream's CTX token is the token just before each key. Exceptions: D8_HINGE_M
+263 (about 0.5 throughout) and HINGE_D8_A 260-262 (up to 0.81 at 1200 for 262, falling to chance by 2400). At S=4 the same
+decoder reads the stream from h at 0.84 (k=4, Muon; 0.5-0.86 in the merged runs) and 1.00 (k=16, Muon) at 4800. The gate input
+(the key's embedding) is at chance in every configuration, as it should be, and h at the first and the last key of a block
+decode alike. Every rerun reproduced its recorded curve through 9600.
