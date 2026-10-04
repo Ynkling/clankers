@@ -229,3 +229,276 @@ EXPLORATORY, NOT A RESULT — batch 13: split_target (S37), gate_state (S38)
           acc 0.359  trans  None  VALcos 0.000  margin 0.44  STREAM-PARTIAL  ROUTED* 1200/2400/end -/-/-
   [ 16/17]   61.0 min  gate_state     D8_HINGE_M seed 264  lr 0.001 (S33's D8_HINGE recipe)
           acc 0.086  trans  None  VALcos 0.999  margin 0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  [ 17/17]   66.1 min  gate_state     HINGE_D8_A seed 264  lr 0.001 (test_slow_start's HINGE recipe)
+          acc 0.075  trans  None  VALcos 0.999  margin -0.00  OTHER  ROUTED* 1200/2400/end -/-/-
+  batch wall clock 66.1 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN split_target
+  idea    S36's split targeted by the read-gate mass at the hinge's key positions (KEYMASS), at most 2 per run
+  source  batch 12's S36 (the all-position target was wrong in half the splits: an empty channel can carry the largest mass); S24 (SPLIT un-merged 8/8 Adam runs at k=4)
+  change  S36's trigger, c* / c0 = the largest / smallest mean read-gate mass at key positions, <= 2 splits, >= 4800 updates apart; S24's operation
+  arm SPLITK_M     lr 0.001  iters 28800  seeds 240-249 (10)  — S33's A_HINGE + trigger + KEYMASS (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset
+  arm HINGE4k4_A   lr 0.001  iters 28800  seeds 240-249 (10)  — main's A4k4 + test_slow_start's HINGE recipe (Adam), run here
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  arm SPLITK_A     lr 0.001  iters 28800  seeds 240-249 (10)  — HINGE4k4_A + trigger + KEYMASS (Adam)
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset
+  pairing seeds 240-249: SPLITK_M with S33's A_HINGE and S36's SPLIT4k4_M; SPLITK_A with HINGE4k4_A (run here); same initial parameters and batches until the first split
+----------------------------------------------------------------------------------------------------
+    seed | SPLITK_M               trans spl      ch | A_HINGE            | S36 SPLIT4k4_M     || SPLITK_A               trans spl      ch | HINGE4k4_A             trans      ch | X A4k4              
+     240 | BOUND ROUTED            7200   1 1+1+1+1 | MERGED (2 share)   | BOUND ROUTED       || BOUND ROUTED            3600   0 1+1+1+1 | BOUND ROUTED            3600 1+1+1+1 | unbound             
+     241 | BOUND ROUTED            6000   1 1+1+1+1 | MERGED (2 share)   | MERGED (2 share)   || BOUND ROUTED           12000   2 1+1+1+1 | BOUND ROUTED           10800 1+1+1+1 | BOUND               
+     242 | BOUND ROUTED            2400   0 1+1+1+1 | BOUND ROUTED       | BOUND ROUTED       || BOUND ROUTED            4800   0 1+1+1+1 | BOUND ROUTED            4800 1+1+1+1 | BOUND               
+     243 | MERGED (2 share)        None   2   2+1+1 | MERGED (2 share)   | MERGED (2 share)   || BOUND NOT routed        7200   0   2+1+1 | BOUND NOT routed        7200   2+1+1 | unbound             
+     244 | MERGED (2 share)        None   2     2+2 | MERGED (2 share)   | MERGED (2 share)   || BOUND ROUTED            4800   0 1+1+1+1 | BOUND ROUTED            4800 1+1+1+1 | unbound             
+     245 | MERGED (2 share)        None   2     2+2 | BOUND NOT routed   | MERGED (2 share)   || BOUND ROUTED            8400   1 1+1+1+1 | BOUND ROUTED            8400 1+1+1+1 | unbound             
+     246 | BOUND ROUTED            2400   0 1+1+1+1 | BOUND ROUTED       | BOUND ROUTED       || BOUND NOT routed        9600   1   2+1+1 | MERGED (2 share)        None   2+1+1 | BOUND               
+     247 | BOUND ROUTED           12000   1 1+1+1+1 | MERGED (2 share)   | BOUND ROUTED       || BOUND ROUTED           10800   1 1+1+1+1 | MERGED (2 share)        None   2+1+1 | unbound             
+     248 | BOUND ROUTED            2400   0 1+1+1+1 | BOUND ROUTED       | BOUND ROUTED       || BOUND NOT routed       12000   1       4 | BOUND NOT routed       15600     2+2 | unbound             
+     249 | MERGED (2 share)        None   2   2+1+1 | MERGED (2 share)   | MERGED (2 share)   || MERGED (3 share)        None   2     3+1 | non-stream KEY          None       4 | BOUND               
+  SPLITK_M vs S33's A_HINGE and vs S36's SPLIT4k4_M (paired):
+    BOUND  SPLITK_M 6/10  A_HINGE 4/10  SPLITK_M only 3, A_HINGE only 1, McNemar two-sided p = 0.625 (printed)
+    BOUND  SPLITK_M 6/10  SPLIT4k4_M 5/10  SPLITK_M only 1, SPLIT4k4_M only 0, McNemar two-sided p = 1 (printed)
+  SPLITK_A vs HINGE4k4_A (paired):
+    BOUND  SPLITK_A 9/10  HINGE4k4_A 7/10  SPLITK_A only 2, HINGE4k4_A only 0, McNemar two-sided p = 0.5 (printed)
+  HINGE4k4_A vs X's A4k4 (printed):
+    BOUND  HINGE4k4_A 7/10  X A4k4 4/10  HINGE4k4_A only 5, X A4k4 only 2, McNemar two-sided p = 0.453 (printed)
+  SPLITK_M checks per run (step: probe acc; E eligible, F fired, B blocked by the cap; KEYMASS c*->c0 / all-position c*->c0; labelled map before; +/- = copies a >= 2-stream channel onto an empty one):
+    240: splits 1
+          2400 acc 0.719 . key 3->1 +  all 3->1 +  map [3, 3, 2, 0] (2+1+1)  key masses [0.25 0.01 0.25 0.50]  all [0.24 0.12 0.21 0.43]
+          4800 acc 0.688 F key 3->1 +  all 3->1 +  map [3, 3, 2, 0] (2+1+1) -> [1, 1, 2, 0] (2+1+1)  key masses [0.25 0.07 0.25 0.43]  all [0.25 0.19 0.24 0.32]
+          7200 acc 1.000 . key 1->3 -  all 2->3 -  map [3, 1, 2, 0] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.24 0.27 0.29 0.20]
+          9600 acc 1.000 . key 1->3 -  all 1->0 -  map [3, 1, 2, 0] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.23 0.26 0.25 0.25]
+    241: splits 1
+          2400 acc 0.781 . key 0->1 +  all 0->1 +  map [2, 3, 0, 0] (2+1+1)  key masses [0.36 0.13 0.25 0.25]  all [0.33 0.13 0.29 0.25]
+          4800 acc 0.750 F key 0->1 +  all 1->2 -  map [2, 3, 0, 0] (2+1+1) -> [2, 3, 0, 0] (2+1+1)  key masses [0.35 0.15 0.25 0.25]  all [0.30 0.34 0.18 0.18]
+          7200 acc 1.000 . key 1->0 -  all 1->0 -  map [2, 3, 0, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.20 0.29 0.24 0.27]
+    242: splits 0
+          2400 acc 1.000 . key 1->3 -  all 0->1 -  map [0, 2, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.26 0.25 0.25 0.25]
+          4800 acc 0.984 . key 1->0 -  all 2->3 -  map [0, 2, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.25 0.26 0.27 0.23]
+          7200 acc 1.000 . key 1->2 -  all 0->3 -  map [0, 2, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.27 0.26 0.25 0.21]
+    243: splits 2
+          2400 acc 0.797 . key 3->2 +  all 3->0 -  map [0, 1, 3, 3] (2+1+1)  key masses [0.25 0.25 0.00 0.50]  all [0.20 0.20 0.22 0.38]
+          4800 acc 0.828 . key 3->2 +  all 3->0 -  map [0, 1, 3, 3] (2+1+1)  key masses [0.25 0.25 0.00 0.50]  all [0.17 0.17 0.33 0.34]
+          7200 acc 0.859 . key 3->2 +  all 2->1 -  map [0, 1, 3, 3] (2+1+1)  key masses [0.25 0.25 0.00 0.50]  all [0.17 0.17 0.34 0.33]
+          9600 acc 0.797 F key 3->2 +  all 2->0 -  map [0, 1, 3, 3] (2+1+1) -> [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.03 0.47]  all [0.17 0.17 0.35 0.32]
+         12000 acc 0.797 B key 2->3 +  all 3->0 -  map [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.39 0.11]  all [0.17 0.17 0.30 0.37]
+         14400 acc 0.797 F key 2->3 +  all 3->0 -  map [0, 1, 2, 2] (2+1+1) -> [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.41 0.09]  all [0.17 0.17 0.30 0.37]
+         16800 acc 0.828 . key 2->3 +  all 3->0 -  map [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.40 0.10]  all [0.17 0.17 0.32 0.34]
+         19200 acc 0.812 B key 2->3 +  all 3->1 -  map [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.41 0.09]  all [0.17 0.17 0.31 0.34]
+         21600 acc 0.891 . key 2->3 +  all 3->1 -  map [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.40 0.10]  all [0.17 0.17 0.30 0.36]
+         24000 acc 0.766 B key 2->3 +  all 3->1 -  map [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.39 0.11]  all [0.17 0.17 0.29 0.37]
+         26400 acc 0.844 . key 2->3 +  all 3->1 -  map [0, 1, 2, 2] (2+1+1)  key masses [0.25 0.25 0.33 0.17]  all [0.18 0.17 0.27 0.39]
+    244: splits 2
+          2400 acc 0.516 . key 0->1 +  all 0->3 +  map [0, 2, 2, 0] (2+2)  key masses [0.46 0.05 0.29 0.21]  all [0.35 0.26 0.23 0.16]
+          4800 acc 0.438 F key 2->3 +  all 2->1 +  map [0, 2, 2, 0] (2+2) -> [0, 2, 2, 0] (2+2)  key masses [0.38 0.12 0.41 0.09]  all [0.29 0.18 0.31 0.22]
+          7200 acc 0.469 . key 0->1 +  all 2->1 +  map [0, 2, 2, 0] (2+2)  key masses [0.39 0.11 0.37 0.13]  all [0.30 0.14 0.30 0.27]
+          9600 acc 0.578 . key 2->3 +  all 2->1 +  map [0, 2, 2, 0] (2+2)  key masses [0.31 0.19 0.34 0.16]  all [0.27 0.17 0.29 0.27]
+         12000 acc 0.484 F key 0->1 +  all 0->1 +  map [0, 2, 2, 0] (2+2) -> [1, 2, 2, 1] (2+2)  key masses [0.36 0.14 0.29 0.21]  all [0.28 0.19 0.27 0.26]
+         14400 acc 0.578 . key 2->3 +  all 2->0 +  map [1, 2, 2, 1] (2+2)  key masses [0.19 0.31 0.34 0.16]  all [0.19 0.28 0.30 0.23]
+         16800 acc 0.484 B key 1->0 +  all 1->0 +  map [1, 2, 2, 1] (2+2)  key masses [0.05 0.45 0.36 0.14]  all [0.10 0.33 0.29 0.27]
+         19200 acc 0.625 . key 1->0 +  all 2->0 +  map [1, 2, 2, 1] (2+2)  key masses [0.13 0.37 0.34 0.16]  all [0.12 0.31 0.32 0.25]
+         21600 acc 0.500 B key 2->3 +  all 1->3 +  map [1, 2, 2, 1] (2+2)  key masses [0.14 0.36 0.42 0.08]  all [0.28 0.33 0.31 0.09]
+         24000 acc 0.547 . key 1->0 +  all 1->3 +  map [1, 2, 2, 1] (2+2)  key masses [0.04 0.46 0.33 0.17]  all [0.20 0.33 0.31 0.16]
+         26400 acc 0.422 B key 1->0 +  all 1->0 +  map [1, 2, 2, 1] (2+2)  key masses [0.04 0.46 0.36 0.14]  all [0.09 0.33 0.31 0.27]
+    245: splits 2
+          2400 acc 0.453 . key 1->0 +  all 2->3 +  map [2, 1, 1, 2] (2+2)  key masses [0.08 0.42 0.41 0.09]  all [0.25 0.28 0.28 0.19]
+          4800 acc 0.562 . key 1->0 +  all 1->3 +  map [2, 1, 1, 2] (2+2)  key masses [0.03 0.47 0.33 0.17]  all [0.31 0.33 0.28 0.09]
+          7200 acc 0.469 F key 1->0 +  all 0->3 -  map [2, 1, 1, 2] (2+2) -> [2, 1, 1, 2] (2+2)  key masses [0.10 0.40 0.39 0.11]  all [0.32 0.30 0.29 0.09]
+          9600 acc 0.547 . key 0->1 +  all 0->1 +  map [2, 0, 0, 2] (2+2)  key masses [0.44 0.06 0.43 0.07]  all [0.31 0.15 0.31 0.23]
+         12000 acc 0.547 F key 0->1 +  all 0->3 +  map [2, 0, 0, 2] (2+2) -> [2, 1, 1, 2] (2+2)  key masses [0.48 0.02 0.41 0.09]  all [0.33 0.25 0.31 0.10]
+         14400 acc 0.531 B key 2->3 +  all 2->0 +  map [2, 1, 1, 2] (2+2)  key masses [0.05 0.45 0.49 0.01]  all [0.02 0.32 0.33 0.33]
+         16800 acc 0.562 . key 2->3 +  all 3->0 -  map [2, 1, 1, 2] (2+2)  key masses [0.09 0.41 0.42 0.08]  all [0.03 0.30 0.31 0.36]
+         19200 acc 0.438 B key 2->3 +  all 3->0 -  map [2, 1, 1, 2] (2+2)  key masses [0.08 0.42 0.49 0.01]  all [0.03 0.31 0.33 0.33]
+         21600 acc 0.438 B key 2->3 +  all 2->0 +  map [2, 1, 1, 2] (2+2)  key masses [0.10 0.40 0.50 0.00]  all [0.04 0.30 0.33 0.33]
+         24000 acc 0.531 . key 1->0 +  all 3->0 -  map [2, 1, 1, 2] (2+2)  key masses [0.05 0.45 0.40 0.10]  all [0.02 0.31 0.30 0.37]
+         26400 acc 0.500 B key 2->3 +  all 3->0 -  map [2, 1, 1, 2] (2+2)  key masses [0.09 0.41 0.46 0.04]  all [0.03 0.30 0.33 0.34]
+    246: splits 0
+          2400 acc 0.953 . key 0->2 -  all 1->0 -  map [2, 0, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.24 0.26 0.25 0.25]
+          4800 acc 1.000 . key 1->0 -  all 2->3 -  map [2, 0, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.25 0.25 0.27 0.24]
+          7200 acc 1.000 . key 1->0 -  all 2->0 -  map [2, 0, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.22 0.25 0.27 0.25]
+    247: splits 1
+          2400 acc 0.609 . key 2->0 +  all 2->0 +  map [2, 2, 1, 3] (2+1+1)  key masses [0.18 0.26 0.37 0.19]  all [0.15 0.31 0.36 0.18]
+          4800 acc 0.656 . key 2->3 -  all 1->0 -  map [2, 2, 1, 3] (2+1+1)  key masses [0.20 0.25 0.36 0.19]  all [0.14 0.35 0.32 0.19]
+          7200 acc 0.641 F key 2->3 -  all 2->0 +  map [2, 2, 1, 3] (2+1+1) -> [3, 3, 1, 0] (2+1+1)  key masses [0.19 0.25 0.38 0.19]  all [0.12 0.34 0.36 0.17]
+          9600 acc 0.828 . key 0->2 -  all 0->2 -  map [2, 3, 1, 0] (1+1+1+1)  key masses [0.38 0.25 0.19 0.19]  all [0.33 0.30 0.15 0.22]
+         12000 acc 0.984 . key 0->2 -  all 1->2 -  map [2, 3, 1, 0] (1+1+1+1)  key masses [0.37 0.25 0.19 0.19]  all [0.29 0.31 0.16 0.25]
+         14400 acc 1.000 . key 0->3 -  all 1->2 -  map [2, 3, 1, 0] (1+1+1+1)  key masses [0.38 0.25 0.19 0.19]  all [0.29 0.34 0.12 0.25]
+    248: splits 0
+          2400 acc 1.000 . key 1->2 -  all 2->3 -  map [3, 2, 0, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.25 0.25 0.25 0.25]
+          4800 acc 0.969 . key 2->1 -  all 3->0 -  map [3, 2, 0, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.19 0.28 0.23 0.30]
+          7200 acc 1.000 . key 0->2 -  all 1->3 -  map [3, 2, 0, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.26 0.29 0.26 0.19]
+    249: splits 2
+          2400 acc 0.719 . key 2->1 +  all 2->0 -  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.01 0.49 0.25]  all [0.18 0.25 0.40 0.18]
+          4800 acc 0.781 . key 2->1 +  all 1->3 -  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.10 0.40 0.25]  all [0.17 0.36 0.30 0.17]
+          7200 acc 0.703 F key 2->1 +  all 1->0 -  map [2, 0, 3, 2] (2+1+1) -> [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.15 0.35 0.25]  all [0.18 0.36 0.28 0.18]
+          9600 acc 0.750 . key 2->1 +  all 2->1 +  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.13 0.37 0.25]  all [0.24 0.23 0.30 0.24]
+         12000 acc 0.703 F key 2->1 +  all 3->0 -  map [2, 0, 3, 2] (2+1+1) -> [1, 0, 3, 1] (2+1+1)  key masses [0.25 0.15 0.35 0.25]  all [0.17 0.19 0.31 0.33]
+         14400 acc 0.703 B key 2->1 +  all 2->1 +  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.13 0.37 0.25]  all [0.25 0.16 0.34 0.24]
+         16800 acc 0.688 B key 2->1 +  all 2->1 +  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.17 0.33 0.25]  all [0.22 0.19 0.32 0.27]
+         19200 acc 0.781 . key 2->1 +  all 2->1 +  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.07 0.43 0.25]  all [0.24 0.13 0.37 0.26]
+         21600 acc 0.797 B key 2->1 +  all 2->1 +  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.11 0.39 0.25]  all [0.26 0.18 0.34 0.23]
+         24000 acc 0.672 B key 2->1 +  all 2->1 +  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.14 0.36 0.25]  all [0.25 0.17 0.33 0.25]
+         26400 acc 0.719 . key 2->1 +  all 2->1 +  map [2, 0, 3, 2] (2+1+1)  key masses [0.25 0.18 0.32 0.25]  all [0.24 0.17 0.33 0.26]
+  SPLITK_M labelled targeting accuracy (copies a >= 2-stream channel onto an empty one): over the 11 fired splits KEYMASS 10/11, the all-position rule (at the same checks) 5/11; over the 51 checks whose labelled map has a shared and an empty channel KEYMASS 49/51, all-position 29/51
+    SPLITK_M 240 splits (channels before -> right after -> at the next check): 4800 3->1: 2+1+1 -> 2+1+1 -> 1+1+1+1
+    SPLITK_M 241 splits (channels before -> right after -> at the next check): 4800 0->1: 2+1+1 -> 2+1+1 -> 1+1+1+1
+    SPLITK_M 243 splits (channels before -> right after -> at the next check): 9600 3->2: 2+1+1 -> 2+1+1 -> 2+1+1; 14400 2->3: 2+1+1 -> 2+1+1 -> 2+1+1
+    SPLITK_M 244 splits (channels before -> right after -> at the next check): 4800 2->3: 2+2 -> 2+2 -> 2+2; 12000 0->1: 2+2 -> 2+2 -> 2+2
+    SPLITK_M 245 splits (channels before -> right after -> at the next check): 7200 1->0: 2+2 -> 2+2 -> 2+2; 12000 0->1: 2+2 -> 2+2 -> 2+2
+    SPLITK_M 247 splits (channels before -> right after -> at the next check): 7200 2->3: 2+1+1 -> 2+1+1 -> 1+1+1+1
+    SPLITK_M 249 splits (channels before -> right after -> at the next check): 7200 2->1: 2+1+1 -> 2+1+1 -> 2+1+1; 12000 2->1: 2+1+1 -> 2+1+1 -> 2+1+1
+  SPLITK_M HARM (held-out accuracy 2400 updates after a split > 0.05 below the value at it): 0/10 runs {}
+  SPLITK_A checks per run (step: probe acc; E eligible, F fired, B blocked by the cap; KEYMASS c*->c0 / all-position c*->c0; labelled map before; +/- = copies a >= 2-stream channel onto an empty one):
+    240: splits 0
+          2400 acc 0.328 . key 0->3 +  all 0->3 +  map [0, 0, 2, 2] (2+2)  key masses [0.45 0.09 0.41 0.05]  all [0.46 0.09 0.41 0.05]
+          4800 acc 1.000 . key 2->1 -  all 2->1 -  map [0, 3, 1, 2] (1+1+1+1)  key masses [0.27 0.21 0.28 0.23]  all [0.23 0.16 0.45 0.17]
+          7200 acc 1.000 . key 2->1 -  all 2->1 -  map [0, 3, 1, 2] (1+1+1+1)  key masses [0.27 0.21 0.28 0.23]  all [0.23 0.16 0.44 0.17]
+    241: splits 2
+          2400 acc 0.188 . key 3->1 -  all 0->1 +  map [0, 3, 0, 0] (3+1)  key masses [0.25 0.24 0.25 0.25]  all [0.25 0.25 0.25 0.25]
+          4800 acc 0.172 F key 3->1 -  all 3->0 -  map [0, 3, 1, 0] (2+1+1) -> [0, 1, 1, 0] (2+2)  key masses [0.25 0.25 0.25 0.25]  all [0.25 0.25 0.25 0.25]
+          7200 acc 0.719 . key 0->1 +  all 0->1 +  map [0, 2, 3, 0] (2+1+1)  key masses [0.49 0.11 0.25 0.15]  all [0.56 0.09 0.23 0.12]
+          9600 acc 0.688 F key 0->1 +  all 0->1 +  map [0, 2, 3, 0] (2+1+1) -> [1, 2, 3, 1] (2+1+1)  key masses [0.50 0.06 0.25 0.20]  all [0.56 0.07 0.22 0.16]
+         12000 acc 1.000 . key 3->0 -  all 1->3 -  map [0, 2, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.29 0.32 0.21 0.18]
+         14400 acc 1.000 . key 3->0 -  all 1->3 -  map [0, 2, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.30 0.31 0.21 0.19]
+    242: splits 0
+          2400 acc 0.156 . key 0->3 +  all 0->3 +  map [0, 0, 2, 0] (3+1)  key masses [0.25 0.25 0.25 0.25]  all [0.25 0.25 0.25 0.25]
+          4800 acc 1.000 . key 2->0 -  all 3->1 -  map [0, 3, 2, 1] (1+1+1+1)  key masses [0.24 0.25 0.25 0.25]  all [0.29 0.19 0.20 0.32]
+          7200 acc 1.000 . key 2->0 -  all 3->1 -  map [0, 3, 2, 1] (1+1+1+1)  key masses [0.24 0.25 0.25 0.25]  all [0.29 0.19 0.19 0.32]
+    243: splits 0
+          2400 acc 0.156 . key 1->0 +  all 1->0 +  map [1, 1, 1, 1] (4)  key masses [0.18 0.36 0.26 0.21]  all [0.12 0.42 0.21 0.25]
+          4800 acc 0.406 . key 1->2 +  all 1->0 +  map [1, 1, 1, 1] (4)  key masses [0.19 0.41 0.15 0.25]  all [0.11 0.43 0.20 0.26]
+          7200 acc 1.000 . key 1->0 -  all 1->0 -  map [1, 0, 2, 1] (2+1+1)  key masses [0.18 0.37 0.19 0.25]  all [0.18 0.36 0.20 0.26]
+          9600 acc 1.000 . key 1->0 -  all 1->0 -  map [1, 0, 2, 1] (2+1+1)  key masses [0.19 0.37 0.19 0.25]  all [0.18 0.36 0.20 0.26]
+    244: splits 0
+          2400 acc 0.188 . key 2->0 +  all 2->0 +  map [2, 2, 2, 3] (3+1)  key masses [0.24 0.24 0.26 0.26]  all [0.24 0.24 0.26 0.26]
+          4800 acc 1.000 . key 1->0 -  all 3->2 -  map [0, 2, 3, 1] (1+1+1+1)  key masses [0.24 0.25 0.25 0.25]  all [0.30 0.19 0.19 0.32]
+          7200 acc 1.000 . key 1->0 -  all 0->2 -  map [0, 2, 3, 1] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.31 0.20 0.19 0.30]
+    245: splits 1
+          2400 acc 0.344 . key 2->3 +  all 2->3 +  map [2, 1, 1, 2] (2+2)  key masses [0.13 0.37 0.40 0.10]  all [0.10 0.40 0.42 0.08]
+          4800 acc 0.750 . key 2->3 +  all 0->3 -  map [2, 1, 0, 2] (2+1+1)  key masses [0.25 0.25 0.34 0.16]  all [0.46 0.17 0.29 0.08]
+          7200 acc 0.672 F key 2->3 +  all 0->3 -  map [2, 1, 0, 2] (2+1+1) -> [2, 1, 0, 2] (2+1+1)  key masses [0.24 0.26 0.37 0.13]  all [0.45 0.19 0.28 0.08]
+          9600 acc 1.000 . key 2->3 -  all 0->2 -  map [2, 1, 0, 3] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.33 0.21 0.18 0.28]
+    246: splits 1
+          2400 acc 0.219 . key 3->2 -  all 2->0 +  map [2, 2, 2, 2] (4)  key masses [0.25 0.25 0.25 0.25]  all [0.25 0.25 0.25 0.25]
+          4800 acc 0.219 F key 2->1 +  all 2->0 +  map [2, 2, 2, 2] (4) -> [2, 2, 2, 2] (4)  key masses [0.24 0.14 0.39 0.24]  all [0.13 0.15 0.56 0.16]
+          7200 acc 0.828 . key 3->1 +  all 3->1 +  map [3, 0, 3, 2] (2+1+1)  key masses [0.26 0.11 0.25 0.37]  all [0.20 0.14 0.20 0.46]
+          9600 acc 1.000 . key 3->1 +  all 3->1 +  map [3, 0, 3, 2] (2+1+1)  key masses [0.26 0.11 0.25 0.38]  all [0.19 0.14 0.21 0.47]
+         12000 acc 1.000 . key 3->1 +  all 3->1 +  map [3, 0, 3, 2] (2+1+1)  key masses [0.26 0.11 0.25 0.38]  all [0.19 0.14 0.20 0.47]
+    247: splits 1
+          2400 acc 0.281 . key 0->3 +  all 0->3 +  map [0, 0, 1, 0] (3+1)  key masses [0.48 0.23 0.24 0.04]  all [0.51 0.24 0.21 0.05]
+          4800 acc 0.719 . key 0->3 +  all 0->3 +  map [2, 0, 1, 0] (2+1+1)  key masses [0.50 0.26 0.23 0.01]  all [0.35 0.27 0.27 0.10]
+          7200 acc 0.766 . key 0->3 +  all 0->3 +  map [2, 0, 1, 0] (2+1+1)  key masses [0.50 0.25 0.25 0.01]  all [0.37 0.22 0.29 0.13]
+          9600 acc 0.719 F key 0->3 +  all 0->3 +  map [2, 0, 1, 0] (2+1+1) -> [2, 0, 1, 0] (2+1+1)  key masses [0.50 0.24 0.25 0.01]  all [0.34 0.19 0.29 0.18]
+         12000 acc 1.000 . key 2->3 -  all 2->0 -  map [2, 0, 1, 3] (1+1+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.20 0.24 0.32 0.25]
+    248: splits 1
+          2400 acc 0.141 . key 1->3 +  all 1->3 +  map [1, 1, 1, 2] (3+1)  key masses [0.25 0.26 0.25 0.25]  all [0.25 0.25 0.25 0.25]
+          4800 acc 0.219 . key 0->2 -  all 3->2 -  map [3, 3, 0, 2] (2+1+1)  key masses [0.25 0.25 0.25 0.25]  all [0.25 0.25 0.25 0.25]
+          7200 acc 0.172 F key 2->0 +  all 2->0 +  map [2, 2, 2, 2] (4) -> [3, 3, 2, 3] (3+1)  key masses [0.19 0.25 0.31 0.25]  all [0.19 0.25 0.30 0.26]
+          9600 acc 0.500 . key 0->3 -  all 3->2 +  map [3, 1, 3, 1] (2+2)  key masses [0.27 0.25 0.25 0.24]  all [0.25 0.25 0.24 0.25]
+         12000 acc 1.000 . key 0->3 -  all 3->1 +  map [3, 3, 3, 3] (4)  key masses [0.27 0.24 0.26 0.24]  all [0.25 0.25 0.25 0.25]
+         14400 acc 1.000 . key 0->1 -  all 3->2 +  map [3, 3, 3, 3] (4)  key masses [0.27 0.23 0.26 0.24]  all [0.25 0.25 0.25 0.26]
+    249: splits 2
+          2400 acc 0.156 . key 2->1 +  all 2->1 +  map [2, 2, 2, 2] (4)  key masses [0.29 0.01 0.38 0.32]  all [0.29 0.01 0.38 0.32]
+          4800 acc 0.266 . key 2->1 +  all 2->1 +  map [2, 2, 2, 2] (4)  key masses [0.21 0.11 0.41 0.27]  all [0.29 0.05 0.55 0.12]
+          7200 acc 0.250 F key 0->3 +  all 0->3 +  map [0, 0, 0, 0] (4) -> [3, 3, 3, 3] (4)  key masses [0.43 0.24 0.21 0.13]  all [0.58 0.09 0.27 0.06]
+          9600 acc 0.203 B key 2->3 -  all 0->1 +  map [0, 0, 0, 0] (4)  key masses [0.31 0.20 0.33 0.16]  all [0.52 0.07 0.32 0.08]
+         12000 acc 0.172 F key 0->3 +  all 0->3 +  map [0, 0, 0, 0] (4) -> [0, 0, 0, 0] (4)  key masses [0.37 0.25 0.23 0.15]  all [0.55 0.09 0.29 0.07]
+         14400 acc 0.344 . key 3->0 +  all 3->1 +  map [3, 3, 3, 3] (4)  key masses [0.15 0.17 0.24 0.44]  all [0.08 0.06 0.29 0.57]
+         16800 acc 0.188 B key 3->0 +  all 3->0 +  map [3, 3, 3, 3] (4)  key masses [0.13 0.23 0.23 0.41]  all [0.06 0.08 0.29 0.57]
+         19200 acc 0.219 . key 3->0 +  all 3->0 +  map [3, 3, 3, 3] (4)  key masses [0.14 0.25 0.21 0.40]  all [0.06 0.09 0.28 0.57]
+         21600 acc 0.203 B key 3->0 +  all 3->0 +  map [3, 3, 3, 3] (4)  key masses [0.12 0.20 0.23 0.46]  all [0.05 0.10 0.26 0.59]
+         24000 acc 0.578 . key 3->0 +  all 3->0 +  map [1, 3, 3, 3] (3+1)  key masses [0.06 0.19 0.25 0.50]  all [0.08 0.13 0.27 0.52]
+         26400 acc 0.469 B key 3->1 +  all 3->1 +  map [0, 3, 3, 3] (3+1)  key masses [0.16 0.09 0.24 0.50]  all [0.16 0.08 0.26 0.51]
+  SPLITK_A labelled targeting accuracy (copies a >= 2-stream channel onto an empty one): over the 8 fired splits KEYMASS 7/8, the all-position rule (at the same checks) 6/8; over the 40 checks whose labelled map has a shared and an empty channel KEYMASS 30/40, all-position 34/40
+    SPLITK_A 241 splits (channels before -> right after -> at the next check): 4800 3->1: 2+1+1 -> 2+2 -> 2+1+1; 9600 0->1: 2+1+1 -> 2+1+1 -> 1+1+1+1
+    SPLITK_A 245 splits (channels before -> right after -> at the next check): 7200 2->3: 2+1+1 -> 2+1+1 -> 1+1+1+1
+    SPLITK_A 246 splits (channels before -> right after -> at the next check): 4800 2->1: 4 -> 4 -> 2+1+1
+    SPLITK_A 247 splits (channels before -> right after -> at the next check): 9600 0->3: 2+1+1 -> 2+1+1 -> 1+1+1+1
+    SPLITK_A 248 splits (channels before -> right after -> at the next check): 7200 2->0: 4 -> 3+1 -> 2+2
+    SPLITK_A 249 splits (channels before -> right after -> at the next check): 7200 0->3: 4 -> 4 -> 4; 12000 0->3: 4 -> 4 -> 4
+  SPLITK_A HARM (held-out accuracy 2400 updates after a split > 0.05 below the value at it): 0/10 runs {}
+  READING S37 MUON (SPLITK_M): neither (BOUND 6/10; >= 8 fixes, <= 5 not)
+  READING S37 ADAM (SPLITK_A): the targeted split fixes four-stream merges (BOUND 9/10; >= 8 fixes, <= 5 not)
+  READING split_target (MUON): neither (BOUND 6/10; >= 8 fixes, <= 5 not)  [EXPLORATORY, not a result]
+  READING split_target (ADAM): the targeted split fixes four-stream merges (BOUND 9/10; >= 8 fixes, <= 5 not)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_state
+  idea    descriptive: is the stream decodable from the gate state h at key positions, at S=8 vs S=4?
+  source  batch 12's S36 (splits at S=8 copied channels onto empty ones and never bound); S33, S35, X's HINGE_D8
+  change  none to the runs (reruns to 9600); labelled nearest-class-mean decoders on h and on the gate input
+  arm D8_HINGE_M   lr 0.001  iters 9600  seeds 260-264 (5)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 9600
+                   schedule: S33's D8_HINGE recipe
+  arm HINGE_D8_A   lr 0.001  iters 9600  seeds 260-264 (5)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 9600
+                   schedule: test_slow_start's HINGE recipe
+  arm A_HINGE_M    lr 0.001  iters 9600  seeds 240-244 (5)  — rerun of S33's A_HINGE (Muon, S=4, k=4) to 9600
+                   schedule: S33's A_HINGE recipe
+  arm HINGE16_M    lr 0.001  iters 9600  seeds 240-244 (5)  — rerun of S35's MUON_HINGE16 (Muon, S=4, k=16) to 9600
+                   schedule: S35's MUON_HINGE16 recipe
+  pairing each rerun against its recorded run (the curve must reproduce through 9600)
+----------------------------------------------------------------------------------------------------
+  CONFIG D8_HINGE_M (rerun of S33's D8_HINGE (Muon, S=8, k=16) to 9600); chance 0.125; reruns reproduce their records through 9600: 5/5
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     260 non-stream OTHER          9600 |         0.14  0.12  0.17  0.14 |         0.13  0.12  0.11  0.14 |         0.13  0.12  0.18  0.13 |         0.14  0.12  0.31  0.12
+     261 MERGED (6 share)          9600 |         0.17  0.12  0.27  0.13 |         0.14  0.12  0.13  0.14 |         0.13  0.12  0.13  0.13 |         0.30  0.12  0.31  0.36
+     262 non-stream OTHER          9600 |         0.17  0.12  0.17  0.13 |         0.13  0.12  0.19  0.12 |         0.14  0.12  0.20  0.15 |         0.14  0.12  0.32  0.13
+     263 MERGED (4 share)          9600 |         0.48  0.12  0.52  0.45 |         0.48  0.12  0.47  0.53 |         0.53  0.12  0.63  0.59 |         0.51  0.12  0.49  0.52
+     264 non-stream OTHER          9600 |         0.14  0.12  0.19  0.13 |         0.13  0.12  0.15  0.12 |         0.13  0.12  0.19  0.13 |         0.15  0.12  0.24  0.12
+    median at  1200 (5 runs): h at key positions  0.17, gate input  0.12, h at the block's first key  0.19, at its last key  0.13
+    median at  2400 (5 runs): h at key positions  0.13, gate input  0.12, h at the block's first key  0.15, at its last key  0.14
+    median at  4800 (5 runs): h at key positions  0.13, gate input  0.12, h at the block's first key  0.19, at its last key  0.13
+    median at  9600 (5 runs): h at key positions  0.15, gate input  0.12, h at the block's first key  0.31, at its last key  0.13
+  READING S38 D8_HINGE_M: the eight-stream gate state does not carry the stream (median h_key at 4800 0.132; < 0.5 not, >= 0.9 does)
+  CONFIG HINGE_D8_A (rerun of X's HINGE_D8 (Adam, S=8, k=16) to 9600); chance 0.125; reruns reproduce their records through 9600: 5/5
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     260 MERGED (6 share)          9600 |         0.23  0.12  0.27  0.27 |         0.16  0.12  0.14  0.12 |         0.39  0.12  0.34  0.35 |         0.54  0.12  0.47  0.56
+     261 non-stream OTHER          9600 |         0.47  0.12  0.44  0.45 |         0.56  0.12  0.38  0.55 |         0.50  0.12  0.49  0.46 |         0.13  0.12  0.15  0.12
+     262 non-stream OTHER          9600 |         0.81  0.12  0.76  0.73 |         0.13  0.12  0.13  0.12 |         0.12  0.12  0.15  0.14 |         0.13  0.12  0.13  0.11
+     263 non-stream OTHER          9600 |         0.14  0.12  0.15  0.13 |         0.15  0.12  0.13  0.12 |         0.14  0.12  0.19  0.09 |         0.13  0.12  0.15  0.18
+     264 non-stream OTHER          9600 |         0.14  0.12  0.10  0.13 |         0.13  0.12  0.08  0.14 |         0.13  0.12  0.15  0.14 |         0.14  0.12  0.20  0.15
+    median at  1200 (5 runs): h at key positions  0.23, gate input  0.12, h at the block's first key  0.27, at its last key  0.27
+    median at  2400 (5 runs): h at key positions  0.15, gate input  0.12, h at the block's first key  0.13, at its last key  0.12
+    median at  4800 (5 runs): h at key positions  0.14, gate input  0.12, h at the block's first key  0.19, at its last key  0.14
+    median at  9600 (5 runs): h at key positions  0.13, gate input  0.12, h at the block's first key  0.15, at its last key  0.15
+  READING S38 HINGE_D8_A: the eight-stream gate state does not carry the stream (median h_key at 4800 0.136; < 0.5 not, >= 0.9 does)
+  CONFIG A_HINGE_M (rerun of S33's A_HINGE (Muon, S=4, k=4) to 9600); chance 0.250; reruns reproduce their records through 9600: 5/5
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     240 MERGED (2 share)          9600 |         0.90  0.25  0.93  0.87 |         0.80  0.25  0.77  0.77 |         0.85  0.25  0.85  0.79 |         0.76  0.25  0.80  0.74
+     241 MERGED (2 share)          9600 |         0.89  0.25  0.92  0.87 |         0.83  0.25  0.95  0.83 |         0.84  0.25  0.81  0.82 |         0.86  0.25  0.80  0.76
+     242 BOUND ROUTED              8400 |         0.90  0.25  0.94  0.77 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |          --    --    --    -- 
+     243 MERGED (2 share)          9600 |         0.85  0.25  0.87  0.84 |         0.90  0.25  0.81  0.84 |         0.76  0.25  0.79  0.75 |         0.76  0.25  0.76  0.76
+     244 MERGED (2 share)          9600 |         0.84  0.25  0.88  0.83 |         0.53  0.25  0.52  0.51 |         0.63  0.25  0.58  0.53 |         0.50  0.25  0.51  0.58
+    median at  1200 (5 runs): h at key positions  0.89, gate input  0.25, h at the block's first key  0.92, at its last key  0.84
+    median at  2400 (5 runs): h at key positions  0.83, gate input  0.25, h at the block's first key  0.81, at its last key  0.83
+    median at  4800 (5 runs): h at key positions  0.84, gate input  0.25, h at the block's first key  0.81, at its last key  0.79
+    median at  9600 (4 runs): h at key positions  0.76, gate input  0.25, h at the block's first key  0.78, at its last key  0.75
+  S38 A_HINGE_M (S=4, printed alongside): median h_key at 4800 0.84
+  CONFIG HINGE16_M (rerun of S35's MUON_HINGE16 (Muon, S=4, k=16) to 9600); chance 0.250; reruns reproduce their records through 9600: 5/5
+    seed outcome at 9600           stop |  1200: h_key v_key h_1st h_last |  2400: h_key v_key h_1st h_last |  4800: h_key v_key h_1st h_last |  9600: h_key v_key h_1st h_last
+     240 BOUND ROUTED              8400 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |          --    --    --    -- 
+     241 BOUND ROUTED              8400 |         0.90  0.25  0.90  0.84 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |          --    --    --    -- 
+     242 BOUND ROUTED              8400 |         0.60  0.25  0.59  0.45 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |          --    --    --    -- 
+     243 BOUND ROUTED              8400 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |          --    --    --    -- 
+     244 BOUND ROUTED              8400 |         0.88  0.25  0.91  0.83 |         1.00  0.25  1.00  1.00 |         1.00  0.25  1.00  1.00 |          --    --    --    -- 
+    median at  1200 (5 runs): h at key positions  0.90, gate input  0.25, h at the block's first key  0.91, at its last key  0.84
+    median at  2400 (5 runs): h at key positions  1.00, gate input  0.25, h at the block's first key  1.00, at its last key  1.00
+    median at  4800 (5 runs): h at key positions  1.00, gate input  0.25, h at the block's first key  1.00, at its last key  1.00
+    median at  9600 (0 runs): h at key positions   -- , gate input   -- , h at the block's first key   -- , at its last key   -- 
+  S38 HINGE16_M (S=4, printed alongside): median h_key at 4800 1.00
+  READING gate_state D8_HINGE_M: the eight-stream gate state does not carry the stream (median h_key at 4800 0.132; < 0.5 not, >= 0.9 does)  [EXPLORATORY, not a result]
+  READING gate_state HINGE_D8_A: the eight-stream gate state does not carry the stream (median h_key at 4800 0.136; < 0.5 not, >= 0.9 does)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S37 split_target (MUON): neither (BOUND 6/10; >= 8 fixes, <= 5 not) (KEYMASS targeting on the fired splits 10/11, the all-position rule 5/11; HARM 0 runs)
+  S37 split_target (ADAM): the targeted split fixes four-stream merges (BOUND 9/10; >= 8 fixes, <= 5 not) (KEYMASS targeting on the fired splits 7/8, the all-position rule 6/8; HARM 0 runs)
+  S37 HINGE4k4_A (Adam, k=4, no trigger): BOUND 7/10
+  S38 gate_state D8_HINGE_M: the eight-stream gate state does not carry the stream (median h_key at 4800 0.132; < 0.5 not, >= 0.9 does)
+  S38 gate_state HINGE_D8_A: the eight-stream gate state does not carry the stream (median h_key at 4800 0.136; < 0.5 not, >= 0.9 does)
+  S38 gate_state A_HINGE_M: printed alongside (median h_key at 4800 0.84)
+  S38 gate_state HINGE16_M: printed alongside (median h_key at 4800 1.00)
+####################################################################################################
