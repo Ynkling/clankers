@@ -22,3 +22,37 @@ EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40) — D
   CHECK dry_gate_prev: D8_PREV_M with W_prev fixed at 0 and excluded from the optimizer equals S33's D8_HINGE|260 bit for bit through 1200 (curves [[1200, 0.0703125, 2.9915246963500977]] vs [[1200, 0.0703125, 2.9915246963500977]]; statistics at [0, 1200] True; groups [{'tag': 'gate', 'kind': 'muon', 'names': ['W_in', 'W_h', 'W_g']}, {'tag': 'rest', 'kind': 'muon', 'names': ['decoder', 'encoder', 'encoder_v', 'lm_head']}, {'tag': 'rest', 'kind': 'adam', 'names': ['embed.weight', 'short_conv.conv_w']}]): ok
   CHECK dry_gate_prev: D8_PREV_A with W_prev fixed at 0 and excluded from the optimizer equals X's HINGE_D8|260 bit for bit through 1200 (curves [[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]; statistics at [0, 1200] True; groups [{'names': ['W_in', 'W_h', 'W_g']}, {'names': ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight', 'short_conv.conv_w']}]): ok
   CHECK dry_gate_prev: children at 9c5939e (2.3 min)
+  CHECK dry_gate_memory: D8_HINGE_M|260 rerun with every measurement reproduces its record through 1200 ([[1200, 0.0703125, 2.9915246963500977]] vs [[1200, 0.0703125, 2.9915246963500977]]); measured at ['0', '50', '100', '200', '300', '400', '600', '800', '1200'] (1200 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_memory: D8_SLOW_M|260 rerun with every measurement reproduces its record through 1200 ([[1200, 0.0693359375, 2.9898359775543213]] vs [[1200, 0.0693359375, 2.9898359775543213]]); measured at ['0', '50', '100', '200', '300', '400', '600', '800', '1200'] (1200 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_memory: HINGE_D8_A|260 rerun with every measurement reproduces its record through 1200 ([[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]); measured at ['0', '50', '100', '200', '300', '400', '600', '800', '1200'] (1200 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_memory: A_HINGE_M|240 rerun with every measurement reproduces its record through 1200 ([[1200, 0.36376953125, 2.240008592605591]] vs [[1200, 0.36376953125, 2.240008592605591]]); measured at ['0', '50', '100', '200', '300', '400', '600', '800', '1200'] (1200 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_gate_memory: the decoder scores 1.0000 on a synthetic separable set (8 classes, 4000 points) and 0.1275 with shuffled labels (chance 0.1250; within 0.05: True): ok
+  CHECK dry_gate_memory: children at 9c5939e (2.5 min)
+  CHECK batch 14: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (4.8 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_gate_prev
+  idea    GATE_PREV: the recurrent gate also reads the previous token's embedding (W_prev v_(t-1) in its pre-activation)
+  source  batch 13's S38 (at S=8 the gate state does not carry the stream at key positions; the stream token is the token right before every key)
+  change  pre-activation W_in v_t + W_prev v_(t-1) + W_h h_(t-1), v_(-1) = 0; W_prev ~ N(0, 0.1^2) from its own generator; W_prev in the gate group; nothing else
+  arm D8_PREV_M    lr 0.001  iters 2400  seeds 260-260 (1)  — S33's D8_HINGE + GATE_PREV (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm D8_PREV_A    lr 0.001  iters 2400  seeds 260-260 (1)  — X's HINGE_D8 + GATE_PREV (Adam)
+                   schedule: gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  pairing seeds 260-269: D8_PREV_M with S33's D8_HINGE, D8_PREV_A with X's HINGE_D8; every shared parameter's initial value and the batch stream are the paired run's
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_gate_memory
+  idea    descriptive: does the gate state form a one-token memory of the stream in updates 0-2400, and keep it?
+  source  batch 13's S38 (S=8 h decodability at chance at 4800; HINGE_D8 262 at 0.81 at 1200, 0.13 at 2400); S33; X
+  change  none to the runs (reruns to 2400); labelled decoders of h, the pre-tanh terms' norms, saturation, read-gate entropy and distinct channels at 11 updates
+  arm D8_HINGE_M   lr 0.001  iters 2400  seeds 260-260 (1)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 2400
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  arm D8_SLOW_M    lr 0.001  iters 2400  seeds 260-260 (1)  — rerun of S33's D8_SLOW (Muon, S=8, k=16, no hinge) to 2400
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400
+  arm HINGE_D8_A   lr 0.001  iters 2400  seeds 260-260 (1)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 2400
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
+  arm A_HINGE_M    lr 0.001  iters 2400  seeds 240-240 (1)  — rerun of S33's A_HINGE (Muon, S=4, k=4) to 2400, a reference
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  pairing each rerun against its recorded run (the curve must reproduce through 2400)
+----------------------------------------------------------------------------------------------------
