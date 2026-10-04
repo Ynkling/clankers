@@ -1,0 +1,85 @@
+{
+ "meta": {
+  "arms": {
+   "A_HINGE_M": {
+    "S": 4,
+    "iters": 9600,
+    "key": "A_HINGE_M",
+    "label": "rerun of S33's A_HINGE (Muon, S=4, k=4) to 9600",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "prio": 1,
+    "sched": "S33's A_HINGE recipe",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244
+    ]
+   },
+   "D8_HINGE_M": {
+    "S": 8,
+    "iters": 9600,
+    "key": "D8_HINGE_M",
+    "label": "rerun of S33's D8_HINGE (Muon, S=8, k=16) to 9600",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "prio": 1,
+    "sched": "S33's D8_HINGE recipe",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "HINGE16_M": {
+    "S": 4,
+    "iters": 9600,
+    "key": "HINGE16_M",
+    "label": "rerun of S35's MUON_HINGE16 (Muon, S=4, k=16) to 9600",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "prio": 1,
+    "sched": "S35's MUON_HINGE16 recipe",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244
+    ]
+   },
+   "HINGE_D8_A": {
+    "S": 8,
+    "iters": 9600,
+    "key": "HINGE_D8_A",
+    "label": "rerun of X's HINGE_D8 (Adam, S=8, k=16) to 9600",
+    "lr": 0.001,
+    "muon_lr": null,
+    "prio": 1,
+    "sched": "test_slow_start's HINGE recipe",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "b2981bd+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-04 05:03:03",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

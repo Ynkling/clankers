@@ -1,0 +1,83 @@
+{
+ "meta": {
+  "arms": {
+   "HINGE4k4_A": {
+    "iters": 28800,
+    "key": "HINGE4k4_A",
+    "label": "main's A4k4 + test_slow_start's HINGE recipe (Adam), run here",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244,
+     245,
+     246,
+     247,
+     248,
+     249
+    ]
+   },
+   "SPLITK_A": {
+    "iters": 28800,
+    "key": "SPLITK_A",
+    "label": "HINGE4k4_A + trigger + KEYMASS (Adam)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244,
+     245,
+     246,
+     247,
+     248,
+     249
+    ]
+   },
+   "SPLITK_M": {
+    "iters": 28800,
+    "key": "SPLITK_M",
+    "label": "S33's A_HINGE + trigger + KEYMASS (Muon)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + the trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT on KEYMASS's c* -> c0, W_g's state reset",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244,
+     245,
+     246,
+     247,
+     248,
+     249
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "b2981bd+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-04 05:03:03",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
