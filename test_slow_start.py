@@ -351,29 +351,63 @@ def stage_S(T, P):
     return ((T + 1) // 3 - 1) // P
 
 
-def attach_hinge(m, S, P, tau, lam, state):
+def attach_hinge(m, S, P, tau, lam, state, window=None, diag=False, stat=None):
     """The hinge on model m (a forward hook): on every training forward (training mode, gradients
     on), lam * [relu(eta2_index - tau) + relu(eta2_half - tau)] enters the loss through Inject;
     state counts the training batches and those with either term > 0, per EVAL_EVERY updates.
     S=None (test_recipe_scope's knob): each batch's own stream count, stage_S(its length, P), so
-    on a curriculum stage the groups are that stage's key positions."""
+    on a curriculum stage the groups are that stage's key positions.
+    test_early_recipe's knobs (None/False = unchanged): window = the last update with weight lam
+    (afterwards the penalty is not injected; its two terms are computed without gradient and an
+    update where one exceeds tau is logged as a would-fire); diag = at each firing the hinge's
+    gradient on the gate (W_in, W_h, W_g; torch.autograd.grad of the injected term, retain_graph,
+    which leaves the training gradient untouched) is kept in state["pending"] for an optimizer
+    step pre-hook to set against the task's; stat = the (eta2_index, eta2_half) function in place
+    of eta2_hinge. With window or diag, the updates of the firings are kept."""
     state.update(n=0, fired=0, windows=[], last=None)
+    log = window is not None or diag
+    if log:
+        state.update(fired_at=[], would_at=[], w_log={}, pending=None, firing_diag=[],
+                     gate=[getattr(m, g) for g in GATE] if diag else None)
+    f = eta2_hinge if stat is None else stat
 
     def hook(mod, args, out):
         if not (mod.training and torch.is_grad_enabled()):
             return None
         logits, sat, gr, gw = out
-        e_i, e_h = eta2_hinge(gr, S if S is not None else stage_S(gr.shape[1], P), P)
+        S_ = S if S is not None else stage_S(gr.shape[1], P)
+        u = state["n"] + 1
+        if window is not None and u in (1, window - 1, window, window + 1, window + 2):
+            state["w_log"][str(u)] = float(lam if u <= window else 0.0)
+        if window is not None and u > window:
+            with torch.no_grad():
+                e_i, e_h = f(gr, S_, P)
+            w = state["n"] // EVAL_EVERY
+            state["n"] += 1
+            while len(state["windows"]) <= w:
+                state["windows"].append(0)
+            if float(e_i) > tau or float(e_h) > tau:
+                state["would_at"].append(u)
+            state["last"] = [float(e_i), float(e_h)]
+            return None
+        e_i, e_h = f(gr, S_, P)
         h_i, h_h = F.relu(e_i - tau), F.relu(e_h - tau)
         w = state["n"] // EVAL_EVERY
         state["n"] += 1
         while len(state["windows"]) <= w:
             state["windows"].append(0)
+        pen = lam * (h_i + h_h)
         if bool(h_i > 0) or bool(h_h > 0):
             state["fired"] += 1
             state["windows"][w] += 1
+            if log:
+                state["fired_at"].append(u)
+            if diag:
+                hg = torch.autograd.grad(pen, state["gate"], retain_graph=True, allow_unused=True)
+                state["pending"] = dict(update=u, hinge=[torch.zeros_like(q) if g is None else g.detach().clone()
+                                                         for q, g in zip(state["gate"], hg)])
         state["last"] = [float(e_i.detach()), float(e_h.detach())]
-        return Inject.apply(logits, lam * (h_i + h_h)), sat, gr, gw
+        return Inject.apply(logits, pen), sat, gr, gw
 
     return m.register_forward_hook(hook)
 
@@ -413,14 +447,19 @@ def extra_stats(model, task, probe, step, base, state):
         out["hs_hinge"] = [state["fired"], state["n"]]
         if step == "end":
             out["hs_windows"] = list(state["windows"])
+            if "fired_at" in state:
+                out.update(hs_fired_at=list(state["fired_at"]), hs_would_at=list(state["would_at"]),
+                           hs_w_log=dict(state["w_log"]), hs_firing_diag=list(state["firing_diag"]))
     return out
 
 
-def make_recipe(slow, tau, warm=WARM, warm_lr=LR_WARM, lam=LAMBDA, keep=None, stage=False):
+def make_recipe(slow, tau, warm=WARM, warm_lr=LR_WARM, lam=LAMBDA, keep=None, stage=False, window=None,
+                diag=False, stat=None):
     """recipe(kw) -> kw for a run path's run_one call, and its state. slow: SLOW's groups and lr
     switch; tau (None = no hinge): HINGE's hook; every arm: extra_stats; keep: run_one's keep.
     stage=True (test_recipe_scope's knob): the hinge takes each batch's stream count from its
-    length (attach_hinge with S=None), for a curriculum's stages; False = unchanged."""
+    length (attach_hinge with S=None), for a curriculum's stages; False = unchanged. window, diag
+    and stat are test_early_recipe's knobs, passed to attach_hinge (None/False = unchanged)."""
     state = {}
 
     def recipe(kw):
@@ -434,7 +473,8 @@ def make_recipe(slow, tau, warm=WARM, warm_lr=LR_WARM, lam=LAMBDA, keep=None, st
 
                 def make():
                     m = mk()
-                    attach_hinge(m, None if stage else task.S, task.P, tau, lam, state)
+                    attach_hinge(m, None if stage else task.S, task.P, tau, lam, state, window=window, diag=diag,
+                                 stat=stat)
                     return m
                 return make
             kw["builder"] = builder
