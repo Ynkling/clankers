@@ -79,3 +79,5 @@ EXPLORATORY, NOT A RESULT — batch 14: gate_memory (S39), gate_prev (S40)
           acc 0.740  trans  None  VALcos 0.006  margin 0.75  STREAM-PARTIAL  reproduces its record True
   [  6/40]   50.6 min  gate_prev      D8_PREV_M  seed 260  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
           acc 0.363  trans  None  VALcos 0.000  margin 0.62  STREAM-PARTIAL  outcome MERGED (4 share)
+  [  7/40]   52.2 min  gate_memory    A_HINGE_M  seed 242  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge)
+          acc 1.000  trans  2400  VALcos 0.003  margin 0.99  DISCOVERED  reproduces its record True
