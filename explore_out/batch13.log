@@ -197,3 +197,9 @@ EXPLORATORY, NOT A RESULT — batch 13: split_target (S37), gate_state (S38)
     total 15.47 h of runs; makespan on 4 workers 3.92 h (worst case)
   RUNTIME RULE (stored 2026-10-04 05:16:27 UTC: makespan 4.14 h on 4 workers): no cut
   17 runs queued on 4 workers (1 torch thread each)
+  [  1/17]    7.5 min  gate_state     A_HINGE_M  seed 242  lr 0.001 (S33's A_HINGE recipe)
+          acc 0.993  trans  2400  VALcos 0.001  margin 1.00  DISCOVERED  ROUTED* 1200/2400/end -/Y/Y
+  [  2/17]    7.6 min  gate_state     HINGE16_M  seed 242  lr 0.001 (S35's MUON_HINGE16 recipe)
+          acc 1.000  trans  2400  VALcos 0.000  margin 0.99  DISCOVERED  ROUTED* 1200/2400/end -/-/-
+  [  3/17]    7.6 min  gate_state     HINGE16_M  seed 241  lr 0.001 (S35's MUON_HINGE16 recipe)
+          acc 0.996  trans  2400  VALcos 0.001  margin 0.98  DISCOVERED  ROUTED* 1200/2400/end -/-/-
