@@ -1,0 +1,297 @@
+"""video/data/report_tables.json — Tables 1-9 of 'Revision 7 (preliminary)', transcribed from the PDF.
+Every number was read off the PDF page images (pages 2, 5-9, 11-12, 16) and cross-checked against the
+pdftotext dump; the X-side numbers of Tables 2, 4, 5, 6 were also recomputed from results/X (see the other
+data files' check_vs_report_* entries)."""
+from common import write
+
+T = {}
+T["_source"] = {
+    "document": "Multi-Channel Hebbian Plasticity in Multilayer BDH Solves Context-Conditional Binding by Partitioning "
+                "Memory — A technical report, Revision 7 (preliminary); project repository Ynkling/clankers",
+    "file": "user upload report_v7.pdf (17 pages); not in the repository",
+    "method": "transcribed by hand from the PDF page images, numbers double-checked against the text layer",
+    "built_by": "video/data/_build/build_tables.py (the transcription lives in that script)",
+    "notation": "counts are 'successes/n'; 'b vs c' = discordant pairs (new arm only vs old arm only); p = exact "
+                "McNemar one-sided unless marked Fisher; machines X (cloud Xeon) and L (Intel i7-12650H) ran the SAME "
+                "seeds, so 'both' columns are descriptive pools, not independent samples (report Section 15).",
+}
+
+T["table1_phase_v_verdicts"] = {
+    "page": 2,
+    "caption": "Phase V. Each test is a file test_<name>.py whose docstring records its pre-registered design and, after "
+               "the run, its result. Every verdict was fixed before the test ran and printed mechanically.",
+    "rows": [
+        dict(test="stream recipe", question="four streams: sixteen channels plus an early check and restarts",
+             X="R1 MAJORITY; R2 NOT PRECISE; R3 SHOWN; R4 NOT SHOWN", L="R1 RELIABLE; R2 PRECISE; R3 SHOWN; R4 NOT SHOWN",
+             section="4"),
+        dict(test="stream curriculum", question="eight streams by a 2 -> 4 -> 8 stream curriculum",
+             X="VALID; C1 NOT SHOWN; C2 MINORITY; C3 UNTESTABLE", L="same", section="5"),
+        dict(test="slow start", question="slow memory plus a hinge, no restarts", X="H0, HA, S0 SHOWN; HB, H0S NOT SHOWN",
+             L="H0, HA, HB, S0, H0S SHOWN", section="7"),
+        dict(test="recipe scope", question="does the hinge need the slow phase; the recipe on the curriculum",
+             X="Q2 SHOWN; Q1, Q3, Q4, Q5 NOT SHOWN", L="Q2, Q3 SHOWN; Q1, Q4, Q5 NOT SHOWN", section="8"),
+        dict(test="early recipe", question="the hinge in updates 1-2400 only; Muon", X="E1, E2 NOT SHOWN",
+             L="E1, E2 SHOWN", section="9.2"),
+        dict(test="exploratory batches 2-14 (E)", question="34 screens of outside ideas and diagnostics",
+             X="see Sections 6, 9-12", L=None, section="6, 9-12"),
+        dict(test="batch 15 (E)", question="the gate's recurrence at eight streams: a cap (S41), its spectrum (S42)",
+             X="S41 running; S42 finished", L=None, section="11"),
+    ],
+}
+
+T["table2_stream_recipe"] = {
+    "page": 5, "section": "4 Four streams: spare channels and an early check",
+    "setup": "S=4, P=4, convolution, Adam 1e-3, fresh seeds 240-259, up to five attempts per trial; check = held-out "
+             "accuracy >= 0.4 at step 4800",
+    "header": ["bound, of 20", "X", "L", "both"],
+    "rows": [
+        dict(arm="A4k16", label="A4k16, k = 16, plain", X=12, L=9, both="21/40", n=20),
+        dict(arm="A4k16_R", label="A4k16_R, k = 16, restart rule", X=17, L=19, both="36/40", n=20),
+        dict(arm="A4k4", label="A4k4, k = 4, plain", X=10, L=5, both="15/40", n=20),
+        dict(arm="A4k4_R", label="A4k4_R, k = 4, restart rule", X=10, L=8, both="18/40", n=20),
+        dict(arm="ceiling4k16", label="perfect gate, k = 16 (of 3)", X=3, L=3, both="6/6", n=3),
+    ],
+    "claims": {
+        "R1": dict(desc="the recipe is reliable (A4k16_R band)", X="MAJORITY (17/20)", L="RELIABLE (19/20)"),
+        "R2": dict(desc="the check is precise: at least 0.9 of passing attempts bind", X="NOT PRECISE (17/20, 0.85)",
+                   L="PRECISE (19/19)"),
+        "R3": dict(desc="spare channels make restarts work, A4k16_R vs A4k4_R (Fisher)", X="SHOWN, p = 0.020",
+                   L="SHOWN, p = 2e-4"),
+        "R4": dict(desc="spare channels alone, on fresh seeds (A4k16 vs A4k4, McNemar)", X="NOT SHOWN, 5 vs 3, p = 0.36",
+                   L="NOT SHOWN, 8 vs 4, p = 0.19"),
+    },
+    "text": {
+        "k4_passing_failures_were_merges": {"X": "9 of 9", "L": "12 of 12"},
+        "plateaus": "a run with two streams sharing a channel already reaches about 0.75, and one with three about 0.5",
+        "with_restarts": "four streams bind on 36 of 40 runs",
+        "part2_eight_streams_L": "perfect gate 2/2; restart arm 0/5, all 25 attempts at 0.06-0.09 at step 4800 "
+                                 "(X dropped Part 2 under its time rule)",
+    },
+}
+
+T["table3_screens"] = {
+    "page": 6, "section": "6 Screens: what decides the gate's first move",
+    "setup": "Two-stream screens on seeds 160-199 (Adam, 1e-3, no convolution); 20-seed screens use 160-179. "
+             "Exploratory, container E, not results.",
+    "header": ["screen", "change", "discovered", "comparison", "verdict"],
+    "rows": [
+        dict(screen="A (X, recorded)", change="-", discovered="12/40", comparison="-", verdict="-"),
+        dict(screen="kWTA warm-up (S4)", change="sparse codes in the memory for 2400 updates", discovered="7/20",
+             comparison="A 7/20", verdict="not"),
+        dict(screen="slow memory (S5, S7)", change="SLOW", discovered="24/40", comparison="A 12/40; 15 vs 3",
+             verdict="- (a)"),
+        dict(screen="gate reset (S11)", change="reset the gate if position or key explains it at 1200",
+             discovered="10/20", comparison="A 7/20; 3 vs 0", verdict="inconclusive"),
+        dict(screen="position penalty (S12)", change="SLOW + a linear penalty on eta^2 by position", discovered="15/20",
+             comparison="A 7/20; 9 vs 1", verdict="promising"),
+        dict(screen="hinge (S13)", change="HINGE", discovered="34/40", comparison="SLOW 24/40; 10 vs 0",
+             verdict="promising"),
+        dict(screen="random kick (S16)", change="a random push of the hinge's size, on the batches where it fires",
+             discovered="12/20", comparison="HINGE 14/20; 1 vs 3", verdict="\"suffices\" (b)"),
+        dict(screen="untimed kick (S20)", change="one random push at update 120", discovered="27/40",
+             comparison="HINGE 34/40; 0 vs 7", verdict="inconclusive"),
+        dict(screen="gate noise (S26)", change="SLOW + decaying Gaussian noise on the gate", discovered="27/40",
+             comparison="HINGE 34/40; 0 vs 7", verdict="inconclusive"),
+    ],
+    "footnotes": {
+        "a": "S5 on 160-179 was inconclusive, S7 on 180-199 promising; pooled here, with no verdict on the pool.",
+        "b": "Run on the 20 seeds where the hinge fired; 'a kick of that size suffices' by its rule (>= 12/20), on the "
+             "boundary. The untimed kick and the gate noise were each compared with SLOW by their rules (27 vs 24 of 40, "
+             "inconclusive) and with HINGE as printed.",
+    },
+    "text": {
+        "routed_star_at_1200": {"sparse_codes": "15/20 vs 6/20", "slow_memory": "23/40 vs 11/40"},
+        "slow_failures_position_splits": "11 of 16 failures over seeds 160-199",
+        "hinge_never_fired": "20 of 40 seeds (bit-identical to slow memory alone); where it fired, usually 1-3 of the "
+                             "roughly 5000 batches before binding",
+        "random_push_vs_hinge": "1 vs 3, p = 0.63",
+    },
+}
+
+T["table4_slow_start"] = {
+    "page": 7, "section": "7 Slow memory and a hinge, confirmed",
+    "setup": "no restarts; Part 0 fresh seeds 280-299 (S=2, P=4, k=2, no conv); Part A seeds 220-239 (S=2, P=8, conv); "
+             "Part B seeds 240-259 (S=4, P=4, k=16, conv); Part C S=8, k=16 (X D8 has 260-265, L 260-269)",
+    "header": ["part", "arm", "X", "L", "both"],
+    "rows": [
+        dict(part="0: S=2, P=4, discovered", arm="A0", label="A0, arm A", X="8/20", L="8/20", both="16/40"),
+        dict(part="0: S=2, P=4, discovered", arm="SLOW0", label="SLOW0", X="15/20", L="15/20", both="30/40"),
+        dict(part="0: S=2, P=4, discovered", arm="HINGE0", label="HINGE0", X="19/20", L="20/20", both="39/40"),
+        dict(part="A: S=2, P=8, bound", arm="DIRECT8", label="DIRECT8 (recorded)", X="13/20", L="12/20", both="25/40"),
+        dict(part="A: S=2, P=8, bound", arm="HINGE8", label="HINGE8", X="20/20", L="17/20", both="37/40"),
+        dict(part="B: S=4, P=4, k=16, bound", arm="A4k16", label="A4k16 (recorded)", X="12/20", L="9/20", both="21/40"),
+        dict(part="B: S=4, P=4, k=16, bound", arm="HINGE4k16", label="HINGE4k16", X="17/20", L="18/20", both="35/40"),
+        dict(part="C: S=8, k=16, bound", arm="D8", label="D8 (recorded)", X="0/6", L="0/10", both="0/16"),
+        dict(part="C: S=8, k=16, bound", arm="HINGE_D8", label="HINGE_D8", X="0/10", L="0/10", both="0/20"),
+    ],
+    "claims": {
+        "H0": dict(desc="HINGE0 beats A0", X=dict(b=11, c=0, p="5e-4", verdict="SHOWN"),
+                   L=dict(b=12, c=0, p="2e-4", verdict="SHOWN")),
+        "HA": dict(desc="HINGE8 beats DIRECT8", X=dict(b=7, c=0, p="0.008", verdict="SHOWN"),
+                   L=dict(b=5, c=0, p="0.031", verdict="SHOWN")),
+        "HB": dict(desc="HINGE4k16 beats A4k16", X=dict(b=7, c=2, p="0.09", verdict="NOT SHOWN"),
+                   L=dict(b=11, c=2, p="0.011", verdict="SHOWN")),
+        "S0": dict(desc="SLOW0 beats A0", X=dict(b=9, c=2, p="0.033", verdict="SHOWN"),
+                   L=dict(b=10, c=3, p="0.046", verdict="SHOWN")),
+        "H0S": dict(desc="HINGE0 beats SLOW0", X=dict(b=4, c=0, p="0.0625", verdict="NOT SHOWN"),
+                    L=dict(b=5, c=0, p="0.031", verdict="SHOWN")),
+    },
+    "bands": {"HINGE0": {"X": "RELIABLE", "L": "RELIABLE"}, "HINGE8": {"X": "RELIABLE", "L": "MAJORITY"},
+              "HINGE4k16": {"X": "MAJORITY", "L": "RELIABLE"}},
+    "band_rule": "RELIABLE >= 18/20, MAJORITY 10-17, MINORITY 1-9, NEVER 0 (test_slow_start.py docstring)",
+    "part_C": "4 of 10 HINGE_D8 runs collapsed on each machine, so its reading was 'it does not' (prevent the collapse)",
+    "readings": {"X": ["the screen replicates on fresh seeds", "it carries to eight keys only"],
+                 "L": ["the screen replicates on fresh seeds", "it carries to the working configuration"]},
+    "text": {
+        "only_HINGE0_failure": "X's seed 287, an OTHER failure on which the hinge fired 950 times",
+        "A0_failures_position": {"X": "9 of 12", "L": "8 of 12"},
+        "SLOW_failures_position": {"X": "4 of 5, the fifth OTHER", "L": "5 of 5"},
+        "HINGE0_never_fired": {"X": "11 of 20", "L": "9 of 20"},
+        "HINGE0_max_firings_first_2400_X": 2,
+        "HINGE4k16_non_stream_failures_X": "0 (A4k16 had 4)",
+        "HINGE_D8_final_acc": "six of ten on each machine ended above 0.15 (up to 0.47 on X and 0.50 on L); X's D8 "
+                              "runs ended at 0.08-0.10",
+    },
+}
+
+T["table5_recipe_scope"] = {
+    "page": 8, "section": "8 Which part of the recipe matters",
+    "header": ["", "X", "L"],
+    "note": "recorded runs on the same seeds in parentheses",
+    "rows": [
+        dict(arm="HONLY0", label="HONLY0, S=2, discovered (A0; HINGE0)", X="12/20", X_recorded=["8", "19"],
+             L="13/20", L_recorded=["8", "20"]),
+        dict(arm="HONLY4k16", label="HONLY4k16, S=4, k=16, bound (A4k16; HINGE4k16)", X="16/20", X_recorded=["12", "17"],
+             L="18/20", L_recorded=["9", "18"]),
+        dict(arm="SC8_H", label="SC8_H, S=8 curriculum, bound (SC8)", X="8/16", X_recorded=["6"], L="7/20",
+             L_recorded=["4"]),
+    ],
+    "claims": {
+        "Q1": dict(desc="HONLY0 beats A0", X="NOT SHOWN, 6 vs 2, p = 0.14", L="NOT SHOWN, 6 vs 1, p = 0.0625"),
+        "Q2": dict(desc="HINGE0 beats HONLY0", X="SHOWN, 8 vs 1, p = 0.020", L="SHOWN, 7 vs 0, p = 0.008"),
+        "Q3": dict(desc="HONLY4k16 beats A4k16", X="NOT SHOWN, 6 vs 2, p = 0.14", L="SHOWN, 9 vs 0, p = 0.002"),
+        "Q4": dict(desc="HINGE4k16 beats HONLY4k16", X="NOT SHOWN, 4 vs 3", L="NOT SHOWN, 2 vs 2"),
+        "Q5": dict(desc="SC8_H beats SC8", X="NOT SHOWN, 6 vs 4, p = 0.38", L="NOT SHOWN, 6 vs 3, p = 0.25"),
+    },
+    "bands": {"SC8_H": {"X": "MAJORITY", "L": "MINORITY"}},
+    "reading": "both parts are needed (both machines)",
+    "text": {
+        "HONLY0_failures_key": {"X": "5 KEY of 8", "L": "5 of 7"},
+        "SC8_H_collapses": {"X": "0 against SC8's 4", "L": "1 against 4"},
+        "SC8_H_binders_without_one_channel_per_stream": {"X": "five of eight", "L": "six of seven"},
+        "SC8_H_two_channels_of_four_at_4800_X": "nine of 16",
+    },
+}
+
+T["table6_early_recipe"] = {
+    "page": 9, "section": "9.2 The early-recipe test",
+    "setup": "Part A: S=2, seeds 300-339, MUON alone (SLOW_M) vs MUON + WINDOW (WIN_M); Part B: S=4, k=16, seeds "
+             "340-359 (X cut to 340-351), WINDOW under Adam (WIN16_A) vs Muon (WIN16_M)",
+    "header": ["", "X", "L"],
+    "rows": [
+        dict(arm="SLOW_M", label="SLOW_M, discovered", X="36/40", L="34/40"),
+        dict(arm="WIN_M", label="WIN_M, discovered", X="40/40", L="40/40"),
+        dict(arm="WIN16_A", label="WIN16_A, bound (by update 4800)", X="10/12", X_by_4800=6, L="17/20", L_by_4800=12),
+        dict(arm="WIN16_M", label="WIN16_M, bound (by update 4800)", X="11/12", X_by_4800=10, L="19/20", L_by_4800=19),
+        dict(arm="CEIL_A, CEIL_B", label="perfect gate under Muon, Parts A and B", X="2/2, 2/2", L="2/2, 2/2"),
+    ],
+    "claims": {
+        "E1": dict(desc="WIN_M beats SLOW_M", X="NOT SHOWN, 4 vs 0, p = 0.0625", L="SHOWN, 6 vs 0, p = 0.016"),
+        "E2": dict(desc="WIN16_M bound by update 4800 more often than WIN16_A", X="NOT SHOWN, 5 vs 1, p = 0.11",
+                   L="SHOWN, 7 vs 0, p = 0.008"),
+    },
+    "bands": {"WIN_M": "RELIABLE on both", "WIN16_M": "RELIABLE on both", "WIN16_A": "MAJORITY on both"},
+    "readings_L": ["the early hinge window works under Muon", "Muon binds four streams sooner"],
+    "text": {
+        "SLOW_M_failures": {"X": "all four position splits, rescued by WIN_M with firings between updates 88 and 230",
+                            "L": "six rescued: five position splits and one STREAM-PARTIAL"},
+        "median_transition_four_streams": {"Muon": 2400, "Adam": 4800, "note": "on both machines"},
+        "four_distinct_channels_at_4800": {"Muon": {"X": "11 of 12", "L": "19 of 20"},
+                                           "Adam": {"X": "6 of 12", "L": "12 of 20"}},
+        "seed_level_agreement": "38/40 for SLOW_M, 40/40 for WIN_M, 9 of 12 and 10 of 12 for the Part B arms",
+    },
+}
+
+T["table7_gate_memory_S39"] = {
+    "page": 11, "section": "11 Eight streams: the gate forgets the context",
+    "caption": "Screen S39: medians over five reruns, each reproducing its recorded curve. Chance is 0.125 at eight "
+               "streams. Under Muon without the hinge the decodability is the same through update 200, higher at 400 "
+               "and 600 (0.51, 0.26) and the same from 1200; its recurrent term at 600 is 2.28.",
+    "updates": [0, 200, 400, 600, 1200, 2400],
+    "blocks": [
+        dict(config="Muon, S = 8, k = 16, HINGE (seeds 260-264)", chance=0.125,
+             decodability=[0.91, 0.70, 0.39, 0.18, 0.15, 0.13],
+             recurrent_term=[0.04, 0.08, 0.20, 1.91, 4.02, 6.93],
+             input_term=[0.06, 0.07, 0.10, 0.11, 0.15, 0.13]),
+        dict(config="Adam, S = 8, k = 16, HINGE (seeds 260-264)", chance=0.125,
+             decodability=[0.91, 0.88, 0.79, 0.50, 0.24, 0.14],
+             recurrent_term=[0.04, 0.05, 0.06, 0.14, 0.32, 5.08], input_term=None),
+        dict(config="Muon, S = 4, k = 4, HINGE (seeds 240-244; chance 0.25)", chance=0.25,
+             decodability=[0.95, 0.84, 0.62, 0.61, 0.85, 0.83],
+             recurrent_term=[0.04, 0.10, 0.49, 0.58, 1.67, 2.27], input_term=None),
+    ],
+    "row_definitions": {"decodability": "nearest-class-mean decoder of stream identity from the gate state h at key "
+                                        "positions", "recurrent_term": "|W_h h_{t-1}| at keys",
+                        "input_term": "|W_in v_t| at keys"},
+    "text": {
+        "S42_spectral_radius": "rho of W_h at init 0.52-0.63; in 7 of 10 runs rho rose clearly above one (peaks "
+                               "1.20-2.13), first crossing between updates 350 and 1400; decodability fell to "
+                               "0.13-0.26 within 50 updates of the crossing; recurrent term passed 1 within 100 updates; "
+                               "other three runs peaked at 0.88-1.03 (stream partly lost, 0.31-0.72 at 1600)",
+        "gate_entropy_8_streams_muon_2400": "2.70 of a possible 2.77",
+        "S38_decodability_4800": "0.13 (Muon), 0.14 (Adam) at S=8; 0.84 (k=4) and 1.00 (k=16) at S=4",
+        "S40_prev_token_input": "input decodes the stream at 0.97-1.00 under Muon; state 0.53-0.64; 0/10 bound per optimizer",
+        "data_in_repo": "none: S38-S42 records live on branch claude/outside-ideas, not in this checkout",
+    },
+}
+
+T["table8_where_it_stands"] = {
+    "page": 12, "section": "13 Where the mechanism stands",
+    "caption": "The main Phase III-V configurations, counted over both machines; bound unless marked. The machines ran "
+               "the same seeds, so these counts are descriptive, not independent samples.",
+    "header": ["setting", "perfect gate", "plain gate", "recipe, no restarts", "restarts", "one channel"],
+    "rows": [
+        dict(setting="S=2, P=4, no conv.", perfect_gate="10/10", plain_gate="223/400 (d)",
+             recipe="HINGE 39/40 (d); Muon + WINDOW 80/80 (d)", restarts="60/60", one_channel="0 of > 200"),
+        dict(setting="S=2, P=8, conv.", perfect_gate="6/6", plain_gate="49/70", recipe="HINGE 37/40",
+             restarts="40/40 (c)", one_channel="0/24 (m)"),
+        dict(setting="S=4, P=4, k=4, conv.", perfect_gate="10/10", plain_gate="29/80", recipe="- (s)",
+             restarts="18/40", one_channel="0/20"),
+        dict(setting="S=4, P=4, k=16, conv.", perfect_gate="6/6", plain_gate="44/80",
+             recipe="HINGE 35/40; hinge only 34/40; Muon + WINDOW 30/32", restarts="36/40", one_channel="-"),
+        dict(setting="S=8, P=4, k=16, conv.", perfect_gate="2/2; 6/6 (c)", plain_gate="0/16",
+             recipe="HINGE 0/20; with the curriculum 15/36", restarts="0/5; 12/36 (c)", one_channel="-"),
+    ],
+    "footnotes": {"d": "Discovered.", "c": "With a curriculum (load at P = 8, streams at S = 8).",
+                  "m": "One channel with the same fast-weight memory.",
+                  "s": "Not run on the main line; a ten-seed screen of HINGE under Adam bound 7/10, 5/10 with one "
+                       "channel per stream."},
+}
+
+T["table9_provenance"] = {
+    "page": 16,
+    "caption": "Phase V commits on branch claude/bdh-growth-hebbian-inference-w90069. Only L's early recipe result is "
+               "in results/L/ (committed in 00ac0f2); L's other four are not yet committed.",
+    "rows": [
+        dict(test="stream recipe", X_test_commit="092937b", X_result_commit="18d5ae1", L_commit="092937b", runs_X=83, runs_L=90),
+        dict(test="stream curriculum", X_test_commit="ffdf0aa", X_result_commit="520fe51", L_commit="631fd62", runs_X=41, runs_L=53),
+        dict(test="slow start", X_test_commit="9c5939e", X_result_commit="b8c6007", L_commit="9c5939e", runs_X=110, runs_L=110),
+        dict(test="recipe scope", X_test_commit="a429af9", X_result_commit="c69f1e6", L_commit="c69f1e6", runs_X=56, runs_L=60),
+        dict(test="early recipe", X_test_commit="9f25dc8", X_result_commit="9437e01", L_commit="9437e01", runs_X=108, runs_L=124),
+    ],
+}
+
+T["abstract_headlines"] = {
+    "two_streams_recipe_discovered": {"X": "19/20", "L": "20/20", "plain_gate": "8/20 on each"},
+    "hinge_over_slow_alone_X": "4 vs 0, p = 0.0625",
+    "eight_keys": {"X": "20/20", "L": "17/20"},
+    "four_streams_k16_no_restarts": {"X": "17/20", "L": "18/20", "vs_plain_X": "7 vs 2, p = 0.09"},
+    "window_off_after_2400_lost": "one of 80 screened runs",
+    "eight_streams_curriculum_best": "15/36",
+    "gate_state_decodability_init": "median 0.91, chance 0.125",
+    "recurrent_term_growth": "0.04 to 5-7 by update 2400; input term 0.06-0.34",
+    "spectral_radius_runs_losing_stream": "7 of 10 (within 50 updates of rho crossing 1)",
+}
+
+if __name__ == "__main__":
+    write("report_tables.json", T)
