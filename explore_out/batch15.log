@@ -17,3 +17,57 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
   muon_repro_check: REF_HINGE_M|260 (S33's D8_HINGE recipe, Muon) through 1200 on Intel(R) Xeon(R) Processor @ 2.80GHz: FINGERPRINTED (curve [[1200, 0.0673828125, 2.99190616607666]]; statistics at [0, 1200]; diagnostics at ['1200', '600']) in gate_cap_muon_repro (176s)
+  CHECK gate_cap: CAP_M with the cap at infinity equals a fresh REF_HINGE_M|260 (this CPU) bit for bit through 1200 (curves [[1200, 0.0673828125, 2.99190616607666]] vs [[1200, 0.0673828125, 2.99190616607666]]; statistics at [0, 1200]; diagnostics at ['1200', '600']; the cap acted on 0 updates; sigma_max(W_h) at init 1.0834): ok
+  CHECK gate_cap: PREV_CAP_M with the cap at infinity equals a fresh REF_PREV_M|260 (this CPU) bit for bit through 1200 (curves [[1200, 0.072265625, 2.991024971008301]] vs [[1200, 0.072265625, 2.991024971008301]]; statistics at [0, 1200]; diagnostics at ['1200', '600']; the cap acted on 0 updates; sigma_max(W_h) at init 1.0834): ok
+  CHECK gate_cap: PREV_CAP_A (Adam) with the cap at infinity equals S40's recorded D8_PREV_A|260 bit for bit through 1200 (curves [[1200, 0.06103515625, 2.809274435043335]] vs [[1200, 0.06103515625, 2.809274435043335]]; statistics at [0, 1200]; the cap acted on 0 updates): ok
+  CHECK gate_cap: REF_HINGE_M|260 statistics at update 0 equal S33 D8_HINGE @2.10GHz|260's (the same configuration and initial parameters: True); printed: its curve through 1200 on this CPU [[1200, 0.0673828125, 2.99190616607666]] vs the record's [[1200, 0.0703125, 2.9915246963500977]]: ok
+  CHECK gate_cap: REF_PREV_M|260 statistics at update 0 equal S40 D8_PREV_M @2.10GHz|260's (the same configuration and initial parameters: True); printed: its curve through 1200 on this CPU [[1200, 0.072265625, 2.991024971008301]] vs the record's [[1200, 0.07080078125, 2.9928462505340576]]: ok
+  CHECK gate_cap: CAP_M: sigma_max(W_h) <= 0.5 + 1e-6 after every one of 50 steps (max 0.5000000; at init 1.0834; the cap first acts at update 1 (sigma_max 1.0826 before it), on 18 of 50 updates): ok
+  CHECK gate_cap: PREV_CAP_M: sigma_max(W_h) <= 0.5 + 1e-6 after every one of 50 steps (max 0.5000000; at init 1.0834; the cap first acts at update 1 (sigma_max 1.0829 before it), on 26 of 50 updates): ok
+  CHECK gate_cap: PREV_CAP_A: sigma_max(W_h) <= 0.5 + 1e-6 after every one of 50 steps (max 0.5000000; at init 1.0834; the cap first acts at update 1 (sigma_max 1.0817 before it), on 21 of 50 updates): ok
+  CHECK gate_cap: PREV_NOREC_M: W_h exactly 0 after every one of 50 steps (50/50), no gradient at any step (0 with one), W_h in no optimizer group (groups [['W_in', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]), W_h zero at the end True; every other parameter's initial value equals D8_PREV_M's (9 parameters, W_prev included: True; W_h there zero, requires_grad False): ok
+  CHECK gate_cap: CAP_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK gate_cap: PREV_CAP_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK gate_cap: PREV_NOREC_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK gate_cap: PREV_CAP_A: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight', 'short_conv.conv_w']]): ok
+  CHECK gate_cap: REF_HINGE_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK gate_cap: REF_PREV_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK gate_cap: the decoder scores 1.0000 on a synthetic separable set (8 classes, 4000 points) and 0.1275 with shuffled labels (chance 0.1250; within 0.05: True): ok
+  CHECK gate_cap: children at 9c5939e (4.2 min)
+  CHECK wh_spectrum: D8_HINGE_M|260 rerun with every measurement reproduces this CPU's REF_HINGE_M|260 (the driver's Muon repro run) through 1200 (curve [[1200, 0.0673828125, 2.99190616607666]] vs [[1200, 0.0673828125, 2.99190616607666]]; statistics at [0, 1200]); measured at 33 updates (0-1600, every 50; 1600 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK wh_spectrum: HINGE_D8_A|260 rerun with every measurement reproduces its record through 1600 (curve [[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]; statistics at [0, 1200]); measured at 33 updates (0-1600, every 50; 1600 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK wh_spectrum: sigma_max and rho (explore_gate_cap_child's, float64) agree with numpy on a random 32x32 matrix (sigma 3.31733746 vs 3.31733746, difference 0.0e+00; rho 1.82491485 vs 1.82491485, difference 4.0e-15; tolerance 1e-6): ok
+  CHECK wh_spectrum: children at 9c5939e (4.3 min)
+  CHECK batch 15: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (8.5 min)
+  recorded the full CHECK pass at 138acfc in /home/user/clankers/explore_out/batch15_checks.json
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_cap
+  idea    cap the recurrent gain of the gate (sigma_max(W_h) <= 0.5 after every step), or remove the recurrence (GATE_PREV's input only)
+  source  batch 14's S39 (at S=8 the stream leaves h as |W_h h_(t-1)| outgrows |W_in v_t|) and S40 (GATE_PREV's input carries the stream, h only partly; 0/10 bound)
+  change  CAP: after every optimizer step W_h <- W_h * 0.5 / sigma_max(W_h) if sigma_max(W_h) > 0.5, optimizer state untouched; NOREC: W_h = 0, frozen; nothing else
+  arm CAP_M        lr 0.001  iters 28800  seeds 260-269 (10)  — S33's D8_HINGE + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_CAP_M   lr 0.001  iters 28800  seeds 260-269 (10)  — S40's D8_PREV_M + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_NOREC_M lr 0.001  iters 28800  seeds 260-269 (10)  — S40's D8_PREV_M with NOREC (W_h = 0, frozen; Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev (W_h frozen at 0) throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm PREV_CAP_A   lr 0.001  iters 28800  seeds 260-269 (10)  — S40's D8_PREV_A + CAP (Adam)
+                   schedule: gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm REF_HINGE_M  lr 0.001  iters 28800  seeds 260-269 (10)  — S33's D8_HINGE rerun on this CPU (Muon reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm REF_PREV_M   lr 0.001  iters 28800  seeds 260-269 (10)  — S40's D8_PREV_M rerun on this CPU (Muon reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  pairing seeds 260-269: CAP_M with REF_HINGE_M (S33's D8_HINGE rerun on this CPU); PREV_CAP_M and PREV_NOREC_M with REF_PREV_M (S40's D8_PREV_M rerun here); PREV_CAP_A with S40's recorded D8_PREV_A (Adam reproduces here); same initial parameters (NOREC: W_h = 0) and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN wh_spectrum
+  idea    descriptive: does rho(W_h) cross 1 just before |W_h h|@key takes off (the stream leaving the gate state)?
+  source  batch 14's S39 (the stream leaves h at S=8 as |W_h h_(t-1)| outgrows |W_in v_t|)
+  change  none to the runs (reruns to 1600); sigma_max(W_h), rho(W_h), the gate's term norms and h's decodability every 50 updates
+  arm D8_HINGE_M   lr 0.001  iters 1600  seeds 260-264 (5)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 1600
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  arm HINGE_D8_A   lr 0.001  iters 1600  seeds 260-264 (5)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 1600
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
+  pairing HINGE_D8_A: each rerun against X's recorded run (the curve and statistics must reproduce through 1600); D8_HINGE_M (fresh on this CPU): each run against S41's REF_HINGE_M with the same seed through 1200
+----------------------------------------------------------------------------------------------------
