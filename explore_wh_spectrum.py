@@ -10,11 +10,10 @@ CONFIGURATIONS (reruns to 1600 updates of recorded runs on their own run paths a
 explore_wh_spectrum_child):
   D8_HINGE_M  S33's D8_HINGE (Muon, S=8, k=16), seeds 260-264
   HINGE_D8_A  X's HINGE_D8 (Adam, S=8, k=16), seeds 260-264
-MACHINE (after the first dry run, by the user's decision; see explore_gate_cap): on this CPU (Xeon @ 2.80GHz) the
-Adam runs reproduce their records, the Muon runs do not. HINGE_D8_A is checked against X's records through 1600 (the
-curve and statistics there). D8_HINGE_M runs fresh, labelled as not the recorded runs: each run is checked instead
-against this CPU's S33 D8_HINGE rerun with the same seed (S41's REF_HINGE_M) through 1200 (the curve and statistics
-there; S41's runs evaluate at 1200, not 1600), and the 2.10GHz record comparison is printed.
+Each rerun is checked against its record through 1600 (the curve and statistics there).
+MACHINE: on a Xeon @ 2.80GHz (the first dry run and segment 1) the Muon runs do not reproduce their records; segment 1's
+D8_HINGE_M runs from that CPU are kept apart, unused (explore_out/wh_spectrum_2p80_results.json), and by the user's
+second decision S42 runs on the 2.10GHz CPU the records were made on, where both configurations reproduce them.
 MEASUREMENTS every 50 updates from 0 to 1600, on S39's probe (seed 39000): sigma_max(W_h) and rho(W_h) (largest
 |eigenvalue|); the median |h|, |W_h h_(t-1)| and |W_in v_t| at key positions; S38's decoder of the stream from h at
 key positions.
@@ -23,9 +22,8 @@ positions), at 50-update resolution.
 LABEL per configuration (fixed before any run): "gain crossing" if in >= 4/5 runs rho first exceeds 1 within 150
 updates before |W_h h|@key first exceeds 1 (both cross by 1600 and 0 <= (first |W_h h|@key > 1) - (first rho > 1)
 <= 150, at 50-update resolution); otherwise "not".
-CHECKS: before any run, one rerun per configuration through 1600 (with every measurement) reproduces its reference
-(HINGE_D8_A: X's record through 1600; D8_HINGE_M: this CPU's REF_HINGE_M|260 through 1200, the driver's Muon repro
-run); every S42 run is checked the same way (a configuration with a run that does not is reported, its label
+CHECKS: before any run, one rerun per configuration through 1600 (with every measurement) reproduces its record; every
+S42 run is checked against its record through 1600 (a configuration with a run that does not is reported, its label
 withheld); rho and sigma_max agree with numpy on a random matrix to 1e-6.
 """
 
@@ -47,8 +45,7 @@ NAME = "wh_spectrum"
 IDEA = "descriptive: does rho(W_h) cross 1 just before |W_h h|@key takes off (the stream leaving the gate state)?"
 SOURCE = "batch 14's S39 (the stream leaves h at S=8 as |W_h h_(t-1)| outgrows |W_in v_t|)"
 CHANGE = "none to the runs (reruns to 1600); sigma_max(W_h), rho(W_h), the gate's term norms and h's decodability every 50 updates"
-PAIRING = ("HINGE_D8_A: each rerun against X's recorded run (the curve and statistics must reproduce through 1600); "
-           "D8_HINGE_M (fresh on this CPU): each run against S41's REF_HINGE_M with the same seed through 1200")
+PAIRING = "each rerun against its recorded run (the curve and statistics must reproduce through 1600)"
 CHILD = "explore_wh_spectrum_child"
 LR = SUB_LR
 MUON_LR = 0.005
@@ -59,7 +56,7 @@ WINDOW, MIN_RUNS = 150, 4
 TIME_STEPS = 200
 REC = {"D8_HINGE_M": ("muon_scale", "D8_HINGE"), "HINGE_D8_A": (None, "HINGE_D8")}
 S39_STORE = "gate_memory"
-MUON = ("D8_HINGE_M",)                       # checked against this CPU's REF_HINGE_M (S41), through REF_AT
+MUON = ()                                    # the 2.80GHz plan checked D8_HINGE_M against S41's REF arm; dropped
 REF_AT = 1200
 MUON_REF = None                              # the driver's REF_HINGE_M|260 run through 1200 (this CPU), when set
 _d8 = tuple(range(260, 265))

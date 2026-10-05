@@ -7,21 +7,25 @@ harness, rules and labels and their resume machinery. Everything below was fixed
                            gate reads GATE_PREV's input only) at S=8, P=4, k=16, conv, all 8 streams from step 1,
                            28800 steps, seeds 260-269: CAP_M (S33's D8_HINGE + CAP, Muon), PREV_CAP_M (S40's
                            D8_PREV_M + CAP), PREV_NOREC_M (S40's D8_PREV_M with NOREC), PREV_CAP_A (S40's D8_PREV_A +
-                           CAP, Adam); the Muon references REF_HINGE_M and REF_PREV_M rerun on this CPU
+                           CAP, Adam)
   S42 explore_wh_spectrum  descriptive: reruns to 1600 of S33's D8_HINGE (Muon) and X's HINGE_D8 (Adam), seeds
                            260-264, measured every 50 updates: sigma_max(W_h), rho(W_h), the gate's term norms and h's
                            decodability; label "gain crossing" / "not"
 
 BACKGROUND (docstring): see explore_gate_cap and explore_wh_spectrum.
 
-MACHINE (after the first dry run, explore_out/batch15_dry_check_failed.log; the user's decision): this container's
-CPU (Xeon @ 2.80GHz) is not the one batches 1-14 ran on (Xeon @ 2.10GHz). Adam runs reproduce their records bit for
-bit here; Muon runs do not (bfloat16 Newton-Schulz). So S41 reruns the Muon references on this CPU (REF_HINGE_M =
-S33's D8_HINGE, REF_PREV_M = S40's D8_PREV_M, seeds 260-269, 28800 steps) as the paired references of CAP_M,
-PREV_CAP_M and PREV_NOREC_M; S42's D8_HINGE_M runs fresh and is checked against REF_HINGE_M; and a MUON REPRO CHECK
-runs in every segment: REF_HINGE_M|260 through 1200 (curve, statistics, diagnostics) is fingerprinted with the CPU in
-the first segment (explore_out/gate_cap_muon_repro_results.json) and must be bit-identical in every later segment
-(a mismatch stops the batch: the in-batch Muon pairing would no longer hold).
+MACHINE: Muon runs (bfloat16 Newton-Schulz) are CPU-specific, Adam runs are not. The first dry run
+(explore_out/batch15_dry_check_failed.log) and segment 1 ran on a Xeon @ 2.80GHz, where the recorded Muon runs do not
+reproduce; by the user's first decision the second dry run and segment 1 used fresh Muon references (REF arms) and
+a per-segment fingerprint. Segment 2's container had the Xeon @ 2.10GHz of batches 1-14 again, where the records
+reproduce (D8_HINGE|260 through 1200) and Adam runs equal the 2.80GHz ones (PREV_CAP_A|260); by the user's second
+decision batch 15 returned to its pre-registered pairing with the recorded runs, on the 2.10GHz CPU: the REF arms
+are dropped; segment 1's eight 2.80GHz Muon runs (CAP_M|260, PREV_CAP_M|260, PREV_NOREC_M|260, S42's D8_HINGE_M
+260-264) are moved to explore_out/gate_cap_2p80_results.json and wh_spectrum_2p80_results.json (unused) and its six
+Adam runs are kept; the runtime rule is applied again to this plan on this CPU (stored in gate_cap_runtime_2p10;
+segment 1's 2.80GHz decision stays in gate_cap_runtime); and a MUON RECORD CHECK runs in every segment: S33's
+D8_HINGE|260 (S41's REF_HINGE_M arm, the same recipe) through 1200 must reproduce its record (curve and statistics),
+or the batch stops (another CPU).
 
 RECIPE: the Adam groups at test_slow_start.LR = test_stream_recipe.LR = test_stream_curriculum.LR = 1e-3 (read
 in the child; the branch's SUB_LR = 1e-3), passed explicitly; Muon lr 0.005 (S33's validity choice); the slow
@@ -33,15 +37,12 @@ configuration). An incomplete arm or configuration gets no reading.
 
 CHECKS (before any run, after the repro check; any failure stops the batch)
 - repro: X's arm A, seed 160, 2400 steps, bit-identical to X's record (in every segment).
-- Muon repro: REF_HINGE_M|260 through 1200 bit-identical to the fingerprint of the first segment (in every segment).
-- S41: with the cap at infinity, CAP_M and PREV_CAP_M equal their paired runs (fresh REF runs on this CPU) bit for
-  bit through 1200, and PREV_CAP_A equals S40's recorded D8_PREV_A through 1200; the REF runs' statistics at update 0
-  equal the recorded runs'; over 50
-  steps of each CAP arm sigma_max(W_h) <= 0.5 + 1e-6 after every step; NOREC: W_h exactly 0 at every step and no
-  update, every other parameter's initial value equals D8_PREV_M's; the optimizer groups cover every trainable
-  parameter once; S38's decoder check.
-- S42: one rerun per configuration reproduces its reference (HINGE_D8_A: X's record through 1600; D8_HINGE_M: this
-  CPU's REF_HINGE_M|260 through 1200), and every S42 run is checked the same way;
+- Muon record check: S33's D8_HINGE|260 through 1200 bit-identical to its record (in every segment).
+- S41: with the cap at infinity, CAP_M and PREV_CAP_M equal their paired recorded runs bit for bit through 1200, and
+  PREV_CAP_A equals S40's recorded D8_PREV_A through 1200; over 50 steps of each CAP arm sigma_max(W_h) <= 0.5 + 1e-6
+  after every step; NOREC: W_h exactly 0 at every step and no update, every other parameter's initial value equals
+  D8_PREV_M's; the optimizer groups cover every trainable parameter once; S38's decoder check.
+- S42: one rerun per configuration through 1600 reproduces its record (and every S42 run is checked through 1600);
   rho and sigma_max agree with numpy on a random matrix to 1e-6.
 - The served modules.
 
@@ -77,7 +78,6 @@ from test_binding_onset import EVAL_EVERY
 SCREENS = (s41, s42)
 DRY_ITERS = 2400
 CHECKS_RECORD = os.path.join(ec.OUT_DIR, "batch15_checks.json")
-MUON_STORE = "gate_cap_muon_repro"
 CUT_H = 9.0
 CUT_ARMS = ("PREV_CAP_A",)
 
@@ -121,36 +121,21 @@ def run_checks():
     print(f"  all CHECKs passed ({(time.time() - t0) / 60:.1f} min)", flush=True)
 
 
-def muon_repro(dry):
-    """REF_HINGE_M|260 (S33's D8_HINGE recipe) through 1200 on this machine: fingerprinted with the CPU in the first
-    segment, compared bit for bit in every later one. Sets the screens' MUON_REF. False on a mismatch."""
+def muon_record_check():
+    """S33's D8_HINGE|260 (S41's REF_HINGE_M arm: the same recipe, no cap) through 1200 on this machine, against its
+    record (curve and statistics). False on a mismatch (another CPU)."""
     t0 = time.time()
     r = s41.child("run", dict(arm="REF_HINGE_M", seed=260, iters=s41.EQ_AT, mlr=s41.MUON_LR))
-    fp = dict(curve=r["curve"], stats=[x for x in r["stats"] if x["step"] != "end" and x["step"] <= s41.EQ_AT],
-              diag={k: v for k, v in r["diag"].items() if k != "end"})
-    s41.MUON_REF = s42.MUON_REF = r
-    name = ("dry_" if dry else "") + MUON_STORE
-    st = ec.load_store(name)
-    ref = st["meta"].get("fingerprint")
-    cpu = ec.cpu_model()
-    if ref is None:
-        st["meta"].update(fingerprint=fp, cpu=cpu, git=git("rev-parse", "--short", "HEAD").strip(),
-                          time=time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()))
-        if not dry:
-            ec.save_store(name, st)
-        print(f"  muon_repro_check: REF_HINGE_M|260 (S33's D8_HINGE recipe, Muon) through {s41.EQ_AT} on {cpu}: FINGERPRINTED "
-              f"(curve {fp['curve']}; statistics at {[x['step'] for x in fp['stats']]}; diagnostics at {sorted(fp['diag'])})"
-              + (" (dry run: not stored)" if dry else f" in {name}") + f" ({time.time() - t0:.0f}s)", flush=True)
-        return True
-    same = fp == ref
-    print(f"  muon_repro_check: REF_HINGE_M|260 through {s41.EQ_AT} on {cpu}: "
-          + ("BIT-IDENTICAL" if same else "NOT bit-identical") + f" to the fingerprint of {st['meta']['time']} on "
-          f"{st['meta']['cpu']} (curve {fp['curve']} vs {ref['curve']}) ({time.time() - t0:.0f}s)", flush=True)
-    return same
+    ref = ec.load_store("muon_scale")["runs"]["D8_HINGE|260"]
+    ok, want, steps = s41.same_upto(r, ref, s41.EQ_AT)
+    print(f"  muon_record_check: S33's D8_HINGE|260 (Muon) through {s41.EQ_AT} on {ec.cpu_model()}: "
+          + ("BIT-IDENTICAL" if ok else "NOT bit-identical") + f" to its record (curve {r['curve']} vs {want}; statistics at "
+          f"{steps}) ({time.time() - t0:.0f}s)", flush=True)
+    return ok
 
 
 def rule_name():
-    return s41.NAME + "_runtime"
+    return s41.NAME + "_runtime_2p10"
 
 
 def apply_cut(cut):
@@ -170,7 +155,7 @@ def per_run(m, k, t):
 
 def projection(workers, dry):
     jobs1 = [(s41, "CAP_M"), (s41, "PREV_CAP_M"), (s41, "PREV_NOREC_M"), (s41, "PREV_CAP_A")]
-    jobs2 = [(s41, "REF_HINGE_M"), (s41, "REF_PREV_M"), (s42, "D8_HINGE_M"), (s42, "HINGE_D8_A")]
+    jobs2 = [(s42, "D8_HINGE_M"), (s42, "HINGE_D8_A"), (s41, "CAP_M"), (s41, "PREV_CAP_A")]
     t = {}
     for jobs in (jobs1, jobs2):
         with ThreadPoolExecutor(max_workers=len(jobs)) as ex:            # each job is a child process
@@ -186,7 +171,8 @@ def projection(workers, dry):
                 d += [per] * len(a["seeds"])
                 rows.append((m.NAME, k, len(a["seeds"]), per, txt))
         print(f"  PROJECTION{tag} (worst case: every run to its iters; pool-load timing: the median interval between "
-              f"optimizer steps, one child per arm or configuration at once, two rounds of 4, 1 thread each, this machine):")
+              f"optimizer steps, one child per arm or configuration at once, two rounds of 4 (the slower of an arm's two "
+              f"timings), 1 thread each, this machine):")
         for nm, k, n, per, txt in rows:
             print(f"    {nm:<14} {k:<12} {n:>2} runs x {per / 60:5.1f} min  ({txt})")
         ms = makespan(d, workers)
@@ -298,9 +284,9 @@ def main():
         if not ec.repro_check():
             print("  ! this container does not reproduce X: the recorded pairing is invalid; stopping.")
             sys.exit(1)
-        if not muon_repro(args.dry):
-            print("  ! the Muon runs no longer reproduce this batch's fingerprint (another machine?): the in-batch Muon "
-                  "pairing would not hold; stopping.")
+        if not muon_record_check():
+            print("  ! the Muon runs do not reproduce their records on this machine (another CPU): the pairing with the "
+                  "recorded Muon runs would not hold; stopping.")
             sys.exit(1)
         rec = None
         if args.resume and os.path.exists(CHECKS_RECORD):
