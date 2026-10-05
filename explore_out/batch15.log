@@ -117,3 +117,5 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
           acc 0.071  trans  None  VALcos 0.999  margin 0.00  OTHER  reproduces its record True
   [ 12/65]   78.3 min  wh_spectrum    D8_HINGE_M   seed 263  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge)
           acc 0.083  trans  None  VALcos 0.001  margin 0.35  STREAM-PARTIAL  reproduces the 2.10GHz record False (a fresh run on this CPU; checked against REF_HINGE_M in the report)
+  [ 13/65]   80.7 min  wh_spectrum    D8_HINGE_M   seed 264  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge)
+          acc 0.096  trans  None  VALcos 0.819  margin 0.02  OTHER  reproduces the 2.10GHz record False (a fresh run on this CPU; checked against REF_HINGE_M in the report)
