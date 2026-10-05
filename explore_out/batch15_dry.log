@@ -34,3 +34,39 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42) — DR
   CHECK dry_gate_cap: REF_PREV_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
   CHECK dry_gate_cap: the decoder scores 1.0000 on a synthetic separable set (8 classes, 4000 points) and 0.1275 with shuffled labels (chance 0.1250; within 0.05: True): ok
   CHECK dry_gate_cap: children at 9c5939e (4.5 min)
+  CHECK dry_wh_spectrum: D8_HINGE_M|260 rerun with every measurement reproduces this CPU's REF_HINGE_M|260 (the driver's Muon repro run) through 1200 (curve [[1200, 0.0673828125, 2.99190616607666]] vs [[1200, 0.0673828125, 2.99190616607666]]; statistics at [0, 1200]); measured at 33 updates (0-1600, every 50; 1600 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_wh_spectrum: HINGE_D8_A|260 rerun with every measurement reproduces its record through 1600 (curve [[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]; statistics at [0, 1200]); measured at 33 updates (0-1600, every 50; 1600 updates counted, 1 model built); the recomputed read gate equals the model's (max difference 0.00e+00): ok
+  CHECK dry_wh_spectrum: sigma_max and rho (explore_gate_cap_child's, float64) agree with numpy on a random 32x32 matrix (sigma 3.31733746 vs 3.31733746, difference 0.0e+00; rho 1.82491485 vs 1.82491485, difference 4.0e-15; tolerance 1e-6): ok
+  CHECK dry_wh_spectrum: children at 9c5939e (4.3 min)
+  CHECK batch 15: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (8.8 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_gate_cap
+  idea    cap the recurrent gain of the gate (sigma_max(W_h) <= 0.5 after every step), or remove the recurrence (GATE_PREV's input only)
+  source  batch 14's S39 (at S=8 the stream leaves h as |W_h h_(t-1)| outgrows |W_in v_t|) and S40 (GATE_PREV's input carries the stream, h only partly; 0/10 bound)
+  change  CAP: after every optimizer step W_h <- W_h * 0.5 / sigma_max(W_h) if sigma_max(W_h) > 0.5, optimizer state untouched; NOREC: W_h = 0, frozen; nothing else
+  arm CAP_M        lr 0.001  iters 2400  seeds 260-260 (1)  — S33's D8_HINGE + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_CAP_M   lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_M + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_NOREC_M lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_M with NOREC (W_h = 0, frozen; Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev (W_h frozen at 0) throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm PREV_CAP_A   lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_A + CAP (Adam)
+                   schedule: gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm REF_HINGE_M  lr 0.001  iters 2400  seeds 260-260 (1)  — S33's D8_HINGE rerun on this CPU (Muon reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm REF_PREV_M   lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_M rerun on this CPU (Muon reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  pairing seeds 260-269: CAP_M with REF_HINGE_M (S33's D8_HINGE rerun on this CPU); PREV_CAP_M and PREV_NOREC_M with REF_PREV_M (S40's D8_PREV_M rerun here); PREV_CAP_A with S40's recorded D8_PREV_A (Adam reproduces here); same initial parameters (NOREC: W_h = 0) and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_wh_spectrum
+  idea    descriptive: does rho(W_h) cross 1 just before |W_h h|@key takes off (the stream leaving the gate state)?
+  source  batch 14's S39 (the stream leaves h at S=8 as |W_h h_(t-1)| outgrows |W_in v_t|)
+  change  none to the runs (reruns to 1600); sigma_max(W_h), rho(W_h), the gate's term norms and h's decodability every 50 updates
+  arm D8_HINGE_M   lr 0.001  iters 1600  seeds 260-260 (1)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 1600
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  arm HINGE_D8_A   lr 0.001  iters 1600  seeds 260-260 (1)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 1600
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
+  pairing each rerun against its recorded run (the curve and statistics must reproduce through 1600)
+----------------------------------------------------------------------------------------------------
