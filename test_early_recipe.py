@@ -156,6 +156,58 @@ Diagnostics (not part of the verdict):
   STREAM-PARTIAL one-to-one (all 4 on one channel through 9600, split by the end). WIN16_M's one
   failure, s345, MERGED (2 share) from 4800 on. At 4800, 11/12 WIN16_M gates held the 4 streams on
   4 distinct channels; WIN16_A 6/12.
+
+RESULT (L, test commit 9f25dc8 run at 9437e01, which changes only this docstring;
+results/L/early_recipe_results.json; counts and p-values recomputed from that file with this
+file's report())
+Run conditions:
+- 124/124 records, none failed; 12th Gen Intel(R) Core(TM) i7-12650H, torch 2.14.0, 6 workers,
+  started 2026-10-04 18:38. Projection 4.58 h: nothing cut (Part B ran seeds 340-359).
+- The meta is written only after verify() passes, so L's CHECKs passed (L's log is not recorded
+  here). Every record: NS fingerprint 91a18153b4d5 (X: f209ef7b8c61); the oneDNN bf16 kernel
+  was not identified ("?").
+- Validity: CEIL_A 2/2 (s300, s301 at 1200), CEIL_B 2/2 (s340, s341 at 1200) -> both parts VALID.
+Claims:
+- E1 WIN_M 40/40 vs SLOW_M 34/40 DISCOVERED, 6 vs 0, p = 0.0156: SHOWN.
+- E2 bound by 4800: WIN16_M 19/20 vs WIN16_A 12/20, 7 vs 0, p = 0.0078: SHOWN.
+- Bands: WIN_M RELIABLE (40/40), WIN16_M RELIABLE (19/20), WIN16_A MAJORITY (17/20).
+- Readings: "the early hinge window works under Muon" (E1); "Muon binds four streams sooner" (E2).
+- Printed, not claims: BOUND WIN16_M 19/20 vs WIN16_A 17/20 (3 vs 1, p = 0.31); median transition
+  SLOW_M 2400 [1200, 4800], WIN_M 2400 [1200, 4800], WIN16_A 4800 [3600, 18000], WIN16_M 2400
+  [2400, 3600].
+Diagnostics (not part of the verdict):
+- SLOW_M's 6 failures: 5 POSITION (s304, s309, s314, s320, s332) and 1 STREAM-PARTIAL (s330);
+  WIN_M discovered on every seed.
+- The hinge fired on 19/40 WIN_M runs (first firing 137 [59, 241]), 18/20 WIN16_A (329 [227,
+  441]) and 17/20 WIN16_M (296 [140, 552]). Hinge/task ratio over every firing: WIN_M 2116.8
+  [2.4, 59489.1], WIN16_A 26.2 [1.9, 633980.8], WIN16_M 44.4 [2.5, 105250.1]. Would-fires after
+  the window: WIN_M 3 runs (3 updates), WIN16_A 8 runs (41572 updates), WIN16_M none.
+- WIN16_A failures: s340 non-stream OTHER and s348 non-stream POSITION (all 4 streams on one
+  channel at the end), s342 MERGED (2 share); s341 bound only at 16800, not routed. WIN16_M's one
+  failure, s341, MERGED (3 share) from 4800 on. At 4800, 19/20 WIN16_M gates held the 4 streams
+  on 4 distinct channels; WIN16_A 12/20.
+
+X AND L SIDE BY SIDE (X ran Part B on 340-351, L on 340-359):
+                                    X (2.80GHz Xeon)   L (i7-12650H)
+  SLOW_M   DISCOVERED                     36/40            34/40
+  WIN_M    DISCOVERED                     40/40            40/40
+  WIN16_A  BOUND                          10/12            17/20
+  WIN16_M  BOUND                          11/12            19/20
+  WIN16_A  bound by 4800                   6/12            12/20
+  WIN16_M  bound by 4800                  10/12            19/20
+  CEIL_A / CEIL_B                       2/2, 2/2         2/2, 2/2
+  E1 (discordant, p)             4 vs 0, 0.0625 NOT SHOWN    6 vs 0, 0.0156 SHOWN
+  E2 (discordant, p)             5 vs 1, 0.11 NOT SHOWN      7 vs 0, 0.0078 SHOWN
+  Pooled, DESCRIPTIVE (not a claim, no p): E1 WIN_M 80/80 vs SLOW_M 70/80, discordant 10 vs 0;
+  E2 bound by 4800 WIN16_M 29/32 vs WIN16_A 18/32, discordant 12 vs 1.
+- Muon's bf16 Newton-Schulz differs between X and L (fingerprints above), so the two machines'
+  Muon runs are replicates, not reproductions. No record reproduces across the machines in any
+  arm, the Adam-only WIN16_A included: every first evaluation (1200) already differs.
+- They are not independent samples. A seed fixes the initialization and the data on both
+  machines, and seed-level outcomes largely agree: SLOW_M 38/40 (X's 4 POSITION failures are
+  all among L's 6), WIN_M 40/40 (the first firing falls on the same update in 14 of the 19 runs
+  that fired on both), WIN16_A 9/12, WIN16_M 10/12 (bound by 4800 11/12). So the pooled counts
+  are not 80 or 32 independent pairs; that is why they carry no p-value.
 """
 
 import argparse
