@@ -223,3 +223,17 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
           acc 0.096  trans  None  VALcos 0.999  margin -0.00  OTHER  reproduces its record True
   [  9/39]   60.7 min  wh_spectrum    D8_HINGE_M   seed 263  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge)
           acc 0.088  trans  None  VALcos 0.001  margin 0.23  OTHER  reproduces its record True
+#################### RESUME 2026-10-05 22:59:07 UTC — the previous segment was stopped by the session's background time limit; saved runs are reused, missing runs re-run (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 60f7d30+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; Muon lr 0.005 (S33's validity choice {'a': 0.005, 'b': 0.005}); S41 28800 steps, the cap at sigma_max(W_h) 0.5; S42 reruns to 1600; 1 torch thread per run
+  lr read for gate_cap CAP_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for gate_cap PREV_CAP_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for gate_cap PREV_NOREC_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for gate_cap PREV_CAP_A: 0.001 (Adam groups)
+  lr read for wh_spectrum D8_HINGE_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for wh_spectrum HINGE_D8_A: 0.001 (Adam groups)
+  S41 readings (per arm, BOUND ROUTED at 28800): 'it breaks the eight-stream stall' if >= 3/10; 'it does not' if 0/10; otherwise neither
+  S42 labels (per configuration): 'gain crossing' if in >= 4/5 runs rho(W_h) first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1; otherwise 'not'
