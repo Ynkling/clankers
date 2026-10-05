@@ -16,6 +16,8 @@ Arms (S=8, P=4, k=16, conv, all 8 streams from step 1: test_stream_curriculum.ru
   PREV_CAP_M    S40's D8_PREV_M (explore_gate_prev_child's GATE_PREV, Muon) + CAP
   PREV_NOREC_M  S40's D8_PREV_M with NOREC
   PREV_CAP_A    S40's D8_PREV_A (GATE_PREV, test_slow_start's HINGE recipe, Adam) + CAP
+  REF_HINGE_M   S33's D8_HINGE rerun here (no cap), the Muon reference on this CPU (added after the first dry run)
+  REF_PREV_M    S40's D8_PREV_M rerun here (no cap), the Muon reference on this CPU (added after the first dry run)
 DIAGNOSTICS (measure()) at updates 600, 1200, 2400, 4800, 9600 (in the post-hook, after the cap) and at the
 end (the model as the run returns it), on S38's 512-sequence probe (seed 38000; S40's): S38's decoder of the
 stream from h at key and at stream-token positions and from the gate input u = W_in v_t (+ W_prev v_(t-1)) at
@@ -45,7 +47,9 @@ CFG = "b"
 ARM = {"CAP_M": dict(opt="muon", prev=False, cap=True, norec=False),
        "PREV_CAP_M": dict(opt="muon", prev=True, cap=True, norec=False),
        "PREV_NOREC_M": dict(opt="muon", prev=True, cap=False, norec=True),
-       "PREV_CAP_A": dict(opt="adam", prev=True, cap=True, norec=False)}
+       "PREV_CAP_A": dict(opt="adam", prev=True, cap=True, norec=False),
+       "REF_HINGE_M": dict(opt="muon", prev=False, cap=False, norec=False),
+       "REF_PREV_M": dict(opt="muon", prev=True, cap=False, norec=False)}
 
 
 def sigma_max(W):

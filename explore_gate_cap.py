@@ -18,21 +18,31 @@ CAP: after every optimizer step, if sigma_max(W_h) > 0.5, W_h <- W_h * 0.5 / sig
 untouched. NOREC: W_h fixed at 0 and excluded from the optimizer, so h_t = tanh(W_in v_t + W_prev v_(t-1))
 (GATE_PREV's input, no recurrence). (explore_gate_cap_child.)
 ARMS (main's run_sc with D8 at 9c5939e, child process):
-  CAP_M         S33's D8_HINGE (Muon) + CAP; paired with S33's D8_HINGE.
-  PREV_CAP_M    S40's D8_PREV_M + CAP; paired with S40's D8_PREV_M.
-  PREV_NOREC_M  S40's D8_PREV_M with NOREC; paired with S40's D8_PREV_M.
-  PREV_CAP_A    S40's D8_PREV_A (Adam) + CAP; paired with S40's D8_PREV_A.
+  CAP_M         S33's D8_HINGE (Muon) + CAP; paired with S33's D8_HINGE (REF_HINGE_M, below).
+  PREV_CAP_M    S40's D8_PREV_M + CAP; paired with S40's D8_PREV_M (REF_PREV_M).
+  PREV_NOREC_M  S40's D8_PREV_M with NOREC; paired with S40's D8_PREV_M (REF_PREV_M).
+  PREV_CAP_A    S40's D8_PREV_A (Adam) + CAP; paired with S40's recorded D8_PREV_A.
+MACHINE (after the first dry run, by the user's decision): this container's CPU (Xeon @ 2.80GHz) is not the one every
+earlier batch ran on (Xeon @ 2.10GHz). Adam runs reproduce their records bit for bit here; Muon runs do not (the
+Newton-Schulz step runs in bfloat16, whose CPU kernels depend on the instruction set). So the Muon references are
+rerun here, seeds 260-269, 28800 steps, with the same diagnostics, and are the paired references:
+  REF_HINGE_M   S33's D8_HINGE, rerun on this CPU (no cap); paired reference for CAP_M.
+  REF_PREV_M    S40's D8_PREV_M, rerun on this CPU (no cap); paired reference for PREV_CAP_M and PREV_NOREC_M.
+The recorded 2.10GHz runs (S33's D8_HINGE, S40's D8_PREV_M) are printed alongside, labelled. A Muon repro check (the
+driver's: REF_HINGE_M|260 through 1200, fingerprinted in the first segment) runs in every segment.
 OUTCOME: BOUND ROUTED at 28800 (test_stream_recipe.outcome).
 READINGS (per arm; fixed before any run): "it breaks the eight-stream stall" if >= 3/10 BOUND ROUTED; "it does not"
-if 0/10; otherwise neither. (Under the runtime cut PREV_CAP_A has 5 seeds; the same counts apply, as of 5.)
+if 0/10; otherwise neither. (Under the runtime cut PREV_CAP_A has 5 seeds; the same counts apply, as of 5.) The REF
+arms are references: no reading.
 DIAGNOSTICS at 600, 1200, 2400, 4800, 9600 and the end: S38's decoder of the stream from h at key and stream-token
 positions and from the gate input at key positions (S38's probe, as S40); the median |W_in v_t|, |W_prev v_(t-1)|,
 |W_h h_(t-1)| (and |h|) at key positions; sigma_max(W_h) (and rho(W_h)); the distinct channels of the
 value-position map (S39's rule); routing_k's map (distinct channels, streams per channel) at 4800, 9600 and the
 end; failure classes; the hinge's firings; sigma_max(W_h) at init and the first update the cap acts.
 CHECKS (child processes): with the cap at infinity, CAP_M and PREV_CAP_M equal their paired runs bit for bit
-through 1200 (CAP_M vs S33's D8_HINGE|260: curve and statistics; PREV_CAP_M vs S40's D8_PREV_M|260: curve,
-statistics and S40's decodability at 1200); over 50 steps of each CAP arm sigma_max(W_h) <= 0.5 + 1e-6 after every
+through 1200 (fresh REF_HINGE_M|260 and REF_PREV_M|260 runs on this CPU: curve, statistics and every diagnostic;
+and, Adam, PREV_CAP_A equals S40's recorded D8_PREV_A|260: curve and statistics); the references' statistics at
+update 0 equal the recorded runs' (the same configuration and initial parameters); over 50 steps of each CAP arm sigma_max(W_h) <= 0.5 + 1e-6 after every
 step; NOREC: W_h exactly 0 at every step, no gradient, in no optimizer group, and every other parameter's initial
 value equals D8_PREV_M's; the optimizer groups cover every trainable parameter once; S38's decoder check.
 RUNTIME (batch level): if the projection is over 9 h, PREV_CAP_A is cut to seeds 260-264.
@@ -62,8 +72,9 @@ SOURCE = ("batch 14's S39 (at S=8 the stream leaves h as |W_h h_(t-1)| outgrows 
           "carries the stream, h only partly; 0/10 bound)")
 CHANGE = ("CAP: after every optimizer step W_h <- W_h * 0.5 / sigma_max(W_h) if sigma_max(W_h) > 0.5, optimizer state "
           "untouched; NOREC: W_h = 0, frozen; nothing else")
-PAIRING = ("seeds 260-269: CAP_M with S33's D8_HINGE; PREV_CAP_M and PREV_NOREC_M with S40's D8_PREV_M; PREV_CAP_A with "
-           "S40's D8_PREV_A; same initial parameters (NOREC: W_h = 0) and batches")
+PAIRING = ("seeds 260-269: CAP_M with REF_HINGE_M (S33's D8_HINGE rerun on this CPU); PREV_CAP_M and PREV_NOREC_M with "
+           "REF_PREV_M (S40's D8_PREV_M rerun here); PREV_CAP_A with S40's recorded D8_PREV_A (Adam reproduces here); same "
+           "initial parameters (NOREC: W_h = 0) and batches")
 CHILD = "explore_gate_cap_child"
 LR = SUB_LR
 MUON_LR = 0.005
@@ -89,9 +100,21 @@ ARMS = {
                          sched=_mu.format("/W_prev (W_h frozen at 0)")),
     "PREV_CAP_A": dict(key="PREV_CAP_A", opt="adam", seeds=SEEDS, lr=LR, iters=28800, muon_lr=None, prio=2,
                        label="S40's D8_PREV_A + CAP (Adam)", sched=_ad + _cap),
+    "REF_HINGE_M": dict(key="REF_HINGE_M", opt="muon", seeds=SEEDS, lr=LR, iters=28800, muon_lr=MUON_LR, prio=2,
+                        label="S33's D8_HINGE rerun on this CPU (Muon reference)", sched=_mu.format("")),
+    "REF_PREV_M": dict(key="REF_PREV_M", opt="muon", seeds=SEEDS, lr=LR, iters=28800, muon_lr=MUON_LR, prio=2,
+                       label="S40's D8_PREV_M rerun on this CPU (Muon reference)", sched=_mu.format("/W_prev")),
 }
-PAIRED = {"CAP_M": ("muon_scale", "D8_HINGE", "S33 D8_HINGE"), "PREV_CAP_M": ("gate_prev", "D8_PREV_M", "S40 D8_PREV_M"),
-          "PREV_NOREC_M": ("gate_prev", "D8_PREV_M", "S40 D8_PREV_M"), "PREV_CAP_A": ("gate_prev", "D8_PREV_A", "S40 D8_PREV_A")}
+REF_ARMS = ("REF_HINGE_M", "REF_PREV_M")
+SELF = None                                  # the paired store is this screen's own (the REF arms)
+PAIRED = {"CAP_M": (SELF, "REF_HINGE_M", "REF_HINGE_M"), "PREV_CAP_M": (SELF, "REF_PREV_M", "REF_PREV_M"),
+          "PREV_NOREC_M": (SELF, "REF_PREV_M", "REF_PREV_M"), "PREV_CAP_A": ("gate_prev", "D8_PREV_A", "S40 D8_PREV_A"),
+          "REF_HINGE_M": ("muon_scale", "D8_HINGE", "S33 D8_HINGE @2.10GHz"),
+          "REF_PREV_M": ("gate_prev", "D8_PREV_M", "S40 D8_PREV_M @2.10GHz")}
+RECORDED = {"CAP_M": ("muon_scale", "D8_HINGE", "S33 D8_HINGE @2.10GHz"),
+            "PREV_CAP_M": ("gate_prev", "D8_PREV_M", "S40 D8_PREV_M @2.10GHz"),
+            "PREV_NOREC_M": ("gate_prev", "D8_PREV_M", "S40 D8_PREV_M @2.10GHz")}
+MUON_REF = None                              # the driver's REF_HINGE_M|260 run through 1200 (this CPU), when set
 
 
 def child(func, payload, timeout=None):
@@ -116,31 +139,56 @@ def _stats_upto(stats, t):
     return {s["step"]: s for s in stats if s["step"] != "end" and s["step"] <= t}
 
 
-def _eq(arm):
-    r = child("run", dict(arm=arm, seed=260, iters=EQ_AT, mlr=MUON_LR, cap="inf"))
-    store, key, lab = PAIRED[arm]
-    ref = ec.load_store(store)["runs"][f"{key}|260"]
-    want = [c for c in ref["curve"] if c[0] <= EQ_AT]
-    sn, sr = _stats_upto(r["stats"], EQ_AT), _stats_upto(ref["stats"], EQ_AT)
-    same = sn.keys() == sr.keys() and all(sn[k] == sr[k] for k in sr)
-    extra, ok_x = "", True
-    if arm == "PREV_CAP_M":
-        d0, d1 = ref["decode"][str(EQ_AT)], r["diag"][str(EQ_AT)]
-        ok_x = all(d0[k] == d1[k] for k in ("h_key", "h_stream", "u_key"))
-        extra = (f"; S40's decodability at {EQ_AT} (h@key, h@stream, input@key) {[d0[k] for k in ('h_key', 'h_stream', 'u_key')]} "
-                 f"vs {[d1[k] for k in ('h_key', 'h_stream', 'u_key')]}")
-    return (f"{arm} with the cap at infinity equals {lab}|260 bit for bit through {EQ_AT} (curves {r['curve']} vs {want}; "
-            f"statistics at {sorted(sr)} {same}{extra}; the cap acted on {r['n_cap']} updates; sigma_max(W_h) at init "
-            f"{r['sigma0']:.4f})", r["curve"] == want and same and ok_x and len(sr) >= 2 and r["n_cap"] == 0)
+def same_upto(r, ref, t, diag=False):
+    """Curve and statistics through t (and, diag, every diagnostic at or before t) equal."""
+    want = [c for c in ref["curve"] if c[0] <= t]
+    sn, sr = _stats_upto(r["stats"], t), _stats_upto(ref["stats"], t)
+    ok = r["curve"] == want and sn.keys() == sr.keys() and all(sn[k] == sr[k] for k in sr) and len(sr) >= 2
+    if diag:
+        keys = [k for k in (ref.get("diag") or {}) if k != "end" and int(k) <= t]
+        ok = ok and len(keys) >= 1 and all(r["diag"].get(k) == ref["diag"][k] for k in keys)
+    return ok, want, sorted(sr)
+
+
+def _fresh(arm, cap=None):
+    p = dict(arm=arm, seed=260, iters=EQ_AT, mlr=ARMS[arm]["muon_lr"])
+    if cap is not None:
+        p["cap"] = cap
+    return child("run", p)
 
 
 def check():
     t0 = time.time()
     with ThreadPoolExecutor(max_workers=4) as ex:
-        f1, f2 = ex.submit(_eq, "CAP_M"), ex.submit(_eq, "PREV_CAP_M")
+        f_cap = ex.submit(_fresh, "CAP_M", "inf")
+        f_pcap = ex.submit(_fresh, "PREV_CAP_M", "inf")
+        f_ref = ex.submit(lambda: MUON_REF) if MUON_REF is not None else ex.submit(_fresh, "REF_HINGE_M")
+        f_pref = ex.submit(_fresh, "REF_PREV_M")
+        f_acap = ex.submit(_fresh, "PREV_CAP_A", "inf")
         fc = ex.submit(child, "checks", dict(mlr=MUON_LR))
         fd = ex.submit(mt.run_child, "explore_gate_state_child", "decoder_check", {})
-        rows = [f1.result(), f2.result()] + [tuple(x) for x in fc.result()] + [tuple(x) for x in fd.result()]
+        rcap, rpcap, rref, rpref, racap = f_cap.result(), f_pcap.result(), f_ref.result(), f_pref.result(), f_acap.result()
+        rows = []
+        for r, ref, lab in ((rcap, rref, "CAP_M with the cap at infinity equals a fresh REF_HINGE_M|260 (this CPU)"),
+                            (rpcap, rpref, "PREV_CAP_M with the cap at infinity equals a fresh REF_PREV_M|260 (this CPU)")):
+            ok, want, steps = same_upto(r, ref, EQ_AT, diag=True)
+            rows.append((f"{lab} bit for bit through {EQ_AT} (curves {r['curve']} vs {want}; statistics at {steps}; "
+                         f"diagnostics at {sorted(k for k in ref['diag'] if k != 'end')}; the cap acted on {r['n_cap']} updates; "
+                         f"sigma_max(W_h) at init {r['sigma0']:.4f})", ok and r["n_cap"] == 0))
+        rec_a = ec.load_store("gate_prev")["runs"]["D8_PREV_A|260"]
+        ok, want, steps = same_upto(racap, rec_a, EQ_AT)
+        rows.append((f"PREV_CAP_A (Adam) with the cap at infinity equals S40's recorded D8_PREV_A|260 bit for bit through {EQ_AT} "
+                     f"(curves {racap['curve']} vs {want}; statistics at {steps}; the cap acted on {racap['n_cap']} updates)",
+                     ok and racap["n_cap"] == 0))
+        for r, (store, key, lab) in ((rref, PAIRED["REF_HINGE_M"]), (rpref, PAIRED["REF_PREV_M"])):
+            rec = ec.load_store(store)["runs"][f"{key}|260"]
+            s0 = _stats_upto(r["stats"], 0)
+            s1 = _stats_upto(rec["stats"], 0)
+            want = [c for c in rec["curve"] if c[0] <= EQ_AT]
+            rows.append((f"{r['arm']}|260 statistics at update 0 equal {lab}|260's (the same configuration and initial "
+                         f"parameters: {s0 == s1}); printed: its curve through {EQ_AT} on this CPU {r['curve']} vs the record's "
+                         f"{want}", s0 == s1 and len(s0) == 1))
+        rows += [tuple(x) for x in fc.result()] + [tuple(x) for x in fd.result()]
     ok = True
     for nm, v in rows:
         print(f"  CHECK {NAME}: {nm}: {'ok' if v else 'FAIL'}", flush=True)
@@ -184,13 +232,20 @@ def report(store):
     got = {arm: {int(k.split("|")[1]): r for k, r in store["runs"].items() if k.startswith(arm + "|") and r.get("ok")}
            for arm in ARMS}
     out = {}
+    def runs_of(store_p, key_p):
+        runs = store["runs"] if store_p is SELF else ec.load_store(store_p)["runs"]
+        return {int(k.split("|")[1]): r for k, r in runs.items() if k.startswith(key_p + "|") and r.get("ok", True)}
     for arm, a in ARMS.items():
         rs = got[arm]
         store_p, key_p, plab = PAIRED[arm]
-        pr = {int(k.split("|")[1]): r for k, r in ec.load_store(store_p)["runs"].items() if k.startswith(key_p + "|")}
-        print(f"  ARM {arm} ({a['label']}), seeds {ec.fmt_seeds(a['seeds'])}; paired with {plab}")
+        pr = runs_of(store_p, key_p)
+        rec = RECORDED.get(arm)
+        rr = runs_of(rec[0], rec[1]) if rec else {}
+        print(f"  ARM {arm} ({a['label']}), seeds {ec.fmt_seeds(a['seeds'])}; " + (
+            f"a reference (no reading); printed with {plab}" if arm in REF_ARMS else f"paired with {plab}"
+            + (f"; {rec[2]} printed alongside" if rec else "")))
         print(f"    {'seed':>4} | {arm:<22} {'trans':>5} {'stop':>5} {'ch@4800':>7} {'ch@9600':>7} {'ch@end':>9} {'hinge':>9} "
-              f"{'sig0':>5} {'cap@':>5} {'#capped':>7} | {plab:<22}")
+              f"{'sig0':>5} {'cap@':>5} {'#capped':>7} | {plab:<22}" + (f" | {rec[2]:<22}" if rec else ""))
         for s in a["seeds"]:
             r = rs.get(s)
             if r is None:
@@ -200,12 +255,17 @@ def report(store):
             print(f"    {s:>4} | {r['outcome']:<22} {str(r['transition']):>5} {r['stopped_at']:>5} "
                   + " ".join(f"{s33.per_channel(s33.map_at(r, t)):>{9 if t == 'end' else 7}}" for t in MAP_AT)
                   + f" {('--' if hf is None else f'{hf[0]}/{hf[1]}'):>9} {r['sigma0']:5.2f} {str(r['first_cap']):>5} "
-                  f"{str(r['n_cap']):>7} | {(pr.get(s) or {}).get('outcome', '--'):<22}")
+                  f"{str(r['n_cap']):>7} | {(pr.get(s) or {}).get('outcome', '--'):<22}"
+                  + (f" | {(rr.get(s) or {}).get('outcome', '--'):<22}" if rec else ""))
         br = {s: r["outcome"] == "BOUND ROUTED" for s, r in rs.items()}
         bo = {s: r.get("outcome") == "BOUND ROUTED" for s, r in pr.items()}
         d = compare(br, bo, a["seeds"], arm, plab.replace(" ", "_"))
+        if rec:
+            compare(br, {s: r.get("outcome") == "BOUND ROUTED" for s, r in rr.items()}, a["seeds"], arm,
+                    rec[2].replace(" ", "_"))
         print(f"    failure classes at the end: {arm} {dict(Counter(r['outcome'] for r in rs.values()))}; {plab} "
-              f"{dict(Counter(pr[s]['outcome'] for s in a['seeds'] if s in pr))}")
+              f"{dict(Counter(pr[s]['outcome'] for s in a['seeds'] if s in pr))}"
+              + (f"; {rec[2]} {dict(Counter(rr[s]['outcome'] for s in a['seeds'] if s in rr))}" if rec else ""))
         print(f"    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:")
         for t in MAP_AT:
             ms = {s: s33.map_at(r, t) for s, r in sorted(rs.items())}
@@ -242,9 +302,13 @@ def report(store):
                                                          for k, _ in cols))
         nb = sum(br.values())
         n = len(rs)
-        rd = ("it breaks the eight-stream stall" if nb >= BREAK_N else "it does not" if nb <= NOT_N else "neither") + \
-             f" (BOUND ROUTED {nb}/{n}; >= {BREAK_N} breaks, {NOT_N} does not)"
-        print(f"  READING S41 {arm}: {rd}")
+        if arm in REF_ARMS:
+            rd = f"reference (no reading): BOUND ROUTED {nb}/{n}"
+            print(f"  S41 {arm}: {rd}")
+        else:
+            rd = ("it breaks the eight-stream stall" if nb >= BREAK_N else "it does not" if nb <= NOT_N else "neither") + \
+                 f" (BOUND ROUTED {nb}/{n}; >= {BREAK_N} breaks, {NOT_N} does not)"
+            print(f"  READING S41 {arm}: {rd}")
         out[arm] = dict(d, bound_routed=nb, n=n, reading=rd, complete=n == len(a["seeds"]), medians=meds,
                         classes=dict(Counter(r["outcome"] for r in rs.values())),
                         first_cap=[r.get("first_cap") for r in rs.values()], sigma0=[r.get("sigma0") for r in rs.values()])
