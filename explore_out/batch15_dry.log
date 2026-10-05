@@ -96,3 +96,323 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42) — DR
           acc 0.062  trans  None  VALcos 0.999  margin -0.00  KEY  reproduces its record True
   [  7/8]   12.0 min  dry_gate_cap   REF_HINGE_M  seed 260  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
           acc 0.083  trans  None  VALcos 1.000  margin -0.00  POSITION  outcome non-stream OTHER; sigma_max(W_h) at init 1.0833814633503531, the cap first at update None, on 0 updates
+  [  8/8]   12.6 min  dry_gate_cap   REF_PREV_M   seed 260  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
+          acc 0.076  trans  None  VALcos 0.999  margin 0.00  OTHER  outcome non-stream OTHER; sigma_max(W_h) at init 1.0833814633503531, the cap first at update None, on 0 updates
+  batch wall clock 12.6 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_gate_cap
+  idea    cap the recurrent gain of the gate (sigma_max(W_h) <= 0.5 after every step), or remove the recurrence (GATE_PREV's input only)
+  source  batch 14's S39 (at S=8 the stream leaves h as |W_h h_(t-1)| outgrows |W_in v_t|) and S40 (GATE_PREV's input carries the stream, h only partly; 0/10 bound)
+  change  CAP: after every optimizer step W_h <- W_h * 0.5 / sigma_max(W_h) if sigma_max(W_h) > 0.5, optimizer state untouched; NOREC: W_h = 0, frozen; nothing else
+  arm CAP_M        lr 0.001  iters 2400  seeds 260-260 (1)  — S33's D8_HINGE + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_CAP_M   lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_M + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_NOREC_M lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_M with NOREC (W_h = 0, frozen; Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev (W_h frozen at 0) throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm PREV_CAP_A   lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_A + CAP (Adam)
+                   schedule: gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm REF_HINGE_M  lr 0.001  iters 2400  seeds 260-260 (1)  — S33's D8_HINGE rerun on this CPU (Muon reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm REF_PREV_M   lr 0.001  iters 2400  seeds 260-260 (1)  — S40's D8_PREV_M rerun on this CPU (Muon reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  pairing seeds 260-269: CAP_M with REF_HINGE_M (S33's D8_HINGE rerun on this CPU); PREV_CAP_M and PREV_NOREC_M with REF_PREV_M (S40's D8_PREV_M rerun here); PREV_CAP_A with S40's recorded D8_PREV_A (Adam reproduces here); same initial parameters (NOREC: W_h = 0) and batches
+----------------------------------------------------------------------------------------------------
+  ARM CAP_M (S33's D8_HINGE + CAP (Muon)), seeds 260-260 (1); paired with REF_HINGE_M; S33 D8_HINGE @2.10GHz printed alongside
+    seed | CAP_M                  trans  stop ch@4800 ch@9600    ch@end     hinge  sig0  cap@ #capped | REF_HINGE_M            | S33 D8_HINGE @2.10GHz 
+     260 | non-stream KEY          None  2400       8       8         8    0/2400  1.08     1    2220 | non-stream OTHER       | non-stream OTHER      
+    BOUND ROUTED  CAP_M 0/1  REF_HINGE_M 0/1  CAP_M only 0, REF_HINGE_M only 0, McNemar two-sided p = 1 (printed)
+    BOUND ROUTED  CAP_M 0/1  S33_D8_HINGE_@2.10GHz 0/1  CAP_M only 0, S33_D8_HINGE_@2.10GHz only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: CAP_M {'non-stream KEY': 1}; REF_HINGE_M {'non-stream OTHER': 1}; S33 D8_HINGE @2.10GHz {'non-stream OTHER': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:1 (8)
+      at  9600: 260:1 (8)
+      at   end: 260:1 (8)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 0/2400, --, --, 0/2400
+    S38's decodability of the stream (chance 0.125) from h at key (stream-token) positions [and from the gate input at key positions]:
+    seed |   600: key  (str)  [inp] |  1200: key  (str)  [inp] |  2400: key  (str)  [inp] |  4800: key  (str)  [inp] |  9600: key  (str)  [inp] |   end: key  (str)  [inp]
+     260 |         0.39 ( 1.00) [ 0.12] |         0.38 ( 0.99) [ 0.12] |         0.19 ( 0.98) [ 0.12] |           -- (   --) [   --] |           -- (   --) [   --] |         0.19 ( 0.98) [ 0.12]
+    median norms at key positions |W_in v_t| / |W_prev v_(t-1)| / |W_h h_(t-1)|, and sigma_max(W_h), per seed:
+    seed |   600: Win  Wprev  Wh   sig |  1200: Win  Wprev  Wh   sig |  2400: Win  Wprev  Wh   sig |  4800: Win  Wprev  Wh   sig |  9600: Win  Wprev  Wh   sig |   end: Win  Wprev  Wh   sig
+     260 |        0.10   --  0.04 0.50 |        0.22   --  0.08 0.50 |        0.48   --  0.13 0.49 |          --   --    --   -- |          --   --    --   -- |        0.48   --  0.13 0.49
+    medians over the runs (distinct(v): the value-position map's distinct channels, S39's rule):
+       at  n |   dec h@key   dec h@str dec inp@key |Win v|@key   |Wprev v|  |Wh h|@key     |h|@key     sig_max         rho     sat@key distinct(v)
+      600  1 |       0.390       1.000       0.125       0.096          --       0.039       0.122       0.500       0.391       0.000       1.000
+     1200  1 |       0.378       0.988       0.125       0.216          --       0.075       0.281       0.500       0.441       0.000       1.000
+     2400  1 |       0.194       0.985       0.125       0.482          --       0.133       0.583       0.488       0.426       0.000       1.000
+     4800  0 |          --          --          --          --          --          --          --          --          --          --          --
+     9600  0 |          --          --          --          --          --          --          --          --          --          --          --
+      end  1 |       0.194       0.985       0.125       0.482          --       0.133       0.583       0.488       0.426       0.000       1.000
+  READING S41 CAP_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)
+  ARM PREV_CAP_M (S40's D8_PREV_M + CAP (Muon)), seeds 260-260 (1); paired with REF_PREV_M; S40 D8_PREV_M @2.10GHz printed alongside
+    seed | PREV_CAP_M             trans  stop ch@4800 ch@9600    ch@end     hinge  sig0  cap@ #capped | REF_PREV_M             | S40 D8_PREV_M @2.10GHz
+     260 | MERGED (3 share)        None  2400 3+3+1+1 3+3+1+1   3+3+1+1    0/2400  1.08     1    2375 | non-stream OTHER       | MERGED (4 share)      
+    BOUND ROUTED  PREV_CAP_M 0/1  REF_PREV_M 0/1  PREV_CAP_M only 0, REF_PREV_M only 0, McNemar two-sided p = 1 (printed)
+    BOUND ROUTED  PREV_CAP_M 0/1  S40_D8_PREV_M_@2.10GHz 0/1  PREV_CAP_M only 0, S40_D8_PREV_M_@2.10GHz only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: PREV_CAP_M {'MERGED (3 share)': 1}; REF_PREV_M {'non-stream OTHER': 1}; S40 D8_PREV_M @2.10GHz {'MERGED (4 share)': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:4 (3+3+1+1)
+      at  9600: 260:4 (3+3+1+1)
+      at   end: 260:4 (3+3+1+1)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 0/2400, --, --, 0/2400
+    S38's decodability of the stream (chance 0.125) from h at key (stream-token) positions [and from the gate input at key positions]:
+    seed |   600: key  (str)  [inp] |  1200: key  (str)  [inp] |  2400: key  (str)  [inp] |  4800: key  (str)  [inp] |  9600: key  (str)  [inp] |   end: key  (str)  [inp]
+     260 |         0.91 ( 0.92) [ 0.88] |         0.88 ( 0.90) [ 0.78] |         0.91 ( 0.94) [ 0.91] |           -- (   --) [   --] |           -- (   --) [   --] |         0.91 ( 0.94) [ 0.91]
+    median norms at key positions |W_in v_t| / |W_prev v_(t-1)| / |W_h h_(t-1)|, and sigma_max(W_h), per seed:
+    seed |   600: Win  Wprev  Wh   sig |  1200: Win  Wprev  Wh   sig |  2400: Win  Wprev  Wh   sig |  4800: Win  Wprev  Wh   sig |  9600: Win  Wprev  Wh   sig |   end: Win  Wprev  Wh   sig
+     260 |        0.14 0.14  0.08 0.50 |        0.27 0.24  0.13 0.50 |        0.49 0.84  0.39 0.50 |          --   --    --   -- |          --   --    --   -- |        0.49 0.84  0.39 0.50
+    medians over the runs (distinct(v): the value-position map's distinct channels, S39's rule):
+       at  n |   dec h@key   dec h@str dec inp@key |Win v|@key   |Wprev v|  |Wh h|@key     |h|@key     sig_max         rho     sat@key distinct(v)
+      600  1 |       0.910       0.917       0.875       0.135       0.141       0.083       0.264       0.500       0.419       0.000       2.000
+     1200  1 |       0.878       0.902       0.781       0.267       0.236       0.126       0.509       0.500       0.415       0.000       3.000
+     2400  1 |       0.914       0.938       0.906       0.487       0.844       0.389       1.396       0.500       0.403       0.000       4.000
+     4800  0 |          --          --          --          --          --          --          --          --          --          --          --
+     9600  0 |          --          --          --          --          --          --          --          --          --          --          --
+      end  1 |       0.914       0.938       0.906       0.487       0.844       0.389       1.396       0.500       0.403       0.000       4.000
+  READING S41 PREV_CAP_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)
+  ARM PREV_NOREC_M (S40's D8_PREV_M with NOREC (W_h = 0, frozen; Muon)), seeds 260-260 (1); paired with REF_PREV_M; S40 D8_PREV_M @2.10GHz printed alongside
+    seed | PREV_NOREC_M           trans  stop ch@4800 ch@9600    ch@end     hinge  sig0  cap@ #capped | REF_PREV_M             | S40 D8_PREV_M @2.10GHz
+     260 | non-stream KEY          None  2400       8       8         8    0/2400  0.00  None       0 | non-stream OTHER       | MERGED (4 share)      
+    BOUND ROUTED  PREV_NOREC_M 0/1  REF_PREV_M 0/1  PREV_NOREC_M only 0, REF_PREV_M only 0, McNemar two-sided p = 1 (printed)
+    BOUND ROUTED  PREV_NOREC_M 0/1  S40_D8_PREV_M_@2.10GHz 0/1  PREV_NOREC_M only 0, S40_D8_PREV_M_@2.10GHz only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: PREV_NOREC_M {'non-stream KEY': 1}; REF_PREV_M {'non-stream OTHER': 1}; S40 D8_PREV_M @2.10GHz {'MERGED (4 share)': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:1 (8)
+      at  9600: 260:1 (8)
+      at   end: 260:1 (8)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 0/2400, --, --, 0/2400
+    S38's decodability of the stream (chance 0.125) from h at key (stream-token) positions [and from the gate input at key positions]:
+    seed |   600: key  (str)  [inp] |  1200: key  (str)  [inp] |  2400: key  (str)  [inp] |  4800: key  (str)  [inp] |  9600: key  (str)  [inp] |   end: key  (str)  [inp]
+     260 |         0.53 ( 0.74) [ 0.53] |         0.44 ( 0.48) [ 0.44] |         0.25 ( 0.59) [ 0.25] |           -- (   --) [   --] |           -- (   --) [   --] |         0.25 ( 0.59) [ 0.25]
+    median norms at key positions |W_in v_t| / |W_prev v_(t-1)| / |W_h h_(t-1)|, and sigma_max(W_h), per seed:
+    seed |   600: Win  Wprev  Wh   sig |  1200: Win  Wprev  Wh   sig |  2400: Win  Wprev  Wh   sig |  4800: Win  Wprev  Wh   sig |  9600: Win  Wprev  Wh   sig |   end: Win  Wprev  Wh   sig
+     260 |        0.09 0.06  0.00 0.00 |        0.16 0.10  0.00 0.00 |        0.61 0.17  0.00 0.00 |          --   --    --   -- |          --   --    --   -- |        0.61 0.17  0.00 0.00
+    medians over the runs (distinct(v): the value-position map's distinct channels, S39's rule):
+       at  n |   dec h@key   dec h@str dec inp@key |Win v|@key   |Wprev v|  |Wh h|@key     |h|@key     sig_max         rho     sat@key distinct(v)
+      600  1 |       0.531       0.744       0.531       0.094       0.056       0.000       0.101       0.000       0.000       0.000       1.000
+     1200  1 |       0.438       0.477       0.438       0.163       0.095       0.000       0.184       0.000       0.000       0.000       1.000
+     2400  1 |       0.250       0.591       0.250       0.613       0.169       0.000       0.631       0.000       0.000       0.000       1.000
+     4800  0 |          --          --          --          --          --          --          --          --          --          --          --
+     9600  0 |          --          --          --          --          --          --          --          --          --          --          --
+      end  1 |       0.250       0.591       0.250       0.613       0.169       0.000       0.631       0.000       0.000       0.000       1.000
+  READING S41 PREV_NOREC_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)
+  ARM PREV_CAP_A (S40's D8_PREV_A + CAP (Adam)), seeds 260-260 (1); paired with S40 D8_PREV_A
+    seed | PREV_CAP_A             trans  stop ch@4800 ch@9600    ch@end     hinge  sig0  cap@ #capped | S40 D8_PREV_A         
+     260 | non-stream KEY          None  2400       8       8         8    0/2400  1.08     1    1687 | MERGED (3 share)      
+    BOUND ROUTED  PREV_CAP_A 0/1  S40_D8_PREV_A 0/1  PREV_CAP_A only 0, S40_D8_PREV_A only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: PREV_CAP_A {'non-stream KEY': 1}; S40 D8_PREV_A {'MERGED (3 share)': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:1 (8)
+      at  9600: 260:1 (8)
+      at   end: 260:1 (8)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 0/2400, --, --, 0/2400
+    S38's decodability of the stream (chance 0.125) from h at key (stream-token) positions [and from the gate input at key positions]:
+    seed |   600: key  (str)  [inp] |  1200: key  (str)  [inp] |  2400: key  (str)  [inp] |  4800: key  (str)  [inp] |  9600: key  (str)  [inp] |   end: key  (str)  [inp]
+     260 |         0.85 ( 0.98) [ 0.88] |         0.43 ( 0.66) [ 0.38] |         0.22 ( 0.30) [ 0.19] |           -- (   --) [   --] |           -- (   --) [   --] |         0.22 ( 0.30) [ 0.19]
+    median norms at key positions |W_in v_t| / |W_prev v_(t-1)| / |W_h h_(t-1)|, and sigma_max(W_h), per seed:
+    seed |   600: Win  Wprev  Wh   sig |  1200: Win  Wprev  Wh   sig |  2400: Win  Wprev  Wh   sig |  4800: Win  Wprev  Wh   sig |  9600: Win  Wprev  Wh   sig |   end: Win  Wprev  Wh   sig
+     260 |        0.10 0.07  0.03 0.50 |        0.20 0.12  0.04 0.50 |        0.38 0.18  0.09 0.48 |          --   --    --   -- |          --   --    --   -- |        0.38 0.18  0.09 0.48
+    medians over the runs (distinct(v): the value-position map's distinct channels, S39's rule):
+       at  n |   dec h@key   dec h@str dec inp@key |Win v|@key   |Wprev v|  |Wh h|@key     |h|@key     sig_max         rho     sat@key distinct(v)
+      600  1 |       0.848       0.981       0.875       0.101       0.070       0.025       0.121       0.500       0.358       0.000       3.000
+     1200  1 |       0.426       0.655       0.375       0.199       0.116       0.037       0.197       0.500       0.270       0.000       1.000
+     2400  1 |       0.222       0.303       0.188       0.385       0.180       0.092       0.498       0.484       0.293       0.000       1.000
+     4800  0 |          --          --          --          --          --          --          --          --          --          --          --
+     9600  0 |          --          --          --          --          --          --          --          --          --          --          --
+      end  1 |       0.222       0.303       0.188       0.385       0.180       0.092       0.498       0.484       0.293       0.000       1.000
+  READING S41 PREV_CAP_A: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)
+  ARM REF_HINGE_M (S33's D8_HINGE rerun on this CPU (Muon reference)), seeds 260-260 (1); a reference (no reading); printed with S33 D8_HINGE @2.10GHz
+    seed | REF_HINGE_M            trans  stop ch@4800 ch@9600    ch@end     hinge  sig0  cap@ #capped | S33 D8_HINGE @2.10GHz 
+     260 | non-stream OTHER        None  2400       8       8         8    7/2400  1.08  None       0 | non-stream OTHER      
+    BOUND ROUTED  REF_HINGE_M 0/1  S33_D8_HINGE_@2.10GHz 0/1  REF_HINGE_M only 0, S33_D8_HINGE_@2.10GHz only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: REF_HINGE_M {'non-stream OTHER': 1}; S33 D8_HINGE @2.10GHz {'non-stream OTHER': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:1 (8)
+      at  9600: 260:1 (8)
+      at   end: 260:1 (8)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 7/2400, --, --, 7/2400
+    S38's decodability of the stream (chance 0.125) from h at key (stream-token) positions [and from the gate input at key positions]:
+    seed |   600: key  (str)  [inp] |  1200: key  (str)  [inp] |  2400: key  (str)  [inp] |  4800: key  (str)  [inp] |  9600: key  (str)  [inp] |   end: key  (str)  [inp]
+     260 |         0.17 ( 0.18) [ 0.12] |         0.14 ( 0.14) [ 0.12] |         0.13 ( 0.15) [ 0.12] |           -- (   --) [   --] |           -- (   --) [   --] |         0.13 ( 0.15) [ 0.12]
+    median norms at key positions |W_in v_t| / |W_prev v_(t-1)| / |W_h h_(t-1)|, and sigma_max(W_h), per seed:
+    seed |   600: Win  Wprev  Wh   sig |  1200: Win  Wprev  Wh   sig |  2400: Win  Wprev  Wh   sig |  4800: Win  Wprev  Wh   sig |  9600: Win  Wprev  Wh   sig |   end: Win  Wprev  Wh   sig
+     260 |        0.12   --  3.31 1.66 |        0.14   --  7.19 1.91 |        0.18   --  7.33 2.22 |          --   --    --   -- |          --   --    --   -- |        0.18   --  7.33 2.22
+    medians over the runs (distinct(v): the value-position map's distinct channels, S39's rule):
+       at  n |   dec h@key   dec h@str dec inp@key |Win v|@key   |Wprev v|  |Wh h|@key     |h|@key     sig_max         rho     sat@key distinct(v)
+      600  1 |       0.169       0.185       0.125       0.122          --       3.314       2.638       1.665       1.292       0.000       1.000
+     1200  1 |       0.137       0.138       0.125       0.142          --       7.190       4.147       1.912       1.749       0.087       1.000
+     2400  1 |       0.129       0.146       0.125       0.179          --       7.332       4.035       2.216       1.932       0.132       1.000
+     4800  0 |          --          --          --          --          --          --          --          --          --          --          --
+     9600  0 |          --          --          --          --          --          --          --          --          --          --          --
+      end  1 |       0.129       0.146       0.125       0.179          --       7.332       4.035       2.216       1.932       0.132       1.000
+  S41 REF_HINGE_M: reference (no reading): BOUND ROUTED 0/1
+  ARM REF_PREV_M (S40's D8_PREV_M rerun on this CPU (Muon reference)), seeds 260-260 (1); a reference (no reading); printed with S40 D8_PREV_M @2.10GHz
+    seed | REF_PREV_M             trans  stop ch@4800 ch@9600    ch@end     hinge  sig0  cap@ #capped | S40 D8_PREV_M @2.10GHz
+     260 | non-stream OTHER        None  2400   5+2+1   5+2+1     5+2+1    9/2400  1.08  None       0 | MERGED (4 share)      
+    BOUND ROUTED  REF_PREV_M 0/1  S40_D8_PREV_M_@2.10GHz 0/1  REF_PREV_M only 0, S40_D8_PREV_M_@2.10GHz only 0, McNemar two-sided p = 1 (printed)
+    failure classes at the end: REF_PREV_M {'non-stream OTHER': 1}; S40 D8_PREV_M @2.10GHz {'MERGED (4 share)': 1}
+    distinct channels holding the 8 streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:3 (5+2+1)
+      at  9600: 260:3 (5+2+1)
+      at   end: 260:3 (5+2+1)
+    the hinge's firings (cumulative training batches with a term > 0 / training batches) at 2400, 4800, 9600, end:
+      260: 9/2400, --, --, 9/2400
+    S38's decodability of the stream (chance 0.125) from h at key (stream-token) positions [and from the gate input at key positions]:
+    seed |   600: key  (str)  [inp] |  1200: key  (str)  [inp] |  2400: key  (str)  [inp] |  4800: key  (str)  [inp] |  9600: key  (str)  [inp] |   end: key  (str)  [inp]
+     260 |         0.16 ( 0.15) [ 0.97] |         0.16 ( 0.14) [ 0.97] |         0.18 ( 0.15) [ 0.91] |           -- (   --) [   --] |           -- (   --) [   --] |         0.18 ( 0.15) [ 0.91]
+    median norms at key positions |W_in v_t| / |W_prev v_(t-1)| / |W_h h_(t-1)|, and sigma_max(W_h), per seed:
+    seed |   600: Win  Wprev  Wh   sig |  1200: Win  Wprev  Wh   sig |  2400: Win  Wprev  Wh   sig |  4800: Win  Wprev  Wh   sig |  9600: Win  Wprev  Wh   sig |   end: Win  Wprev  Wh   sig
+     260 |        0.12 0.11  4.09 1.64 |        0.15 0.15  5.25 1.85 |        0.15 0.22  6.32 2.13 |          --   --    --   -- |          --   --    --   -- |        0.15 0.22  6.32 2.13
+    medians over the runs (distinct(v): the value-position map's distinct channels, S39's rule):
+       at  n |   dec h@key   dec h@str dec inp@key |Win v|@key   |Wprev v|  |Wh h|@key     |h|@key     sig_max         rho     sat@key distinct(v)
+      600  1 |       0.158       0.152       0.969       0.118       0.112       4.094       2.897       1.640       1.462       0.021       1.000
+     1200  1 |       0.156       0.138       0.969       0.150       0.152       5.250       3.267       1.854       1.693       0.062       1.000
+     2400  1 |       0.182       0.155       0.906       0.152       0.223       6.319       3.617       2.133       1.811       0.093       3.000
+     4800  0 |          --          --          --          --          --          --          --          --          --          --          --
+     9600  0 |          --          --          --          --          --          --          --          --          --          --          --
+      end  1 |       0.182       0.155       0.906       0.152       0.223       6.319       3.617       2.133       1.811       0.093       3.000
+  S41 REF_PREV_M: reference (no reading): BOUND ROUTED 0/1
+  DRY RUN READING dry_gate_cap CAP_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_gate_cap PREV_CAP_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_gate_cap PREV_NOREC_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)  [EXPLORATORY, not a result]
+  DRY RUN READING dry_gate_cap PREV_CAP_A: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not)  [EXPLORATORY, not a result]
+  DRY RUN REFERENCE dry_gate_cap REF_HINGE_M: reference (no reading): BOUND ROUTED 0/1  [EXPLORATORY, not a result]
+  DRY RUN REFERENCE dry_gate_cap REF_PREV_M: reference (no reading): BOUND ROUTED 0/1  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_wh_spectrum
+  idea    descriptive: does rho(W_h) cross 1 just before |W_h h|@key takes off (the stream leaving the gate state)?
+  source  batch 14's S39 (the stream leaves h at S=8 as |W_h h_(t-1)| outgrows |W_in v_t|)
+  change  none to the runs (reruns to 1600); sigma_max(W_h), rho(W_h), the gate's term norms and h's decodability every 50 updates
+  arm D8_HINGE_M   lr 0.001  iters 1600  seeds 260-260 (1)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 1600
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  arm HINGE_D8_A   lr 0.001  iters 1600  seeds 260-260 (1)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 1600
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
+  pairing each rerun against its recorded run (the curve and statistics must reproduce through 1600)
+----------------------------------------------------------------------------------------------------
+  CONFIG D8_HINGE_M (rerun of S33's D8_HINGE (Muon, S=8, k=16) to 1600); fresh runs on this CPU: they reproduce this CPU's REF_HINGE_M (S41) through 1200: 1/1 (0 without a reference yet); they reproduce the 2.10GHz records through 1600: 0/1 (printed)
+    per run: the first update with rho(W_h) > 1, with |W_h h|@key > 1, the difference (window 0-150):
+     260: rho > 1 first at   500, |W_h h|@key > 1 first at   500, difference     0: within; S39's measurements at its 10 shared updates repeated exactly at 1
+    per run, every 50 updates from 0 to 1600 (columns: updates 0, 50, ..., 1600):
+      rho(W_h):
+        260:  0.63  0.64  0.75  0.77  0.81  0.80  0.93  0.83  0.82  0.98  1.15  1.20  1.29  1.34  1.41  1.43  1.45  1.48  1.47  1.47  1.46  1.48  1.48  1.59  1.75  1.78  1.87  1.77  1.81  2.01  2.10  2.13  2.09
+      sig_max(W_h):
+        260:  1.08  1.06  1.09  1.10  1.14  1.23  1.33  1.33  1.43  1.54  1.65  1.67  1.66  1.68  1.67  1.68  1.75  1.75  1.70  1.68  1.67  1.69  1.72  1.80  1.91  1.93  1.98  1.94  1.96  2.11  2.19  2.24  2.22
+      |Wh h|@key:
+        260:  0.04  0.05  0.06  0.07  0.07  0.08  0.16  0.12  0.15  0.25  2.23  2.60  3.31  3.61  4.05  4.19  4.37  4.58  4.70  4.74  4.11  4.55  4.91  6.08  7.19  7.36  7.86  7.22  7.48  8.65  9.01  9.18  8.96
+      |Win v|@key:
+        260:  0.07  0.07  0.07  0.08  0.08  0.08  0.08  0.09  0.10  0.11  0.12  0.12  0.12  0.13  0.13  0.13  0.14  0.14  0.15  0.14  0.14  0.15  0.16  0.15  0.14  0.15  0.14  0.15  0.16  0.16  0.16  0.16  0.16
+      |h|@key:
+        260:  0.08  0.08  0.09  0.10  0.10  0.11  0.19  0.15  0.19  0.28  1.97  2.21  2.64  2.76  2.96  3.04  3.08  3.14  3.24  3.27  2.89  3.10  3.38  3.81  4.15  4.18  4.30  4.14  4.18  4.38  4.39  4.42  4.40
+      dec h@key:
+        260:  0.82  0.77  0.81  0.75  0.71  0.71  0.49  0.65  0.59  0.42  0.21  0.18  0.16  0.16  0.16  0.15  0.15  0.16  0.15  0.16  0.14  0.14  0.14  0.13  0.14  0.14  0.13  0.14  0.13  0.13  0.14  0.13  0.16
+    medians over the runs:
+    update  n |     sig_max         rho     |h|@key  |Wh h|@key |Win v|@key   dec h@key   dec h@str     sat@key
+         0  1 |       1.083       0.625       0.083       0.042       0.073       0.824       1.000       0.000
+        50  1 |       1.065       0.643       0.079       0.045       0.069       0.767       1.000       0.000
+       100  1 |       1.094       0.753       0.086       0.060       0.073       0.807       1.000       0.000
+       150  1 |       1.103       0.765       0.099       0.068       0.082       0.749       0.999       0.000
+       200  1 |       1.144       0.808       0.104       0.074       0.078       0.709       0.987       0.000
+       250  1 |       1.234       0.797       0.113       0.083       0.080       0.713       0.979       0.000
+       300  1 |       1.332       0.933       0.189       0.161       0.079       0.492       0.745       0.000
+       350  1 |       1.333       0.829       0.152       0.122       0.086       0.651       0.922       0.000
+       400  1 |       1.427       0.816       0.191       0.149       0.101       0.593       0.938       0.000
+       450  1 |       1.537       0.976       0.285       0.247       0.109       0.419       0.592       0.000
+       500  1 |       1.652       1.152       1.966       2.232       0.118       0.208       0.203       0.000
+       550  1 |       1.672       1.195       2.215       2.601       0.119       0.178       0.181       0.000
+       600  1 |       1.665       1.292       2.637       3.313       0.122       0.155       0.171       0.000
+       650  1 |       1.684       1.336       2.765       3.612       0.129       0.161       0.175       0.001
+       700  1 |       1.667       1.410       2.959       4.054       0.127       0.156       0.164       0.016
+       750  1 |       1.683       1.429       3.042       4.186       0.128       0.146       0.160       0.020
+       800  1 |       1.747       1.453       3.077       4.374       0.138       0.151       0.160       0.025
+       850  1 |       1.748       1.477       3.144       4.576       0.144       0.157       0.170       0.033
+       900  1 |       1.702       1.470       3.236       4.699       0.149       0.149       0.156       0.026
+       950  1 |       1.679       1.466       3.268       4.738       0.143       0.158       0.176       0.034
+      1000  1 |       1.672       1.457       2.893       4.112       0.138       0.143       0.150       0.030
+      1050  1 |       1.694       1.483       3.096       4.545       0.152       0.142       0.153       0.028
+      1100  1 |       1.719       1.485       3.383       4.908       0.158       0.142       0.154       0.022
+      1150  1 |       1.801       1.592       3.811       6.084       0.150       0.131       0.130       0.051
+      1200  1 |       1.912       1.749       4.148       7.190       0.142       0.139       0.135       0.087
+      1250  1 |       1.928       1.783       4.180       7.359       0.149       0.141       0.143       0.109
+      1300  1 |       1.978       1.866       4.298       7.860       0.138       0.134       0.171       0.163
+      1350  1 |       1.945       1.766       4.141       7.223       0.153       0.136       0.137       0.108
+      1400  1 |       1.958       1.811       4.176       7.476       0.157       0.134       0.137       0.124
+      1450  1 |       2.114       2.014       4.383       8.646       0.160       0.134       0.135       0.275
+      1500  1 |       2.194       2.095       4.391       9.008       0.157       0.141       0.133       0.312
+      1550  1 |       2.238       2.129       4.416       9.182       0.164       0.130       0.130       0.306
+      1600  1 |       2.216       2.088       4.398       8.957       0.159       0.158       0.131       0.276
+  LABEL S42 D8_HINGE_M: not (rho first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1 in 1/1 runs; >= 4 = gain crossing)
+  CONFIG HINGE_D8_A (rerun of X's HINGE_D8 (Adam, S=8, k=16) to 1600); reruns reproduce their records through 1600: 1/1
+    per run: the first update with rho(W_h) > 1, with |W_h h|@key > 1, the difference (window 0-150):
+     260: rho > 1 first at  None, |W_h h|@key > 1 first at  None, difference  None: NOT within; S39's measurements at its 10 shared updates repeated exactly at 10
+    per run, every 50 updates from 0 to 1600 (columns: updates 0, 50, ..., 1600):
+      rho(W_h):
+        260:  0.63  0.62  0.63  0.64  0.69  0.78  0.71  0.90  0.86  0.95  0.83  0.81  0.78  0.72  0.76  0.75  0.70  0.82  0.99  0.89  0.88  0.93  0.94  0.92  0.92  0.95  0.83  0.88  0.84  0.83  0.88  0.92  0.72
+      sig_max(W_h):
+        260:  1.08  1.07  1.08  1.08  1.09  1.12  1.14  1.26  1.26  1.31  1.25  1.24  1.22  1.21  1.24  1.26  1.23  1.25  1.32  1.31  1.30  1.33  1.33  1.33  1.33  1.34  1.30  1.32  1.32  1.30  1.34  1.35  1.28
+      |Wh h|@key:
+        260:  0.04  0.04  0.05  0.05  0.06  0.07  0.07  0.12  0.13  0.20  0.15  0.15  0.14  0.14  0.15  0.15  0.14  0.16  0.37  0.28  0.26  0.34  0.34  0.34  0.32  0.35  0.27  0.33  0.32  0.29  0.35  0.37  0.23
+      |Win v|@key:
+        260:  0.07  0.07  0.07  0.08  0.09  0.09  0.10  0.11  0.13  0.16  0.17  0.18  0.17  0.19  0.19  0.19  0.20  0.21  0.21  0.21  0.21  0.22  0.23  0.23  0.23  0.25  0.26  0.27  0.28  0.28  0.29  0.28  0.29
+      |h|@key:
+        260:  0.08  0.08  0.08  0.09  0.09  0.10  0.12  0.13  0.15  0.21  0.17  0.17  0.16  0.17  0.18  0.19  0.18  0.19  0.37  0.34  0.34  0.38  0.36  0.39  0.36  0.37  0.37  0.39  0.42  0.38  0.40  0.39  0.42
+      dec h@key:
+        260:  0.82  0.81  0.83  0.83  0.82  0.79  0.76  0.53  0.48  0.31  0.43  0.45  0.50  0.50  0.50  0.48  0.51  0.43  0.23  0.25  0.27  0.23  0.24  0.24  0.24  0.25  0.27  0.24  0.25  0.25  0.22  0.22  0.31
+    medians over the runs:
+    update  n |     sig_max         rho     |h|@key  |Wh h|@key |Win v|@key   dec h@key   dec h@str     sat@key
+         0  1 |       1.083       0.625       0.083       0.042       0.073       0.824       1.000       0.000
+        50  1 |       1.072       0.619       0.083       0.043       0.074       0.809       1.000       0.000
+       100  1 |       1.082       0.632       0.084       0.047       0.074       0.826       1.000       0.000
+       150  1 |       1.081       0.644       0.089       0.051       0.081       0.825       1.000       0.000
+       200  1 |       1.085       0.691       0.093       0.056       0.085       0.819       1.000       0.000
+       250  1 |       1.120       0.784       0.104       0.070       0.094       0.794       0.991       0.000
+       300  1 |       1.139       0.705       0.115       0.069       0.098       0.757       0.993       0.000
+       350  1 |       1.262       0.902       0.133       0.116       0.108       0.532       0.807       0.000
+       400  1 |       1.256       0.859       0.151       0.131       0.133       0.475       0.706       0.000
+       450  1 |       1.308       0.946       0.213       0.201       0.160       0.307       0.524       0.000
+       500  1 |       1.254       0.834       0.170       0.149       0.168       0.426       0.702       0.000
+       550  1 |       1.240       0.810       0.174       0.150       0.177       0.454       0.699       0.000
+       600  1 |       1.219       0.777       0.164       0.137       0.173       0.504       0.752       0.000
+       650  1 |       1.205       0.717       0.175       0.136       0.189       0.498       0.802       0.000
+       700  1 |       1.238       0.759       0.179       0.148       0.185       0.498       0.758       0.000
+       750  1 |       1.260       0.754       0.185       0.154       0.187       0.478       0.749       0.000
+       800  1 |       1.230       0.703       0.182       0.144       0.201       0.508       0.730       0.000
+       850  1 |       1.251       0.816       0.192       0.161       0.206       0.434       0.682       0.000
+       900  1 |       1.322       0.995       0.371       0.366       0.210       0.229       0.357       0.000
+       950  1 |       1.310       0.889       0.338       0.277       0.209       0.247       0.480       0.000
+      1000  1 |       1.304       0.875       0.337       0.262       0.212       0.267       0.516       0.000
+      1050  1 |       1.329       0.934       0.376       0.339       0.222       0.231       0.453       0.000
+      1100  1 |       1.331       0.943       0.362       0.336       0.233       0.242       0.456       0.000
+      1150  1 |       1.334       0.923       0.387       0.343       0.231       0.236       0.460       0.000
+      1200  1 |       1.333       0.916       0.357       0.316       0.233       0.244       0.450       0.000
+      1250  1 |       1.344       0.954       0.368       0.345       0.249       0.248       0.392       0.000
+      1300  1 |       1.300       0.833       0.370       0.271       0.262       0.272       0.443       0.000
+      1350  1 |       1.321       0.878       0.388       0.329       0.272       0.236       0.405       0.000
+      1400  1 |       1.318       0.842       0.415       0.318       0.277       0.248       0.392       0.000
+      1450  1 |       1.305       0.828       0.378       0.288       0.283       0.246       0.427       0.000
+      1500  1 |       1.338       0.882       0.396       0.349       0.291       0.223       0.404       0.000
+      1550  1 |       1.346       0.924       0.393       0.370       0.284       0.220       0.386       0.000
+      1600  1 |       1.281       0.721       0.417       0.234       0.292       0.311       0.478       0.000
+  LABEL S42 HINGE_D8_A: not (rho first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1 in 0/1 runs; >= 4 = gain crossing)
+  DRY RUN LABEL dry_wh_spectrum D8_HINGE_M: not (rho first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1 in 1/1 runs; >= 4 = gain crossing)  [EXPLORATORY, not a result]
+  DRY RUN LABEL dry_wh_spectrum HINGE_D8_A: not (rho first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1 in 0/1 runs; >= 4 = gain crossing)  [EXPLORATORY, not a result]
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  S41 gate_cap CAP_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not); failure classes {'non-stream KEY': 1}; median decodability of h at key positions 600 0.39, 1200 0.38, 2400 0.19, 4800 --, 9600 --, end 0.19
+  S41 gate_cap PREV_CAP_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not); failure classes {'MERGED (3 share)': 1}; median decodability of h at key positions 600 0.91, 1200 0.88, 2400 0.91, 4800 --, 9600 --, end 0.91
+  S41 gate_cap PREV_NOREC_M: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not); failure classes {'non-stream KEY': 1}; median decodability of h at key positions 600 0.53, 1200 0.44, 2400 0.25, 4800 --, 9600 --, end 0.25
+  S41 gate_cap PREV_CAP_A: it does not (BOUND ROUTED 0/1; >= 3 breaks, 0 does not); failure classes {'non-stream KEY': 1}; median decodability of h at key positions 600 0.85, 1200 0.43, 2400 0.22, 4800 --, 9600 --, end 0.22
+  S41 gate_cap REF_HINGE_M: reference (no reading): BOUND ROUTED 0/1; failure classes {'non-stream OTHER': 1}; median decodability of h at key positions 600 0.17, 1200 0.14, 2400 0.13, 4800 --, 9600 --, end 0.13
+  S41 gate_cap REF_PREV_M: reference (no reading): BOUND ROUTED 0/1; failure classes {'non-stream OTHER': 1}; median decodability of h at key positions 600 0.16, 1200 0.16, 2400 0.18, 4800 --, 9600 --, end 0.18
+  S42 wh_spectrum D8_HINGE_M: not (rho first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1 in 1/1 runs; >= 4 = gain crossing); per run (first rho > 1, first |W_h h|@key > 1): 260 (500, 500)
+  S42 wh_spectrum HINGE_D8_A: not (rho first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1 in 0/1 runs; >= 4 = gain crossing); per run (first rho > 1, first |W_h h|@key > 1): 260 (None, None)
+####################################################################################################

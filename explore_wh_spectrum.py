@@ -47,7 +47,8 @@ NAME = "wh_spectrum"
 IDEA = "descriptive: does rho(W_h) cross 1 just before |W_h h|@key takes off (the stream leaving the gate state)?"
 SOURCE = "batch 14's S39 (the stream leaves h at S=8 as |W_h h_(t-1)| outgrows |W_in v_t|)"
 CHANGE = "none to the runs (reruns to 1600); sigma_max(W_h), rho(W_h), the gate's term norms and h's decodability every 50 updates"
-PAIRING = "each rerun against its recorded run (the curve and statistics must reproduce through 1600)"
+PAIRING = ("HINGE_D8_A: each rerun against X's recorded run (the curve and statistics must reproduce through 1600); "
+           "D8_HINGE_M (fresh on this CPU): each run against S41's REF_HINGE_M with the same seed through 1200")
 CHILD = "explore_wh_spectrum_child"
 LR = SUB_LR
 MUON_LR = 0.005

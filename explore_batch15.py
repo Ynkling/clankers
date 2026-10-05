@@ -244,9 +244,15 @@ def run_waves(workers, pv):
             st = stores[job["name"]]
             st["runs"][f"{job['arm']}|{job['seed']}"] = rec
             ec.save_store(job["name"], st)
-            extra = (f"outcome {rec.get('outcome')}; sigma_max(W_h) at init {rec.get('sigma0')}, the cap first at update "
-                     f"{rec.get('first_cap')}, on {rec.get('n_cap')} updates" if job["screen"] == s41.__name__
-                     else f"reproduces its record {rec.get('reproduces')}")
+            if job["screen"] == s41.__name__:
+                s0 = rec.get("sigma0")
+                extra = (f"outcome {rec.get('outcome')}; sigma_max(W_h) at init {'--' if s0 is None else f'{s0:.4f}'}, the cap "
+                         f"first at update {rec.get('first_cap')}, on {rec.get('n_cap')} updates")
+            elif "reproduces_record" in rec:
+                extra = (f"reproduces the 2.10GHz record {rec['reproduces_record']} (a fresh run on this CPU; checked against "
+                         f"REF_HINGE_M in the report)")
+            else:
+                extra = f"reproduces its record {rec.get('reproduces')}"
             print(f"  [{n:>3}/{len(jobs)}] {(time.time() - t0) / 60:6.1f} min  {job['name']:<14} {job['arm']:<12} seed "
                   f"{job['seed']}  lr {rec['lr']:g} ({rec['sched']})\n          "
                   f"{ec.line(rec) if rec.get('ok') else 'FAILED ' + str(rec.get('error'))}  {extra}", flush=True)
