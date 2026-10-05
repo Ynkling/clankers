@@ -187,3 +187,21 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
                    schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
   pairing each rerun against its recorded run (the curve and statistics must reproduce through 1600)
 ----------------------------------------------------------------------------------------------------
+  PROJECTION (worst case: every run to its iters; pool-load timing: the median interval between optimizer steps, one child per arm or configuration at once, two rounds of 4 (the slower of an arm's two timings), 1 thread each, this machine):
+    gate_cap       CAP_M        10 runs x  53.3 min  (28800 steps x 105.9 ms + 24 evals x 5.8 s + 6 measurements x 0.9 s)
+    gate_cap       PREV_CAP_M   10 runs x  59.0 min  (28800 steps x 117.2 ms + 24 evals x 6.6 s + 6 measurements x 1.0 s)
+    gate_cap       PREV_NOREC_M 10 runs x  56.9 min  (28800 steps x 112.7 ms + 24 evals x 6.7 s + 6 measurements x 1.0 s)
+    gate_cap       PREV_CAP_A   10 runs x  54.8 min  (28800 steps x 109.0 ms + 24 evals x 5.9 s + 6 measurements x 0.9 s)
+    wh_spectrum    D8_HINGE_M    5 runs x   3.5 min  (1600 steps x 107.7 ms + 1 evals x 8.1 s + 33 measurements x 0.9 s)
+    wh_spectrum    HINGE_D8_A    5 runs x   3.4 min  (1600 steps x 102.1 ms + 1 evals x 7.1 s + 33 measurements x 1.0 s)
+    total 37.90 h of runs; makespan on 4 workers 9.50 h (worst case)
+  RUNTIME RULE: projected makespan 9.50 h > 9 h: PREV_CAP_A cut to 260-264 (stored)
+  PROJECTION AFTER THE CUT (worst case: every run to its iters; pool-load timing: the median interval between optimizer steps, one child per arm or configuration at once, two rounds of 4 (the slower of an arm's two timings), 1 thread each, this machine):
+    gate_cap       CAP_M        10 runs x  53.3 min  (28800 steps x 105.9 ms + 24 evals x 5.8 s + 6 measurements x 0.9 s)
+    gate_cap       PREV_CAP_M   10 runs x  59.0 min  (28800 steps x 117.2 ms + 24 evals x 6.6 s + 6 measurements x 1.0 s)
+    gate_cap       PREV_NOREC_M 10 runs x  56.9 min  (28800 steps x 112.7 ms + 24 evals x 6.7 s + 6 measurements x 1.0 s)
+    gate_cap       PREV_CAP_A    5 runs x  54.8 min  (28800 steps x 109.0 ms + 24 evals x 5.9 s + 6 measurements x 0.9 s)
+    wh_spectrum    D8_HINGE_M    5 runs x   3.5 min  (1600 steps x 107.7 ms + 1 evals x 8.1 s + 33 measurements x 0.9 s)
+    wh_spectrum    HINGE_D8_A    5 runs x   3.4 min  (1600 steps x 102.1 ms + 1 evals x 7.1 s + 33 measurements x 1.0 s)
+    total 33.33 h of runs; makespan on 4 workers 8.42 h (worst case)
+  39 runs queued on 4 workers (1 torch thread each), submitted in this order: CAP_M|260 PREV_CAP_M|260 PREV_NOREC_M|260 CAP_M|261 D8_HINGE_M|260 D8_HINGE_M|261 D8_HINGE_M|262 D8_HINGE_M|263 D8_HINGE_M|264 PREV_CAP_A|261 PREV_CAP_M|261 PREV_NOREC_M|261 CAP_M|262 PREV_CAP_A|262 PREV_CAP_M|262 PREV_NOREC_M|262 CAP_M|263 PREV_CAP_A|263 PREV_CAP_M|263 PREV_NOREC_M|263 CAP_M|264 PREV_CAP_A|264 PREV_CAP_M|264 PREV_NOREC_M|264 CAP_M|265 PREV_CAP_M|265 PREV_NOREC_M|265 CAP_M|266 PREV_CAP_M|266 PREV_NOREC_M|266 CAP_M|267 PREV_CAP_M|267 PREV_NOREC_M|267 CAP_M|268 PREV_CAP_M|268 PREV_NOREC_M|268 CAP_M|269 PREV_CAP_M|269 PREV_NOREC_M|269

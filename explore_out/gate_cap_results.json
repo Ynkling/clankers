@@ -83,50 +83,6 @@
      268,
      269
     ]
-   },
-   "REF_HINGE_M": {
-    "iters": 28800,
-    "key": "REF_HINGE_M",
-    "label": "S33's D8_HINGE rerun on this CPU (Muon reference)",
-    "lr": 0.001,
-    "muon_lr": 0.005,
-    "opt": "muon",
-    "prio": 2,
-    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
-    "seeds": [
-     260,
-     261,
-     262,
-     263,
-     264,
-     265,
-     266,
-     267,
-     268,
-     269
-    ]
-   },
-   "REF_PREV_M": {
-    "iters": 28800,
-    "key": "REF_PREV_M",
-    "label": "S40's D8_PREV_M rerun on this CPU (Muon reference)",
-    "lr": 0.001,
-    "muon_lr": 0.005,
-    "opt": "muon",
-    "prio": 2,
-    "sched": "Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
-    "seeds": [
-     260,
-     261,
-     262,
-     263,
-     264,
-     265,
-     266,
-     267,
-     268,
-     269
-    ]
    }
   },
   "dry": false,
