@@ -82,3 +82,5 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42) — DR
     total 0.70 h of runs; makespan on 4 workers 0.19 h (worst case)
   RUNTIME RULE: projected makespan 0.19 h <= 9 h: no cut (dry run: not stored)
   8 runs queued on 4 workers (1 torch thread each), submitted in this order: CAP_M|260 PREV_CAP_A|260 PREV_CAP_M|260 PREV_NOREC_M|260 D8_HINGE_M|260 HINGE_D8_A|260 REF_HINGE_M|260 REF_PREV_M|260
+  [  1/8]    5.8 min  dry_gate_cap   CAP_M        seed 260  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step))
+          acc 0.083  trans  None  VALcos 1.000  margin 0.00  KEY  outcome non-stream KEY; sigma_max(W_h) at init 1.0833814633503531, the cap first at update 1, on 2220 updates
