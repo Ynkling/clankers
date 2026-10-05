@@ -57,7 +57,7 @@ Four streams were the open problem. Revision 7 adds Phase V: five pre-registered
 **Eight streams remain unsolved.** No learned-gate run trained on all eight streams from the start has bound, and a curriculum over the number of streams reaches at most 15/36, mostly without one channel per stream. Screens trace the failure to the gate:
 - its recurrent state carries the stream at initialization (median decodability 0.91, chance 0.125) and loses it within the first 600–1200 updates;
 - over the same period its recurrent term grows from 0.04 to 5–7 by update 2400, while its input term stays between 0.06 and 0.34;
-- in a later screen the stream was lost, within 50 updates, in each of the seven of ten runs where the spectral radius of the gate's recurrent weights rose clearly above one.
+- in a later screen the stream was lost, within 100 updates, in each of the seven of ten runs where the spectral radius of the gate's recurrent weights rose clearly above one.
 
 A cap on that recurrence is being screened.
 
@@ -70,7 +70,7 @@ Phase IV is condensed in [Section 2](#2-earlier-phases-in-brief); Revision 6 has
 Machines:
 - **X:** a cloud container. It ran every Phase V test, on two Intel Xeon hosts (2.10 and 2.80 GHz). Adam runs reproduce bit for bit across them, and X's results recorded after the stream-recipe test come from the 2.80 GHz host.
 - **L:** an Intel i7-12650H. It also ran every Phase V test.
-- **E:** a third container that runs the exploratory screens on a separate branch ([Section 6](#6-screens-what-decides-the-gates-first-move)). Its batches 2–14 ran on a 2.10 GHz Xeon, apart from two segments of batch 7; batch 15 runs on a 2.80 GHz Xeon.
+- **E:** a third container that runs the exploratory screens on a separate branch ([Section 6](#6-screens-what-decides-the-gates-first-move)). Its batches 2–14 ran on a 2.10 GHz Xeon, apart from two segments of batch 7. Batch 15 also runs there, after a first segment on a 2.80 GHz Xeon whose Muon runs were set aside.
 
 Every verdict is per machine. Both machines run the same seeds, so pooled counts are descriptive and carry no p-value ([Section 15](#15-methodological-findings)). L's results for four of the five tests are not yet committed to the repository; their verdicts were regenerated from L's results files with each test's own report function ([Provenance](#provenance)).
 
@@ -314,15 +314,13 @@ Every learned-gate arm trained on all eight streams from step 1 has failed, unde
 
 The jump in the recurrent term between updates 400 and 600 under Muon is sudden. Our reading was that the recurrence's gain crosses one: past that point the state sustains itself and ignores its input. At eight streams the gate's output stays near uniform (entropy 2.70 of a possible 2.77 at update 2400 under Muon), so the task gives its input weights little reason to grow.
 
-**The gain crossing (S42, batch 15).** This screen reran the two eight-stream configurations of Table 7 to update 1600 on seeds 260–264 and logged the spectral radius ρ of $W_h$ every 50 updates. It ran on E's new 2.80 GHz host, where Muon runs no longer reproduce S39's records (Section [15](#15-methodological-findings)), so its Muon runs are new trajectories on the same seeds; its Adam runs reproduce X's records. At initialization ρ was 0.52–0.63.
+**The gain crossing (S42, batch 15).** This screen reran the two eight-stream configurations of Table 7 to update 1600 on seeds 260–264 and logged the spectral radius ρ of $W_h$ every 50 updates. Every rerun reproduced its recorded run through update 1200, so these are S39's runs, measured more finely. (A first attempt ran on a 2.80 GHz host, where Muon runs do not reproduce, Section [15](#15-methodological-findings); its Muon runs were set aside.) At initialization ρ was 0.52–0.63.
 
-- In seven of the ten runs ρ rose clearly above one (peaks 1.20–2.13), first crossing it between updates 350 and 1400. In each of them, the stream's decodability from *h* at keys fell to 0.13–0.26 within 50 updates of the crossing, and the recurrent term passed 1 within 100 updates.
+- In seven of the ten runs ρ rose clearly above one (peaks 1.28–2.03), first crossing it between updates 300 and 1400. In each of them, the stream's decodability from *h* at keys fell to 0.13–0.23 within 100 updates of the crossing, and the recurrent term passed 1 within 100 updates.
 
-- In the other three (one Muon, two Adam) ρ peaked at 0.88–1.03, and the stream was only partly lost (0.31–0.72 at update 1600).
+- In the other three (one Muon, two Adam) ρ peaked at 0.88–1.02, and the stream was only partly lost (0.31–0.73 at update 1600).
 
-- In two Muon runs ρ later fell back below one, and decodability partly recovered (to 0.50 and 0.69).
-
-The screen's pre-set rule asks whether, in at least four of five runs, the recurrent term first exceeds 1 within 150 updates after ρ first does. It labels the Muon configuration "gain crossing" (4 of 5) and the Adam configuration "not" (3 of 5; in its two other runs ρ never exceeded one). We applied that rule to the saved records ourselves, before E's report. The pattern is what the gain-crossing reading predicts, but it is a correlation in ten runs. The intervention is S41, still running: a cap of 0.5 on the spectral norm of $W_h$, the cap together with the previous-token input, and the previous-token input with no recurrence at all. Four of its 55 runs are saved, one seed per arm; none bound, and four runs cannot be read.
+The screen's pre-set rule asks whether, in at least four of five runs, the recurrent term first exceeds 1 within 150 updates after ρ first does. It labels the Muon configuration "gain crossing" (4 of 5) and the Adam configuration "not" (3 of 5; in its two other runs ρ never exceeded one). We applied that rule to the saved records ourselves, before E's report. The pattern is what the gain-crossing reading predicts, but it is a correlation in ten runs. The intervention is S41, still running: a cap of 0.5 on the spectral norm of $W_h$, the cap together with the previous-token input, and the previous-token input with no recurrence at all. Five of its 35 runs are saved; none bound, and five runs cannot be read.
 
 ## 12. Distant cues
 
@@ -495,7 +493,7 @@ setsid nohup python3 -u test_early_recipe.py --workers 4 > early_recipe.log 2>&1
 
 ## Provenance
 
-**Table 9.** Phase V commits on branch `claude/bdh-growth-hebbian-inference-w90069`. The L commit is the one recorded in L's results file; L's test code equals X's test commit. Only L's `early_recipe` result is in `results/L/` (committed in `00ac0f2`); L's other four are not yet committed. Their verdicts here were regenerated with each test's own report function from L's results files, and for `recipe_scope` they match L's full log. X: Intel Xeon at 2.10 GHz through `stream_recipe`, 2.80 GHz after; L: Intel i7-12650H; PyTorch 2.14.0 throughout.
+**Table 9.** Phase V commits on branch `claude/bdh-growth-hebbian-inference-w90069`. The L commit is the one recorded in L's results file; L's test code equals X's test commit. Only L's `early_recipe` result is in `results/L/` (committed in `00ac0f2`); L's other four are not yet committed. Their verdicts here were regenerated with each test's own report function from L's results files, and for `recipe_scope` they match L's full log. X: Intel Xeon at 2.10 GHz through `stream_recipe`, 2.80 GHz after; L: Intel i7-12650H; PyTorch 2.14.0 throughout.
 
 | test                | X: test commit / result commit | L: commit (results file) | runs, X; L |
 |:--------------------|:-------------------------------|:-------------------------|:-----------|
@@ -505,7 +503,7 @@ setsid nohup python3 -u test_early_recipe.py --workers 4 > early_recipe.log 2>&1
 | `recipe_scope`      | `a429af9` / `c69f1e6`          | `c69f1e6`                | 56; 60     |
 | `early_recipe`      | `9f25dc8` / `9437e01`          | `9437e01`                | 108; 124   |
 
-**Table 10.** Exploratory batches on branch `claude/outside-ideas`, container E, one thread per run. Every batch began each segment with a check that reproduced one of X's recorded runs bit for bit. Batches 2–14 ran on a 2.10 GHz Xeon (two segments of batch 7 excepted), batch 15 on a 2.80 GHz Xeon, where each segment also fingerprinted a fresh Muon reference. Batch 15's count is at the time of writing: all 10 of S42's runs and 4 of S41's 55. S29 and S30 were deferred and S31 dropped; none has run.
+**Table 10.** Exploratory batches on branch `claude/outside-ideas`, container E, one thread per run. Every batch began each segment with a check that reproduced one of X's recorded runs bit for bit. Batches 2–15 ran on a 2.10 GHz Xeon, apart from two segments of batch 7 and batch 15's first segment; that segment ran on a 2.80 GHz Xeon, and its eight Muon runs were set aside because Muon does not reproduce across processors. Batch 15's count is at the time of writing: all 10 of S42's runs and 5 of S41's 35. S29 and S30 were deferred and S31 dropped; none has run.
 
 | batch | screens                                                            | code commit |     runs |
 |:------|:-------------------------------------------------------------------|:------------|---------:|
@@ -522,7 +520,7 @@ setsid nohup python3 -u test_early_recipe.py --workers 4 > early_recipe.log 2>&1
 | 12    | S36 plateau-triggered split                                        | `faa1926`   |       30 |
 | 13    | S37 targeted split, S38 gate-state probe                           | `c2b30dc`   |       50 |
 | 14    | S39 gate memory over time, S40 previous-token input                | `07ccfb7`   |       40 |
-| 15    | S41 gate cap (running), S42 $W_h$ spectrum                         | `1432fe0`   | 14 of 65 |
+| 15    | S41 gate cap (running), S42 $W_h$ spectrum                         | `90c3a28`   | 15 of 45 |
 
 For Phases I–IV, see the [Provenance section of `docs/revision6.md`](docs/revision6.md#provenance).
 
