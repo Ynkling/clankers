@@ -1,0 +1,166 @@
+====================================================================================================
+Recipe scope: the hinge without the slow schedule, and the HINGE recipe on the stream curriculum
+  HONLY: the hinge (1.0 * [relu(eta2_index - 0.2) + relu(eta2_half - 0.2)]) with one optimizer group at 0.001; SC8_H: SLOW (gate 0.001, the rest 0.0001 for updates 1-2400) + the hinge on each stage's key positions
+  Part 0: 24000 steps (DISCOVERED); Part B: 28800 steps (BOUND); Part C: stages switch at 4800 and 9600, 28800 steps (BOUND on the 8-stream set, stage 3)
+  HONLY0     arm A + the hinge, one group at 1e-3 (S=2, P=4, k=2, no conv)         seeds 280-299 (20)
+  HONLY4k16  A4k16 + the hinge, one group at 1e-3 (S=4, P=4, k=16, conv)           seeds 240-259 (20)
+  SC8_H      SC8 + HINGE (slow 1-2400; hinge on each stage's key positions)        seeds 260-279 (20)
+  --slow        slow_start_results.json (CPU 12th Gen Intel(R) Core(TM) i7-12650H, git 9c5939e, 110 records)
+  --recipe      stream_recipe_results.json (CPU 12th Gen Intel(R) Core(TM) i7-12650H, git 092937b, 90 records)
+  --curriculum  stream_curriculum_results.json (CPU 12th Gen Intel(R) Core(TM) i7-12650H, git 631fd62, 53 records)
+  --scale       scale_axes_results.json (CPU 12th Gen Intel(R) Core(TM) i7-12650H, git 248c482, 80 records)
+  --short       short_conv_results.json (CPU 12th Gen Intel(R) Core(TM) i7-12650H, git 4610878, 165 records)
+  torch 2.14.0   CPU 12th Gen Intel(R) Core(TM) i7-12650H   4 worker processes x 1 thread   git c69f1e6
+====================================================================================================
+
+test_slow_start.py's verification (which runs test_stream_curriculum's, and so on down to
+test_multilayer_binding's), with X's recorded files:
+test_stream_curriculum.py's verification (which runs test_stream_recipe's, and so on down to
+test_multilayer_binding's):
+test_stream_recipe.py's verification (which runs test_stream_channels', and so on down to
+test_multilayer_binding's):
+test_stream_channels.py's verification (which runs test_scale_axes's, and so on down to
+test_multilayer_binding's), with its default --prev (scale_axes_results.json):
+test_scale_axes.py's verification (which runs test_curriculum_confirm's, and so on down
+to test_multilayer_binding's):
+test_curriculum_confirm.py's verification (which runs test_load_curriculum's, and so on
+down to test_multilayer_binding's), with its default --prev (load_curriculum_results.json):
+test_load_curriculum.py's verification (which runs test_p_scaling's, and so on down to
+test_multilayer_binding's); its CHECK 72 pairs with p_scaling_results.json, the p_scaling file named in
+the --prev file's meta:
+test_p_scaling.py's verification (which runs test_conv_lr's, and so on down to
+test_multilayer_binding's); its CHECK 64 pairs with conv_lr_results.json, the conv_lr file named
+in the --p8 file's meta:
+test_conv_lr.py's verification (which runs test_short_conv's, and so on down to
+test_multilayer_binding's); its CHECK 59 pairs with short_conv_results.json, the short_conv file
+named in the --p4 file's meta:
+test_short_conv.py's verification (which runs test_router_layout's, and so on down
+to test_multilayer_binding's):
+test_router_layout.py's verification (which runs test_router_reliability's, and so on
+down to test_multilayer_binding's):
+test_router_reliability.py's verification (which runs test_readout_path's, and so on
+down to test_multilayer_binding's):
+test_readout_path.py's verification (which runs test_router_confirm's, and so on
+down to test_multilayer_binding's):
+test_router_confirm.py's verification (which runs test_router_curriculum's, and so
+on down to test_multilayer_binding's):
+test_router_curriculum.py's verification (which runs test_router_discovery's, and so
+on down to test_multilayer_binding's):
+test_router_discovery.py's verification (which runs test_channel_binding's, and so on
+down to test_multilayer_binding's):
+test_channel_binding.py's verification (which runs test_binding_onset's, which runs
+test_multilayer_binding's):
+test_binding_onset.py's CHECKs (which include test_multilayer_binding's 1-6):
+====================================================================================================
+VERIFICATION — printed before any training
+====================================================================================================
+CHECK 1  k=1, no gate, RoPE, weights copied from a bdh.BDH instance (n_head=1,
+         dropout=0): MultiBDH reproduces bdh.BDH's logits, per n_layer. The copy
+         uses load_state_dict(strict=True), so the parameter sets are identical.
+         n_layer=1  G=None                   max |logits - bdh.BDH| = 0.00e+00
+         n_layer=1  G=ones via uniform k=1   max |logits - bdh.BDH| = 0.00e+00
+         n_layer=2  G=None                   max |logits - bdh.BDH| = 0.00e+00
+         n_layer=2  G=ones via uniform k=1   max |logits - bdh.BDH| = 0.00e+00
+         n_layer=3  G=None                   max |logits - bdh.BDH| = 0.00e+00
+         n_layer=3  G=ones via uniform k=1   max |logits - bdh.BDH| = 0.00e+00
+         -> REPRODUCES bdh.BDH
+
+CHECK 2  GatedAttention's RoPE scores equal bdh.Attention's on random input:
+         scores (V = identity): max diff = 0.00e+00
+         outputs (random V)   : max diff = 0.00e+00
+         -> IDENTICAL
+
+CHECK 3  gate algebra: a uniform gate over k channels gives g_r.g_w = k*(1/k)^2 =
+         1/k, so the multichannel score must equal the single-channel score / k:
+         k=2: max |score_k - score_1/k| = 0.00e+00
+         k=3: max |score_k - score_1/k| = 4.77e-07
+         k=4: max |score_k - score_1/k| = 0.00e+00
+         -> CONFIRMED
+         model level (informative): uniform k=2 vs single channel, same weights,
+         max |logits diff| = 8.94e-04. bdh.py LayerNorms yKV right after the
+         attention, which cancels the 1/k up to LayerNorm's eps — so the uniform-
+         gate floor and the plain single channel B are nearly the same function.
+
+CHECK 4  the task generator is REUSED from test_binding_capacity, not rewritten:
+         BindTask.__module__ = 'test_binding_capacity'
+         BindTask.make_batch is test_binding_capacity.BindTask.make_batch: True
+         at S=1 (Gate 0): one context token throughout = True; every query
+         answered by its key's bound value = True
+         -> REUSED
+
+CHECK 5  the gate is test_instrument_v2.Instrument.gates itself: MultiBDH vs an
+         Instrument holding the same gate weights and embeddings, bitwise:
+         recurrent: max |MultiBDH gate - Instrument gate| = 0.00e+00
+           perfect: max |MultiBDH gate - Instrument gate| = 0.00e+00
+           uniform: max |MultiBDH gate - Instrument gate| = 0.00e+00
+         -> IDENTICAL
+
+CHECK 6  one gate, applied identically at EVERY layer: with the perfect gate, every
+         cross-stream score must be exactly zero inside each layer's attention:
+         layers seen: 3 (n_layer=3)
+         layer 0: max |cross-stream score| = 0.00e+00   max |same-stream score| = 7.62e-01
+         layer 1: max |cross-stream score| = 0.00e+00   max |same-stream score| = 7.35e-01
+         layer 2: max |cross-stream score| = 0.00e+00   max |same-stream score| = 6.35e-01
+         -> APPLIED AT EVERY LAYER
+
+ALL VERIFICATION CHECKS PASSED
+
+====================================================================================================
+VERIFICATION — this test's own CHECKs
+====================================================================================================
+CHECK 7  the long-run training loop IS Gate 0's: onset_run with no evaluation,
+         then run_ml's own final evaluation (512 sequences drawn from the
+         training generator), vs test_multilayer_binding.run_ml itself:
+         n_layer=3 decay seed 0, 1200 steps: run_ml acc=0.3564453125  onset_run acc=0.3564453125  -> IDENTICAL
+         n_layer=2 rope  seed 0, 1200 steps: run_ml acc=0.5634765625  onset_run acc=0.5634765625  -> IDENTICAL
+
+CHECK 8  evaluation does not perturb training: 4800 steps with an evaluation every
+         1200 steps vs none, n_layer=3 decay, seed 0, primary task:
+         evaluations made: 4   final weights bitwise equal: True
+         held-out accuracy: with evals 0.326171875  without 0.326171875  -> IDENTICAL
+
+CHECK 9  the reference transformer's causal mask works: changing every token after
+         position t must leave logits at positions <= t untouched (train mode, as
+         trained, and eval mode, as evaluated):
+         train  with the mask: max |change at positions <= t| = 0.00e+00   without it: 3.26e-01 (the check has teeth)  -> CAUSAL
+         eval   with the mask: max |change at positions <= t| = 0.00e+00   without it: 2.97e-01 (the check has teeth)  -> CAUSAL
+
+CHECK 10 the primary task leaves nothing to eliminate: one query per sequence,
+         answered by its key's bound value:
+         query positions scored per sequence: 1   bound value answers every query: True   sequence length: 15
+
+ALL VERIFICATION CHECKS PASSED
+
+====================================================================================================
+VERIFICATION — this test's own CHECKs
+====================================================================================================
+CHECK 15 the knobs added for this test are inert at their defaults, vs 2282d72:
+         arms_for(task) == legacy arms_for(task): True
+         run_ml (recurrent k=2, 60 steps, per-role cosine trace at 0/30/60) == legacy: True   VAL cos at end 0.999924
+         report() on a synthetic store, full printed text == legacy: True (103 lines)
+         attempt() record (all fields but wall time) == legacy: True
+
+CHECK 16 the substrate: every arm is test_multilayer_binding.build at mult=8, and
+         the single-channel arm trained through build is bit-identical to
+         make_bdh(mult=8) — the model test_binding_recipe.py confirmed:
+           floor: n_layer 3 decay N=256  k=2 gate=uniform   readout=False h_gate=32  params  25984 state  49152  -> OK
+         ceiling: n_layer 3 decay N=256  k=2 gate=perfect   readout=False h_gate=32  params  25984 state  49152  -> OK
+               A: n_layer 3 decay N=256  k=2 gate=recurrent readout=False h_gate=32  params  28096 state  49152  -> OK
+            A_ro: n_layer 3 decay N=256  k=2 gate=recurrent readout=True  h_gate=32  params  29120 state  49152  -> OK
+               B: n_layer 3 decay N=256  k=1 gate=none      readout=False h_gate=32  params  25984 state  24576  -> OK
+               E: n_layer 3 decay N=256  k=1 gate=recurrent readout=True  h_gate=32  params  29088 state  24576  -> OK
+           E_mem: n_layer 3 decay N=512  k=1 gate=recurrent readout=True  h_gate=32  params  53664 state  49152  -> OK
+           E_h64: n_layer 3 decay N=256  k=1 gate=recurrent readout=True  h_gate=64  params  34240 state  24576  -> OK
+          E_h128: n_layer 3 decay N=256  k=1 gate=recurrent readout=True  h_gate=128 params  50688 state  24576  -> OK
+         B via build vs make_bdh, S=2 P=4, seed 2, 1200 steps: weights equal True, curves equal True  -> IDENTICAL
+         E_mem memory == A memory: 49152 vs 49152 floats  -> MATCHED
+
+CHECK 17 the task: S=2 streams bind DIFFERENT values to the same key, and the
+         one query per sequence is answered by its own stream's value:
+         P=4  length 27  queries scored per sequence 1   streams conflict on every key: True   query answered by its stream: True  -> OK
+         P=8  length 51  queries scored per sequence 1   streams conflict on every key: True   query answered by its stream: True  -> OK
+         P=16 length 99  queries scored per sequence 1   streams conflict on every key: True   query answered by its stream: True  -> OK
+
+CHECK 18 a worker's run (record and gate cosines) is bit-identical to the same run
+         here, and its cosines equal role_cosines (run_ml's diagnostic, CHECK 15)
+         applied to the same model trained directly with onset_run:
