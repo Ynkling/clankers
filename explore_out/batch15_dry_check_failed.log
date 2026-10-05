@@ -1,0 +1,29 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42) — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git d57f621 | python 3.11.15 | torch threads 1
+====================================================================================================
+  recipe read in the child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups; the branch's SUB_LR 0.001); WARM 2400, TAU 0.2, LAMBDA 1.0; Muon lr 0.005 (S33's validity choice {'a': 0.005, 'b': 0.005}); S41 28800 steps, the cap at sigma_max(W_h) 0.5; S42 reruns to 1600; 1 torch thread per run
+  lr read for dry_gate_cap CAP_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_gate_cap PREV_CAP_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_gate_cap PREV_NOREC_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_gate_cap PREV_CAP_A: 0.001 (Adam groups)
+  lr read for dry_wh_spectrum D8_HINGE_M: 0.001 (Adam groups); Muon lr 0.005
+  lr read for dry_wh_spectrum HINGE_D8_A: 0.001 (Adam groups)
+  S41 readings (per arm, BOUND ROUTED at 28800): 'it breaks the eight-stream stall' if >= 3/10; 'it does not' if 0/10; otherwise neither
+  S42 labels (per configuration): 'gain crossing' if in >= 4/5 runs rho(W_h) first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1; otherwise 'not'
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (72s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK dry_gate_cap: CAP_M with the cap at infinity equals S33 D8_HINGE|260 bit for bit through 1200 (curves [[1200, 0.0673828125, 2.99190616607666]] vs [[1200, 0.0703125, 2.9915246963500977]]; statistics at [0, 1200] False; the cap acted on 0 updates; sigma_max(W_h) at init 1.0834): FAIL
+  CHECK dry_gate_cap: PREV_CAP_M with the cap at infinity equals S40 D8_PREV_M|260 bit for bit through 1200 (curves [[1200, 0.072265625, 2.991024971008301]] vs [[1200, 0.07080078125, 2.9928462505340576]]; statistics at [0, 1200] False; S40's decodability at 1200 (h@key, h@stream, input@key) [0.177734375, 0.15625, 0.96875] vs [0.1558837890625, 0.1380615234375, 0.96875]; the cap acted on 0 updates; sigma_max(W_h) at init 1.0834): FAIL
+  CHECK dry_gate_cap: CAP_M: sigma_max(W_h) <= 0.5 + 1e-6 after every one of 50 steps (max 0.5000000; at init 1.0834; the cap first acts at update 1 (sigma_max 1.0826 before it), on 18 of 50 updates): ok
+  CHECK dry_gate_cap: PREV_CAP_M: sigma_max(W_h) <= 0.5 + 1e-6 after every one of 50 steps (max 0.5000000; at init 1.0834; the cap first acts at update 1 (sigma_max 1.0829 before it), on 26 of 50 updates): ok
+  CHECK dry_gate_cap: PREV_CAP_A: sigma_max(W_h) <= 0.5 + 1e-6 after every one of 50 steps (max 0.5000000; at init 1.0834; the cap first acts at update 1 (sigma_max 1.0817 before it), on 21 of 50 updates): ok
+  CHECK dry_gate_cap: PREV_NOREC_M: W_h exactly 0 after every one of 50 steps (50/50), no gradient at any step (0 with one), W_h in no optimizer group (groups [['W_in', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]), W_h zero at the end True; every other parameter's initial value equals D8_PREV_M's (9 parameters, W_prev included: True; W_h there zero, requires_grad False): ok
+  CHECK dry_gate_cap: CAP_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_gate_cap: PREV_CAP_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_gate_cap: PREV_NOREC_M: the optimizer groups cover every trainable parameter once ([['W_in', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_gate_cap: PREV_CAP_A: the optimizer groups cover every trainable parameter once ([['W_in', 'W_h', 'W_g', 'W_prev'], ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_gate_cap: the decoder scores 1.0000 on a synthetic separable set (8 classes, 4000 points) and 0.1275 with shuffled labels (chance 0.1250; within 0.05: True): ok
+  CHECK dry_gate_cap: children at 9c5939e (3.4 min)
+  ! CHECK failed in dry_gate_cap; stopping.
