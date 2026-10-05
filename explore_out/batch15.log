@@ -13,3 +13,6 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
   lr read for wh_spectrum HINGE_D8_A: 0.001 (Adam groups)
   S41 readings (per arm, BOUND ROUTED at 28800): 'it breaks the eight-stream stall' if >= 3/10; 'it does not' if 0/10; otherwise neither
   S42 labels (per configuration): 'gain crossing' if in >= 4/5 runs rho(W_h) first exceeds 1 within 150 updates before |W_h h|@key first exceeds 1; otherwise 'not'
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (72s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
