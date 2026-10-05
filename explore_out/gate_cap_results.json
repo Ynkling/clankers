@@ -1,0 +1,144 @@
+{
+ "meta": {
+  "arms": {
+   "CAP_M": {
+    "iters": 28800,
+    "key": "CAP_M",
+    "label": "S33's D8_HINGE + CAP (Muon)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "PREV_CAP_A": {
+    "iters": 28800,
+    "key": "PREV_CAP_A",
+    "label": "S40's D8_PREV_A + CAP (Adam)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "prio": 2,
+    "sched": "gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "PREV_CAP_M": {
+    "iters": 28800,
+    "key": "PREV_CAP_M",
+    "label": "S40's D8_PREV_M + CAP (Muon)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "PREV_NOREC_M": {
+    "iters": 28800,
+    "key": "PREV_NOREC_M",
+    "label": "S40's D8_PREV_M with NOREC (W_h = 0, frozen; Muon)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g/W_prev (W_h frozen at 0) throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "REF_HINGE_M": {
+    "iters": 28800,
+    "key": "REF_HINGE_M",
+    "label": "S33's D8_HINGE rerun on this CPU (Muon reference)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "REF_PREV_M": {
+    "iters": 28800,
+    "key": "REF_PREV_M",
+    "label": "S40's D8_PREV_M rerun on this CPU (Muon reference)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "prio": 2,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   }
+  },
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "b8c3edd+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-05 02:34:27",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
