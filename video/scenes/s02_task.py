@@ -176,7 +176,7 @@ class BindingTask(ClankersScene):
         read = VGroup(L("read K0 →", size=22), gate_bar([0.5, 0.5], width=1.4),
                       L("V2 or V13?", size=22, color=BAD)).arrange(RIGHT, buff=0.2)
         read.next_to(writes, RIGHT, buff=0.7)
-        stat = VGroup(L("single-channel runs that bound", size=22, color=MUTED),
+        stat = VGroup(L("single-channel runs that bound (no convolution)", size=22, color=MUTED),
                       L("0 of more than 200", size=34, color=BAD, weight="BOLD"),
                       L("S = 2, P = 4, no convolution", size=18, color=FAINT)).arrange(DOWN, buff=0.12)
         stat.to_corner(DR, buff=0.7).shift(0.5 * UP)
@@ -187,7 +187,8 @@ class BindingTask(ClankersScene):
 
         with self.voiceover(
             "That middle level is a trap. A single memory stores both bindings of a key in the same place, and in "
-            "the basic setting, not one of more than two hundred single-channel runs escaped it."
+            "the basic setting, without the convolution we meet later, not one of more than two hundred "
+            "single-channel runs escaped it."
         ) as vo:
             self.play(ShowCreation(trap))
             mob_line = VGroup(line, ends, axis_lab, m_guess, m_blind, m_solve, trap)

@@ -149,18 +149,26 @@ class Intro(ClankersScene):
         with self.voiceover(
             "That is the question behind the repository Ynkling slash clankers, and its technical report: "
             "Multi-Channel Hebbian Plasticity in Multilayer BDH Solves Context-Conditional Binding by Partitioning "
-            "Memory. This video covers all of it: the model, the task, the code, the experiments, what works, what "
-            "still fails, and how the work was checked.",
+            "Memory. Its subtitle gives the news: an early-training recipe now finds the partition without restarts "
+            "in most runs, for two streams and for four with spare channels, while at eight streams the gate forgets "
+            "the context. This video covers all of it: the model, the task, the code, the experiments, what works, "
+            "what still fails, and how the work was checked.",
             spoken="That is the question behind the repository Inkling slash clankers, and its technical report: "
             "Multi-Channel Hebbian Plasticity in Multilayer B D H Solves Context-Conditional Binding by Partitioning "
-            "Memory. This video covers all of it: the model, the task, the code, the experiments, what works, what "
-            "still fails, and how the work was checked.",
+            "Memory. Its subtitle gives the news: an early-training recipe now finds the partition without restarts "
+            "in most runs, for two streams and for four with spare channels, while at eight streams the gate forgets "
+            "the context. This video covers all of it: the model, the task, the code, the experiments, what works, "
+            "what still fails, and how the work was checked.",
         ) as vo:
             self.play(FadeIn(repo, shift=0.2 * UP))
             vo.wait_until(2.5)
             self.play(LaggedStartMap(FadeIn, t_lines, shift=0.2 * UP, lag_ratio=0.3), run_time=2.0)
-            self.play(FadeIn(VGroup(sub, sub2)), FadeIn(meta))
+            self.play(FadeIn(meta))
             vo.wait_until_sentence(1)
+            self.play(FadeIn(sub, shift=0.1 * UP), run_time=1.2)
+            self.play(Indicate(sub, color=GOOD, scale_factor=1.03), run_time=1.5)
+            self.play(FadeIn(sub2, shift=0.1 * UP), run_time=1.2)
+            vo.wait_until_sentence(2)
             self.play(LaggedStartMap(FadeIn, road, shift=0.2 * UP, lag_ratio=0.25), run_time=3.0)
         self.wait(0.8)
         self.clear_all()

@@ -54,8 +54,8 @@ channel only → "7".
 
 *Visual:* the routing arrows dissolve into a question mark over a small purple "gate" box.
 
-**N0.5** That is the question behind the repository Ynkling slash clankers, and its technical report: Multi-Channel Hebbian Plasticity in Multilayer BDH Solves Context-Conditional Binding by Partitioning Memory. This video covers all of it: the model, the task, the code, the experiments, what works, what still fails, and how the work was checked.
-(spoken: "Inkling slash clankers")
+**N0.5** That is the question behind the repository Ynkling slash clankers, and its technical report: Multi-Channel Hebbian Plasticity in Multilayer BDH Solves Context-Conditional Binding by Partitioning Memory. Its subtitle gives the news: an early-training recipe now finds the partition without restarts in most runs, for two streams and for four with spare channels, while at eight streams the gate forgets the context. This video covers all of it: the model, the task, the code, the experiments, what works, what still fails, and how the work was checked.
+(spoken: replace "Ynkling" by "Inkling")
 
 *Visual:* title card with the full report title, "A technical report · Revision 7 (preliminary)",
 "github.com/Ynkling/clankers". Then a quick roadmap strip of chapter icons.
@@ -67,10 +67,10 @@ channel only → "7".
 **N1.1** The model underneath is BDH, the Dragon Hatchling, introduced by Pathway in 2025. BDH keeps its working memory in synapses. Each token activates a sparse set of neurons, and a Hebbian rule strengthens the connections between neurons that are active together. Reading the memory means asking which stored patterns overlap with what is active now.
 
 *Visual:* two rows of neuron dots; a token lights a few (sparse); co-active pairs get a thickening synapse
-line ("fire together, wire together"). Then the same as a grid σ accumulating outer products
-(`S ← S + x_t ⊗ v_t`, from `bdh_recurrent.py`), and a read `x_t · S`.
+line ("fire together, wire together"). Then the same as a grid S (= ρ) of shape N neurons × d value features (256 × 32), accumulating outer
+products `S ← S + x_t ⊗ v_t` (bdh_recurrent.py:10), and a read `x_t · S`. Label the axes "neurons (N)" and "value features (d)".
 
-**N1.2** On a GPU this becomes linear attention. The score between the current position t and an earlier position s is a content match: the dot product of their sparse, positive neuron codes. In this project a positional decay of 0.95 per step weights it, so a memory fades to half its strength in about fourteen tokens.
+**N1.2** On a GPU this becomes linear attention. The score between the current position t and an earlier position s is a content match: the dot product of their sparse, positive neuron codes. In this project a positional decay of 0.95 per token of distance weights it, so a memory fades to half its strength in about fourteen tokens.
 
 *Visual:* `M(R"\text{score}(t,s) = (x_t\cdot x_s)\,\times\,0.95^{\,t-s}")`; small plot of 0.95^Δ vs Δ with the
 half-life marker at 13.5. Source: `test_instrument_v2.py: decay_mask`, report §16.
@@ -81,9 +81,10 @@ half-life marker at 13.5. Source: `test_instrument_v2.py: decay_mask`, report §
 with the sentences (encoder+relu → attn → ln → encoder_v+relu → product → decoder → residual).
 A side flow-diagram may mirror it.
 
-**N1.4** The repository uses that file unmodified, at a tiny size: three layers, two hundred fifty-six neurons, an embedding width of thirty-two, one head. About twenty-eight thousand parameters in all.
+**N1.4** The repository uses that file unmodified, at a tiny size: three layers, two hundred fifty-six neurons, an embedding width of thirty-two, one head. About twenty-six thousand parameters, and twenty-eight to twenty-nine thousand once the gate we meet next is added.
 
-*Visual:* spec card: layers 3 · N 256 · d 32 · heads 1 · decay 0.95 · ≈28k parameters. Source: report §3, facts_model §2.11.
+*Visual:* spec card: layers 3 · N 256 · d 32 · heads 1 · decay 0.95 · ≈26k parameters (≈28–29k with the gate).
+Source: report §3; parameter count facts_model §2.11 / README.
 
 ---------------------------------------------------------------------------------------------------
 
@@ -110,9 +111,9 @@ prediction at the query's key position). Tag: "seed 280, first training batch, r
 
 *Visual:* accuracy number line 0 → 1 with ticks at 1/16, 1/S = 0.5, 1. Labels "guess", "stream-blind", "solved".
 
-**N2.5** That middle level is a trap. A single memory stores both bindings of a key in the same place, and in the basic setting, not one of more than two hundred single-channel runs escaped it.
+**N2.5** That middle level is a trap. A single memory stores both bindings of a key in the same place, and in the basic setting, without the convolution we meet later, not one of more than two hundred single-channel runs escaped it.
 
-*Visual:* single grid with superimposed K0 bindings (V13 and V2); tag "one channel: 0 of > 200 bound (S=2, P=4)". Source: report §13, Table 8.
+*Visual:* single grid with superimposed K0 bindings (V13 and V2); tag "one channel, no convolution: 0 of > 200 bound (S=2, P=4)". Source: report §13, Table 8.
 Optional small table: S,P → length: (2,4) 27 · (2,8) 51 · (4,4) 51 · (8,4) 99.
 
 ---------------------------------------------------------------------------------------------------
@@ -138,7 +139,7 @@ Code tag: `scores = scores * self.G` and `G = einsum("btk,bsk->bts", gr, gw)` (t
 *Visual:* replay the Ch. 2 sequence; each token's gate one-hot in its stream color; writes land in their
 channel; query reads its channel → V2. Tag "perfect gate: 10/10 (S=2, P=4)". Source: Table 8.
 
-**N3.5** The real question is whether a gate can learn this. The learned gate, arm A, is a small recurrent network over the token embeddings, with a thirty-two unit state h. At each step, h is the hyperbolic tangent of two terms: the input term, which looks at the current token, and the recurrent term, which carries the previous state forward. A linear map and a softmax turn h into the gate.
+**N3.5** The real question is whether a gate can learn this. The learned gate, arm A, is a small recurrent network over the token embeddings, with a thirty-two unit state h. At each step, h is the hyperbolic tangent of the sum of two terms: the input term, which looks at the current token, and the recurrent term, which carries the previous state forward. A linear map and a softmax turn h into the gate.
 
 *Visual:* equation (2): `h_t = tanh(W_in v_t + W_h h_{t-1})`, `g_t = softmax(W_g h_t)`; color `W_in v_t` teal
 ("input term") and `W_h h_{t-1}` purple ("recurrent term"). An unrolled RNN diagram over 4 tokens.
@@ -162,7 +163,7 @@ TransformMatchingTex. A k=3 simplex triangle with the uniform point at the centr
 *Visual:* strike out 1/k with label "LayerNorm cancels"; `∂/∂δ_t ∝ δ_s` → `= 0 at δ = 0`; a landscape
 curve flat at the center.
 
-**N4.3** And the gate does start almost exactly uniform, because the embeddings are initialized small. At the first step, the gradient reaching the gate has a norm below ten to the minus five; the rest of the model's is about 2.6. One more detail: the gate ends in a softmax, so the k rows of its gradient sum to zero, and that gradient has rank at most k minus one.
+**N4.3** And the gate does start almost exactly uniform, because the embeddings are initialized small. At the first step, the gradient reaching the gate has a norm below ten to the minus five; the rest of the model's is about 2.6. One more detail: the gate ends in a softmax, so the k rows of the gradient into its output matrix, W_g, sum to zero, and that gradient has rank at most k minus one.
 
 *Visual:* log-scale bar pair: gate < 1e-5 vs rest ≈ 2.6 (five orders of magnitude). Source: report §1.
 
@@ -174,25 +175,25 @@ curve flat at the center.
 
 ## Ch. 5 — `s05_rig.py` / `ConvAndMuon` — "Two more parts" (~95 s)
 
-**N5.1** Two more parts of the setup. Most runs since Phase Four include a short causal convolution, the kind Mamba and most modern linear-attention models place before their token mixer. It is a depthwise filter four tokens wide, applied at every layer and initialized to the identity, so at first it changes nothing. It feeds the queries and the values; the residual stream and the gate's input are not convolved.
+**N5.1** Two more parts of the setup. Since Phase Four, most arms include a short causal convolution, the kind Mamba and most modern linear-attention models place before their token mixer. It is a depthwise filter four tokens wide, applied at every layer and initialized to the identity, so at first it changes nothing. It feeds the queries and the values; the residual stream and the gate's input are not convolved.
 
-*Visual:* `x̃_t = Σ_{j=0}^{3} w_j ⊙ x_{t−j}` (eq. 4); a 4-wide window sliding over tokens; weights shown as
+*Visual:* `x̃_t = Σ_{j=0}^{3} w_j ⊙ x_{t−j}` (source tag "README eq. (4); report §1"); a 4-wide window sliding over tokens; weights shown as
 [1, 0, 0, 0] at init. Optional code_block `CausalConv` (test_multilayer_binding.py:225-242).
 
-**N5.2** In this task each context token sits two positions before its value, so the convolution's lag-two weight can carry the context right onto the value's position. That gives one channel a second route to binding, which is why results with the convolution are scored with care.
+**N5.2** In this task each context token sits two positions before its value, so the convolution's lag-two weight can carry the context right onto the value's position. That gives even a single-channel model a second route to binding, one that never separates the streams, and a gated model can take it too. That is why results with the convolution are scored on routing, not on binding alone.
 
 *Visual:* in a triple CTX·KEY·VAL, a curved arrow from CTX to VAL labelled "lag 2"; the w_2 entry glows.
 
-**N5.3** Second, the optimizer. Before Phase Five every main-line test used Adam. Phase Five adds Muon. For each weight matrix, Muon takes the momentum and replaces it by an approximately orthogonalized version, computed with five Newton–Schulz steps. As a result, the size of an update no longer depends on the size of the gradient.
+**N5.3** Second, the optimizer. Before Phase Five every main-line test used Adam. Phase Five adds Muon. Muon takes the momentum of each weight matrix it handles and replaces it by an approximately orthogonalized version, computed with five Newton–Schulz steps. As a result, the size of an update no longer depends on the size of the gradient.
 
 *Visual:* singular-value bars of a momentum matrix (spread 0.1 … 20); apply σ ↦ aσ + bσ³ + cσ⁵ (a, b, c =
 3.4445, −4.775, 2.0315) after normalizing, five times: bars converge into a band near 1. Then "gradient × 10
 → same update" demo. Source: test_early_recipe.py MUON_KW; torch.optim._muon.
 
-**N5.4** Muon handles every matrix, and each head slice of a three-dimensional weight. Adam keeps the embedding, the convolution and the one-dimensional parameters.
+**N5.4** Muon handles the weight matrices, each head slice of a three-dimensional weight included. The embedding and the convolution stay with Adam, along with any one-dimensional parameters.
 
 *Visual:* parameter chips sorted into two bins: Muon {encoder, encoder_v, decoder, lm_head, W_in, W_h, W_g},
-Adam {embed, conv}.
+Adam {embed, conv} (this model has no 1-D parameters).
 
 ---------------------------------------------------------------------------------------------------
 
@@ -203,21 +204,28 @@ Adam {embed, conv}.
 *Visual:* accuracy-vs-step axes with evaluation dots every 1200; a 0.95 dashed line; a real curve if
 available from `video/data` (else schematic); three dots above the line → "stop".
 
-**N6.2** A run is bound if an evaluation reaches 0.95 and every later one stays there; the first such step is its transition. With two streams and two channels, a run is discovered if it is bound and the streams' read gates are separated at the value positions. With more channels than streams, a run is bound and routed if every stream has a channel of its own and every stream is at least ninety percent accurate.
+**N6.2** A run is bound if an evaluation reaches 0.95 and every later one stays there; the first such step is its transition. With two streams and two channels, a run is discovered if it is bound and the streams' read gates are separated at the value positions. With more than two streams and at least as many channels as streams, a run is bound and routed if it is bound, every stream has a channel of its own, and every stream is at least ninety percent accurate.
 
 *Visual:* three definition cards: BOUND (with transition marker on the curve), DISCOVERED (k = S = 2:
 two separated gate bars), BOUND ROUTED (k ≥ S > 2: one-to-one stream→channel map drawn as arrows).
 
-**N6.3** The failures have names. The code looks at the gate's channel choice at key positions, and asks how much of its variance is explained by position, either the triple's index or which half of the sequence it is in, or by the key's identity. That fraction is eta squared. Above one half, the run is a POSITION or a KEY failure.
+**N6.3** Screens also score routing partway through a run. The routing margin compares how well the query's gate matches its target value with how well it matches the same key's values in other streams. With a margin of at least 0.9, and over ninety percent of the gate's variance explained by stream, a run counts as routed at that step.
+
+*Visual:* the routing margin m = g_q·g_tgt − mean(g_q·g_dis) shown on the query's gate and the value positions
+of the queried key (target in the query's stream color, distractors in the others); a margin dial filling to 0.9;
+tag "ROUTED* (screens): m ≥ 0.9 and η² by stream > 0.9". Source: report §3; test_slow_start.py routed_star.
+
+**N6.4** The failures have names. The code looks at the gate's channel choice at key positions, and asks how much of its variance is explained by position, either the triple's index or which half of the sequence it is in, or by the key's identity. That fraction is eta squared. At one half or more, a failed run is a POSITION or a KEY failure.
 
 *Visual:* a "gate map": rows = sequences of a batch, columns = key positions, cell color = channel chosen.
 Show (a) stream split (colors follow the stream), (b) POSITION split (left half one channel, right half the other),
 (c) KEY split (columns by key). η² meter for each.
 
-**N6.4** With more than two streams, a gate can also put several streams in one channel: a merge. And a run whose final accuracy stays below 0.15 has collapsed. Keep these in mind; most of the story is about which of them a gate falls into.
+**N6.5** With more than two streams, a gate can also put several streams in one channel: a merge. And a run whose final accuracy stays below 0.15 has collapsed. Keep these in mind; most of the story is about which of them a gate falls into.
 
-*Visual:* four streams → channels map with two streams sharing a channel ("MERGED, 2 share"); then
-everything into one channel ("collapsed, accuracy < 0.15"). Source: report §3 Outcomes.
+*Visual:* four streams → channels map with two streams sharing a channel ("MERGED, 2 share", accuracy ≈ 0.75);
+then EIGHT streams all in one channel ("collapsed, accuracy ≈ 1/8 < 0.15", e.g. X's SC8 seed 263 ended at 0.124).
+Do not label four streams on one channel as collapsed: that sits near 0.25 and is classed non-stream. Source: report §3, §5.
 
 ---------------------------------------------------------------------------------------------------
 
@@ -235,11 +243,12 @@ everything into one channel ("collapsed, accuracy < 0.15"). Source: report §3 O
 
 *Visual:* Phase III card: two-channel ✓ vs one channel ✗; learned gate ≈ ½.
 
-**N7.4** Phase Four ran ten pre-registered tests. A readout from the gate's state into the residual stream harmed the gate, through its gradient. At two streams, more channels did not raise the gate's rate, but a restart rule that reads only held-out accuracy at step twenty-four hundred succeeded in sixty of sixty trials.
+**N7.4** Phase Four ran ten pre-registered tests. A readout from the gate's state into the residual stream harmed the gate, through its gradient. At two streams, more channels did not raise the gate's rate, but a restart rule that reads only held-out accuracy at step twenty-four hundred succeeded in sixty of sixty trials. The short convolution did not replace the gate at the working learning rate: one channel bound seven of eighty runs, the gate fifty-one. But at four times that rate, one channel with the convolution bound thirty-four of eighty, through its lag-two weight.
 
-*Visual:* Phase IV card, bullet 1 (readout ✗ via gradient: A 41/60 vs A_ro 2/60, README §4), bullet 2 (restart 60/60).
+*Visual:* Phase IV card, bullet 1 (readout ✗ via gradient: A 41/60 vs A_ro 2/60, README §4), bullet 2 (restart 60/60),
+bullet 3 (convolution at 1e-3: one channel 7/80, gate 51/80; at 4e-3 one channel 34/80 via lag 2).
 
-**N7.5** With eight keys per stream, the gate bound from scratch in forty-nine of seventy runs, while one channel with the same fast-weight memory and nearly twice the parameters bound none of twenty-four. The advantage is the partition, not the memory. At four streams with four channels the gate bound only fourteen of forty, mostly failing by merging streams. Spare channels removed most merges. What remained was an early commitment to a split by something other than the stream.
+**N7.5** With eight keys per stream, at the working rate, the gate bound from scratch in forty-nine of seventy runs, while one channel with the same fast-weight memory and nearly twice the parameters bound none of twenty-four. The advantage is the partition, not the memory. At four streams with four channels the gate bound only fourteen of forty, mostly failing by merging streams. Eight or sixteen channels removed most of those merges. What remained was an early commitment to a split by something other than the stream.
 
 *Visual:* bullets 3–4 with counts (49/70 vs 0/24; 14/40, merges); final line emphasised: "early commitment to
 a non-stream split". Source: report §2.
@@ -259,7 +268,7 @@ CLAIMS · DIAGNOSTICS · CHECKS · RUNTIME · OUTPUT · RESULT appearing; zoom o
 *Visual:* pipeline: docstring → CHECKs 1…128 (counter ticking) → projection → training → verdict line
 `E1 ... NOT SHOWN` / `SHOWN` → RESULT appended.
 
-**N8.3** Two machines run every test: X, a cloud container, and L, an Intel laptop processor. They run the same seeds, so every verdict is given per machine, and pooled counts are descriptive, not independent evidence. A third container, E, runs quick exploratory screens on a separate branch, and nothing there counts as a result until a pre-registered test confirms it.
+**N8.3** Two machines run every Phase Four and Phase Five test: X, a cloud container, and L, an Intel laptop processor. Every verdict is given per machine. They run the same seeds, so pooled counts are descriptive, not independent evidence. A third container, E, runs quick exploratory screens on a separate branch, and nothing there counts as a result until a pre-registered test confirms it.
 
 *Visual:* machine badges X, L, E with their CPUs (X: Xeon 2.10/2.80 GHz; L: i7-12650H; E: Xeon, branch
 `claude/outside-ideas`). Same seed list feeding X and L.
@@ -278,16 +287,18 @@ into the cells. Then a 0–100 % ruler with band thresholds (NEVER 0 · MINORITY
 *Visual:* file tree; highlight bdh.py, test_multilayer_binding.py (MultiBDH, GatedAttention, CausalConv),
 test_instrument_v2.py (Instrument.gates, decay_mask, perfect gate).
 
-**N9.2** Then come the experiments, about forty files in the order the project ran them: the Phase One and Two instrument tests, the Phase Three binding tests, the ten Phase Four tests, and the five Phase Five tests this report adds. Each test imports its predecessors, so the chain of checks grows with the project.
+**N9.2** Then come the experiments, thirty-four test files in the order the project ran them: the Phase One and Two instrument tests, the Phase Three binding tests, the ten Phase Four tests, and the five Phase Five tests this report adds. Each later test imports its predecessors, so the chain of checks grows with the project.
 
 *Visual:* test files grouped into phase bands (from facts_repo), Phase V five highlighted:
 stream_recipe, stream_curriculum, slow_start, recipe_scope, early_recipe. Import arrows forming a chain.
 
-**N9.3** Results live in results slash X and results slash L: one JSON file per test per machine, and a table of the commit, processor and start time behind each one. Earlier revisions of the report sit beside them.
+**N9.3** Machine X's results live in results slash X: a JSON file for each recorded test, and a table of the commit, processor and start time behind each one. Of machine L's Phase Five results, only the early-recipe file is committed so far; the report regenerated L's other verdicts from L's own files. And mind the branches: at the time of this video, the default branch's README still follows Revision Six, Revision Seven and its README sit on the research branch, and the screens live on a branch of their own.
 
-*Visual:* results/X, results/L folders; results/README.md table row; a JSON snippet showing meta.git, CPU.
+*Visual:* results/X folder; results/README.md table row; a JSON snippet showing meta.git, meta.cpu. results/L with
+only early_recipe highlighted as L's own (footnote: other results/L files are copies of X's, Xeon CPU in meta).
+Branch strip: default branch (README = Rev 6) · claude/bdh-growth-hebbian-inference-w90069 (Rev 7) · claude/outside-ideas (screens).
 
-**N9.4** Running a test is one command. It runs its checks, prints the projection, then trains on four workers with one thread each. Finished runs are cached, so an interrupted test resumes. Training is deterministic for a given machine and thread count, which is what makes bit-for-bit pairing possible. A flag can pool another machine's results, and tests that pair with earlier runs refuse to pair unless a recorded run reproduces exactly.
+**N9.4** Running a test is one command. It runs its checks, prints the projection, then trains on four workers with one thread each. Finished runs are cached, so an interrupted test resumes. Training is deterministic for a given processor and thread count, which is what makes bit-for-bit pairing possible. A flag can pool another machine's results, and tests that pair with earlier runs refuse to pair unless a recorded run reproduces exactly. Two practical notes. The git log lets you audit the pre-registration, since each test's design is committed before its result. And the tests load older modules straight from git history, so run them from a git clone, not a downloaded archive.
 
 *Visual:* terminal: `pip install -r requirements.txt` / `python3 test_stream_recipe.py --workers 4` /
 `--also results/X/stream_recipe_results.json`; output lines CHECK ... ok, projection, progress.
@@ -300,7 +311,7 @@ stream_recipe, stream_curriculum, slow_start, recipe_scope, early_recipe. Import
 
 *Visual:* Table 1 condensed (test · question · verdict on X · verdict on L) — five rows; highlight row 1.
 
-**N10.2** Revision Six had noticed, after the fact, that at four streams with spare channels, a held-out accuracy of at least 0.4 at step forty-eight hundred had picked the eventual binders with thirty-eight of thirty-eight precision. The stream recipe test made that a restart rule on fresh seeds: four streams, four keys, the convolution; continue a run if it clears 0.4 at step forty-eight hundred, otherwise restart from a new seed, up to five attempts. It ran with sixteen channels, and with four as a control.
+**N10.2** Revision Six had noticed, after the fact, that at four streams with spare channels, a held-out accuracy of at least 0.4 at step forty-eight hundred had picked the eventual binders with thirty-eight of thirty-eight precision. The stream recipe test made that a restart rule on fresh seeds: four streams, four keys, the convolution; continue a run if it clears 0.4 at step forty-eight hundred, otherwise restart from a new seed, up to five attempts, the fifth continuing regardless. It ran with sixteen channels, and with four as a control.
 
 *Visual:* flowchart: attempt → step 4800 check "acc ≥ 0.4?" → yes: continue · no: new seed (≤ 5 attempts).
 
@@ -313,7 +324,7 @@ stream_recipe, stream_curriculum, slow_start, recipe_scope, early_recipe. Import
 *Visual:* the arithmetic: (1 + 1 + ½ + ½)/4 = 0.75; (1 + ⅓·3)/4 = 0.5, shown with four stream chips over
 channels; then accuracy axis with plateau lines at 0.75 and 0.5 above the 0.4 check line.
 
-**N10.5** So the check works only with spare channels. The recipe was reliable on L and a majority on X, and spare channels making restarts work was shown on both machines. L also tried eight streams: the perfect gate bound both its runs, and the restart arm none of five.
+**N10.5** So the check works only with spare channels. The restart recipe was reliable on L and a majority on X, and spare channels making restarts work was shown on both machines. Without restarts, sixteen channels did not bind significantly more than four on either machine. L also tried eight streams: the perfect gate bound both its runs, and the restart arm none of five.
 
 *Visual:* verdict badges R1 (X MAJORITY, L RELIABLE), R2 (X NOT PRECISE, L PRECISE), R3 SHOWN both, R4 NOT SHOWN
 both; eight-stream footnote 2/2 vs 0/5. Source: report §4, Table 2.
@@ -326,34 +337,37 @@ both; eight-stream footnote 2/2 vs 0/5. Source: report §4, Table 2.
 
 *Visual:* three-stage timeline (2 → 4 → 8 streams per sequence; updates 1–4800, 4801–9600, then 8).
 
-**N11.2** The curriculum bound six of sixteen runs on X and four of twenty on L; training on all eight from the start bound none, zero of six and zero of ten. With so few runs, neither difference was significant, so "the curriculum beats training from scratch" was not shown. The scratch runs mostly collapsed below 0.15. The curriculum's binders appeared soon after the switch to eight streams, but several of them bound without one channel per stream, and its failures were collapses and merges.
+**N11.2** The curriculum bound six of sixteen runs on X and four of twenty on L; training on all eight from the start bound none, zero of six and zero of ten. With so few runs, neither difference was significant, so "the curriculum beats training from scratch" was not shown. The scratch runs mostly collapsed below 0.15. On X, every curriculum binder bound soon after the switch to eight streams, but three of its six bound without one channel per stream. Over both machines, the curriculum's failures were collapses and merges.
 
-*Visual:* bars SC8 6/16 (X), 4/20 (L) vs D8 0/6, 0/10; verdicts C1 NOT SHOWN both, C2 MINORITY both, C3 UNTESTABLE.
+*Visual:* bars SC8 6/16 (X), 4/20 (L) vs D8 0/6, 0/10; verdicts C1 NOT SHOWN both (3 vs 0, p = 0.125; 2 vs 0, p = 0.25),
+C2 (curriculum with restarts, SC8_R 7/16, 5/20) MINORITY both, C3 UNTESTABLE both.
 Source: report §5.
 
 ---------------------------------------------------------------------------------------------------
 
 ## Ch. 12 — `s12_screens.py` / `Screens` — "The race" (~120 s)
 
-**N12.1** Where did the new recipe come from? From screens: cheap exploratory runs, mostly at two streams and four keys, each paired by seed with a recorded run. A screen that looks promising goes back to the main line for a proper test.
+**N12.1** Where did the new recipe come from? From screens: cheap exploratory runs, mostly at two streams and four keys, each paired by seed with a recorded run or with an earlier screen. A screen that looks promising goes back to the main line for a proper test.
 
 *Visual:* container E badge; screen cards S4 … S26 fanning out; one card "promising → main line".
 
-**N12.2** Two observations shaped everything. First, routing at step twelve hundred predicts routing at the end: the outcome is decided early. Second, early training looks like a race. The gate is searching for the stream split. Meanwhile the memory is learning too, and it can start exploiting some other split, early positions against late ones, which already relieves part of the key confusion. Whichever settles first wins.
+**N12.2** Several observations shaped everything. First, routing at step twelve hundred predicts routing at the end, though not binding: the gate's split is decided early. And what the memory learns seems to steer it: sparse memory codes, with the gate untouched, made the gate route by stream at step twelve hundred in fifteen of twenty runs instead of six, without making it bind. So the report reads early training as a race. The gate is searching for the stream split. Meanwhile the memory is learning too, and it can start exploiting some other split, early positions against late ones, which already relieves part of the key confusion. Whichever settles first tends to win.
 
 *Visual:* **the race**: two runners on parallel tracks — purple "gate finds the stream split" and teal
-"memory exploits a position split" — with a finish line at "commitment". The teal runner usually wins.
+"memory exploits a position split" — with a finish line at "commitment". The teal runner often wins (unaided, the plain gate discovers only about half the time).
 
-**N12.3** So, slow the memory down. For the first twenty-four hundred updates, everything except the gate trains at a tenth of the learning rate. Over forty seeds, that lifted discovery from twelve to twenty-four, and twenty-three runs routed at step twelve hundred instead of eleven.
+**N12.3** So, slow the memory down. For the first twenty-four hundred updates, everything except the gate trains at a tenth of the learning rate. Pooled over two screens and forty seeds, discovery rose from twelve to twenty-four, and twenty-three runs routed at step twelve hundred instead of eleven.
 
 *Visual:* the teal runner slows (lr/10 tag); purple wins more often. Bars: A 12/40 → slow memory 24/40 (15 vs 3).
 
-**N12.4** The failures that remained were mostly position splits, so the next screen went after exactly those, with a hinge penalty. It removed them. On the same seeds, it discovered on ten where slow memory alone did not, and on none where slow memory won.
+**N12.4** With slow memory, the failures that remained were mostly position splits, eleven of sixteen. So later screens went after exactly those, and the one carried forward was a hinge penalty. On the same seeds as slow memory alone, it discovered on ten seeds where slow memory did not, and on none where slow memory won.
 
-*Visual:* Table 3 as bars: A 12/40 · kWTA 7/20 · slow 24/40 · gate reset 10/20 · position penalty 15/20 ·
-hinge 34/40 (vs slow 24/40, 10 vs 0) · random kick 12/20 · untimed kick 27/40 · gate noise 27/40. Hinge bar in orange.
+*Visual:* Table 3 as bars, each beside its own comparison: A 12/40 (on seeds 160–179: 7/20) · kWTA 7/20 vs A 7/20 (not) ·
+slow 24/40 vs A 12/40 (15 vs 3, pooled, no verdict) · gate reset 10/20 vs A 7/20 (inconclusive) · position penalty 15/20 vs A 7/20 (promising) ·
+hinge 34/40 vs slow 24/40 (10 vs 0, promising) · random kick 12/20 vs hinge 14/20 on the 20 seeds where it fired ·
+untimed kick 27/40 vs hinge 34/40 (0 vs 7) · gate noise 27/40 vs hinge 34/40 (0 vs 7). Hinge bar in orange. Label all as screens.
 
-**N12.5** And the hinge acts rarely. On twenty of forty seeds it never fired. Where it did, it usually fired on one to three of the roughly five thousand batches before binding. A random push of the same size, on the same batches, did most of what the hinge did. A single random push at a fixed update did not. Timing appears to do most of the work.
+**N12.5** And the hinge acts rarely. On twenty of forty seeds it never fired. Where it did, it usually fired on one to three of the roughly five thousand batches before binding. A random push of the same size, on the same batches, did most of what the hinge did. A single random push at a fixed update did not. Timing appears to do most of the work; whether the hinge's direction adds anything was not resolved.
 
 *Visual:* a 0 → 5000 batch timeline per seed (a few rows), with sparse orange ticks early; comparison chips
 "random push, same batches: 12/20 vs hinge 14/20" and "one push at update 120: 27/40 vs 34/40 (0 vs 7)".
@@ -392,7 +406,7 @@ matrices ×0.1 until 2400, Adam groups 1e-4 → 1e-3. Source: report §3 Recipes
 
 ## Ch. 14 — `s14_slow_start.py` / `SlowStart` — "Slow memory and a hinge, confirmed" (~120 s)
 
-**N14.1** The slow start test took the recipe to fresh seeds and to the working configurations, with no restarts anywhere.
+**N14.1** Why does dropping restarts matter, when restarts already gave sixty of sixty at two streams? A restart rule needs cheap runs and a reliable early check for every new setting, while a large model is usually trained once, so it needs a recipe that works inside a single run. The slow start test took the recipe to fresh seeds and to the working configurations, with no restarts anywhere.
 
 *Visual:* Table 4 layout appears (parts 0, A, B, C).
 
@@ -427,7 +441,7 @@ count strip; Part C 0/10, 0/10 in red. Source: report §7, Table 4.
 
 *Visual:* Q2 SHOWN both (8 vs 1, p = 0.020; 7 vs 0, p = 0.008); quote card "both parts are needed".
 
-**N15.3** With sixteen channels at four streams, the hinge alone did about as well as the full recipe. The slow phase may matter only when channels are few; that is an observation, not a tested claim. On the eight-stream curriculum, the hinge removed the collapses, but merges took their place: on X, nine of sixteen gates held all eight streams in just two channels of four.
+**N15.3** With sixteen channels at four streams, the hinge alone did about as well as the full recipe. The slow phase may matter only when channels are few; that is an observation, not a tested claim. On the eight-stream curriculum, the hinge bound eight of sixteen on X and seven of twenty on L, not significantly more than the curriculum alone. It removed the collapses on X and all but one on L, but merges took their place, and most binders did not give each stream its own channel. On X, at update forty-eight hundred, nine of sixteen gates held all eight streams in just two channels, four streams to each.
 
 *Visual:* HONLY4k16 16/20, 18/20 vs HINGE4k16 17, 18 (Q4 NOT SHOWN); SC8_H 8/16, 7/20; eight stream chips
 packed 4 + 4 into two channels. Source: report §8, Table 5.
@@ -445,7 +459,7 @@ update axis.
 
 *Visual:* two arrows on a log scale: task gradient (×1) vs hinge gradient (×850 Muon, ×726 Adam).
 
-**N16.3** Under Muon, the gate's momentum then stayed aligned with that push for a median of fifty-nine updates, and since Muon's step size does not depend on the gradient's size, the gate keeps moving in the hinge's direction the whole time. Under Adam, a gradient far above its running average produces a sign-like, full-size step. Either way: a large, directional push, delivered early, while the gate is still near its flat uniform start.
+**N16.3** Under Muon, the gate's momentum then stayed aligned with that push for a median of fifty-nine updates, and since Muon's step size does not depend on the gradient's size, the gate keeps moving in the hinge's direction the whole time. Under Adam, a gradient far above its running average produces a sign-like, full-size step. Either way: a large, directional push, delivered early, while the gate is presumably still near its flat uniform start.
 
 *Visual:* the simplex/flat-landscape ball from Ch. 4 receives a big orange kick and travels; a cosine trace
 staying above 0.5 for ~59 updates under Muon. Callback to Ch. 4's "whatever pushes it off first".
@@ -458,7 +472,7 @@ staying above 0.5 for ~59 updates under Muon. Callback to Ch. 4's "whatever push
 
 ## Ch. 17 — `s17_early_recipe.py` / `EarlyRecipeTest` — "The early-recipe test" (~95 s)
 
-**N17.1** The early recipe test checked both findings on fresh seeds. At two streams, Muon with slow memory alone discovered thirty-six of forty on X and thirty-four on L. Adding the early hinge window made it forty of forty, on both.
+**N17.1** The early recipe test took two screened findings to fresh seeds: that the early hinge window helps under Muon, and that Muon binds four streams sooner. At two streams, Muon with slow memory alone discovered thirty-six of forty on X and thirty-four on L. Adding the early hinge window made it forty of forty, on both.
 
 *Visual:* Table 6 part A bars: SLOW_M 36/40, 34/40 · WIN_M 40/40, 40/40.
 
@@ -467,7 +481,7 @@ staying above 0.5 for ~59 updates under Muon. Callback to Ch. 4's "whatever push
 *Visual:* Part B: WIN16_A 10/12 (6 by 4800) X, 17/20 (12) L; WIN16_M 11/12 (10) X, 19/20 (19) L. Transition
 strip plot from data if available; median markers 2400 (Muon) vs 4800 (Adam). Badges E1, E2 per machine.
 
-**N17.3** Why do the machines differ? X's fresh baseline was higher than in the screens, leaving less room, and its time rule cut the four-stream part to twelve seeds. And the two machines are not independent replicates. They ran the same seeds, so most seed-level outcomes agree, yet no run reproduced across machines, and Muon's low-precision Newton–Schulz step even differs between X's two Xeon hosts.
+**N17.3** Why did X fall short? Two things weakened its run. On fresh seeds, slow memory alone already discovered thirty-six of forty on X, against thirty-one in the screens, leaving less room; and X's time rule cut the four-stream part to twelve seeds. And the two machines are not independent replicates. They ran the same seeds, so most seed-level outcomes agree, yet no run reproduced bit for bit across machines, and Muon's low-precision Newton–Schulz step even differs between X's two Xeon hosts.
 
 *Visual:* two seed columns (X, L) with mostly matching ✓/✗; a "≠ bits" tag; bf16 chip. Source: report §9.2, Table 6.
 
@@ -475,11 +489,11 @@ strip plot from data if available; median markers 2400 (Muon) vs 4800 (Adam). Ba
 
 ## Ch. 18 — `s18_merges.py` / `Merges` — "Breaking merges" (~90 s)
 
-**N18.1** At four streams with only four channels, the failures are merges, and spare channels are the main fix. Can a merge, once formed, be broken? Screens took eight recorded four-channel runs that were merged at update ninety-six hundred and continued each one.
+**N18.1** At four streams with only four channels, the failures are merges, and spare channels are the main fix, though not a cure: over two tests, plain runs merged thirty-two times in eighty with four channels, and nine in eighty with sixteen. Can a merge, once formed, be broken? Screens took eight recorded four-channel runs that were merged at update ninety-six hundred and continued each one.
 
 *Visual:* 4 streams over 4 channels: two share channel 1, channel 3 idle.
 
-**N18.2** Repeated large pushes on the gate split none of eight. A router z-loss split two: it did lower the logits' scale, but by lowering them all together, along the one direction the softmax ignores.
+**N18.2** Repeated large pushes on the gate split none of eight. A router z-loss split only two. It did lower the logits' scale, but by lowering them all together, along the one direction the softmax ignores.
 
 *Visual:* S21 0/8; S27 2/8; logits bar group shifting down uniformly, softmax output unchanged.
 
@@ -488,7 +502,7 @@ strip plot from data if available; median markers 2400 (Muon) vs 4800 (Adam). Ba
 *Visual:* W_g rows as colored strips; row of channel 1 copied onto row of channel 3 (+ε); the two merged
 streams then diverge to separate channels. S24 8/8 vs 1/8.
 
-**N18.4** Triggering the copy without labels, when accuracy stalls, worked less well, because the rule aimed at the wrong channel about half the time. Aiming by gate mass at key positions fixed the aim under Muon, ten of eleven on target, and bound six of ten with one channel per stream, against three without splitting. Why a split sometimes fails even on target is still open.
+**N18.4** Triggering the copy without labels, when accuracy stalls, was then screened from scratch under Muon: it bound five of ten, against four of ten without it, and it aimed at the wrong channel in about half of its thirty-one splits. Aiming by gate mass at key positions put ten of eleven splits on target under Muon, and bound six of ten with one channel per stream, against three without splitting; under Adam, six against five. In these small screens, why a split sometimes fails even on target is still open.
 
 *Visual:* S36 5/10 vs 4/10 (aim wrong ~½ of 31 splits); S37 Muon 10/11 on target vs 5/11; bound 6/10 vs 3/10.
 Source: report §10.
@@ -501,9 +515,10 @@ Source: report §10.
 
 *Visual:* a grid of ~100 small red ✗ cells vs a green ✓ "perfect gate".
 
-**N19.2** Does the gate's state even carry the stream? A simple decoder, reading the gate's hidden state at key positions, recovered the stream at 0.13 under Muon and 0.14 under Adam, against a chance level of 0.125. At four streams the same decoder read 0.84, or 1.00 with sixteen channels. That is striking, because each key's stream token sits just one position earlier. The gate needs one token of memory, and it doesn't have it.
+**N19.2** Does the gate's state even carry the stream? A simple decoder, reading the gate's hidden state at key positions after forty-eight hundred updates, read the stream at only 0.13 under Muon and 0.14 under Adam, against a chance level of 0.125. At four streams the same decoder read 0.84 with four channels, and 1.00 with sixteen. That is striking, because each key's stream token sits just one position earlier. The gate needs one token of memory, and it doesn't have it.
 
-*Visual:* bars: S=8 Muon 0.13, Adam 0.14 vs chance 0.125 line; S=4 0.84 (k=4), 1.00 (k=16). A key token with an arrow
+*Visual:* bars: S=8 Muon 0.13, Adam 0.14 (medians at update 4800) vs chance 0.125 line; S=4 0.84 (k=4), 1.00 (k=16) with
+their own chance 0.25 tick. A key token with an arrow
 to the CTX token one step back: "1 token of memory needed".
 
 **N19.3** When is it lost? At initialization the decoder reads 0.91: with small weights, the state still carries the previous token. Training removes this memory within the first six hundred to twelve hundred updates. The loss coincides with the recurrent term overtaking the input term. Under Muon the recurrent term passes the input term by update four hundred, and by update twenty-four hundred it is near seven, while the input term stays around 0.1.
@@ -515,15 +530,15 @@ input term Muon S8 0.06 0.07 0.10 0.11 0.15 0.13. Colors: recurrent = purple, in
 
 **N19.4** It is mostly not saturation of the tanh: at update twenty-four hundred, the median share of saturated units is at most fifteen percent. At four streams, by contrast, the input term grows and the memory survives. At eight streams the gate's output stays nearly uniform, so the task gives its input weights little reason to grow.
 
-*Visual:* S=4 curve stays high; entropy gauge 2.70 of max 2.77 (uniform over 16).
+*Visual:* S=4 curve dips to 0.61, then recovers to 0.83 (chance 0.25 for S=4; 0.125 for S=8); entropy gauge 2.70 of max 2.77 (uniform over 16).
 
-**N19.5** Here is the picture. The gate's state is a small dynamical system driven by its input. If the recurrent weights contract, the state forgets its past and follows the current token, so every stream token leaves a recognizable mark. If they expand, the state sustains itself and ignores its input.
+**N19.5** Here is the report's reading. The gate's state is a small dynamical system driven by its input. If the recurrent weights contract, old history fades and the state follows the last few tokens, so every stream token leaves a mark that is still there at the next key. That is why the decoder reads 0.91 at initialization, when the recurrence is weak. If the weights expand, the state sustains itself and ignores its input.
 
 *Visual:* **phase-plane animation**: 2-D state h; input pulses colored by stream. Contracting W_h (ρ < 1):
 the state jumps to a stream-specific region each pulse (colored clusters, decodable). Expanding W_h (ρ > 1):
 the state runs along its own orbit/attractor regardless of pulses (colors mixed). Show ρ on a dial.
 
-**N19.6** A later screen measured exactly this: the spectral radius of the recurrent weights, every fifty updates. It started between 0.52 and 0.63. In seven of ten runs it rose clearly above one, and in each of those the stream's decodability fell to between 0.13 and 0.26 within fifty updates of the crossing. Where it peaked near one, the stream was only partly lost; where it fell back below one, decodability partly recovered. Ten runs give a correlation, not a proof.
+**N19.6** A later screen measured exactly this: the spectral radius of the recurrent weights, every fifty updates. It started between 0.52 and 0.63. In seven of ten runs it rose clearly above one, and in each of those the stream's decodability fell to between 0.13 and 0.26 within fifty updates of the crossing. Where it peaked near one, the stream was only partly lost; where it fell back below one, decodability partly recovered. By the screen's own pre-set rule, the Muon configuration showed the pattern and the Adam configuration did not. Ten runs give a correlation, not a proof.
 
 *Visual:* ρ(t) schematic crossing 1 (dashed) between updates 350 and 1400, decodability dropping right after;
 counts 7/10 crossed (peaks 1.20–2.13), 3/10 peaked 0.88–1.03; 2 recovered (0.50, 0.69). Source: report §11 (S42).
@@ -540,7 +555,11 @@ counts 7/10 crossed (peaks 1.20–2.13), 3/10 peaked 0.88–1.03; 2 recovered (0
 
 *Visual:* header layout: `CTX0 K V K V K V … | CTX1 K V K V …`; distance arrows growing.
 
-**N20.2** But a screen found a deeper problem. A single channel can bind the header layout too, three of ten, and seven of ten with slow memory. So binding there is no evidence that a gate routes. What is still needed is a distant-cue task that one channel provably cannot solve.
+**N20.2** The recipe did not carry over either: slow memory with the hinge discovered none of ten at a distance, failing by key splits. A five percent labelled nudge toward the stream split discovered ten of ten with slow memory, but that uses labels.
+
+*Visual:* S17 slow + hinge 0/10 (key splits); S10/S15 labelled nudge 5/10, 10/10 with slow memory, tagged "uses labels".
+
+**N20.3** But a screen found a deeper problem. A single channel can bind the header layout too, three of ten, and seven of ten with slow memory. So binding there is no evidence that a gate routes. What is still needed is a distant-cue task that one channel provably cannot solve.
 
 *Visual:* single channel 3/10, 7/10 (slow) with a "binding ≠ routing" stamp. Source: report §12.
 
@@ -557,21 +576,24 @@ counts 7/10 crossed (peaks 1.20–2.13), 3/10 peaked 0.88–1.03; 2 recovered (0
 *Visual:* highlight the "recipe, no restarts" column: HINGE 39/40, Muon+WINDOW 80/80; HINGE 37/40 (P=8); HINGE 35/40,
 hinge only 34/40, Muon+WINDOW 30/32 (S=4, k=16).
 
-**N21.3** At eight streams the obstacle moves upstream. Before any routing can form, the gate's recurrent state stops reflecting its input. No change to the gate's readout, whether a hinge, a split, or an optimizer, can route by a stream its state does not carry. And merges remain at four channels: spare channels prevent most of them, and a targeted copy breaks some.
+**N21.3** At eight streams the obstacle moves upstream. Before any routing can form, the gate's recurrent state stops reflecting its input. No change to the gate's readout, whether a hinge, a split, or an optimizer, can route by a stream its state does not carry. And merges remain at four channels: spare channels prevent most of them, and in screens a targeted copy breaks some of the rest.
 
-*Visual:* S=8 row: HINGE 0/20; curriculum 15/36 (descriptive). Four claim cards summarizing. Source: report §13, Table 8.
+*Visual:* S=8 row: HINGE from scratch 0/20; HINGE + stream curriculum 15/36 bound (descriptive; 11 of the 15 without one
+channel per stream). Four claim cards summarizing. Source: report §13, Table 8.
 
 ---------------------------------------------------------------------------------------------------
 
 ## Ch. 22 — `s22_retrospective.py` / `Retrospective` — "Keeping score on itself" (~110 s)
 
-**N22.1** The report also grades its own earlier claims. The title claim stands. "A learned gate finds the partition, reliably with restarts, at two streams; four are the open problem": superseded, since the recipe now binds two streams, and four with sixteen channels, without restarts. The early check at four streams: partly confirmed, precise on L but not on X. "It depends on what the memory learns first": supported by a pre-registered test. Restarts as the working recipe: replaced. And Revision Six's pooled p-values across the machines: corrected, because both machines ran the same seeds.
+**N22.1** The report also grades its own earlier claims. The title claim stands. "A learned gate finds the partition, reliably with restarts, at two streams; four are the open problem": superseded, since the recipe now binds two streams, and four with sixteen channels, without restarts. The early check at four streams: partly confirmed, precise on L but not on X. "It depends on what the memory learns first": supported by a pre-registered test. Restarts as the working recipe: replaced, at two streams and at four with sixteen channels, by the early-training recipe. And Revision Six's pooled p-values across the machines: corrected, because both machines ran the same seeds.
 
 *Visual:* claim list with badges STANDS · SUPERSEDED · PARTLY CONFIRMED · SUPPORTED · REPLACED · CORRECTED.
 
-**N22.2** It lists its own errors in this phase too: calling the two machines independent replicates; reading the hinge's rarity as a sign it wasn't needed, when a few well-timed firings were the mechanism; a merge breaker claimed before its trigger existed, then specified wrongly; a confirmation planned from the screens' numbers that met a higher baseline; machine differences blamed on Muon's kernels alone; specifications lost between sessions; a validity arm without the budget to bind; and process slips, caught by the tests' own pairing checks.
+**N22.2** It lists its own errors in this phase too: calling the two machines independent replicates; reading the hinge's rare firings under Muon as a sign it might not be needed, when a few well-timed firings were the mechanism; a merge breaker claimed before its trigger existed, then specified wrongly; a confirmation planned from the screens' numbers that met a higher baseline; machine differences blamed on Muon's kernels alone; specifications lost between sessions; a validity arm without the budget to bind; and process slips, among them a results-file mix-up on machine L that the test's own pairing checks stopped before any training.
 
-*Visual:* six error cards with short titles (from report §14.2).
+*Visual:* eight error cards with short titles (report §14.2): replicates treated as independent · "the hinge barely takes part" ·
+merge breaker over-claimed, then mis-specified · underpowered confirmation · machine differences misattributed ·
+specifications lost between sessions · validity arm without the budget · process slips.
 
 **N22.3** Five lessons come out of it. Give each machine its own seeds when you want independent confirmation. Bit-for-bit determinism depends on the processor and its kernels, so record the kernel path. Probe the mechanism before designing the fix. Score routing, not binding, wherever the memory has another route. And power a confirmation for the baseline it will actually meet.
 
@@ -585,7 +607,7 @@ hinge only 34/40, Muon+WINDOW 30/32 (S=4, k=16).
 
 *Visual:* limitation tiles (task · recipe needs structure · model · streams · replication · screens).
 
-**N23.2** How far is this from a language model? Phase Five removes per-run restarts, and the recipe works under Muon, an optimizer already used to pretrain large language models. What stands in the way, roughly in order of risk: many contexts, where the gate's recurrence needs redesign or constraint; the hinge's nuisance variables, which need a generic version; context cues at a distance; the gate's token-by-token compute; the memory horizon; and prior art, since Mixture-of-Memories already routes tokens among linear-attention memories at the billion-parameter scale.
+**N23.2** How far is this from a language model? Phase Five removes per-run restarts at two streams, and at four with sixteen channels, and the recipe works under Muon, an optimizer already used to pretrain large language models. What stands in the way, roughly in order of risk: many contexts, where the gate's recurrence needs redesign or constraint; the hinge's nuisance variables, which need a generic version; context cues at a distance; the gate's token-by-token compute; the memory horizon; and prior art, since Mixture-of-Memories already routes tokens among linear-attention memories at the billion-parameter scale.
 
 *Visual:* risk ladder 1–6 (report §17).
 
@@ -597,7 +619,7 @@ hinge only 34/40, Muon+WINDOW 30/32 (S=4, k=16).
 
 *Visual:* recap montage: channels with perfect routing; SLOW + HINGE icons; ρ > 1 warning.
 
-**N23.5** Everything you saw is in the repository: the model, every test with its pre-registered design, and every result file. Thanks for watching.
-(spoken: "Everything you saw is in the repository, Inkling slash clankers: the model, every test with its pre-registered design, and every result file. Thanks for watching.")
+**N23.5** Everything you saw is in the repository and its branches: the model, every test with its pre-registered design, the screens, and the results files, apart from four of machine L's, which are not yet committed. Thanks for watching.
+(spoken: "Everything you saw is in the repository, Inkling slash clankers, and its branches: the model, every test with its pre-registered design, the screens, and the results files, apart from four of machine L's, which are not yet committed. Thanks for watching.")
 
 *Visual:* end card: "github.com/Ynkling/clankers", report title, "Made with ManimGL (3b1b/manim) · narration: Kokoro TTS".
