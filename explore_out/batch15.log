@@ -553,3 +553,5 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
   6 runs queued on 4 workers (1 torch thread each), submitted in this order: CAP_M|268 PREV_CAP_M|268 PREV_NOREC_M|268 CAP_M|269 PREV_CAP_M|269 PREV_NOREC_M|269
   [  1/6]   53.7 min  gate_cap       CAP_M        seed 268  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step))
           acc 0.163  trans  None  VALcos 0.578  margin 0.28  STREAM-PARTIAL  outcome MERGED (8 share); sigma_max(W_h) at init 1.1231, the cap first at update 1, on 25458 updates
+  [  2/6]   54.1 min  gate_cap       CAP_M        seed 269  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step))
+          acc 0.237  trans  None  VALcos 0.000  margin 0.39  STREAM-PARTIAL  outcome MERGED (4 share); sigma_max(W_h) at init 1.0696, the cap first at update 1, on 24959 updates
