@@ -804,3 +804,12 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [  8]   57.8 min  window_scale     LOCAL3_SLOW16_A          seed 245  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 211b6c0+dirty, code 01767493e840, attempt 1: acc 1.000  trans  4800  outcome BOUND ROUTED; decoder at 4800: h CTX/KEY/VAL 0.75/1.00/1.00
   start   57.8 min  window_scale     LOCAL3_SLOW16_A          seed 249  (projected worst case 38 min)
+  [  9]   63.9 min  window_scale     LOCAL3_SLOW16_A          seed 247  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 06ee79c, code 01767493e840, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; decoder at 4800: h CTX/KEY/VAL 0.71/1.00/1.00
+  start   63.9 min  window_scale     LOCAL3_SLOW16_A          seed 250  (projected worst case 38 min)
+  [ 10]   63.9 min  window_scale     LOCAL3_SLOW16_A          seed 246  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 06ee79c+dirty, code 01767493e840, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; decoder at 4800: h CTX/KEY/VAL 0.73/1.00/1.00
+  start   63.9 min  window_scale     LOCAL3_SLOW16_A          seed 251  (projected worst case 38 min)
+  [ 11]   64.0 min  window_scale     LOCAL3_SLOW16_A          seed 248  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 06ee79c+dirty, code 01767493e840, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; decoder at 4800: h CTX/KEY/VAL 0.43/1.00/1.00
+  start   64.0 min  window_scale     LOCAL3_SLOW16_A          seed 252  (projected worst case 38 min)
