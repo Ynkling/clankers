@@ -419,10 +419,11 @@ S41: none of the four arms bound a run, so every reading is "it does not". What 
   Final held-out
   accuracy is higher than the paired D8_PREV_M in 10/10 pairs (median 0.61 vs 0.37; 0.87 in 260 and 261). This is the closest the
   eight-stream configuration has come in these screens, but no run reached the bind criterion, and the pre-registered reading is 0/10.
-- Without any recurrence (PREV_NOREC_M) every run ends non-stream KEY and the gate input itself loses the stream (median 0.56 at
-  600 to 0.19 at 4800): |W_in v_t| (the key's embedding) grows past |W_prev v_(t-1)| (3.5 vs 1.6 at the end), so the gate routes by key.
-  Final held-out accuracy is below the paired D8_PREV_M in 9/10. So W_h is needed, bounded: the capped recurrence carries the
-  previous token's information in a way the direct input alone does not keep.
+- PREV_NOREC_M's input (v_t, v_(t-1)) cannot see the stream token at VAL positions (CTX is two back), so it cannot label the
+  writes; its 10/10 KEY splits are a property of that window, not evidence about recurrence. The numbers as measured: every run
+  ends non-stream KEY; the gate input's decodability of the stream at key positions falls from a median 0.56 at 600 to 0.19 at
+  4800; |W_in v_t| at key positions grows past |W_prev v_(t-1)| (3.5 vs 1.6 at the end); final held-out accuracy is below the
+  paired D8_PREV_M in 9/10.
 - Under Adam (PREV_CAP_A, 5 runs) the cap keeps h's decodability at 0.60-0.94 (median), 5/5 MERGED with 3-5 sharing, accuracy as
   the paired runs (higher in 2/5).
 
