@@ -76,10 +76,10 @@ OTHER_FAIL = "#7A808C"
 OUT_COLORS = {"D": GOOD, "P": BAD, "K": KEY_SPLIT, "O": OTHER_FAIL}
 
 # Part 0 strip geometry
-SQ, PITCH = 0.28, 0.34
+SQ, PITCH = 0.28, 0.37
 STRIP_X0 = -3.6
 ROW_Y = {"X": [1.85, 1.49, 1.13], "L": [0.45, 0.09, -0.27]}
-NAME_RX, CODE_LX, COUNT_LX, CHIP_LX = -4.6, -4.45, 3.3, 4.15
+NAME_RX, CODE_LX, COUNT_LX, CHIP_LX = -4.6, -4.45, 3.9, 4.75
 
 
 def col_x(j):
@@ -113,7 +113,7 @@ def fmt_p(p):
     return f"{float(p):.4f}" if "e" in str(p) else str(p)
 
 
-def pair_text(b, c, p, color_counts=True, size=20):
+def pair_text(b, c, p, color_counts=True, size=22):
     """'11 vs 0  ·  p = 0.0005' with the discordant counts coloured like the highlights."""
     t = L(f"{b} vs {c}  ·  p = {fmt_p(p)}", size=size, color=INK)
     nb, nc = len(str(b)), len(str(c))
@@ -174,7 +174,7 @@ class SlowStart(ClankersScene):
 
     # ================================================================== N14.1  why drop restarts
     def why_restarts(self):
-        x0, xc, xe = -5.0, -2.5, 2.3
+        x0, xc, xe = -5.0, -2.5, 1.6
         ys = [1.95, 1.3, 0.65]
         head = L("restart rule (Phase IV)", 24, weight="BOLD").move_to([-6.3, 2.55, 0], aligned_edge=LEFT)
         check_line = DashedLine([xc, 2.3, 0], [xc, 0.4, 0], dash_length=0.08).set_stroke(FAINT, 2)
@@ -192,7 +192,7 @@ class SlowStart(ClankersScene):
                 mk = check_mark().move_to([xc + 0.3, y, 0])
                 ex = VGroup(Rectangle(width=xe - xc - 0.6, height=0.24).set_fill(GOOD, 0.75).set_stroke(width=0)
                             .move_to([xc + 0.6, y, 0], aligned_edge=LEFT))
-                ex.add(L("bound", 22, GOOD, weight="BOLD").next_to(ex[0], RIGHT, buff=0.15))
+                ex.add(L("discovered", 22, GOOD, weight="BOLD").next_to(ex[0], RIGHT, buff=0.15))
             marks.add(mk)
             extras.add(ex)
         stat = VGroup(L("60/60", 48, GOOD, weight="BOLD"), L("trials succeeded", 22),
@@ -272,7 +272,7 @@ class SlowStart(ClankersScene):
             work_brace = Brace(VGroup(cards[1], cards[2]), UP, buff=0.12)
             work_lab = L("the working configurations", 22, WARN, weight="BOLD").next_to(work_brace, UP, buff=0.1)
             no_any = chip("no restarts in any arm", GOOD, 24).next_to(cards, DOWN, buff=0.4)
-            foot = L("* recorded runs of the plain gate from earlier tests, on the same seeds", 20, MUTED)
+            foot = L("* recorded runs of the plain gate from earlier tests, on the same seeds (X's D8: 260–265 only)", 20, MUTED)
             foot.next_to(no_any, DOWN, buff=0.3)
 
             self.play(FadeOut(VGroup(restart_part, big_lab, big, recipe_seg, ticks, recipe_lab)),
@@ -299,10 +299,10 @@ class SlowStart(ClankersScene):
         tabs.arrange(RIGHT, buff=0.12)
         tabs.move_to([6.6, 3.15, 0], aligned_edge=RIGHT)
         self.tabs = tabs
+        self.play(*[FadeOut(cards[i].body[1:]) for i in range(4)],
+                  FadeOut(VGroup(work_brace, work_lab, no_any, foot)), run_time=0.45)
         self.play(*[ReplacementTransform(cards[i].box, tabs[i][0]) for i in range(4)],
-                  *[ReplacementTransform(cards[i].body[0], tabs[i][1]) for i in range(4)],
-                  *[FadeOut(cards[i].body[1:]) for i in range(4)],
-                  FadeOut(VGroup(work_brace, work_lab, no_any, foot)), run_time=1.0)
+                  *[ReplacementTransform(cards[i].body[0], tabs[i][1]) for i in range(4)], run_time=0.85)
         self.add(tabs)   # regroup the transformed pieces under one mobject
 
     # ================================================================== N14.2 + N14.3  Part 0
@@ -387,7 +387,7 @@ class SlowStart(ClankersScene):
                     self.play(FadeIn(rows[1].cnt, shift=0.1 * LEFT), run_time=0.4)
 
         # ---------------- N14.3 paired tests on discordant seeds
-        TX0, CW = -5.5, [3.9, 3.45, 3.45]
+        TX0, CW = -6.2, [3.9, 3.75, 3.75]
         xs = [TX0, TX0 + CW[0], TX0 + CW[0] + CW[1], TX0 + sum(CW)]
         ys = {"head": -1.0, "H0": -1.5, "S0": -2.0, "H0S": -2.5}
         rules = VGroup(Line([xs[0], -0.75, 0], [xs[3], -0.75, 0]).set_stroke(INK, 2),
@@ -560,6 +560,9 @@ class SlowStart(ClankersScene):
         callout = L("950: the one failed run, seed 287", 20, MUTED).move_to([col_x(j287), fy - 0.6, 0])
         call_line = Line(digits[j287].get_bottom() + 0.05 * DOWN, callout.get_top() + 0.05 * UP).set_stroke(MUTED, 1.5)
         zeros = VGroup(*[digits[j] for j, f in enumerate(FIRINGS_X) if f == 0])
+        zero_boxes = VGroup(*[RoundedRectangle(width=0.26, height=0.36, corner_radius=0.06)
+                              .set_stroke(WARN, 2).set_fill(WARN, 0.08).move_to([col_x(j), fy, 0])
+                              for j, f in enumerate(FIRINGS_X) if f == 0])
         never = chip("never fired: 11 of 20", WARN, 20).move_to([CHIP_LX - 0.6, fy, 0], aligned_edge=LEFT)
         x_hinge = B["X"].rows[2]
 
@@ -593,7 +596,8 @@ class SlowStart(ClankersScene):
                       self.swap_note("Report §7; hinge firings: data/hinge_firings.json"), run_time=1.0)
             self.play(ShowCreation(call_line), FadeIn(callout, shift=0.1 * DOWN), run_time=0.4)
             vo.wait_until(at_phrase(vo, 2, "never on eleven"))
-            self.play(LaggedStart(*[z.animate.set_color(WARN).scale(1.25) for z in zeros], lag_ratio=0.06),
+            self.play(LaggedStart(*[z.animate.set_color(WARN) for z in zeros], lag_ratio=0.06),
+                      LaggedStartMap(ShowCreation, zero_boxes, lag_ratio=0.06),
                       FadeIn(never, shift=0.1 * LEFT), run_time=0.9)
 
             # ---------------- Part C: eight streams (the firing row stays up a moment longer)

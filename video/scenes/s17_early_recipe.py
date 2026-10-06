@@ -267,7 +267,7 @@ class EarlyRecipeTest(ClankersScene):
     def part_b(self):
         head_a = self.part_a_mobs["head"]
         head = header_line("E2", MUON_COLOR, "Muon binds four streams sooner",
-                           "four streams · 16 channels · seeds 340–359")
+                           "four streams · 16 channels · seeds 340–359 (X: 340–351)")
 
         # ---- the dot plot: one dot per run at the evaluation where it first counted as bound
         CHECKS = [1200, 2400, 3600, 4800, 6000, 7200, 8400]
@@ -317,6 +317,8 @@ class EarlyRecipeTest(ClankersScene):
                        L("later", 20, MUTED).move_to([X_LATER, Y_TICK, 0]),
                        L("not bound", 20, BAD).move_to([X_NEVER, Y_TICK, 0]))
         tick_head = L("bound at update", 20, MUTED).move_to([-6.45, Y_TICK, 0], aligned_edge=LEFT)
+        dot_key = VGroup(Dot(radius=R).set_fill(INK, 1).set_stroke(width=0), L("= one run (one seed)", 20, MUTED))
+        dot_key.arrange(RIGHT, buff=0.12).move_to([-6.45, Y_TOP + 0.15, 0], aligned_edge=LEFT)
         brk_x = (COL_X[8400] + X_LATER) / 2
         brk = VGroup(*[Line([brk_x - 0.07 + dx, Y_TICK - 0.12, 0], [brk_x + 0.07 + dx, Y_TICK + 0.12, 0])
                        .set_stroke(MUTED, 2) for dx in (-0.06, 0.06)])
@@ -348,8 +350,8 @@ class EarlyRecipeTest(ClankersScene):
 
         # ---- the verdict board (E1, E2 x machine)
         CELL_X = {"X": 0.25, "L": 3.95}
-        Y_BHEAD, Y_E = -1.75, {"E1": -2.38, "E2": -3.02}
-        b_rule = Line([-6.45, Y_BHEAD - 0.27, 0], [6.45, Y_BHEAD - 0.27, 0]).set_stroke(FAINT, 1.5)
+        Y_BHEAD, Y_E = -1.7, {"E1": -2.31, "E2": -2.93}
+        b_rule = Line([-6.45, Y_BHEAD - 0.25, 0], [6.45, Y_BHEAD - 0.25, 0]).set_stroke(FAINT, 1.5)
         row_labels = {}
         for e, col, txt, sub in (("E1", HINGE_COLOR, "the early window works under Muon", "two streams, discovered"),
                                  ("E2", MUON_COLOR, "Muon binds four streams sooner", "four streams, bound by 4800")):
@@ -367,7 +369,7 @@ class EarlyRecipeTest(ClankersScene):
 
         def col_hl(m, color):
             w = max(cells[m, e].get_width() for e in ("E1", "E2")) + 0.36
-            top, bot = Y_BHEAD + 0.27, Y_E["E2"] - 0.36
+            top, bot = Y_BHEAD + 0.25, Y_E["E2"] - 0.37
             r = Rectangle(width=w, height=top - bot).set_fill(color, 0.09).set_stroke(color, 1.5, opacity=0.7)
             r.move_to([cells[m, "E1"].get_left()[0] + w / 2 - 0.18, (top + bot) / 2, 0])
             return r
@@ -398,7 +400,8 @@ class EarlyRecipeTest(ClankersScene):
                 d.set_fill(opacity=0).set_stroke(opacity=0)
                 d.add_updater(reveal)
             self.add(dots, cursor)
-            self.play(cursor_x.animate.set_value(X_NEVER + 0.5), run_time=3.2, rate_func=linear)
+            self.play(cursor_x.animate.set_value(X_NEVER + 0.5), FadeIn(dot_key),
+                      run_time=3.2, rate_func=linear)
             for d in dots:
                 d.clear_updaters()
             cursor.clear_updaters()
@@ -416,7 +419,7 @@ class EarlyRecipeTest(ClankersScene):
                       *[FadeIn(row_labels[e], shift=0.15 * UP) for e in row_labels], FadeTransform(src_b, src_c),
                       run_time=0.9)
             lbox = col_hl("L", MACHINE_COLORS["L"])
-            self.play(FadeIn(lbox), Indicate(b_badges["L"], scale_factor=1.3, color=MACHINE_COLORS["L"]), run_time=0.7)
+            self.play(FadeIn(lbox), b_badges["L"].animate(rate_func=there_and_back).scale(1.35), run_time=0.7)
             vo.wait_until(at_phrase(vo, 1, "six to zero") - 0.2)
             self.play(FadeIn(cells["L", "E1"], shift=0.15 * LEFT), Indicate(row_labels["E1"][1][0], color=HINGE_COLOR),
                       run_time=0.8)
@@ -428,7 +431,7 @@ class EarlyRecipeTest(ClankersScene):
             # On X: same direction, not significant
             vo.wait_until_sentence(2)
             xbox = col_hl("X", MACHINE_COLORS["X"])
-            self.play(FadeOut(lbox), FadeIn(xbox), Indicate(b_badges["X"], scale_factor=1.3, color=MACHINE_COLORS["X"]),
+            self.play(FadeOut(lbox), FadeIn(xbox), b_badges["X"].animate(rate_func=there_and_back).scale(1.35),
                       run_time=0.7)
             vo.wait_until(at_phrase(vo, 2, "four to zero") - 0.2)
             self.play(FadeIn(cells["X", "E1"], shift=0.15 * LEFT), run_time=0.7)
@@ -444,16 +447,19 @@ class EarlyRecipeTest(ClankersScene):
                 cx = COL_X[MEDIAN[m, a]]
                 med_boxes[m, a] = RoundedRectangle(width=0.66, height=0.54, corner_radius=0.08).move_to([cx, y, 0])
                 med_boxes[m, a].set_stroke(OPT_COLOR[a], 2.5).set_fill(opacity=0)
-            self.play(FadeOut(xbox), FadeIn(col_heads[2]),
-                      *[ShowCreation(med_boxes[m, "WIN16_M"]) for m in MACHINES],
-                      *[FadeIn(med_vals[m, "WIN16_M"], shift=0.1 * LEFT) for m in MACHINES], run_time=0.9)
-            vo.wait_until(at_phrase(vo, 3, "against forty-eight") - 0.2)
-            self.play(*[ShowCreation(med_boxes[m, "WIN16_A"]) for m in MACHINES],
-                      *[FadeIn(med_vals[m, "WIN16_A"], shift=0.1 * LEFT) for m in MACHINES], run_time=0.9)
+            self.play(FadeOut(xbox), *[ShowCreation(med_boxes[m, "WIN16_M"]) for m in MACHINES], run_time=0.9)
+            vo.wait_until(at_phrase(vo, 3, "twenty-four hundred") - 0.2)
+            self.play(FadeIn(col_heads[2]),
+                      *[FadeIn(med_vals[m, "WIN16_M"], shift=0.15 * LEFT) for m in MACHINES], run_time=0.8)
+            vo.wait_until(at_phrase(vo, 3, "on both machines"))
             self.play(*[Indicate(med_vals[m, "WIN16_M"], color=MUON_COLOR, scale_factor=1.25) for m in MACHINES],
+                      *[badges[i].animate(rate_func=there_and_back).scale(1.3) for i in range(len(MACHINES))],
                       run_time=0.8)
+            vo.wait_until(at_phrase(vo, 3, "against forty-eight") - 0.2)
+            self.play(*[ShowCreation(med_boxes[m, "WIN16_A"]) for m in MACHINES], run_time=0.6)
+            self.play(*[FadeIn(med_vals[m, "WIN16_A"], shift=0.15 * LEFT) for m in MACHINES], run_time=0.7)
 
-        self.part_b_mobs = dict(cells=cells, board=[b_rule, *b_badges.values(), *row_labels.values()],
+        self.part_b_mobs = dict(cells=cells, board=[b_rule, *b_badges.values(), *row_labels.values(), src_c],
                                 warn_hl=col_hl("X", WARN))
 
     # ============================================================== N17.3a  why X fell short
@@ -526,21 +532,23 @@ class EarlyRecipeTest(ClankersScene):
         cut_lab = L("cut by X's time rule", 20, WARN).next_to(cut_part, DOWN, buff=0.18)
         src = source_note("Report §9.1 (S32), §9.2; p for b vs 0 is (1/2)^b (exact McNemar, one-sided)")
 
+        # clear the run plot first, keeping the verdict board
+        board = self.part_b_mobs["board"]
+        keep_ids = {id(cells[m, e]) for m in MACHINES for e in ("E1", "E2")} | {id(b) for b in board}
+        keep_ids |= {id(self.title_mob), id(self.frame)}
+        self.play(*[FadeOut(mob) for mob in self.mobjects if id(mob) not in keep_ids], run_time=0.6)
+        xbox = self.part_b_mobs["warn_hl"]
+        q = T("Why did X fall short?", 40, WARN).move_to([xbox.get_center()[0], -0.55, 0])
+
         with self.voiceover(
             "Why did X fall short? Two things weakened its run. On fresh seeds, slow memory alone already "
             "discovered thirty-six of forty on X, against thirty-one in the screens, leaving less room; and X's "
             "time rule cut the four-stream part to twelve seeds."
         ) as vo:
-            # Why did X fall short?
-            board = self.part_b_mobs["board"]
-            keep_ids = {id(cells[m, e]) for m in MACHINES for e in ("E1", "E2")} | {id(b) for b in board}
-            keep_ids |= {id(self.title_mob), id(self.frame)}
-            others = [mob for mob in self.mobjects if id(mob) not in keep_ids]
-            xbox = self.part_b_mobs["warn_hl"]
-            q = T("?", 44, WARN).next_to(xbox, LEFT, buff=0.15)
-            self.play(*[FadeOut(mob) for mob in others], FadeIn(xbox), FadeIn(q, scale=0.6),
+            # Why did X fall short?  (the board stays; the X column is the question)
+            self.play(FadeIn(xbox), FadeIn(q, shift=0.2 * UP),
                       cells["L", "E1"].animate.set_opacity(0.35), cells["L", "E2"].animate.set_opacity(0.35),
-                      run_time=0.9)
+                      run_time=0.8)
 
             # Two things weakened its run.
             vo.wait_until_sentence(1)
@@ -608,7 +616,10 @@ class EarlyRecipeTest(ClankersScene):
                         for i in range(40) if not AGREE[i]])
         agree = VGroup(L(f"{sum(AGREE)} of 40", 26, INK, weight="BOLD"), L("seeds agree", 20, MUTED))
         agree.arrange(DOWN, buff=0.08).move_to([5.55, (Y_X + Y_L) / 2, 0])
-        agree_more = L("with the window: 40 of 40 · four streams: 9 and 10 of 12", 20, MUTED)
+        sla = _ER["seed_level_agreement_X_vs_L"]
+        agree_more = L(f"also: with the window {sla['WIN_M']['same_outcome']} of {sla['WIN_M']['n']} · four streams, "
+                       f"Adam {sla['WIN16_A']['same_outcome']} of {sla['WIN16_A']['n']}, "
+                       f"Muon {sla['WIN16_M']['same_outcome']} of {sla['WIN16_M']['n']}", 20, MUTED)
         agree_more.next_to(seed_b, DOWN, buff=0.12).align_to(ex[-1], RIGHT).shift(0.1 * RIGHT)
 
         # left card: same seed, different digits
@@ -641,7 +652,7 @@ class EarlyRecipeTest(ClankersScene):
         c2 = VGroup(c2_head, hosts, rows, bf16).arrange(DOWN, buff=0.25)
         c2_card = card(c2, buff=0.28)
         c2_card.move_to([3.4, -1.75, 0])
-        src = source_note("Report §9.2, §15; data/early_recipe.json (SLOW_M per seed; curve of seed 300)")
+        src = source_note("Report p. 1 & Table 9 (hosts), §9.2, §15; data/early_recipe.json (SLOW_M per seed, seed 300)")
 
         with self.voiceover(
             "And the two machines are not independent replicates. They ran the same seeds, so most seed-level "
@@ -655,8 +666,8 @@ class EarlyRecipeTest(ClankersScene):
 
             # same seeds
             vo.wait_until_sentence(1)
-            self.play(FadeOut(VGroup(q, strike)), FadeIn(q2, shift=0.15 * DOWN), FadeIn(seed_chip, scale=0.8),
-                      run_time=0.7)
+            self.play(LaggedStart(FadeOut(VGroup(q, strike), shift=0.3 * UP), FadeIn(q2, shift=0.3 * UP),
+                                  lag_ratio=0.65), FadeIn(seed_chip, scale=0.8), run_time=0.9)
             self.play(*[GrowArrow(a) for a in seed_arrows], run_time=0.6)
             self.play(ReplacementTransform(mcards["X"][1][0], bx), ReplacementTransform(mcards["L"][1][0], bl),
                       FadeOut(VGroup(mcards["X"][0], mcards["X"][1][1], mcards["L"][0], mcards["L"][1][1], seed_arrows)),

@@ -90,7 +90,7 @@ def curved_arrow(a, b, angle, color, tip=0.18, width=3) -> VMobject:
     return arc
 
 
-def machine_split(x: str, l: str, size=20) -> VGroup:
+def machine_split(x: str, l: str, size=22) -> VGroup:
     g = VGroup(L("X", size, MACHINE_COLORS["X"], weight="BOLD"), L(x, size, MUTED),
                L("L", size, MACHINE_COLORS["L"], weight="BOLD"), L(l, size, MUTED))
     g.arrange(RIGHT, buff=0.08)
@@ -243,7 +243,7 @@ class History(ClankersScene):
         # ---- left: the gate at a key position, in two streams
         cx = -3.2
         lab1 = L("Phase I gate: a function of the token alone", 24, GATE_COLOR).move_to([cx, 2.1, 0])
-        f1 = M(r"g_t = \mathrm{softmax}(W_{\mathrm{tok}}\, e_t)", 38).move_to([cx, 1.6, 0])
+        f1 = M(r"g_t = \mathrm{softmax}(W_{\mathrm{tok}}\, v_t)", 38).move_to([cx, 1.6, 0])
         heads = VGroup(L("token", 20, MUTED).move_to([-5.35, 0.7, 0]),
                        L("gate gives", 20, MUTED).move_to([-2.75, 0.7, 0]),
                        L("routing needs", 20, MUTED).move_to([-0.55, 0.7, 0]))
@@ -358,7 +358,7 @@ class History(ClankersScene):
                        VGroup(token("CTX0", "ctx", 0, **tw), token("K0", **tw), token("?", "query", **tw))
                        .arrange(RIGHT, buff=0.06))
         strip.arrange(RIGHT, buff=0.3).move_to(1.85 * UP)
-        strip_lab = L("the binding task: 2 streams, 4 keys, 27 tokens", 20, MUTED).next_to(strip, DOWN, buff=0.18)
+        strip_lab = L("the binding task: 2 streams, 4 keys, 27 tokens", 22, MUTED).next_to(strip, DOWN, buff=0.18)
 
         lx, lw, bw = -5.35, 3.3, 3.6
         ys = [0.35, -0.55, -1.45, -2.3]
@@ -384,9 +384,9 @@ class History(ClankersScene):
         half_x = r_x.track.get_left()[0] + bw / 2
         half = DashedLine([half_x, ys[2] + 0.38, 0], [half_x, ys[3] - 0.38, 0]).set_stroke(WARN, 2.5)
         half_lab = L("half", 20, WARN, weight="BOLD").next_to(half, DOWN, buff=0.08)
-        refs = VGroup(*[L("vs one-channel refs 0/10, 0/10", 20, MUTED).next_to(r.value, RIGHT, buff=0.35)
+        refs = VGroup(*[L("vs one-channel refs 0/10, 0/10", 22, MUTED).next_to(r.value, RIGHT, buff=0.35)
                         for r in (r_x, r_l)])
-        pvals = VGroup(*[L(p, 20, GOOD).next_to(rf, DOWN, buff=0.06, aligned_edge=LEFT)
+        pvals = VGroup(*[L(p, 22, GOOD).next_to(rf, DOWN, buff=0.06, aligned_edge=LEFT)
                          for p, rf in zip(("p = 0.004", "p = 0.002"), refs)])
 
         with self.voiceover(
@@ -396,9 +396,10 @@ class History(ClankersScene):
         ) as vo:
             self.play(FadeOut(self.n72_mobs), run_time=0.6)
             self.focus_phase(2, LaggedStartMap(FadeIn, strip, shift=0.15 * RIGHT, lag_ratio=0.15),
-                             FadeIn(strip_lab), run_time=1.2)
+                             FadeIn(strip_lab), self.swap_source("Report §2, §3; README §2 (Phase III; C1 on X and L)"),
+                             run_time=1.2)
             self.at(vo, 1)
-            self.play(FadeIn(icon2), *show_bar(r_perfect), self.swap_source("Report §2; README §2 (Phase III)"))
+            self.play(FadeIn(icon2), *show_bar(r_perfect))
             self.play(ShowCreation(tick), run_time=0.4)
             self.at_phrase(vo, 1, "where no single-channel")
             self.play(FadeIn(icon1), *show_bar(r_one))
@@ -424,7 +425,7 @@ class History(ClankersScene):
         items = VGroup()
         for i, name in enumerate(TESTS):
             box = Square(0.13).set_stroke(MUTED, 1.5).set_fill(GATE_COLOR, 0)
-            txt = Text(name, font=MONO, font_size=20, fill_color=MUTED)
+            txt = Text(name, font=MONO, font_size=22, fill_color=MUTED)
             it = VGroup(box, txt).arrange(RIGHT, buff=0.15)
             it.move_to([-6.5, 1.22 - 0.4 * i, 0], aligned_edge=LEFT)
             items.add(it)
@@ -455,7 +456,7 @@ class History(ClankersScene):
         tests = self.build_test_list()
 
         # F1: the readout (README §4, Table 2; discovered of 30 per machine)
-        h1 = panel_header("a readout from the gate's state", "two streams, four keys · discovered")
+        h1 = panel_header("a readout from the gate's state into the residual stream", "two streams, four keys · discovered")
         ys = [0.95, 0.05, -0.85]
         f1 = [pbar("no readout", 41, 60, GATE_COLOR, ys[0], ("22/30", "19/30")),
               pbar("readout", 2, 60, BAD, ys[1], ("2/30", "0/30")),
@@ -474,8 +475,8 @@ class History(ClankersScene):
         ns = verdict_badge("NOT SHOWN", 20).next_to(brace, RIGHT, buff=0.12)
         restart = pbar("restart rule, k = 2", 60, 60, GOOD, -1.95, ("30/30", "30/30"))
         rel = verdict_badge("RELIABLE", 20).next_to(restart.value, RIGHT, buff=0.3)
-        rule = VGroup(L("at step 2400 it reads held-out accuracy, nothing else:", 20, MUTED),
-                      L("≥ 0.6: continue  ·  else: restart from a fresh seed (up to 5 attempts)", 20, MUTED))
+        rule = VGroup(L("at step 2400 it reads held-out accuracy, nothing else:", 22, MUTED),
+                      L("≥ 0.6: continue  ·  else: restart from a fresh seed (up to 5 attempts)", 22, MUTED))
         rule.arrange(DOWN, buff=0.08, aligned_edge=LEFT).move_to([PX, -2.95, 0], aligned_edge=LEFT)
 
         # F3/F4: the short convolution (README §7, Table 5; bound)
@@ -493,11 +494,12 @@ class History(ClankersScene):
         lag_arc = curved_arrow(lag_tok[0].get_top() + 0.03 * UP, lag_tok[2].get_top() + 0.03 * UP, -PI / 2.2, WARN,
                                tip=0.22)
         lag_lab = L("lag 2", 22, WARN, weight="BOLD").next_to(lag_arc, UP, buff=0.05)
-        lag_txt = VGroup(L("the lag-2 weight carries the context", 22, INK),
-                         L("to the value: no stream separation", 22, INK)).arrange(DOWN, buff=0.08, aligned_edge=LEFT)
-        lag_txt.next_to(lag_tok, RIGHT, buff=0.45)
-        lag_num = L("single-channel binders' lag-2 weight, median on X: 0.158 vs 0.082", 20, MUTED)
-        lag_num.move_to([PX, -2.75, 0], aligned_edge=LEFT)
+        lag_txt = VGroup(L("the lag-2 weight writes the context", 22, INK),
+                         L("into the value's position, so one channel", 22, INK),
+                         L("binds without separating the streams", 22, INK)).arrange(DOWN, buff=0.08, aligned_edge=LEFT)
+        lag_txt.next_to(lag_tok, RIGHT, buff=0.45).shift(0.1 * UP)
+        lag_num = L("median lag-2 weight on X: one-channel binders 0.158, non-binders 0.082", 22, MUTED)
+        lag_num.move_to([PX, -2.85, 0], aligned_edge=LEFT)
 
         with self.voiceover(
             "Phase Four ran ten pre-registered tests. A readout from the gate's state into the residual stream harmed "
@@ -552,10 +554,14 @@ class History(ClankersScene):
             self.at_phrase(vo, 4, "one channel with the convolution")
             self.play(*morph_bar(f3[0], f4), FadeIn(ghost_lab, shift=0.1 * UP), run_time=1.1)
             self.play(ShowCreation(ghost), run_time=0.4)
-            self.at_phrase(vo, 4, "through its lag-two", -0.4)
-            self.play(FadeIn(lag_tok), run_time=0.4)
+            self.play(LaggedStartMap(FadeIn, lag_tok, shift=0.1 * UP, lag_ratio=0.2), run_time=0.7)
+            self.at_phrase(vo, 4, "through its lag-two", -0.3)
             self.play(ShowCreation(lag_arc), FadeIn(lag_lab), FadeIn(lag_txt, shift=0.1 * LEFT), run_time=0.8)
-            self.play(FadeIn(lag_num), run_time=0.5)
+            self.play(FadeIn(lag_num, shift=0.1 * UP), run_time=0.5)
+        # let the lag-2 route sit for a moment before the next paragraph
+        self.play(Indicate(lag_tok[2], color=STREAM_COLORS[0], scale_factor=1.15),
+                  FlashAround(lag_arc, color=WARN), run_time=1.0)
+        self.wait(0.8)
         self.tests = tests
         self.n74_mobs = VGroup(h3, lr4, bar_parts(f4), ghost, ghost_lab, lag_tok, lag_arc, lag_lab, lag_txt, lag_num)
 
@@ -571,8 +577,9 @@ class History(ClankersScene):
         icon_o = mini_grid(3, 6, MEMORY_COLOR, fill_cells=(0, 1, 4, 7, 8, 9, 13, 16, 17), fill_color=mix,
                            opacity=0.75)
         icon_o.move_to([5.75, o8.track.get_y(), 0])
-        mem_note = VGroup(L("same fast-weight state, 49,152 each;", 20, MUTED),
-                          L("the single channel (N = 512) has 1.8 × the parameters", 20, MUTED))
+        icon_lab = L("memory", 20, MUTED).next_to(icon_g, UP, buff=0.15)
+        mem_note = VGroup(L("same fast-weight state, 49,152 each;", 22, MUTED),
+                          L("the single channel (N = 512) has 1.8 × the parameters", 22, MUTED))
         mem_note.arrange(DOWN, buff=0.08, aligned_edge=LEFT).move_to([PX, -1.0, 0], aligned_edge=LEFT)
         params = L("50,944 vs 28,480", 20, WARN, weight="BOLD").next_to(mem_note[1], RIGHT, buff=0.25)
         moral = T("The advantage is the partition, not the memory.", 32, INK, t2c={"partition": GOOD})
@@ -585,12 +592,12 @@ class History(ClankersScene):
         for name, col in (("bound", GOOD), ("streams merged", BAD), ("non-stream split", MUTED)):
             chip = Square(0.22).set_fill(col, 0.9).set_stroke(width=0)
             legend.add(VGroup(chip, L(name, 20, MUTED)).arrange(RIGHT, buff=0.12))
-        legend.arrange(RIGHT, buff=0.4).move_to([PX, 1.15, 0], aligned_edge=LEFT)
+        legend.arrange(RIGHT, buff=0.4).move_to([PX, 1.2, 0], aligned_edge=LEFT)
         col_head = L("bound per machine", 20, MUTED)
         sx0, sw, sh = -1.25, 5.3, 0.42
-        col_head.move_to([sx0 + sw + 0.25, 1.15, 0], aligned_edge=LEFT)
-        data = [(4, (14, 16, 10), ("9/20", "5/20"), 0.4), (8, (23, 4, 13), ("10/20", "13/20"), -0.45),
-                (16, (23, 1, 16), ("10/20", "13/20"), -1.3)]
+        col_head.move_to([sx0 + sw + 0.25, 1.2, 0], aligned_edge=LEFT)
+        data = [(4, (14, 16, 10), ("9/20", "5/20"), 0.5), (8, (23, 4, 13), ("10/20", "13/20"), -0.3),
+                (16, (23, 1, 16), ("10/20", "13/20"), -1.1)]
         rows = []
         for k, counts, split, y in data:
             lab = L(f"k = {k}", 22, INK).move_to([PX, y, 0], aligned_edge=LEFT)
@@ -616,27 +623,48 @@ class History(ClankersScene):
             rows.append(g)
 
         # the stream-to-channel picture: four streams, k channels
-        def chan_map(targets, k, y=-2.35, x_left=PX + 0.15, shared=BAD):
-            dots = VGroup(*[Circle(radius=0.12).set_fill(STREAM_COLORS[s], 1).set_stroke(width=0)
+        def chan_map(targets, k, y=-2.1, x_left=PX + 0.15):
+            dots = VGroup(*[Circle(radius=0.13).set_fill(STREAM_COLORS[s], 1).set_stroke(width=0)
                             for s in range(4)])
-            boxes = VGroup(*[RoundedRectangle(width=0.32, height=0.3, corner_radius=0.05).set_stroke(MUTED, 1.5)
+            boxes = VGroup(*[RoundedRectangle(width=0.36, height=0.33, corner_radius=0.05).set_stroke(MUTED, 1.5)
                              for _ in range(k)])
-            boxes.arrange(RIGHT, buff=0.1).move_to([x_left, y - 0.32, 0], aligned_edge=LEFT)
+            boxes.arrange(RIGHT, buff=0.1).move_to([x_left, y - 0.34, 0], aligned_edge=LEFT)
             for s, d in enumerate(dots):
-                d.move_to([boxes[s].get_x(), y + 0.38, 0])
+                d.move_to([boxes[s].get_x(), y + 0.4, 0])
             used = {}
             for s, c in enumerate(targets):
                 used.setdefault(c, []).append(s)
+            # a channel holding one stream is drawn in that stream's color; a shared channel is striped with the
+            # colors of every stream in it (stream 3 is red, so red alone cannot also mean "shared")
+            stripes = VGroup()
             for c, ss in used.items():
-                col = STREAM_COLORS[ss[0]] if len(ss) == 1 else shared
-                boxes[c].set_fill(col, 0.35).set_stroke(col, 2)
+                b = boxes[c]
+                if len(ss) == 1:
+                    col = STREAM_COLORS[ss[0]]
+                    b.set_fill(col, 0.35).set_stroke(col, 2)
+                    continue
+                w, h = (b.get_width() - 0.08) / len(ss), b.get_height() - 0.08
+                for j, s in enumerate(ss):
+                    r = Rectangle(width=w, height=h).set_fill(STREAM_COLORS[s], 0.75).set_stroke(width=0)
+                    r.move_to(b.get_left() + (0.04 + (j + 0.5) * w) * RIGHT)
+                    stripes.add(r)
+                b.set_stroke(INK, 2.5)
             arrows = VGroup(*[Arrow(dots[s].get_bottom(), boxes[c].get_top(), buff=0.04, thickness=2.5)
                               .set_color(STREAM_COLORS[s]) for s, c in enumerate(targets)])
-            return VGroup(dots, boxes, arrows)
+            return VGroup(dots, boxes, stripes, arrows)
 
         map_merge = chan_map([0, 1, 2, 2], 4)
         map_spare = chan_map([0, 1, 2, 5], 8)
-        map_none = chan_map([0, 0, 0, 0], 8, shared=MUTED)
+        map_none = chan_map([0, 0, 0, 0], 8)
+
+        def morph_map(a, b) -> list:
+            """Dots, boxes and arrows move; the stripes of shared channels fade (they have no counterpart)."""
+            anims = [ReplacementTransform(a[i], b[i]) for i in (0, 1, 3)]
+            if len(a[2]):
+                anims.append(FadeOut(a[2]))
+            if len(b[2]):
+                anims.append(FadeIn(b[2]))
+            return anims
 
         def two_lines(a, b, color):
             return VGroup(L(a, 22, color), L(b, 22, color)).arrange(DOWN, buff=0.08, aligned_edge=LEFT)
@@ -645,9 +673,9 @@ class History(ClankersScene):
         txt_spare = two_lines("spare channels:", "room for every stream", GOOD)
         txt_none = two_lines("a non-stream split:", "every stream lands in one channel", INK)
         for t in (txt_merge, txt_spare, txt_none):
-            t.move_to([map_spare.get_right()[0] + 0.45, -2.35, 0], aligned_edge=LEFT)
+            t.move_to([map_spare.get_right()[0] + 0.45, -2.1, 0], aligned_edge=LEFT)
         final = T("What remained: an early commitment to a non-stream split", 30, WARN)
-        final.move_to([2.0, -3.2, 0])
+        final.move_to([2.0, -3.08, 0])
         if final.get_right()[0] > 6.6:
             final.shift((6.6 - final.get_right()[0]) * RIGHT)
 
@@ -661,7 +689,7 @@ class History(ClankersScene):
             self.play(FadeOut(self.n74_mobs), *self.focus_tests([7, 8]), FadeIn(h5),
                       self.swap_source("Report §2; README §8.3–8.4, Table 6"), run_time=0.8)
             self.play(FadeIn(VGroup(g8.name_mob, g8.track), shift=0.1 * UP), FadeIn(icon_g, shift=0.1 * LEFT),
-                      run_time=0.6)
+                      FadeIn(icon_lab), run_time=0.6)
             self.at_phrase(vo, 0, "the gate bound from scratch", -0.2)
             self.play(*grow_only(g8), Indicate(icon_g, scale_factor=1.1))
             self.at_phrase(vo, 0, "while one channel")
@@ -678,7 +706,7 @@ class History(ClankersScene):
             self.play(ShowCreation(moral_line), Indicate(icon_g, scale_factor=1.15), run_time=0.8)
             # ---- four streams, four channels
             self.at(vo, 2)
-            self.play(FadeOut(VGroup(bar_parts(g8), bar_parts(o8), icon_g, icon_o, mem_note, params, moral,
+            self.play(FadeOut(VGroup(bar_parts(g8), bar_parts(o8), icon_g, icon_o, icon_lab, mem_note, params, moral,
                                      moral_line)),
                       *self.focus_tests([8]), FadeTransform(h5, h6),
                       self.swap_source("Report §2; README §9, Table 7 (seeds 220–239)"), run_time=0.8)
@@ -686,22 +714,23 @@ class History(ClankersScene):
             self.play(FadeIn(legend), FadeIn(col_head), FadeIn(r4.lab), FadeIn(r4.frame), run_time=0.6)
             self.at_phrase(vo, 2, "the gate bound only", 0.3)
             self.play(GrowFromEdge(r4.segs[0], LEFT), FadeIn(r4.nums[0]), FadeIn(r4.msplit), run_time=0.8)
-            self.at_phrase(vo, 2, "mostly failing")
-            self.play(GrowFromEdge(r4.segs[1], LEFT), FadeIn(r4.nums[1]), run_time=0.6)
+            self.at_phrase(vo, 2, "mostly failing", -0.2)
+            self.play(GrowFromEdge(r4.segs[1], LEFT), FadeIn(r4.nums[1]), FadeIn(map_merge),
+                      FadeIn(txt_merge, shift=0.1 * LEFT), run_time=0.8)
             self.play(GrowFromEdge(r4.segs[2], LEFT), FadeIn(r4.nums[2]), run_time=0.5)
-            self.play(FadeIn(map_merge), FadeIn(txt_merge, shift=0.1 * LEFT),
-                      Indicate(r4.segs[1], color=BAD, scale_factor=1.08), run_time=0.8)
+            self.play(Indicate(r4.segs[1], color=BAD, scale_factor=1.08),
+                      Indicate(VGroup(map_merge[1][2], map_merge[2]), color=INK, scale_factor=1.3), run_time=0.8)
             # ---- spare channels remove most merges
             self.at(vo, 3)
             self.play(*self.focus_tests([9]), self.swap_source("Report §2; README §9.2, Table 7 (stream_channels)"),
                       *[TransformFromCopy(r4, r) for r in rows[1:]], run_time=1.0)
-            self.play(ReplacementTransform(map_merge, map_spare), FadeTransform(txt_merge, txt_spare),
+            self.play(*morph_map(map_merge, map_spare), FadeTransform(txt_merge, txt_spare),
                       *[Indicate(r.nums[1], color=BAD, scale_factor=1.5) for r in rows], run_time=1.0)
             # ---- what remained
             self.at(vo, 4)
             boxes = VGroup(*[SurroundingRectangle(r.segs[2], buff=0.035).set_stroke(WARN, 3) for r in rows])
             self.play(LaggedStartMap(ShowCreation, boxes, lag_ratio=0.25),
                       *[r.segs[2].animate.set_fill(MUTED, 1) for r in rows], run_time=0.9)
-            self.play(ReplacementTransform(map_spare, map_none), FadeTransform(txt_spare, txt_none), run_time=0.8)
+            self.play(*morph_map(map_spare, map_none), FadeTransform(txt_spare, txt_none), run_time=0.8)
             self.play(Write(final), run_time=1.3)
             self.play(Indicate(final, color=WARN, scale_factor=1.04), run_time=0.9)

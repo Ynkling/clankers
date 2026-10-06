@@ -66,7 +66,7 @@ def dots(n_good, n, color, r=0.1, buff=0.08):
 
 def result_row(name, screen, k, n, word, color, y):
     """'name (Sxx)   o o o o o o o o o o   k/n word' on one line at height y."""
-    lab = VGroup(L(name, 22, INK), L(f"({screen})", 20, MUTED)).arrange(RIGHT, buff=0.15)
+    lab = VGroup(L(name, 22, INK), L(f"({screen})", 22, MUTED)).arrange(RIGHT, buff=0.15)
     lab.move_to([-6.3, y, 0], aligned_edge=LEFT)
     d = dots(k, n, color)
     d.move_to([-1.35, y, 0], aligned_edge=LEFT)
@@ -77,7 +77,7 @@ def result_row(name, screen, k, n, word, color, y):
     return g
 
 
-def chip(text, color, size=20):
+def chip(text, color, size=22):
     t = L(text, size, color, weight="BOLD")
     box = RoundedRectangle(width=t.get_width() + 0.3, height=t.get_height() + 0.2, corner_radius=0.1)
     box.set_fill(color, 0.12).set_stroke(color, 1.5)
@@ -175,7 +175,7 @@ class DistantCues(ClankersScene):
         braces = VGroup()
         for mob, text in ((blocks[0], "stream 0's block"), (blocks[1], "stream 1's block"), (q, "query")):
             br = Brace(mob, DOWN, buff=0.1).set_color(MUTED)
-            braces.add(VGroup(br, L(text, 20, MUTED).next_to(br, DOWN, buff=0.08)))
+            braces.add(VGroup(br, L(text, 22, MUTED).next_to(br, DOWN, buff=0.08)))
 
         arcs = VGroup()
         dist_nums = VGroup()
@@ -187,15 +187,15 @@ class DistantCues(ClankersScene):
                 end = blk.ctx.get_top() + (0.3 - 0.2 * i) * RIGHT + 0.04 * UP
                 arcs.add(reach_arrow(start, end, c, angle=TAU / 3))
                 dist_nums.add(L(str(1 + 2 * i), 22, c, weight="BOLD").next_to(key, DOWN, buff=0.12))
-        dist_cap = L("tokens back from each key to its stream token   (grouped layout: always 1)", 20, MUTED)
-        dist_cap.move_to([0, 0.08, 0])
+        dist_cap = L("tokens back from each key to its stream token   (grouped layout: always 1)", 22, MUTED)
+        dist_cap.move_to([0, 0.1, 0])
 
         # ---------------------------------------------------------------- the gate's choice at each key
         squares = VGroup(*[Square(0.3).set_fill(STREAM_COLORS[key_stream[i]], 0.92).set_stroke(INK, 1, opacity=0.5)
                            .move_to([k.get_x(), ROW_Y - 0.62, 0]) for i, k in enumerate(keys)])
-        sq_lab = L("square under a key: the channel the gate sends it to", 20, MUTED)
-        sq_lab.move_to([0, 0.08, 0])
-        state_y = -0.4
+        sq_lab = L("square under a key: the channel the gate sends it to", 22, MUTED)
+        sq_lab.move_to([0, 0.1, 0])
+        state_y = -0.42
 
         def recolor(rule, run_time=1.0):
             return [sq.animate.set_fill(rule(i), 0.92) for i, sq in enumerate(squares)]
@@ -209,8 +209,8 @@ class DistantCues(ClankersScene):
         r_rec = result_row("recipe: slow memory + hinge", "S17", *S17, "discovered", GOOD, rows_y[2])
         r_nudge = result_row("5% labelled nudge", "S10", *S10, "discovered", WARN, rows_y[3])
         r_nslow = result_row("nudge + slow memory", "S15", *S15, "discovered", WARN, rows_y[4])
-        src = source_note("Report §12 (screens S6, S10, S15, S17, S23; seeds 160–169)")
-        src_layout = source_note("explore_far_cue.py (header layout); example sequence")
+        src = source_note("Report §12 (screens S6, S10, S15, S17, S23; seeds 160–169) · layout: explore_far_cue.py")
+        src_layout = source_note("explore_far_cue.py on claude/outside-ideas (header layout); example sequence")
 
         with self.voiceover(
             "In a language model, the cues that set a context are usually far from the tokens they govern. "
@@ -275,8 +275,9 @@ class DistantCues(ClankersScene):
             new_state = chip("key split: the channel follows the key, not the stream", HINGE_COLOR).move_to([0, state_y, 0])
             self.play(*recolor(by_key), FadeTransform(state, new_state), FadeIn(kchip, shift=0.1 * LEFT), run_time=1.1)
             state = new_state
-            self.play(LaggedStart(*[Indicate(VGroup(keys[i], squares[i]), color=WHITE, scale_factor=1.15)
-                                    for i in range(8) if key_id[i] == 0], lag_ratio=0.3), run_time=1.0)
+            # the same key gets the same channel in both blocks
+            self.play(*[FlashAround(VGroup(keys[i], squares[i]), color=HINGE_COLOR, stroke_width=3)
+                        for i in range(8) if key_id[i] == 0], run_time=1.0)
 
             vo.wait_until_sentence(1)
             new_state = chip("labelled nudge: pushed toward channel = stream", WARN).move_to([0, state_y, 0])
@@ -300,21 +301,22 @@ class DistantCues(ClankersScene):
         old_rows = VGroup(r_plain, r_ceil, r_rec, r_nudge, r_nslow, kchip, lbl_brace, lbl_chip)
         one_bar = Rectangle(width=row.get_width(), height=0.36)
         one_bar.set_fill(one_color, 0.85).set_stroke(INK, 1, opacity=0.5).move_to([row.get_x(), squares.get_y(), 0])
-        one_lab = L("one channel: every token goes into the same memory", 20, BG, weight="BOLD").move_to(one_bar)
+        one_lab = L("one channel: every token goes into the same memory", 22, BG, weight="BOLD").move_to(one_bar)
 
         with self.voiceover(
             "But a screen found a deeper problem. A single channel can bind the header layout too, three of ten, "
             "and seven of ten with slow memory. So binding there is no evidence that a gate routes. What is still "
             "needed is a distant-cue task that one channel provably cannot solve."
         ) as vo:
-            self.play(FadeOut(old_rows, shift=0.3 * DOWN), FadeOut(state, shift=0.3 * DOWN), run_time=0.8)
+            question = chip("S23: does binding here need the gate at all?", BAD).move_to([0, state_y, 0])
+            self.play(FadeOut(old_rows, shift=0.3 * DOWN), FadeTransform(state, question), run_time=0.8)
             self.play(Indicate(VGroup(squares, sq_lab), color=BAD, scale_factor=1.05), run_time=0.9)
 
             vo.wait_until_sentence(1)
             new_title = section_title("One channel binds it too")
             new_state = chip("no gate: nothing to route", one_color).move_to([0, state_y, 0])
             self.play(FadeTransform(title, new_title), ReplacementTransform(squares, one_bar),
-                      FadeOut(sq_lab), FadeIn(new_state, shift=0.1 * DOWN), run_time=1.1)
+                      FadeOut(sq_lab), FadeTransform(question, new_state), run_time=1.1)
             self.play(FadeIn(one_lab), run_time=0.4)
             title, state = new_title, new_state
             vo.wait_until(at_phrase(vo, 1, "three of ten") - 0.3)

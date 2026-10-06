@@ -127,9 +127,10 @@ U_PUSH = 0.42                       # where the ball is when the alignment ends
 
 
 def ball_u(t):
+    # off the flat top and onto the slope, but not routed: no S32 run was routed at update 300 or 600
     if t <= ALIGNED:
         return U_PUSH * t / ALIGNED   # equal steps (Muon's step size ignores the gradient's size)
-    return U_PUSH + 0.5 * (1 - np.exp(-(t - ALIGNED) / 14.0))
+    return U_PUSH + 0.08 * (1 - np.exp(-(t - ALIGNED) / 25.0))
 
 
 class EarlyKick(ClankersScene):
@@ -220,7 +221,7 @@ class EarlyKick(ClankersScene):
         lost_chip = chip(f"{S32_C} lost", MUTED, size=22)
         chips = VGroup(res_chip, lost_chip).arrange(RIGHT, buff=0.2)
         chips.move_to([6.5, 0.65, 0], aligned_edge=RIGHT)
-        mcn = L(f"McNemar {S32_B} vs {S32_C}, p = {S32_P}", size=20, color=MUTED)
+        mcn = L(f"McNemar {S32_B} vs {S32_C}, p = {S32_P}", size=22, color=MUTED)
         mcn.next_to(chips, DOWN, buff=0.15).align_to(chips, RIGHT)
         copy_arrow = Arrow(c_dots.get_bottom() + 0.05 * DOWN, d_dots.get_top() + 0.05 * UP, buff=0.05,
                            thickness=2.5, fill_color=HINGE_COLOR)
@@ -240,7 +241,7 @@ class EarlyKick(ClankersScene):
         band_labs = VGroup(*[L(str(u), size=20, color=HINGE_COLOR, weight="BOLD")
                              .next_to([tl_x(u), tl_y, 0], DOWN, buff=0.15) for u in FIRST_FIRE])
         desc = L("first firing, on every rescued seed", size=22, color=HINGE_COLOR)
-        desc.next_to(band, RIGHT, buff=0.25)
+        desc.next_to(band_labs, DOWN, buff=0.14).align_to(band, LEFT)
         target = band.get_top()
         links = VGroup(*[Line(d.get_bottom(), target).set_stroke(HINGE_COLOR, 1.5, opacity=0.7) for d in rescued])
         timeline = VGroup(axis, ticks, tick_labs, ax_lab, band, band_labs)
@@ -326,10 +327,12 @@ class EarlyKick(ClankersScene):
 
         # one firing: a spike inside the band
         u_fire = 0.5 * (FIRST_FIRE[0] + FIRST_FIRE[1])
-        spike = Line([tl_x(u_fire), y0, 0], [tl_x(u_fire), y0 + 1.05, 0]).set_stroke(HINGE_COLOR, 5)
-        spike_dot = Dot([tl_x(u_fire), y0 + 1.05, 0], radius=0.07).set_fill(HINGE_COLOR, 1)
-        spike_lab = L("a firing", size=22, color=HINGE_COLOR, weight="BOLD")
-        spike_lab.next_to(spike_dot, LEFT, buff=0.15)
+        spike = Line([tl_x(u_fire), y0, 0], [tl_x(u_fire), y0 + 0.85, 0]).set_stroke(HINGE_COLOR, 5)
+        spike_dot = Dot([tl_x(u_fire), y0 + 0.85, 0], radius=0.07).set_fill(HINGE_COLOR, 1)
+        spike_lab = VGroup(L("a firing", size=22, color=HINGE_COLOR, weight="BOLD"),
+                           L("an update where the hinge's penalty is above zero", size=20, color=MUTED))
+        spike_lab.arrange(RIGHT, buff=0.2, aligned_edge=DOWN)
+        spike_lab.next_to(spike_dot, RIGHT, buff=0.15)
 
         # log scale of gradient size on the gate, relative to the task gradient
         XL, DEC = -3.0, 2.1
@@ -477,7 +480,7 @@ class EarlyKick(ClankersScene):
             d.tk = tk
             d.add_updater(lambda m: m.set_opacity(1.0 if tt.get_value() >= m.tk - 1e-6 else 0.0))
             feet.add(d)
-        steps_lab = VGroup(L("equal-size steps", size=20, color=MUON_COLOR, weight="BOLD"),
+        steps_lab = VGroup(L("equal-size steps", size=22, color=MUON_COLOR, weight="BOLD"),
                            L("(Muon ignores the gradient's size)", size=20, color=MUTED))
         steps_lab.arrange(DOWN, buff=0.06, aligned_edge=LEFT).move_to([LCX - 0.3, LTOP + 0.95, 0], aligned_edge=LEFT)
 
@@ -498,6 +501,7 @@ class EarlyKick(ClankersScene):
         ad_chip = chip("Adam", ADAM_COLOR, size=22)
         ad_head = L("step = momentum ÷ running average size", size=22, color=INK)
         a_head = VGroup(ad_chip, ad_head).arrange(RIGHT, buff=0.2).move_to([-6.4, 2.3, 0], aligned_edge=LEFT)
+        a_sub = L("one bar per gate weight", size=20, color=MUTED).move_to([-6.4, 1.92, 0], aligned_edge=LEFT)
         base_ad = 0.3
         xs = [-5.6 + 0.6 * i for i in range(8)]
         heights = [1.25, -1.05, 1.4, 0.95, -1.3, 1.15, -0.9, 1.35]
@@ -529,20 +533,25 @@ class EarlyKick(ClankersScene):
         stmt = VGroup(T("Either way:", size=30, color=MUTED),
                       T("a large, directional push,", size=38),
                       T("delivered early", size=38, color=HINGE_COLOR)).arrange(DOWN, buff=0.22, aligned_edge=LEFT)
-        stmt.move_to([-3.5, 0.75, 0])
+        stmt.move_to([-3.5, 0.95, 0])
+        stmt.shift((-6.2 - stmt.get_left()[0]) * RIGHT)
         y0 = self.tl_y
         marks = VGroup(*[Circle(radius=0.09).set_stroke(GATE_COLOR, 2.5).set_fill(BG, 1).move_to([tl_x(u), y0, 0])
                          for u in (300, 600)])
-        marks_lab = L("no run routed yet", size=20, color=GATE_COLOR)
+        marks_lab = L("no run routed yet", size=22, color=GATE_COLOR)
         marks_lab.move_to([0.5 * (tl_x(300) + tl_x(600)), y0 + 0.55, 0])
         rband = Rectangle(width=tl_x(900) - tl_x(600), height=0.4).set_fill(GATE_COLOR, 0.3).set_stroke(GATE_COLOR, 1.5)
         rband.move_to([tl_x(600), y0, 0], aligned_edge=DL)
-        rband_lab = L("routing appears", size=20, color=GATE_COLOR).move_to([rband.get_x(), y0 + 0.55, 0])
-        flat = DashedLine(ls_point(-0.36) + 0.03 * UP, ls_point(0.36) + 0.03 * UP, dash_length=0.1).set_stroke(WARN, 3)
-        flat_lab = L("near the flat uniform start", size=22, color=WARN).next_to(flat, UP, buff=0.5)
+        rband_lab = L("routing appears", size=22, color=GATE_COLOR).move_to([rband.get_x(), y0 + 0.55, 0])
+        flat = ParametricCurve(ls_point, t_range=(-0.34, 0.34, 0.02)).set_stroke(WARN, 6)
         ghost = Circle(radius=R_BALL).set_fill(GATE_COLOR, 0.35).set_stroke(INK, 1, opacity=0.4).move_to(ball_pos(0))
-        quote = L("Ch. 4: whatever pushes it off first decides where it goes", size=20, color=MUTED)
-        quote.move_to([LCX - 0.2, -1.55, 0])
+        flat_lab = L("near the flat uniform start", size=22, color=WARN).next_to(ghost, UP, buff=0.14)
+        q_bar = Line(UP, DOWN).set_stroke(FAINT, 3)
+        q_txt = VGroup(L("Ch. 4: whatever pushes it off first", size=22, color=MUTED),
+                       L("decides where it goes", size=22, color=MUTED)).arrange(DOWN, buff=0.08, aligned_edge=LEFT)
+        q_bar.set_height(q_txt.get_height() + 0.1).next_to(q_txt, LEFT, buff=0.15)
+        quote = VGroup(q_bar, q_txt)
+        quote.next_to(stmt, DOWN, buff=0.55, aligned_edge=LEFT)
 
         with self.voiceover(
             "Under Muon, the gate's momentum then stayed aligned with that push for a median of fifty-nine "
@@ -583,7 +592,7 @@ class EarlyKick(ClankersScene):
                 m.clear_updaters()
             self.remove(mom)
             self.play(FadeOut(VGroup(mu_chip, mu_head, sub, chart, half, trace, tdot, m59, m59_lab, fill)),
-                      FadeIn(a_head), FadeIn(zero_ad), FadeIn(band_ad), FadeIn(g_bars_small),
+                      FadeIn(a_head), FadeIn(a_sub), FadeIn(zero_ad), FadeIn(band_ad), FadeIn(g_bars_small),
                       FadeIn(leg_ad[0]), run_time=0.9)
             vo.wait_until(at_phrase(vo, 1, "far above"))
             self.play(ReplacementTransform(g_bars_small, g_bars), FadeIn(leg_ad[1]), run_time=1.0)
@@ -592,8 +601,9 @@ class EarlyKick(ClankersScene):
 
             # sentence 3: either way
             vo.wait_until_sentence(2)
-            self.play(FadeOut(VGroup(a_head, zero_ad, band_ad, s_bars, step_lab)), FadeOut(steps_lab), FadeOut(feet),
-                      FadeIn(stmt[0]), run_time=0.7)
+            self.play(FadeOut(VGroup(a_head, a_sub, zero_ad, band_ad, s_bars, step_lab)), FadeOut(steps_lab),
+                      FadeOut(feet), run_time=0.5)
+            self.play(FadeIn(stmt[0]), run_time=0.4)
             self.play(Write(stmt[1]), run_time=1.0)
             vo.wait_until(at_phrase(vo, 2, "delivered early"))
             self.play(Write(stmt[2]), Indicate(self.timeline[4], color=HINGE_COLOR, scale_factor=1.15), run_time=1.0)
@@ -603,6 +613,9 @@ class EarlyKick(ClankersScene):
             vo.wait_until(at_phrase(vo, 2, "near its flat"))
             self.play(ShowCreation(flat), FadeIn(flat_lab), FadeIn(ghost, scale=0.5), run_time=0.9)
             self.play(FadeIn(quote, shift=0.1 * UP), run_time=0.7)
+        # let the Ch. 4 callback be read before the next part
+        self.play(Indicate(ghost, color=GATE_COLOR, scale_factor=1.3), run_time=1.0)
+        self.wait(0.9)
 
         self.kick_mobs = VGroup(stmt, landscape, ball, flat, flat_lab, ghost, quote, marks, marks_lab, rband,
                                 rband_lab, self.tl_desc)
@@ -637,8 +650,10 @@ class EarlyKick(ClankersScene):
         off_lab = L("off", size=22, color=MUTED).next_to([sx(6000), y_win, 0], UP, buff=0.1)
         cut = DashedLine([sx(2400), y_sax, 0], [sx(2400), y_full + hh + 0.15, 0], dash_length=0.07)
         cut.set_stroke(HINGE_COLOR, 1.5, opacity=0.8)
+        more = VGroup(*[L("…", size=24, color=HINGE_COLOR).next_to([SX1, y, 0], RIGHT, buff=0.1)
+                        for y in (y_full + hh, y_win)])
         sched = VGroup(head, sax, sticks, stick_labs, sax_lab, n_full, n_win, base_full, base_win, on_full, on_win,
-                       w1, w0, off_lab, cut)
+                       w1, w0, off_lab, cut, more)
 
         # S34 results
         rows = []
@@ -650,13 +665,18 @@ class EarlyKick(ClankersScene):
         for fb, y in zip(rows, (-0.5, -1.05, -1.8, -2.35)):
             fb.move_to([0, y, 0])
         res.shift((-6.3 - res.get_left()[0]) * RIGHT)
-        mu_vs = L("1 vs 0", size=22, color=INK).move_to([res.get_right()[0] + 0.8, -0.775, 0])
-        ad_vs = L("0 vs 0", size=22, color=INK).move_to([res.get_right()[0] + 0.8, -2.075, 0])
+        def vs_lab(text, y):
+            g = VGroup(L(text, size=24, color=INK, weight="BOLD"),
+                       L("seeds the window lost vs gained", size=20, color=MUTED)).arrange(DOWN, buff=0.08)
+            return g.move_to([res.get_right()[0] + 0.35, y, 0], aligned_edge=LEFT)
+
+        mu_vs = vs_lab("1 vs 0", -0.775)
+        ad_vs = vs_lab("0 vs 0", -2.075)
         tr = rows[0].track
         gap = Rectangle(width=tr.get_width() / 40, height=tr.get_height()).set_fill(BAD, 0.0).set_stroke(BAD, 2.5)
         gap.move_to([tr.get_left()[0] + tr.get_width() * 38.5 / 40, tr.get_y(), 0])
         loss = VGroup(T("one loss in 80 runs", size=30, color=INK),
-                      L("the lost Muon seed had needed 277 late firings", size=20, color=MUTED))
+                      L("the lost Muon seed had needed 277 late firings", size=22, color=MUTED))
         loss.arrange(DOWN, buff=0.1, aligned_edge=LEFT).move_to([-6.3, -3.1, 0], aligned_edge=LEFT)
 
         # S35: cumulative runs bound, Muon (E) vs Adam (X, HINGE4k16)
@@ -671,7 +691,7 @@ class EarlyKick(ClankersScene):
         adam_line = VMobject().set_points_as_corners([chart.c2p(u, c) for u, c in zip(evals, adam_cum)])
         adam_line.set_stroke(ADAM_COLOR, 4)
         adam_dots = VGroup(*[Dot(chart.c2p(u, c), radius=0.045).set_fill(ADAM_COLOR, 1)
-                             for u, c in zip(evals, adam_cum)])
+                             for u, c in zip(evals, adam_cum) if u <= X_H16[-1]])
         mu_pre = DashedLine(chart.c2p(0, 0), chart.c2p(2400, S35_BY2400), dash_length=0.08).set_stroke(MUON_COLOR, 4)
         mu_line = VMobject().set_points_as_corners([chart.c2p(2400, S35_BY2400), chart.c2p(3600, S35_BOUND),
                                                     chart.c2p(24000, S35_BOUND)]).set_stroke(MUON_COLOR, 5)
@@ -684,11 +704,14 @@ class EarlyKick(ClankersScene):
         mu_name = VGroup(L("Muon + recipe", size=22, color=MUON_COLOR, weight="BOLD"), machine_badge("E", size=20),
                          L("screen S35", size=20, color=MUTED)).arrange(RIGHT, buff=0.15)
         mu_name.next_to(chart.c2p(12000, S35_BOUND), UP, buff=0.2)
-        ad_name = VGroup(L("Adam + recipe", size=22, color=ADAM_COLOR, weight="BOLD"), machine_badge("X", size=20),
-                         L("HINGE4k16, bound 3600–21,600", size=20, color=MUTED)).arrange(RIGHT, buff=0.15)
-        ad_name.move_to(chart.c2p(15500, 9.5))
+        ad_line1 = VGroup(L("Adam + recipe", size=22, color=ADAM_COLOR, weight="BOLD"), machine_badge("X", size=20),
+                          L("slow-start test", size=20, color=MUTED)).arrange(RIGHT, buff=0.15)
+        ad_line2 = L("HINGE4k16 · bound between 3600 and 21,600", size=20, color=MUTED)
+        ad_name = VGroup(ad_line1, ad_line2).arrange(DOWN, buff=0.1, aligned_edge=LEFT)
+        ad_name.move_to(chart.c2p(9400, 10.4), aligned_edge=UL)
         end_lab = L(f"{S35_BOUND}/{S35_N}", size=24, color=INK, weight="BOLD").next_to(chart.c2p(24000, S35_BOUND),
                                                                                         RIGHT, buff=0.15)
+        both_lab = L("both", size=20, color=MUTED).next_to(end_lab, DOWN, buff=0.08)
 
         with self.voiceover(
             "That suggests the hinge is only needed early. With the hinge switched off after update twenty-four "
@@ -696,15 +719,18 @@ class EarlyKick(ClankersScene):
             "thirty-four against thirty-four."
         ) as vo:
             self.play(*self.new_title("Only needed early"), FadeOut(self.kick_mobs),
-                      ReplacementTransform(self.timeline[0], sax), FadeOut(VGroup(*self.timeline[1:])),
+                      FadeOut(VGroup(*self.timeline[1:])),
                       *self.new_source("Report §9.1 · screens S34, S35 (machine E); test_early_recipe.py; X: data/slow_start.json"),
-                      run_time=1.0)
+                      run_time=0.6)
+            self.play(ReplacementTransform(self.timeline[0], sax), run_time=0.6)
             self.play(FadeIn(head), FadeIn(sticks), FadeIn(stick_labs), FadeIn(sax_lab), FadeIn(n_full),
                       FadeIn(base_full), FadeIn(w1[0]), FadeIn(w0[0]), run_time=0.6)
             self.play(ShowCreation(on_full), run_time=0.8)
+            self.play(FadeIn(more[0]), run_time=0.3)
             vo.wait_until(at_phrase(vo, 1, "switched off"))
             self.play(FadeIn(n_win), FadeIn(base_win), FadeIn(w1[1]), FadeIn(w0[1]), run_time=0.5)
             self.play(ShowCreation(on_win), run_time=1.2)
+            self.add(more[1])
             self.play(ShowCreation(cut), FadeIn(off_lab), Indicate(stick_labs[1], color=HINGE_COLOR), run_time=0.8)
             vo.wait_until(at_phrase(vo, 1, "Muon discovered"))
             self.play(FadeIn(VGroup(rows[0].name_mob, rows[0].track)), *grow_bar(rows[0]), run_time=1.0)
@@ -718,15 +744,15 @@ class EarlyKick(ClankersScene):
         with self.voiceover("One loss in eighty runs.") as vo:
             self.play(ShowCreation(gap), FadeIn(mu_vs), FadeIn(ad_vs), FadeIn(loss[0], shift=0.1 * UP), run_time=0.9)
             self.play(FadeIn(loss[1]), Indicate(gap, color=BAD, scale_factor=1.4), run_time=0.9)
+        self.play(Indicate(mu_vs[0], color=BAD), run_time=0.9)
+        self.wait(0.8)
 
         with self.voiceover(
             "And at four streams with sixteen channels, Muon with the recipe bound seventeen of twenty, fifteen of "
             "them by update twenty-four hundred."
         ) as vo:
-            self.play(FadeOut(VGroup(sched, res, mu_vs, ad_vs, gap, loss)), FadeIn(c_head), FadeIn(chart),
-                      run_time=1.0)
-            self.play(ShowCreation(adam_line), FadeIn(ad_name), run_time=1.6)
-            self.play(FadeIn(adam_dots), run_time=0.3)
+            self.play(FadeOut(VGroup(sched, res, mu_vs, ad_vs, gap, loss)), run_time=0.6)
+            self.play(FadeIn(c_head), FadeIn(chart), run_time=0.8)
             vo.wait_until(at_phrase(vo, 0, "Muon with the recipe"))
             self.play(ShowCreation(mu_pre), run_time=0.6)
             self.play(ShowCreation(mu_line), FadeIn(mu_dot2), FadeIn(mu_name), run_time=1.2)
@@ -735,3 +761,8 @@ class EarlyKick(ClankersScene):
             self.play(ShowCreation(cut2), FadeIn(cut2_lab), FadeIn(mu_dot, scale=0.5), FadeIn(by_lab, shift=0.1 * RIGHT),
                       run_time=0.9)
             self.play(Flash(mu_dot.get_center(), color=MUON_COLOR, flash_radius=0.4), run_time=0.7)
+        # the same configuration under Adam (X's slow-start runs): the same 17/20, bound later
+        self.bring_to_back(adam_line)        # under Muon's line where both sit at 17
+        self.play(ShowCreation(adam_line), FadeIn(ad_name), run_time=1.6)
+        self.play(FadeIn(adam_dots), FadeIn(both_lab), run_time=0.5)
+        self.wait(1.2)

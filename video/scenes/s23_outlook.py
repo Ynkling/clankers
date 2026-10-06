@@ -138,7 +138,7 @@ class Outlook(ClankersScene):
         W, H = 4.2, 2.85
         centers = [np.array([x, y, 0]) for y in (1.25, -1.95) for x in (-4.45, 0.0, 4.45)]
         frames = VGroup(*[frame_rect(c, W, H) for c in centers])
-        acc = [STREAM_COLORS[0], HINGE_COLOR, MEMORY_COLOR, BAD, WARN, MUTED]
+        acc = [INK, HINGE_COLOR, MEMORY_COLOR, BAD, WARN, MUTED]
         heads = VGroup(*[head_in(f, t, a) for f, t, a in zip(frames, [
             "A synthetic task", "The recipe needs structure", "A tiny model",
             "Eight streams: no recipe", "One set of seeds", "Screens are screens"], acc)])
@@ -190,7 +190,7 @@ class Outlook(ClankersScene):
         hl_lab = VGroup(L("memory half-life", 20, WARN), L("≈ 14 tokens", 20, WARN)).arrange(DOWN, buff=0.06,
                                                                                           aligned_edge=LEFT)
         hl_lab.next_to(ax, RIGHT, buff=0.15).align_to(ax, UP).shift(0.05 * DOWN)
-        ax_lab = L("tokens back", 20, FAINT).next_to(ax, DOWN, buff=0.06).align_to(ax, LEFT)
+        ax_lab = L("tokens back", 20, MUTED).next_to(ax, DOWN, buff=0.06).align_to(ax, LEFT)
 
         # --- tile 4: streams
         c = centers[3]
@@ -306,7 +306,7 @@ class Outlook(ClankersScene):
         trail.add_updater(lambda m: m.put_start_and_end_on(np.array([x0, TY, 0]), here.get_center()))
 
         def add_row(text, sub=None):
-            t = L(text, 24, INK)
+            t = L(text, 24, INK, t2c={"Muon": MUON_COLOR})
             g = VGroup(check_mark(GOOD, 0.24), t).arrange(RIGHT, buff=0.25)
             if sub:
                 s = L(sub, 20, MUTED).next_to(t, DOWN, buff=0.1, aligned_edge=LEFT)
@@ -319,12 +319,12 @@ class Outlook(ClankersScene):
         adds = VGroup(add1, add2).arrange(DOWN, buff=0.4, aligned_edge=LEFT).move_to([0.0, 0.25, 0])
         adds_head = L("What Phase V adds", 24, GOOD, weight="BOLD").next_to(adds, UP, buff=0.35, aligned_edge=LEFT)
         src_a = source_note("Report §17")
-        compact = L("no restarts · Muon", 20, GOOD).move_to([(x0 - 2.6) / 2, TY - 0.36, 0])
+        compact = L("no restarts · Muon", 20, GOOD, t2c={"Muon": MUON_COLOR}).move_to([(x0 - 2.6) / 2, TY - 0.36, 0])
 
         # the ladder
         rungs_data = [
             ("Many contexts", ["eight streams fail: the gate's recurrence needs redesign or constraint"]),
-            ("Nuisance variables", ["the hinge's come from the task's structure; a language model needs a generic version"]),
+            ("Nuisance variables", ["they come from the task's structure; a language model needs a generic version"]),
             ("Distant cues", ["unresolved; the header layout cannot tell routing from single-channel binding"]),
             ("Gate compute", ["the recurrent gate runs token by token; a contractive or parallel gate would remove that cost"]),
             ("Memory horizon", ["a half-life of about 14 tokens, far below a language model's context"]),
@@ -338,10 +338,10 @@ class Outlook(ClankersScene):
             circ = Circle(radius=0.24).set_fill(col, 0.2).set_stroke(col, 2).move_to([-5.0, y, 0])
             num = L(str(i + 1), 22, col, weight="BOLD").move_to(circ)
             nm = L(name, 24, INK, weight="BOLD").move_to([-4.55, y, 0], aligned_edge=LEFT)
-            nt = VGroup(*[L(n, 20, MUTED) for n in notes]).arrange(DOWN, buff=0.06, aligned_edge=LEFT)
-            nt.move_to([-2.1, y, 0], aligned_edge=LEFT)
-            if nt.get_right()[0] > 6.6:
-                nt.set_width(6.6 + 2.1).move_to([-2.1, y, 0], aligned_edge=LEFT)
+            nt = VGroup(*[L(n, 22, MUTED) for n in notes]).arrange(DOWN, buff=0.06, aligned_edge=LEFT)
+            nt.move_to([-2.3, y, 0], aligned_edge=LEFT)
+            if nt.get_right()[0] > 6.5:
+                nt.set_width(6.5 + 2.3).move_to([-2.3, y, 0], aligned_edge=LEFT)
             rungs.add(VGroup(circ, num, nm, nt))
         risk_ar = Arrow([-5.85, rungs[-1].get_bottom()[1], 0], [-5.85, rungs[0].get_top()[1] + 0.05, 0], buff=0,
                         thickness=3).set_color(MUTED)
@@ -353,7 +353,7 @@ class Outlook(ClankersScene):
             sq.move_to([-1.4 + i * 1.3, TY, 0])
             barriers.add(VGroup(sq, L(str(i + 1), 20, col, weight="BOLD").move_to(sq)))
         mom = chip("Mixture-of-Memories · billion-parameter scale", MUTED, 20)
-        mom.move_to([x1, TY - 0.45, 0], aligned_edge=RIGHT).shift(0.25 * RIGHT)
+        mom.move_to([x1 + 0.25, TY - 0.56, 0], aligned_edge=RIGHT)
 
         with self.voiceover(N2) as vo:
             self.play(ShowCreation(track), FadeIn(here, scale=0.5), FadeIn(here_lab), run_time=1.0)
@@ -545,12 +545,12 @@ class Outlook(ClankersScene):
         fills = VGroup(*[VGroup(*[cell.copy().set_fill(STREAM_COLORS[s], 0.75).set_stroke(width=0)
                                   for j, cell in enumerate(chans[s].cells) if (j * 7 + 3 * s) % 5 < 3])
                          for s in range(2)])
-        res_head = L("found without restarts", 20, MUTED).move_to([cx, -1.55, 0])
+        res_head = L("found without restarts (HINGE, X + L)", 20, MUTED).move_to([cx, -1.55, 0])
         fb1 = frac_bar("S = 2", 39, 40, GOOD, width=1.25, height=0.3, label_width=1.45, size=20)
         fb2 = frac_bar("S = 4, k = 16", 35, 40, GOOD, width=1.25, height=0.3, label_width=1.45, size=20)
         fbs = VGroup(fb1, fb2).arrange(DOWN, buff=0.2, aligned_edge=LEFT)
         fbs.move_to([cx, -2.2, 0])
-        fb_note = L("HINGE; S = 2 discovered, S = 4 bound", 20, FAINT).move_to([cx, -2.82, 0])
+        fb_note = L("discovered at S = 2; bound at S = 4", 20, MUTED).move_to([cx, -2.82, 0])
         if fb_note.get_width() > W - 0.3:
             fb_note.set_width(W - 0.3)
 
@@ -567,16 +567,20 @@ class Outlook(ClankersScene):
         for u in (0, 1200, 2400, 3600):
             ticks.add(Line([ux(u), ay - 0.06, 0], [ux(u), ay + 0.06, 0]).set_stroke(MUTED, 2))
             ticks.add(L(f"{u}", 20, MUTED).next_to([ux(u), ay, 0], DOWN, buff=0.12))
-        ax_lab = L("update", 20, FAINT).next_to(ticks, DOWN, buff=0.1)
+        ax_lab = L("update", 20, MUTED).next_to(ticks, DOWN, buff=0.1)
         window = Rectangle(width=ux(2400) - ux(0), height=2.5).set_fill(SLOW_COLOR, 0.08).set_stroke(width=0)
         window.move_to([(ux(0) + ux(2400)) / 2, ay + 1.25, 0])
         win_edge = DashedLine([ux(2400), ay, 0], [ux(2400), ay + 2.5, 0], dash_length=0.08).set_stroke(SLOW_COLOR, 2)
         slow_lab = L("slow the memory", 22, SLOW_COLOR, weight="BOLD").move_to([px0, 1.45, 0], aligned_edge=LEFT)
-        lo, hi = 0.75, 1.1
+        # the memory's learning rate, drawn to scale: 1/10 of the full rate for updates 1-2400, then full
+        y0, full = 0.45, 1.2
+        lo, hi = y0 + full / 10, y0 + full
+        lr_zero = Line([px0, y0, 0], [px1, y0, 0]).set_stroke(FAINT, 1.5)
+        lr_zero.add(L("0", 20, MUTED).next_to(lr_zero.get_left(), LEFT, buff=0.1))
         lr_step = VMobject().set_points_as_corners([[ux(0), lo, 0], [ux(2400), lo, 0], [ux(2400), hi, 0],
                                                     [ux(3600), hi, 0]]).set_stroke(SLOW_COLOR, 4)
-        lr_lab = L("memory at 1/10 the rate", 20, SLOW_COLOR).next_to([ux(1200), lo, 0], DOWN, buff=0.1)
-        full_lab = L("full rate", 20, MUTED).next_to([ux(3000), hi, 0], UP, buff=0.1)
+        lr_lab = L("memory at 1/10 the rate", 20, SLOW_COLOR).move_to([px0 + 0.08, lo + 0.27, 0], aligned_edge=LEFT)
+        full_lab = L("full rate", 20, MUTED).next_to([ux(3000), hi, 0], DOWN, buff=0.12)
         hinge_lab = VGroup(L("push the gate off", 22, HINGE_COLOR, weight="BOLD"),
                            L("positional splits", 22, HINGE_COLOR, weight="BOLD")).arrange(DOWN, buff=0.06,
                                                                                           aligned_edge=LEFT)
@@ -584,7 +588,7 @@ class Outlook(ClankersScene):
         spikes = VGroup(*[Line([ux(u), ay, 0], [ux(u), ay + 0.55, 0]).set_stroke(HINGE_COLOR, 1.5, opacity=0.8)
                           for u in FIRINGS])
         fire_note = VGroup(L(f"hinge firings: {len(FIRINGS)} in {len(_WIN)} runs", 20, MUTED),
-                           L("(Muon + WINDOW, machine X)", 20, FAINT)).arrange(DOWN, buff=0.06)
+                           L("(Muon + WINDOW, machine X)", 20, MUTED)).arrange(DOWN, buff=0.06)
         fire_note.move_to([cx, -2.05, 0])
         both = L("both confined to updates 1–2400", 20, INK).move_to([cx, -2.75, 0])
 
@@ -605,18 +609,21 @@ class Outlook(ClankersScene):
         dax = Axes(x_range=[0, 2400, 1200], y_range=[0, 1, 0.5], width=3.0, height=1.25,
                    axis_config=dict(stroke_color=MUTED, stroke_width=1.5, include_tip=False, tick_size=0.04))
         dax.move_to([cx + 0.15, -1.3, 0])
-        dticks = VGroup(*[L(f"{u}", 20, MUTED).next_to(dax.c2p(u, 0), DOWN, buff=0.08) for u in (0, 1200, 2400)])
+        dticks = VGroup(*[L(f"{u}", 20, MUTED).next_to(dax.c2p(u, 0), DOWN, buff=0.08) for u in (1200, 2400)])
+        dticks.add(L("update", 20, MUTED).next_to(dax.c2p(400, 0), DOWN, buff=0.08))
         chance = DashedLine(dax.c2p(0, 0.125), dax.c2p(2400, 0.125), dash_length=0.06).set_stroke(FAINT, 1.5)
-        ch_lab = L("chance", 20, FAINT).next_to(dax.c2p(2400, 0.125), UP, buff=0.06).align_to(dax, RIGHT)
+        ch_lab = L("chance 0.125", 20, MUTED)
         ylab = VGroup(L("1", 20, MUTED).next_to(dax.c2p(0, 1), LEFT, buff=0.1),
                       L("0", 20, MUTED).next_to(dax.c2p(0, 0), LEFT, buff=0.1))
         dec_curve = VMobject().set_points_as_corners([dax.c2p(u, d) for u, d in zip(S39_UPDATES, S39_DECOD)])
         dec_curve.set_stroke(BAD, 3.5)
         d0 = L(f"{S39_DECOD[0]:.2f}", 20, INK).next_to(dax.c2p(0, S39_DECOD[0]), RIGHT, buff=0.12)
-        d1 = L(f"{S39_DECOD[-1]:.2f}", 20, BAD).next_to(dax.c2p(2400, S39_DECOD[-1]), UP, buff=0.32)
+        d1 = L(f"{S39_DECOD[-1]:.2f}", 20, BAD, weight="BOLD")
+        VGroup(d1, ch_lab).arrange(RIGHT, buff=0.2).next_to(dax.c2p(2400, S39_DECOD[-1]), UP, buff=0.3)
+        VGroup(d1, ch_lab).align_to(dax, RIGHT)
         lost = L("lost before routing forms", 20, INK).move_to([cx, -2.75, 0])
 
-        src_s = source_note("Report §13 Table 8, §11 Table 7 (S39, Muon) and S42; data/hinge_firings.json")
+        src_s = source_note("Report §13 Table 8; §3 (SLOW); §11 Table 7 (S39, Muon) and S42; data/hinge_firings.json")
 
         with self.voiceover(N4) as vo:
             self.play(LaggedStartMap(FadeIn, panels, shift=0.15 * UP, lag_ratio=0.2), run_time=1.0)
@@ -649,7 +656,7 @@ class Outlook(ClankersScene):
                       run_time=0.8)
             self.play(FadeIn(window), ShowCreation(win_edge), FadeIn(both, shift=0.1 * UP), run_time=0.8)
             vo.wait_until(at_phrase(vo, 2, "slow the memory"))
-            self.play(FadeIn(slow_lab, shift=0.1 * RIGHT), ShowCreation(lr_step), FadeIn(lr_lab), FadeIn(full_lab),
+            self.play(FadeIn(slow_lab, shift=0.1 * RIGHT), FadeIn(lr_zero), ShowCreation(lr_step), FadeIn(lr_lab), FadeIn(full_lab),
                       run_time=1.0)
             vo.wait_until(at_phrase(vo, 2, "and push the gate"))
             self.play(FadeIn(hinge_lab, shift=0.1 * RIGHT), LaggedStartMap(ShowCreation, spikes, lag_ratio=0.03),
@@ -715,7 +722,7 @@ class Outlook(ClankersScene):
         rtitle = VGroup(T("Multi-Channel Hebbian Plasticity in Multilayer BDH", 34),
                         T("Solves Context-Conditional Binding by Partitioning Memory", 34)).arrange(DOWN, buff=0.15)
         meta = L("A technical report · Revision 7 (preliminary)", 22, MUTED)
-        credit = L("Made with ManimGL (3b1b/manim) · narration: Kokoro TTS", 20, FAINT)
+        credit = L("Made with ManimGL (3b1b/manim) · narration: Kokoro TTS", 20, MUTED)
         endcard = VGroup(rtitle, meta, credit).arrange(DOWN, buff=0.4).move_to([0, -0.2, 0])
         thanks = T("Thanks for watching.", 36, INK).move_to([0, -2.75, 0])
 

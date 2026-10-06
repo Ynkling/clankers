@@ -166,7 +166,7 @@ class FourStreams(ClankersScene):
         e_line.arrange(RIGHT, buff=0.2).move_to([LEFT_X, ys[-1] - 0.75, 0], aligned_edge=LEFT)
         legend = VGroup()
         for word, col in [("shown, reliable, precise", GOOD), ("valid", VERDICT_STYLES["VALID"]),
-                          ("majority", WARN), ("minority", HINGE_COLOR), ("not shown, untestable", MUTED)]:
+                          ("majority", WARN), ("minority", HINGE_COLOR), ("not shown, not precise, untestable", MUTED)]:
             legend.add(VGroup(Dot(radius=0.07, fill_color=col), L(word, size=20, color=col)).arrange(RIGHT, buff=0.1))
         legend.arrange(RIGHT, buff=0.35).move_to([LEFT_X, -3.35, 0], aligned_edge=LEFT)
         src1 = source_note("Report Table 1")
@@ -213,18 +213,20 @@ class FourStreams(ClankersScene):
         r6_title.arrange(DOWN, buff=0.1, aligned_edge=LEFT)
         dots = VGroup(*[Dot(radius=0.065).set_fill(FAINT, 1) for _ in range(80)]).arrange_in_grid(4, 20, buff=0.08)
         passers = dots[:38]
+        missed = dots[38:46]          # binders that were still below 0.4 at step 4800
         r6_pass = L("passed the check: 38", size=24, color=WARN)
         r6_bound = L("of those, bound: 38 of 38", size=24, color=GOOD)
-        r6_miss = L("(it missed 8 late binders)", size=20, color=MUTED)
+        r6_miss = VGroup(Dot(radius=0.065).set_fill(GOOD, 0.25).set_stroke(GOOD, 2),
+                         L("(it missed 8 late binders)", size=20, color=MUTED)).arrange(RIGHT, buff=0.15)
         r6 = VGroup(r6_title, dots, r6_pass, r6_bound, r6_miss).arrange(DOWN, buff=0.22, aligned_edge=LEFT)
         r6_card = card(r6, buff=0.3)
         r6_card.move_to([4.25, 0.3, 0])
         src2a = source_note("Report §4; test_stream_recipe.py docstring")
         cont_lab = L("≥ 0.4: continue", size=20, color=GOOD).next_to(axes.c2p(T_CHECK, 0.88), RIGHT, buff=0.12)
-        rest_lab = L("< 0.4: restart", size=20, color=BAD).next_to(axes.c2p(T_CHECK, 0.12), RIGHT, buff=0.75)
+        rest_lab = L("< 0.4: restart", size=20, color=BAD).next_to(axes.c2p(T_CHECK, 0.06), RIGHT, buff=0.12)
 
         FX = 3.55
-        box_a = flow_box([("attempt j: train seed s + 1000·j", INK)], MUTED, width=3.6, size=20)
+        box_a = flow_box([("attempt j = 0…4: seed s + 1000·j", INK)], MUTED, width=3.6, size=20)
         box_b = flow_box([("at step 4800:", INK), ("held-out accuracy ≥ 0.4 ?", WARN)], WARN, width=3.6, size=20)
         box_c = flow_box([("yes: continue to the end", GOOD)], GOOD, width=3.6, size=20)
         flow = VGroup(box_a, box_b, box_c).arrange(DOWN, buff=0.55).move_to([FX, 0.55, 0])
@@ -235,7 +237,7 @@ class FourStreams(ClankersScene):
         no_grp = L("no: restart", size=20, color=BAD, weight="BOLD")
         no_grp.move_to([(ar_ab.get_right()[0] + box_a.get_right()[0]) / 2 + 0.1, ar_ab.get_center()[1], 0])
         rule_notes = VGroup(L("at most 5 attempts per trial", size=20, color=INK),
-                            L("the 5th continues regardless", size=20, color=MUTED))
+                            L("the 5th (j = 4) continues regardless", size=20, color=MUTED))
         rule_notes.arrange(DOWN, buff=0.1).next_to(box_c, DOWN, buff=0.35)
 
         setup = VGroup(*[verdict_badge(t, size=20, color=c) for t, c in [
@@ -249,9 +251,19 @@ class FourStreams(ClankersScene):
             return polyline(axes, steps_for(len(vals)), vals, color=color, width=3.5)
 
         att_curves = [attempt_curve(a["early"], INK) for a in TRIAL]
-        att_labels = [L(f"attempt {a['j'] + 1}: seed {a['seed']}", size=20, color=INK) for a in TRIAL]
-        for lab in att_labels:
-            lab.move_to(axes.c2p(13200, 0.32))
+        # a running log of the trial: attempt j, its seed, its held-out accuracy at step 4800
+        LOG_X = axes.c2p(10200, 0)[0]
+        log_head = L("one trial on X: A4k16_R, seed 247", size=20, color=MUTED)
+        log_head.move_to([LOG_X, axes.c2p(0, 0.615)[1], 0], aligned_edge=LEFT)
+        log_rows = []
+        for r, a in enumerate(TRIAL):
+            y = axes.c2p(0, 0.495 - 0.113 * r)[1]
+            row = VGroup(L(f"attempt {a['j']}:", size=20, color=INK),
+                         L(f"seed {a['seed']}", size=20, color=INK),
+                         L(f"→ {a['acc_4800']:.2f}", size=20, color=GOOD if a["passed"] else BAD, weight="BOLD"))
+            for piece, dx in zip(row, (0.0, 1.0, 2.05)):
+                piece.move_to([LOG_X + dx, y, 0], aligned_edge=LEFT)
+            log_rows.append(row)
         att_vals = [L(f"{a['acc_4800']:.2f}", size=20, color=GOOD if a["passed"] else BAD, weight="BOLD")
                     for a in TRIAL]
         for v, a in zip(att_vals, TRIAL):
@@ -283,7 +295,9 @@ class FourStreams(ClankersScene):
             at_phrase(vo, 0, "thirty-eight of")
             self.play(LaggedStart(*[d.animate.set_fill(GOOD) for d in passers], lag_ratio=0.03),
                       FadeIn(r6_bound, shift=0.1 * DOWN), run_time=1.0)
-            self.play(FadeIn(r6_miss), run_time=0.5)
+            self.play(FadeIn(r6_miss),
+                      LaggedStart(*[d.animate.set_fill(GOOD, 0.25).set_stroke(GOOD, 2) for d in missed],
+                                  lag_ratio=0.08), run_time=0.8)
 
             vo.wait_until_sentence(1)
             self.play(FadeOut(r6_card), FadeOut(src2a), FadeIn(src2b), run_time=0.6)
@@ -296,8 +310,8 @@ class FourStreams(ClankersScene):
             at_phrase(vo, 1, "four streams, four")
             self.play(LaggedStartMap(FadeIn, setup[:3], shift=0.1 * UP, lag_ratio=0.3), run_time=1.0)
             at_phrase(vo, 1, "continue a run")
-            # attempt 1 of the real trial heads for the check while the flowchart is built
-            self.play(FadeIn(box_a, shift=0.1 * DOWN), FadeIn(att_labels[0]), run_time=0.5)
+            # attempt 0 of a real trial heads for the check while the flowchart is built
+            self.play(FadeIn(box_a, shift=0.1 * DOWN), FadeIn(log_head), FadeIn(log_rows[0][:2]), run_time=0.5)
             self.play(GrowArrow(ar_ab), FadeIn(box_b, shift=0.1 * DOWN),
                       ShowCreation(att_curves[0], rate_func=linear), run_time=1.0)
             self.play(GrowArrow(ar_bc), FadeIn(box_c, shift=0.1 * DOWN), run_time=0.6)
@@ -306,22 +320,23 @@ class FourStreams(ClankersScene):
                 a = TRIAL[i]
                 xm = cross_mark(axes.c2p(T_CHECK, a["acc_4800"]))
                 extra = [ShowCreation(loop), FadeIn(no_grp)] if first else [Indicate(no_grp, color=BAD)]
-                self.play(FadeIn(xm, scale=0.6), FadeIn(att_vals[i]), box_b[0].animate.set_stroke(BAD, 3), *extra,
-                          run_time=0.7 if first else 0.45)
+                self.play(FadeIn(xm, scale=0.6), FadeIn(att_vals[i]), FadeIn(log_rows[i][2], shift=0.1 * LEFT),
+                          box_b[0].animate.set_stroke(BAD, 3), *extra, run_time=0.7 if first else 0.5)
                 self.play(att_curves[i].animate.set_stroke(FAINT, 2), FadeOut(xm), FadeOut(att_vals[i]),
-                          box_b[0].animate.set_stroke(WARN, 2), run_time=0.3)
+                          log_rows[i][:2].animate.set_color(MUTED), box_b[0].animate.set_stroke(WARN, 2),
+                          run_time=0.35)
 
             at_phrase(vo, 1, "otherwise restart")
             fail(0, first=True)
-            # attempts 2 and 3 (seeds 1247, 2247) fail too; attempt 4 (seed 3247) passes
+            # attempts 1 and 2 (seeds 1247, 2247) fail too; attempt 3 (seed 3247) passes
             for i in (1, 2):
                 extra = [FadeIn(rule_notes[0], shift=0.1 * UP)] if i == 1 else []
-                self.play(ShowCreation(att_curves[i], rate_func=linear),
-                          ReplacementTransform(att_labels[i - 1], att_labels[i]), *extra, run_time=0.6)
+                self.play(ShowCreation(att_curves[i], rate_func=linear), FadeIn(log_rows[i][:2]), *extra,
+                          run_time=0.6)
                 fail(i)
-            self.play(ShowCreation(att_curves[3], rate_func=linear),
-                      ReplacementTransform(att_labels[2], att_labels[3]), run_time=0.7)
+            self.play(ShowCreation(att_curves[3], rate_func=linear), FadeIn(log_rows[3][:2]), run_time=0.7)
             self.play(att_curves[3].animate.set_stroke(GOOD, 3.5), FadeIn(att_vals[3]),
+                      FadeIn(log_rows[3][2], shift=0.1 * LEFT), log_rows[3][:2].animate.set_color(GOOD),
                       Flash(axes.c2p(T_CHECK, TRIAL[3]["acc_4800"]), color=GOOD),
                       box_b[0].animate.set_stroke(GOOD, 3), Indicate(box_c, color=GOOD), run_time=0.6)
             self.play(ShowCreation(tail, rate_func=linear), FadeIn(rule_notes[1], shift=0.1 * UP), run_time=1.5)
@@ -355,10 +370,9 @@ class FourStreams(ClankersScene):
         src2c = source_note("Report §4; test_stream_recipe.py, Part 1")
 
         trial_mobs = VGroup(axes, chk, cont_lab, rest_lab, flow, ar_ab, ar_bc, loop, no_grp, rule_notes, setup, *att_curves,
-                            att_labels[-1], att_vals[-1], tail, bind_dot, bind_lab, src2b)
+                            log_head, *log_rows, att_vals[-1], tail, bind_dot, bind_lab, src2b)
         with self.voiceover("It ran with sixteen channels, and with four as a control.") as vo:
-            self.play(FadeOut(trial_mobs), run_time=0.6)
-            self.play(FadeIn(row16, shift=0.15 * RIGHT), FadeIn(src2c), run_time=0.7)
+            self.play(FadeOut(trial_mobs), FadeIn(row16, shift=0.15 * RIGHT), FadeIn(src2c), run_time=0.9)
             at_phrase(vo, 0, "with four")
             self.play(FadeIn(row4, shift=0.15 * RIGHT), run_time=0.7)
             self.play(FadeIn(col_heads), LaggedStartMap(FadeIn, cells, lag_ratio=0.15),
@@ -540,7 +554,7 @@ class FourStreams(ClankersScene):
         stall = L("pass, then stall", size=20, color=INK).move_to(ax4.c2p(17500, 0.25))
 
         verdict4 = VGroup(
-            L("passed the check, then failed: all merges", size=22, color=INK),
+            L("k = 4 · passed the check, then failed: all merges", size=22, color=INK),
             VGroup(machine_badge("X", size=20), L("9 of 9", size=26, color=X_COL, weight="BOLD"),
                    machine_badge("L", size=20), L("12 of 12", size=26, color=L_COL, weight="BOLD"))
             .arrange(RIGHT, buff=0.18),
@@ -556,11 +570,11 @@ class FourStreams(ClankersScene):
             "one half. Both clear the 0.4 bar, and then stall. With four channels, every attempt that passed the "
             "check and then failed was a merge: nine of nine on X, twelve of twelve on L."
         ) as vo:
-            self.play(FadeOut(chart3), run_time=0.6)
-            self.play(LaggedStartMap(FadeIn, chips, shift=0.1 * DOWN, lag_ratio=0.15), FadeIn(chip_lab),
+            self.play(FadeOut(chart3),
+                      LaggedStartMap(FadeIn, chips, shift=0.1 * DOWN, lag_ratio=0.15), FadeIn(chip_lab),
                       LaggedStartMap(FadeIn, VGroup(*[r[1] for r in chans_a]), lag_ratio=0.15),
                       *[FadeIn(r[0][0].copy().set_fill(PANEL, 1).set_stroke(FAINT, 1)) for r in chans_a],
-                      FadeIn(src4), run_time=1.0)
+                      FadeIn(src4), run_time=1.2)
             vo.wait_until_sentence(1)
             self.play(LaggedStartMap(GrowArrow, arrows_a, lag_ratio=0.2),
                       LaggedStart(*[FadeIn(r[0]) for r in chans_a], lag_ratio=0.2), run_time=1.3)
@@ -588,7 +602,7 @@ class FourStreams(ClankersScene):
             self.play(FadeIn(verdict4[1][:2], scale=0.9), run_time=0.6)
             at_phrase(vo, 4, "twelve of twelve")
             self.play(FadeIn(verdict4[1][2:], scale=0.9), run_time=0.6)
-        self.clear_all(exclude=(title, test_tag))
+        merges_view = [m for m in self.mobjects if m not in (title, test_tag) and m is not self.frame]
 
         # ============================================================ N10.5 verdicts
         CL, VX, VL = -6.4, 1.55, 4.75
@@ -621,7 +635,7 @@ class FourStreams(ClankersScene):
             vrows[cid] = VGroup(lhs, *cells_, rl)
         vrule = Line([CL, 2.05, 0], [6.5, 2.05, 0]).set_stroke(INK, 1.5)
 
-        e8_head = L("L also tried eight streams (S = 8, k = 16):", size=22, color=INK)
+        e8_head = L("L also tried eight streams (S = 8, k = 16; descriptive):", size=22, color=INK)
         e8_ceil = frac_bar("perfect gate", 2, 2, color=GOOD, width=1.6, label_width=0, size=22)
         e8_rest = frac_bar("restart arm", 0, 5, color=BAD, width=1.6, label_width=0, size=22)
         e8_rest.value.set_color(BAD)
@@ -637,7 +651,8 @@ class FourStreams(ClankersScene):
             "channels did not bind significantly more than four on either machine. L also tried eight streams: "
             "the perfect gate bound both its runs, and the restart arm none of five."
         ) as vo:
-            self.play(FadeIn(vhead), ShowCreation(vrule), FadeIn(src5), run_time=0.6)
+            self.play(*[FadeOut(m) for m in merges_view], FadeIn(vhead), ShowCreation(vrule), FadeIn(src5),
+                      run_time=0.9)
             self.play(FadeIn(vrows["R2"][0], shift=0.1 * RIGHT), ShowCreation(vrows["R2"][3]), run_time=0.6)
             self.play(FadeIn(vrows["R2"][1], scale=0.9), FadeIn(vrows["R2"][2], scale=0.9), run_time=0.7)
             vo.wait_until_sentence(1)
@@ -669,3 +684,4 @@ class FourStreams(ClankersScene):
                       run_time=0.8)
         self.wait(0.6)
         self.clear_all()
+        self.wait(0.2)     # hold the empty frame so the chapter ends on it

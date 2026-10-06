@@ -147,12 +147,12 @@ def make_lr_plot(x0, x1, y0, y1, umax=7200, lg0=-4.4, lg1=-1.9):
     for u in range(0, umax + 1, 1200):
         ticks.add(Line(P(u, lg0), P(u, lg0) + 0.1 * DOWN).set_stroke(MUTED, 2))
         if u % 2400 == 0:
-            labels.add(L(f"{u}", 20, MUTED).next_to(P(u, lg0), DOWN, buff=0.17))
-    u_lab = L("update", 20, MUTED).next_to(labels[0], LEFT, buff=0.35)
+            labels.add(L(f"{u}", 22, MUTED).next_to(P(u, lg0), DOWN, buff=0.17))
+    u_lab = L("update", 22, MUTED).next_to(labels[0], LEFT, buff=0.35)
     for lg, tex in [(-4, R"10^{-4}"), (-3, R"10^{-3}"), (-2, R"10^{-2}")]:
         ticks.add(Line(P(0, lg), P(0, lg) + 0.1 * LEFT).set_stroke(MUTED, 2))
         labels.add(M(tex, 26, MUTED).next_to(P(0, lg), LEFT, buff=0.17))
-    title = L("learning rate (log scale)", 20, MUTED).next_to(y_axis.get_top(), RIGHT, buff=0.15).shift(0.05 * DOWN)
+    title = L("learning rate (log scale)", 22, MUTED).next_to(y_axis.get_top(), RIGHT, buff=0.15).shift(0.05 * DOWN)
     axes = VGroup(x_axis, y_axis, ticks, labels, u_lab, title)
     return P, axes
 
@@ -236,14 +236,14 @@ class Recipe(ClankersScene):
         gate_line = Line(P(0, -3), P(7200, -3)).set_stroke(GATE_COLOR, 7)
         rest_lo = Line(P(0, -4), P(2400, -4)).set_stroke(SLOW_COLOR, 4)
         rest_hi = VMobject().set_points_as_corners([P(2400, -4), P(2400, -3), P(7200, -3)]).set_stroke(SLOW_COLOR, 3.5)
-        gate_lab = L("gate: 10⁻³ throughout", 20, GATE_COLOR).next_to(P(4800, -3), UP, buff=0.15)
-        rest_lab = L("everything else: 10⁻⁴", 20, SLOW_COLOR).next_to(P(1200, -4), DOWN, buff=0.15)
+        gate_lab = L("gate: 10⁻³ throughout", 22, GATE_COLOR).next_to(P(4800, -3), UP, buff=0.15)
+        rest_lab = L("everything else: 10⁻⁴", 22, SLOW_COLOR).next_to(P(1200, -4), DOWN, buff=0.15)
         rest_lab.align_to(P(150, -4), LEFT)
-        jump_lab = L("× 10 after update 2400", 20, SLOW_COLOR).next_to(P(2400, -3.5), RIGHT, buff=0.15)
+        jump_lab = L("× 10 after update 2400", 22, SLOW_COLOR).next_to(P(2400, -3.5), RIGHT, buff=0.15)
         shade = Rectangle(width=P(2400, 0)[0] - P(0, 0)[0], height=P(0, -1.9)[1] - P(0, -4.4)[1])
         shade.set_fill(SLOW_COLOR, 0.08).set_stroke(width=0).move_to(
             [(P(0, 0)[0] + P(2400, 0)[0]) / 2, (P(0, -1.9)[1] + P(0, -4.4)[1]) / 2, 0])
-        shade_lab = VGroup(L("slow phase", 20, SLOW_COLOR, weight="BOLD"), L("updates 1–2400", 20, SLOW_COLOR))
+        shade_lab = VGroup(L("slow phase", 22, SLOW_COLOR, weight="BOLD"), L("updates 1–2400", 22, SLOW_COLOR))
         shade_lab.arrange(DOWN, buff=0.08).move_to(shade).align_to(shade, UP).shift(0.15 * DOWN)
         src = source_note("Report §3 (Recipes); test_slow_start.py:37-39, 239-241, 418-423")
 
@@ -267,13 +267,16 @@ class Recipe(ClankersScene):
             self.play(LaggedStart(*[FlashAround(c, color=GATE_COLOR) for c in g1_slots], lag_ratio=0.15),
                       ShowCreation(gate_line), run_time=1.2)
             self.play(FadeIn(gate_lab, shift=0.1 * UP), run_time=0.5)
-            vo.wait_until(vo.time_of(3) + 1.0)
+            vo.wait_until_sentence(3)
+            self.play(FlashAround(g2_box, color=SLOW_COLOR), Indicate(g2_lab, color=SLOW_COLOR, scale_factor=1.08),
+                      run_time=1.0)
+            vo.wait_until(vo.time_of(3) + 1.45)
             self.play(*[FlashAround(c, color=WARN) for c in g2_slots[:2]],
                       *[Indicate(c[1], color=WARN, scale_factor=1.15) for c in g2_slots[:2]], run_time=1.2)
-            vo.wait_until(vo.time_of(3) + 3.0)
+            vo.wait_until(vo.time_of(3) + 3.9)
             self.play(FadeIn(shade), FadeIn(shade_lab), ShowCreation(rest_lo), run_time=1.4)
             self.play(FadeIn(rest_lab, shift=0.1 * DOWN), run_time=0.5)
-            vo.wait_until(vo.time_of(3) + 6.8)
+            vo.wait_until(vo.time_of(3) + 8.0)
             self.play(ShowCreation(rest_hi), run_time=1.4)
             self.play(FadeIn(jump_lab, shift=0.1 * RIGHT), run_time=0.5)
 
@@ -307,30 +310,36 @@ class Recipe(ClankersScene):
         self.set_cells(POSN)
         gate_cells = VGroup(*[cells[0][j].copy().next_to(keys[j], DOWN, buff=0.22) for j in range(8)])
 
-        j_labels = VGroup(*[L(f"{c}", 20, MUTED).move_to([X0 + c * PITCH, 1.02, 0]) for c in range(8)])
-        j_cap = L("j", 20, MUTED, weight="BOLD").move_to([X0 - 0.5, 1.02, 0])
-        rows_lab = L("8 of the batch's 32 sequences", 20, MUTED).rotate(PI / 2).move_to([X0 - 0.5, Y0 - 3.5 * PITCH, 0])
-        legend = VGroup(
-            VGroup(Square(0.22).set_fill(CH0, 1).set_stroke(width=0), L("channel 0", 20, CH0)).arrange(RIGHT, buff=0.1),
-            VGroup(Square(0.22).set_fill(CH1, 1).set_stroke(width=0), L("channel 1", 20, CH1)).arrange(RIGHT, buff=0.1),
-        ).arrange(RIGHT, buff=0.35)
+        j_labels = VGroup(*[L(f"{c}", 22, MUTED).move_to([X0 + c * PITCH, 1.02, 0]) for c in range(8)])
+        j_cap = L("j", 22, MUTED, weight="BOLD").move_to([X0 - 0.5, 1.02, 0])
+        rows_lab = L("8 of the batch's 32 sequences", 22, MUTED).rotate(PI / 2).move_to([X0 - 0.5, Y0 - 3.5 * PITCH, 0])
+
+        def swatch(color, text, tcolor):
+            return VGroup(Square(0.24).set_fill(color, 1).set_stroke(width=0), L(text, 22, tcolor)).arrange(RIGHT, buff=0.1)
+
+        legend = VGroup(swatch(CH0, "channel 0", CH0), swatch(CH1, "channel 1", CH1),
+                        swatch(MID, "50/50", MUTED)).arrange(RIGHT, buff=0.3)
+        # first shown under the strip, captioned, then moved above the batch matrix
+        gate_cap = L("the read gate at each key:", 22, INK)
+        intro_row = VGroup(gate_cap, legend.copy()).arrange(RIGHT, buff=0.35).move_to([0, 0.55, 0])
         legend.move_to([X0 - 0.17, 1.5, 0], aligned_edge=LEFT)
-        col_outlines = VGroup(*[Rectangle(width=CELL + 0.06, height=8 * PITCH).set_stroke(WARN, 1.5)
+        # grouping annotations in INK (yellow is channel 1 here)
+        col_outlines = VGroup(*[Rectangle(width=CELL + 0.06, height=8 * PITCH).set_stroke(INK, 2)
                                 .move_to([X0 + c * PITCH, Y0 - 3.5 * PITCH, 0]) for c in range(8)])
-        idx_lab = L("by index", 20, MUTED).next_to(col_means, RIGHT, buff=0.25)
-        half_lab = L("by half", 20, MUTED).next_to(half_means, RIGHT, buff=0.25)
+        idx_lab = L("by index", 22, MUTED).next_to(col_means, RIGHT, buff=0.25)
+        half_lab = L("by half", 22, MUTED).next_to(half_means, RIGHT, buff=0.25)
         divider = DashedLine([X0 + 3.5 * PITCH, 1.2, 0], [X0 + 3.5 * PITCH, -3.38, 0], dash_length=0.08)
-        divider.set_stroke(WARN, 2)
-        half_heads = VGroup(L("first half", 20, WARN).move_to([X0 + 1.5 * PITCH, 1.02, 0]),
-                            L("second half", 20, WARN).move_to([X0 + 5.5 * PITCH, 1.02, 0]))
-        mean_note = L("means over all 32", 20, FAINT).next_to(half_lab, DOWN, buff=0.12).align_to(half_lab, LEFT)
-        ex_cap = VGroup(L("example gate:", 20, MUTED), L("position split", 20, INK, weight="BOLD"))
-        ex_cap.arrange(DOWN, buff=0.1).move_to([-1.85, Y0 - 3.5 * PITCH, 0])
+        divider.set_stroke(INK, 2)
+        half_heads = VGroup(L("first half", 22, INK).move_to([X0 + 1.5 * PITCH, 1.02, 0]),
+                            L("second half", 22, INK).move_to([X0 + 5.5 * PITCH, 1.02, 0]))
+        mean_note = L("means over all 32", 20, MUTED).next_to(half_lab, DOWN, buff=0.1).align_to(half_lab, LEFT)
+        ex_cap = VGroup(L("example gate:", 22, MUTED), L("position split", 22, INK, weight="BOLD"))
+        ex_cap.arrange(DOWN, buff=0.1).move_to([-1.75, Y0 - 3.5 * PITCH, 0])
 
         # right column: the definition and two meters
         frac = M(R"\eta^2 = \frac{\text{between-group variance}}{\text{total variance}}", 30)
         frac.move_to([1.85, 1.5, 0])
-        pooled = VGroup(L("pooled over", 20, MUTED), L("channels", 20, MUTED)).arrange(DOWN, buff=0.06)
+        pooled = VGroup(L("pooled over", 22, MUTED), L("channels", 22, MUTED)).arrange(DOWN, buff=0.06)
         pooled.next_to(frac, RIGHT, buff=0.35)
         MX0, MW = 0.6, 3.2
         self.MX0, self.MW = MX0, MW
@@ -355,19 +364,21 @@ class Recipe(ClankersScene):
             self.play(*self.focus(1), Write(hdr), run_time=1.0)
             vo.wait_until_sentence(1)
             self.play(LaggedStartMap(FadeIn, strip, lag_ratio=0.08), run_time=0.9)
-            self.play(LaggedStart(*[Indicate(k[1], color=WARN, scale_factor=1.6) for k in keys], lag_ratio=0.08),
-                      *[k[0].animate.set_stroke(WARN, 2.5) for k in keys],
+            self.play(LaggedStart(*[Indicate(k[1], color=INK, scale_factor=1.6) for k in keys], lag_ratio=0.08),
+                      *[k[0].animate.set_stroke(INK, 3) for k in keys],
                       q_key.animate.set_opacity(0.3), run_time=1.0)
-            self.play(LaggedStart(*[FadeIn(g, shift=0.15 * DOWN) for g in gate_cells], lag_ratio=0.08), run_time=0.8)
+            self.play(LaggedStart(*[FadeIn(g, shift=0.15 * DOWN) for g in gate_cells], lag_ratio=0.08),
+                      FadeIn(intro_row, shift=0.1 * DOWN), run_time=0.8)
             self.play(*[ReplacementTransform(gate_cells[j], cells[0][j]) for j in range(8)],
+                      ReplacementTransform(intro_row[1], legend), FadeOut(gate_cap),
                       FadeOut(strip), FadeIn(j_labels), FadeIn(j_cap), run_time=1.0)
             self.play(LaggedStart(*[FadeIn(cells[r], shift=0.1 * DOWN) for r in range(1, 8)], lag_ratio=0.12),
-                      FadeIn(rows_lab), FadeIn(legend), FadeIn(src), run_time=1.2)
+                      FadeIn(rows_lab), FadeIn(src), run_time=1.2)
             self.play(FadeIn(ex_cap, shift=0.1 * LEFT), run_time=0.5)
             vo.wait_until_sentence(2)
             self.play(FadeIn(frac, shift=0.1 * DOWN), FadeIn(pooled), run_time=0.8)
             vo.wait_until(vo.time_of(2) + 2.6)
-            self.play(LaggedStartMap(ShowCreation, col_outlines, lag_ratio=0.08), j_labels.animate.set_color(WARN),
+            self.play(LaggedStartMap(ShowCreation, col_outlines, lag_ratio=0.08), j_labels.animate.set_color(INK),
                       run_time=0.8)
             self.play(*[TransformFromCopy(VGroup(*[cells[r][c] for r in range(8)]), col_means[c]) for c in range(8)],
                       FadeOut(col_outlines), FadeIn(idx_lab), run_time=1.0)
@@ -445,7 +456,7 @@ class Recipe(ClankersScene):
         self.pen_val.set_color(HINGE_COLOR).move_to([p_track.get_right()[0] + 0.15, PY, 0], aligned_edge=LEFT)
         self.badge = verdict_badge("fires", size=20, color=HINGE_COLOR).move_to([5.3, -2.2, 0])
         self.PY = PY
-        src = source_note("examples: test_slow_start.eta2_hinge, S = 2, P = 4, B = 32 (facts_model §5.2)")
+        src = source_note("Report §3; examples scored by eta2_hinge, test_slow_start.py:329-345")
 
         with self.voiceover(
             "The penalty is the part of each value above 0.2, added together. It is zero while the gate's choice "
@@ -473,7 +484,7 @@ class Recipe(ClankersScene):
             vo.wait_until_sentence(1)
             self.play(UpdateFromAlphaFunc(self.cells, lambda m, a: self.apply_state(1 - a)),
                       FadeTransform(cap[1], cap_rand, time_span=(0, 0.6)), run_time=1.8)
-            vo.wait_until(vo.time_of(1) + 0.42 * (vo.time_of(2) - vo.time_of(1)))
+            vo.wait_until(vo.time_of(1) + 0.55 * (vo.time_of(2) - vo.time_of(1)))   # "... and it fires when"
             # ... and fires when the gate starts splitting by position
             self.play(UpdateFromAlphaFunc(self.cells, lambda m, a: self.apply_state(a), rate_func=linear),
                       FadeTransform(cap_rand, cap_pos, time_span=(0, 0.6)), run_time=2.6)
@@ -511,14 +522,14 @@ class Recipe(ClankersScene):
         row2 = VGroup(*[chip(n, MUTED) for n in ["conv", "encoder", "encoder_v", "decoder", "lm_head"]])
         row2.arrange(RIGHT, buff=0.18).move_to([2.7, -1.35, 0])
         gate_brace = Brace(row1[1:], DOWN, buff=0.08).set_color(GATE_COLOR)
-        gate_txt = L("the gate", 20, GATE_COLOR).next_to(gate_brace, DOWN, buff=0.06)
+        gate_txt = L("the gate", 22, GATE_COLOR).next_to(gate_brace, DOWN, buff=0.06)
         src_box = VGroup(L("penalty", 24, HINGE_COLOR, weight="BOLD"), L("1.60", 24, HINGE_COLOR))
         src_box.arrange(RIGHT, buff=0.25)
         src_box = card(src_box, buff=0.18, edge=HINGE_COLOR).move_to([2.7, 1.55, 0])
         arrows = VGroup(*[Arrow(src_box.get_bottom(), c.get_top(), buff=0.08, thickness=3).set_color(HINGE_COLOR)
                           for c in row1])
-        no_grad = L("no gradient from the penalty", 20, MUTED).next_to(row2, DOWN, buff=0.2)
-        src = source_note("Report §3; test_slow_start.py:40-46")
+        no_grad = L("no gradient from the penalty", 22, MUTED).next_to(row2, DOWN, buff=0.2)
+        src = source_note("Report §3; test_slow_start.py:40-46, 135 (CHECK 107)")
         self.play(FadeOut(right_col), FadeOut(old_src), FadeIn(src), FadeIn(src_box), FadeIn(row1), FadeIn(row2),
                   run_time=0.8)
         self.play(LaggedStartMap(GrowArrow, arrows, lag_ratio=0.15), run_time=0.8)
@@ -532,11 +543,11 @@ class Recipe(ClankersScene):
         left = VGroup(self.cells, self.col_means, self.half_means, st["rows_lab"], st["legend"], st["idx_lab"],
                       st["half_lab"], st["divider"], st["half_heads"], st["mean_note"], st["ex_cap"])
         strip = mini_strip().move_to([0, 1.45, 0])
-        stream_tags = VGroup(*[L(f"stream {s}", 20, STREAM_COLORS[s]).next_to(strip[i], DOWN, buff=0.22)
+        stream_tags = VGroup(*[L(f"stream {s}", 22, STREAM_COLORS[s]).next_to(strip[i], DOWN, buff=0.22)
                                for i, s in enumerate([t[0] for t in SEQ] + [0])])
         strike = Line(stream_tags.get_left() + 0.15 * LEFT, stream_tags.get_right() + 0.15 * RIGHT)
         strike.set_stroke(BAD, 3)
-        never = L("stream labels: the hinge never reads them", 20, MUTED).next_to(stream_tags, DOWN, buff=0.18)
+        never = L("stream labels: the hinge never reads them", 22, INK).next_to(stream_tags, DOWN, buff=0.2)
         keys = VGroup(*[strip[j][1] for j in range(8)])
         marks = VGroup(*[Triangle().scale(0.09).rotate(PI).set_fill(WARN, 1).set_stroke(width=0)
                          .next_to(k, UP, buff=0.1) for k in keys])
@@ -547,7 +558,7 @@ class Recipe(ClankersScene):
         maps = VGroup(*[VGroup(token(f"CTX{s}", "ctx", s), Arrow(LEFT, RIGHT, buff=0).set_width(0.6),
                                L("channel ?", 22, MUTED)).arrange(RIGHT, buff=0.18) for s in (0, 1)])
         maps.arrange(DOWN, buff=0.15, aligned_edge=LEFT)
-        ok_body = L("never says which channel a stream goes to", 20, INK)
+        ok_body = L("never says which channel a stream goes to", 22, INK)
         ok_in = VGroup(ok_head, maps, ok_body).arrange(DOWN, buff=0.22)
         ok_card = card(ok_in, buff=0.25, edge=GOOD)
         ok_card[0].set_width(5.9, stretch=True)
@@ -557,7 +568,8 @@ class Recipe(ClankersScene):
         need_head.arrange(RIGHT, buff=0.2)
         tri = VGroup(mini_token("ctx", 0), mini_token("key"), mini_token("val", 0)).arrange(RIGHT, buff=0.05)
         tri[1][0].set_stroke(WARN, 2.5)
-        pos_txt = L("keys at positions 3j + 1, and their index j", 20, INK)
+        pos_txt = VGroup(L("keys at positions 3j + 1,", 22, INK), L("and their index j", 22, INK)).arrange(
+            DOWN, buff=0.08, aligned_edge=LEFT)
         need_ex = VGroup(tri, pos_txt).arrange(RIGHT, buff=0.3)
         need_body = L("that is task structure", 22, WARN)
         need_in = VGroup(need_head, need_ex, need_body).arrange(DOWN, buff=0.3)
@@ -601,7 +613,7 @@ class Recipe(ClankersScene):
 
         def legend_row(color, head, sub):
             sw = Line(ORIGIN, 0.45 * RIGHT).set_stroke(color, 6)
-            txt = VGroup(L(head, 22, color, weight="BOLD"), L(sub, 20, MUTED)).arrange(DOWN, buff=0.06,
+            txt = VGroup(L(head, 22, color, weight="BOLD"), L(sub, 22, MUTED)).arrange(DOWN, buff=0.06,
                                                                                       aligned_edge=LEFT)
             return VGroup(sw, txt).arrange(RIGHT, buff=0.2, aligned_edge=UP)
 
@@ -621,14 +633,14 @@ class Recipe(ClankersScene):
         HY0, HY1 = 1.2, 2.1
         h_axis = Line([P(0, 0)[0], HY0, 0], [P(7200, 0)[0] + 0.15, HY0, 0]).set_stroke(MUTED, 2)
         h_yaxis = Line([P(0, 0)[0], HY0, 0], [P(0, 0)[0], HY1 + 0.2, 0]).set_stroke(MUTED, 2)
-        h_ticks = VGroup(L("0", 20, MUTED).next_to([P(0, 0)[0], HY0, 0], LEFT, buff=0.17),
-                         L("1", 20, MUTED).next_to([P(0, 0)[0], HY1, 0], LEFT, buff=0.17))
+        h_ticks = VGroup(L("0", 22, MUTED).next_to([P(0, 0)[0], HY0, 0], LEFT, buff=0.17),
+                         L("1", 22, MUTED).next_to([P(0, 0)[0], HY1, 0], LEFT, buff=0.17))
         h_name = L("hinge weight", 22, HINGE_COLOR, weight="BOLD").next_to(h_ticks, LEFT, buff=0.3)
         x = lambda u: P(u, 0)[0]  # noqa: E731
         h_line = VMobject().set_points_as_corners([[x(0), HY1, 0], [x(2400), HY1, 0], [x(2400), HY0, 0],
                                                    [x(7200), HY0, 0]]).set_stroke(HINGE_COLOR, 5)
-        h_on = L("hinge on", 20, HINGE_COLOR).next_to([x(1200), HY1, 0], DOWN, buff=0.15)
-        h_off = L("off after update 2400", 20, MUTED).next_to([x(4800), HY0, 0], UP, buff=0.15)
+        h_on = L("hinge on", 22, HINGE_COLOR).next_to([x(1200), HY1, 0], DOWN, buff=0.15)
+        h_off = L("off after update 2400", 22, MUTED).next_to([x(4800), HY0, 0], UP, buff=0.15)
         win_shade = Rectangle(width=x(2400) - x(0), height=HY1 + 0.3 - HY0).set_fill(HINGE_COLOR, 0.08)
         win_shade.set_stroke(width=0).move_to([(x(0) + x(2400)) / 2, (HY1 + 0.3 + HY0) / 2, 0])
 
@@ -639,7 +651,7 @@ class Recipe(ClankersScene):
         t_mid = (P(1200, LG5E3) + P(1200, LG5E4)) / 2
         tenth = VGroup(Arrow(t_mid, P(1200, LG5E3), buff=0.06, thickness=2.5),
                        Arrow(t_mid, P(1200, LG5E4), buff=0.06, thickness=2.5)).set_color(MUON_COLOR)
-        tenth_lab = L("× 0.1", 20, MUON_COLOR).next_to(tenth, RIGHT, buff=0.1)
+        tenth_lab = L("× 0.1", 22, MUON_COLOR).next_to(tenth, RIGHT, buff=0.1)
         lr_lab = L("0.005", 22, GATE_COLOR, weight="BOLD").next_to(P(6000, LG5E3), UP, buff=0.12)
         src = source_note("Report §3 (Recipes); test_early_recipe.py:254-259, 391-401")
 
@@ -657,12 +669,17 @@ class Recipe(ClankersScene):
             self.play(ShowCreation(h_line), FadeIn(win_shade), run_time=1.6)
             self.play(FadeIn(h_on), FadeIn(h_off), run_time=0.6)
             vo.wait_until_sentence(2)
-            self.play(*self.focus(3), run_time=0.4)
+            # MUON is the two-speed schedule under Muon; the window hinge is a separate variant: dim it
+            hinge_lines = VGroup(h_axis, h_yaxis, h_line)          # open polylines: dim the stroke only
+            hinge_texts = VGroup(h_ticks, h_name, h_on, h_off)
+            self.play(*self.focus(3), hinge_lines.animate.set_stroke(opacity=0.25),
+                      hinge_texts.animate.set_fill(opacity=0.25), win_shade.animate.set_fill(opacity=0.03),
+                      run_time=0.5)
             self.play(Transform(gate_line, gate_m), TransformFromCopy(rest_line, rest_m),
                       Transform(rest_line, adam_m),
                       FadeOut(VGroup(leg_slow, leg_title), time_span=(0, 0.6)),
                       FadeIn(VGroup(leg_muon, leg_title_m), time_span=(0.8, 1.8)), run_time=1.8)
             self.play(GrowFromCenter(tenth), FadeIn(tenth_lab), run_time=0.7)
-            vo.wait_until(vo.time_of(2) + 4.4)
+            vo.wait_until(vo.time_of(2) + 4.9)                                      # "... of 0.005"
             self.play(FadeIn(lr_lab, shift=0.1 * UP), Indicate(leg_muon[0], color=GATE_COLOR, scale_factor=1.05),
                       run_time=0.8)

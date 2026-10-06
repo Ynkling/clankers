@@ -6,9 +6,34 @@ which also brings in `from manimlib import *`.
 """
 from __future__ import annotations
 
+import os as _os
+from pathlib import Path as _Path
+
 from manimlib import *  # noqa: F401,F403
+from manimlib.config import manim_config as _manim_config
+import manimlib.utils.tex_file_writing as _tex_writing
+from manimlib.utils.cache import cache_on_disk as _cache_on_disk
 
 from common.narration import NarrationMixin
+
+# ManimGL compiles every Tex through one shared latex_cache/working.tex, and when a compile fails it
+# silently converts whatever working.dvi is lying around. With several renders running at once that
+# caches one scene's equation under another's key. Give each process its own work directory and
+# never let a stale DVI through.
+_TEX_DIR = _Path(__file__).resolve().parent.parent / "build" / "tex_work" / str(_os.getpid())
+_TEX_DIR.mkdir(parents=True, exist_ok=True)
+_manim_config.directories.latex_cache = str(_TEX_DIR)
+_full_tex_to_svg = getattr(_tex_writing.full_tex_to_svg, "__wrapped__", _tex_writing.full_tex_to_svg)
+
+
+def full_tex_to_svg(full_tex: str, compiler: str = "latex", message: str = ""):
+    work = _Path(_manim_config.directories.latex_cache)
+    for ext in (".dvi", ".xdv"):
+        (work / f"working{ext}").unlink(missing_ok=True)
+    return _full_tex_to_svg(full_tex, compiler, message)
+
+
+_tex_writing.full_tex_to_svg = _cache_on_disk(full_tex_to_svg)
 
 # ---------------------------------------------------------------- palette
 BG = "#0E1016"

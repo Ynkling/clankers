@@ -215,8 +215,10 @@ class FlatStart(ClankersScene):
             self.play(ShowCreation(strikes, lag_ratio=0.5), FadeIn(zero_note), run_time=0.7)
             # the struck terms leave with their strikes, then the rest closes up into eq. (3)
             # (opacity, not FadeOut: a FadeOut restores sub-parts of e_full when it finishes)
+            pluses = e_full["+"]                # 1/k (+) mid_s (+) mid_t (+) dd: the last two go too
             self.play(e_full[mid_s].animate.set_opacity(0).shift(0.15 * DOWN),
                       e_full[mid_t].animate.set_opacity(0).shift(0.15 * DOWN),
+                      pluses[1].animate.set_opacity(0), pluses[2].animate.set_opacity(0),
                       FadeOut(strikes, shift=0.15 * DOWN), FadeOut(zero_note, shift=0.15 * DOWN), run_time=0.4)
             self.play(TransformMatchingTex(e_full, e3, matched_keys=[R"\delta_t\cdot\delta_s"]), run_time=0.9)
             self.play(FadeIn(e3_tag, shift=0.1 * LEFT), run_time=0.4)
