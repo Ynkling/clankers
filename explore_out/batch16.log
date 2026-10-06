@@ -862,3 +862,5 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 6d3f20d, code d6ccc68892a7, attempt 1: acc 0.068  trans  None  outcome non-stream OTHER; decoder at 4800: h CTX/KEY/VAL 0.14/0.12/0.13
   [ 28]   97.1 min  window_recipe    LOCAL3_SLOW              seed 160  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 6d3f20d+dirty, code 46867e792241, attempt 1: acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED
+  [ 29]   98.9 min  write_decoders   HINGE_D8_A               seed 263  lr 0.001  (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8e64157, code d6ccc68892a7, attempt 1: acc 0.072  trans  None  outcome non-stream OTHER; decoder at 4800: h CTX/KEY/VAL 0.25/0.14/0.13
