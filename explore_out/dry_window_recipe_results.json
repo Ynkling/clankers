@@ -1,0 +1,47 @@
+{
+ "meta": {
+  "arms": {
+   "LOCAL3": {
+    "iters": 2400,
+    "key": "LOCAL3",
+    "label": "batch 1's S1 LOCAL3, unchanged (160-179: batch 1's records)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "prio": 1,
+    "sched": "lr 0.001 throughout",
+    "seeds": [
+     180
+    ]
+   },
+   "LOCAL3_SLOW": {
+    "iters": 2400,
+    "key": "LOCAL3_SLOW",
+    "label": "LOCAL3 + S5's SLOW schedule, no hinge",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "prio": 1,
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused)",
+    "seeds": [
+     160
+    ]
+   }
+  },
+  "code_shas": [
+   "46867e79224188b330486f9342f0603ade983817"
+  ],
+  "cut": [],
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "93bdfe6",
+   "python": "3.11.15",
+   "started": "2026-10-06 13:48:26",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

@@ -1,0 +1,45 @@
+{
+ "meta": {
+  "arms": {
+   "RES_D8_A": {
+    "iters": 2400,
+    "key": "RES_D8_A",
+    "label": "reservoir gate (W_h frozen, rho 0.5) + SLOW + HINGE (Adam)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "gate W_in/W_g 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge",
+    "seeds": [
+     260
+    ]
+   },
+   "RES_D8_M": {
+    "iters": 2400,
+    "key": "RES_D8_M",
+    "label": "reservoir gate (W_h frozen, rho 0.5) + S25's groups + HINGE (Muon)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "sched": "Muon lr 0.005: gate W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge",
+    "seeds": [
+     260
+    ]
+   }
+  },
+  "code_shas": [
+   "f2c00d3f4a59d93d9a0176e9b868d4c7cb6dc598"
+  ],
+  "cut": [],
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "93bdfe6",
+   "python": "3.11.15",
+   "started": "2026-10-06 13:48:26",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
