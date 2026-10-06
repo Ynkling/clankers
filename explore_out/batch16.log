@@ -2661,3 +2661,9 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [  2]   43.1 min  stream_knobs     DECAY98                  seed 261  lr 0.001  (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 92b2b86+dirty, code ea36a6e5d44b, attempt 1: acc 0.086  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.13/0.13/0.13
   start   43.1 min  reservoir_gate   RES_D8_A                 seed 264  (projected worst case 48 min)
+  [  3]   43.6 min  stream_knobs     DECAY98                  seed 262  lr 0.001  (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 3fd340a, code ea36a6e5d44b, attempt 1: acc 0.885  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.13/0.13/0.13
+  start   43.6 min  reservoir_gate   RES_D8_A                 seed 265  (projected worst case 48 min)
+  [  4]   43.6 min  stream_knobs     DECAY98                  seed 260  lr 0.001  (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 3fd340a+dirty, code ea36a6e5d44b, attempt 1: acc 0.628  trans  None  outcome MERGED (3 share); decoder at 2400: h CTX/KEY/VAL 0.48/0.43/0.35
+  start   43.6 min  reservoir_gate   RES_D8_A                 seed 266  (projected worst case 48 min)
