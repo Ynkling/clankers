@@ -1522,3 +1522,12 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [ 50]   96.4 min  window_recipe    LOCAL3_SLOW              seed 183  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc87ac3, code 46867e792241, attempt 1: acc 0.746  trans  None  VALcos 0.600  margin 0.53  STREAM-PARTIAL
   start   96.4 min  window_recipe    LOCAL3_SLOW              seed 187  (projected worst case 2 min)
+  [ 51]   97.9 min  stream_knobs     LR3E3                    seed 264  lr 0.003  (gate W_in/W_h/W_g 0.003 throughout; every other parameter 0.0003 for updates 1-2400, 0.003 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git ddc1e0a, code ea36a6e5d44b, attempt 1: acc 0.131  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.66/0.47/0.31
+  start   97.9 min  window_recipe    LOCAL3_SLOW              seed 188  (projected worst case 2 min)
+  [ 52]   97.9 min  window_recipe    LOCAL3_SLOW              seed 187  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git ddc1e0a+dirty, code 46867e792241, attempt 1: acc 1.000  trans  2400  VALcos 0.001  margin 1.00  DISCOVERED
+  start   97.9 min  window_recipe    LOCAL3_SLOW              seed 189  (projected worst case 2 min)
+  [ 53]   98.1 min  window_recipe    LOCAL3_SLOW              seed 185  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git ddc1e0a+dirty, code 46867e792241, attempt 1: acc 0.882  trans  None  VALcos 0.317  margin 0.71  STREAM-PARTIAL
+  start   98.1 min  window_recipe    LOCAL3_SLOW              seed 190  (projected worst case 2 min)
