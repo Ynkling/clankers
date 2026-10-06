@@ -167,3 +167,6 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   start    0.0 min  window_scale     LOCAL3_SLOW_D8_M         seed 261  (projected worst case 85 min)
   start    0.0 min  window_scale     LOCAL3_SLOW_D8_M         seed 262  (projected worst case 85 min)
   start    0.0 min  window_scale     LOCAL3_SLOW_D8_M         seed 263  (projected worst case 85 min)
+  [  1]   37.2 min  window_scale     LOCAL3_SLOW_D8_M         seed 261  lr 0.001, Muon lr 0.005  (Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 3d950d9, code 01767493e840, attempt 1: acc 0.985  trans  9600  outcome BOUND ROUTED; decoder at 9600: h CTX/KEY/VAL 0.35/1.00/1.00
+  start   37.2 min  window_scale     LOCAL3_SLOW16_A          seed 240  (projected worst case 38 min)
