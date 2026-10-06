@@ -114,6 +114,41 @@ OUTPUT
 Per-seed raw values first, then validity, counts, the claims (pooled with --also, then per machine),
 readings, diagnostics and curves; with --also, X and L side by side.
 Results: muon_recipe_results.json (gitignored; X's copy in results/X/).
+
+RESULT (X, test commit 74f5907; results/X/muon_recipe_results.json)
+Run conditions:
+- 156/156 records, none failed; 325.6 min of training after 3.2 h of verification, 4 workers x 1
+  thread, one start (2.80GHz host, started 2026-10-06 06:19, detached with setsid).
+- Every CHECK passed (inherited 1-128, own 129-134). Every record: 2.80GHz, gemm:jit:bf16, NS
+  fingerprint f209ef7b8c61.
+- Drop rule: projection 17.96 h > 10 h, so WIN8_A was cut to seeds 460-469 (projection 16.45 h; the
+  rule has no further step). Parts A and B and WIN8_M ran every seed.
+- Validity: CEIL_A 2/2 (1200), CEIL_B 2/2 (1200), CEIL_C 2/2 (2400) -> all three parts VALID.
+Claims:
+- Pooled (primary): not computed on X alone; it needs L's complete file (--also).
+- Per machine (secondary):
+  - M1 WIN_M 39/40 vs SLOW_M 35/40 DISCOVERED, 4 vs 0, p = 0.0625: NOT SHOWN.
+  - M2 bound by 4800: WIN16_M 15/20 vs WIN16_A 9/20, 7 vs 1, p = 0.035: SHOWN.
+  - M3 bound by 4800: WIN8_M 9/10 vs WIN8_A 9/10 (the 10 seeds both ran), 1 vs 1, p = 0.75: NOT SHOWN.
+- Bands: WIN_M RELIABLE (39/40, Wilson 95% [0.871, 0.996]); WIN16_M RELIABLE (19/20, [0.764, 0.991]);
+  WIN8_M RELIABLE (20/20, [0.839, 1.000]).
+- Printed, not claims: BOUND WIN16_M 19/20 vs WIN16_A 17/20 (3 vs 1, p = 0.31); WIN8_M 10/10 vs WIN8_A
+  9/10 on 460-469 (1 vs 0, p = 0.5). Median transition SLOW_M 2400, WIN_M 2400, WIN16_A 4800 [3600,
+  27600], WIN16_M 2400 [2400, 19200], WIN8_A 3600 [3600, 4800], WIN8_M 4800 [3600, 6000].
+Diagnostics (not part of the verdict):
+- SLOW_M's 5 failures: 3 POSITION (s407, s418, s434) and 2 KEY (s400, s421). WIN_M discovered on all
+  but s421 (KEY under both; its one firing at update 551).
+- The hinge fired on 20/40 WIN_M runs (first firing 150 [50, 551]), 13/20 WIN16_A (385 [183, 726]),
+  18/20 WIN16_M (293 [185, 565]), 7/10 WIN8_A (362 [218, 669]) and 7/20 WIN8_M (198 [141, 400]).
+  Hinge/task ratio over every firing: WIN_M 1127.6 [0.1, 132443.4], WIN16_A 21.6 [1.4, 631101.0],
+  WIN16_M 110.0 [6.6, 24919.6], WIN8_A 20.5 [2.9, 269637.5], WIN8_M 3440.6 [1.9, 63263.6].
+  Would-fires after the window: WIN_M 5 runs (6 updates), WIN16_A 7 runs (51454 updates), WIN8_A 2
+  runs (15982), WIN16_M and WIN8_M none.
+- Part B: merged at the end WIN16_A 5 (s440, s447, s448, s456, s458), WIN16_M 3 (s445, s453, s459;
+  s445 and s453 bound, not routed). At 4800, 17/20 WIN16_M gates held the 4 streams on 4 distinct
+  channels; WIN16_A 9/20.
+- Part C: WIN8_M bound on every seed, 17 by 4800 (s468, s478, s479 at 6000); WIN8_A's one failure,
+  s461, is POSITION (WIN8_M bound it at 3600 after firings at 141 and 163).
 """
 
 import argparse
