@@ -103,12 +103,13 @@ def records(arm, seeds):
     return {s: st[f"{key}|{s}"] for s in seeds if f"{key}|{s}" in st}
 
 
-def reproduces(r, ref):
+def reproduces(r, ref, t=ITERS):
+    """Curve and statistics equal a record's through step t (the rerun's length)."""
     if ref is None:
         return None
-    want = [c for c in ref["curve"] if c[0] <= ITERS]
-    sn = [s for s in r["stats"] if s["step"] != "end" and s["step"] <= ITERS]
-    so = [s for s in ref["stats"] if s["step"] != "end" and s["step"] <= ITERS]
+    want = [c for c in ref["curve"] if c[0] <= t]
+    sn = [s for s in r["stats"] if s["step"] != "end" and s["step"] <= t]
+    so = [s for s in ref["stats"] if s["step"] != "end" and s["step"] <= t]
     return r["curve"] == want and sn == so
 
 
@@ -123,14 +124,14 @@ def report():
         rs = c16.runs_of(me, arm)
         recs = records(arm, a["seeds"])
         src, key = REC[arm]
-        same = {s: reproduces(r, recs.get(s)) for s, r in rs.items()}
+        same = {s: reproduces(r, recs.get(s), a["iters"]) for s, r in rs.items()}
         extra = ""
         if arm in fresh_ref and fresh_ref[arm] in s44.ARMS:
             refs = c16.runs_of(s44, fresh_ref[arm], seeds=a["seeds"])
-            eq = {s: reproduces(r, refs.get(s)) for s, r in rs.items() if s in refs}
-            extra = f"; equal to S44's {fresh_ref[arm]} (same CPU) through {ITERS}: {eq}"
+            eq = {s: reproduces(r, refs.get(s), a["iters"]) for s, r in rs.items() if s in refs}
+            extra = f"; equal to S44's {fresh_ref[arm]} (same CPU) through {a['iters']}: {eq}"
         feats = ("h_ctx", "h_key", "h_val") + (("u_ctx", "u_key", "u_val") if arm == "D8_PREV_A" else ())
-        print(f"  CONFIG {arm} ({a['label']}): reproduces {'X' if src == 'X' else src}'s {key} record through {ITERS}: "
+        print(f"  CONFIG {arm} ({a['label']}): reproduces {'X' if src == 'X' else src}'s {key} record through {a['iters']}: "
               + ", ".join(f"{s} {same[s]}" for s in sorted(same)) + (" (Muon: a record from the 2.10GHz CPU; fresh here)"
                                                                      if a["opt"] == "muon" else "") + extra)
         meds = rp.decode_block(rs, steps=STEPS, chance=a["chance"], feats=feats)
