@@ -846,3 +846,6 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [ 22]   86.4 min  write_decoders   D8_PREV_A                seed 262  lr 0.001  (W_prev in the gate group; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git b4d46a8+dirty, code d6ccc68892a7, attempt 1: acc 0.063  trans  None  outcome non-stream OTHER; decoder at 4800: h CTX/KEY/VAL 0.88/0.89/0.62
   start   86.4 min  write_decoders   HINGE_D8_A               seed 261  (projected worst case 18 min)
+  [ 23]   87.9 min  write_decoders   D8_PREV_A                seed 263  lr 0.001  (W_prev in the gate group; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 65eeedc, code d6ccc68892a7, attempt 1: acc 0.070  trans  None  outcome non-stream KEY; decoder at 4800: h CTX/KEY/VAL 0.94/0.92/0.74
+  start   87.9 min  write_decoders   HINGE_D8_A               seed 262  (projected worst case 18 min)
