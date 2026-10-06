@@ -52,6 +52,7 @@ PRONUNCIATION = [
     (r"\bRoPE\b", "rope"),
     (r"\bη²", "eta squared"),
     (r"\bW_(in|h|g|ro)\b", r"W \1"),
+    (r"\bKEY\b", "key"),
     (r"\bencoder_v\b", "encoder v"),
     (r"\blm_head\b", "L M head"),
     (r"\bvs\.?\b", "versus"),
