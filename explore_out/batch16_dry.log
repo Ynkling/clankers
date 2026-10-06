@@ -1,0 +1,112 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44), reservoir_gate (S45), stream_knobs (S46), write_decoders (S47) — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git 93bdfe6 | python 3.11.15 | torch threads 1
+====================================================================================================
+  code SHA dry_window_recipe: 46867e792241 over 21 modules (0 served from main at 9c5939e): bdh bdh_recurrent explore_b16_gates explore_common explore_common2 explore_local_gate explore_window_recipe_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_instrument_v2 test_interference test_multilayer_binding test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_short_conv
+  code SHA dry_window_scale: 01767493e840 over 40 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_window_scale_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  code SHA dry_reservoir_gate: f2c00d3f4a59 over 38 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_reservoir_gate_child explore_slow_hinge explore_slow_mem explore_slow_pos test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  code SHA dry_stream_knobs: ea36a6e5d44b over 38 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_stream_knobs_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  code SHA dry_write_decoders: d6ccc68892a7 over 40 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_common explore_common2 explore_gate_prev_child explore_gate_state_child explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_write_decoders_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  this segment's CPU: Intel(R) Xeon(R) Processor @ 2.80GHz; the batch's CPU (Muon runs and their references): Intel(R) Xeon(R) Processor @ 2.80GHz
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (109s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  PROJECTION OF THIS DRY RUN (worst case: every run to its iters; pool-load timing, 1 thread each, this machine):
+    window_recipe   LOCAL3                    1 runs x    1.6 min  (step 37.6 ms, evaluation 1.5 s, decoder 0.3 s)
+    window_recipe   LOCAL3_SLOW               1 runs x    1.6 min  (step 39.2 ms, evaluation 1.8 s, decoder 0.3 s)
+    window_scale    LOCAL3_SLOW16_A           1 runs x    2.9 min  (step 67.9 ms, evaluation 3.8 s, decoder 0.6 s)
+    window_scale    LOCAL3_SLOW16_M           1 runs x    3.3 min  (step 78.0 ms, evaluation 3.9 s, decoder 0.6 s)
+    window_scale    MUON_HINGE16_REF          1 runs x    4.2 min  (step 99.9 ms, evaluation 4.0 s, decoder 0.6 s)
+    window_scale    LOCAL3_SLOW_D8_A          1 runs x    5.9 min  (step 134.6 ms, evaluation 12.1 s, decoder 1.5 s)
+    window_scale    LOCAL3_SLOW_D8_M          1 runs x    6.3 min  (step 145.2 ms, evaluation 11.4 s, decoder 1.6 s)
+    window_scale    LOCAL3_SLOW_D8_A_SPLIT    1 runs x    7.7 min  (step 136.1 ms, evaluation 9.7 s, decoder 1.5 s)
+    window_scale    D8_HINGE_M_REF            1 runs x    8.0 min  (step 186.2 ms, evaluation 12.4 s, decoder 1.5 s)
+    reservoir_gate  RES_D8_A                  1 runs x    7.4 min  (step 175.5 ms, evaluation 9.5 s, decoder 1.4 s)
+    reservoir_gate  RES_D8_M                  1 runs x    7.7 min  (step 182.5 ms, evaluation 9.8 s, decoder 1.4 s)
+    stream_knobs    LR3E4                     1 runs x    7.6 min  (step 179.7 ms, evaluation 9.6 s, decoder 1.5 s)
+    stream_knobs    LR3E3                     1 runs x    7.0 min  (step 165.6 ms, evaluation 10.1 s, decoder 1.4 s)
+    stream_knobs    WH_SLOW                   1 runs x    7.1 min  (step 167.3 ms, evaluation 10.2 s, decoder 1.3 s)
+    stream_knobs    DECAY98                   1 runs x    7.0 min  (step 164.7 ms, evaluation 9.5 s, decoder 1.5 s)
+    stream_knobs    PERFECT98                 1 runs x    5.1 min  (step 119.4 ms, evaluation 8.6 s, decoder 0.0 s)
+    write_decoders  HINGE_D8_A                1 runs x    7.5 min  (step 177.8 ms, evaluation 9.7 s, decoder 1.6 s)
+    write_decoders  D8_HINGE_M                1 runs x    7.9 min  (step 186.4 ms, evaluation 9.5 s, decoder 1.4 s)
+    write_decoders  A_HINGE_M                 1 runs x    3.8 min  (step 90.8 ms, evaluation 4.6 s, decoder 0.9 s)
+    write_decoders  HINGE16_M                 1 runs x    3.8 min  (step 91.4 ms, evaluation 4.3 s, decoder 0.7 s)
+    write_decoders  D8_PREV_A                 1 runs x    8.3 min  (step 198.0 ms, evaluation 8.4 s, decoder 1.9 s)
+    total 2.03 h of runs; makespan on 4 workers 0.52 h (worst case)
+  PROJECTION OF THE FULL BATCH (worst case: every run to its iters; pool-load timing, 1 thread each, this machine):
+    window_recipe   LOCAL3                   20 runs x   15.6 min  (step 37.6 ms, evaluation 1.5 s, decoder 0.3 s)
+    window_recipe   LOCAL3_SLOW              40 runs x   16.3 min  (step 39.2 ms, evaluation 1.8 s, decoder 0.3 s)
+    window_scale    LOCAL3_SLOW16_A          20 runs x   34.1 min  (step 67.9 ms, evaluation 3.8 s, decoder 0.6 s)
+    window_scale    LOCAL3_SLOW16_M          20 runs x   39.0 min  (step 78.0 ms, evaluation 3.9 s, decoder 0.6 s)
+    window_scale    MUON_HINGE16_REF         20 runs x   49.6 min  (step 99.9 ms, evaluation 4.0 s, decoder 0.6 s)
+    window_scale    LOCAL3_SLOW_D8_A         10 runs x   69.6 min  (step 134.6 ms, evaluation 12.1 s, decoder 1.5 s)
+    window_scale    LOCAL3_SLOW_D8_M         10 runs x   74.4 min  (step 145.2 ms, evaluation 11.4 s, decoder 1.6 s)
+    window_scale    LOCAL3_SLOW_D8_A_SPLIT   10 runs x   71.1 min  (step 136.1 ms, evaluation 9.7 s, decoder 1.5 s)
+    window_scale    D8_HINGE_M_REF           10 runs x   94.4 min  (step 186.2 ms, evaluation 12.4 s, decoder 1.5 s)
+    reservoir_gate  RES_D8_A                 10 runs x   88.1 min  (step 175.5 ms, evaluation 9.5 s, decoder 1.4 s)
+    reservoir_gate  RES_D8_M                 10 runs x   91.6 min  (step 182.5 ms, evaluation 9.8 s, decoder 1.4 s)
+    stream_knobs    LR3E4                     5 runs x   90.1 min  (step 179.7 ms, evaluation 9.6 s, decoder 1.5 s)
+    stream_knobs    LR3E3                     5 runs x   83.6 min  (step 165.6 ms, evaluation 10.1 s, decoder 1.4 s)
+    stream_knobs    WH_SLOW                   5 runs x   84.4 min  (step 167.3 ms, evaluation 10.2 s, decoder 1.3 s)
+    stream_knobs    DECAY98                   5 runs x   82.9 min  (step 164.7 ms, evaluation 9.5 s, decoder 1.5 s)
+    stream_knobs    PERFECT98                 5 runs x   60.8 min  (step 119.4 ms, evaluation 8.6 s, decoder 0.0 s)
+    write_decoders  HINGE_D8_A                5 runs x   15.0 min  (step 177.8 ms, evaluation 9.7 s, decoder 1.6 s)
+    write_decoders  D8_HINGE_M                5 runs x   15.6 min  (step 186.4 ms, evaluation 9.5 s, decoder 1.4 s)
+    write_decoders  A_HINGE_M                 5 runs x    7.6 min  (step 90.8 ms, evaluation 4.6 s, decoder 0.9 s)
+    write_decoders  HINGE16_M                 5 runs x    7.6 min  (step 91.4 ms, evaluation 4.3 s, decoder 0.7 s)
+    write_decoders  D8_PREV_A                 5 runs x   16.5 min  (step 198.0 ms, evaluation 8.4 s, decoder 1.9 s)
+    total 177.19 h of runs; makespan on 4 workers 44.33 h (worst case)
+  RUNTIME RULE: projected makespan 44.33 h > 10 h: cut, re-projecting after each: stream_knobs LR3E4 -> 42.44 h; reservoir_gate RES_D8_M -> 38.63 h; window_scale LOCAL3_SLOW_D8_A_SPLIT -> 35.67 h; window_scale LOCAL3_SLOW16_M -> 28.28 h; still over 10 h after every listed cut: S43, S44(b)'s Adam arm and S47 are never cut, so the batch runs at 28.28 h (dry run: not stored)
+  dry run: the runtime rule's decision is printed, not applied (every arm is exercised)
+  recipe read in a child from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups), WARM 2400, TAU 0.2, LAMBDA 1.0; S43: the branch's test_channel_binding.SUB_LR 0.001, test_short_conv.MAX_ITERS 24000; Muon lr 0.005; 1 torch thread per run
+  lr for dry_window_recipe LOCAL3: 0.001; iters 2400; seeds 180-180 (1)
+  lr for dry_window_recipe LOCAL3_SLOW: 0.001; iters 2400; seeds 160-160 (1)
+  lr for dry_window_scale LOCAL3_SLOW16_A: 0.001; iters 2400; seeds 240-240 (1)
+  lr for dry_window_scale LOCAL3_SLOW16_M: 0.001; Muon lr 0.005; iters 2400; seeds 240-240 (1)
+  lr for dry_window_scale MUON_HINGE16_REF: 0.001; Muon lr 0.005; iters 2400; seeds 240-240 (1)
+  lr for dry_window_scale LOCAL3_SLOW_D8_A: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_window_scale LOCAL3_SLOW_D8_M: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
+  lr for dry_window_scale LOCAL3_SLOW_D8_A_SPLIT: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_window_scale D8_HINGE_M_REF: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
+  lr for dry_reservoir_gate RES_D8_A: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_reservoir_gate RES_D8_M: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
+  lr for dry_stream_knobs LR3E4: 0.0003; iters 2400; seeds 260-260 (1)
+  lr for dry_stream_knobs LR3E3: 0.003; iters 2400; seeds 260-260 (1)
+  lr for dry_stream_knobs WH_SLOW: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_stream_knobs DECAY98: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_stream_knobs PERFECT98: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_write_decoders HINGE_D8_A: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_write_decoders D8_HINGE_M: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
+  lr for dry_write_decoders A_HINGE_M: 0.001; Muon lr 0.005; iters 2400; seeds 240-240 (1)
+  lr for dry_write_decoders HINGE16_M: 0.001; Muon lr 0.005; iters 2400; seeds 240-240 (1)
+  lr for dry_write_decoders D8_PREV_A: 0.001; iters 2400; seeds 260-260 (1)
+  CHECK local_gate: local=False equals arm A (parameters): ok
+  CHECK local_gate: local=False equals arm A (logits): ok
+  CHECK local_gate: local=True shares arm A's parameters: ok
+  CHECK local_gate: gate at t ignores token t-3: ok
+  CHECK local_gate: gate at t sees token t-2: ok
+  CHECK dry_window_recipe: batch 1's LOCAL3 checks (explore_local_gate.check: local=False equals arm A, parameters and logits; local=True shares arm A's parameters; the gate at t ignores token t-3 and sees t-2): ok
+  CHECK dry_window_recipe: with the window weights at [1, 0, 0] (lag 0) and W_h = 0 the LOCAL3 gate equals arm A's gate with W_h = 0 (max |diff| 5.96e-08 <= 1e-6; bit-identical False): ok
+  CHECK dry_window_recipe: explore_b16_gates.window_init(seed) equals batch 1's window for seeds 160 and 199: ok
+  CHECK dry_window_recipe: LOCAL3_SLOW: two groups covering every trainable parameter once (8 tensors; gate group ['W_in', 'W_g', 'gate_conv.conv_w']); W_h frozen, in no group, unchanged after 2401 updates: ok
+  CHECK dry_window_recipe: LOCAL3_SLOW lrs [gate, rest] at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001] (2401 updates, ok=True): ok
+  CHECK dry_write_decoders: the decoder scores 1.0000 on a synthetic separable set (8 classes, 4000 points) and 0.1275 with shuffled labels (chance 0.1250; within 0.05: True): ok
+  CHECK dry_write_decoders: explore_b16_gates.ncm equals S38's ncm on random data (0.1333 vs 0.1333): ok
+  CHECK dry_write_decoders: explore_b16_gates.ncm scores 1.0000 on S38's separable set and 0.1275 with shuffled labels (chance 0.1250, within 0.05): ok
+  CHECK dry_write_decoders: the decoder's fit and score halves are disjoint sets of sequences (256 + 256 = 512): ok
+  CHECK dry_write_decoders: config a: on S38's probe the CTX positions 3j hold the stream tokens 0..3 ([0, 1, 2, 3]), KEY positions 3j+1 keys (4-7), VAL positions 3j+2 values (8-23), disjoint: ok
+  CHECK dry_write_decoders: config k16: on S38's probe the CTX positions 3j hold the stream tokens 0..3 ([0, 1, 2, 3]), KEY positions 3j+1 keys (4-7), VAL positions 3j+2 values (8-23), disjoint: ok
+  CHECK dry_write_decoders: config b: on S38's probe the CTX positions 3j hold the stream tokens 0..7 ([0, 1, 2, 3, 4, 5, 6, 7]), KEY positions 3j+1 keys (8-11), VAL positions 3j+2 values (12-27), disjoint: ok
+  CHECK dry_write_decoders: the read gate recomputed from h equals the model's (max |diff| per gate kind {'recurrent': '0.0e+00', 'GATE_PREV': '0.0e+00', 'LOCAL3': '0.0e+00', 'reservoir': '0.0e+00'} <= 1e-6): ok
+  CHECK dry_write_decoders: GATE_PREV at update 0: its input decodes the stream at KEY (CTX one back) at 1.000 and at VAL (two back) at 0.131, chance 0.125 (the audit's point: KEY by construction, VAL not): ok
+  CHECK dry_reservoir_gate: at init every parameter but W_h equals the run path's model's; W_h = W_h0 x 0.5 / rho(W_h0) (rho0 0.6251, sigma0 1.0834 -> rho 0.5000000, sigma 0.8666); |rho - 0.5| <= 1e-6; frozen (True): ok
+  CHECK dry_reservoir_gate: adam: over 50 steps W_h receives no update (equal to its rescaled initial value: True; W_in moved: True); rho(W_h) after 50 steps 0.5000000 (|rho - 0.5| <= 1e-6); the groups cover every trainable parameter once, W_h in none ([['W_in', 'W_g'], ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_reservoir_gate: muon: over 50 steps W_h receives no update (equal to its rescaled initial value: True; W_in moved: True); rho(W_h) after 50 steps 0.5000000 (|rho - 0.5| <= 1e-6); the groups cover every trainable parameter once, W_h in none ([['W_in', 'W_g'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK dry_window_recipe: LOCAL3|160 with the decoder probe reproduces batch 1's record through 2400 (curve [[1200, 0.48486328125, 1.5864747762680054], [2400, 0.76220703125, 0.5037660002708435]] vs [[1200, 0.48486328125, 1.5864747762680054], [2400, 0.76220703125, 0.5037660002708435]]; statistics at [0, 1200, 2400] equal True; decoder at 1200/2400 h_key [1.0, 1.0], h_val [1.0, 1.0]): ok
+  CHECK dry_stream_knobs: decay 0.98 enters the decay mask and nothing else: parameters and buffers equal (True); attention attributes that differ ['decay']; layer-1 scores = the 0.95 model's x (0.98/0.95)^(t-s) (max rel. diff 2.4e-07 <= 1e-5); logits differ (True) and equal the 0.95 model's bit for bit with the decay set back (True): ok
+  CHECK dry_stream_knobs: the perfect gate's routing is unchanged at decay 0.98 (read gate bitwise equal: True; one-hot over 16 channels: True): ok
+  CHECK dry_stream_knobs: explore_b16_main's Adam recipe at the default lrs (gate W_in/W_h/W_g 1e-3; the rest 1e-4 -> 1e-3; the hinge) reproduces X's HINGE_D8|260 through 1200 (curve [[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]; statistics equal): ok
+  CHECK dry_stream_knobs: LR3E4: groups [('gate', ['W_in', 'W_h', 'W_g']), ('rest', 6)] cover every parameter once; lrs at update 1 [0.0003, 2.9999999999999997e-05], 2400 [0.0003, 2.9999999999999997e-05], 2401 [0.0003, 0.0003]: ok
+  CHECK dry_stream_knobs: LR3E3: groups [('gate', ['W_in', 'W_h', 'W_g']), ('rest', 6)] cover every parameter once; lrs at update 1 [0.003, 0.00030000000000000003], 2400 [0.003, 0.00030000000000000003], 2401 [0.003, 0.003]: ok
+  CHECK dry_stream_knobs: WH_SLOW: groups [('gate', ['W_in', 'W_g']), ('fixed', ['W_h']), ('rest', 6)] cover every parameter once; lrs at update 1 [0.001, 0.0001, 0.0001], 2400 [0.001, 0.0001, 0.0001], 2401 [0.001, 0.0001, 0.001]: ok

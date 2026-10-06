@@ -124,9 +124,15 @@ def plan(arms_of, t, cut, workers, show=False, tag=""):
 
 
 def runtime_rule(workers, dry):
-    t = timings(workers)
     st = ec.load_store(RUNTIME_STORE)
     stored = st["meta"].get("cut")
+    if stored is not None and stored.get("timings") and not dry:
+        t = {tuple(k.split("|")): v for k, v in stored["timings"].items()}
+        print(f"  RUNTIME RULE (stored {stored['time']} on {stored['cpu']}: makespan {stored['makespan_h0']:.2f} h on "
+              f"{stored['workers']} workers): cut {[tuple(c) for c in stored['cut']] or 'nothing'} -> {stored['makespan_h']:.2f} h "
+              f"(the stored timings are reused)", flush=True)
+        return t, stored
+    t = timings(workers)
     full = {nm: arms for nm, arms in FULL.items()}
     if dry:
         plan({m.NAME.replace("dry_", ""): m.ARMS for m in SCREENS}, t, set(), workers, show=True, tag=" OF THIS DRY RUN")
@@ -138,7 +144,8 @@ def runtime_rule(workers, dry):
             ms = plan(full, t, set(cut), workers)
             steps.append(dict(cut=list(cut[-1]), makespan_h=ms / 3600))
         dec = dict(cut=[list(c) for c in cut], makespan_h0=ms0 / 3600, steps=steps, makespan_h=ms / 3600, workers=workers,
-                   cpu=ec.cpu_model(), time=time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()))
+                   cpu=ec.cpu_model(), time=time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
+                   timings={f"{a}|{b}": v for (a, b), v in t.items()})
         print(f"  RUNTIME RULE: projected makespan {ms0 / 3600:.2f} h " + (f"> {CUT_H:g} h: cut, re-projecting after each: "
               + "; ".join(f"{s['cut'][0]} {s['cut'][1]} -> {s['makespan_h']:.2f} h" for s in steps) if cut else f"<= {CUT_H:g} h: no cut")
               + (f"; still over {CUT_H:g} h after every listed cut: S43, S44(b)'s Adam arm and S47 are never cut, so the batch "
@@ -227,10 +234,20 @@ def line(j, rec):
     return s
 
 
-def dur_fn(t):
+def dur_fn(t, cpu):
+    """A job's expected duration for packing a segment: 1.05 x the longest wall time of the arm's completed runs on this
+    CPU when there is one (the eight-stream runs go the distance), else the projection's worst case."""
+    seen = {}
+    for m in SCREENS:
+        for r in ec.load_store(m.NAME)["runs"].values():
+            if r.get("ok") and r.get("cpu") == cpu and r.get("secs_wall"):
+                k = (m.NAME, r["arm"])
+                seen[k] = max(seen.get(k, 0.0), r["secs_wall"])
+
     def dur(j):
         nm = j["name"].replace("dry_", "")
-        return per_run(nm, j["arm"], BY_NAME[nm].ARMS[j["arm"]], t)
+        w = seen.get((j["name"], j["arm"]))
+        return 1.05 * w if w else per_run(nm, j["arm"], BY_NAME[nm].ARMS[j["arm"]], t)
     return dur
 
 
@@ -310,7 +327,7 @@ def main():
         print(f"  {len(jobs)} runs queued on {args.workers} workers (1 torch thread each)"
               + (f"; segment budget {budget / 60:.0f} min left" if budget else ""), flush=True)
         t0 = time.time()
-        c16.run_pool(jobs, args.workers, dur_fn(t), budget, line)
+        c16.run_pool(jobs, args.workers, dur_fn(t, cpu), budget, line)
         print(f"  batch wall clock {(time.time() - t0) / 60:.1f} min (this segment)")
     print("#" * 100)
     print(f"REPORTS — {ec.BANNER}{dl}")
