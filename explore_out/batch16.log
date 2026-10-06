@@ -1471,3 +1471,9 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [ 33]   78.3 min  window_recipe    LOCAL3_SLOW              seed 168  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 3085afd, code 46867e792241, attempt 1: acc 1.000  trans  3600  VALcos 0.000  margin 1.00  DISCOVERED
   start   78.3 min  window_recipe    LOCAL3_SLOW              seed 170  (projected worst case 2 min)
+  [ 34]   80.0 min  window_recipe    LOCAL3_SLOW              seed 163  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7ca1e83, code 46867e792241, attempt 1: acc 0.744  trans  None  VALcos 0.601  margin 0.51  STREAM-PARTIAL
+  start   80.0 min  window_recipe    LOCAL3_SLOW              seed 171  (projected worst case 2 min)
+  [ 35]   80.2 min  window_recipe    LOCAL3_SLOW              seed 170  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7ca1e83+dirty, code 46867e792241, attempt 1: acc 1.000  trans  3600  VALcos 0.000  margin 1.00  DISCOVERED
+  start   80.2 min  window_recipe    LOCAL3_SLOW              seed 172  (projected worst case 2 min)
