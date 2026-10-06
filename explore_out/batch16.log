@@ -1384,3 +1384,9 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [  4]   51.9 min  stream_knobs     WH_SLOW                  seed 263  lr 0.001  (W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git e272e47+dirty, code ea36a6e5d44b, attempt 1: acc 0.500  trans  None  outcome MERGED (3 share); decoder at 2400: h CTX/KEY/VAL 0.56/0.58/0.41
   start   51.9 min  window_recipe    LOCAL3                   seed 182  (projected worst case 17 min)
+  [  5]   53.3 min  window_recipe    LOCAL3                   seed 180  lr 0.001  (lr 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 12e63ea, code 46867e792241, attempt 1: acc 1.000  trans  2400  VALcos 0.000  margin 1.00  DISCOVERED
+  start   53.3 min  window_recipe    LOCAL3                   seed 183  (projected worst case 17 min)
+  [  6]   53.4 min  window_recipe    LOCAL3                   seed 181  lr 0.001  (lr 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 12e63ea+dirty, code 46867e792241, attempt 1: acc 1.000  trans  2400  VALcos 0.002  margin 1.00  DISCOVERED
+  start   53.4 min  window_recipe    LOCAL3                   seed 184  (projected worst case 17 min)
