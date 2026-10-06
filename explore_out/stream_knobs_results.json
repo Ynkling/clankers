@@ -1,0 +1,87 @@
+{
+ "meta": {
+  "arms": {
+   "DECAY98": {
+    "iters": 28800,
+    "key": "DECAY98",
+    "label": "HINGE_D8 at decay 0.98",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "LR3E3": {
+    "iters": 28800,
+    "key": "LR3E3",
+    "label": "HINGE_D8 at lr 3e-3",
+    "lr": 0.003,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "gate W_in/W_h/W_g 0.003 throughout; every other parameter 0.0003 for updates 1-2400, 0.003 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "PERFECT98": {
+    "iters": 28800,
+    "key": "PERFECT98",
+    "label": "the perfect gate at decay 0.98 (validity)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "every parameter 0.001 throughout (the perfect gate's plain recipe); decay 0.98; no hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "WH_SLOW": {
+    "iters": 28800,
+    "key": "WH_SLOW",
+    "label": "HINGE_D8 with W_h at lr/10",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   }
+  },
+  "code_shas": [
+   "ea36a6e5d44b23ec4fc116c17b43228159317375"
+  ],
+  "cut": [
+   "LR3E4"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "0b63873+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-06 14:53:07",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

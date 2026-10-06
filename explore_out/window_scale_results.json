@@ -1,0 +1,134 @@
+{
+ "meta": {
+  "arms": {
+   "D8_HINGE_M_REF": {
+    "iters": 28800,
+    "key": "D8_HINGE_M_REF",
+    "label": "S33's D8_HINGE, fresh on this CPU (reference)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "needed_by": [
+     [
+      "window_scale",
+      "LOCAL3_SLOW_D8_M"
+     ],
+     [
+      "reservoir_gate",
+      "RES_D8_M"
+     ]
+    ],
+    "opt": "muon",
+    "part": "b",
+    "ref": true,
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "LOCAL3_SLOW16_A": {
+    "iters": 28800,
+    "key": "LOCAL3_SLOW16_A",
+    "label": "LOCAL3 + SLOW, no hinge (Adam), S=4, k=16",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "part": "a",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244,
+     245,
+     246,
+     247,
+     248,
+     249,
+     250,
+     251,
+     252,
+     253,
+     254,
+     255,
+     256,
+     257,
+     258,
+     259
+    ]
+   },
+   "LOCAL3_SLOW_D8_A": {
+    "iters": 28800,
+    "key": "LOCAL3_SLOW_D8_A",
+    "label": "LOCAL3 + SLOW, no hinge (Adam), S=8, k=16",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "part": "b",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "LOCAL3_SLOW_D8_M": {
+    "iters": 28800,
+    "key": "LOCAL3_SLOW_D8_M",
+    "label": "LOCAL3 + S25's groups (Muon), no hinge, S=8, k=16",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "part": "b",
+    "sched": "Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   }
+  },
+  "code_shas": [
+   "01767493e8401d9feaa5722818decfc2c7ad65ca"
+  ],
+  "cut": [
+   "LOCAL3_SLOW16_M",
+   "LOCAL3_SLOW_D8_A_SPLIT",
+   "MUON_HINGE16_REF"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "0b63873+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-06 14:53:07",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

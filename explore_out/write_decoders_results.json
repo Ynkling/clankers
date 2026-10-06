@@ -1,0 +1,106 @@
+{
+ "meta": {
+  "arms": {
+   "A_HINGE_M": {
+    "chance": 0.25,
+    "iters": 4800,
+    "key": "A_HINGE_M",
+    "label": "S33's A_HINGE (Muon; S=4, k=4), fresh on this CPU, to 4800",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244
+    ]
+   },
+   "D8_HINGE_M": {
+    "chance": 0.125,
+    "iters": 4800,
+    "key": "D8_HINGE_M",
+    "label": "S33's D8_HINGE (Muon), fresh on this CPU, to 4800",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "D8_PREV_A": {
+    "chance": 0.125,
+    "iters": 4800,
+    "key": "D8_PREV_A",
+    "label": "S40's D8_PREV_A (GATE_PREV, Adam), rerun to 4800",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "W_prev in the gate group; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   },
+   "HINGE16_M": {
+    "chance": 0.25,
+    "iters": 4800,
+    "key": "HINGE16_M",
+    "label": "S35's MUON_HINGE16 (Muon; S=4, k=16), fresh on this CPU, to 4800",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "sched": "Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     240,
+     241,
+     242,
+     243,
+     244
+    ]
+   },
+   "HINGE_D8_A": {
+    "chance": 0.125,
+    "iters": 4800,
+    "key": "HINGE_D8_A",
+    "label": "X's HINGE_D8 (Adam), rerun to 4800",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264
+    ]
+   }
+  },
+  "code_shas": [
+   "d6ccc68892a760061fc89f016d1dbd48746e6ec0"
+  ],
+  "cut": [],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "0b63873+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-06 14:53:07",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

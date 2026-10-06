@@ -1,0 +1,44 @@
+{
+ "meta": {
+  "arms": {
+   "RES_D8_A": {
+    "iters": 28800,
+    "key": "RES_D8_A",
+    "label": "reservoir gate (W_h frozen, rho 0.5) + SLOW + HINGE (Adam)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "gate W_in/W_g 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   }
+  },
+  "code_shas": [
+   "f2c00d3f4a59d93d9a0176e9b868d4c7cb6dc598"
+  ],
+  "cut": [
+   "RES_D8_M"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "0b63873+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-06 14:53:07",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

@@ -58,3 +58,112 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   CHECK local_gate: local=True shares arm A's parameters: ok
   CHECK local_gate: gate at t ignores token t-3: ok
   CHECK local_gate: gate at t sees token t-2: ok
+  CHECK write_decoders: the decoder scores 1.0000 on a synthetic separable set (8 classes, 4000 points) and 0.1275 with shuffled labels (chance 0.1250; within 0.05: True): ok
+  CHECK write_decoders: explore_b16_gates.ncm equals S38's ncm on random data (0.1333 vs 0.1333): ok
+  CHECK write_decoders: explore_b16_gates.ncm scores 1.0000 on S38's separable set and 0.1275 with shuffled labels (chance 0.1250, within 0.05): ok
+  CHECK write_decoders: the decoder's fit and score halves are disjoint sets of sequences (256 + 256 = 512): ok
+  CHECK write_decoders: config a: on S38's probe the CTX positions 3j hold the stream tokens 0..3 ([0, 1, 2, 3]), KEY positions 3j+1 keys (4-7), VAL positions 3j+2 values (8-23), disjoint: ok
+  CHECK write_decoders: config k16: on S38's probe the CTX positions 3j hold the stream tokens 0..3 ([0, 1, 2, 3]), KEY positions 3j+1 keys (4-7), VAL positions 3j+2 values (8-23), disjoint: ok
+  CHECK write_decoders: config b: on S38's probe the CTX positions 3j hold the stream tokens 0..7 ([0, 1, 2, 3, 4, 5, 6, 7]), KEY positions 3j+1 keys (8-11), VAL positions 3j+2 values (12-27), disjoint: ok
+  CHECK write_decoders: the read gate recomputed from h equals the model's (max |diff| per gate kind {'recurrent': '0.0e+00', 'GATE_PREV': '0.0e+00', 'LOCAL3': '0.0e+00', 'reservoir': '0.0e+00'} <= 1e-6): ok
+  CHECK write_decoders: GATE_PREV at update 0: its input decodes the stream at KEY (CTX one back) at 1.000 and at VAL (two back) at 0.131, chance 0.125 (the audit's point: KEY by construction, VAL not): ok
+  CHECK window_recipe: batch 1's LOCAL3 checks (explore_local_gate.check: local=False equals arm A, parameters and logits; local=True shares arm A's parameters; the gate at t ignores token t-3 and sees t-2): ok
+  CHECK window_recipe: with the window weights at [1, 0, 0] (lag 0) and W_h = 0 the LOCAL3 gate equals arm A's gate with W_h = 0 (max |diff| 5.96e-08 <= 1e-6; bit-identical False): ok
+  CHECK window_recipe: explore_b16_gates.window_init(seed) equals batch 1's window for seeds 160 and 199: ok
+  CHECK window_recipe: LOCAL3_SLOW: two groups covering every trainable parameter once (8 tensors; gate group ['W_in', 'W_g', 'gate_conv.conv_w']); W_h frozen, in no group, unchanged after 2401 updates: ok
+  CHECK window_recipe: LOCAL3_SLOW lrs [gate, rest] at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001] (2401 updates, ok=True): ok
+  CHECK reservoir_gate: at init every parameter but W_h equals the run path's model's; W_h = W_h0 x 0.5 / rho(W_h0) (rho0 0.6251, sigma0 1.0834 -> rho 0.5000000, sigma 0.8666); |rho - 0.5| <= 1e-6; frozen (True): ok
+  CHECK reservoir_gate: adam: over 50 steps W_h receives no update (equal to its rescaled initial value: True; W_in moved: True); rho(W_h) after 50 steps 0.5000000 (|rho - 0.5| <= 1e-6); the groups cover every trainable parameter once, W_h in none ([['W_in', 'W_g'], ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight', 'short_conv.conv_w']]): ok
+  CHECK reservoir_gate: muon: over 50 steps W_h receives no update (equal to its rescaled initial value: True; W_in moved: True); rho(W_h) after 50 steps 0.5000000 (|rho - 0.5| <= 1e-6); the groups cover every trainable parameter once, W_h in none ([['W_in', 'W_g'], ['decoder', 'encoder', 'encoder_v', 'lm_head'], ['embed.weight', 'short_conv.conv_w']]): ok
+  CHECK window_scale: config k16: LOCAL3's conversion keeps every parameter of the run path's model bitwise (9), adds only ['gate_conv.conv_w'], equal to batch 1's window for the seed (True); W_h frozen (True); class LocalBDH: ok
+  CHECK window_scale: config b: LOCAL3's conversion keeps every parameter of the run path's model bitwise (9), adds only ['gate_conv.conv_w'], equal to batch 1's window for the seed (True); W_h frozen (True); class LocalBDH: ok
+  CHECK window_scale: config b: the LOCAL3 gate at t = 30 ignores token t-3 (True) and sees token t-2 (True): ok
+  CHECK window_scale: config b: with the window at [1, 0, 0] and W_h = 0 the LOCAL3 gate equals arm A's gate with W_h = 0 (max |diff| 0.00e+00 <= 1e-6): ok
+  CHECK window_scale: config k16 LOCAL3 Adam: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]; W_h in no group and unchanged after 2401 updates (True): ok
+  CHECK window_scale: config k16 LOCAL3 Muon (S25's groups): [(('gate', 'muon'), ['W_in', 'W_g']), (('gate', 'adam'), ['gate_conv.conv_w']), (('rest', 'muon'), ['decoder', 'encoder', 'encoder_v', 'lm_head']), (('rest', 'adam'), ['embed.weight', 'short_conv.conv_w'])]; lrs at update 1 [0.005, 0.001, 0.0005, 0.0001], 2400 [0.005, 0.001, 0.0005, 0.0001], 2401 [0.005, 0.001, 0.005, 0.001]: ok
+  CHECK window_scale: config b LOCAL3 Adam: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]; W_h in no group and unchanged after 2401 updates (True): ok
+  CHECK window_scale: config b LOCAL3 Muon (S25's groups): [(('gate', 'muon'), ['W_in', 'W_g']), (('gate', 'adam'), ['gate_conv.conv_w']), (('rest', 'muon'), ['decoder', 'encoder', 'encoder_v', 'lm_head']), (('rest', 'adam'), ['embed.weight', 'short_conv.conv_w'])]; lrs at update 1 [0.005, 0.001, 0.0005, 0.0001], 2400 [0.005, 0.001, 0.0005, 0.0001], 2401 [0.005, 0.001, 0.005, 0.001]: ok
+  CHECK window_scale: explore_b16_main.muon_groups with the recurrent gate's names equals S33's groups (True): ok
+  CHECK window_scale: the SPLIT arm's inertness check is skipped: the arm is cut: ok
+  CHECK window_recipe: LOCAL3|160 with the decoder probe reproduces batch 1's record through 2400 (curve [[1200, 0.48486328125, 1.5864747762680054], [2400, 0.76220703125, 0.5037660002708435]] vs [[1200, 0.48486328125, 1.5864747762680054], [2400, 0.76220703125, 0.5037660002708435]]; statistics at [0, 1200, 2400] equal True; decoder at 1200/2400 h_key [1.0, 1.0], h_val [1.0, 1.0]): ok
+  CHECK stream_knobs: decay 0.98 enters the decay mask and nothing else: parameters and buffers equal (True); attention attributes that differ ['decay']; layer-1 scores = the 0.95 model's x (0.98/0.95)^(t-s) (max rel. diff 2.4e-07 <= 1e-5); logits differ (True) and equal the 0.95 model's bit for bit with the decay set back (True): ok
+  CHECK stream_knobs: the perfect gate's routing is unchanged at decay 0.98 (read gate bitwise equal: True; one-hot over 16 channels: True): ok
+  CHECK stream_knobs: explore_b16_main's Adam recipe at the default lrs (gate W_in/W_h/W_g 1e-3; the rest 1e-4 -> 1e-3; the hinge) reproduces X's HINGE_D8|260 through 1200 (curve [[1200, 0.0615234375, 2.8093132972717285]] vs [[1200, 0.0615234375, 2.8093132972717285]]; statistics equal): ok
+  CHECK stream_knobs: LR3E4: groups [('gate', ['W_in', 'W_h', 'W_g']), ('rest', 6)] cover every parameter once; lrs at update 1 [0.0003, 2.9999999999999997e-05], 2400 [0.0003, 2.9999999999999997e-05], 2401 [0.0003, 0.0003]: ok
+  CHECK stream_knobs: LR3E3: groups [('gate', ['W_in', 'W_h', 'W_g']), ('rest', 6)] cover every parameter once; lrs at update 1 [0.003, 0.00030000000000000003], 2400 [0.003, 0.00030000000000000003], 2401 [0.003, 0.003]: ok
+  CHECK stream_knobs: WH_SLOW: groups [('gate', ['W_in', 'W_g']), ('fixed', ['W_h']), ('rest', 6)] cover every parameter once; lrs at update 1 [0.001, 0.0001, 0.0001], 2400 [0.001, 0.0001, 0.0001], 2401 [0.001, 0.0001, 0.001]: ok
+  CHECK batch 16: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (5.7 min)
+  recorded the full CHECK pass (code SHAs, the batch's CPU Intel(R) Xeon(R) Processor @ 2.80GHz) in /home/user/clankers/explore_out/batch16_checks.json
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_recipe
+  idea    the width-3 window gate (batch 1's LOCAL3) with S5's slow memory and no hinge
+  source  the audit of 6 October 2026, section 3.1: LOCAL3 beat arm A 15/20 vs 7/20 in batch 1 and was dropped; it cannot position-split, and slow memory removes key splits (Q2)
+  change  LOCAL3_SLOW: LOCAL3 + S5's two-group schedule (gate W_in, W_g, window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); LOCAL3 unchanged on 20 new seeds
+  arm LOCAL3       lr 0.001  iters 24000  seeds 180-199 (20)  — batch 1's S1 LOCAL3, unchanged (160-179: batch 1's records)
+                   schedule: lr 0.001 throughout
+  arm LOCAL3_SLOW  lr 0.001  iters 24000  seeds 160-199 (40)  — LOCAL3 + S5's SLOW schedule, no hinge
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused)
+  pairing seeds 160-199 with S13's SLOW_HINGE, S5/S7's SLOW_MEM and LOCAL3 (batch 1's records on 160-179); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_scale
+  idea    the window gate (LOCAL3) with slow memory, no hinge, at four and eight streams (k=16, conv)
+  source  the audit of 6 October 2026, sections 3.1 and 3.2 (the window sees CTX at the read and the write positions)
+  change  main's A4k16 / D8 paths with LOCAL3's gate in place of the recurrent gate, the SLOW schedule (Adam) or S25's groups (Muon 0.005), no hinge; SPLIT: + S37's KEYMASS trigger
+  arm LOCAL3_SLOW16_A lr 0.001  iters 28800  seeds 240-259 (20)  — LOCAL3 + SLOW, no hinge (Adam), S=4, k=16
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm LOCAL3_SLOW_D8_A lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3 + SLOW, no hinge (Adam), S=8, k=16
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm LOCAL3_SLOW_D8_M lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3 + S25's groups (Muon), no hinge, S=8, k=16
+                   schedule: Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge
+  arm D8_HINGE_M_REF lr 0.001  iters 28800  seeds 260-269 (10)  — S33's D8_HINGE, fresh on this CPU (reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  pairing (a) seeds 240-259: Adam with X's HINGE4k16, Muon with MUON_HINGE16_REF (S35's recipe, fresh on this CPU); (b) seeds 260-269: Adam with X's HINGE_D8, Muon with D8_HINGE_M_REF (S33's recipe, fresh on this CPU), SPLIT with LOCAL3_SLOW_D8_A; same initial parameters (+ the window) and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN reservoir_gate
+  idea    a frozen reservoir gate: W_h fixed at its init rescaled to spectral radius 0.5 (echo-state), W_in and W_g trained
+  source  the audit of 6 October 2026, section 4 (LRU / contractive recurrences); batch 15's S41 and S42
+  change  arm A's gate with W_h <- W_h0 x 0.5 / rho(W_h0), frozen; + SLOW + main's HINGE (Adam) or S25's groups (Muon)
+  arm RES_D8_A     lr 0.001  iters 28800  seeds 260-269 (10)  — reservoir gate (W_h frozen, rho 0.5) + SLOW + HINGE (Adam)
+                   schedule: gate W_in/W_g 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge
+  pairing seeds 260-269: Adam with X's HINGE_D8, Muon with S44's D8_HINGE_M_REF (fresh on this CPU); same initial parameters (W_h rescaled) and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN stream_knobs
+  idea    the eight-stream knobs never varied: the learning rate (x0.3, x3), W_h's rate (/10), the memory decay (0.98)
+  source  the audit of 6 October 2026, section 3.4; Okpekpe & Orvieto (arXiv 2508.19029)
+  change  X's HINGE_D8 with one knob changed per arm; the perfect gate at decay 0.98 (validity)
+  arm LR3E3        lr 0.003  iters 28800  seeds 260-264 (5)  — HINGE_D8 at lr 3e-3
+                   schedule: gate W_in/W_h/W_g 0.003 throughout; every other parameter 0.0003 for updates 1-2400, 0.003 after; + main's HINGE hinge
+  arm WH_SLOW      lr 0.001  iters 28800  seeds 260-264 (5)  — HINGE_D8 with W_h at lr/10
+                   schedule: W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  arm DECAY98      lr 0.001  iters 28800  seeds 260-264 (5)  — HINGE_D8 at decay 0.98
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge
+  arm PERFECT98    lr 0.001  iters 28800  seeds 260-264 (5)  — the perfect gate at decay 0.98 (validity)
+                   schedule: every parameter 0.001 throughout (the perfect gate's plain recipe); decay 0.98; no hinge
+  pairing seeds 260-264, printed beside X's recorded HINGE_D8 (same initial parameters and batches); descriptive
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN write_decoders
+  idea    decode the stream from the gate state at the write (VAL) positions, beside CTX and KEY
+  source  the audit of 6 October 2026, section 3.2 (one token of memory at the read, two at the write)
+  change  none to the runs (reruns to 4800); S38's decoder at CTX, KEY and VAL at 0, 1200, 2400, 4800
+  arm HINGE_D8_A   lr 0.001  iters 4800  seeds 260-264 (5)  — X's HINGE_D8 (Adam), rerun to 4800
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  arm D8_HINGE_M   lr 0.001  iters 4800  seeds 260-264 (5)  — S33's D8_HINGE (Muon), fresh on this CPU, to 4800
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm A_HINGE_M    lr 0.001  iters 4800  seeds 240-244 (5)  — S33's A_HINGE (Muon; S=4, k=4), fresh on this CPU, to 4800
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm HINGE16_M    lr 0.001  iters 4800  seeds 240-244 (5)  — S35's MUON_HINGE16 (Muon; S=4, k=16), fresh on this CPU, to 4800
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm D8_PREV_A    lr 0.001  iters 4800  seeds 260-264 (5)  — S40's D8_PREV_A (GATE_PREV, Adam), rerun to 4800
+                   schedule: W_prev in the gate group; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  pairing each rerun against its record (Adam: reproduce through 4800; Muon: fresh on this CPU)
+----------------------------------------------------------------------------------------------------
+  165 runs queued on 4 workers (1 torch thread each); segment budget 98 min left
+  start    0.0 min  window_scale     LOCAL3_SLOW_D8_M         seed 260  (projected worst case 85 min)
+  start    0.0 min  window_scale     LOCAL3_SLOW_D8_M         seed 261  (projected worst case 85 min)
+  start    0.0 min  window_scale     LOCAL3_SLOW_D8_M         seed 262  (projected worst case 85 min)
+  start    0.0 min  window_scale     LOCAL3_SLOW_D8_M         seed 263  (projected worst case 85 min)
