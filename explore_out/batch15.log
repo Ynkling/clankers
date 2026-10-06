@@ -498,3 +498,38 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (55s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  muon_record_check: S33's D8_HINGE|260 (Muon) through 1200 on Intel(R) Xeon(R) Processor @ 2.10GHz: BIT-IDENTICAL to its record (curve [[1200, 0.0703125, 2.9915246963500977]] vs [[1200, 0.0703125, 2.9915246963500977]]; statistics at [0, 1200]) (142s)
+  CHECKs skipped (repro check above still run): the screen code is unchanged — no file outside explore_out/ and explore_batch15.py differs from 5ce369b, where the full CHECK suite passed (2026-10-05 21:09:18 UTC; its output is earlier in this log). git diff --stat 5ce369b:
+     explore_out/README.md                          |      2 +-
+     explore_out/batch15.log                        |    361 +
+     explore_out/batch15_checks.json                |      4 +-
+     explore_out/gate_cap_results.json              | 183376 +++++++++++++++++++++-
+     explore_out/gate_cap_runtime_2p10_results.json |     20 +
+     explore_out/wh_spectrum_results.json           |   5195 +
+     6 files changed, 185347 insertions(+), 3611 deletions(-)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN gate_cap
+  idea    cap the recurrent gain of the gate (sigma_max(W_h) <= 0.5 after every step), or remove the recurrence (GATE_PREV's input only)
+  source  batch 14's S39 (at S=8 the stream leaves h as |W_h h_(t-1)| outgrows |W_in v_t|) and S40 (GATE_PREV's input carries the stream, h only partly; 0/10 bound)
+  change  CAP: after every optimizer step W_h <- W_h * 0.5 / sigma_max(W_h) if sigma_max(W_h) > 0.5, optimizer state untouched; NOREC: W_h = 0, frozen; nothing else
+  arm CAP_M        lr 0.001  iters 28800  seeds 260-269 (10)  — S33's D8_HINGE + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_CAP_M   lr 0.001  iters 28800  seeds 260-269 (10)  — S40's D8_PREV_M + CAP (Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  arm PREV_NOREC_M lr 0.001  iters 28800  seeds 260-269 (10)  — S40's D8_PREV_M with NOREC (W_h = 0, frozen; Muon)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g/W_prev (W_h frozen at 0) throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm PREV_CAP_A   lr 0.001  iters 28800  seeds 260-269 (10)  — S40's D8_PREV_A + CAP (Adam)
+                   schedule: gate W_in/W_h/W_g/W_prev 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step)
+  pairing seeds 260-269: CAP_M with S33's recorded D8_HINGE; PREV_CAP_M and PREV_NOREC_M with S40's recorded D8_PREV_M; PREV_CAP_A with S40's recorded D8_PREV_A; same initial parameters (NOREC: W_h = 0) and batches; on the 2.10GHz CPU the records were made on
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN wh_spectrum
+  idea    descriptive: does rho(W_h) cross 1 just before |W_h h|@key takes off (the stream leaving the gate state)?
+  source  batch 14's S39 (the stream leaves h at S=8 as |W_h h_(t-1)| outgrows |W_in v_t|)
+  change  none to the runs (reruns to 1600); sigma_max(W_h), rho(W_h), the gate's term norms and h's decodability every 50 updates
+  arm D8_HINGE_M   lr 0.001  iters 1600  seeds 260-264 (5)  — rerun of S33's D8_HINGE (Muon, S=8, k=16) to 1600
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400; + main's HINGE hinge
+  arm HINGE_D8_A   lr 0.001  iters 1600  seeds 260-264 (5)  — rerun of X's HINGE_D8 (Adam, S=8, k=16) to 1600
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400; + main's HINGE hinge
+  pairing each rerun against its recorded run (the curve and statistics must reproduce through 1600)
+----------------------------------------------------------------------------------------------------
