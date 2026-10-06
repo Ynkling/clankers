@@ -236,7 +236,8 @@ def line(j, rec):
 
 def dur_fn(t, cpu):
     """A job's expected duration for packing a segment: 1.05 x the longest wall time of the arm's completed runs on this
-    CPU when there is one (the eight-stream runs go the distance), else the projection's worst case."""
+    CPU when there is one (the eight-stream runs go the distance); else its projected worst case scaled by this CPU's
+    median observed / projected ratio (x 1.10), or the projection itself before any run on this CPU."""
     seen = {}
     for m in SCREENS:
         for r in ec.load_store(m.NAME)["runs"].values():
@@ -244,10 +245,20 @@ def dur_fn(t, cpu):
                 k = (m.NAME, r["arm"])
                 seen[k] = max(seen.get(k, 0.0), r["secs_wall"])
 
+    ratios = sorted(w / per_run(nm.replace("dry_", ""), arm, BY_NAME[nm.replace("dry_", "")].ARMS[arm], t)
+                    for (nm, arm), w in seen.items() if arm in BY_NAME[nm.replace("dry_", "")].ARMS)
+    factor = ratios[len(ratios) // 2] if ratios else None          # this CPU's speed against the projection
+
     def dur(j):
         nm = j["name"].replace("dry_", "")
         w = seen.get((j["name"], j["arm"]))
-        return 1.05 * w if w else per_run(nm, j["arm"], BY_NAME[nm].ARMS[j["arm"]], t)
+        if w:
+            return 1.05 * w
+        p = per_run(nm, j["arm"], BY_NAME[nm].ARMS[j["arm"]], t)
+        return 1.10 * factor * p if factor else p
+    if factor:
+        print(f"  packing: arms without a run on this CPU are sized at 1.10 x {factor:.2f} x their projection (the median "
+              f"observed / projected ratio over {len(ratios)} arms run on this CPU)", flush=True)
     return dur
 
 
