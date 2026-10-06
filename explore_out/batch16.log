@@ -2103,3 +2103,7 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [  1]   45.1 min  reservoir_gate   RES_D8_A                 seed 262  lr 0.001  (gate W_in/W_g 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 47d915b+dirty, code f2c00d3f4a59, attempt 1: acc 0.460  trans  None  outcome MERGED (3 share); decoder at 9600: h CTX/KEY/VAL 0.90/0.57/0.41
   start   45.1 min  stream_knobs     WH_SLOW                  seed 264  (projected worst case 54 min)
+  [  2]   45.3 min  reservoir_gate   RES_D8_A                 seed 261  lr 0.001  (gate W_in/W_g 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 390dbf9, code f2c00d3f4a59, attempt 1: acc 0.253  trans  None  outcome non-stream OTHER; decoder at 9600: h CTX/KEY/VAL 0.76/0.42/0.31
+  [  3]   45.7 min  reservoir_gate   RES_D8_A                 seed 260  lr 0.001  (gate W_in/W_g 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 390dbf9+dirty, code f2c00d3f4a59, attempt 1: acc 0.223  trans  None  outcome MERGED (5 share); decoder at 9600: h CTX/KEY/VAL 0.66/0.29/0.25
