@@ -475,3 +475,5 @@ EXPLORATORY, NOT A RESULT — batch 15: gate_cap (S41), wh_spectrum (S42)
           acc 0.488  trans  None  VALcos 0.000  margin 0.50  STREAM-PARTIAL  outcome MERGED (5 share); sigma_max(W_h) at init 1.0528, the cap first at update 1, on 25906 updates
   [  5/14]  109.1 min  gate_cap       PREV_NOREC_M seed 266  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g/W_prev (W_h frozen at 0) throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
           acc 0.392  trans  None  VALcos 1.000  margin -0.00  KEY  outcome non-stream KEY; sigma_max(W_h) at init 0.0000, the cap first at update None, on 0 updates
+  [  6/14]  109.7 min  gate_cap       CAP_M        seed 267  lr 0.001 (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge; + CAP (sigma_max(W_h) <= 0.5 after every step))
+          acc 0.221  trans  None  VALcos 0.000  margin 0.23  KEY  outcome non-stream OTHER; sigma_max(W_h) at init 1.1226, the cap first at update 1, on 24530 updates
