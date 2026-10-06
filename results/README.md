@@ -25,4 +25,8 @@ Commit = the git head each run was started from (its `meta.git`); date = its `me
 | X/slow_start_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 9c5939e | 2026-10-02 05:21 |
 | X/recipe_scope_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | a429af9 | 2026-10-03 02:50 |
 | X/early_recipe_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 9f25dc8 | 2026-10-04 06:26 |
+| L/stream_recipe_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 092937b | 2026-09-29 22:57 |
+| L/stream_curriculum_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | ffdf0aa (run at 631fd62) | 2026-09-30 15:27 |
+| L/slow_start_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 9c5939e | 2026-10-01 21:19 |
+| L/recipe_scope_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | a429af9 (run at c69f1e6) | 2026-10-03 13:02 |
 | L/early_recipe_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 9f25dc8 (run at 9437e01) | 2026-10-04 18:38 |
