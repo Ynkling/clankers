@@ -147,7 +147,7 @@ def cmd_assemble(args) -> int:
     raw = out_dir / "raw.mp4"
     subprocess.check_call(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", str(concat),
                            "-c:v", "copy", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11",
-                           "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(raw)])
+                           "-c:a", "aac", "-b:a", "96k", "-ac", "1", "-ar", "48000", str(raw)])
 
     # subtitles and chapters, offset by each part's real duration
     cues, chapters, t0 = [], [], 0.0
