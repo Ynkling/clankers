@@ -23,8 +23,23 @@ CLAIMS = [
 ]
 ROW_Y0, ROW_DY = 1.92, 0.55
 TEXT_X, BADGE_X = -6.35, 3.95
+DIV_Y = -1.2                # dashed rule between the ledger and the evidence strip
 DETAIL_Y = -2.25            # centre of the evidence strip under the ledger
 DETAIL_CUES = {1: "reliably with restarts"}   # claim 2: keep claim 1's evidence until the quote gets going
+# N22.1, one voiceover block per graded claim (split at sentence boundaries), so that each claim's
+# evidence can be read for a moment after its verdict is spoken
+CLAIM_NARRATION = [
+    "The report also grades its own earlier claims. The title claim stands.",
+    "\"A learned gate finds the partition, reliably with restarts, at two streams; four are the open problem\": "
+    "superseded, since the recipe now binds two streams, and four with sixteen channels, without restarts.",
+    "The early check at four streams: partly confirmed, precise on L but not on X.",
+    "\"It depends on what the memory learns first\": supported by a pre-registered test.",
+    "Restarts as the working recipe: replaced, at two streams and at four with sixteen channels, by the "
+    "early-training recipe.",
+    "And Revision Six's pooled p-values across the machines: corrected, because both machines ran the same seeds.",
+]
+CLAIM_SENTENCE = [1, 0, 0, 0, 0, 0]          # index, within its block, of the sentence that grades the claim
+CLAIM_HOLD = [0.4, 0.5, 1.3, 1.3, 0.9, 0.9]  # extra seconds on the finished evidence after each block
 
 # ---------------------------------------------------------------- §14.2: errors made during Phase V
 ERRORS = [
@@ -138,7 +153,7 @@ class Retrospective(ClankersScene):
         head_r = L("Revision 7's verdict", size=22, color=MUTED, weight="BOLD")
         head_r.move_to([BADGE_X, 2.47, 0], aligned_edge=LEFT)
         head_rule = Line([-6.5, 2.22, 0], [6.5, 2.22, 0]).set_stroke(FAINT, 1.5)
-        div = DashedLine([-6.5, -1.12, 0], [6.5, -1.12, 0], dash_length=0.08).set_stroke(FAINT, 1)
+        div = DashedLine([-6.5, DIV_Y, 0], [6.5, DIV_Y, 0], dash_length=0.08).set_stroke(FAINT, 1)
 
         rows, badges = VGroup(), VGroup()
         for i, (quote, tag, verdict) in enumerate(CLAIMS):
@@ -169,50 +184,44 @@ class Retrospective(ClankersScene):
                  "Report §14.1; hinge firings: X, Muon + WINDOW, seed 319 (data/hinge_firings.json)",
                  "Report §14.1"]
 
-        with self.voiceover(
-            "The report also grades its own earlier claims. The title claim stands. \"A learned gate finds the "
-            "partition, reliably with restarts, at two streams; four are the open problem\": superseded, since the "
-            "recipe now binds two streams, and four with sixteen channels, without restarts. The early check at "
-            "four streams: partly confirmed, precise on L but not on X. \"It depends on what the memory learns "
-            "first\": supported by a pre-registered test. Restarts as the working recipe: replaced, at two streams "
-            "and at four with sixteen channels, by the early-training recipe. And Revision Six's pooled p-values "
-            "across the machines: corrected, because both machines ran the same seeds."
-        ) as vo:
-            # sentence 0: the ledger's two columns
-            self.play(FadeIn(head_l, shift=0.15 * RIGHT), ShowCreation(head_rule), run_time=0.9)
-            self.play(FadeIn(head_r, shift=0.15 * LEFT), ShowCreation(div), run_time=0.8)
-
-            hl = None
-            note = None
-            prev = None
-            for i in range(6):
-                s = i + 1
-                vo.wait_until(max(cue(vo, s) - 0.2, 0))
+        hl = None
+        note = None
+        prev = None
+        for i in range(6):
+            s = CLAIM_SENTENCE[i]
+            with self.voiceover(CLAIM_NARRATION[i]) as vo:
+                if i == 0:
+                    # sentence 0: the ledger's two columns
+                    self.play(FadeIn(head_l, shift=0.15 * RIGHT), ShowCreation(head_rule), run_time=0.9)
+                    self.play(FadeIn(head_r, shift=0.15 * LEFT), ShowCreation(div), run_time=0.8)
+                    vo.wait_until(max(cue(vo, s) - 0.2, 0))
                 new_hl = hl_for(i)
                 anims = [FadeIn(rows[i], shift=0.2 * RIGHT)]
                 anims.append(FadeIn(new_hl) if hl is None else Transform(hl, new_hl))
                 if i:
                     anims.append(rows[:i].animate.set_opacity(0.55))
-                swap = []
                 new_note = source_note(notes[i])
-                swap.append(FadeIn(details[i].intro, shift=0.15 * UP))
-                if prev is not None:
-                    swap.append(FadeOut(prev, shift=0.15 * DOWN))
-                swap.append(FadeIn(new_note) if note is None else FadeTransform(note, new_note))
+                note_anim = FadeIn(new_note) if note is None else FadeTransform(note, new_note)
+                # the old evidence leaves before the new one arrives (no cross-fade of two strips)
+                out = [FadeOut(prev, shift=0.15 * DOWN)] if prev is not None else []
                 if i in DETAIL_CUES:
                     # keep the previous evidence up a little longer; swap when the claim's words are spoken
                     self.play(*anims, run_time=0.8)
-                    vo.wait_until(cue(vo, s, DETAIL_CUES[i]) - 0.3)
-                    self.play(*swap, run_time=0.8)
+                    vo.wait_until(cue(vo, s, DETAIL_CUES[i]) - 0.6)
+                    self.play(*out, note_anim, run_time=0.4)
                 else:
-                    self.play(*anims, *swap, run_time=0.9)
+                    self.play(*anims, *out, note_anim, run_time=0.5)
+                self.play(FadeIn(details[i].intro, shift=0.15 * UP), run_time=0.5)
                 if hl is None:
                     hl = new_hl
                 note = new_note
                 details[i].run(vo, s, badges[i])
                 prev = details[i]
-
-            self.play(FadeOut(hl), rows.animate.set_opacity(1.0), run_time=0.6)
+            if i < 5:
+                self.wait(CLAIM_HOLD[i])
+        # the whole ledger, graded
+        self.play(FadeOut(hl), rows.animate.set_opacity(1.0), run_time=0.6)
+        self.wait(CLAIM_HOLD[5])
 
         # ============================================================ N22.2 errors in Phase V
         title2 = section_title("Errors made during Phase V")
@@ -239,11 +248,11 @@ class Retrospective(ClankersScene):
             "budget to bind; and process slips, among them a results-file mix-up on machine L that the test's own "
             "pairing checks stopped before any training."
         ) as vo:
-            self.play(FadeTransform(title, title2),
-                      ledger.animate.scale(0.5).set_opacity(0).move_to(2.2 * UP),
-                      FadeOut(prev, shift=0.15 * DOWN), FadeOut(div), FadeTransform(note, note2),
-                      LaggedStartMap(FadeIn, slots, lag_ratio=0.08, run_time=1.6), run_time=1.0)
-            self.remove(ledger)
+            # clear the ledger first, then lay out eight empty slots (no overlap of the two pictures)
+            self.play(LaggedStart(
+                AnimationGroup(FadeTransform(title, title2), FadeOut(ledger, shift=0.3 * UP),
+                               FadeOut(prev, shift=0.15 * DOWN), FadeOut(div), FadeTransform(note, note2)),
+                LaggedStartMap(FadeIn, slots, lag_ratio=0.08), lag_ratio=0.6), run_time=1.6)
             for i in range(8):
                 vo.wait_until(max(cue(vo, 0, ERROR_CUES[i]) - 0.15, 0))
                 self.play(FadeOut(slots[i]), FadeIn(cards[i], shift=0.12 * UP), run_time=0.6)
@@ -391,7 +400,7 @@ class Retrospective(ClankersScene):
 
     def detail_partly(self):
         head = L("the check on fresh seeds 240–259 (k = 16): of the attempts it passed, how many bound?",
-                 size=20, color=MUTED)
+                 size=22, color=MUTED)
         head.move_to([-6.35, DETAIL_Y + 0.72, 0], aligned_edge=LEFT)
         rows = VGroup()
         for m, num, den in [("L", 19, 19), ("X", 17, 20)]:
@@ -430,7 +439,7 @@ class Retrospective(ClankersScene):
         with open(os.path.join(DATA, "slow_start.json")) as fh:
             d = json.load(fh)
         head = L("pre-registered test S0, fresh seeds 280–299: slow memory alone against the plain gate "
-                 "(discovered, of 20)", size=20, color=MUTED)
+                 "(discovered, of 20)", size=22, color=MUTED)
         head.move_to([-6.35, DETAIL_Y + 0.72, 0], aligned_edge=LEFT)
         arms = [("plain gate", "A0", ADAM_COLOR), ("slow memory", "SLOW0", SLOW_COLOR)]
         bar_w, name_w = 1.8, 1.55
@@ -464,8 +473,9 @@ class Retrospective(ClankersScene):
             verdicts.add(verdict_badge(cl["verdict"], size=20))
         stats.arrange(DOWN, buff=0.3, aligned_edge=LEFT)
         stats.move_to([x_cols[1] + bar_w + 1.25, (ys[0] + ys[1]) / 2 + 0.2, 0], aligned_edge=LEFT)
+        v_x0 = max(r.get_right()[0] for r in stats) + 0.3          # both verdicts in one column
         for v, r in zip(verdicts, stats):
-            v.next_to(r, RIGHT, buff=0.3)
+            v.move_to([v_x0, r.get_y(), 0], aligned_edge=LEFT)
         test_lab = L("S0: slow memory beats the plain gate", size=20, color=MUTED)
         test_lab.next_to(stats, UP, buff=0.18, aligned_edge=LEFT)
         g = VGroup(head, chart, test_lab, stats, verdicts)
@@ -487,7 +497,7 @@ class Retrospective(ClankersScene):
         with open(os.path.join(DATA, "hinge_firings.json")) as fh:
             fired = json.load(fh)["early_recipe"]["X"]["arms"]["WIN_M"]["runs"]["319"]["fired_at"]
         # left: restarts — attempts until one passes an early check
-        left_head = L("restarts: retry until an early check passes", size=20, color=MUTED)
+        left_head = L("restarts: retry until an early check passes", size=22, color=MUTED)
         att = VGroup()
         check_x = 1.6
         for k, ok in enumerate([False, False, True]):
@@ -506,7 +516,7 @@ class Retrospective(ClankersScene):
         left.move_to([-6.35, DETAIL_Y - 0.1, 0], aligned_edge=LEFT)
 
         # right: the early-training recipe — one run; slow memory and hinge firings in updates 1-2400
-        right_head = L("early-training recipe: one run, no restarts", size=20, color=GOOD)
+        right_head = L("early-training recipe: one run, no restarts", size=22, color=GOOD)
         axis = NumberLine(x_range=[0, 3600, 1200], width=4.6, include_tip=False).set_stroke(MUTED, 2)
         ticks = VGroup(*[L(f"{v}", size=20, color=MUTED).next_to(axis.n2p(v), DOWN, buff=0.12)
                          for v in (0, 1200, 2400, 3600)])
@@ -515,7 +525,8 @@ class Retrospective(ClankersScene):
         band.move_to(axis.n2p(1200) + 0.3 * UP)
         band_lab = L("slow memory", size=20, color=SLOW_COLOR).move_to(band)
         kicks = VGroup(*[Line(axis.n2p(u), axis.n2p(u) + 0.75 * UP).set_stroke(HINGE_COLOR, 2.5) for u in fired])
-        kick_lab = L("hinge", size=20, color=HINGE_COLOR).next_to(kicks, UP, buff=0.08)
+        kick_lab = L("hinge firings", size=20, color=HINGE_COLOR).next_to(kicks, UP, buff=0.08)
+        kick_lab.align_to(axis, LEFT)
         upd = L("updates", size=20, color=MUTED).next_to(axis, RIGHT, buff=0.15)
         plot = VGroup(axis, ticks, band, band_lab, kicks, kick_lab, upd)
         right = VGroup(right_head, plot).arrange(DOWN, buff=0.25, aligned_edge=LEFT)
@@ -562,7 +573,7 @@ class Retrospective(ClankersScene):
         p2 = L("p = 0.049 (S = 4, k = 16)", size=22, color=INK)
         pv = VGroup(pool_head, p1, p2).arrange(DOWN, buff=0.16, aligned_edge=LEFT)
         pv.next_to(brace, RIGHT, buff=0.3)
-        st1, st2 = strike(p1), strike(p2)
+        st1, st2 = strike(p1, width=2), strike(p2, width=2)
         desc = VGroup(Arrow(LEFT, RIGHT, buff=0, thickness=2.5).set_width(0.7).set_fill(WARN, 0.9).set_stroke(width=0),
                       VGroup(L("not independent:", size=20, color=MUTED),
                              L("descriptive only", size=24, color=WARN, weight="BOLD")).arrange(DOWN, buff=0.1, aligned_edge=LEFT)
@@ -579,8 +590,8 @@ class Retrospective(ClankersScene):
             self.stamp(badge)
             vo.wait_until(cue(vo, s, "because both machines"))
             self.play(LaggedStartMap(ShowCreation, links, lag_ratio=0.08), FadeIn(same, shift=0.1 * UP), run_time=1.0)
-            self.play(ShowCreation(st1), ShowCreation(st2), p1.animate.set_opacity(0.5),
-                      p2.animate.set_opacity(0.5), FadeIn(desc, shift=0.1 * RIGHT), run_time=0.8)
+            self.play(ShowCreation(st1), ShowCreation(st2), p1.animate.set_opacity(0.7),
+                      p2.animate.set_opacity(0.7), FadeIn(desc, shift=0.1 * RIGHT), run_time=0.8)
         g.run = run
         return g
 

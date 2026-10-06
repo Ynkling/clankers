@@ -69,8 +69,31 @@ PRONUNCIATION = [
 ]
 
 
+_ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve",
+         "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"]
+_TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+
+
+def _int_words(n: int) -> str:
+    if n < 20:
+        return _ONES[n]
+    if n < 100:
+        return _TENS[n // 10] + ("" if n % 10 == 0 else "-" + _ONES[n % 10])
+    if n < 1000:
+        rest = n % 100
+        return _ONES[n // 100] + " hundred" + ("" if rest == 0 else " " + _int_words(rest))
+    return str(n)
+
+
+def _decimal_words(m: re.Match) -> str:
+    # The phonemizer sometimes reads "0.15" as "zero. fifteen" (a full stop and a wrong number),
+    # depending on the words around it; spell every decimal out instead.
+    whole, frac = m.group(1), m.group(2)
+    return _int_words(int(whole)) + " point " + " ".join(_ONES[int(d)] for d in frac)
+
+
 def spoken_form(text: str) -> str:
-    out = text
+    out = re.sub(r"(?<![\d.])(\d{1,3})\.(\d+)(?!\d)(?!\.\d)", _decimal_words, text)
     for pattern, repl in PRONUNCIATION:
         out = re.sub(pattern, repl, out)
     return re.sub(r"\s+", " ", out).strip()

@@ -59,6 +59,11 @@ WIN_S8 = _S39["D8_HINGE_M"]["win_stream"]              # same, 8 streams (Muon)
 assert round(WIN_S4[0], 2) == 0.06 and round(WIN_S4[-1], 2) == 0.55       # §11: "from 0.06 to 0.55"
 assert max(_S39[c]["sat_key"][-1] for c in ("D8_HINGE_M", "D8_SLOW_M", "HINGE_D8_A")) <= 0.155   # "at most 15%"
 ENTROPY = _S39["D8_HINGE_M"]["entropy_key"][-1]
+# Adam's input term at keys (Table 7 prints only Muon's): S39 medians at Table 7's updates. §11: "600 under Adam
+# (0.14 against 0.08)".
+IN_A8 = [_S39["HINGE_D8_A"]["win_key"][U39.index(u)] for u in UPD7]
+assert round(IN_A8[3], 2) == 0.08 and REC_A8[3] == 0.14 and 0.06 <= min(IN_A8) and max(IN_A8) <= 0.15
+assert [round(x, 2) for x in (_S39["D8_HINGE_M"]["win_key"][U39.index(u)] for u in UPD7)] == IN_M8
 assert round(ENTROPY, 2) == 2.70 and abs(np.log(16) - 2.77) < 0.01
 
 _S42 = _load("critic/s42_spectrum.json")["runs"]
@@ -87,6 +92,7 @@ assert round(min(r["rho"][0] for r in _S42.values()), 2) == 0.52
 assert round(max(r["rho"][0] for r in _S42.values()), 2) == 0.63
 # the two runs whose rho fell back below one, and the update from which it stays below one
 FELL_BACK = {"D8_HINGE_M|261": 1400, "D8_HINGE_M|264": 1150}
+assert all(k in CROSSED for k in FELL_BACK)                                   # "2 of the 7"
 for _k, _u in FELL_BACK.items():
     assert all(x < 1 for x in _S42[_k]["rho"][U42.index(_u):])
 assert round(_S42["D8_HINGE_M|261"]["dec"][U42.index(1400)], 2) == 0.50
@@ -205,9 +211,16 @@ def y_labels(ax, ys, x0, texts=None, size=20):
     return VGroup(*[L(t, size, MUTED).next_to(ax.c2p(x0, y), LEFT, buff=0.12) for y, t in zip(ys, texts)])
 
 
+LOG_OFF = 1.5     # log charts plot log10(y) + 1.5, so the axis (y = 0.0316) sits at the bottom of the plot
+
+
+def ly(y):
+    return np.log10(y) + LOG_OFF
+
+
 def chart_line(ax, xs, ys, color, width=3.5, step=50, log=False):
     """Polyline through (x, y) with intermediate points every `step` in x, so ShowCreation runs evenly in x."""
-    yv = [np.log10(y) for y in ys] if log else list(ys)
+    yv = [ly(y) for y in ys] if log else list(ys)
     pts = []
     for (x0, y0), (x1, y1) in zip(zip(xs, yv), zip(xs[1:], yv[1:])):
         n = max(1, int(round((x1 - x0) / step)))
@@ -219,7 +232,7 @@ def chart_line(ax, xs, ys, color, width=3.5, step=50, log=False):
 
 
 def chart_dots(ax, xs, ys, color, r=0.055, log=False):
-    return VGroup(*[Dot(ax.c2p(x, np.log10(y) if log else y), radius=r).set_fill(color, 1).set_stroke(BG, 1)
+    return VGroup(*[Dot(ax.c2p(x, ly(y) if log else y), radius=r).set_fill(color, 1).set_stroke(BG, 1)
                     for x, y in zip(xs, ys)])
 
 
@@ -361,7 +374,7 @@ class EightStreams(ClankersScene):
         handle = Line(ORIGIN, 0.6 * (DR / np.sqrt(2))).set_stroke(WARN, 6)
         handle.shift(lens.get_center() + 0.42 * DR / np.sqrt(2) - handle.get_start())
         probe = VGroup(lens, handle)
-        probe_lab = L("the gate's state h", 24, WARN).next_to(lens, DOWN, buff=0.3)
+        probe_lab = L("the gate's state h", 24, WARN).next_to(lens, LEFT, buff=0.25)
         gate_lab = L("the gate (Ch. 3)", 22, MUTED).next_to(eq, UP, buff=0.5)
 
         with self.voiceover(text) as vo:
@@ -422,9 +435,9 @@ class EightStreams(ClankersScene):
         dec_arrow = Arrow(dec_box.get_bottom(), dec_q.get_top(), buff=0.06, thickness=3).set_color(INK)
 
         # bar chart
-        ax = axes_at([-5.2, -2.85, 0], 7.6, 2.5, [0, 8, 1], [0, 1, 0.5], x_ticks=False)
+        ax = axes_at([-5.2, -2.7, 0], 7.6, 2.4, [0, 8, 1], [0, 1, 0.5], x_ticks=False)
         ylab = y_labels(ax, [0, 0.5, 1], 0)
-        yname = L("stream read from h", 20, MUTED).rotate(PI / 2).next_to(ax.y_axis, LEFT, buff=0.62)
+        yname = L("decoder accuracy", 20, MUTED).rotate(PI / 2).next_to(ax.y_axis, LEFT, buff=0.62)
         bw = 0.72
 
         def bar(x, v, color):
@@ -447,15 +460,17 @@ class EightStreams(ClankersScene):
         ch8_l = L("chance 1/8", 20, INK).next_to(ch8, RIGHT, buff=0.15)
         ch4 = DashedLine(ax.c2p(4.4, 0.25), ax.c2p(7.0, 0.25), dash_length=0.08).set_stroke(INK, 2)
         ch4_l = L("chance 1/4", 20, INK).next_to(ch4, RIGHT, buff=0.15)
-        src = source_note("Report §11 (screen S38): 8 streams, medians at update 4800")
+        src = source_note("Report §11, screen S38 (machine E): medians at update 4800")
 
-        mem_arrow = CurvedArrow(toks[7].get_top() + 0.05 * UP, toks[6].get_top() + 0.05 * UP, angle=PI * 0.75)
+        mem_arrow = ArcBetweenPoints(toks[7].get_top() + 0.05 * UP, toks[6].get_top() + 0.05 * UP, angle=PI * 0.75)
         mem_arrow.set_stroke(WARN, 3)
-        mem_lab = L("one position back", 22, WARN).next_to(mem_arrow, UP, buff=0.12)
+        arc_mid = mem_arrow.point_from_proportion(0.5)
+        mem_arrow.add_tip(width=0.2, length=0.2)
+        mem_lab = L("one position back", 22, WARN).next_to(mem_arrow, UP, buff=0.26)
         need = L("needs 1 token of memory", 24, WARN, weight="BOLD")
         need.move_to([5.0, 2.95, 0])
-        lost = cross_mark(0.45, BAD, 6).move_to(mem_arrow.get_center() + 0.1 * UP)
-        lost8 = SurroundingRectangle(VGroup(b_m8, b_a8, subl[:2]), buff=0.12).set_stroke(BAD, 2.5)
+        lost = cross_mark(0.34, BAD, 6).move_to(arc_mid)
+        lost8 = SurroundingRectangle(VGroup(b_m8, b_a8, subl[:2], grp8), buff=0.1).set_stroke(BAD, 2.5)
 
         text = ("Does the gate's state even carry the stream? A simple decoder, reading the gate's hidden state at "
                 "key positions after forty-eight hundred updates, read the stream at only 0.13 under Muon and 0.14 "
@@ -520,16 +535,18 @@ class EightStreams(ClankersScene):
     # ---------------------------------------------------------------------------------- N19.3
     def part_when_lost(self):
         axL = axes_at([-5.45, -2.55, 0], 5.2, 3.9, [0, 2400, 200], [0, 1, 0.25])
-        axR = axes_at([1.3, -2.55, 0], 5.2, 3.9, [0, 2400, 200], [-1.5, 1.0, 0.5])
+        axR = axes_at([1.3, -2.55, 0], 5.2, 3.9, [0, 2400, 200], [0, 2.5, 0.5])     # log10(y) + 1.5
         xticks = [0, 600, 1200, 2400]
-        xlL, xlR = x_labels(axL, xticks, 0), x_labels(axR, xticks, -1.5)
+        xlL, xlR = x_labels(axL, xticks, 0), x_labels(axR, xticks, 0)
         ylL = y_labels(axL, [0, 0.5, 1], 0)
-        ylR = y_labels(axR, [-1, 0, 1], 0, texts=["0.1", "1", "10"])
+        ylR = y_labels(axR, [ly(0.1), ly(1), ly(10)], 0, texts=["0.1", "1", "10"])
+        gridR = VGroup(*[DashedLine(axR.c2p(0, ly(v)), axR.c2p(2400, ly(v)), dash_length=0.05)
+                         for v in (0.1, 1)]).set_stroke(FAINT, 1.2, opacity=0.8)
         xnL = L("updates", 20, MUTED).next_to(xlL, DOWN, buff=0.1)
         xnR = L("updates", 20, MUTED).next_to(xlR, DOWN, buff=0.1)
-        hdL = L("stream read from h at keys", 22, INK).next_to(axL.c2p(1200, 1), UP, buff=0.3)
+        hdL = L("decoder accuracy: stream from h at keys", 22, INK).next_to(axL.c2p(1200, 1), UP, buff=0.3)
         hdR = VGroup(L("size of the two terms at keys", 22, INK), L("(log scale)", 20, MUTED)).arrange(RIGHT, buff=0.15)
-        hdR.next_to(axR.c2p(1200, 1.0), UP, buff=0.3)
+        hdR.next_to(axR.c2p(1200, 2.5), UP, buff=0.3)
 
         l_m8 = chart_line(axL, UPD7, DEC_M8, MUON_COLOR)
         l_a8 = chart_line(axL, UPD7, DEC_A8, ADAM_COLOR)
@@ -544,31 +561,32 @@ class EightStreams(ClankersScene):
         band = Rectangle(width=axL.c2p(1200, 0)[0] - axL.c2p(600, 0)[0], height=axL.c2p(0, 1)[1] - axL.c2p(0, 0)[1])
         band.set_fill(WARN, 0.10).set_stroke(width=0).move_to(axL.c2p(900, 0.5))
         band_l = L("600–1200", 20, WARN).move_to(axL.c2p(900, 0.05))
-        src = source_note("Report §11, Table 7 (screen S39: medians of five reruns)")
+        src = source_note("Report §11, Table 7 (screen S39, machine E: medians of five reruns); "
+                          "Adam's input term: S39 series")
 
-        lg = np.log10
         r_m8 = chart_line(axR, UPD7, REC_M8, REC_COLOR, log=True)
         i_m8 = chart_line(axR, UPD7, IN_M8, IN_COLOR, log=True)
         r_a8 = DashedVMobject(chart_line(axR, UPD7, REC_A8, REC_COLOR, width=2.5, log=True), num_dashes=45)
+        i_a8 = DashedVMobject(chart_line(axR, UPD7, IN_A8, IN_COLOR, width=2.5, log=True), num_dashes=45)
         d_r = chart_dots(axR, UPD7, REC_M8, REC_COLOR, log=True)
         d_i = chart_dots(axR, UPD7, IN_M8, IN_COLOR, log=True)
         lab_r = VGroup(L("recurrent term", 20, REC_COLOR), M(R"|W_h h_{t-1}|", 26, REC_COLOR)).arrange(DOWN, buff=0.08)
-        lab_r.move_to(axR.c2p(430, 0.72))
+        lab_r.move_to(axR.c2p(430, 2.22))
         lab_i = VGroup(L("input term", 20, IN_COLOR), M(R"|W_{\text{in}} v_t|", 26, IN_COLOR)).arrange(RIGHT, buff=0.1)
-        lab_i.move_to(axR.c2p(1800, -0.62))
-        lab_a = L("Adam", 20, REC_COLOR).move_to(axR.c2p(2150, 0.2))
-        lab_m = L("Muon", 20, REC_COLOR).move_to(axR.c2p(1500, 0.86))
+        lab_i.move_to(axR.c2p(1800, 0.9))
+        lab_a = L("Adam (dashed)", 20, REC_COLOR).move_to(axR.c2p(2050, 1.3))
+        lab_m = L("Muon (solid)", 20, REC_COLOR).move_to(axR.c2p(1450, 2.38))
 
         g400 = VGroup(DashedLine(axL.c2p(400, 0), axL.c2p(400, 0.82), dash_length=0.07),
-                      DashedLine(axR.c2p(400, -1.5), axR.c2p(400, -0.25), dash_length=0.07)).set_stroke(WARN, 2)
-        hl400 = VGroup(Dot(axR.c2p(400, lg(0.20)), radius=0.1).set_fill(REC_COLOR, 1),
-                       Dot(axR.c2p(400, lg(0.10)), radius=0.1).set_fill(IN_COLOR, 1),
+                      DashedLine(axR.c2p(400, 0), axR.c2p(400, 1.25), dash_length=0.07)).set_stroke(WARN, 2)
+        hl400 = VGroup(Dot(axR.c2p(400, ly(0.20)), radius=0.1).set_fill(REC_COLOR, 1),
+                       Dot(axR.c2p(400, ly(0.10)), radius=0.1).set_fill(IN_COLOR, 1),
                        Dot(axL.c2p(400, 0.39), radius=0.1).set_fill(MUON_COLOR, 1))
-        lab400 = VGroup(L("update 400:", 20, WARN), L("0.20", 20, REC_COLOR, weight="BOLD"),
+        lab400 = VGroup(L("Muon, update 400:", 20, WARN), L("0.20", 20, REC_COLOR, weight="BOLD"),
                         L("vs", 20, WARN), L("0.10", 20, IN_COLOR, weight="BOLD")).arrange(RIGHT, buff=0.1)
-        lab400.next_to(axR.c2p(400, -1.5), UP, buff=0.12).shift(1.05 * RIGHT)
-        end_r = L("6.93", 24, REC_COLOR, weight="BOLD").move_to(axR.c2p(2280, 0.98))
-        end_i = L("0.06–0.15", 22, IN_COLOR, weight="BOLD").move_to(axR.c2p(2050, -1.12))
+        lab400.next_to(axR.c2p(400, 0), UP, buff=0.1).align_to(axR.c2p(440, 0), LEFT)
+        end_r = L("6.93", 24, REC_COLOR, weight="BOLD").move_to(axR.c2p(2280, 2.48))
+        end_i = L("0.06–0.15", 22, IN_COLOR, weight="BOLD").move_to(axR.c2p(2050, 0.32))
 
         text = ("When is it lost? At initialization the decoder reads 0.91: with small weights, the state still carries "
                 "the previous token. Training removes this memory within the first six hundred to twelve hundred "
@@ -595,12 +613,14 @@ class EightStreams(ClankersScene):
                       run_time=2.6, rate_func=linear)
             self.play(FadeIn(band), FadeIn(band_l), run_time=0.7)
             vo.wait_until_sentence(3)
-            self.play(FadeIn(VGroup(axR, xlR, ylR, xnR, hdR)), run_time=0.6)
-            self.play(ShowCreation(r_m8), ShowCreation(i_m8), LaggedStartMap(FadeIn, d_r, lag_ratio=0.3),
-                      LaggedStartMap(FadeIn, d_i, lag_ratio=0.3), run_time=2.2, rate_func=linear)
-            self.play(FadeIn(lab_r), FadeIn(lab_i), run_time=0.6)
+            self.play(FadeIn(VGroup(axR, gridR, xlR, ylR, xnR, hdR)), run_time=0.6)
+            self.play(ShowCreation(r_m8), ShowCreation(i_m8), ShowCreation(r_a8), ShowCreation(i_a8),
+                      LaggedStartMap(FadeIn, d_r, lag_ratio=0.3), LaggedStartMap(FadeIn, d_i, lag_ratio=0.3),
+                      run_time=2.2, rate_func=linear)
+            self.play(FadeIn(lab_r), FadeIn(lab_i), FadeIn(lab_a), FadeIn(lab_m), run_time=0.6)
             vo.wait_until_sentence(4)
-            self.play(ShowCreation(r_a8), FadeIn(lab_a), FadeIn(lab_m), run_time=1.2)
+            self.play(Indicate(lab_m, color=REC_COLOR, scale_factor=1.15), r_m8.animate.set_stroke(width=5),
+                      run_time=1.0)
             cue.wait_for(4, "by update four hundred")
             self.play(ShowCreation(g400), FadeIn(hl400, scale=0.5), FadeIn(lab400, shift=0.1 * UP), run_time=0.9)
             cue.wait_for(4, "twenty-four hundred it is")
@@ -608,7 +628,8 @@ class EightStreams(ClankersScene):
             cue.wait_for(4, "while the input")
             self.play(Indicate(d_i[-1], color=IN_COLOR, scale_factor=2.0), FadeIn(end_i, shift=0.1 * UP), run_time=0.9)
 
-        right = VGroup(axR, xlR, ylR, xnR, hdR, r_m8, i_m8, r_a8, d_r, d_i, lab_r, lab_i, lab_a, lab_m, g400[1],
+        right = VGroup(axR, gridR, xlR, ylR, xnR, hdR, r_m8, i_m8, r_a8, i_a8, d_r, d_i, lab_r, lab_i, lab_a, lab_m,
+                       g400[1],
                        hl400[:2], lab400, end_r, end_i)
         left = SimpleNamespace(ax=axL, leg=leg, src=src, extra=VGroup(g400[0], hl400[2], band, band_l),
                                     group=VGroup(axL, xlL, ylL, xnL, hdL, l_m8, l_a8, d_m8, d_a8, chance, chance_l,
@@ -619,7 +640,6 @@ class EightStreams(ClankersScene):
     # ---------------------------------------------------------------------------------- N19.4
     def part_why_not(self, left):
         axL = left.ax
-        lg = np.log10
         # row 1: saturation
         sat_head = L("units saturated (|h| > 0.95) at update 2400", 20, INK)
         sat_track = Rectangle(width=4.2, height=0.3).set_fill(PANEL, 1).set_stroke(PANEL_EDGE, 1)
@@ -662,7 +682,8 @@ class EightStreams(ClankersScene):
         ch4_l = L("chance 1/4", 20, S4_COLOR).move_to(axL.c2p(1900, 0.305))
         dip = L("0.61", 22, S4_COLOR, weight="BOLD").move_to(axL.c2p(700, 0.56))
         rec = L("0.83", 22, S4_COLOR, weight="BOLD").next_to(axL.c2p(2400, 0.83), UP, buff=0.15).shift(0.1 * LEFT)
-        src = source_note("Report §11; S39 series: data/critic/s39_gate_memory.json")
+        src = source_note("Report §11; screen S39 (machine E): data/critic/s39_gate_memory.json; "
+                          "gate bar drawn with entropy 2.70")
 
         text = ("It is mostly not saturation of the tanh: at update twenty-four hundred, the median share of saturated "
                 "units is at most fifteen percent. At four streams, by contrast, the input term grows and the memory "
@@ -723,15 +744,15 @@ class EightStreams(ClankersScene):
         cx, ty, pitch = 3.65, -1.25, 0.98
         frame_ = RoundedRectangle(width=1.1, height=0.72, corner_radius=0.12).set_stroke(WARN, 2.5).move_to([cx, ty, 0])
         tape_lab = L("input token", 20, WARN).next_to(frame_, UP, buff=0.1)
-        masks = VGroup()          # soft edges of the tape window; tokens farther out are not drawn at all
+        masks = VGroup()          # soft edges of the tape window (|x - cx| from 1.75 to 2.85); nothing beyond
         for side in (-1, 1):
-            for k in range(6):
+            for k in range(5):
                 w = 0.22
-                m = Rectangle(width=w, height=0.8).set_fill(BG, (k + 1) / 6).set_stroke(width=0)
-                m.move_to([cx + side * (2.25 + k * w), ty, 0])
+                m = Rectangle(width=w, height=0.8).set_fill(BG, (k + 1) / 5).set_stroke(width=0)
+                m.move_to([cx + side * (1.75 + w / 2 + k * w), ty, 0])
                 masks.add(m)
-            far = Rectangle(width=0.75, height=0.8).set_fill(BG, 1).set_stroke(width=0)
-            far.move_to([cx + side * (2.25 + 6 * 0.22 + 0.375 - 0.11), ty, 0])
+            far = Rectangle(width=1.0, height=0.8).set_fill(BG, 1).set_stroke(width=0)
+            far.move_to([cx + side * (2.85 + 0.5), ty, 0])
             masks.add(far)
 
         bar_x0, bar_scale = 2.55, 1.85
@@ -797,9 +818,9 @@ class EightStreams(ClankersScene):
 
         def place_tape(m):
             r = state["run"]
-            v = t.get_value()
+            v = float(np.clip(t.get_value(), 0.5, len(r.toks) - 0.5))   # token i is centred while it is applied
             r.toks.shift((cx + (0.5 - v) * pitch - r.toks[0].get_x()) * RIGHT)
-            m.set_submobjects([tk for tk in r.toks if abs(tk.get_x() - cx) < 3.7])
+            m.set_submobjects([tk for tk in r.toks if abs(tk.get_x() - cx) < 3.3])
 
         def bar_of(kind):
             def make():
@@ -837,6 +858,7 @@ class EightStreams(ClankersScene):
         verdict_ex = VGroup(L("colors mixed:", 22, BAD, weight="BOLD"),
                             L("the state ignores its input", 22, BAD)).arrange(DOWN, buff=0.08)
         verdict_ex.move_to(verdict_in)
+        strong_note = L("strong recurrence: the state runs on by itself", 20, INK).move_to(init_note)
         src = source_note("2-D sketch: h ← tanh(u + ρ·R·h), not data; decoder 0.91: Report Table 7")
 
         text = ("Here is the report's reading. The gate's state is a small dynamical system driven by its input. If the "
@@ -874,24 +896,25 @@ class EightStreams(ClankersScene):
             vo.wait_until_sentence(4)
             detach(run_in)
             self.play(run_in.kdots.animate.set_opacity(0.0), FadeOut(verdict_in), FadeOut(init_note),
-                      FadeOut(run_in.win), rho.animate.set_value(RHO_EX), run_time=1.0)
+                      FadeOut(run_in.win), rho.animate.set_value(RHO_EX), run_time=0.9)
             self.remove(run_in.kdots)
             t.set_value(0)
             attach(run_ex)
             self.add(run_ex.kdots)
             self.remove(masks, frame_)
             self.add(run_ex.win, masks, frame_)
-            self.play(Indicate(dial.lab_hi, color=BAD, scale_factor=1.2), t.animate.set_value(6), run_time=2.0,
-                      rate_func=linear)
-            self.play(t.animate.set_value(36), run_time=2.0, rate_func=linear)
-            self.play(t.animate.set_value(len(seq_ex)), run_time=1.0, rate_func=linear)   # fast-forward
-        self.play(FadeIn(verdict_ex, shift=0.1 * UP), run_time=0.7)
-        self.wait(0.4)
+            self.play(Indicate(dial.lab_hi, color=BAD, scale_factor=1.2), FadeIn(strong_note),
+                      t.animate.set_value(6), run_time=1.6, rate_func=linear)
+            self.play(t.animate.set_value(30), run_time=1.3, rate_func=linear)
+            self.play(FadeIn(verdict_ex, shift=0.1 * UP), t.animate.set_value(len(seq_ex)), run_time=1.3,
+                      rate_func=linear)                                                   # fast-forward
+        self.wait(1.0)
         detach(run_ex)
         for m in (dot, trail):
             m.clear_updaters()
         self.play(FadeOut(VGroup(plane, dot, trail, run_ex.kdots, run_ex.win, masks, frame_, tape_lab, in_name,
-                                 rec_name, base, in_bar, rec_bar, verdict_ex, src, needle, rho_lab, dial_head,
+                                 rec_name, base, in_bar, rec_bar, verdict_ex, strong_note, src, needle, rho_lab,
+                                 dial_head,
                                  dial.lo, dial.hi, dial[2], dial[3], dial.lab_lo, dial.lab_hi, dial.hub)),
                   run_time=0.8)
         return dial
@@ -906,7 +929,8 @@ class EightStreams(ClankersScene):
         xnD = L("updates", 20, MUTED).next_to(xlD, DOWN, buff=0.08)
         nR = VGroup(L("spectral radius", 20, MUTED), M(R"\rho(W_h)", 30, REC_COLOR)).arrange(RIGHT, buff=0.15)
         nR.next_to(axR.c2p(0, 2.25), RIGHT, buff=0.25).shift(0.05 * DOWN)
-        nD = L("stream read from h at keys", 20, MUTED).move_to(axD.c2p(0, 1) + 0.42 * UP, aligned_edge=LEFT)
+        nD = L("decoder accuracy: stream from h at keys", 20, MUTED).move_to(axD.c2p(0, 1) + 0.42 * UP,
+                                                                               aligned_edge=LEFT)
         one = DashedLine(axR.c2p(0, 1), axR.c2p(1600, 1), dash_length=0.09).set_stroke(INK, 2)
         one_l = L("ρ = 1", 20, INK).next_to(axR.c2p(1600, 1), RIGHT, buff=0.1)
         chance = DashedLine(axD.c2p(0, 0.125), axD.c2p(1600, 0.125), dash_length=0.08).set_stroke(INK, 1.5, opacity=0.7)
@@ -923,10 +947,12 @@ class EightStreams(ClankersScene):
         ex_r = [seg(axR, U42, ex["rho"], a, b, INK, 4) for a, b in ex_parts]
         ex_d = [seg(axD, U42, ex["dec"], a, b, INK, 4) for a, b in ex_parts]
         cross_x = 500
-        vline = DashedLine(axR.c2p(cross_x, 2.25), axD.c2p(cross_x, 0), dash_length=0.08).set_stroke(WARN, 2)
+        vline = VGroup(DashedLine(axR.c2p(cross_x, 1.85), axR.c2p(cross_x, 0), dash_length=0.08),
+                       DashedLine(axD.c2p(cross_x, 1), axD.c2p(cross_x, 0), dash_length=0.08)).set_stroke(WARN, 2)
         cdot_r = Dot(axR.c2p(cross_x, ex["rho"][10]), radius=0.09).set_fill(WARN, 1)
         cdot_d = Dot(axD.c2p(500, ex["dec"][10]), radius=0.09).set_fill(WARN, 1)
         c_lab = L("crosses 1 at update 500", 20, WARN).move_to(axR.c2p(cross_x + 40, 0.42), aligned_edge=LEFT)
+        ex_lab = L("one Muon run (seed 260)", 20, INK).move_to(axR.c2p(40, 1.65), aligned_edge=LEFT)
         d_lab = L(f"{ex['dec'][10]:.2f} at 500", 20, WARN)
         d_lab.next_to(axD.c2p(500, ex["dec"][10]), RIGHT, buff=0.15).shift(0.3 * UP)
 
@@ -956,11 +982,11 @@ class EightStreams(ClankersScene):
             return VGroup(d, body)
 
         x_col = 2.2
-        t_head = L("screen S42: 10 runs (5 Muon, 5 Adam)", 20, MUTED)
+        t_head = L("S42 on machine E: 10 runs (5 Muon, 5 Adam)", 20, MUTED)
         t1 = row(BAD, "7 of 10 rose clearly above 1", "peaks 1.20–2.13, crossing at 350–1400",
                  "stream fell to 0.13–0.26 within 50 updates")
-        t2 = row(WARN, "3 of 10 peaked at 0.88–1.03", "stream only partly lost: 0.31–0.72")
-        t3 = row(GOOD, "2 fell back below 1", "stream partly recovered: 0.50, 0.69")
+        t2 = row(WARN, "3 of 10 peaked at 0.88–1.03", "stream only partly lost: 0.31–0.72 at 1600")
+        t3 = row(GOOD, "2 of the 7 fell back below 1", "stream partly recovered: 0.50, 0.69 (Muon)")
         rule_h = L("pre-set rule", 22, INK, weight="BOLD")
         rule_m = VGroup(L("Muon:", 20, MUON_COLOR, weight="BOLD"), L("“gain crossing” (4 of 5)", 20, INK)
                         ).arrange(RIGHT, buff=0.12)
@@ -999,14 +1025,15 @@ class EightStreams(ClankersScene):
             cue.wait_for(1, "and zero point six")
             self.play(FlashAround(VGroup(init_pts, init_l), color=REC_COLOR), run_time=1.0)
             vo.wait_until_sentence(2)
-            self.play(ShowCreation(ex_r[0]), ShowCreation(ex_d[0]), FadeOut(init_l), run_time=1.6, rate_func=linear)
+            self.play(ShowCreation(ex_r[0]), ShowCreation(ex_d[0]), FadeOut(init_l), FadeIn(ex_lab), run_time=1.6,
+                      rate_func=linear)
             self.play(ShowCreation(ex_r[1]), ShowCreation(ex_d[1]), run_time=0.5, rate_func=linear)
-            self.play(ShowCreation(vline), FadeIn(cdot_r, scale=0.5), FadeIn(c_lab), run_time=0.6)
+            self.play(*[ShowCreation(v) for v in vline], FadeIn(cdot_r, scale=0.5), FadeIn(c_lab), run_time=0.6)
             self.play(ShowCreation(ex_r[2]), ShowCreation(ex_d[2]), FadeIn(cdot_d, scale=0.5), FadeIn(d_lab),
                       run_time=1.8, rate_func=linear)
             cue.wait_for(2, "and in each of those")
             self.play(LaggedStartMap(ShowCreation, o_r, lag_ratio=0.15), LaggedStartMap(ShowCreation, o_d, lag_ratio=0.15),
-                      FadeIn(t1, shift=0.1 * LEFT), FadeOut(VGroup(c_lab, d_lab)), run_time=2.2)
+                      FadeIn(t1, shift=0.1 * LEFT), FadeOut(VGroup(c_lab, d_lab, ex_lab)), run_time=2.2)
             cue.wait_for(2, "between zero point")
             self.play(FadeIn(drop_band), FadeIn(drop_l, shift=0.1 * LEFT), run_time=0.7)
             cue.wait_for(2, "within fifty")
@@ -1061,10 +1088,10 @@ class EightStreams(ClankersScene):
         rho = ValueTracker(1.6)
         needle = dial_needle(dial, rho)
         s41_h = L("S41: cap the recurrence", 24, INK, weight="BOLD").move_to([3.15, 0.75, 0])
-        cap_eq = M(R"\sigma_{\max}(W_h) \le 0.5 \;\Rightarrow\; \rho \le 0.5 < 1", 32, INK)
+        cap_eq = M(R"\sigma_{\max}(W_h) \le 0.5 \quad\Rightarrow\quad \rho(W_h) \le 0.5 < 1", 32, INK)
         cap_eq.next_to(s41_h, DOWN, buff=0.25)
         running = verdict_badge("running", size=22, color=WARN).next_to(s41_h, RIGHT, buff=0.35)
-        src = source_note("Report §11 (screens S40, S41)")
+        src = source_note("Report §11 (screens S40, S41, machine E)")
 
         text = ("Feeding the gate the previous token directly did not solve it either: its input then decodes the stream "
                 "almost perfectly, but the recurrent term dilutes it, and no run bound. The intervention now running is "
