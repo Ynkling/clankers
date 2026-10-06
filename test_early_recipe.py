@@ -483,14 +483,15 @@ def iters_of(a, sched):
     return sched["iters_a"] if a["part"] == "A" else sched["iters_b"]
 
 
-def one_run(a, seed, iters, sched, tau=None, keep=None, stat=None, log_lr=False):
-    """A run of arm a (tau None = the arm's own; returns the record with the optimizer's fields)."""
+def one_run(a, seed, iters, sched, tau=None, keep=None, stat=None, log_lr=False, path=None):
+    """A run of arm a (tau None = the arm's own; returns the record with the optimizer's fields). path: the run path
+    (None = run_path; test_muon_recipe's knob, inert at None)."""
     t = a["tau"] if tau is None else tau
     rc, state, holder = make_rc(a["opt"], a["slow"], t, window=sched["window"], warm=sched["warm"], keep=keep, stat=stat)
     if holder is not None and log_lr:
         holder["log_lr"] = True
     with running(state, holder):
-        rec = run_path(a, seed, iters, rc)
+        rec = (run_path if path is None else path)(a, seed, iters, rc)
     if rec.get("ok"):
         rec["opt"] = a["opt"]
         rec["host"] = host_info()
@@ -535,11 +536,12 @@ def legacy_job(part, which):
     return strip_all(mod.variant_job(part, 3, EVAL_EVERY, True, 0.0)["rec"])
 
 
-def lr_job(key):
+def lr_job(key, arm=None, path=None):
     """CHECK 124: through the arm's real path and schedule, each group's lr at every update (MuonAdam's lr log;
     under Adam an optimizer step pre-hook) and the groups' parameters; the forward stubbed and every held-out
-    accuracy 0.5 (no early stop), 2401 updates."""
-    a = ARM[key]
+    accuracy 0.5 (no early stop), 2401 updates. arm, path: another test's arm dict and run path (None = ARM[key]
+    and run_path; test_muon_recipe's knobs, inert at None)."""
+    a = ARM[key] if arm is None else arm
     lrs, ids = [], {}
 
     def hook(opt, args, kwargs):
@@ -559,7 +561,7 @@ def lr_job(key):
         if holder is not None:
             holder["log_lr"] = True
         with running(state, holder):
-            rec = run_path(a, 3, WARM + 1, rc)
+            rec = (run_path if path is None else path)(a, 3, WARM + 1, rc)
     finally:
         tbo.evaluate, tbo.logits_of = saved
         h.remove()
