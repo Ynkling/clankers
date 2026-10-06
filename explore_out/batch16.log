@@ -1375,3 +1375,12 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [  1]   51.1 min  stream_knobs     WH_SLOW                  seed 261  lr 0.001  (W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8eda13b+dirty, code ea36a6e5d44b, attempt 1: acc 0.385  trans  None  outcome MERGED (4 share); decoder at 2400: h CTX/KEY/VAL 0.55/0.55/0.44
   start   51.1 min  stream_knobs     LR3E3                    seed 264  (projected worst case 54 min)
+  [  2]   51.7 min  stream_knobs     WH_SLOW                  seed 260  lr 0.001  (W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e272e47, code ea36a6e5d44b, attempt 1: acc 0.618  trans  None  outcome MERGED (3 share); decoder at 2400: h CTX/KEY/VAL 0.44/0.40/0.32
+  start   51.7 min  window_recipe    LOCAL3                   seed 180  (projected worst case 17 min)
+  [  3]   51.8 min  stream_knobs     WH_SLOW                  seed 262  lr 0.001  (W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e272e47+dirty, code ea36a6e5d44b, attempt 1: acc 0.231  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.39/0.60/0.59
+  start   51.8 min  window_recipe    LOCAL3                   seed 181  (projected worst case 17 min)
+  [  4]   51.9 min  stream_knobs     WH_SLOW                  seed 263  lr 0.001  (W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e272e47+dirty, code ea36a6e5d44b, attempt 1: acc 0.500  trans  None  outcome MERGED (3 share); decoder at 2400: h CTX/KEY/VAL 0.56/0.58/0.41
+  start   51.9 min  window_recipe    LOCAL3                   seed 182  (projected worst case 17 min)
