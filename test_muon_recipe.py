@@ -149,6 +149,51 @@ Diagnostics (not part of the verdict):
   channels; WIN16_A 9/20.
 - Part C: WIN8_M bound on every seed, 17 by 4800 (s468, s478, s479 at 6000); WIN8_A's one failure,
   s461, is POSITION (WIN8_M bound it at 3600 after firings at 141 and 163).
+
+RESULT (L, test commit 74f5907; results/L/muon_recipe_results.json; recomputed from that file with
+this file's report(), --report --also results/X/muon_recipe_results.json)
+Run conditions:
+- 166/166 records, none failed; 12th Gen Intel(R) Core(TM) i7-12650H, torch 2.14.0, 6 workers, started
+  2026-10-05 23:08. Projection 7.21 h: nothing cut (WIN8_A ran 1460-1479).
+- The meta is written only after verify() passes, so L's CHECKs passed (L's log is not recorded here).
+  Every record: NS fingerprint 91a18153b4d5 (X: f209ef7b8c61); oneDNN bf16 kernel not identified ("?").
+- CHECK 132's --also part holds both ways: each file names the other machine, its seeds lie in the
+  other machine's ranges (X 400-479, L 1400-1479), the CPU labels differ and no seed overlaps.
+- Validity: CEIL_A 2/2, CEIL_B 2/2, CEIL_C 2/2 -> all three parts VALID.
+Per machine (secondary):
+- M1 WIN_M 40/40 vs SLOW_M 34/40 DISCOVERED, 6 vs 0, p = 0.0156: SHOWN.
+- M2 bound by 4800: WIN16_M 9/20 vs WIN16_A 11/20, 5 vs 7, p = 0.81: NOT SHOWN.
+- M3 bound by 4800: WIN8_M 13/20 vs WIN8_A 11/20, 6 vs 4, p = 0.38: NOT SHOWN.
+- Bands: WIN_M RELIABLE (40/40, Wilson [0.912, 1.000]); WIN16_M MAJORITY (14/20, [0.481, 0.855]);
+  WIN8_M RELIABLE (19/20, [0.764, 0.991]).
+- Printed, not claims: BOUND WIN16_M 14/20 vs WIN16_A 16/20 (3 vs 5); WIN8_M 19/20 vs WIN8_A 18/20
+  (2 vs 1). Median transition SLOW_M 2400, WIN_M 2400 [1200, 14400], WIN16_A 4800, WIN16_M 3600
+  [2400, 21600], WIN8_A 4800 [3600, 26400], WIN8_M 4800 [3600, 8400].
+Diagnostics (not part of the verdict):
+- SLOW_M's 6 failures are all POSITION (s1409, s1418, s1419, s1424, s1430, s1438); WIN_M discovered
+  on every seed (s1413 only at 14400).
+- WIN16_M's 6 failures: 5 MERGED (2 share) and 1 STREAM-PARTIAL; 7 merged at the end (2 of them bound,
+  not routed). WIN16_A's 4: 3 non-stream POSITION, 1 MERGED. At 4800, WIN16_M held the 4 streams on 4
+  distinct channels in 10/20 runs, WIN16_A in 11/20.
+- WIN8_M's one failure, s1461, OTHER (no firing; 1331 would-fires after the window); WIN8_A's two:
+  s1468 KEY, s1476 OTHER.
+- The hinge fired on 23/40 WIN_M runs (first 136 [54, 278]), 16/20 WIN16_A (380 [220, 1036]), 19/20
+  WIN16_M (225 [129, 435]), 15/20 WIN8_A (281 [33, 654]) and 6/20 WIN8_M (174 [121, 405]).
+
+POOLED (primary; X + L, b and c summed over both machines' pairs; computed identically from either
+machine's side)
+- M1 WIN_M 79/80 vs SLOW_M 69/80 DISCOVERED, 10 vs 0 (X 4 vs 0, L 6 vs 0), p = 0.00098: SHOWN.
+- M2 bound by 4800: WIN16_M 24/40 vs WIN16_A 20/40, 12 vs 8 (X 7 vs 1, L 5 vs 7), p = 0.25: NOT SHOWN.
+- M3 bound by 4800: WIN8_M 22/30 vs WIN8_A 20/30 (X's 10 pairs + L's 20), 7 vs 5 (X 1 vs 1, L 6 vs 4),
+  p = 0.39: NOT SHOWN.
+- Bands: WIN_M RELIABLE (79/80, Wilson [0.933, 0.998]); WIN16_M MAJORITY (33/40, [0.681, 0.913]);
+  WIN8_M RELIABLE (39/40, [0.871, 0.996]).
+- Reading: not "the Muon recipe is reliable at the working configurations"; it falls short at WIN16_M
+  (S=4, P=4, k=16, conv): MAJORITY 33/40, Wilson lower bound 0.681.
+- Printed, not claims: BOUND WIN16_M 33/40 vs WIN16_A 33/40 (6 vs 6); WIN8_M 29/30 vs WIN8_A 27/30 on
+  the paired seeds (3 vs 1).
+- X and L disagree at four streams: WIN16_M bound 19/20 on X and 14/20 on L, and M2 is 7 vs 1 on X but
+  5 vs 7 on L. These are independent seeds, so neither machine's count reproduces the other's.
 """
 
 import argparse
