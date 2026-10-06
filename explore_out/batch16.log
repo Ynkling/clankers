@@ -176,3 +176,6 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [  3]   60.0 min  window_scale     LOCAL3_SLOW16_A          seed 241  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git ed0aee8, code 01767493e840, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; decoder at 4800: h CTX/KEY/VAL 0.39/1.00/1.00
   start   60.0 min  write_decoders   D8_PREV_A                seed 260  (projected worst case 19 min)
+  [  4]   78.5 min  write_decoders   D8_PREV_A                seed 260  lr 0.001  (W_prev in the gate group; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 9eaeeef, code d6ccc68892a7, attempt 1: acc 0.059  trans  None  outcome non-stream OTHER; decoder at 4800: h CTX/KEY/VAL 0.16/0.19/0.13
+  start   78.5 min  write_decoders   D8_HINGE_M               seed 260  (projected worst case 18 min)
