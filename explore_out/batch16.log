@@ -6446,3 +6446,5 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   start   44.2 min  window_scale     LOCAL3_SLOW_D8_A         seed 268  (projected worst case 61 min)
   [  2]   58.2 min  window_scale     LOCAL3_SLOW_D8_A         seed 265  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 03ca393, code 01767493e840, attempt 1: acc 0.749  trans  None  outcome MERGED (2 share); decoder at 9600: h CTX/KEY/VAL 0.47/0.90/0.87
+  [  3]   59.0 min  window_scale     LOCAL3_SLOW_D8_A         seed 266  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 3698d97, code 01767493e840, attempt 1: acc 0.867  trans  None  outcome MERGED (2 share); decoder at 9600: h CTX/KEY/VAL 0.34/0.83/0.83
