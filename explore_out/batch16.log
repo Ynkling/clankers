@@ -7483,3 +7483,71 @@ REPORTS — EXPLORATORY, not a result
                    schedule: W_prev in the gate group; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
   pairing each rerun against its record (Adam: reproduce through 4800; Muon: fresh on this CPU)
 ----------------------------------------------------------------------------------------------------
+  CONFIG HINGE_D8_A (X's HINGE_D8 (Adam), rerun to 4800): reproduces X's HINGE_D8 record through 4800: 260 True, 261 True, 262 True, 263 True, 264 True
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     260 |         1.00  0.83  0.47 |         0.45  0.23  0.20 |         0.20  0.16  0.14 |         0.33  0.39  0.30
+     261 |         1.00  0.91  0.46 |         0.69  0.47  0.26 |         0.71  0.56  0.30 |         0.66  0.50  0.32
+     262 |         1.00  0.87  0.49 |         0.99  0.81  0.57 |         0.13  0.13  0.13 |         0.14  0.12  0.13
+     263 |         1.00  0.96  0.46 |         0.17  0.14  0.13 |         0.17  0.15  0.14 |         0.25  0.14  0.13
+     264 |         1.00  0.96  0.50 |         0.14  0.14  0.13 |         0.15  0.13  0.13 |         0.14  0.13  0.13
+     med |         1.00  0.91  0.47 |         0.45  0.23  0.20 |         0.17  0.15  0.14 |         0.25  0.14  0.13
+  CONFIG D8_HINGE_M (S33's D8_HINGE (Muon), fresh on this CPU, to 4800): reproduces muon_scale's D8_HINGE record through 4800: 260 False, 261 False, 262 False, 263 False, 264 False (Muon: a record from the 2.10GHz CPU; fresh here); equal to S44's D8_HINGE_M_REF (same CPU) through 4800: {260: True, 261: True, 262: True, 263: True, 264: True}
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     260 |         1.00  0.83  0.47 |         0.14  0.14  0.13 |         0.15  0.13  0.14 |         0.14  0.13  0.13
+     261 |         1.00  0.91  0.46 |         0.26  0.28  0.26 |         0.47  0.65  0.70 |         0.55  0.49  0.49
+     262 |         1.00  0.87  0.49 |         0.19  0.20  0.21 |         0.15  0.14  0.14 |         0.16  0.14  0.14
+     263 |         1.00  0.96  0.46 |         0.53  0.51  0.50 |         0.50  0.57  0.67 |         0.47  0.55  0.55
+     264 |         1.00  0.96  0.50 |         0.72  0.62  0.45 |         0.75  0.60  0.68 |         0.76  0.79  0.77
+     med |         1.00  0.91  0.47 |         0.26  0.28  0.26 |         0.47  0.57  0.67 |         0.47  0.49  0.49
+  CONFIG A_HINGE_M (S33's A_HINGE (Muon; S=4, k=4), fresh on this CPU, to 4800): reproduces muon_scale's A_HINGE record through 4800: 240 False, 241 False, 242 False, 243 False, 244 False (Muon: a record from the 2.10GHz CPU; fresh here)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.250), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     240 |         1.00  1.00  0.72 |         0.81  0.90  0.90 |         0.87  0.83  0.84 |         0.76  0.75  0.76
+     241 |         1.00  0.95  0.57 |         0.70  0.95  0.92 |         0.93  0.85  0.90 |         0.81  0.78  0.78
+     242 |         1.00  0.86  0.66 |         0.88  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     243 |         1.00  0.87  0.55 |         0.76  0.91  0.81 |         0.79  0.83  0.77 |         0.84  0.86  0.90
+     244 |         1.00  0.99  0.71 |         0.82  0.91  0.79 |         0.73  0.78  0.78 |         0.77  0.81  0.80
+     med |         1.00  0.95  0.66 |         0.81  0.91  0.90 |         0.87  0.83  0.84 |         0.81  0.81  0.80
+  CONFIG HINGE16_M (S35's MUON_HINGE16 (Muon; S=4, k=16), fresh on this CPU, to 4800): reproduces muon_k16's MUON_HINGE16 record through 4800: 240 False, 241 False, 242 False, 243 False, 244 False (Muon: a record from the 2.10GHz CPU; fresh here)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.250), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     240 |         1.00  1.00  0.72 |         1.00  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     241 |         1.00  0.95  0.57 |         0.97  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     242 |         1.00  0.86  0.66 |         0.57  0.78  0.80 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     243 |         1.00  0.87  0.55 |         1.00  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     244 |         1.00  0.99  0.71 |         0.98  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     med |         1.00  0.95  0.66 |         0.98  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+  CONFIG D8_PREV_A (S40's D8_PREV_A (GATE_PREV, Adam), rerun to 4800): reproduces gate_prev's D8_PREV_A record through 4800: 260 True, 261 True, 262 True, 263 True, 264 True
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL / uCTX / uKEY / uVAL positions (chance 0.125), per seed:
+    seed |     0:   CTX   KEY   VAL  uCTX  uKEY  uVAL |  1200:   CTX   KEY   VAL  uCTX  uKEY  uVAL |  2400:   CTX   KEY   VAL  uCTX  uKEY  uVAL |  4800:   CTX   KEY   VAL  uCTX  uKEY  uVAL
+     260 |         0.99  1.00  0.69  1.00  1.00  0.13 |         0.53  0.58  0.40  0.99  0.44  0.12 |         0.14  0.15  0.15  0.86  0.50  0.12 |         0.16  0.19  0.13  0.79  0.47  0.12
+     261 |         0.99  1.00  0.61  0.99  1.00  0.12 |         0.39  0.48  0.35  0.96  0.81  0.12 |         0.37  0.46  0.34  0.97  0.81  0.12 |         0.42  0.53  0.40  0.99  0.78  0.13
+     262 |         0.98  0.98  0.69  1.00  1.00  0.13 |         0.91  0.87  0.71  1.00  1.00  0.13 |         0.92  0.89  0.72  1.00  0.97  0.13 |         0.88  0.89  0.62  0.97  1.00  0.13
+     263 |         1.00  1.00  0.82  1.00  1.00  0.13 |         0.93  0.84  0.59  1.00  0.69  0.13 |         0.94  0.87  0.64  1.00  0.69  0.13 |         0.94  0.92  0.74  1.00  0.94  0.12
+     264 |         0.99  1.00  0.71  1.00  1.00  0.13 |         0.17  0.18  0.18  0.86  0.81  0.13 |         0.19  0.23  0.24  0.79  0.84  0.13 |         0.28  0.40  0.48  0.63  1.00  0.13
+     med |         0.99  1.00  0.69  1.00  1.00  0.13 |         0.53  0.58  0.40  0.99  0.81  0.13 |         0.37  0.46  0.34  0.97  0.81  0.13 |         0.42  0.53  0.48  0.97  0.94  0.13
+  SIDE BY SIDE (medians over the runs; h = the gate state; chance 1/S): CTX (3j) | KEY (3j+1) | VAL (3j+2)
+    HINGE_D8_A     0: 1.00 | 0.91 | 0.47  1200: 0.45 | 0.23 | 0.20  2400: 0.17 | 0.15 | 0.14  4800: 0.25 | 0.14 | 0.13
+    D8_HINGE_M     0: 1.00 | 0.91 | 0.47  1200: 0.26 | 0.28 | 0.26  2400: 0.47 | 0.57 | 0.67  4800: 0.47 | 0.49 | 0.49
+    A_HINGE_M      0: 1.00 | 0.95 | 0.66  1200: 0.81 | 0.91 | 0.90  2400: 0.87 | 0.83 | 0.84  4800: 0.81 | 0.81 | 0.80
+    HINGE16_M      0: 1.00 | 0.95 | 0.66  1200: 0.98 | 1.00 | 1.00  2400: 1.00 | 1.00 | 1.00  4800: 1.00 | 1.00 | 1.00
+    D8_PREV_A      0: 0.99 | 1.00 | 0.69  1200: 0.53 | 0.58 | 0.40  2400: 0.37 | 0.46 | 0.34  4800: 0.42 | 0.53 | 0.48
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S43 window_recipe: neither (LOCAL3_SLOW 31/40 DISCOVERED; SLOW_HINGE 34/40; SLOW_HINGE only 8, LOCAL3_SLOW only 5; replaces: >= 36/40 and SLOW_HINGE only - LOCAL3_SLOW only <= 1; does not: <= 30/40); vs SLOW_MEM: LOCAL3_SLOW only 13, SLOW_MEM only 6, p = 0.167; LOCAL3_SLOW failure classes {'STREAM-PARTIAL': 5, 'KEY': 4}
+  S44 window_scale (a): carries to four streams (LOCAL3_SLOW16_A 20/20, reference only 0, arm only 5; carries: >= 16/20 and reference only - arm only <= 1; LOCAL3_SLOW16_M cut by the runtime rule)
+  S44 window_scale (b): breaks the eight-stream stall (LOCAL3_SLOW_D8_A 3/10; LOCAL3_SLOW_D8_M 3/10; breaks: either >= 3/10; does not: both 0/10)
+  S45 reservoir_gate: does not (RES_D8_A 0/10; breaks: either >= 3/10; does not: both 0/10)
+  S46 stream_knobs LR3E3: bound 0/5, BOUND ROUTED 0/5, median final accuracy 0.10; classes {'non-stream OTHER': 4, 'non-stream KEY': 1} (descriptive)
+  S46 stream_knobs WH_SLOW: bound 0/5, BOUND ROUTED 0/5, median final accuracy 0.48; classes {'MERGED (3 share)': 2, 'MERGED (4 share)': 2, 'non-stream OTHER': 1} (descriptive)
+  S46 stream_knobs DECAY98: bound 0/5, BOUND ROUTED 0/5, median final accuracy 0.63; classes {'MERGED (3 share)': 2, 'non-stream OTHER': 3} (descriptive)
+  S46 stream_knobs PERFECT98: bound 5/5, BOUND ROUTED 5/5, median final accuracy 1.00; classes {'BOUND ROUTED': 5} (descriptive)
+  S47 write_decoders HINGE_D8_A: median h decodability CTX/KEY/VAL at 4800 0.25/0.14/0.13 (at 0: 1.00/0.91/0.47); reproduces its record: 5/5 (descriptive)
+  S47 write_decoders D8_HINGE_M: median h decodability CTX/KEY/VAL at 4800 0.47/0.49/0.49 (at 0: 1.00/0.91/0.47); reproduces its record: 0/5 (descriptive)
+  S47 write_decoders A_HINGE_M: median h decodability CTX/KEY/VAL at 4800 0.81/0.81/0.80 (at 0: 1.00/0.95/0.66); reproduces its record: 0/5 (descriptive)
+  S47 write_decoders HINGE16_M: median h decodability CTX/KEY/VAL at 4800 1.00/1.00/1.00 (at 0: 1.00/0.95/0.66); reproduces its record: 0/5 (descriptive)
+  S47 write_decoders D8_PREV_A: median h decodability CTX/KEY/VAL at 4800 0.42/0.53/0.48 (at 0: 0.99/1.00/0.69); reproduces its record: 5/5 (descriptive)
+####################################################################################################
