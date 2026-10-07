@@ -9,3 +9,22 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (50s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  PROJECTION OF THE FULL BATCH (worst case: every run to its iters; pool-load timing, 1 thread each, this machine):
+    window_d8    W_SPLIT            10 runs x   37.5 min  (step 70.1 ms, evaluation 6.0 s, decoder 1.0 s)
+    window_d8    W_D98              10 runs x   37.0 min  (step 70.9 ms, evaluation 6.5 s, decoder 0.9 s)
+    window_d8    W_SPLIT_D98        10 runs x   38.3 min  (step 70.8 ms, evaluation 6.8 s, decoder 0.9 s)
+    window_d8    W_LONG             10 runs x   54.9 min  (step 70.1 ms, evaluation 6.3 s, decoder 1.0 s)
+    window_d8    W_NOSLOW           10 runs x   38.3 min  (step 74.5 ms, evaluation 5.6 s, decoder 0.8 s)
+    window_d8    W_WIDTH4           10 runs x   37.5 min  (step 73.0 ms, evaluation 5.3 s, decoder 1.0 s)
+    window_d8    W_SPLIT_M          10 runs x   39.1 min  (step 74.3 ms, evaluation 5.4 s, decoder 0.9 s)
+    window_d8    W_M_REF            10 runs x   39.4 min  (step 76.5 ms, evaluation 5.9 s, decoder 0.9 s)
+    window_fail  LOCAL3_SLOW_RERUN   9 runs x    7.4 min  (step 17.1 ms, evaluation 1.1 s, decoder 0.2 s, gate cells 0.09 s)
+    total 54.80 h of runs; makespan on 4 workers 13.78 h (worst case)
+  RUNTIME RULE: projected makespan 13.78 h > 10 h: cut, re-projecting after each: window_d8 W_WIDTH4 -> 12.17 h; window_d8 W_NOSLOW -> 10.63 h; window_d8 W_SPLIT_M -> 7.35 h (stored)
+  arms cut: ['window_d8:W_NOSLOW', 'window_d8:W_SPLIT_M', 'window_d8:W_WIDTH4']; references dropped with them: ['window_d8:W_M_REF']
+  recipe read in children from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups), WARM 2400; the warm lr 0.0001; the trigger: every 2400 from 4800 (reference 2400), acc < 0.95, rise < 0.02, <= 3 splits (S37: 2), gap 4800; decay 0.98; S49: the branch's test_channel_binding.SUB_LR 0.001, test_short_conv.MAX_ITERS 24000; Muon lr 0.005; 1 torch thread per run
+  lr for window_d8 W_SPLIT: 0.001; iters 28800; seeds 260-269 (10)
+  lr for window_d8 W_D98: 0.001; iters 28800; seeds 260-269 (10)
+  lr for window_d8 W_SPLIT_D98: 0.001; iters 28800; seeds 260-269 (10)
+  lr for window_d8 W_LONG: 0.001; iters 43200; seeds 260-269 (10)
+  lr for window_fail LOCAL3_SLOW_RERUN: 0.001; iters 24000; seeds [163, 169, 173, 183, 185, 186, 188, 192, 197] (9)
