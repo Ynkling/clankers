@@ -28,3 +28,7 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   lr for window_d8 W_SPLIT_D98: 0.001; iters 28800; seeds 260-269 (10)
   lr for window_d8 W_LONG: 0.001; iters 43200; seeds 260-269 (10)
   lr for window_fail LOCAL3_SLOW_RERUN: 0.001; iters 24000; seeds [163, 169, 173, 183, 185, 186, 188, 192, 197] (9)
+  CHECK window_fail: the (stream, key) cell table on a synthetic gate (stream 0 on channel 0; stream 1 on channel 0 for keys 0, 1 and on channel 1 for keys 2, 3): KEY [[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 0.0, 0.0]], VAL [[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 0.0, 0.0]]; soft share 0.0; eta^2 by cell 1.000 (1 = p fixed by the cell): ok
+  CHECK window_fail: cells() carries test_router_layout.routing_stats unchanged (the eta^2 and margin fail_class reads): ok
+  CHECK window_fail: the dense measurements are inert: LOCAL3_SLOW|163 through 2400 with them equals S43's run code without them (curve [[1200, 0.30810546875, 2.3693504333496094], [2400, 0.533203125, 1.5524489879608154]]; statistics and decoder equal True); 61 measurements at [0, 25, 50, 75, 100]..2400, 2400 updates: ok
+  CHECK window_fail: the nine seeds are S43's unbound LOCAL3_SLOW seeds (40 records of code 46867e792241; not DISCOVERED: [163, 169, 173, 183, 185, 186, 188, 192, 197]; classes ['STREAM-PARTIAL', 'KEY', 'KEY', 'STREAM-PARTIAL', 'STREAM-PARTIAL', 'KEY', 'STREAM-PARTIAL', 'KEY', 'STREAM-PARTIAL']): ok
