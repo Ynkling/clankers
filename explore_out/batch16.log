@@ -2667,3 +2667,4 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [  4]   43.6 min  stream_knobs     DECAY98                  seed 260  lr 0.001  (gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 3fd340a+dirty, code ea36a6e5d44b, attempt 1: acc 0.628  trans  None  outcome MERGED (3 share); decoder at 2400: h CTX/KEY/VAL 0.48/0.43/0.35
   start   43.6 min  reservoir_gate   RES_D8_A                 seed 266  (projected worst case 48 min)
+#################### CONTAINER RESTART 2026-10-07 00:02:16 UTC — segment 6 was stopped by a container restart, not the time limit: its 4 saved runs (stream_knobs DECAY98 260-263) are kept; its in-flight runs are lost. The new container again has an Intel(R) Xeon(R) Processor @ 2.10GHz: Adam jobs only, by the fixed rule. (EXPLORATORY, not a result) ####################
