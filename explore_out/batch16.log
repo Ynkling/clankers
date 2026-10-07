@@ -2914,3 +2914,8 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   [ 10]   79.3 min  write_decoders   A_HINGE_M                seed 241  lr 0.001, Muon lr 0.005  (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git f1adbb9+dirty, code d6ccc68892a7, attempt 1: acc 0.753  trans  None  outcome MERGED (2 share); decoder at 4800: h CTX/KEY/VAL 0.81/0.78/0.78
   start   79.3 min  write_decoders   HINGE16_M                seed 243  (projected worst case 9 min)
+  [ 11]   79.6 min  write_decoders   A_HINGE_M                seed 242  lr 0.001, Muon lr 0.005  (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 8d5b8f2, code d6ccc68892a7, attempt 1: acc 1.000  trans  2400  outcome BOUND ROUTED; decoder at 4800: h CTX/KEY/VAL 1.00/1.00/1.00
+  start   79.6 min  write_decoders   HINGE16_M                seed 244  (projected worst case 9 min)
+  [ 12]   79.9 min  write_decoders   A_HINGE_M                seed 243  lr 0.001, Muon lr 0.005  (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 8d5b8f2+dirty, code d6ccc68892a7, attempt 1: acc 0.740  trans  None  outcome MERGED (2 share); decoder at 4800: h CTX/KEY/VAL 0.84/0.86/0.90
