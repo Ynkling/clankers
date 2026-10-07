@@ -448,7 +448,8 @@ held-out accuracy and channel counts are the best of any eight-stream arm screen
 
 S44, what the window gate does at four and eight streams (observations, not readings):
 - The window gate's state carries the stream at the write positions as well as the read: at S=4 (Adam) the median
-  decodability of h at KEY / VAL is 0.73 / 0.81 at 1200 and 1.00 / 1.00 from 4800 on; at S=8 under Muon 0.93-1.00 at both
+  decodability of h at KEY / VAL is 0.73 / 0.81 at 1200 and 1.00 / 1.00 at 4800 (the two runs still training at 9600:
+  0.69-0.76); at S=8 under Muon 0.93-1.00 at both
   from 1200 to 9600; at S=8 under Adam it dips to 0.55-0.67 at 2400-4800 and recovers to 0.87 / 0.88 at 9600. The recurrent
   reference D8_HINGE_M_REF stays at 0.14-0.28 (median) at both positions.
 - These are the first eight-stream runs in these screens to bind routed (every recurrent arm in S38-S42 and S45 bound 0/10).
@@ -478,7 +479,7 @@ S47 (closes the gap behind Revision 7, Section 11): median decodability of h at 
 | S40's D8_PREV_A (GATE_PREV, Adam) | 0.99 / 1.00 / 0.69 | 0.53 / 0.58 / 0.40 | 0.37 / 0.46 / 0.34 | 0.42 / 0.53 / 0.48 |
 
 At initialization the recurrent state decodes the stream at VAL (two back) well below KEY (0.47-0.69 against 0.91-1.00);
-after training VAL tracks KEY within about 0.1 in every configuration. GATE_PREV's input decodes the stream at KEY (median
+after training VAL is within 0.1 of KEY in the four plain recurrent configurations, and 0.05-0.18 below it under GATE_PREV. GATE_PREV's input decodes the stream at KEY (median
 0.81-1.00) and at chance at VAL (0.12-0.13), as the audit said; its state h decodes VAL at 0.34-0.48.
 
 Handed back as promising for a pre-registered test on the main branch: S44, the window gate (LOCAL3) with slow memory and no
