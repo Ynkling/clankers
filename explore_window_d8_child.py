@@ -314,11 +314,11 @@ def checks(p):
     st = o3.state[m3.W_g]
     zeroed = all(float(v.abs().max()) == 0.0 for k, v in st.items() if torch.is_tensor(v) and k != "step") and \
         any(float(v.abs().max()) > 0 for k, v in sb.items() if k != "step")
-    rows.append((f"the trigger at cap 3 (Adam): fired at {fired}, blocked by the 4800 gap at {gap}, by the cap at {cap}; each split "
+    rows.append((f"the trigger at cap 3 (Adam): fired at {fired}, blocked by the 4800 gap at {gap}, by the cap at {cap} (from the third split on the cap is named); each split "
                  f"copies W_g's row c* onto c0 with noise (row distances after {[round(r['row_dist_after'], 4) for r in r3 if r['fired']]}"
                  f" > 0) and zeroes W_g's Adam state (exp_avg, exp_avg_sq zero after: {zeroed}); targets labelled "
                  f"{[(r['key_cs'], r['key_c0'], r['key_ok']) for r in r3 if r['fired']]}",
-                 fired == [4800, 9600, 14400] and gap == [7200, 12000, 16800] and cap == [19200, 21600, 24000, 26400] and zeroed
+                 fired == [4800, 9600, 14400] and gap == [7200, 12000] and cap == [16800, 19200, 21600, 24000, 26400] and zeroed
                  and all(r["row_dist_after"] > 0 for r in r3 if r["fired"])))
     if p.get("muon"):
         rm, mmu, omu, sbm = _trigger_rows(a, task, seed, lambda info, oo: make_trigger(task, seed, info, oo, 26400, thr=1.01,
