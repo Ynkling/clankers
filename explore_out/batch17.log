@@ -115,3 +115,6 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   [ 13]   91.3 min  window_d8        W_SPLIT_D98              seed 262  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 3d7b2d9, code 375b30d487df, attempt 1: acc 1.000  trans 18000  outcome BOUND ROUTED; decoder at 20400: h CTX/KEY/VAL 0.38/1.00/1.00; splits 3 at [7200, 12000, 16800]
   start   91.3 min  window_fail      LOCAL3_SLOW_RERUN        seed 192  (projected worst case 7 min)
+  [ 14]   92.4 min  window_fail      LOCAL3_SLOW_RERUN        seed 185  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git b80b532, code 3d097ab8b5cc, attempt 1: acc 0.882  trans  None  VALcos 0.317  margin 0.71  STREAM-PARTIAL
+  start   92.4 min  window_fail      LOCAL3_SLOW_RERUN        seed 197  (projected worst case 7 min)
