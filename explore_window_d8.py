@@ -174,23 +174,24 @@ def eq_upto(r, ref, t):
 def split_check():
     from concurrent.futures import ThreadPoolExecutor
     ref = b16_runs("LOCAL3_SLOW_D8_A", (260,)).get(260)
-    jobs = [("W_SPLIT", dict(arm="W_SPLIT", seed=260, iters=SPLIT_CHECK_ITERS, thr=0.0))]
+    jobs = [("W_SPLIT", dict(arm="W_SPLIT", seed=260, iters=SPLIT_CHECK_ITERS, thr=0.0, total=ITERS))]
     if "W_SPLIT_M" in ARMS:
-        jobs.append(("W_SPLIT_M", dict(arm="W_SPLIT_M", seed=260, iters=MUON_CHECK_ITERS, thr=0.0, mlr=MUON_LR)))
+        jobs.append(("W_SPLIT_M", dict(arm="W_SPLIT_M", seed=260, iters=MUON_CHECK_ITERS, thr=0.0, mlr=MUON_LR, total=ITERS)))
         if M_REF_FROM[0] != "batch 16":
             jobs.append(("W_M_REF", dict(arm="W_M_REF", seed=260, iters=MUON_CHECK_ITERS, mlr=MUON_LR)))
     with ThreadPoolExecutor(max_workers=len(jobs)) as ex:
         res = dict(zip([j[0] for j in jobs], ex.map(lambda j: child("run", j[1]), jobs)))
     r = res["W_SPLIT"]
-    ok = ref is not None and eq_upto(r, ref, SPLIT_CHECK_ITERS) and r["splits"] == 0 and len(r["checks"]) >= 2
+    eq = ref is not None and eq_upto(r, ref, SPLIT_CHECK_ITERS)
+    ok = eq and r["splits"] == 0 and len(r["checks"]) >= 2
     rows = [(f"with the trigger's threshold at 0, W_SPLIT|260 equals batch 16's LOCAL3_SLOW_D8_A|260 ({ref['cpu'] if ref else '?'}) "
              f"bit for bit through {SPLIT_CHECK_ITERS} (curve {r['curve']}; statistics and the decoder at "
-             f"{sorted(int(k) for k in (ref or {}).get('decode', {}) if k.isdigit() and int(k) <= SPLIT_CHECK_ITERS)} equal: {ok}; "
+             f"{sorted(int(k) for k in (ref or {}).get('decode', {}) if k.isdigit() and int(k) <= SPLIT_CHECK_ITERS)} equal: {eq}; "
              f"checks logged at {[c['step'] for c in r['checks']]}, {r['splits']} splits)", ok)]
     if "W_SPLIT_M" in res:
         rm = res["W_SPLIT_M"]
         pm = res["W_M_REF"] if "W_M_REF" in res else b16_runs("LOCAL3_SLOW_D8_M", (260,)).get(260)
-        okm = pm is not None and eq_upto(rm, pm, MUON_CHECK_ITERS) and rm["splits"] == 0
+        okm = pm is not None and eq_upto(rm, pm, MUON_CHECK_ITERS) and rm["splits"] == 0 and len(rm["checks"]) >= 1
         rows.append((f"with the threshold at 0, W_SPLIT_M|260 equals its Muon pair ({M_REF_FROM[0]}) bit for bit through "
                      f"{MUON_CHECK_ITERS} (curve {rm['curve']}; {okm})", okm))
     return rows

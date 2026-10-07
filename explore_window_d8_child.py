@@ -154,7 +154,7 @@ def build_rc(arm_name, p, holder, out, info):
             ctx, opt_of = s25.muon_in_onset_run(holder), (lambda: holder["opts"][0].muon)
         else:
             ctx, opt_of = s36c.adam_capture(holder), (lambda: holder["opts"][0])
-        rc = s36c.with_trigger(rc, make_trigger(task, p["seed"], info, opt_of, p["iters"] - EVERY,
+        rc = s36c.with_trigger(rc, make_trigger(task, p["seed"], info, opt_of, p.get("total", p["iters"]) - EVERY,
                                                 max_splits=p.get("max_splits", MAX_SPLITS), thr=p.get("thr", ACC_THR)))
     elif arm["opt"] == "muon":
         ctx = s25.muon_in_onset_run(holder)
@@ -164,7 +164,8 @@ def build_rc(arm_name, p, holder, out, info):
 
 
 def run(p):
-    """p: arm, seed, iters, mlr (Muon arms), eval_every / probe (timing), thr (CHECK), keep (CHECK)."""
+    """p: arm, seed, iters, mlr (Muon arms), eval_every / probe (timing), thr / total (CHECK: the trigger's last check is
+    total - 2400, total defaulting to iters), keep (CHECK)."""
     arm = ARM[p["arm"]]
     holder, out, info = {}, {}, dict(checks=[])
     rc, ctx = build_rc(p["arm"], p, holder, out, info)
