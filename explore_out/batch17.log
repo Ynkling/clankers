@@ -719,3 +719,45 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   code SHA window_d8: 375b30d487df over 41 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
   code SHA window_fail: 3d097ab8b5cc over 22 modules (0 served from main at 9c5939e): bdh bdh_recurrent explore_b16_gates explore_common explore_common2 explore_local_gate explore_window_fail_child explore_window_recipe_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_instrument_v2 test_interference test_multilayer_binding test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_short_conv
   this segment's CPU: Intel(R) Xeon(R) Processor @ 2.10GHz; the batch's CPU (Muon runs and their pairs): Intel(R) Xeon(R) Processor @ 2.10GHz
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (45s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  RUNTIME RULE (stored 2026-10-07 15:01:16 UTC on Intel(R) Xeon(R) Processor @ 2.10GHz: makespan 13.78 h on 4 workers): cut [('window_d8', 'W_WIDTH4'), ('window_d8', 'W_NOSLOW'), ('window_d8', 'W_SPLIT_M')] -> 7.35 h (the stored timings are reused)
+  arms cut: ['window_d8:W_NOSLOW', 'window_d8:W_SPLIT_M', 'window_d8:W_WIDTH4']; references dropped with them: ['window_d8:W_M_REF']
+  recipe read in children from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups), WARM 2400; the warm lr 0.0001; the trigger: every 2400 from 4800 (reference 2400), acc < 0.95, rise < 0.02, <= 3 splits (S37: 2), gap 4800; decay 0.98; S49: the branch's test_channel_binding.SUB_LR 0.001, test_short_conv.MAX_ITERS 24000; Muon lr 0.005; 1 torch thread per run
+  lr for window_d8 W_SPLIT: 0.001; iters 28800; seeds 260-269 (10)
+  lr for window_d8 W_D98: 0.001; iters 28800; seeds 260-269 (10)
+  lr for window_d8 W_SPLIT_D98: 0.001; iters 28800; seeds 260-269 (10)
+  lr for window_d8 W_LONG: 0.001; iters 43200; seeds 260-269 (10)
+  lr for window_fail LOCAL3_SLOW_RERUN: 0.001; iters 24000; seeds [163, 169, 173, 183, 185, 186, 188, 192, 197] (9)
+  CHECKs skipped (repro check above still run): every screen's code SHA equals the one at the full CHECK pass (2026-10-07 15:10:14 UTC, git 2aedc04+dirty, on Intel(R) Xeon(R) Processor @ 2.10GHz; its output is earlier in this log)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_d8
+  idea    one-knob changes to the eight-stream window gate (LOCAL3_SLOW_D8_A, 3/10): splits, decay 0.98, length, one rate, width 4
+  source  batch 16's S44(b) (the window gate broke the eight-stream stall at 3/10 Adam and 3/10 Muon); the user's batch 17
+  change  LOCAL3_SLOW_D8_A + S37's KEYMASS trigger (<= 3 splits) / decay 0.98 / both / 43200 updates / one rate 1e-3 / a width-4 window; LOCAL3_SLOW_D8_M + the trigger
+  arm W_SPLIT      lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A + the KEYMASS trigger (<= 3 splits)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_D98        lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A at decay 0.98
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98
+  arm W_SPLIT_D98  lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A at decay 0.98 + the KEYMASS trigger
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_LONG       lr 0.001  iters 43200  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A to 43200 updates
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 260-269: the Adam arms with batch 16's LOCAL3_SLOW_D8_A records; W_SPLIT_M with LOCAL3_SLOW_D8_M on the same CPU (batch 16's records or W_M_REF); same initial parameters (+ the window) and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_fail
+  idea    classify LOCAL3_SLOW's nine unbound two-stream runs (S43): the gate at the write positions, and when key splits form
+  source  batch 16's S43 (LOCAL3_SLOW 31/40; failures STREAM-PARTIAL 5, KEY 4); the user's batch 17
+  change  none to the runs (S43's run code on the nine seeds); the gate measured densely early and at every evaluation
+  arm LOCAL3_SLOW_RERUN lr 0.001  iters 24000  seeds [163, 169, 173, 183, 185, 186, 188, 192, 197] (9)  — S43's LOCAL3_SLOW on its nine unbound seeds, rerun with dense gate measurements
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused)
+  pairing each rerun against its own S43 record (must reproduce it bit for bit)
+----------------------------------------------------------------------------------------------------
+  20 runs queued on 4 workers (1 torch thread each); segment budget 115 min left
+  packing: arms without a run on this CPU are sized at 1.10 x 1.01 x their projection (the median observed / projected ratio over 4 arms run on this CPU)
+  start    0.0 min  window_d8        W_D98                    seed 260  (projected worst case 41 min)
+  start    0.0 min  window_d8        W_D98                    seed 261  (projected worst case 41 min)
+  start    0.0 min  window_d8        W_D98                    seed 262  (projected worst case 41 min)
+  start    0.0 min  window_d8        W_D98                    seed 263  (projected worst case 41 min)
