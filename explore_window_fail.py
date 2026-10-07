@@ -179,6 +179,12 @@ def report():
               f"(curve and statistics): {rep}; acc {r['acc']:.3f}; KEY split {key_label(t0)}"
               + (f" (formed at {t0}" + (f"; first crossing {first}" if first != t0 else "") + ")" if t0 is not None
                  else (f" (first crossing {first}, not held)" if first is not None else "")))
+        e_end = series(r, "eta_key_by_key")[-1][1] if series(r, "eta_key_by_key") else None
+        if e_end is not None and abs(e_end - ETA_SPLIT) < 0.02:
+            print(f"       note: eta^2 by key at the end {e_end:.4f} is on the threshold {ETA_SPLIT} (a gate that splits the streams "
+                  f"on two keys and puts the other two keys on different channels has eta^2 by key 0.5 exactly), so this "
+                  f"run's KEY-split label follows sampling noise")
+            out[s]["on_threshold"] = True
         for f, lab in (("eta_key_by_key", "by key   "), ("eta_key_by_stream", "by stream"), ("margin", "margin   ")):
             print(f"       {lab} " + " ".join(f2(at(r, t, f)) for t in SHOW))
     print("  (1) THE GATE AT VAL POSITIONS (the writes) AT THE END, beside KEY positions (the reads): mean p = P(channel 0) per "
@@ -216,9 +222,11 @@ def report():
     summ = dict(
         reproduce=f"{sum(1 for o in out.values() if o['reproduces'])}/{len(out)} reruns reproduce S43's records",
         key=(f"KEY runs ({len(keyruns)}): " + ", ".join(f"{s} {out[s]['key']}" + (f" ({out[s]['formed']})" if out[s]['formed']
-                                                                                 is not None else "") for s in keyruns)),
+                                                                                 is not None else "")
+                                                      + (" [on the threshold]" if out[s].get("on_threshold") else "") for s in keyruns)),
         key_partial=(f"STREAM-PARTIAL runs ({len(partial)}): " + ", ".join(
-            f"{s} {out[s]['key']}" + (f" ({out[s]['formed']})" if out[s]['formed'] is not None else "") for s in partial)),
+            f"{s} {out[s]['key']}" + (f" ({out[s]['formed']})" if out[s]['formed'] is not None else "")
+            + (" [on the threshold]" if out[s].get("on_threshold") else "") for s in partial)),
         val=(f"STREAM-PARTIAL at VAL: " + "; ".join(f"{s} {out[s].get('val_pattern')} {out[s].get('val_labels')}" for s in partial)),
         val_key=(f"KEY at VAL: " + "; ".join(f"{s} {out[s].get('val_pattern')}" for s in keyruns)))
     for v in summ.values():

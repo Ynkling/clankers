@@ -313,7 +313,7 @@ def report():
             pre_lab, pre = plab, pr
         print(f"  ARM {arm} ({a['label']}), seeds {ec.fmt_seeds(a['seeds'])}; {a['sched']}")
         maps_table(arm, a, rs, plab, pr)
-        d = rp.compare(rs, pr, a["seeds"], arm, plab.split(" ")[0])
+        d = rp.compare(rs, pr, a["seeds"], arm, "B16_D8_M" if plab.startswith("batch 16") else plab.split(" ")[0])
         print(f"    failure classes at the end: {arm} {rp.classes(rs)}; {plab} {rp.classes({s: pr[s] for s in a['seeds'] if s in pr})}")
         print(f"    transitions: {arm} {rp.transitions(rs)}; {plab} {rp.transitions({s: pr[s] for s in a['seeds'] if s in pr})}")
         if "SPLIT" in arm:
