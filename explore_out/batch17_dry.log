@@ -100,3 +100,12 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49) — D
   start    0.0 min  dry_window_d8    W_SPLIT_M                seed 260  (projected worst case 3 min)
   start    0.0 min  dry_window_d8    W_SPLIT_D98              seed 260  (projected worst case 3 min)
   start    0.0 min  dry_window_d8    W_WIDTH4                 seed 260  (projected worst case 3 min)
+  [  1]    3.6 min  dry_window_d8    W_SPLIT_D98              seed 260  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f59e0d5, code 375b30d487df, attempt 1: acc 0.131  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.25/0.95/0.88; splits 0 at []
+  start    3.6 min  dry_window_d8    W_NOSLOW                 seed 260  (projected worst case 3 min)
+  [  2]    3.6 min  dry_window_d8    W_WIDTH4                 seed 260  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; window width 4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f59e0d5+dirty, code 375b30d487df, attempt 1: acc 0.069  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.23/0.48/0.41
+  start    3.6 min  dry_window_d8    W_D98                    seed 260  (projected worst case 3 min)
+  [  3]    3.7 min  dry_window_d8    W_M_REF                  seed 260  lr 0.001, Muon lr 0.005  (Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f59e0d5+dirty, code 375b30d487df, attempt 1: acc 0.237  trans  None  outcome MERGED (2 share); decoder at 2400: h CTX/KEY/VAL 0.38/0.99/0.97
+  start    3.7 min  dry_window_d8    W_LONG                   seed 260  (projected worst case 3 min)
