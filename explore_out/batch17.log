@@ -106,3 +106,6 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   [ 10]   85.6 min  window_fail      LOCAL3_SLOW_RERUN        seed 173  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git e84dec1, code 3d097ab8b5cc, attempt 1: acc 0.612  trans  None  VALcos 0.896  margin 0.23  KEY
   start   85.6 min  window_fail      LOCAL3_SLOW_RERUN        seed 185  (projected worst case 7 min)
+  [ 11]   87.2 min  window_d8        W_LONG                   seed 265  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git b31a409, code 375b30d487df, attempt 1: acc 0.751  trans  None  outcome MERGED (2 share); decoder at 43200: h CTX/KEY/VAL 0.20/0.81/0.89
+  start   87.2 min  window_fail      LOCAL3_SLOW_RERUN        seed 186  (projected worst case 7 min)
