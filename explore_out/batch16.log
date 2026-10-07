@@ -3493,3 +3493,472 @@ EXPLORATORY, NOT A RESULT — batch 16: window_recipe (S43), window_scale (S44),
   start    0.0 min  window_scale     D8_HINGE_M_REF           seed 263  (projected worst case 110 min)
   [  1]   65.5 min  window_scale     D8_HINGE_M_REF           seed 263  lr 0.001, Muon lr 0.005  (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git e8dbd67+dirty, code 01767493e840, attempt 1: acc 0.385  trans  None  outcome MERGED (4 share); decoder at 9600: h CTX/KEY/VAL 0.51/0.44/0.40
+  [  2]   65.7 min  window_scale     D8_HINGE_M_REF           seed 260  lr 0.001, Muon lr 0.005  (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 7a9f9b1, code 01767493e840, attempt 1: acc 0.100  trans  None  outcome non-stream OTHER; decoder at 9600: h CTX/KEY/VAL 0.13/0.14/0.13
+  [  3]   65.9 min  window_scale     D8_HINGE_M_REF           seed 262  lr 0.001, Muon lr 0.005  (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 7a9f9b1+dirty, code 01767493e840, attempt 1: acc 0.098  trans  None  outcome non-stream OTHER; decoder at 9600: h CTX/KEY/VAL 0.18/0.15/0.13
+  [  4]   66.0 min  window_scale     D8_HINGE_M_REF           seed 261  lr 0.001, Muon lr 0.005  (Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 7a9f9b1+dirty, code 01767493e840, attempt 1: acc 0.376  trans  None  outcome MERGED (4 share); decoder at 9600: h CTX/KEY/VAL 0.50/0.46/0.40
+  30 runs left for the next segment: none fits in the 49 min left of this one (worst-case projections)
+  batch wall clock 66.0 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_recipe
+  idea    the width-3 window gate (batch 1's LOCAL3) with S5's slow memory and no hinge
+  source  the audit of 6 October 2026, section 3.1: LOCAL3 beat arm A 15/20 vs 7/20 in batch 1 and was dropped; it cannot position-split, and slow memory removes key splits (Q2)
+  change  LOCAL3_SLOW: LOCAL3 + S5's two-group schedule (gate W_in, W_g, window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); LOCAL3 unchanged on 20 new seeds
+  arm LOCAL3       lr 0.001  iters 24000  seeds 180-199 (20)  — batch 1's S1 LOCAL3, unchanged (160-179: batch 1's records)
+                   schedule: lr 0.001 throughout
+  arm LOCAL3_SLOW  lr 0.001  iters 24000  seeds 160-199 (40)  — LOCAL3 + S5's SLOW schedule, no hinge
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused)
+  pairing seeds 160-199 with S13's SLOW_HINGE, S5/S7's SLOW_MEM and LOCAL3 (batch 1's records on 160-179); same initial parameters and batches
+----------------------------------------------------------------------------------------------------
+  per seed (outcome: DISCOVERED, BOUND unrouted, or test_router_layout.fail_class; transition; decodability of the gate state h by S38's decoder at KEY / VAL positions at 1200, 2400, 4800, end; chance 0.5):
+    seed | LOCAL3           trans | LOCAL3_SLOW      trans   h@KEY 1200/2400/4800/end   h@VAL 1200/2400/4800/end | S13 SLOW_HINGE   S5/S7 SLOW_MEM  
+     160 | DISCOVERED*       6000 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     161 | DISCOVERED*       2400 | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     162 | DISCOVERED*       3600 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       POSITION        
+     163 | STREAM-PARTIAL*   None | STREAM-PARTIAL    None        0.75/0.75/0.75/0.75        0.75/0.75/0.75/0.75 | DISCOVERED       DISCOVERED      
+     164 | KEY*              None | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     165 | KEY*              None | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     166 | DISCOVERED*       2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       POSITION        
+     167 | DISCOVERED*       1200 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | OTHER            POSITION        
+     168 | DISCOVERED*       2400 | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     169 | KEY*              None | KEY               None        0.50/0.61/0.53/0.50        0.51/0.51/0.52/0.51 | DISCOVERED       DISCOVERED      
+     170 | DISCOVERED*       2400 | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     171 | DISCOVERED*       2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | OTHER            OTHER           
+     172 | DISCOVERED*       2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     173 | DISCOVERED*       2400 | KEY               None        0.62/0.64/0.62/0.62        0.62/0.62/0.51/0.63 | DISCOVERED       POSITION        
+     174 | DISCOVERED*       2400 | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     175 | DISCOVERED*       3600 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       POSITION        
+     176 | DISCOVERED*       2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        0.93/1.00/1.00/1.00 | DISCOVERED       POSITION        
+     177 | STREAM-PARTIAL*   None | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       POSITION        
+     178 | DISCOVERED*       2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     179 | DISCOVERED*       2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     180 | DISCOVERED        2400 | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       POSITION        
+     181 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     182 | DISCOVERED       10800 | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     183 | DISCOVERED        1200 | STREAM-PARTIAL    None        0.75/0.75/0.75/0.75        0.75/0.75/0.75/0.75 | DISCOVERED       DISCOVERED      
+     184 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     185 | DISCOVERED        1200 | STREAM-PARTIAL    None        0.98/0.88/0.94/0.88        0.88/0.88/0.88/0.86 | DISCOVERED       DISCOVERED      
+     186 | KEY               None | KEY               None        0.50/0.50/0.50/0.50        0.50/0.50/0.51/0.50 | DISCOVERED       DISCOVERED      
+     187 | DISCOVERED        6000 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | KEY              KEY             
+     188 | DISCOVERED        1200 | STREAM-PARTIAL    None        0.99/1.00/0.89/0.88        0.91/0.93/0.88/0.88 | DISCOVERED       DISCOVERED      
+     189 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | KEY              KEY             
+     190 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       POSITION        
+     191 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     192 | DISCOVERED        1200 | KEY               None        0.50/0.50/0.50/0.50        0.50/0.50/0.50/0.53 | DISCOVERED       OTHER           
+     193 | DISCOVERED        2400 | DISCOVERED        3600        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | OTHER            KEY             
+     194 | DISCOVERED        7200 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     195 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     196 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     197 | KEY               None | STREAM-PARTIAL    None        0.50/0.50/0.50/0.88        0.50/0.50/0.50/0.67 | OTHER            POSITION        
+     198 | DISCOVERED        2400 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       DISCOVERED      
+     199 | DISCOVERED        3600 | DISCOVERED        2400        1.00/1.00/1.00/1.00        1.00/1.00/1.00/1.00 | DISCOVERED       POSITION        
+    (* batch 1's record)
+  LOCAL3 (new runs, 180-199) decodability of h at KEY / VAL, per seed, 1200/2400/4800/end:
+    180: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.68/0.99/1.00/1.00
+    181: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.55/0.59/0.60/0.60
+    182: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.92/0.72/0.61/0.86
+    183: KEY 1.00/1.00/--/1.00  VAL 1.00/1.00/--/1.00  CTX 0.71/0.69/--/0.73
+    184: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.65/0.64/0.64/0.64
+    185: KEY 1.00/1.00/--/1.00  VAL 1.00/1.00/--/1.00  CTX 0.63/0.62/--/0.62
+    186: KEY 0.50/0.50/0.50/0.50  VAL 0.50/0.50/0.50/0.54  CTX 0.81/0.66/0.57/0.59
+    187: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.85/0.64/0.88/0.68
+    188: KEY 1.00/1.00/--/1.00  VAL 1.00/1.00/--/1.00  CTX 0.96/0.58/--/0.57
+    189: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.71/0.73/0.72/0.72
+    190: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.93/0.89/0.89/0.89
+    191: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.79/0.98/0.96/0.96
+    192: KEY 1.00/1.00/--/1.00  VAL 1.00/1.00/--/1.00  CTX 0.98/0.99/--/0.96
+    193: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.69/0.77/0.77/0.77
+    194: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.83/0.94/0.91/0.90
+    195: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.88/0.66/0.61/0.61
+    196: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.70/0.56/0.57/0.57
+    197: KEY 0.50/0.50/0.50/0.50  VAL 0.50/0.50/0.50/0.50  CTX 0.54/0.56/0.49/0.58
+    198: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.74/0.70/0.71/0.71
+    199: KEY 1.00/1.00/1.00/1.00  VAL 1.00/1.00/1.00/1.00  CTX 0.98/0.67/0.64/0.58
+  DISCOVERED, paired (same seeds, initial parameters and batches; exact McNemar, two-sided):
+    LOCAL3_SLOW  31/40   S13 SLOW_HINGE   34/40   LOCAL3_SLOW only 5, S13 SLOW_HINGE only 8, p = 0.581
+    LOCAL3_SLOW  31/40   S5/S7 SLOW_MEM   24/40   LOCAL3_SLOW only 13, S5/S7 SLOW_MEM only 6, p = 0.167
+    LOCAL3_SLOW  31/40   LOCAL3           33/40   LOCAL3_SLOW only 3, LOCAL3 only 5, p = 0.727
+    LOCAL3_SLOW  17/20   LOCAL3 (160-179) 15/20   LOCAL3_SLOW only 3, LOCAL3 (160-179) only 1, p = 0.625
+    LOCAL3 over 160-199: 33/40 (batch 1's 160-179 15/20, new 180-199 18/20)
+  failure classes (unbound runs; test_router_layout.fail_class):
+    LOCAL3_SLOW     160-179 {'STREAM-PARTIAL': 1, 'KEY': 2}   180-199 {'STREAM-PARTIAL': 4, 'KEY': 2}
+    LOCAL3          160-179 {'STREAM-PARTIAL': 2, 'KEY': 3}   180-199 {'KEY': 2}
+    S13 SLOW_HINGE  160-179 {'OTHER': 2}   180-199 {'KEY': 2, 'OTHER': 2}
+    S5/S7 SLOW_MEM  160-179 {'POSITION': 7, 'OTHER': 1}   180-199 {'POSITION': 4, 'KEY': 3, 'OTHER': 1}
+  prediction (diagnostic, fixed before any run): no POSITION failure and KEY failures <= 1/20 on 160-179 (batch 1's LOCAL3: 4 by the audit's count, 3 by fail_class): LOCAL3_SLOW POSITION 0 (160-199), KEY 2/20 on 160-179 -> not met
+  transitions LOCAL3_SLOW     median 2400 (n 31): [2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600]
+  transitions LOCAL3          median 2400 (n 33): [1200, 1200, 1200, 1200, 1200, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 3600, 3600, 3600, 6000, 6000, 7200, 10800]
+  transitions S13 SLOW_HINGE  median 2400.0 (n 34): [2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800]
+  median decodability of the gate state over the new runs (chance 0.50):
+    arm             at   n  h@CTX  h@KEY  h@VAL
+    LOCAL3        1200  20   0.76   1.00   1.00
+    LOCAL3        2400  20   0.68   1.00   1.00
+    LOCAL3        4800  16   0.68   1.00   1.00
+    LOCAL3         end  20   0.69   1.00   1.00
+    LOCAL3_SLOW   1200  40   0.71   1.00   1.00
+    LOCAL3_SLOW   2400  40   0.81   1.00   1.00
+    LOCAL3_SLOW   4800  40   0.70   1.00   1.00
+    LOCAL3_SLOW    end  40   0.70   1.00   1.00
+  READING S43: neither (LOCAL3_SLOW 31/40 DISCOVERED; SLOW_HINGE 34/40; SLOW_HINGE only 8, LOCAL3_SLOW only 5; replaces: >= 36/40 and SLOW_HINGE only - LOCAL3_SLOW only <= 1; does not: <= 30/40)
+  READING window_recipe: neither (LOCAL3_SLOW 31/40 DISCOVERED; SLOW_HINGE 34/40; SLOW_HINGE only 8, LOCAL3_SLOW only 5; replaces: >= 36/40 and SLOW_HINGE only - LOCAL3_SLOW only <= 1; does not: <= 30/40)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_scale
+  idea    the window gate (LOCAL3) with slow memory, no hinge, at four and eight streams (k=16, conv)
+  source  the audit of 6 October 2026, sections 3.1 and 3.2 (the window sees CTX at the read and the write positions)
+  change  main's A4k16 / D8 paths with LOCAL3's gate in place of the recurrent gate, the SLOW schedule (Adam) or S25's groups (Muon 0.005), no hinge; SPLIT: + S37's KEYMASS trigger
+  arm LOCAL3_SLOW16_A lr 0.001  iters 28800  seeds 240-259 (20)  — LOCAL3 + SLOW, no hinge (Adam), S=4, k=16
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm LOCAL3_SLOW_D8_A lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3 + SLOW, no hinge (Adam), S=8, k=16
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm LOCAL3_SLOW_D8_M lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3 + S25's groups (Muon), no hinge, S=8, k=16
+                   schedule: Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge
+  arm D8_HINGE_M_REF lr 0.001  iters 28800  seeds 260-269 (10)  — S33's D8_HINGE, fresh on this CPU (reference)
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  pairing (a) seeds 240-259: Adam with X's HINGE4k16, Muon with MUON_HINGE16_REF (S35's recipe, fresh on this CPU); (b) seeds 260-269: Adam with X's HINGE_D8, Muon with D8_HINGE_M_REF (S33's recipe, fresh on this CPU), SPLIT with LOCAL3_SLOW_D8_A; same initial parameters (+ the window) and batches
+----------------------------------------------------------------------------------------------------
+  cut by the runtime rule: ['LOCAL3_SLOW16_M', 'LOCAL3_SLOW_D8_A_SPLIT', 'MUON_HINGE16_REF'] (no runs, no reading)
+  ARM LOCAL3_SLOW16_A (LOCAL3 + SLOW, no hinge (Adam), S=4, k=16), seeds 240-259 (20)
+    seed | LOCAL3_SLOW16_A          trans  stop   acc   ch@4800   ch@9600    ch@end | X HINGE4k16           
+     240 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     241 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | MERGED (2 share)      
+     242 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | STREAM-PARTIAL one-to-one
+     243 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | MERGED (2 share)      
+     244 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     245 | BOUND ROUTED              4800  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     246 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND NOT routed      
+     247 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     248 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     249 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     250 | BOUND ROUTED              8400 10800  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     251 | BOUND ROUTED              4800  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     252 | BOUND ROUTED             10800 13200  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     253 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     254 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     255 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     256 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     257 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     258 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND ROUTED          
+     259 | BOUND ROUTED              3600  8400  1.00   1+1+1+1   1+1+1+1   1+1+1+1 | BOUND NOT routed      
+    BOUND ROUTED  LOCAL3_SLOW16_A 20/20  X_HINGE4k16 15/20  LOCAL3_SLOW16_A only 5, X_HINGE4k16 only 0, McNemar two-sided p = 0.0625
+    failure classes at the end: LOCAL3_SLOW16_A {'BOUND ROUTED': 20}; X HINGE4k16 {'BOUND ROUTED': 15, 'MERGED (2 share)': 2, 'STREAM-PARTIAL one-to-one': 1, 'BOUND NOT routed': 2}
+    transitions: [3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 4800, 8400, 10800]
+    distinct channels holding the streams (routing_k's map; streams per channel), per seed:
+      at  4800: 240:4 (1+1+1+1)  241:4 (1+1+1+1)  242:4 (1+1+1+1)  243:4 (1+1+1+1)  244:4 (1+1+1+1)  245:4 (1+1+1+1)  246:4 (1+1+1+1)  247:4 (1+1+1+1)  248:4 (1+1+1+1)  249:4 (1+1+1+1)  250:4 (1+1+1+1)  251:4 (1+1+1+1)  252:4 (1+1+1+1)  253:4 (1+1+1+1)  254:4 (1+1+1+1)  255:4 (1+1+1+1)  256:4 (1+1+1+1)  257:4 (1+1+1+1)  258:4 (1+1+1+1)  259:4 (1+1+1+1)
+      at  9600: 240:4 (1+1+1+1)  241:4 (1+1+1+1)  242:4 (1+1+1+1)  243:4 (1+1+1+1)  244:4 (1+1+1+1)  245:4 (1+1+1+1)  246:4 (1+1+1+1)  247:4 (1+1+1+1)  248:4 (1+1+1+1)  249:4 (1+1+1+1)  250:4 (1+1+1+1)  251:4 (1+1+1+1)  252:4 (1+1+1+1)  253:4 (1+1+1+1)  254:4 (1+1+1+1)  255:4 (1+1+1+1)  256:4 (1+1+1+1)  257:4 (1+1+1+1)  258:4 (1+1+1+1)  259:4 (1+1+1+1)
+      at   end: 240:4 (1+1+1+1)  241:4 (1+1+1+1)  242:4 (1+1+1+1)  243:4 (1+1+1+1)  244:4 (1+1+1+1)  245:4 (1+1+1+1)  246:4 (1+1+1+1)  247:4 (1+1+1+1)  248:4 (1+1+1+1)  249:4 (1+1+1+1)  250:4 (1+1+1+1)  251:4 (1+1+1+1)  252:4 (1+1+1+1)  253:4 (1+1+1+1)  254:4 (1+1+1+1)  255:4 (1+1+1+1)  256:4 (1+1+1+1)  257:4 (1+1+1+1)  258:4 (1+1+1+1)  259:4 (1+1+1+1)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.250), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL
+     240 |         0.29  0.73  0.74 |         0.28  1.00  1.00 |         0.52  1.00  1.00 |           --    --    --
+     241 |         0.36  0.88  0.92 |         0.38  1.00  1.00 |         0.39  1.00  1.00 |           --    --    --
+     242 |         0.39  0.82  0.82 |         0.66  0.99  0.98 |         0.73  1.00  1.00 |           --    --    --
+     243 |         0.43  0.71  0.74 |         0.41  0.97  0.91 |         0.40  1.00  1.00 |           --    --    --
+     244 |         0.39  0.96  0.99 |         0.57  1.00  1.00 |         0.65  1.00  1.00 |           --    --    --
+     245 |         0.44  0.58  0.59 |         0.37  0.61  0.79 |         0.75  1.00  1.00 |           --    --    --
+     246 |         0.34  0.60  0.84 |         0.42  0.76  0.98 |         0.73  1.00  1.00 |           --    --    --
+     247 |         0.36  0.80  0.85 |         0.47  1.00  1.00 |         0.71  1.00  1.00 |           --    --    --
+     248 |         0.39  0.78  0.85 |         0.46  1.00  1.00 |         0.43  1.00  1.00 |           --    --    --
+     249 |         0.44  0.79  0.79 |         0.42  1.00  1.00 |         0.43  1.00  1.00 |           --    --    --
+     250 |         0.34  0.25  0.25 |         0.47  0.35  0.31 |         0.62  0.69  0.59 |         0.56  0.69  0.64
+     251 |         0.54  0.64  0.76 |         0.71  0.77  0.79 |         0.83  1.00  1.00 |           --    --    --
+     252 |         0.36  0.38  0.37 |         0.55  0.56  0.56 |         0.65  0.68  0.69 |         0.77  0.74  0.76
+     253 |         0.34  0.70  0.73 |         0.33  1.00  1.00 |         0.47  1.00  1.00 |           --    --    --
+     254 |         0.35  0.83  0.88 |         0.32  0.98  0.98 |         0.55  1.00  1.00 |           --    --    --
+     255 |         0.33  1.00  1.00 |         0.57  1.00  1.00 |         0.53  1.00  1.00 |           --    --    --
+     256 |         0.37  0.63  0.88 |         0.40  0.81  0.86 |         0.60  1.00  1.00 |           --    --    --
+     257 |         0.44  0.71  0.87 |         0.42  0.98  0.95 |         0.52  1.00  1.00 |           --    --    --
+     258 |         0.28  0.74  0.72 |         0.27  0.88  0.84 |         0.66  1.00  1.00 |           --    --    --
+     259 |         0.32  0.76  0.66 |         0.35  0.86  0.89 |         0.42  1.00  1.00 |           --    --    --
+     med |         0.36  0.73  0.81 |         0.42  0.98  0.98 |         0.57  1.00  1.00 |         0.67  0.72  0.70
+  ARM LOCAL3_SLOW_D8_A (LOCAL3 + SLOW, no hinge (Adam), S=8, k=16), seeds 260-269 (10)
+    seed | LOCAL3_SLOW_D8_A         trans  stop   acc   ch@4800   ch@9600    ch@end | X HINGE_D8            
+     260 | not run                 
+     261 | not run                 
+     262 | not run                 
+     263 | not run                 
+     264 | not run                 
+     265 | not run                 
+     266 | not run                 
+     267 | not run                 
+     268 | not run                 
+     269 | not run                 
+    BOUND ROUTED  LOCAL3_SLOW_D8_A 0/0  X_HINGE_D8 0/0  LOCAL3_SLOW_D8_A only 0, X_HINGE_D8 only 0, McNemar two-sided p = 1
+    failure classes at the end: LOCAL3_SLOW_D8_A {}; X HINGE_D8 {'non-stream OTHER': 6, 'MERGED (4 share)': 2, 'MERGED (6 share)': 1, 'MERGED (3 share)': 1}
+    transitions: []
+    distinct channels holding the streams (routing_k's map; streams per channel), per seed:
+      at  4800: 
+      at  9600: 
+      at   end: 
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL
+     med |           --    --    -- |           --    --    -- |           --    --    -- |           --    --    --
+  ARM LOCAL3_SLOW_D8_M (LOCAL3 + S25's groups (Muon), no hinge, S=8, k=16), seeds 260-269 (10)
+    seed | LOCAL3_SLOW_D8_M         trans  stop   acc   ch@4800   ch@9600    ch@end | D8_HINGE_M_REF        
+     260 | MERGED (2 share)          None 28800  0.50   2+2+2+2   2+2+2+2   2+2+2+2 | non-stream OTHER      
+     261 | BOUND ROUTED              9600 12000  0.99 1+1+1+1+1+1+1+1 1+1+1+1+1+1+1+1 1+1+1+1+1+1+1+1 | MERGED (4 share)      
+     262 | MERGED (2 share)          None 28800  0.75 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 | non-stream OTHER      
+     263 | MERGED (2 share)          None 28800  0.79 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 | MERGED (4 share)      
+     264 | not run                 
+     265 | not run                 
+     266 | not run                 
+     267 | not run                 
+     268 | not run                 
+     269 | not run                 
+    BOUND ROUTED  LOCAL3_SLOW_D8_M 1/4  D8_HINGE_M_REF 0/4  LOCAL3_SLOW_D8_M only 1, D8_HINGE_M_REF only 0, McNemar two-sided p = 1
+    failure classes at the end: LOCAL3_SLOW_D8_M {'MERGED (2 share)': 3, 'BOUND ROUTED': 1}; D8_HINGE_M_REF {'non-stream OTHER': 2, 'MERGED (4 share)': 2}
+    transitions: [9600]
+    distinct channels holding the streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:4 (2+2+2+2)  261:8 (1+1+1+1+1+1+1+1)  262:6 (2+2+1+1+1+1)  263:6 (2+2+1+1+1+1)
+      at  9600: 260:4 (2+2+2+2)  261:8 (1+1+1+1+1+1+1+1)  262:6 (2+2+1+1+1+1)  263:6 (2+2+1+1+1+1)
+      at   end: 260:4 (2+2+2+2)  261:8 (1+1+1+1+1+1+1+1)  262:6 (2+2+1+1+1+1)  263:6 (2+2+1+1+1+1)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL
+     260 |         0.29  0.88  0.77 |         0.37  0.98  0.98 |         0.23  0.88  0.77 |         0.22  0.83  0.87
+     261 |         0.32  0.87  0.76 |         0.44  1.00  1.00 |         0.29  1.00  1.00 |         0.35  1.00  1.00
+     262 |         0.31  0.93  0.94 |         0.31  0.99  1.00 |         0.26  0.90  0.90 |         0.23  0.96  0.97
+     263 |         0.33  0.94  0.96 |         0.38  1.00  1.00 |         0.32  0.92  0.96 |         0.24  0.95  0.98
+     med |         0.31  0.91  0.86 |         0.38  1.00  1.00 |         0.28  0.91  0.93 |         0.24  0.96  0.97
+  ARM D8_HINGE_M_REF (S33's D8_HINGE, fresh on this CPU (reference)), seeds 260-269 (10)
+    seed | D8_HINGE_M_REF           trans  stop   acc   ch@4800   ch@9600    ch@end | X HINGE_D8            
+     260 | non-stream OTHER          None 28800  0.10         8         8         8 | non-stream OTHER      
+     261 | MERGED (4 share)          None 28800  0.38     4+3+1     4+3+1     4+3+1 | non-stream OTHER      
+     262 | non-stream OTHER          None 28800  0.10     6+1+1         8         8 | MERGED (4 share)      
+     263 | MERGED (4 share)          None 28800  0.39     4+2+2     4+2+2     4+2+2 | non-stream OTHER      
+     264 | not run                 
+     265 | not run                 
+     266 | not run                 
+     267 | not run                 
+     268 | not run                 
+     269 | not run                 
+    BOUND ROUTED  D8_HINGE_M_REF 0/4  X_HINGE_D8 0/4  D8_HINGE_M_REF only 0, X_HINGE_D8 only 0, McNemar two-sided p = 1
+    failure classes at the end: D8_HINGE_M_REF {'non-stream OTHER': 2, 'MERGED (4 share)': 2}; X HINGE_D8 {'non-stream OTHER': 6, 'MERGED (4 share)': 2, 'MERGED (6 share)': 1, 'MERGED (3 share)': 1}
+    transitions: []
+    distinct channels holding the streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:1 (8)  261:3 (4+3+1)  262:3 (6+1+1)  263:3 (4+2+2)
+      at  9600: 260:1 (8)  261:3 (4+3+1)  262:1 (8)  263:3 (4+2+2)
+      at   end: 260:1 (8)  261:3 (4+3+1)  262:1 (8)  263:3 (4+2+2)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL
+     260 |         0.14  0.14  0.13 |         0.15  0.13  0.14 |         0.14  0.13  0.13 |         0.13  0.14  0.13
+     261 |         0.26  0.28  0.26 |         0.47  0.65  0.70 |         0.55  0.49  0.49 |         0.50  0.46  0.40
+     262 |         0.19  0.20  0.21 |         0.15  0.14  0.14 |         0.16  0.14  0.14 |         0.18  0.15  0.13
+     263 |         0.53  0.51  0.50 |         0.50  0.57  0.67 |         0.47  0.55  0.55 |         0.51  0.44  0.40
+     med |         0.22  0.24  0.23 |         0.31  0.36  0.41 |         0.32  0.31  0.31 |         0.34  0.30  0.27
+  S44 D8_HINGE_M_REF: reference (no reading): BOUND ROUTED 0/4
+  READING S44(a): carries to four streams (LOCAL3_SLOW16_A 20/20, reference only 0, arm only 5; carries: >= 16/20 and reference only - arm only <= 1; LOCAL3_SLOW16_M cut by the runtime rule)
+  READING S44(b): INCOMPLETE (LOCAL3_SLOW_D8_A 0/10, LOCAL3_SLOW_D8_M 4/10), no reading
+  READING window_scale (a): carries to four streams (LOCAL3_SLOW16_A 20/20, reference only 0, arm only 5; carries: >= 16/20 and reference only - arm only <= 1; LOCAL3_SLOW16_M cut by the runtime rule)  [EXPLORATORY, not a result]
+  READING window_scale (b): INCOMPLETE (LOCAL3_SLOW_D8_A 0/10, LOCAL3_SLOW_D8_M 4/10), no reading  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN reservoir_gate
+  idea    a frozen reservoir gate: W_h fixed at its init rescaled to spectral radius 0.5 (echo-state), W_in and W_g trained
+  source  the audit of 6 October 2026, section 4 (LRU / contractive recurrences); batch 15's S41 and S42
+  change  arm A's gate with W_h <- W_h0 x 0.5 / rho(W_h0), frozen; + SLOW + main's HINGE (Adam) or S25's groups (Muon)
+  arm RES_D8_A     lr 0.001  iters 28800  seeds 260-269 (10)  — reservoir gate (W_h frozen, rho 0.5) + SLOW + HINGE (Adam)
+                   schedule: gate W_in/W_g 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen at rho 0.5; + main's HINGE hinge
+  pairing seeds 260-269: Adam with X's HINGE_D8, Muon with S44's D8_HINGE_M_REF (fresh on this CPU); same initial parameters (W_h rescaled) and batches
+----------------------------------------------------------------------------------------------------
+  cut by the runtime rule: ['RES_D8_M'] (no runs, no reading)
+  ARM RES_D8_A (reservoir gate (W_h frozen, rho 0.5) + SLOW + HINGE (Adam)), seeds 260-269 (10)
+    seed | RES_D8_A                 trans  stop   acc   ch@4800   ch@9600    ch@end | X HINGE_D8            
+     260 | MERGED (5 share)          None 28800  0.22       7+1       5+3       5+3 | non-stream OTHER      
+     261 | non-stream OTHER          None 28800  0.25       5+3       5+3       5+3 | non-stream OTHER      
+     262 | MERGED (3 share)          None 28800  0.46       4+4     4+3+1   3+3+1+1 | MERGED (4 share)      
+     263 | MERGED (4 share)          None 28800  0.37       4+4       4+4     4+3+1 | non-stream OTHER      
+     264 | non-stream OTHER          None 28800  0.25       5+3       5+3       5+3 | non-stream OTHER      
+     265 | non-stream OTHER          None 28800  0.15       6+2 3+2+1+1+1       4+4 | MERGED (4 share)      
+     266 | MERGED (4 share)          None 28800  0.31         8       6+2     4+2+2 | non-stream OTHER      
+     267 | MERGED (3 share)          None 28800  0.50       4+4       4+4   3+3+1+1 | MERGED (6 share)      
+     268 | not run                 
+     269 | not run                 
+    BOUND ROUTED  RES_D8_A 0/8  X_HINGE_D8 0/8  RES_D8_A only 0, X_HINGE_D8 only 0, McNemar two-sided p = 1
+    failure classes at the end: RES_D8_A {'MERGED (5 share)': 1, 'non-stream OTHER': 3, 'MERGED (3 share)': 2, 'MERGED (4 share)': 2}; X HINGE_D8 {'non-stream OTHER': 6, 'MERGED (4 share)': 2, 'MERGED (6 share)': 1, 'MERGED (3 share)': 1}
+    transitions: []
+    distinct channels holding the streams (routing_k's map; streams per channel), per seed:
+      at  4800: 260:2 (7+1)  261:2 (5+3)  262:2 (4+4)  263:2 (4+4)  264:2 (5+3)  265:2 (6+2)  266:1 (8)  267:2 (4+4)
+      at  9600: 260:2 (5+3)  261:2 (5+3)  262:3 (4+3+1)  263:2 (4+4)  264:2 (5+3)  265:5 (3+2+1+1+1)  266:2 (6+2)  267:2 (4+4)
+      at   end: 260:2 (5+3)  261:2 (5+3)  262:4 (3+3+1+1)  263:3 (4+3+1)  264:2 (5+3)  265:2 (4+4)  266:3 (4+2+2)  267:4 (3+3+1+1)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL
+     260 |         1.00  0.42  0.26 |         0.83  0.22  0.21 |         0.80  0.23  0.21 |         0.66  0.29  0.25
+     261 |         1.00  0.72  0.37 |         0.79  0.16  0.15 |         0.83  0.67  0.38 |         0.76  0.42  0.31
+     262 |         1.00  0.88  0.45 |         1.00  0.28  0.22 |         0.89  0.67  0.42 |         0.90  0.57  0.41
+     263 |         1.00  0.71  0.33 |         0.78  0.46  0.24 |         0.75  0.69  0.43 |         0.86  0.74  0.31
+     264 |         1.00  0.75  0.40 |         0.96  0.77  0.40 |         0.70  0.66  0.35 |         0.81  0.68  0.28
+     265 |         1.00  0.50  0.39 |         1.00  0.50  0.39 |         1.00  0.63  0.30 |         0.99  0.62  0.33
+     266 |         1.00  0.82  0.31 |         0.97  0.75  0.31 |         0.91  0.68  0.34 |         0.92  0.92  0.49
+     267 |         1.00  0.68  0.38 |         0.95  0.39  0.26 |         0.75  0.57  0.37 |         0.81  0.67  0.45
+     med |         1.00  0.72  0.38 |         0.96  0.43  0.25 |         0.82  0.66  0.36 |         0.84  0.64  0.32
+    rho(W_h) / sigma_max(W_h) at init (before / after the rescaling) and at 1200, 2400, 4800, 9600:
+      260: init rho 0.625 -> 0.500000, sigma 1.083 -> 0.8666; 1200: 0.500000 / 0.8666, 2400: 0.500000 / 0.8666, 4800: 0.500000 / 0.8666, 9600: 0.500000 / 0.8666
+      261: init rho 0.552 -> 0.500000, sigma 0.985 -> 0.8929; 1200: 0.500000 / 0.8929, 2400: 0.500000 / 0.8929, 4800: 0.500000 / 0.8929, 9600: 0.500000 / 0.8929
+      262: init rho 0.582 -> 0.500000, sigma 1.052 -> 0.9033; 1200: 0.500000 / 0.9033, 2400: 0.500000 / 0.9033, 4800: 0.500000 / 0.9033, 9600: 0.500000 / 0.9033
+      263: init rho 0.522 -> 0.500000, sigma 1.082 -> 1.0365; 1200: 0.500000 / 1.0365, 2400: 0.500000 / 1.0365, 4800: 0.500000 / 1.0365, 9600: 0.500000 / 1.0365
+      264: init rho 0.596 -> 0.500000, sigma 1.143 -> 0.9595; 1200: 0.500000 / 0.9595, 2400: 0.500000 / 0.9595, 4800: 0.500000 / 0.9595, 9600: 0.500000 / 0.9595
+      265: init rho 0.626 -> 0.500000, sigma 1.053 -> 0.8409; 1200: 0.500000 / 0.8409, 2400: 0.500000 / 0.8409, 4800: 0.500000 / 0.8409, 9600: 0.500000 / 0.8409
+      266: init rho 0.631 -> 0.500000, sigma 1.024 -> 0.8114; 1200: 0.500000 / 0.8114, 2400: 0.500000 / 0.8114, 4800: 0.500000 / 0.8114, 9600: 0.500000 / 0.8114
+      267: init rho 0.622 -> 0.500000, sigma 1.123 -> 0.9019; 1200: 0.500000 / 0.9019, 2400: 0.500000 / 0.9019, 4800: 0.500000 / 0.9019, 9600: 0.500000 / 0.9019
+  READING S45: INCOMPLETE (RES_D8_A 8/10), no reading
+  READING reservoir_gate: INCOMPLETE (RES_D8_A 8/10), no reading  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN stream_knobs
+  idea    the eight-stream knobs never varied: the learning rate (x0.3, x3), W_h's rate (/10), the memory decay (0.98)
+  source  the audit of 6 October 2026, section 3.4; Okpekpe & Orvieto (arXiv 2508.19029)
+  change  X's HINGE_D8 with one knob changed per arm; the perfect gate at decay 0.98 (validity)
+  arm LR3E3        lr 0.003  iters 28800  seeds 260-264 (5)  — HINGE_D8 at lr 3e-3
+                   schedule: gate W_in/W_h/W_g 0.003 throughout; every other parameter 0.0003 for updates 1-2400, 0.003 after; + main's HINGE hinge
+  arm WH_SLOW      lr 0.001  iters 28800  seeds 260-264 (5)  — HINGE_D8 with W_h at lr/10
+                   schedule: W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  arm DECAY98      lr 0.001  iters 28800  seeds 260-264 (5)  — HINGE_D8 at decay 0.98
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge
+  arm PERFECT98    lr 0.001  iters 28800  seeds 260-264 (5)  — the perfect gate at decay 0.98 (validity)
+                   schedule: every parameter 0.001 throughout (the perfect gate's plain recipe); decay 0.98; no hinge
+  pairing seeds 260-264, printed beside X's recorded HINGE_D8 (same initial parameters and batches); descriptive
+----------------------------------------------------------------------------------------------------
+  cut by the runtime rule: ['LR3E4'] (no runs)
+  X HINGE_D8 (recorded; lr 1e-3, decay 0.95): 260: non-stream OTHER, acc 0.246  261: non-stream OTHER, acc 0.096  262: MERGED (4 share), acc 0.357  263: non-stream OTHER, acc 0.245  264: non-stream OTHER, acc 0.086
+  ARM LR3E3 (HINGE_D8 at lr 3e-3; gate W_in/W_h/W_g 0.003 throughout; every other parameter 0.0003 for updates 1-2400, 0.003 after; + main's HINGE hinge), seeds 260, 261, 262, 263, 264
+    seed | outcome                  bound trans    acc | h@CTX/KEY/VAL 1200 | h@CTX/KEY/VAL 2400 | X HINGE_D8
+     260 | non-stream OTHER            no  None  0.090 | 0.86 0.58 0.42     | 0.88 0.57 0.42     | non-stream OTHER
+     261 | non-stream OTHER            no  None  0.090 | 0.85 0.63 0.43     | 0.12 0.12 0.12     | non-stream OTHER
+     262 | non-stream OTHER            no  None  0.097 | 0.45 0.33 0.28     | 0.47 0.32 0.26     | MERGED (4 share)
+     263 | non-stream KEY              no  None  0.144 | 0.87 0.72 0.53     | 0.30 0.26 0.25     | non-stream OTHER
+     264 | non-stream OTHER            no  None  0.131 | 0.65 0.47 0.29     | 0.66 0.47 0.31     | non-stream OTHER
+    rho(W_h) every 400 updates from 0 (sigma_max(W_h) in brackets every 2400):
+      260: 0.63[1.08] 0.90 0.90 0.90 0.90 0.91 0.91[1.47] 0.91 0.91 0.91 0.91 0.90 0.88[1.47] 0.88 2.51 3.14 3.14 3.14 3.14[3.55] 3.14 3.94 3.89 4.66 4.68 4.68[5.23] 4.68 4.69 4.70 4.69 4.69 4.69[5.24] 4.68 4.69 4.70 4.70 4.71 4.61[5.20] 5.24 5.10 5.15 5.18 5.19 5.30[5.83] 5.31 5.09 5.09 5.08 5.08 5.08[5.84] 5.08 5.09 5.09 5.09 5.10 5.10[5.90] 6.92 7.00 7.03 7.07 7.09 7.08[7.59] 7.06 7.09 7.07 7.07 7.07 7.10[7.66] 7.09 7.27 7.27 7.27 7.35 7.28[8.32]
+      261: 0.55[0.99] 0.95 0.95 0.81 3.59 3.60 3.68[4.26] 3.69 3.68 3.71 3.70 3.72 3.61[4.24] 3.59 3.15 3.14 3.14 3.03 4.76[5.12] 4.77 4.77 4.77 4.79 4.87 4.87[5.10] 4.87 4.87 2.60 2.68 3.26 3.26[4.33] 3.26 3.26 3.26 3.26 3.26 3.27[4.33] 3.27 3.27 3.33 3.33 3.32 3.28[4.35] 3.21 3.27 3.84 3.84 3.84 3.84[5.14] 3.84 3.84 3.84 3.83 3.83 3.83[5.15] 3.83 3.82 3.82 6.34 6.35 6.35[6.73] 6.35 6.35 6.35 6.35 6.34 6.35[6.72] 6.34 6.35 6.35 6.34 6.34 6.35[6.73]
+      262: 0.58[1.05] 0.82 0.81 0.82 0.87 0.96 0.84[1.68] 0.88 0.86 0.82 0.76 0.81 0.82[1.64] 0.85 0.80 3.09 3.09 3.28 3.35[3.75] 3.36 3.36 3.36 3.35 3.35 3.36[3.78] 3.35 3.02 3.12 3.13 3.12 3.06[3.80] 3.34 3.34 3.34 3.33 3.33 3.33[3.85] 3.34 3.34 3.35 3.35 3.35 3.35[3.87] 3.36 3.35 3.37 3.63 3.62 3.63[4.28] 4.17 4.21 4.21 4.21 4.21 4.21[4.79] 4.22 4.21 4.21 4.21 4.22 4.21[4.78] 4.21 4.21 4.27 4.26 4.26 4.27[4.84] 4.07 4.94 4.89 4.91 4.94 4.86[5.43]
+      263: 0.52[1.08] 0.71 0.70 0.70 0.71 0.72 1.00[2.29] 1.00 1.11 1.31 1.09 1.16 1.15[2.16] 1.59 2.00 1.51 2.27 1.97 2.04[3.13] 1.88 1.76 2.21 2.46 2.41 2.92[3.44] 4.12 4.78 4.67 4.78 4.78 4.75[5.26] 4.27 4.63 4.49 4.36 4.33 4.23[5.15] 4.11 4.22 4.38 4.34 3.84 3.60[5.06] 4.05 3.92 3.97 3.87 3.84 4.85[5.75] 5.05 5.04 4.81 4.56 4.71 4.53[5.71] 4.64 4.62 4.53 4.55 4.52 4.56[6.07] 4.46 4.71 4.72 4.74 4.83 4.90[6.06] 4.79 4.61 4.56 4.86 4.96 4.84[7.00]
+      264: 0.60[1.14] 0.87 0.71 0.71 0.71 0.71 0.71[1.50] 0.71 0.71 0.71 0.71 0.75 0.71[1.51] 0.73 3.02 4.26 4.26 4.26 4.26[4.85] 4.26 4.26 4.26 4.26 4.27 4.27[4.86] 4.27 4.75 4.88 4.88 4.88 4.88[5.35] 4.88 4.88 4.88 4.88 4.88 4.88[5.35] 4.87 4.87 4.87 4.88 4.87 4.87[5.35] 4.88 4.87 4.87 4.88 4.88 4.88[5.35] 4.88 4.88 4.88 4.89 4.89 4.92[5.39] 4.93 4.93 4.94 5.11 5.98 5.97[6.31] 6.06 6.93 6.93 6.94 7.00 7.11[7.87] 7.11 7.11 7.11 7.11 7.11 7.11[7.87]
+    medians: 1200: CTX 0.85 KEY 0.58 VAL 0.42; 2400: CTX 0.47 KEY 0.32 VAL 0.26
+  S46 LR3E3: bound 0/5, BOUND ROUTED 0/5, median final accuracy 0.10 (descriptive)
+  ARM WH_SLOW (HINGE_D8 with W_h at lr/10; W_in/W_g 0.001 throughout; W_h 0.0001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge), seeds 260, 261, 262, 263, 264
+    seed | outcome                  bound trans    acc | h@CTX/KEY/VAL 1200 | h@CTX/KEY/VAL 2400 | X HINGE_D8
+     260 | MERGED (3 share)            no  None  0.618 | 0.73 0.54 0.28     | 0.44 0.40 0.32     | non-stream OTHER
+     261 | MERGED (4 share)            no  None  0.385 | 1.00 0.77 0.38     | 0.55 0.55 0.44     | non-stream OTHER
+     262 | non-stream OTHER            no  None  0.231 | 1.00 0.93 0.54     | 0.39 0.60 0.59     | MERGED (4 share)
+     263 | MERGED (3 share)            no  None  0.500 | 0.96 0.66 0.36     | 0.56 0.58 0.41     | non-stream OTHER
+     264 | MERGED (4 share)            no  None  0.481 | 0.98 0.59 0.42     | 0.68 0.36 0.27     | non-stream OTHER
+    rho(W_h) every 400 updates from 0 (sigma_max(W_h) in brackets every 2400):
+      260: 0.63[1.08] 0.63 0.65 0.71 0.83 0.82 0.71[1.76] 0.72 0.68 0.66 0.66 0.67 0.65[1.68] 0.66 0.63 0.64 0.63 0.62 0.66[1.55] 0.69 0.69 0.69 0.70 0.70 0.70[1.56] 0.71 0.72 0.72 0.72 0.71 0.73[1.58] 0.75 0.77 0.73 0.79 0.79 0.81[1.59] 0.85 0.86 0.87 0.87 0.87 0.89[1.69] 0.88 0.90 0.90 0.90 0.91 0.90[1.70] 0.90 0.90 0.90 0.90 0.90 0.88[1.71] 0.87 0.87 0.88 0.89 0.90 0.89[1.73] 0.91 0.90 0.89 0.87 0.88 0.87[1.76] 0.85 0.83 0.79 0.79 0.77 0.77[1.78]
+      261: 0.55[0.99] 0.55 0.56 0.56 0.58 0.70 0.71[1.89] 0.68 0.67 0.64 0.65 0.63 0.66[1.82] 0.63 0.62 0.62 0.62 0.63 0.65[1.80] 0.64 0.62 0.63 0.63 0.63 0.63[1.81] 0.64 0.64 0.64 0.65 0.65 0.65[1.82] 0.66 0.66 0.66 0.67 0.67 0.66[1.85] 0.67 0.67 0.67 0.67 0.68 0.68[1.87] 0.68 0.68 0.69 0.69 0.70 0.70[1.88] 0.71 0.71 0.71 0.72 0.73 0.73[1.89] 0.73 0.74 0.76 0.80 0.81 0.84[1.86] 0.83 0.88 0.89 0.77 0.78 0.79[1.84] 0.80 0.84 0.83 0.81 0.82 0.84[1.86]
+      262: 0.58[1.05] 0.59 0.59 0.60 0.60 0.66 0.68[1.95] 0.70 0.68 0.67 0.66 0.69 0.69[1.86] 0.67 0.67 0.65 0.68 0.66 0.66[1.86] 0.66 0.66 0.66 0.66 0.67 0.67[1.86] 0.67 0.67 0.68 0.68 0.68 0.69[1.89] 0.69 0.69 0.69 0.69 0.69 0.69[1.94] 0.70 0.70 0.70 0.70 0.70 0.70[1.92] 0.70 0.70 0.71 0.71 0.70 0.71[1.94] 0.71 0.71 0.71 0.72 0.72 0.72[1.96] 0.72 0.73 0.72 0.73 0.73 0.74[1.95] 0.74 0.74 0.75 0.75 0.75 0.76[1.95] 0.76 0.77 0.77 0.77 0.78 0.78[1.94]
+      263: 0.52[1.08] 0.54 0.55 0.55 0.65 0.64 0.74[1.75] 0.67 0.73 0.74 0.73 0.74 0.70[1.77] 0.73 0.69 0.72 0.68 0.69 0.69[1.73] 0.68 0.69 0.68 0.69 0.71 0.73[1.71] 0.73 0.71 0.70 0.72 0.72 0.71[1.70] 0.70 0.70 0.70 0.70 0.71 0.70[1.71] 0.69 0.73 0.73 0.71 0.72 0.74[1.73] 0.72 0.73 0.73 0.73 0.75 0.75[1.76] 0.74 0.73 0.74 0.76 0.75 0.76[1.75] 0.75 0.76 0.77 0.78 0.80 0.78[1.83] 0.79 0.79 0.80 0.80 0.80 0.79[1.87] 0.80 0.80 0.80 0.80 0.79 0.80[1.90]
+      264: 0.60[1.14] 0.60 0.60 0.67 0.78 0.78 0.78[1.38] 0.78 0.78 0.76 0.64 0.70 0.67[1.60] 0.66 0.69 0.74 0.70 0.63 0.65[1.61] 0.64 0.65 0.69 0.73 0.69 0.70[1.58] 0.74 0.83 0.83 0.79 0.79 0.79[1.68] 0.80 0.80 0.83 0.84 0.87 0.85[1.71] 0.82 0.83 0.80 0.87 0.81 0.81[1.74] 0.76 0.82 0.90 0.79 0.77 0.82[1.77] 0.81 0.81 0.83 0.83 0.90 0.95[1.78] 0.98 1.00 0.95 0.92 0.97 1.00[1.78] 0.91 0.93 0.98 0.98 0.98 1.01[1.81] 0.98 0.97 0.94 0.95 1.00 0.99[1.84]
+    medians: 1200: CTX 0.98 KEY 0.66 VAL 0.38; 2400: CTX 0.55 KEY 0.55 VAL 0.41
+  S46 WH_SLOW: bound 0/5, BOUND ROUTED 0/5, median final accuracy 0.48 (descriptive)
+  ARM DECAY98 (HINGE_D8 at decay 0.98; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; decay 0.98; + main's HINGE hinge), seeds 260, 261, 262, 263, 264
+    seed | outcome                  bound trans    acc | h@CTX/KEY/VAL 1200 | h@CTX/KEY/VAL 2400 | X HINGE_D8
+     260 | MERGED (3 share)            no  None  0.628 | 0.47 0.31 0.31     | 0.48 0.43 0.35     | non-stream OTHER
+     261 | non-stream OTHER            no  None  0.086 | 0.14 0.13 0.13     | 0.13 0.13 0.13     | non-stream OTHER
+     262 | non-stream OTHER            no  None  0.885 | 0.27 0.18 0.14     | 0.13 0.13 0.13     | MERGED (4 share)
+     263 | MERGED (3 share)            no  None  0.726 | 0.98 0.62 0.38     | 0.98 0.62 0.40     | non-stream OTHER
+     264 | not run
+    rho(W_h) every 400 updates from 0 (sigma_max(W_h) in brackets every 2400):
+      260: 0.63[1.08] 0.66 0.83 0.87 0.87 0.82 0.73[2.84] 0.79 0.79 0.74 0.72 0.72 0.76[2.42] 0.89 0.86 0.86 0.85 0.88 0.81[2.85] 0.86 0.86 0.86 0.87 0.90 0.91[3.00] 0.96 1.08 0.88 0.96 0.91 0.90[3.12] 0.96 1.01 1.12 0.89 0.95 1.07[3.29] 1.07 1.02 1.25 1.03 1.01 1.09[3.39] 0.99 0.91 0.94 0.94 1.20 1.03[3.46] 1.25 1.07 1.12 0.95 1.14 1.19[3.51] 1.33 1.16 1.30 1.12 1.45 1.30[3.60] 1.23 1.12 1.13 1.52 1.54 1.54[3.73] 1.50 1.43 1.38 1.32 1.38 1.35[3.73]
+      261: 0.55[0.99] 0.60 0.67 1.63 1.68 1.80 1.78[2.26] 1.86 1.95 2.24 2.32 2.32 2.33[2.71] 2.22 2.24 2.29 2.31 2.37 2.40[2.82] 2.48 2.47 2.52 2.53 2.65 2.67[2.99] 2.67 2.67 2.68 2.67 2.67 2.68[3.00] 2.68 2.65 2.66 2.84 2.85 2.84[3.22] 2.87 2.94 2.95 2.97 2.98 2.98[3.28] 3.04 3.25 3.16 3.13 3.21 3.17[3.43] 3.17 3.17 3.17 3.17 3.17 3.17[3.43] 3.17 3.16 3.16 3.16 3.16 3.16[3.42] 3.17 3.18 3.18 3.14 3.15 3.16[3.42] 3.18 3.19 3.19 3.24 3.27 3.25[3.51]
+      262: 0.58[1.05] 0.58 0.71 1.06 0.85 1.70 1.85[2.33] 1.85 2.18 2.17 2.03 2.17 2.15[2.66] 2.35 2.36 2.28 2.28 2.29 2.29[2.87] 2.28 2.29 2.30 2.30 2.29 2.31[2.87] 2.33 2.32 2.41 2.68 2.73 2.89[3.30] 2.95 2.95 2.96 2.94 2.93 2.93[3.32] 2.93 2.92 2.36 2.44 2.52 2.58[3.11] 2.64 2.62 2.55 2.53 2.68 2.65[3.21] 2.66 2.69 2.71 2.64 2.69 2.70[3.26] 2.74 2.79 2.80 2.83 2.88 2.88[3.39] 2.78 2.79 2.80 2.83 2.77 2.76[3.37] 2.76 2.75 2.74 2.74 2.75 2.88[3.43]
+      263: 0.52[1.08] 0.57 0.85 0.66 0.66 0.66 0.66[1.12] 0.67 0.67 0.67 0.67 1.52 1.60[1.99] 2.25 2.17 2.15 2.17 2.33 2.31[2.63] 2.33 2.20 2.20 2.19 2.18 2.17[2.54] 1.99 0.86 0.84 1.09 0.80 0.88[2.43] 0.86 0.90 0.86 0.84 0.92 0.86[2.49] 0.91 0.96 0.97 0.99 1.01 1.08[2.81] 1.17 1.19 1.17 1.16 1.18 1.17[2.84] 1.17 1.14 1.10 1.22 1.11 1.19[2.86] 1.18 1.08 1.20 1.19 1.13 1.19[2.92] 1.03 1.07 1.11 1.03 1.06 1.08[2.93] 1.03 1.29 1.11 1.28 1.11 1.39[3.04]
+    medians: 1200: CTX 0.37 KEY 0.25 VAL 0.22; 2400: CTX 0.31 KEY 0.28 VAL 0.24
+  S46 DECAY98: bound 0/4, BOUND ROUTED 0/4, median final accuracy 0.68 (descriptive)
+  ARM PERFECT98 (the perfect gate at decay 0.98 (validity); every parameter 0.001 throughout (the perfect gate's plain recipe); decay 0.98; no hinge), seeds 260, 261, 262, 263, 264
+    seed | outcome                  bound trans    acc | h@CTX/KEY/VAL 1200 | h@CTX/KEY/VAL 2400 | X HINGE_D8
+     260 | not run
+     261 | not run
+     262 | not run
+     263 | not run
+     264 | not run
+  S46 PERFECT98: bound 0/0, BOUND ROUTED 0/0, median final accuracy   -- (descriptive)
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN write_decoders
+  idea    decode the stream from the gate state at the write (VAL) positions, beside CTX and KEY
+  source  the audit of 6 October 2026, section 3.2 (one token of memory at the read, two at the write)
+  change  none to the runs (reruns to 4800); S38's decoder at CTX, KEY and VAL at 0, 1200, 2400, 4800
+  arm HINGE_D8_A   lr 0.001  iters 4800  seeds 260-264 (5)  — X's HINGE_D8 (Adam), rerun to 4800
+                   schedule: gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  arm D8_HINGE_M   lr 0.001  iters 4800  seeds 260-264 (5)  — S33's D8_HINGE (Muon), fresh on this CPU, to 4800
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm A_HINGE_M    lr 0.001  iters 4800  seeds 240-244 (5)  — S33's A_HINGE (Muon; S=4, k=4), fresh on this CPU, to 4800
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm HINGE16_M    lr 0.001  iters 4800  seeds 240-244 (5)  — S35's MUON_HINGE16 (Muon; S=4, k=16), fresh on this CPU, to 4800
+                   schedule: Muon lr 0.005: gate W_in/W_h/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam on embedding and conv 0.0001 for 1-2400, 0.001 after; + main's HINGE hinge
+  arm D8_PREV_A    lr 0.001  iters 4800  seeds 260-264 (5)  — S40's D8_PREV_A (GATE_PREV, Adam), rerun to 4800
+                   schedule: W_prev in the gate group; gate W_in/W_h/W_g 0.001 throughout; every other parameter 0.0001 for updates 1-2400, 0.001 after; + main's HINGE hinge
+  pairing each rerun against its record (Adam: reproduce through 4800; Muon: fresh on this CPU)
+----------------------------------------------------------------------------------------------------
+  CONFIG HINGE_D8_A (X's HINGE_D8 (Adam), rerun to 4800): reproduces X's HINGE_D8 record through 4800: 260 True, 261 True, 262 True, 263 True, 264 True
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     260 |         1.00  0.83  0.47 |         0.45  0.23  0.20 |         0.20  0.16  0.14 |         0.33  0.39  0.30
+     261 |         1.00  0.91  0.46 |         0.69  0.47  0.26 |         0.71  0.56  0.30 |         0.66  0.50  0.32
+     262 |         1.00  0.87  0.49 |         0.99  0.81  0.57 |         0.13  0.13  0.13 |         0.14  0.12  0.13
+     263 |         1.00  0.96  0.46 |         0.17  0.14  0.13 |         0.17  0.15  0.14 |         0.25  0.14  0.13
+     264 |         1.00  0.96  0.50 |         0.14  0.14  0.13 |         0.15  0.13  0.13 |         0.14  0.13  0.13
+     med |         1.00  0.91  0.47 |         0.45  0.23  0.20 |         0.17  0.15  0.14 |         0.25  0.14  0.13
+  CONFIG D8_HINGE_M (S33's D8_HINGE (Muon), fresh on this CPU, to 4800): reproduces muon_scale's D8_HINGE record through 4800: 260 False, 261 False, 262 False, 263 False, 264 False (Muon: a record from the 2.10GHz CPU; fresh here); equal to S44's D8_HINGE_M_REF (same CPU) through 4800: {260: True, 261: True, 262: True, 263: True}
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     260 |         1.00  0.83  0.47 |         0.14  0.14  0.13 |         0.15  0.13  0.14 |         0.14  0.13  0.13
+     261 |         1.00  0.91  0.46 |         0.26  0.28  0.26 |         0.47  0.65  0.70 |         0.55  0.49  0.49
+     262 |         1.00  0.87  0.49 |         0.19  0.20  0.21 |         0.15  0.14  0.14 |         0.16  0.14  0.14
+     263 |         1.00  0.96  0.46 |         0.53  0.51  0.50 |         0.50  0.57  0.67 |         0.47  0.55  0.55
+     264 |         1.00  0.96  0.50 |         0.72  0.62  0.45 |         0.75  0.60  0.68 |         0.76  0.79  0.77
+     med |         1.00  0.91  0.47 |         0.26  0.28  0.26 |         0.47  0.57  0.67 |         0.47  0.49  0.49
+  CONFIG A_HINGE_M (S33's A_HINGE (Muon; S=4, k=4), fresh on this CPU, to 4800): reproduces muon_scale's A_HINGE record through 4800: 240 False, 241 False, 242 False, 243 False, 244 False (Muon: a record from the 2.10GHz CPU; fresh here)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.250), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     240 |         1.00  1.00  0.72 |         0.81  0.90  0.90 |         0.87  0.83  0.84 |         0.76  0.75  0.76
+     241 |         1.00  0.95  0.57 |         0.70  0.95  0.92 |         0.93  0.85  0.90 |         0.81  0.78  0.78
+     242 |         1.00  0.86  0.66 |         0.88  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     243 |         1.00  0.87  0.55 |         0.76  0.91  0.81 |         0.79  0.83  0.77 |         0.84  0.86  0.90
+     244 |         1.00  0.99  0.71 |         0.82  0.91  0.79 |         0.73  0.78  0.78 |         0.77  0.81  0.80
+     med |         1.00  0.95  0.66 |         0.81  0.91  0.90 |         0.87  0.83  0.84 |         0.81  0.81  0.80
+  CONFIG HINGE16_M (S35's MUON_HINGE16 (Muon; S=4, k=16), fresh on this CPU, to 4800): reproduces muon_k16's MUON_HINGE16 record through 4800: 240 False, 241 False, 242 False, 243 False, 244 False (Muon: a record from the 2.10GHz CPU; fresh here)
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.250), per seed:
+    seed |     0:   CTX   KEY   VAL |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL
+     240 |         1.00  1.00  0.72 |         1.00  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     241 |         1.00  0.95  0.57 |         0.97  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     242 |         1.00  0.86  0.66 |         0.57  0.78  0.80 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     243 |         1.00  0.87  0.55 |         1.00  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     244 |         1.00  0.99  0.71 |         0.98  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+     med |         1.00  0.95  0.66 |         0.98  1.00  1.00 |         1.00  1.00  1.00 |         1.00  1.00  1.00
+  CONFIG D8_PREV_A (S40's D8_PREV_A (GATE_PREV, Adam), rerun to 4800): reproduces gate_prev's D8_PREV_A record through 4800: 260 True, 261 True, 262 True, 263 True, 264 True
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL / uCTX / uKEY / uVAL positions (chance 0.125), per seed:
+    seed |     0:   CTX   KEY   VAL  uCTX  uKEY  uVAL |  1200:   CTX   KEY   VAL  uCTX  uKEY  uVAL |  2400:   CTX   KEY   VAL  uCTX  uKEY  uVAL |  4800:   CTX   KEY   VAL  uCTX  uKEY  uVAL
+     260 |         0.99  1.00  0.69  1.00  1.00  0.13 |         0.53  0.58  0.40  0.99  0.44  0.12 |         0.14  0.15  0.15  0.86  0.50  0.12 |         0.16  0.19  0.13  0.79  0.47  0.12
+     261 |         0.99  1.00  0.61  0.99  1.00  0.12 |         0.39  0.48  0.35  0.96  0.81  0.12 |         0.37  0.46  0.34  0.97  0.81  0.12 |         0.42  0.53  0.40  0.99  0.78  0.13
+     262 |         0.98  0.98  0.69  1.00  1.00  0.13 |         0.91  0.87  0.71  1.00  1.00  0.13 |         0.92  0.89  0.72  1.00  0.97  0.13 |         0.88  0.89  0.62  0.97  1.00  0.13
+     263 |         1.00  1.00  0.82  1.00  1.00  0.13 |         0.93  0.84  0.59  1.00  0.69  0.13 |         0.94  0.87  0.64  1.00  0.69  0.13 |         0.94  0.92  0.74  1.00  0.94  0.12
+     264 |         0.99  1.00  0.71  1.00  1.00  0.13 |         0.17  0.18  0.18  0.86  0.81  0.13 |         0.19  0.23  0.24  0.79  0.84  0.13 |         0.28  0.40  0.48  0.63  1.00  0.13
+     med |         0.99  1.00  0.69  1.00  1.00  0.13 |         0.53  0.58  0.40  0.99  0.81  0.13 |         0.37  0.46  0.34  0.97  0.81  0.13 |         0.42  0.53  0.48  0.97  0.94  0.13
+  SIDE BY SIDE (medians over the runs; h = the gate state; chance 1/S): CTX (3j) | KEY (3j+1) | VAL (3j+2)
+    HINGE_D8_A     0: 1.00 | 0.91 | 0.47  1200: 0.45 | 0.23 | 0.20  2400: 0.17 | 0.15 | 0.14  4800: 0.25 | 0.14 | 0.13
+    D8_HINGE_M     0: 1.00 | 0.91 | 0.47  1200: 0.26 | 0.28 | 0.26  2400: 0.47 | 0.57 | 0.67  4800: 0.47 | 0.49 | 0.49
+    A_HINGE_M      0: 1.00 | 0.95 | 0.66  1200: 0.81 | 0.91 | 0.90  2400: 0.87 | 0.83 | 0.84  4800: 0.81 | 0.81 | 0.80
+    HINGE16_M      0: 1.00 | 0.95 | 0.66  1200: 0.98 | 1.00 | 1.00  2400: 1.00 | 1.00 | 1.00  4800: 1.00 | 1.00 | 1.00
+    D8_PREV_A      0: 0.99 | 1.00 | 0.69  1200: 0.53 | 0.58 | 0.40  2400: 0.37 | 0.46 | 0.34  4800: 0.42 | 0.53 | 0.48
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S43 window_recipe: neither (LOCAL3_SLOW 31/40 DISCOVERED; SLOW_HINGE 34/40; SLOW_HINGE only 8, LOCAL3_SLOW only 5; replaces: >= 36/40 and SLOW_HINGE only - LOCAL3_SLOW only <= 1; does not: <= 30/40); vs SLOW_MEM: LOCAL3_SLOW only 13, SLOW_MEM only 6, p = 0.167; LOCAL3_SLOW failure classes {'STREAM-PARTIAL': 5, 'KEY': 4}
+  S44 window_scale (a): carries to four streams (LOCAL3_SLOW16_A 20/20, reference only 0, arm only 5; carries: >= 16/20 and reference only - arm only <= 1; LOCAL3_SLOW16_M cut by the runtime rule)
+  S44 window_scale (b): INCOMPLETE (LOCAL3_SLOW_D8_A 0/10, LOCAL3_SLOW_D8_M 4/10), no reading
+  S45 reservoir_gate: INCOMPLETE (RES_D8_A 8/10), no reading
+  S46 stream_knobs LR3E3: bound 0/5, BOUND ROUTED 0/5, median final accuracy 0.10; classes {'non-stream OTHER': 4, 'non-stream KEY': 1} (descriptive)
+  S46 stream_knobs WH_SLOW: bound 0/5, BOUND ROUTED 0/5, median final accuracy 0.48; classes {'MERGED (3 share)': 2, 'MERGED (4 share)': 2, 'non-stream OTHER': 1} (descriptive)
+  S46 stream_knobs DECAY98: bound 0/4, BOUND ROUTED 0/4, median final accuracy 0.68; classes {'MERGED (3 share)': 2, 'non-stream OTHER': 2} (descriptive)
+  S46 stream_knobs PERFECT98: bound 0/0, BOUND ROUTED 0/0, median final accuracy --; classes {} (descriptive)
+  S47 write_decoders HINGE_D8_A: median h decodability CTX/KEY/VAL at 4800 0.25/0.14/0.13 (at 0: 1.00/0.91/0.47); reproduces its record: 5/5 (descriptive)
+  S47 write_decoders D8_HINGE_M: median h decodability CTX/KEY/VAL at 4800 0.47/0.49/0.49 (at 0: 1.00/0.91/0.47); reproduces its record: 0/5 (descriptive)
+  S47 write_decoders A_HINGE_M: median h decodability CTX/KEY/VAL at 4800 0.81/0.81/0.80 (at 0: 1.00/0.95/0.66); reproduces its record: 0/5 (descriptive)
+  S47 write_decoders HINGE16_M: median h decodability CTX/KEY/VAL at 4800 1.00/1.00/1.00 (at 0: 1.00/0.95/0.66); reproduces its record: 0/5 (descriptive)
+  S47 write_decoders D8_PREV_A: median h decodability CTX/KEY/VAL at 4800 0.42/0.53/0.48 (at 0: 0.99/1.00/0.69); reproduces its record: 5/5 (descriptive)
+####################################################################################################
