@@ -507,14 +507,15 @@ S48, what the splits did (observations, not readings):
   bound runs the transition came at the evaluation right after the last split (1200 updates later), in the other three
   2400-4800 later. The one unbound run (267) used all three splits and ended MERGED (2 share), accuracy 0.88.
 - W_SPLIT's maps before its first split are LOCAL3_SLOW_D8_A's (bit for bit). The arms differ only by the splits.
-- Decay 0.98 alone settled the maps early, mostly 2+2+1+1+1+1 or 2+1+1+1+1+1+1 from 4800, held to the end. Two runs reached
-  accuracy 1.0 without routing (BOUND NOT routed at 9600 and 12000). It lost two of the three seeds the reference bound
-  (261, 263; 264 too), while its state decoded the stream at KEY / VAL at 0.93 / 0.95 (median) already at 4800. The window
+- Decay 0.98 alone settled the maps early (one partition, mostly 2+2+1+1+1+1 or 2+1+1+1+1+1+1, from 4800-12000 to the
+  end). Two runs reached accuracy 1.0 without routing (BOUND NOT routed at 9600 and 12000). It lost all three seeds the
+  reference bound (261, 263, 264), while its state decoded the stream at KEY / VAL at 0.93 / 0.95 (median) already at 4800. The window
   gate carries the stream there; the merge is not a decodability problem. With the trigger on the same runs (W_SPLIT_D98)
-  the splits broke these held merges on six seeds; the two not-routed runs fired no split (accuracy 1.0 before a plateau
+  the splits broke the held merge on all seven seeds where W_D98 ended MERGED; the two not-routed runs fired no split (accuracy 1.0 before a plateau
   check could fire) and are W_D98's runs bit for bit.
 - W_LONG: through 28800 every run is LOCAL3_SLOW_D8_A's; the extra 14400 updates bound one more (267 at 31200). The other
-  six held MERGED (2 share) maps unchanged from 12000-19200 to 43200 (accuracy 0.75-0.88).
+  six ended MERGED (2 share) at accuracy 0.75-0.88; five held one partition from 12000-21600 to 43200, and 260 went from
+  3+1+1+1+1+1 to 2+1+1+1+1+1+1 at 36000.
 
 S49, LOCAL3_SLOW's nine unbound two-stream runs (S43). LOCAL3's read gate equals its write gate, so the KEY and VAL tables
 are the same function of the window; they agree on every run.
@@ -528,7 +529,7 @@ are the same function of the window; they agree on every run.
     threshold, so their KEY-split label follows sampling noise;
   - on 2 of 4: 197, with the other two keys both on channel 1.
   Their patterns were fixed by update 600-1200, except 197. Each passed through a key-dominated gate early (first crossings
-  at 25-225); 183, 185 and 188 left it by 400-700. 197 kept a full key split (eta^2 1.0 from 800) through at least 12000
+  at 25-225); 183, 185 and 188 left it by 400-600, 163 fell back to the 0.5 threshold by 800. 197 kept a full key split (eta^2 1.0 from 800) through at least 12000
   and became stream-partial only by the end.
 - So at two streams the window gate's key splits form within the first 600 updates, while the non-gate parameters are
   still at 1e-4. Where the streams do separate, they separate key by key and stop partway.
