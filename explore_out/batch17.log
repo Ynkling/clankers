@@ -776,3 +776,6 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   [  5]   54.7 min  window_d8        W_D98                    seed 265  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git b724aba, code 375b30d487df, attempt 1: acc 1.000  trans  9600  outcome BOUND NOT routed; decoder at 12000: h CTX/KEY/VAL 0.65/0.98/0.99
   start   54.7 min  window_d8        W_D98                    seed 268  (projected worst case 41 min)
+  [  6]   63.0 min  window_d8        W_D98                    seed 264  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 4a71180, code 375b30d487df, attempt 1: acc 0.877  trans  None  outcome MERGED (2 share); decoder at 28800: h CTX/KEY/VAL 0.54/0.97/0.92
+  start   63.0 min  window_d8        W_D98                    seed 269  (projected worst case 41 min)
