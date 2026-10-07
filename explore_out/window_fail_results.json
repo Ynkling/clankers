@@ -1,0 +1,41 @@
+{
+ "meta": {
+  "arms": {
+   "LOCAL3_SLOW_RERUN": {
+    "iters": 24000,
+    "key": "LOCAL3_SLOW_RERUN",
+    "label": "S43's LOCAL3_SLOW on its nine unbound seeds, rerun with dense gate measurements",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused)",
+    "seeds": [
+     163,
+     169,
+     173,
+     183,
+     185,
+     186,
+     188,
+     192,
+     197
+    ]
+   }
+  },
+  "code_shas": [
+   "3d097ab8b5cc0e3f6ec26a9133018248f21563ac"
+  ],
+  "cut": [],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "810d2d3+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-07 14:58:34",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

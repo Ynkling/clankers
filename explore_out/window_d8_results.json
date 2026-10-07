@@ -1,0 +1,114 @@
+{
+ "meta": {
+  "arms": {
+   "W_D98": {
+    "iters": 28800,
+    "key": "W_D98",
+    "label": "LOCAL3_SLOW_D8_A at decay 0.98",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "W_LONG": {
+    "iters": 43200,
+    "key": "W_LONG",
+    "label": "LOCAL3_SLOW_D8_A to 43200 updates",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "W_SPLIT": {
+    "iters": 28800,
+    "key": "W_SPLIT",
+    "label": "LOCAL3_SLOW_D8_A + the KEYMASS trigger (<= 3 splits)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "W_SPLIT_D98": {
+    "iters": 28800,
+    "key": "W_SPLIT_D98",
+    "label": "LOCAL3_SLOW_D8_A at decay 0.98 + the KEYMASS trigger",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   }
+  },
+  "code_shas": [
+   "375b30d487df39f5474a6fa81656ff0458bf5eb7"
+  ],
+  "cut": [
+   "W_M_REF",
+   "W_NOSLOW",
+   "W_SPLIT_M",
+   "W_WIDTH4"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "810d2d3+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-07 14:58:34",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
