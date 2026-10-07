@@ -442,3 +442,271 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 3d90da6, code 375b30d487df, attempt 1: acc 1.000  trans  9600  outcome BOUND NOT routed; decoder at 12000: h CTX/KEY/VAL 0.65/0.98/0.99; splits 0 at []
   [ 10]  101.9 min  window_d8        W_SPLIT_D98              seed 263  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git b8bf06f, code 375b30d487df, attempt 1: acc 1.000  trans 18000  outcome BOUND ROUTED; decoder at 20400: h CTX/KEY/VAL 0.27/1.00/1.00; splits 2 at [9600, 16800]
+  [ 11]  103.6 min  window_d8        W_SPLIT_D98              seed 264  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8282aca, code 375b30d487df, attempt 1: acc 1.000  trans 15600  outcome BOUND ROUTED; decoder at 18000: h CTX/KEY/VAL 0.65/1.00/1.00; splits 1 at [14400]
+  20 runs left for the next segment: none fits in the 12 min left of this one (worst-case projections)
+  batch wall clock 103.6 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_d8
+  idea    one-knob changes to the eight-stream window gate (LOCAL3_SLOW_D8_A, 3/10): splits, decay 0.98, length, one rate, width 4
+  source  batch 16's S44(b) (the window gate broke the eight-stream stall at 3/10 Adam and 3/10 Muon); the user's batch 17
+  change  LOCAL3_SLOW_D8_A + S37's KEYMASS trigger (<= 3 splits) / decay 0.98 / both / 43200 updates / one rate 1e-3 / a width-4 window; LOCAL3_SLOW_D8_M + the trigger
+  arm W_SPLIT      lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A + the KEYMASS trigger (<= 3 splits)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_D98        lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A at decay 0.98
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98
+  arm W_SPLIT_D98  lr 0.001  iters 28800  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A at decay 0.98 + the KEYMASS trigger
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_LONG       lr 0.001  iters 43200  seeds 260-269 (10)  — LOCAL3_SLOW_D8_A to 43200 updates
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 260-269: the Adam arms with batch 16's LOCAL3_SLOW_D8_A records; W_SPLIT_M with LOCAL3_SLOW_D8_M on the same CPU (batch 16's records or W_M_REF); same initial parameters (+ the window) and batches
+----------------------------------------------------------------------------------------------------
+  pairs: batch 16's LOCAL3_SLOW_D8_A (code 01767493e840; 10 runs on ['Intel(R) Xeon(R) Processor @ 2.80GHz']), BOUND ROUTED 3/10; Muon pair: W_M_REF (LOCAL3_SLOW_D8_M fresh, same CPU), BOUND ROUTED 0/0
+  cut by the runtime rule: ['W_M_REF', 'W_NOSLOW', 'W_SPLIT_M', 'W_WIDTH4'] (no runs, no reading)
+  ARM W_SPLIT (LOCAL3_SLOW_D8_A + the KEYMASS trigger (<= 3 splits)), seeds 260-269 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+    streams per channel (routing_k's map) at every check and at the end; '.' = the run had stopped (its last map holds):
+    seed | outcome                trans  stop   acc |      2400      4800      7200      9600     12000     14400     16800     19200     21600     24000     26400     28800 |             end | LOCAL3_SLOW_D8_A
+     260 | BOUND ROUTED           18000 20400  1.00 |       5+3       5+3 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         . | 1+1+1+1+1+1+1+1 | MERGED (3 share) (trans None)
+     261 | BOUND ROUTED           15600 18000  1.00 | 3+2+1+1+1       5+3       5+3 2+2+2+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 16800)
+     262 | BOUND ROUTED           22800 25200  1.00 |       4+4       5+3     4+3+1     4+3+1 2+2+2+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         . | 1+1+1+1+1+1+1+1 | MERGED (2 share) (trans None)
+     263 | BOUND ROUTED           14400 16800  1.00 |         8       5+3     5+2+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 21600)
+     264 | not run
+     265 | not run
+     266 | not run
+     267 | not run
+     268 | not run
+     269 | not run
+    BOUND ROUTED  W_SPLIT 4/4  LOCAL3_SLOW_D8_A 2/4  W_SPLIT only 2, LOCAL3_SLOW_D8_A only 0, McNemar two-sided p = 0.5
+    failure classes at the end: W_SPLIT {'BOUND ROUTED': 4}; LOCAL3_SLOW_D8_A {'MERGED (3 share)': 1, 'BOUND ROUTED': 3, 'MERGED (2 share)': 6}
+    transitions: W_SPLIT [14400, 15600, 18000, 22800]; LOCAL3_SLOW_D8_A [16800, 19200, 21600]
+    the trigger's checks (step: probe acc; E eligible, F fired, B blocked by gap/cap), and each split's target (KEYMASS c* -> c0; labelled ok = c* holds >= 2 streams and c0 none; streams on c* before; map before -> after):
+      260: 2 split(s); checks 2400:0.08 4800:0.16 7200:0.61 9600:0.70 12000:0.70F 14400:0.92 16800:0.91F 19200:1.00
+         split at 12000: c* 14 -> c0 6, labelled ok True (streams on c* [2, 3, 5], on c0 []); 3+1+1+1+1+1 -> 3+1+1+1+1+1; maps [11, 9, 14, 14, 10, 14, 15, 4] -> [11, 9, 6, 6, 10, 6, 15, 4]
+         split at 16800: c* 6 -> c0 8, labelled ok True (streams on c* [2, 3], on c0 []); 2+1+1+1+1+1+1 -> 2+1+1+1+1+1+1; maps [11, 9, 6, 6, 10, 14, 15, 4] -> [11, 9, 6, 6, 10, 14, 15, 4]
+      261: 2 split(s); checks 2400:0.11 4800:0.06F 7200:0.06Bg 9600:0.45 12000:0.94 14400:0.91F 16800:1.00
+         split at 4800: c* 10 -> c0 1, labelled ok True (streams on c* [1, 2, 3], on c0 []); 5+3 -> 5+3; maps [5, 10, 10, 10, 5, 5, 5, 5] -> [5, 1, 1, 1, 5, 5, 5, 5]
+         split at 14400: c* 5 -> c0 15, labelled ok True (streams on c* [0, 4], on c0 []); 2+1+1+1+1+1+1 -> 2+1+1+1+1+1+1; maps [5, 1, 10, 0, 5, 8, 12, 13] -> [15, 1, 10, 0, 15, 8, 12, 13]
+      262: 1 split(s); checks 2400:0.05 4800:0.20 7200:0.23 9600:0.30 12000:0.48 14400:0.66 16800:0.77 19200:0.75F 21600:0.89 24000:1.00
+         split at 19200: c* 9 -> c0 6, labelled ok True (streams on c* [4, 7], on c0 []); 2+2+1+1+1+1 -> 2+2+1+1+1+1; maps [1, 11, 10, 3, 9, 1, 2, 9] -> [1, 11, 10, 3, 6, 1, 2, 6]
+      263: 2 split(s); checks 2400:0.08 4800:0.08F 7200:0.12 9600:0.92 12000:0.91F 14400:1.00 16800:1.00
+         split at 4800: c* 10 -> c0 13, labelled ok True (streams on c* [2, 3, 4, 5, 6], on c0 []); 5+3 -> 5+3; maps [15, 15, 10, 10, 10, 10, 10, 15] -> [15, 15, 13, 13, 13, 13, 13, 15]
+         split at 12000: c* 13 -> c0 7, labelled ok True (streams on c* [2, 6], on c0 []); 2+1+1+1+1+1+1 -> 2+1+1+1+1+1+1; maps [9, 1, 13, 8, 10, 14, 13, 15] -> [9, 1, 7, 8, 10, 14, 7, 15]
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL | 19200:   CTX   KEY   VAL |   end:   CTX   KEY   VAL
+     260 |         0.90  0.84  0.86 |         0.19  0.57  0.57 |         0.23  0.50  0.60 |         0.50  0.87  0.84 |         0.55  1.00  1.00 |         0.55  1.00  1.00
+     261 |         0.86  0.92  0.77 |         0.68  0.86  0.73 |         0.14  0.37  0.67 |         0.31  0.89  0.87 |           --    --    -- |         0.35  1.00  1.00
+     262 |         0.90  0.79  0.90 |         0.29  0.49  0.54 |         0.23  0.41  0.65 |         0.28  0.57  0.69 |         0.47  0.85  0.92 |         0.53  1.00  1.00
+     263 |         0.91  0.79  0.97 |         0.25  0.62  0.44 |         0.39  0.63  0.62 |         0.64  0.99  1.00 |           --    --    -- |         0.91  1.00  1.00
+     med |         0.90  0.81  0.88 |         0.27  0.60  0.55 |         0.23  0.45  0.63 |         0.41  0.88  0.86 |         0.51  0.92  0.96 |         0.54  1.00  1.00
+    agreement before the arms diverge — equal to LOCAL3_SLOW_D8_A through the first split (step), or throughout when none fired: {260: (12000, True), 261: (4800, True), 262: (19200, True), 263: (4800, True)}
+  READING S48 W_SPLIT: INCOMPLETE (4/10), no reading
+
+  ARM W_D98 (LOCAL3_SLOW_D8_A at decay 0.98), seeds 260-269 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98
+    streams per channel (routing_k's map) at every check and at the end; '.' = the run had stopped (its last map holds):
+    seed | outcome                trans  stop   acc |      2400      4800      7200      9600     12000     14400     16800     19200     21600     24000     26400     28800 |             end | LOCAL3_SLOW_D8_A
+     260 | not run
+     261 | not run
+     262 | not run
+     263 | not run
+     264 | not run
+     265 | not run
+     266 | not run
+     267 | not run
+     268 | not run
+     269 | not run
+    BOUND ROUTED  W_D98 0/0  LOCAL3_SLOW_D8_A 0/0  W_D98 only 0, LOCAL3_SLOW_D8_A only 0, McNemar two-sided p = 1
+    failure classes at the end: W_D98 {}; LOCAL3_SLOW_D8_A {'MERGED (3 share)': 1, 'BOUND ROUTED': 3, 'MERGED (2 share)': 6}
+    transitions: W_D98 []; LOCAL3_SLOW_D8_A [16800, 19200, 21600]
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL | 19200:   CTX   KEY   VAL |   end:   CTX   KEY   VAL
+     med |           --    --    -- |           --    --    -- |           --    --    -- |           --    --    -- |           --    --    -- |           --    --    --
+  READING S48 W_D98: INCOMPLETE (0/10), no reading
+
+  ARM W_SPLIT_D98 (LOCAL3_SLOW_D8_A at decay 0.98 + the KEYMASS trigger), seeds 260-269 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+    streams per channel (routing_k's map) at every check and at the end; '.' = the run had stopped (its last map holds):
+    seed | outcome                trans  stop   acc |      2400      4800      7200      9600     12000     14400     16800     19200     21600     24000     26400     28800 |             end | LOCAL3_SLOW_D8_A
+     260 | BOUND ROUTED           13200 15600  1.00 |       4+4 2+2+1+1+1+1 2+2+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         .         . | 1+1+1+1+1+1+1+1 | MERGED (3 share) (trans None)
+     261 | BOUND ROUTED            8400 10800  1.00 |       5+3 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 16800)
+     262 | BOUND ROUTED           18000 20400  1.00 |       5+3 3+2+1+1+1 3+2+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         . | 1+1+1+1+1+1+1+1 | MERGED (2 share) (trans None)
+     263 | BOUND ROUTED           18000 20400  1.00 |       6+2 3+2+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 21600)
+     264 | BOUND ROUTED           15600 18000  1.00 |       5+3 2+2+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 19200)
+     265 | BOUND NOT routed        9600 12000  1.00 |       4+4 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1         .         .         .         .         .         .         . |     2+2+1+1+1+1 | MERGED (2 share) (trans None)
+     266 | not run
+     267 | not run
+     268 | not run
+     269 | not run
+    BOUND ROUTED  W_SPLIT_D98 5/6  LOCAL3_SLOW_D8_A 3/6  W_SPLIT_D98 only 2, LOCAL3_SLOW_D8_A only 0, McNemar two-sided p = 0.5
+    failure classes at the end: W_SPLIT_D98 {'BOUND ROUTED': 5, 'BOUND NOT routed': 1}; LOCAL3_SLOW_D8_A {'MERGED (3 share)': 1, 'BOUND ROUTED': 3, 'MERGED (2 share)': 6}
+    transitions: W_SPLIT_D98 [8400, 9600, 13200, 15600, 18000, 18000]; LOCAL3_SLOW_D8_A [16800, 19200, 21600]
+    the trigger's checks (step: probe acc; E eligible, F fired, B blocked by gap/cap), and each split's target (KEYMASS c* -> c0; labelled ok = c* holds >= 2 streams and c0 none; streams on c* before; map before -> after):
+      260: 0 split(s); checks 2400:0.14 4800:0.75 7200:0.80 9600:0.88 12000:0.97 14400:1.00
+      261: 1 split(s); checks 2400:0.09 4800:0.89 7200:0.84F 9600:1.00
+         split at 7200: c* 3 -> c0 4, labelled ok True (streams on c* [5, 6], on c0 []); 2+1+1+1+1+1+1 -> 2+1+1+1+1+1+1; maps [11, 6, 15, 1, 14, 3, 3, 5] -> [11, 6, 15, 1, 14, 3, 3, 5]
+      262: 3 split(s); checks 2400:0.12 4800:0.56 7200:0.56F 9600:0.84 12000:0.75F 14400:0.91 16800:0.88F 19200:1.00
+         split at 7200: c* 0 -> c0 13, labelled ok True (streams on c* [2, 4, 7], on c0 []); 3+2+1+1+1 -> 3+2+1+1+1; maps [1, 14, 0, 2, 0, 3, 1, 0] -> [1, 14, 0, 2, 0, 3, 1, 0]
+         split at 12000: c* 1 -> c0 7, labelled ok True (streams on c* [0, 6], on c0 []); 2+2+1+1+1+1 -> 2+2+1+1+1+1; maps [1, 14, 13, 2, 13, 3, 1, 0] -> [7, 14, 13, 2, 13, 3, 7, 0]
+         split at 16800: c* 13 -> c0 5, labelled ok True (streams on c* [2, 4], on c0 []); 2+1+1+1+1+1+1 -> 2+1+1+1+1+1+1; maps [1, 14, 13, 2, 13, 3, 7, 0] -> [1, 14, 5, 2, 5, 3, 7, 0]
+      263: 2 split(s); checks 2400:0.09 4800:0.66 7200:0.77 9600:0.75F 12000:0.88 14400:0.91 16800:0.89F 19200:1.00
+         split at 9600: c* 5 -> c0 9, labelled ok True (streams on c* [2, 4, 6], on c0 []); 3+1+1+1+1+1 -> 3+1+1+1+1+1; maps [14, 0, 5, 3, 5, 6, 5, 4] -> [14, 0, 9, 3, 9, 6, 9, 4]
+         split at 16800: c* 5 -> c0 15, labelled ok True (streams on c* [4, 6], on c0 []); 2+1+1+1+1+1+1 -> 2+1+1+1+1+1+1; maps [14, 0, 9, 3, 5, 6, 5, 4] -> [14, 0, 9, 3, 15, 6, 15, 4]
+      264: 1 split(s); checks 2400:0.12 4800:0.59 7200:0.78 9600:0.88 12000:0.91 14400:0.88F 16800:1.00
+         split at 14400: c* 2 -> c0 15, labelled ok True (streams on c* [5, 6], on c0 []); 2+1+1+1+1+1+1 -> 2+1+1+1+1+1+1; maps [3, 6, 4, 9, 7, 2, 2, 1] -> [3, 6, 4, 9, 7, 2, 2, 1]
+      265: 0 split(s); checks 2400:0.19 4800:0.73 7200:0.78 9600:1.00 12000:1.00
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL | 19200:   CTX   KEY   VAL |   end:   CTX   KEY   VAL
+     260 |         0.62  0.62  0.68 |         0.25  0.95  0.88 |         0.30  0.84  0.96 |         0.33  0.97  0.98 |           --    --    -- |         0.35  1.00  1.00
+     261 |         0.89  0.92  0.78 |         0.19  0.54  0.60 |         0.30  1.00  1.00 |         0.32  1.00  1.00 |           --    --    -- |         0.33  1.00  1.00
+     262 |         0.68  0.73  0.64 |         0.20  0.44  0.72 |         0.28  0.78  0.88 |         0.33  0.91  0.99 |         0.39  1.00  1.00 |         0.38  1.00  1.00
+     263 |         0.91  0.81  0.96 |         0.24  0.44  0.51 |         0.25  0.91  0.96 |         0.29  0.82  0.86 |         0.25  1.00  1.00 |         0.27  1.00  1.00
+     264 |         0.79  0.91  0.90 |         0.16  0.66  0.75 |         0.39  0.87  0.90 |         0.53  0.99  1.00 |           --    --    -- |         0.65  1.00  1.00
+     265 |         0.33  0.27  0.19 |         0.20  0.59  0.39 |         0.57  0.95  0.93 |         0.52  0.99  1.00 |           --    --    -- |         0.65  0.98  0.99
+     med |         0.73  0.77  0.73 |         0.20  0.56  0.66 |         0.30  0.89  0.94 |         0.33  0.98  1.00 |         0.32  1.00  1.00 |         0.36  1.00  1.00
+    agreement before the arms diverge — equal to W_D98 through the first split (step), or throughout when none fired: {}
+  READING S48 W_SPLIT_D98: INCOMPLETE (6/10), no reading
+
+  ARM W_LONG (LOCAL3_SLOW_D8_A to 43200 updates), seeds 260-269 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    streams per channel (routing_k's map) at every check and at the end; '.' = the run had stopped (its last map holds):
+    seed | outcome                trans  stop   acc |      2400      4800      7200      9600     12000     14400     16800     19200     21600     24000     26400     28800     31200     33600     36000     38400     40800     43200 |             end | LOCAL3_SLOW_D8_A
+     260 | MERGED (2 share)        None 43200  0.86 |       5+3       5+3 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 |   2+1+1+1+1+1+1 | MERGED (3 share) (trans None)
+     261 | BOUND ROUTED           16800 19200  1.00 | 3+2+1+1+1       5+3       5+3   3+2+2+1 2+2+2+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         .         .         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 16800)
+     262 | MERGED (2 share)        None 43200  0.88 |       4+4       5+3     4+3+1     4+3+1 2+2+2+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 |   2+1+1+1+1+1+1 | MERGED (2 share) (trans None)
+     263 | BOUND ROUTED           21600 24000  1.00 |         8       5+3   4+2+1+1 4+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 21600)
+     264 | BOUND ROUTED           19200 21600  1.00 |     5+2+1     4+3+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+1+1+1+1+1+1 1+1+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         .         .         .         .         .         . | 1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 19200)
+     265 | MERGED (2 share)        None 43200  0.75 |       4+4     4+3+1 3+2+1+1+1 3+2+1+1+1 3+2+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 |     2+2+1+1+1+1 | MERGED (2 share) (trans None)
+     266 | MERGED (2 share)        None 43200  0.88 |       5+3       5+3   4+2+1+1   4+2+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 |   2+1+1+1+1+1+1 | MERGED (2 share) (trans None)
+     267 | BOUND ROUTED           31200 33600  1.00 |       5+3       4+4   3+2+2+1 3+2+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 2+2+1+1+1+1 1+1+1+1+1+1+1+1 1+1+1+1+1+1+1+1         .         .         .         . | 1+1+1+1+1+1+1+1 | MERGED (2 share) (trans None)
+     268 | MERGED (2 share)        None 43200  0.87 |       5+3       5+3 3+2+1+1+1 3+2+1+1+1 3+1+1+1+1+1 3+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 |   2+1+1+1+1+1+1 | MERGED (2 share) (trans None)
+     269 | MERGED (2 share)        None 43200  0.88 |       5+3       5+3     3+3+2 2+2+2+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 2+1+1+1+1+1+1 |   2+1+1+1+1+1+1 | MERGED (2 share) (trans None)
+    BOUND ROUTED  W_LONG 4/10  LOCAL3_SLOW_D8_A 3/10  W_LONG only 1, LOCAL3_SLOW_D8_A only 0, McNemar two-sided p = 1
+    failure classes at the end: W_LONG {'MERGED (2 share)': 6, 'BOUND ROUTED': 4}; LOCAL3_SLOW_D8_A {'MERGED (3 share)': 1, 'BOUND ROUTED': 3, 'MERGED (2 share)': 6}
+    transitions: W_LONG [16800, 19200, 21600, 31200]; LOCAL3_SLOW_D8_A [16800, 19200, 21600]
+    S38's decoder: stream decodability of the gate state h at CTX / KEY / VAL positions (chance 0.125), per seed:
+    seed |  1200:   CTX   KEY   VAL |  2400:   CTX   KEY   VAL |  4800:   CTX   KEY   VAL |  9600:   CTX   KEY   VAL | 19200:   CTX   KEY   VAL |   end:   CTX   KEY   VAL
+     260 |         0.90  0.84  0.86 |         0.19  0.57  0.57 |         0.23  0.50  0.60 |         0.50  0.87  0.84 |         0.40  0.81  0.84 |         0.53  0.93  0.95
+     261 |         0.86  0.92  0.77 |         0.68  0.86  0.73 |         0.14  0.37  0.67 |         0.37  0.86  0.86 |         0.56  1.00  1.00 |         0.56  1.00  1.00
+     262 |         0.90  0.79  0.90 |         0.29  0.49  0.54 |         0.23  0.41  0.65 |         0.28  0.57  0.69 |         0.47  0.85  0.92 |         0.41  0.97  0.95
+     263 |         0.91  0.79  0.97 |         0.25  0.62  0.44 |         0.39  0.63  0.62 |         0.50  0.95  0.91 |         0.33  0.97  0.99 |         0.34  1.00  1.00
+     264 |         0.81  0.91  0.88 |         0.25  0.60  0.66 |         0.34  0.61  0.67 |         0.60  0.86  0.92 |         0.52  1.00  1.00 |         0.51  1.00  1.00
+     265 |         0.85  0.77  0.81 |         0.15  0.60  0.47 |         0.33  0.66  0.81 |         0.47  0.90  0.87 |         0.30  0.87  0.81 |         0.20  0.81  0.89
+     266 |         0.93  0.90  0.91 |         0.31  0.57  0.61 |         0.25  0.50  0.53 |         0.34  0.83  0.83 |         0.39  0.92  0.92 |         0.41  0.93  0.95
+     267 |         0.88  0.84  0.91 |         0.15  0.46  0.67 |         0.18  0.70  0.72 |         0.24  0.91  0.94 |         0.27  0.94  0.96 |         0.46  1.00  1.00
+     268 |         0.94  0.90  0.94 |         0.28  0.55  0.61 |         0.19  0.45  0.66 |         0.31  0.87  0.90 |         0.47  0.90  0.92 |         0.53  0.91  0.90
+     269 |         0.94  0.80  0.94 |         0.24  0.58  0.82 |         0.25  0.64  0.76 |         0.44  0.96  0.96 |         0.33  0.93  0.92 |         0.47  0.91  0.93
+     med |         0.90  0.84  0.91 |         0.25  0.58  0.61 |         0.24  0.55  0.67 |         0.41  0.87  0.88 |         0.40  0.92  0.92 |         0.47  0.95  0.95
+    agreement before the arms diverge — equal to LOCAL3_SLOW_D8_A through 28800 (curve, statistics, common decoder steps): {260: True, 261: True, 262: True, 263: True, 264: True, 265: True, 266: True, 267: True, 268: True, 269: True}
+  READING S48 W_LONG: neither (BOUND ROUTED 4/10; improves: >= 6/10; does not: <= 3/10; vs LOCAL3_SLOW_D8_A: arm only 1, pair only 0, p = 1)
+
+  READING window_d8 W_SPLIT: INCOMPLETE (4/10), no reading  [EXPLORATORY, not a result]
+  READING window_d8 W_D98: INCOMPLETE (0/10), no reading  [EXPLORATORY, not a result]
+  READING window_d8 W_SPLIT_D98: INCOMPLETE (6/10), no reading  [EXPLORATORY, not a result]
+  READING window_d8 W_LONG: neither (BOUND ROUTED 4/10; improves: >= 6/10; does not: <= 3/10; vs LOCAL3_SLOW_D8_A: arm only 1, pair only 0, p = 1)  [EXPLORATORY, not a result]
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN window_fail
+  idea    classify LOCAL3_SLOW's nine unbound two-stream runs (S43): the gate at the write positions, and when key splits form
+  source  batch 16's S43 (LOCAL3_SLOW 31/40; failures STREAM-PARTIAL 5, KEY 4); the user's batch 17
+  change  none to the runs (S43's run code on the nine seeds); the gate measured densely early and at every evaluation
+  arm LOCAL3_SLOW_RERUN lr 0.001  iters 24000  seeds [163, 169, 173, 183, 185, 186, 188, 192, 197] (9)  — S43's LOCAL3_SLOW on its nine unbound seeds, rerun with dense gate measurements
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused)
+  pairing each rerun against its own S43 record (must reproduce it bit for bit)
+----------------------------------------------------------------------------------------------------
+  9/9 reruns; each compared with its S43 record (code 46867e792241)
+  (2) KEY SPLITS: eta^2 of p at KEY positions by key (>= 0.5 = a key split), by stream, and the query routing margin, at updates 0, 100, 200, 300, 400, 500, 600, 700, 800, 1000, 1200, 1600, 2400, 4800, 12000, 24000:
+    163: S43 class STREAM-PARTIAL, rerun class STREAM-PARTIAL, reproduces S43's record bit for bit (curve and statistics): True; acc 0.744; KEY split after update 600 (formed at 15600; first crossing 200)
+       note: eta^2 by key at the end 0.5000 is on the threshold 0.5 (a gate that splits the streams on two keys and puts the other two keys on different channels has eta^2 by key 0.5 exactly), so this run's KEY-split label follows sampling noise
+       by key    0.10 0.39 0.50 0.52 0.74 0.80 0.74 0.53 0.50 0.50 0.50 0.49 0.49 0.50 0.50 0.50
+       by stream 0.29 0.09 0.00 0.01 0.01 0.10 0.20 0.30 0.29 0.27 0.27 0.27 0.26 0.25 0.25 0.25
+       margin    -0.00 0.00 -0.00 -0.00 0.00 0.01 0.08 0.33 0.44 0.47 0.49 0.50 0.50 0.51 0.51 0.51
+    169: S43 class KEY, rerun class KEY, reproduces S43's record bit for bit (curve and statistics): True; acc 0.500; KEY split by update 600 (formed at 300)
+       by key    0.08 0.03 0.23 0.54 0.70 0.90 0.99 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+       by stream 0.00 0.20 0.07 0.11 0.14 0.05 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+       margin    -0.00 -0.00 0.00 0.00 0.01 0.02 0.00 0.00 0.00 0.00 0.00 0.00 0.00 -0.00 0.00 -0.00
+    173: S43 class KEY, rerun class KEY, reproduces S43's record bit for bit (curve and statistics): True; acc 0.612; KEY split by update 600 (formed at 0)
+       by key    0.55 0.84 0.79 0.78 0.66 0.81 0.78 0.76 0.76 0.73 0.73 0.73 0.73 0.73 0.72 0.73
+       by stream 0.00 0.00 0.08 0.17 0.26 0.10 0.09 0.08 0.08 0.08 0.08 0.07 0.08 0.07 0.07 0.07
+       margin    0.00 0.00 0.00 0.02 0.11 0.10 0.16 0.18 0.19 0.22 0.22 0.23 0.23 0.23 0.23 0.23
+    183: S43 class STREAM-PARTIAL, rerun class STREAM-PARTIAL, reproduces S43's record bit for bit (curve and statistics): True; acc 0.746; KEY split none at the end (first crossing 25, not held)
+       note: eta^2 by key at the end 0.5000 is on the threshold 0.5 (a gate that splits the streams on two keys and puts the other two keys on different channels has eta^2 by key 0.5 exactly), so this run's KEY-split label follows sampling noise
+       by key    0.45 0.55 0.75 0.74 0.70 0.59 0.49 0.49 0.50 0.49 0.49 0.50 0.50 0.50 0.50 0.50
+       by stream 0.12 0.08 0.08 0.18 0.21 0.25 0.31 0.29 0.27 0.27 0.28 0.25 0.25 0.25 0.25 0.25
+       margin    -0.00 0.00 0.00 0.04 0.12 0.26 0.44 0.48 0.49 0.51 0.52 0.52 0.52 0.53 0.53 0.53
+    185: S43 class STREAM-PARTIAL, rerun class STREAM-PARTIAL, reproduces S43's record bit for bit (curve and statistics): True; acc 0.882; KEY split none at the end (first crossing 225, not held)
+       by key    0.01 0.08 0.44 0.44 0.15 0.14 0.16 0.16 0.16 0.16 0.17 0.19 0.18 0.20 0.20 0.20
+       by stream 0.30 0.32 0.34 0.46 0.74 0.72 0.68 0.67 0.69 0.68 0.67 0.63 0.64 0.60 0.60 0.60
+       margin    -0.00 -0.00 0.00 0.08 0.58 0.67 0.68 0.69 0.70 0.71 0.71 0.71 0.71 0.71 0.71 0.71
+    186: S43 class KEY, rerun class KEY, reproduces S43's record bit for bit (curve and statistics): True; acc 0.500; KEY split by update 600 (formed at 200)
+       by key    0.21 0.21 0.51 0.83 0.96 0.99 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+       by stream 0.21 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+       margin    -0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 -0.00
+    188: S43 class STREAM-PARTIAL, rerun class STREAM-PARTIAL, reproduces S43's record bit for bit (curve and statistics): True; acc 0.868; KEY split none at the end (first crossing 175, not held)
+       by key    0.19 0.27 0.68 0.59 0.17 0.11 0.13 0.15 0.13 0.15 0.16 0.17 0.15 0.20 0.20 0.20
+       by stream 0.06 0.01 0.03 0.30 0.74 0.79 0.74 0.71 0.73 0.70 0.67 0.66 0.70 0.60 0.60 0.60
+       margin    -0.00 0.00 0.00 0.04 0.54 0.74 0.76 0.77 0.77 0.77 0.78 0.78 0.78 0.78 0.79 0.79
+    192: S43 class KEY, rerun class KEY, reproduces S43's record bit for bit (curve and statistics): True; acc 0.497; KEY split by update 600 (formed at 150)
+       by key    0.47 0.41 0.78 0.88 0.96 0.99 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+       by stream 0.02 0.00 0.00 0.03 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00
+       margin    -0.00 -0.00 -0.00 0.00 0.00 0.00 -0.00 -0.00 0.00 0.00 0.00 0.00 0.00 -0.00 0.00 -0.00
+    197: S43 class STREAM-PARTIAL, rerun class STREAM-PARTIAL, reproduces S43's record bit for bit (curve and statistics): True; acc 0.741; KEY split none at the end (first crossing 125, not held)
+       by key    0.30 0.50 0.73 0.84 0.85 0.90 0.97 0.99 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.33
+       by stream 0.00 0.00 0.02 0.03 0.08 0.04 0.01 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.33
+       margin    -0.00 0.00 0.00 0.02 0.04 0.04 0.01 0.00 -0.00 -0.00 -0.00 -0.00 0.00 0.00 -0.00 0.49
+  (1) THE GATE AT VAL POSITIONS (the writes) AT THE END, beside KEY positions (the reads): mean p = P(channel 0) per (stream, key) cell; per key: split (|p(s0) - p(s1)| >= 0.5) or shared on ch0 / ch1; soft = share of 0.1 < p < 0.9; eta^2 of p by stream / key / cell / value token:
+    163 VAL stream 0 [1.00 0.00 0.00 0.00]  stream 1 [1.00 0.00 1.00 1.00]  keys ['ch0', 'ch1', 'split', 'split']: streams split on 2 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.25 key 0.50 cell 1.00 by value 0.01
+    163 KEY stream 0 [1.00 0.00 0.00 0.00]  stream 1 [1.00 0.00 1.00 1.00]  keys ['ch0', 'ch1', 'split', 'split']: streams split on 2 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.25 key 0.50 cell 1.00
+         margin 0.507
+    169 VAL stream 0 [0.00 1.00 0.00 0.00]  stream 1 [0.00 1.00 0.00 0.00]  keys ['ch1', 'ch0', 'ch1', 'ch1']: key-routed (both channels); soft 0.00; eta^2 by stream 0.00 key 1.00 cell 1.00 by value 0.00
+    169 KEY stream 0 [0.00 1.00 0.00 0.00]  stream 1 [0.00 1.00 0.00 0.00]  keys ['ch1', 'ch0', 'ch1', 'ch1']: key-routed (both channels); soft 0.00; eta^2 by stream 0.00 key 1.00 cell 1.00
+         margin -0.000
+    173 VAL stream 0 [1.00 1.00 0.00 0.01]  stream 1 [1.00 1.00 0.00 1.00]  keys ['ch0', 'ch0', 'ch1', 'split']: streams split on 1 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.07 key 0.74 cell 1.00 by value 0.01
+    173 KEY stream 0 [1.00 1.00 0.00 0.00]  stream 1 [1.00 1.00 0.00 1.00]  keys ['ch0', 'ch0', 'ch1', 'split']: streams split on 1 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.07 key 0.73 cell 1.00
+         margin 0.229
+    183 VAL stream 0 [0.00 0.00 0.00 1.00]  stream 1 [1.00 0.00 1.00 1.00]  keys ['split', 'ch1', 'split', 'ch0']: streams split on 2 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.25 key 0.50 cell 1.00 by value 0.01
+    183 KEY stream 0 [0.00 0.00 0.00 1.00]  stream 1 [1.00 0.00 1.00 1.00]  keys ['split', 'ch1', 'split', 'ch0']: streams split on 2 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.25 key 0.50 cell 1.00
+         margin 0.527
+    185 VAL stream 0 [1.00 1.00 1.00 0.00]  stream 1 [0.00 0.00 0.00 0.00]  keys ['split', 'split', 'split', 'ch1']: streams split on 3 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.60 key 0.20 cell 1.00 by value 0.01
+    185 KEY stream 0 [1.00 1.00 1.00 0.00]  stream 1 [0.00 0.00 0.00 0.00]  keys ['split', 'split', 'split', 'ch1']: streams split on 3 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.60 key 0.20 cell 1.00
+         margin 0.715
+    186 VAL stream 0 [1.00 1.00 0.00 1.00]  stream 1 [1.00 1.00 0.00 1.00]  keys ['ch0', 'ch0', 'ch1', 'ch0']: key-routed (both channels); soft 0.00; eta^2 by stream 0.00 key 1.00 cell 1.00 by value 0.00
+    186 KEY stream 0 [1.00 1.00 0.00 1.00]  stream 1 [1.00 1.00 0.00 1.00]  keys ['ch0', 'ch0', 'ch1', 'ch0']: key-routed (both channels); soft 0.00; eta^2 by stream 0.00 key 1.00 cell 1.00
+         margin -0.000
+    188 VAL stream 0 [0.00 0.00 1.00 0.00]  stream 1 [1.00 1.00 1.00 1.00]  keys ['split', 'split', 'ch0', 'split']: streams split on 3 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.60 key 0.20 cell 1.00 by value 0.00
+    188 KEY stream 0 [0.00 0.00 1.00 0.00]  stream 1 [1.00 1.00 1.00 1.00]  keys ['split', 'split', 'ch0', 'split']: streams split on 3 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.60 key 0.20 cell 1.00
+         margin 0.785
+    192 VAL stream 0 [1.00 1.00 0.00 1.00]  stream 1 [1.00 1.00 0.00 1.00]  keys ['ch0', 'ch0', 'ch1', 'ch0']: key-routed (both channels); soft 0.00; eta^2 by stream 0.00 key 1.00 cell 1.00 by value 0.01
+    192 KEY stream 0 [1.00 1.00 0.00 1.00]  stream 1 [1.00 1.00 0.00 1.00]  keys ['ch0', 'ch0', 'ch1', 'ch0']: key-routed (both channels); soft 0.00; eta^2 by stream 0.00 key 1.00 cell 1.00
+         margin -0.000
+    197 VAL stream 0 [0.00 0.00 0.00 0.00]  stream 1 [1.00 0.00 1.00 0.00]  keys ['split', 'ch1', 'split', 'ch1']: streams split on 2 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.33 key 0.33 cell 1.00 by value 0.01
+    197 KEY stream 0 [0.00 0.00 0.00 0.00]  stream 1 [1.00 0.00 1.00 0.00]  keys ['split', 'ch1', 'split', 'ch1']: streams split on 2 of 4 keys, shared on the rest; soft 0.00; eta^2 by stream 0.33 key 0.33 cell 1.00
+         margin 0.488
+  (1') THE VAL PATTERN OVER TIME (per key: split / ch0 / ch1) at updates 600, 1200, 2400, 4800, 12000, end:
+    163 (STREAM-PARTIAL): ch0/ch1/ch0/ch0  ch0/ch1/split/split  ch0/ch1/split/split  ch0/ch1/split/split  ch0/ch1/split/split  ch0/ch1/split/split
+    169 (KEY): ch1/ch0/ch1/ch1  ch1/ch0/ch1/ch1  ch1/ch0/ch1/ch1  ch1/ch0/ch1/ch1  ch1/ch0/ch1/ch1  ch1/ch0/ch1/ch1
+    173 (KEY): ch0/ch0/ch1/split  ch0/ch0/ch1/split  ch0/ch0/ch1/split  ch0/ch0/ch1/split  ch0/ch0/ch1/split  ch0/ch0/ch1/split
+    183 (STREAM-PARTIAL): split/ch1/split/ch0  split/ch1/split/ch0  split/ch1/split/ch0  split/ch1/split/ch0  split/ch1/split/ch0  split/ch1/split/ch0
+    185 (STREAM-PARTIAL): split/split/split/ch1  split/split/split/ch1  split/split/split/ch1  split/split/split/ch1  split/split/split/ch1  split/split/split/ch1
+    186 (KEY): ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0
+    188 (STREAM-PARTIAL): split/split/ch0/split  split/split/ch0/split  split/split/ch0/split  split/split/ch0/split  split/split/ch0/split  split/split/ch0/split
+    192 (KEY): ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0  ch0/ch0/ch1/ch0
+    197 (STREAM-PARTIAL): ch0/ch1/ch0/ch1  ch0/ch1/ch0/ch1  ch0/ch1/ch0/ch1  ch0/ch1/ch0/ch1  ch0/ch1/ch0/ch1  split/ch1/split/ch1
+  S49 9/9 reruns reproduce S43's records
+  S49 KEY runs (4): 169 by update 600 (300), 173 by update 600 (0), 186 by update 600 (200), 192 by update 600 (150)
+  S49 STREAM-PARTIAL runs (5): 163 after update 600 (15600) [on the threshold], 183 none at the end [on the threshold], 185 none at the end, 188 none at the end, 197 none at the end
+  S49 STREAM-PARTIAL at VAL: 163 streams split on 2 of 4 keys, shared on the rest ['ch0', 'ch1', 'split', 'split']; 183 streams split on 2 of 4 keys, shared on the rest ['split', 'ch1', 'split', 'ch0']; 185 streams split on 3 of 4 keys, shared on the rest ['split', 'split', 'split', 'ch1']; 188 streams split on 3 of 4 keys, shared on the rest ['split', 'split', 'ch0', 'split']; 197 streams split on 2 of 4 keys, shared on the rest ['split', 'ch1', 'split', 'ch1']
+  S49 KEY at VAL: 169 key-routed (both channels); 173 streams split on 1 of 4 keys, shared on the rest; 186 key-routed (both channels); 192 key-routed (both channels)
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S48 window_d8 W_SPLIT: INCOMPLETE (4/10), no reading; bound seeds [260, 261, 262, 263]; classes {'BOUND ROUTED': 4}
+  S48 window_d8 W_D98: INCOMPLETE (0/10), no reading; bound seeds []; classes {}
+  S48 window_d8 W_SPLIT_D98: INCOMPLETE (6/10), no reading; bound seeds [260, 261, 262, 263, 264]; classes {'BOUND ROUTED': 5, 'BOUND NOT routed': 1}
+  S48 window_d8 W_LONG: neither (BOUND ROUTED 4/10; improves: >= 6/10; does not: <= 3/10; vs LOCAL3_SLOW_D8_A: arm only 1, pair only 0, p = 1); bound seeds [261, 263, 264, 267]; classes {'MERGED (2 share)': 6, 'BOUND ROUTED': 4}
+  S48 cut by the runtime rule: ['W_M_REF', 'W_NOSLOW', 'W_SPLIT_M', 'W_WIDTH4']
+  S49 window_fail: 9/9 reruns reproduce S43's records (descriptive)
+  S49 window_fail: KEY runs (4): 169 by update 600 (300), 173 by update 600 (0), 186 by update 600 (200), 192 by update 600 (150) (descriptive)
+  S49 window_fail: STREAM-PARTIAL runs (5): 163 after update 600 (15600) [on the threshold], 183 none at the end [on the threshold], 185 none at the end, 188 none at the end, 197 none at the end (descriptive)
+  S49 window_fail: STREAM-PARTIAL at VAL: 163 streams split on 2 of 4 keys, shared on the rest ['ch0', 'ch1', 'split', 'split']; 183 streams split on 2 of 4 keys, shared on the rest ['split', 'ch1', 'split', 'ch0']; 185 streams split on 3 of 4 keys, shared on the rest ['split', 'split', 'split', 'ch1']; 188 streams split on 3 of 4 keys, shared on the rest ['split', 'split', 'ch0', 'split']; 197 streams split on 2 of 4 keys, shared on the rest ['split', 'ch1', 'split', 'ch1'] (descriptive)
+  S49 window_fail: KEY at VAL: 169 key-routed (both channels); 173 streams split on 1 of 4 keys, shared on the rest; 186 key-routed (both channels); 192 key-routed (both channels) (descriptive)
+####################################################################################################
