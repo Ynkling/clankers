@@ -1134,3 +1134,6 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   start    0.0 min  window_d8        W_SPLIT                  seed 268  (projected worst case 34 min)
   start    0.0 min  window_d8        W_SPLIT                  seed 269  (projected worst case 34 min)
   start    0.0 min  window_d8        W_SPLIT_D98              seed 266  (projected worst case 30 min)
+  [  1]   27.6 min  window_d8        W_SPLIT                  seed 268  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 2173b1d, code 375b30d487df, attempt 1: acc 1.000  trans 16800  outcome BOUND ROUTED; decoder at 19200: h CTX/KEY/VAL 0.78/1.00/1.00; splits 2 at [4800, 12000]
+  start   27.6 min  window_d8        W_SPLIT_D98              seed 267  (projected worst case 30 min)
