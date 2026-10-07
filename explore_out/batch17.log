@@ -82,3 +82,6 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49)
   [  2]   31.7 min  window_d8        W_LONG                   seed 263  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git aa917ac, code 375b30d487df, attempt 1: acc 1.000  trans 21600  outcome BOUND ROUTED; decoder at 24000: h CTX/KEY/VAL 0.34/1.00/1.00
   start   31.7 min  window_d8        W_LONG                   seed 265  (projected worst case 55 min)
+  [  3]   54.3 min  window_d8        W_LONG                   seed 264  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e191f86, code 375b30d487df, attempt 1: acc 1.000  trans 19200  outcome BOUND ROUTED; decoder at 21600: h CTX/KEY/VAL 0.51/1.00/1.00
+  start   54.3 min  window_d8        W_SPLIT_D98              seed 260  (projected worst case 38 min)
