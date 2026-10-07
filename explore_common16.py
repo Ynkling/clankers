@@ -225,7 +225,9 @@ def run_pool(jobs, workers, dur, budget_s=None, line=None):
     import multiprocessing as mp
     from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
     t0 = time.time()
-    todo = sorted(jobs, key=lambda j: -dur(j))
+    # Muon jobs first (they run only on the batch's CPU; Adam jobs can run on any CPU that passes the repro check),
+    # then longest first
+    todo = sorted(jobs, key=lambda j: (j.get("opt") != "muon", -dur(j)))
     retried = set()
     done = 0
 
