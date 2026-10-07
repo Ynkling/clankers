@@ -1,0 +1,132 @@
+{
+ "meta": {
+  "arms": {
+   "W_D98": {
+    "iters": 2400,
+    "key": "W_D98",
+    "label": "LOCAL3_SLOW_D8_A at decay 0.98",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98",
+    "seeds": [
+     260
+    ]
+   },
+   "W_LONG": {
+    "iters": 2400,
+    "key": "W_LONG",
+    "label": "LOCAL3_SLOW_D8_A to 43200 updates",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     260
+    ]
+   },
+   "W_M_REF": {
+    "iters": 2400,
+    "key": "W_M_REF",
+    "label": "LOCAL3_SLOW_D8_M, fresh on this CPU (reference)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "needed_by": [
+     [
+      "window_d8",
+      "W_SPLIT_M"
+     ]
+    ],
+    "opt": "muon",
+    "pair": null,
+    "ref": true,
+    "sched": "Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge",
+    "seeds": [
+     260
+    ]
+   },
+   "W_NOSLOW": {
+    "iters": 2400,
+    "key": "W_NOSLOW",
+    "label": "LOCAL3_SLOW_D8_A at a single rate",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "every trainable parameter 0.001 throughout; W_h frozen (unused); no hinge",
+    "seeds": [
+     260
+    ]
+   },
+   "W_SPLIT": {
+    "iters": 2400,
+    "key": "W_SPLIT",
+    "label": "LOCAL3_SLOW_D8_A + the KEYMASS trigger (<= 3 splits)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed",
+    "seeds": [
+     260
+    ]
+   },
+   "W_SPLIT_D98": {
+    "iters": 2400,
+    "key": "W_SPLIT_D98",
+    "label": "LOCAL3_SLOW_D8_A at decay 0.98 + the KEYMASS trigger",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed",
+    "seeds": [
+     260
+    ]
+   },
+   "W_SPLIT_M": {
+    "iters": 2400,
+    "key": "W_SPLIT_M",
+    "label": "LOCAL3_SLOW_D8_M + the KEYMASS trigger (<= 3 splits)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "pair": "D8_M",
+    "sched": "Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed",
+    "seeds": [
+     260
+    ]
+   },
+   "W_WIDTH4": {
+    "iters": 2400,
+    "key": "W_WIDTH4",
+    "label": "LOCAL3_SLOW_D8_A with a width-4 window",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "pair": "D8_A",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; window width 4",
+    "seeds": [
+     260
+    ]
+   }
+  },
+  "code_shas": [
+   "375b30d487df39f5474a6fa81656ff0458bf5eb7"
+  ],
+  "cut": [],
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "f91f08b",
+   "python": "3.11.15",
+   "started": "2026-10-07 14:37:43",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

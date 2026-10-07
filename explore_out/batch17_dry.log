@@ -43,3 +43,60 @@ EXPLORATORY, NOT A RESULT — batch 17: window_d8 (S48), window_fail (S49) — D
   lr for dry_window_d8 W_SPLIT_M: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
   lr for dry_window_d8 W_M_REF: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
   lr for dry_window_fail LOCAL3_SLOW_RERUN: 0.001; iters 2400; seeds 163-163 (1)
+  CHECK dry_window_fail: the (stream, key) cell table on a synthetic gate (stream 0 on channel 0; stream 1 on channel 0 for keys 0, 1 and on channel 1 for keys 2, 3): KEY [[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 0.0, 0.0]], VAL [[1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 0.0, 0.0]]; soft share 0.0; eta^2 by cell 1.000 (1 = p fixed by the cell): ok
+  CHECK dry_window_fail: cells() carries test_router_layout.routing_stats unchanged (the eta^2 and margin fail_class reads): ok
+  CHECK dry_window_fail: the dense measurements are inert: LOCAL3_SLOW|163 through 2400 with them equals S43's run code without them (curve [[1200, 0.30810546875, 2.3693504333496094], [2400, 0.533203125, 1.5524489879608154]]; statistics and decoder equal True); 61 measurements at [0, 25, 50, 75, 100]..2400, 2400 updates: ok
+  CHECK dry_window_fail: the nine seeds are S43's unbound LOCAL3_SLOW seeds (40 records of code 46867e792241; not DISCOVERED: [163, 169, 173, 183, 185, 186, 188, 192, 197]; classes ['STREAM-PARTIAL', 'KEY', 'KEY', 'STREAM-PARTIAL', 'STREAM-PARTIAL', 'KEY', 'STREAM-PARTIAL', 'KEY', 'STREAM-PARTIAL']): ok
+  CHECK dry_window_d8: to_local_w(3) is explore_b16_gates.to_local (batch 16's LOCAL3 conversion): ok
+  CHECK dry_window_d8: width 4: the conversion keeps every parameter of the run path's model bitwise (9), adds only ['gate_conv.conv_w'] of shape (32, 4) = window_init_w(seed, 4) (|w| max 0.4990 <= 0.5), W_h frozen (True); window_init_w(seed, 3) equals batch 1's window (True): ok
+  CHECK dry_window_d8: width 3: the gate at t = 30 ignores token t-3 (True) and sees token t-2 (True): ok
+  CHECK dry_window_d8: width 4: the gate at t = 30 ignores token t-4 (True) and sees token t-3 (True): ok
+  CHECK dry_window_d8: with the windows at [1, 0, 0] and [1, 0, 0, 0] the width-3 and width-4 gates are equal (max |diff| 0.00e+00): ok
+  CHECK dry_window_d8: decay 0.98 on the LOCAL3 model: parameters and buffers equal (True); attention attributes that differ ['decay']; gate equal (True); logits differ (True) and equal the 0.95 model's bit for bit with the decay set back (True); set_decay is S46's: ok
+  CHECK dry_window_d8: W_NOSLOW: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.001], 2400 [0.001, 0.001], 2401 [0.001, 0.001]; window width 3, decay 0.95: ok
+  CHECK dry_window_d8: W_WIDTH4: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]; window width 4, decay 0.95: ok
+  CHECK dry_window_d8: W_D98: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]; window width 3, decay 0.98: ok
+  CHECK dry_window_d8: the trigger at cap 2 equals S37's make_trigger row for row over checks 2400..26400 (fired at [4800, 9600] vs [4800, 9600]; W_g equal after): ok
+  CHECK dry_window_d8: the trigger at cap 3 (Adam): fired at [4800, 9600, 14400], blocked by the 4800 gap at [7200, 12000], by the cap at [16800, 19200, 21600, 24000, 26400] (from the third split on the cap is named); each split copies W_g's row c* onto c0 with noise (row distances after [0.0976, 0.092, 0.0846] > 0) and zeroes W_g's Adam state (exp_avg, exp_avg_sq zero after: True); targets labelled [(6, 4, False), (6, 1, False), (6, 8, False)]: ok
+  CHECK dry_window_d8: the trigger under Muon: W_g is in the Muon optimizer (True); fired at [4800]; W_g's Muon state ['momentum_buffer'] nonzero before and zero after (True): ok
+  CHECK dry_window_d8: with the trigger's threshold at 0, W_SPLIT|260 equals batch 16's LOCAL3_SLOW_D8_A|260 (Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 6000 (curve [[1200, 0.060546875, 2.809293270111084], [2400, 0.1005859375, 2.770794153213501], [3600, 0.09716796875, 2.7249908447265625], [4800, 0.09423828125, 2.714980363845825], [6000, 0.15966796875, 2.5879364013671875]]; statistics and the decoder at [1200, 2400, 4800] equal: True; checks logged at [2400, 4800], 0 splits): ok
+  CHECK dry_window_d8: with the threshold at 0, W_SPLIT_M|260 equals its Muon pair (W_M_REF) bit for bit through 3600 (curve [[1200, 0.068359375, 2.9911153316497803], [2400, 0.2373046875, 2.4884212017059326], [3600, 0.43359375, 1.5793131589889526]]; True): ok
+  CHECK batch 17: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (9.0 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_window_d8
+  idea    one-knob changes to the eight-stream window gate (LOCAL3_SLOW_D8_A, 3/10): splits, decay 0.98, length, one rate, width 4
+  source  batch 16's S44(b) (the window gate broke the eight-stream stall at 3/10 Adam and 3/10 Muon); the user's batch 17
+  change  LOCAL3_SLOW_D8_A + S37's KEYMASS trigger (<= 3 splits) / decay 0.98 / both / 43200 updates / one rate 1e-3 / a width-4 window; LOCAL3_SLOW_D8_M + the trigger
+  arm W_SPLIT      lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_A + the KEYMASS trigger (<= 3 splits)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_D98        lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_A at decay 0.98
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98
+  arm W_SPLIT_D98  lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_A at decay 0.98 + the KEYMASS trigger
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; decay 0.98; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_LONG       lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_A to 43200 updates
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm W_NOSLOW     lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_A at a single rate
+                   schedule: every trainable parameter 0.001 throughout; W_h frozen (unused); no hinge
+  arm W_WIDTH4     lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_A with a width-4 window
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; window width 4
+  arm W_SPLIT_M    lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_M + the KEYMASS trigger (<= 3 splits)
+                   schedule: Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_M_REF      lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_M, fresh on this CPU (reference)
+                   schedule: Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge
+  pairing seeds 260-269: the Adam arms with batch 16's LOCAL3_SLOW_D8_A records; W_SPLIT_M with LOCAL3_SLOW_D8_M on the same CPU (batch 16's records or W_M_REF); same initial parameters (+ the window) and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_window_fail
+  idea    classify LOCAL3_SLOW's nine unbound two-stream runs (S43): the gate at the write positions, and when key splits form
+  source  batch 16's S43 (LOCAL3_SLOW 31/40; failures STREAM-PARTIAL 5, KEY 4); the user's batch 17
+  change  none to the runs (S43's run code on the nine seeds); the gate measured densely early and at every evaluation
+  arm LOCAL3_SLOW_RERUN lr 0.001  iters 2400  seeds 163-163 (1)  — S43's LOCAL3_SLOW on its nine unbound seeds, rerun with dense gate measurements
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused)
+  pairing each rerun against its own S43 record (must reproduce it bit for bit)
+----------------------------------------------------------------------------------------------------
+  9 runs queued on 4 workers (1 torch thread each)
+  start    0.0 min  dry_window_d8    W_M_REF                  seed 260  (projected worst case 3 min)
+  start    0.0 min  dry_window_d8    W_SPLIT_M                seed 260  (projected worst case 3 min)
+  start    0.0 min  dry_window_d8    W_SPLIT_D98              seed 260  (projected worst case 3 min)
+  start    0.0 min  dry_window_d8    W_WIDTH4                 seed 260  (projected worst case 3 min)
