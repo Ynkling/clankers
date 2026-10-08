@@ -32,3 +32,15 @@ EXPLORATORY, NOT A RESULT — session H: H/eight, H/stability
   start    0.0 min  H/eight          SPLIT                    seed 461  (projected worst case 720 min)
   start    0.0 min  H/eight          SPLIT                    seed 462  (projected worst case 720 min)
   start    0.0 min  H/eight          SPLIT                    seed 463  (projected worst case 720 min)
+  [  1]   24.4 min  H/eight          SPLIT                    seed 460  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f4810e1, code 91494b36315e, attempt 1: acc 1.000  trans 19200  outcome BOUND ROUTED; map [13, 1, 0, 14, 2, 11, 15, 8] key [13, 1, 0, 14, 2, 11, 15, 8]; split fired at [4800, 9600, 16800]
+  start   24.4 min  H/eight          SPLIT                    seed 464  (projected worst case 720 min)
+  [  2]   31.0 min  H/eight          SPLIT                    seed 461  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f4810e1+dirty, code 91494b36315e, attempt 1: acc 1.000  trans 22800  outcome BOUND ROUTED; map [0, 8, 9, 15, 7, 10, 11, 13] key [0, 8, 9, 15, 7, 10, 11, 13]; split fired at [9600, 14400, 21600]
+  start   31.0 min  H/eight          SPLIT                    seed 465  (projected worst case 720 min)
+  [  3]   34.6 min  H/eight          SPLIT                    seed 463  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f4810e1+dirty, code 91494b36315e, attempt 1: acc 1.000  trans 26400  outcome BOUND ROUTED; map [1, 2, 5, 11, 8, 0, 13, 7] key [1, 2, 5, 11, 8, 0, 13, 7]; split fired at [12000, 16800, 21600]
+  start   34.6 min  H/eight          SPLIT                    seed 466  (projected worst case 720 min)
+  [  4]   37.9 min  H/eight          SPLIT                    seed 462  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f4810e1+dirty, code 91494b36315e, attempt 1: acc 1.000  trans 27600  outcome BOUND ROUTED; map [11, 12, 15, 0, 9, 4, 10, 6] key [11, 12, 15, 0, 9, 4, 10, 6]; split fired at [12000, 26400]
+  start   37.9 min  H/eight          SPLIT                    seed 467  (projected worst case 720 min)
