@@ -9,7 +9,8 @@ gate_conv.conv_w at 1e-3 throughout; every other trainable parameter (the memory
 included) at 1e-4 for updates 1-2400 and 1e-3 after (switched after the evaluation at 2400); no hinge.
   A_DELTA        test_short_conv.TASK (grouped S=2, P=4, k=2, no conv): S43's own run path (s43c.builder, groups,
                  make_check with S38's decoder at 1200/2400/4800/end, stats explore_common2.stats_b2) with the built
-                 model converted by explore_delta_mem.to_delta(beta="learned") (L2 keys, tied write, decay 0.95).
+                 model converted by explore_delta_mem.to_delta(beta="learned") (L2 keys, tied write, decay 0.95),
+                 evaluated by explore_f_delta_fast (impl "fast": the parallel form's numbers, a faster evaluation).
   D_DELTA, D_HEBB  explore_f_tasks.RandHeaderTask() (S=2, P=8, NB=2, blocks 2..6; vocab 26): the same model rule built
                  on this task's vocabulary (explore_local_gate.LocalGateBDH with test_channel_binding's ARCH and arm A,
                  the same seeding as make_model), the same groups and switch, stats explore_f_tasks.rand_header_stats at
@@ -29,6 +30,7 @@ from torch.optim.optimizer import register_optimizer_step_pre_hook, register_opt
 import explore_common as ec
 import explore_common2 as c2
 import explore_delta_mem as dm
+import explore_f_delta_fast as ff
 import explore_local_gate as s1
 import explore_b16_gates as g16
 import explore_window_recipe_child as s43c
@@ -76,7 +78,7 @@ def builder(arm_name):
                 m = s43c.builder(True)(a, seed)()                  # S43's LOCAL3_SLOW model, unchanged
             else:
                 m = local_model(task, a, seed)
-            return dm.to_delta(m, seed=seed, **DELTA_KW) if arm["delta"] else m
+            return ff.to_delta_fast(m, seed=seed, **DELTA_KW) if arm["delta"] else m
         return make
     return b
 
@@ -178,6 +180,10 @@ def _lrs(arm_name, seed, iters):
 
 def checks(p):
     rows = []
+    for nm, v in ff.fast_checks():
+        rows.append((f"explore_f_delta_fast: {nm}", v))
+    for nm, v in ff.model_checks(lambda: s43c.builder(True)(s43c.A, 310)(), ec.TASK):
+        rows.append((f"explore_f_delta_fast, grouped LOCAL3: {nm}", v))
     for nm, v in ft.check_rand_header():
         rows.append((f"RandHeaderTask: {nm}", v))
     # models

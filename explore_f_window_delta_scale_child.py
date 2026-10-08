@@ -17,7 +17,8 @@ ARMS
                 >= 4800 apart; the last check at the run's length - 2400; S24's split of W_g's row c* onto c0, W_g's Adam
                 state zeroed); no hinge; the Hebbian memory. S38's decoder after every evaluation.
   {B,C}_DELTA   the same, the model converted by explore_delta_mem.to_delta(beta="learned") after to_local (L2 keys, tied
-                write, decay 0.95); attn.w_b, attn.b_b in the 'rest' group.
+                write, decay 0.95), evaluated by explore_f_delta_fast (impl "fast": the parallel form's numbers, a faster
+                evaluation for k = 16); attn.w_b, attn.b_b in the 'rest' group.
   {B,C}_ORACLE_{HEBB,DELTA}  the perfect gate (ceiling4k16 / ceil8_D8, k = 16), the perfect gate's own recipe (one Adam
                 at 1e-3 on every parameter, no slow phase, no trigger), Hebbian or delta (learned beta).
 """
@@ -35,6 +36,7 @@ import explore_window_d8_child as wd8c
 import explore_b16_gates as g16
 import explore_b16_main as b16
 import explore_delta_mem as dm
+import explore_f_delta_fast as ff
 import test_stream_recipe as tsr
 
 MAX_SPLITS = 3
@@ -55,17 +57,17 @@ def arm_model(arm):
     return b16.arm_of(arm["cfg"])
 
 
-def convert_of(arm, impl="parallel"):
+def convert_of(arm, impl="fast"):
     conv = () if arm.get("perfect") else (g16.to_local,)
     if arm["delta"]:
-        conv = conv + (dm.converter(impl=impl, **DELTA_KW),)
+        conv = conv + ((ff.converter(**DELTA_KW),) if impl == "fast" else (dm.converter(impl=impl, **DELTA_KW),))
     return conv
 
 
 def build_rc(arm_name, p, holder, out, info):
     arm = ARM[arm_name]
     task = b16.task_of(arm["cfg"])
-    conv = convert_of(arm, p.get("impl", "parallel"))
+    conv = convert_of(arm, p.get("impl", "fast"))
     box = p.get("box")
     on_build = (lambda m: box.__setitem__("m", m)) if box is not None else None
     if arm.get("perfect"):
@@ -136,7 +138,7 @@ def checks(p):
         if cpu != REC_CPU:
             rows.append((f"{cfg}: recorded {key} NOT APPLICABLE on {cpu}", True))
             continue
-        for arm_name, impl in ((arm_h, "parallel"), (arm_d, "hebb")):
+        for arm_name, impl in ((arm_h, "fast"), (arm_d, "hebb")):
             t0 = time.time()
             r = run(dict(arm=arm_name, seed=seed, iters=t, total=total, impl=impl))
             same, want = b16.same_upto(r, ref, t)
@@ -144,6 +146,12 @@ def checks(p):
             rows.append((f"{cfg}: {arm_name} (memory impl {impl}) on seed {seed} reproduces {key} through {t} bit for bit "
                          f"(curve {r['curve']} vs {want}; statistics equal {same}; decoder at 1200/2400 equal {dec}; "
                          f"{time.time() - t0:.0f} s)", same and dec))
+    # (1b) the fast evaluation of the delta memory (explore_f_delta_fast)
+    for nm, v in ff.fast_checks():
+        rows.append((f"explore_f_delta_fast: {nm}", v))
+    a8 = b16.arm_of("b")
+    for nm, v in ff.model_checks(lambda: g16.to_local(tsr.builder_for(a8)(a8, 310)(), 310), b16.task_of("b")):
+        rows.append((f"explore_f_delta_fast, S=8 k=16 LOCAL3 + conv: {nm}", v))
     # (2) groups: the memory's parameters are in the 'rest' group; the gate group is LOCAL3's
     for cfg in ("k16", "b"):
         a = b16.arm_of(cfg)
