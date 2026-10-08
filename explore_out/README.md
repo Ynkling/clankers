@@ -540,3 +540,21 @@ Handed back as promising for a pre-registered test on the main branch: S48's W_S
 memory, no hinge and S37's KEYMASS split trigger (<= 3 splits) at eight streams: 9/10 BOUND ROUTED against 3/10 for the same
 seeds without the trigger (6 / 0 discordant, p = 0.031), every split targeted as labelled. W_SPLIT_D98 (8/10) adds nothing
 the splits do not. Not: W_D98, W_LONG. Cut: W_NOSLOW, W_WIDTH4, W_SPLIT_M. Descriptive: S49.
+
+## Session H
+
+Branch claude/explore-H, seeds 420-479, outputs in `explore_out/H/` (reports `report_1.md`, `report_2.md`; logs `s58.log`,
+`s58b_s60.log`, `s58_check_failed.log`; stores `collapse_results.json`, `eight_results.json`, `stability_results.json`). One
+thread per run on a Xeon @ 2.10GHz, torch 2.14.0+cu130. X's arm A was reproduced bit for bit in every invocation. EXPLORATORY,
+not a result.
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S58 collapse (S=4, k=16; 40 paired seeds) | BOUND ROUTED: SPLIT 39, RESET 39, GUMBEL_W 37, SWITCH 36, NONE 38, GUMBEL_RW 5 (33 MERGED); oracle 2/2 | R1 noise replaces the split: does not apply; R2 the split is the reset: holds by rule, uninformative (SPLIT vs NONE 1 vs 0); R3 balance loss helps: does not apply |
+| S58b eight (S=8, k=16, 43200; 10 seeds) | SPLIT 10/10, RESET 2/10 (8 MERGED), GUMBEL_W 0/10 (10 MERGED); oracle 2/2 | does not carry (SPLIT only 8 and 10 vs 0) |
+| S60 stability (S=2, k=2; 10 seeds) | DISCOVERED: REF 8, TEMP_FLOOR 7, STABLEMAX 7, EMA_EVAL 8; ceiling_conv 2/2 | no change at n = 10; saturation is never reached before binding; EMA asymmetry uninformative |
+
+Handed back for a pre-registered test: at eight streams the split's row copy, not its Adam reset, is the effective part
+(SPLIT 10/10 vs RESET 2/10 on the same trigger). Not promising: Gumbel gate noise (on the read side it collapses even
+four streams), the Switch loss (it moves KEY and VAL routing onto different channels; margin 0.46), the temperature floor,
+stable-max.
