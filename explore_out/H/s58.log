@@ -497,3 +497,18 @@ EXPLORATORY, NOT A RESULT — session H: H/collapse
   [154]  257.2 min  H/collapse       GUMBEL_RW                seed 451  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7f73eb0+dirty, code 9c9172a89d60, attempt 1: acc 0.516  trans  None  outcome MERGED (2 share); map [10, 1, 10, 1] key [10, 1, 10, 1]
   start  257.2 min  H/collapse       GUMBEL_RW                seed 457  (projected worst case 480 min)
+  [155]  269.3 min  H/collapse       GUMBEL_RW                seed 454  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34a567a, code 9c9172a89d60, attempt 1: acc 0.491  trans  None  outcome MERGED (2 share); map [10, 15, 10, 15] key [10, 15, 10, 15]
+  start  269.3 min  H/collapse       GUMBEL_RW                seed 458  (projected worst case 480 min)
+  [156]  269.6 min  H/collapse       GUMBEL_RW                seed 455  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34a567a+dirty, code 9c9172a89d60, attempt 1: acc 0.748  trans  None  outcome MERGED (2 share); map [0, 11, 11, 12] key [0, 11, 11, 12]
+  start  269.6 min  H/collapse       GUMBEL_RW                seed 459  (projected worst case 480 min)
+  [157]  271.2 min  H/collapse       GUMBEL_RW                seed 456  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34a567a+dirty, code 9c9172a89d60, attempt 1: acc 0.747  trans  None  outcome MERGED (2 share); map [12, 4, 11, 4] key [12, 4, 11, 4]
+  start  271.2 min  H/collapse       SWITCH                   seed 420  (projected worst case 480 min)
+  [158]  272.3 min  H/collapse       GUMBEL_RW                seed 457  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34a567a+dirty, code 9c9172a89d60, attempt 1: acc 0.751  trans  None  outcome MERGED (2 share); map [14, 14, 8, 10] key [14, 14, 8, 10]
+  start  272.3 min  H/collapse       SWITCH                   seed 421  (projected worst case 480 min)
+  [159]  274.1 min  H/collapse       GUMBEL_RW                seed 459  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34a567a+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  4800  outcome BOUND ROUTED; map [7, 6, 13, 4] key [7, 6, 13, 4]
+  start  274.1 min  H/collapse       SWITCH                   seed 422  (projected worst case 480 min)
