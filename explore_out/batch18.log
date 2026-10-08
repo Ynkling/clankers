@@ -574,3 +574,9 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [  5]   65.3 min  window_recipe_ablation W_RESET                  seed 261  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; W_g's Adam state zeroed after the evaluations at batch 17's W_SPLIT split updates (per seed))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 4123fa1, code 300b8e0ba54a, attempt 1: acc 0.738  trans  None  outcome MERGED (2 share); decoder at 28800: h CTX/KEY/VAL 0.32/0.80/0.83; resets at [4800, 14400]
   start   65.3 min  window_recipe_ablation W_RESET                  seed 263  (projected worst case 35 min)
+  [  6]   66.4 min  window_recipe_ablation W_M_REF                  seed 269  lr 0.001, Muon lr 0.005  (Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a4f8468, code 300b8e0ba54a, attempt 1: acc 0.866  trans  None  outcome MERGED (2 share); decoder at 28800: h CTX/KEY/VAL 0.19/0.93/0.98
+  start   66.4 min  window_recipe_ablation W_RESET                  seed 264  (projected worst case 35 min)
+  [  7]   66.4 min  window_recipe_ablation W_RESET                  seed 262  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; W_g's Adam state zeroed after the evaluations at batch 17's W_SPLIT split updates (per seed))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a4f8468+dirty, code 300b8e0ba54a, attempt 1: acc 0.881  trans  None  outcome MERGED (2 share); decoder at 28800: h CTX/KEY/VAL 0.36/0.93/0.99; resets at [19200]
+  start   66.4 min  window_recipe_ablation W_RESET                  seed 265  (projected worst case 35 min)
