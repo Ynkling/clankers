@@ -135,3 +135,6 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [ 13]   82.4 min  window_recipe_ablation W_M_REF                  seed 260  lr 0.001, Muon lr 0.005  (Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 3c217c2, code 300b8e0ba54a, attempt 1: acc 0.762  trans  None  outcome MERGED (2 share); decoder at 28800: h CTX/KEY/VAL 0.18/0.97/0.97
   start   82.4 min  split_k4         W4k4_SPLIT               seed 241  (projected worst case 15 min)
+  [ 14]   84.8 min  split_k4         W4k4_SPLIT               seed 240  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a70f6a8, code 6c8051a868ff, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; decoder at 8400: h CTX/KEY/VAL 0.48/1.00/1.00; splits 0 at []
+  start   84.8 min  split_k4         W4k4_SPLIT               seed 242  (projected worst case 15 min)
