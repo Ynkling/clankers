@@ -341,3 +341,136 @@ EXPLORATORY, NOT A RESULT — Session F s53 (F/delta_controls)
   [100]  108.3 min  F/delta_controls SINGLE_HEBB_H            seed 303  lr 0.001  (Adam 0.001 throughout)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git bd1c954+dirty, code 429221e60279, attempt 1: acc 0.334  trans  None  unbound  last/notlast 0.33/0.34
   start  108.3 min  F/delta_controls SINGLE_HEBB_H            seed 307  (projected worst case 5 min)
+  [101]  112.2 min  F/delta_controls SINGLE_HEBB_H            seed 304  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 147e5cf, code 429221e60279, attempt 1: acc 0.976  trans 24000  BOUND  last/notlast 0.95/1.00
+  [102]  112.6 min  F/delta_controls SINGLE_HEBB_H            seed 305  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 147e5cf+dirty, code 429221e60279, attempt 1: acc 0.369  trans  None  unbound  last/notlast 0.41/0.32
+  [103]  112.9 min  F/delta_controls SINGLE_HEBB_H            seed 306  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 147e5cf+dirty, code 429221e60279, attempt 1: acc 0.936  trans  None  unbound  last/notlast 0.88/0.99
+  [104]  113.1 min  F/delta_controls SINGLE_HEBB_H            seed 307  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 147e5cf+dirty, code 429221e60279, attempt 1: acc 0.319  trans  None  unbound  last/notlast 0.32/0.32
+  2 runs left for the next segment: none fits in the 2 min left of this one (worst-case projections)
+  segment saved 104 runs
+  runs left: 2
+exit 0
+=== queue: S53 resume Thu Oct  8 06:09:43 UTC 2026
+==============================================================================================================
+EXPLORATORY, NOT A RESULT — Session F s53 (F/delta_controls)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 147e5cf+dirty | python 3.11.17 | torch threads 1 | started 2026-10-08 06:09:44
+==============================================================================================================
+  code SHA F/delta_controls: 429221e60279 over 23 modules (bdh, bdh_recurrent, explore_common, explore_common2, explore_delta_mem, explore_f_delta_controls_child, explore_f_tasks, explore_far_cue, explore_local_gate, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  CHECK C1 parallel = sequential over 24 cases (beta 0 / 0.5 / 1 / per token, write tied / 1, decay fixed / routed / per-channel): forward max |diff| 4.44e-16 <= 1e-10, gradients 2.22e-15 <= 1e-8: ok
+  CHECK C2 LOCAL3 S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 2.38e-06 (relative 2.4e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.49e-07, attention outputs 3.81e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 perfect S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.27e-07, attention outputs 6.68e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 single k=1 (arm B), parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 8.58e-06 (relative 5.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.19e-07, attention outputs 5.96e-07 (relative 3.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.79e-07, attention outputs 4.77e-07 (relative 3.9e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C3 oracle gate, grouped, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C4 overwrite (beta 1, L2 keys, one channel, decay 0.95, float32): ‖S k̂ − v2‖ = 1.56e-06 after (k, v1), (k, v2); 1.09e-06 with 6 other writes between; the parallel read at a later key-k position equals 0.95·v2 to 1.59e-06 / 1.46e-06; all < 1e-5: ok
+  CHECK C5 learned beta = 0.5 exactly at init (True); to_delta keeps every existing parameter (True) and adds ['attn.w_b', 'attn.b_b']: ok
+  CHECK C5 routed decay at init: alpha at g = 1 0.9500000 (0.95 to 1e-6), at g = 0 1.0 (exactly 1), at g = 0.3 / 0.7 0.98473 / 0.96473; delta0 -2.6037: ok
+  CHECK C5 GDN decay init (seed 350, k = 2): A [2.198, 13.653], dt [0.06425, 0.00468] (softplus(b_dt) recovers dt), alpha at init [0.8683, 0.9381]; w_a = 0; same seed same draw, another seed another: ok
+  CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.10GHz (38 s): ok
+  ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
+  (explore_f_delta_checks: 44 s, all passed)
+  CHECK F/delta_controls: grouped: models as stated (k, gate, memory, beta, no conv); SINGLE_DELTA and SINGLE_HEBB share every initial parameter (True); SINGLE_DELTA_L shares them and adds attn.w_b, attn.b_b (True); ORACLE_DELTA and ORACLE_HEBB share every initial parameter (True): ok
+  CHECK F/delta_controls: header: models as stated (k, gate, memory, beta, no conv); SINGLE_DELTA and SINGLE_HEBB share every initial parameter (True); SINGLE_DELTA_L shares them and adds attn.w_b, attn.b_b (True); ORACLE_DELTA and ORACLE_HEBB share every initial parameter (True): ok
+  CHECK F/delta_controls: header8: models as stated (k, gate, memory, beta, no conv); SINGLE_DELTA and SINGLE_HEBB share every initial parameter (True); SINGLE_DELTA_L shares them and adds attn.w_b, attn.b_b (True); ORACLE_DELTA and ORACLE_HEBB share every initial parameter (True): ok
+  CHECK F/delta_controls: P = 8 header task: L = 37, qpos = [35], vocab 26: ok
+  timings reused from explore_out/F/s53_runtime.json
+  2 runs queued; projected worst case 0.16 h of runs, makespan 0.08 h on 4 workers
+  start    0.0 min  F/delta_controls SINGLE_HEBB_H            seed 308  (projected worst case 5 min)
+  start    0.0 min  F/delta_controls SINGLE_HEBB_H            seed 309  (projected worst case 5 min)
+  [  1]    4.6 min  F/delta_controls SINGLE_HEBB_H            seed 309  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 147e5cf+dirty, code 429221e60279, attempt 1: acc 0.311  trans  None  unbound  last/notlast 0.33/0.29
+  [  2]    4.7 min  F/delta_controls SINGLE_HEBB_H            seed 308  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 147e5cf+dirty, code 429221e60279, attempt 1: acc 0.820  trans  None  unbound  last/notlast 0.72/0.93
+  segment saved 2 runs
+  runs left: 0
+### S53 delta_controls — counts (BOUND; Wilson 95%; band)
+
+| arm | layout | BOUND | transitions: median (all) | final acc median | write order: acc last / not-last / last-written value among not-last (medians) |
+|---|---|---|---|---|---|
+| SINGLE_HEBB_G | grouped | 0/10 [0.00, 0.28] NEVER of 10 | -- | 0.49 | 0.53 / 0.45 / 0.55 |
+| SINGLE_HEBB_H | header | 1/10 [0.02, 0.40] MINORITY of 10 | 24000 (24000) | 0.40 | 0.37 / 0.44 / 0.04 |
+| SINGLE_DELTA_G | grouped | 4/10 [0.17, 0.69] MINORITY of 10 | 3600 (2400, 3600, 3600, 4800) | 0.52 | 0.53 / 0.53 / 0.44 |
+| SINGLE_DELTA_H | header | 8/10 [0.49, 0.94] MAJORITY of 10 | 2400 (1200, 2400, 2400, 2400, 2400, 2400, 2400, 2400) | 1.00 | 0.99 / 1.00 / 0.00 |
+| SINGLE_DELTA_L_G | grouped | 0/10 [0.00, 0.28] NEVER of 10 | -- | 0.22 | 0.22 / 0.22 / 0.25 |
+| SINGLE_DELTA_L_H | header | 0/10 [0.00, 0.28] NEVER of 10 | -- | 0.32 | 0.31 / 0.32 / 0.07 |
+| ORACLE_HEBB_G | grouped | 10/10 [0.72, 1.00] RELIABLE of 10 | 1200 (1200, 1200, 1200, 1200, 1200, 1200, 2400, 2400, 2400, 6000) | 1.00 | 1.00 / 1.00 / 0.00 |
+| ORACLE_HEBB_H | header | 10/10 [0.72, 1.00] RELIABLE of 10 | 1200 (1200, 1200, 1200, 1200, 1200, 1200, 1200, 2400, 2400, 4800) | 1.00 | 1.00 / 1.00 / 0.00 |
+| ORACLE_DELTA_G | grouped | 10/10 [0.72, 1.00] RELIABLE of 10 | 1200 (1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200) | 1.00 | 1.00 / 1.00 / 0.00 |
+| ORACLE_DELTA_H | header | 10/10 [0.72, 1.00] RELIABLE of 10 | 1200 (1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200) | 1.00 | 1.00 / 1.00 / 0.00 |
+| ORACLE_HEBB_P8 | header8 | 3/3 [0.44, 1.00] RELIABLE of 3 | 18000 (14400, 18000, 24000) | 1.00 | 1.00 / 1.00 / 0.00 |
+| ORACLE_DELTA_P8 | header8 | 3/3 [0.44, 1.00] RELIABLE of 3 | 4800 (2400, 4800, 6000) | 1.00 | 1.00 / 1.00 / 0.00 |
+
+Validity (perfect gate binds on >= 2 of seeds 300-302):
+
+- grouped: ORACLE_DELTA 3/3 -> VALID (the delta reading needs this)
+- grouped: ORACLE_HEBB 3/3 -> VALID (printed)
+- header: ORACLE_DELTA 3/3 -> VALID (the delta reading needs this)
+- header: ORACLE_HEBB 3/3 -> VALID (printed)
+
+Paired (same seeds and batches; exact one-sided McNemar):
+
+- grouped: SINGLE_HEBB 0/10 vs SINGLE_DELTA 4/10: SINGLE_HEBB only 0, SINGLE_DELTA only 4, p(SINGLE_HEBB > SINGLE_DELTA) = 1
+- grouped: SINGLE_HEBB 0/10 vs SINGLE_DELTA_L 0/10: SINGLE_HEBB only 0, SINGLE_DELTA_L only 0, p(SINGLE_HEBB > SINGLE_DELTA_L) = 1
+- grouped: ORACLE_DELTA 10/10 vs ORACLE_HEBB 10/10: ORACLE_DELTA only 0, ORACLE_HEBB only 0, p(ORACLE_DELTA > ORACLE_HEBB) = 1
+- header: SINGLE_HEBB 1/10 vs SINGLE_DELTA 8/10: SINGLE_HEBB only 0, SINGLE_DELTA only 7, p(SINGLE_HEBB > SINGLE_DELTA) = 1
+- header: SINGLE_HEBB 1/10 vs SINGLE_DELTA_L 0/10: SINGLE_HEBB only 1, SINGLE_DELTA_L only 0, p(SINGLE_HEBB > SINGLE_DELTA_L) = 0.5
+- header: ORACLE_DELTA 10/10 vs ORACLE_HEBB 10/10: ORACLE_DELTA only 0, ORACLE_HEBB only 0, p(ORACLE_DELTA > ORACLE_HEBB) = 1
+- header P=8 (48000): ORACLE_DELTA 3/3 vs ORACLE_HEBB 3/3: delta only 0, hebb only 0, p = 1
+
+READING R1: **neither** (SINGLE_DELTA 4/10 grouped, 8/10 header; SINGLE_HEBB 0/10, 1/10; rule: SINGLE_DELTA <= 1/10 on both and SINGLE_HEBB >= 3/10 on one, both layouts valid)
+
+READING R2: **neither** (seeds where ORACLE_DELTA binds and ORACLE_HEBB does not: 0 of 3; rule >= 2)
+
+Write order (descriptive; median run per layout; held-out 2048):
+
+- grouped SINGLE_DELTA: acc last 0.53, not-last 0.53, last-written value among not-last 0.44; by query stream 0.52 / 0.52 -> does not
+- grouped SINGLE_DELTA_L: acc last 0.22, not-last 0.22, last-written value among not-last 0.25; by query stream 0.21 / 0.22
+- grouped SINGLE_HEBB: acc last 0.53, not-last 0.45, last-written value among not-last 0.55; by query stream 0.50 / 0.48
+- header SINGLE_DELTA: acc last 0.99, not-last 1.00, last-written value among not-last 0.00; by query stream 1.00 / 1.00 -> does not
+- header SINGLE_DELTA_L: acc last 0.31, not-last 0.32, last-written value among not-last 0.07; by query stream 0.32 / 0.32
+- header SINGLE_HEBB: acc last 0.37, not-last 0.44, last-written value among not-last 0.04; by query stream 0.40 / 0.41
+
+Per seed (BOUND transition or final acc; write order last/not-last):
+
+| seed | SINGLE_HEBB_G | SINGLE_HEBB_H | SINGLE_DELTA_G | SINGLE_DELTA_H | SINGLE_DELTA_L_G | SINGLE_DELTA_L_H | ORACLE_HEBB_G | ORACLE_HEBB_H | ORACLE_DELTA_G | ORACLE_DELTA_H |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 300 | 0.49 (0.54/0.44) | 0.46 (0.40/0.54) | 0.50 (0.54/0.45) | B@2400 (0.99/1.00) | 0.22 (0.22/0.23) | 0.31 (0.32/0.30) | B@2400 (1.00/1.00) | B@4800 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 301 | 0.50 (0.51/0.48) | 0.44 (0.35/0.53) | 0.49 (0.44/0.54) | B@2400 (0.98/0.99) | 0.21 (0.22/0.21) | 0.32 (0.31/0.32) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 302 | 0.50 (0.51/0.49) | 0.34 (0.35/0.32) | 0.50 (0.49/0.51) | 0.33 (0.34/0.32) | 0.21 (0.20/0.22) | 0.33 (0.34/0.31) | B@2400 (1.00/1.00) | B@2400 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 303 | 0.49 (0.56/0.43) | 0.33 (0.33/0.34) | 0.39 (0.39/0.38) | 0.55 (0.55/0.55) | 0.23 (0.25/0.21) | 0.31 (0.32/0.31) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 304 | 0.50 (0.58/0.42) | B@24000 (0.95/1.00) | 0.52 (0.52/0.53) | B@2400 (0.99/0.99) | 0.22 (0.22/0.22) | 0.33 (0.32/0.33) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 305 | 0.48 (0.46/0.51) | 0.37 (0.41/0.32) | B@4800 (1.00/1.00) | B@2400 (1.00/1.00) | 0.22 (0.22/0.22) | 0.33 (0.34/0.33) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 306 | 0.49 (0.57/0.42) | 0.94 (0.88/0.99) | B@3600 (1.00/1.00) | B@2400 (1.00/1.00) | 0.22 (0.22/0.21) | 0.32 (0.31/0.34) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 307 | 0.48 (0.54/0.43) | 0.32 (0.32/0.32) | B@2400 (1.00/1.00) | B@1200 (1.00/1.00) | 0.22 (0.21/0.23) | 0.31 (0.31/0.32) | B@2400 (1.00/1.00) | B@2400 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 308 | 0.49 (0.52/0.47) | 0.82 (0.72/0.93) | 0.51 (0.52/0.49) | B@2400 (1.00/1.00) | 0.22 (0.22/0.22) | 0.22 (0.23/0.21) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+| 309 | 0.49 (0.53/0.46) | 0.31 (0.33/0.29) | B@3600 (1.00/1.00) | B@2400 (0.99/1.00) | 0.21 (0.21/0.20) | 0.32 (0.31/0.33) | B@6000 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) | B@1200 (1.00/1.00) |
+
+P = 8 header per seed: 300: HEBB B@24000, DELTA B@6000; 301: HEBB B@14400, DELTA B@2400; 302: HEBB B@18000, DELTA B@4800
+
+SINGLE_DELTA_L: mean β at CTX / KEY / VAL per layer at the end (median over runs):
+
+- grouped: layer 1 0.30/0.00/0.14; layer 2 0.56/0.00/0.12; layer 3 0.57/0.01/0.16
+- header: layer 1 0.65/0.00/0.35; layer 2 0.49/0.00/0.10; layer 3 0.64/0.00/0.03
+
+Oracle routing check (end, median): ORACLE_HEBB_G margin 1.00; ORACLE_DELTA_G margin 1.00; ORACLE_HEBB_H margin 1.00; ORACLE_DELTA_H margin 1.00
+
+Runs: 106 ok (failed records 0), 7.67 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.10GHz']; git ['147e5cf', '147e5cf+dirty', '91a3d26', '91a3d26+dirty', '93ddb60', '9ddda81', '9ddda81+dirty', 'bb906e5', 'bb906e5+dirty', 'bd1c954', 'bd1c954+dirty', 'da4f065']; code SHA 429221e60279
+exit 0
