@@ -317,3 +317,12 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 15]  857.2 min  F/window_delta_scale C_HEBB                   seed 313  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git af53cb4, code c8612c854acc, attempt 1: acc 1.000  trans 32400  BOUND ROUTED  splits 3  map --
   start  857.2 min  F/window_delta_scale C_HEBB                   seed 316  (projected worst case 58 min)
+  [ 16]  869.5 min  F/window_delta_scale C_HEBB                   seed 315  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 439a406, code c8612c854acc, attempt 1: acc 1.000  trans 27600  BOUND ROUTED  splits 3  map --
+  start  869.5 min  F/window_delta_scale C_HEBB                   seed 317  (projected worst case 58 min)
+  [ 17]  876.0 min  F/window_delta_scale C_HEBB                   seed 314  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 439a406+dirty, code c8612c854acc, attempt 1: acc 0.875  trans  None  MERGED (2 share)  splits 3  map --
+  start  876.0 min  F/window_delta_scale C_HEBB                   seed 318  (projected worst case 58 min)
+  [ 18]  887.9 min  F/window_delta_scale C_HEBB                   seed 316  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 439a406+dirty, code c8612c854acc, attempt 1: acc 1.000  trans 22800  BOUND ROUTED  splits 3  map --
+  start  887.9 min  F/window_delta_scale C_HEBB                   seed 319  (projected worst case 58 min)
