@@ -512,3 +512,36 @@ EXPLORATORY, NOT A RESULT — session H: H/collapse
   [159]  274.1 min  H/collapse       GUMBEL_RW                seed 459  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34a567a+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  4800  outcome BOUND ROUTED; map [7, 6, 13, 4] key [7, 6, 13, 4]
   start  274.1 min  H/collapse       SWITCH                   seed 422  (projected worst case 480 min)
+  [160]  275.7 min  H/collapse       SWITCH                   seed 420  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [2, 0, 12, 3] key [2, 10, 12, 3]
+  start  275.7 min  H/collapse       SWITCH                   seed 423  (projected worst case 480 min)
+  [161]  276.8 min  H/collapse       SWITCH                   seed 421  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [3, 10, 2, 5] key [8, 4, 2, 9]
+  start  276.8 min  H/collapse       SWITCH                   seed 424  (projected worst case 480 min)
+  [162]  278.8 min  H/collapse       SWITCH                   seed 422  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [12, 1, 2, 3] key [14, 1, 7, 3]
+  start  278.8 min  H/collapse       SWITCH                   seed 425  (projected worst case 480 min)
+  [163]  280.4 min  H/collapse       SWITCH                   seed 423  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [0, 15, 12, 8] key [0, 13, 2, 8]
+  start  280.4 min  H/collapse       SWITCH                   seed 426  (projected worst case 480 min)
+  [164]  282.1 min  H/collapse       SWITCH                   seed 424  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  7200  outcome BOUND NOT routed; map [12, 13, 3, 3] key [12, 13, 3, 3]
+  start  282.1 min  H/collapse       SWITCH                   seed 427  (projected worst case 480 min)
+  [165]  283.4 min  H/collapse       SWITCH                   seed 425  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [3, 10, 9, 12] key [13, 7, 0, 4]
+  start  283.4 min  H/collapse       SWITCH                   seed 428  (projected worst case 480 min)
+  [166]  284.4 min  H/collapse       GUMBEL_RW                seed 458  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel read+write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 0.251  trans  None  outcome non-stream KEY; map [15, 15, 8, 15] key [8, 15, 8, 8]
+  start  284.4 min  H/collapse       SWITCH                   seed 429  (projected worst case 480 min)
+  [167]  285.0 min  H/collapse       SWITCH                   seed 426  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [9, 13, 3, 1] key [9, 13, 3, 7]
+  start  285.0 min  H/collapse       SWITCH                   seed 430  (projected worst case 480 min)
+  [168]  286.7 min  H/collapse       SWITCH                   seed 427  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [1, 0, 13, 14] key [6, 11, 12, 3]
+  start  286.7 min  H/collapse       SWITCH                   seed 431  (projected worst case 480 min)
+  [169]  288.1 min  H/collapse       SWITCH                   seed 428  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [4, 15, 8, 10] key [7, 15, 8, 10]
+  start  288.1 min  H/collapse       SWITCH                   seed 432  (projected worst case 480 min)
+  [170]  289.0 min  H/collapse       SWITCH                   seed 429  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Switch 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git de06074+dirty, code 9c9172a89d60, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [8, 15, 2, 4] key [6, 9, 5, 3]
+  start  289.0 min  H/collapse       SWITCH                   seed 433  (projected worst case 480 min)
