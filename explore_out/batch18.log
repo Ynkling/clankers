@@ -634,3 +634,9 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [ 25]  108.3 min  two_stream_keysplits W2_KEYHINGE              seed 173  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git daa769a, code bd2ad99c5016, attempt 1: acc 1.000  trans  6000  DISCOVERED; key term fired on 6 updates
   start  108.3 min  two_stream_keysplits W2_KEYHINGE              seed 176  (projected worst case 6 min)
+  [ 26]  109.1 min  two_stream_keysplits W2_KEYHINGE              seed 175  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ed800f, code bd2ad99c5016, attempt 1: acc 1.000  trans  4800  DISCOVERED; key term fired on 1 updates
+  start  109.1 min  two_stream_keysplits W2_K4                    seed 175  (projected worst case 6 min)
+  [ 27]  109.1 min  two_stream_keysplits W2_KEYHINGE              seed 174  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ed800f+dirty, code bd2ad99c5016, attempt 1: acc 1.000  trans  6000  DISCOVERED; key term fired on 7 updates
+  start  109.1 min  two_stream_keysplits W2_K4                    seed 176  (projected worst case 6 min)
