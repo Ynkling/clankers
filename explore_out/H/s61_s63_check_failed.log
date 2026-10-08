@@ -22,3 +22,10 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
   CHECK H/query_gate: collapse: on the perfect gate the query, VAL and KEY maps are the identity ([0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]) and margin_val = 1.0000 (1 for a one-hot gate): ok
   CHECK H/query_gate: eight: on the perfect gate the query, VAL and KEY maps are the identity ([0, 1, 2, 3, 4, 5, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7], [0, 1, 2, 3, 4, 5, 6, 7]) and margin_val = 1.0000 (1 for a one-hot gate): ok
   all CHECKs of H/query_gate passed (0.1 min)
+  CHECK H/hardness: tau schedule {0: 1.0, 2400: 1.0, 2401: 0.9999652777777778, 13200: 0.625, 24000: 0.25, 30000: 0.25}: ok
+  CHECK H/hardness: HARD_W: before 2400 LOCAL3's gates (True); from 2400 the write gate is one-hot of argmax (True, argmax agrees True) with no gradient (True); the read gate is LOCAL3's soft gate with gradient (True); global RNG untouched (True): ok
+  CHECK H/hardness: ANNEAL: at n = 13200 both gates = softmax(z / 0.625) (True); at n = 2400 LOCAL3's gate bitwise (True): ok
+  CHECK H/hardness: REF (as is, threshold 0) equals batch 16's LOCAL3_SLOW_D8_A|260 (Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 6000 (curve [[1200, 0.060546875], [2400, 0.1005859375], [3600, 0.09716796875], [4800, 0.09423828125], [6000, 0.15966796875]]; statistics); updates counted None: FAIL
+  CHECK H/hardness: ANNEAL (end temperature 1, threshold 0) equals batch 16's LOCAL3_SLOW_D8_A|260 (Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 6000 (curve [[1200, 0.060546875], [2400, 0.1005859375], [3600, 0.09716796875], [4800, 0.09423828125], [6000, 0.15966796875]]; statistics); updates counted 6000: ok
+  CHECK H/hardness: HARD_W (hard switch never reached, threshold 0) equals batch 16's LOCAL3_SLOW_D8_A|260 (Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 6000 (curve [[1200, 0.060546875], [2400, 0.1005859375], [3600, 0.09716796875], [4800, 0.09423828125], [6000, 0.15966796875]]; statistics); updates counted 6000: ok
+  ! CHECK failed in H/hardness; stopping before any screen run.

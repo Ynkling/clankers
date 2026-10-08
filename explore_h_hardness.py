@@ -86,7 +86,7 @@ def check():
         rows += [tuple(x) for x in fu.result()]
     for (arm, p, how), r in res:
         eq, c = s58.eq_upto(r, ref, 6000)
-        eq = eq and r["splits"] == 0 and len(r["checks"]) >= 2 and r.get("n_upd") == 6000
+        eq = eq and r["splits"] == 0 and len(r["checks"]) >= 2 and (arm == "REF" or r.get("n_upd") == 6000)
         rows.append((f"{arm} ({how}, threshold 0) equals batch 16's LOCAL3_SLOW_D8_A|{REC_SEED} ({ref and ref['cpu']}) bit for bit "
                      f"through 6000 (curve {[x[:2] for x in c] if c else c}; statistics); updates counted {r.get('n_upd')}", eq))
     ok = True
