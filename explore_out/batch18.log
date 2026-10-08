@@ -1128,3 +1128,6 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [ 32]   39.8 min  two_stream_keysplits W2_K4                    seed 182  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); k=4)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 2446e47, code bd2ad99c5016, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED
   start   39.8 min  two_stream_keysplits W2_K4                    seed 186  (projected worst case 6 min)
+  [ 33]   40.2 min  two_stream_keysplits W2_K4                    seed 183  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 69a83cb, code bd2ad99c5016, attempt 1: acc 1.000  trans  2400  outcome BOUND ROUTED
+  start   40.2 min  two_stream_keysplits W2_K4                    seed 187  (projected worst case 6 min)
