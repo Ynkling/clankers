@@ -97,9 +97,47 @@ cut, and no cut rule was given for Part A. Perfect gates first, then longest fir
 
 OUTPUT: per-seed raw values first, then validity, counts, claims (pooled with --also, then per machine), bands,
 diagnostics, curves. Results: window_gate_results.json (gitignored; each machine's copy in results/X or results/L).
+
+AMENDMENT OF 8 OCTOBER 2026: PART D (specs/test_window_gate.md, "Amendment"; X's run had started at 2f98f06)
+The user's answers before any Part D code: Part D runs 43200 steps (matching Part C, so G2 and G4 pair on equal
+budgets); the original G2 is printed, not a claim.
+- Part D (S=8, P=4, k=16, conv; Part C's path, run_sc with D8, 43200 steps; Part C's seeds; validity = Part C's CEIL_C):
+    WIN3_SPLIT_D8  WIN3_SLOW_D8 + batch 17's W_SPLIT trigger (explore_window_d8_child.make_trigger at 992e320 = S37's
+                   make_trigger with the cap as a parameter; copied here with S36's probe_data, split_op and
+                   with_trigger and S37's read_gate, select and targeting): checks after the evaluations at 2400
+                   (reference), 4800, 7200, ... through total - 2400 = 40800, after the path's check and the lr switch, on
+                   the 64-sequence probe (generator 12345); fire if probe accuracy < 0.95 and it rose < 0.02 since the
+                   previous check; at most 3 splits, none within 4800 updates of the previous one (capped or gapped
+                   checks logged as blocked); c* / c0 = the largest / smallest mean read-gate mass at the probe's key
+                   positions; W_g[c0] = w + n2, W_g[c*] = w + n1 (w = W_g[c*], noise 0.1 std(w), generator 12_000_000 +
+                   1000 x seed + split count); W_g's Adam state zeroed. onset_run's Adam built by a capturing factory.
+    WIN3_RESET_D8  the reset-only control: the same rule on its own run; where it fires, W_g's Adam state is zeroed, W_g
+                   untouched. Part C's first five seeds (X 540-544, L 1540-1544). Printed, not claimed.
+- Claims: G2 becomes WIN3_SPLIT_D8 beats HINGE_D8 (BOUND ROUTED); G4: WIN3_SPLIT_D8 beats WIN3_SLOW_D8 (BOUND ROUTED);
+  G1 and G3 unchanged; pooled primary, per machine secondary. Printed, not claims: the original G2 (WIN3_SLOW_D8 vs
+  HINGE_D8) and WIN3_RESET_D8 vs WIN3_SLOW_D8. Bands with Wilson for every arm. Reading (pooled): "eight streams bind
+  without labels or restarts" if WIN3_SPLIT_D8 is RELIABLE pooled (>= 36/40) and G2 and G4 are SHOWN pooled.
+- Diagnostics: every split's update, c* -> c0 and whether the target is labelled ok (c* holds >= 2 streams and c0 none
+  on the labelled map before it); blocked checks and why; the labelled map at every check; the control's resets.
+- CHECKs:
+  - 141 WIN3_SPLIT_D8 at seed 263 equals batch 17's W_SPLIT|263 (explore_out/window_d8_results.json at 992e320; 2.10GHz;
+        first split at 4800) bit for bit through 7200: curve, gradient norms, every statistic both records hold, and
+        the trigger's rows at 2400, 4800 and 7200 (the fields both hold). Asserted on X, printed on L.
+  - 142 The trigger's mechanics (a model after one Adam step; the trigger called at each check with no training in
+        between; threshold above 1): fires at 4800, 9600, 14400; gap-blocked at 7200 and 12000; cap-blocked from 16800;
+        each split leaves W_g's rows c* and c0 apart and zeroes W_g's Adam state; the reset-only variant at the same
+        checks zeroes the state and leaves W_g unchanged.
+  - 143 With the threshold at 0, WIN3_SPLIT_D8 and WIN3_RESET_D8 at seed 1 equal WIN3_SLOW_D8 bit for bit through 6000.
+  - 144 (a resume) Part A-C records cached by an earlier start reproduce under this code: the first cached WIN3_SLOW
+        and WIN3_SLOW_D8 records through 2400.
+  - 139 extended: WIN3_SPLIT_D8 on Part C's range, WIN3_RESET_D8 on its first five seeds.
+- Runtime: the split arm is never cut (nothing is cut). On X the run started at 2f98f06 finishes Parts A-C untouched;
+  this code then resumes the same results file: the full verification, the projection, and only Part D's runs. The meta
+  keeps the first start's commit and time and records the amendment's start (commit, time, arms). L runs it all at once.
 """
 
 import argparse
+import contextlib
 import json
 import math
 import multiprocessing as mp
@@ -122,6 +160,8 @@ from test_multilayer_binding import MultiBDH, CausalConv, D
 import test_binding_onset as tbo
 from test_binding_onset import EVAL_EVERY, fmt_step
 from test_router_curriculum import get, load_store, init_worker, makespan, cpu_model, save_results
+from test_instrument_v2 import TAU_END
+from test_multilayer_binding import probe_batch
 from test_router_reliability import strip_all
 import test_router_reliability as trr
 from test_conv_lr import bound_r, mcnemar_greater
@@ -165,6 +205,10 @@ ARMS = [
     dict(key="WIN16_A", part="B", kind="early", slow=True, ceil=False, label="WIN16_A       ADAM + WINDOW, recurrent gate (S=4, P=4, k=16, conv)"),
     dict(key="WIN3_SLOW_D8", part="C", kind="local", slow=True, ceil=False, label="WIN3_SLOW_D8  LOCAL3 + SLOW, no hinge (S=8, P=4, k=16, conv)"),
     dict(key="HINGE_D8", part="C", kind="hinge", slow=True, ceil=False, label="HINGE_D8      recurrent gate, SLOW + hinge (S=8, P=4, k=16, conv)"),
+    dict(key="WIN3_SPLIT_D8", part="C", kind="split", slow=True, ceil=False, amend=True,
+         label="WIN3_SPLIT_D8 WIN3_SLOW_D8 + batch 17's split trigger (Part D)"),
+    dict(key="WIN3_RESET_D8", part="C", kind="reset", slow=True, ceil=False, amend=True,
+         label="WIN3_RESET_D8 WIN3_SLOW_D8 + the trigger, Adam reset only (Part D control)"),
     dict(key="CEIL_A", part="A", kind="ceil", slow=False, ceil=True, label="CEIL_A        perfect gate (validity, Part A)"),
     dict(key="CEIL_B", part="B", kind="ceil", slow=False, ceil=True, label="CEIL_B        perfect gate ceiling4k16 (validity, Part B)"),
     dict(key="CEIL_C", part="C", kind="ceil", slow=False, ceil=True, label="CEIL_C        perfect gate SC8_ceil, no curriculum (validity, Part C)"),
@@ -175,8 +219,22 @@ ARMS_RUN = tuple(k for k in KEYS if not ARM[k]["ceil"])
 CEILS = (("A", "CEIL_A"), ("B", "CEIL_B"), ("C", "CEIL_C"))
 TPART = {"A": "0", "B": "B", "C": "C"}     # test_slow_start's part names (tag, raw_rows)
 OUTCOME = {"A": "DISCOVERED", "B": "BOUND ROUTED", "C": "BOUND ROUTED"}
-CLAIMS = (("G1", "WIN3_SLOW16", "WIN16_A", "B"), ("G2", "WIN3_SLOW_D8", "HINGE_D8", "C"))
+CLAIMS = (("G1", "WIN3_SLOW16", "WIN16_A", "B"), ("G2", "WIN3_SPLIT_D8", "HINGE_D8", "C"),
+          ("G4", "WIN3_SPLIT_D8", "WIN3_SLOW_D8", "C"))
 G3 = ("G3", "WIN3_SLOW", "HINGE0", "A")
+PRINTED = (("slow memory on the window gate", "WIN3_SLOW", "WIN3", "A"),
+           ("the original G2", "WIN3_SLOW_D8", "HINGE_D8", "C"),
+           ("the reset-only control", "WIN3_RESET_D8", "WIN3_SLOW_D8", "C"))
+READING_D = "eight streams bind without labels or restarts"
+RESET_N = 5                                # the reset-only control: Part C's first five seeds
+# The trigger (batch 17's W_SPLIT: S37's with the cap as a parameter; S36's probe and operation)
+PROBE_N, PROBE_SEED = 64, 12345
+ACC_THR, RISE = 0.95, 0.02
+EVERY, FIRST, REF_AT = 2400, 4800, 2400
+NOISE_REL, NOISE_BASE = 0.1, 12_000_000
+MAX_SPLITS, GAP = 3, 4800
+SPLIT_SHA = "992e320"                      # claude/outside-ideas: batch 17's W_SPLIT records (CHECK 141)
+SPLIT_SEED, SPLIT_THROUGH = 263, 7200
 CEIL_C_ARM = dict(tscur.ARM["SC8_ceil"], key="CEIL_C", cur=False)
 
 
@@ -184,7 +242,7 @@ def seeds_for(machine):
     r = RANGES[machine]
     A, B, C = (tuple(r[p]) for p in "ABC")
     return dict(WIN3=A, WIN3_SLOW=A, HINGE0=A, WIN3_SLOW16=B, WIN16_A=B, WIN3_SLOW_D8=C, HINGE_D8=C,
-                CEIL_A=A[:VALID_N], CEIL_B=B[:VALID_N], CEIL_C=C[:VALID_N])
+                WIN3_SPLIT_D8=C, WIN3_RESET_D8=C[:RESET_N], CEIL_A=A[:VALID_N], CEIL_B=B[:VALID_N], CEIL_C=C[:VALID_N])
 
 
 SEEDS = seeds_for("X")                     # main() sets the machine's
@@ -304,24 +362,166 @@ def iters_of(a, sched):
     return sched[{"A": "iters_a", "B": "iters_b", "C": "iters_c"}[a["part"]]]
 
 
-def one_run(a, seed, iters, sched, keep=None):
-    """A run of arm a: (record, hinge state or None)."""
+# ── Part D: batch 17's W_SPLIT trigger (explore_window_d8_child.make_trigger at 992e320, S37's with the cap as a
+#    parameter), with S36's probe_data, split_op and with_trigger and S37's read_gate, select and targeting ─────
+@contextlib.contextmanager
+def adam_capture(holder):
+    """onset_run's torch.optim.Adam(param_groups(model), lr=lr), built by the same constructor and kept (S36's)."""
+    def factory(params, lr=1e-3, **kw):
+        opt = ter._ADAM(params, lr=lr, **kw)
+        holder.setdefault("opts", []).append(opt)
+        return opt
+    torch.optim.Adam = factory
+    try:
+        yield
+    finally:
+        torch.optim.Adam = ter._ADAM
+
+
+def probe_data(task):
+    return task.make_batch(PROBE_N, torch.Generator().manual_seed(PROBE_SEED))[0]
+
+
+@torch.no_grad()
+def read_gate(m, data):
+    was = m.training
+    m.eval()
+    try:
+        return m(data[:, :-1], TAU_END)[2]
+    finally:
+        m.train(was)
+
+
+def select(gr, S, P):
+    """(KEYMASS c*, c0, key masses), (all-position c*, c0, masses) from a read gate gr (B, T, k)."""
+    j = torch.arange(S * P)
+    km = gr[:, 3 * j + 1].mean((0, 1))
+    am = gr.mean((0, 1))
+    return (int(km.argmax()), int(km.argmin()), km), (int(am.argmax()), int(am.argmin()), am)
+
+
+def targeting(cmap, cs, c0):
+    """Labelled: does (c*, c0) copy a channel holding >= 2 streams onto one holding none?"""
+    return cmap.count(cs) >= 2 and cmap.count(c0) == 0
+
+
+def noise_for(w, seed):
+    sd = NOISE_REL * w.std()
+    g = torch.Generator().manual_seed(seed)
+    n1 = torch.randn(w.shape, generator=g, dtype=w.dtype) * sd                   # row c*
+    n2 = torch.randn(w.shape, generator=g, dtype=w.dtype) * sd                   # row c0
+    return sd, n1, n2
+
+
+def zero_state(o, W):
+    st = o.state.get(W)
+    zeroed = []
+    if st:
+        for k, v in st.items():
+            if torch.is_tensor(v):
+                v.zero_()
+                zeroed.append(k)
+    return zeroed
+
+
+def split_op(m, o, cs, c0, seed):
+    """S24's SPLIT on W_g, then W_g's optimizer state (in o) zeroed in place (S36's)."""
+    assert not any(n.startswith("b_g") or n == "W_g_bias" for n, _ in m.named_parameters())
+    W = m.W_g
+    with torch.no_grad():
+        w = W[cs].clone()
+        before = float((W[cs] - W[c0]).norm())
+        sd, n1, n2 = noise_for(w, seed)
+        W[c0] = w + n2
+        W[cs] = w + n1
+    zeroed = zero_state(o, W)
+    return dict(noise_sd=float(sd), noise_seed=seed, row_dist_before=before,
+                row_dist_after=float((W[cs] - W[c0]).detach().norm()), state_zeroed=zeroed)
+
+
+def reset_op(m, o):
+    """The reset-only control: W_g's optimizer state zeroed in place; W_g untouched."""
+    return dict(state_zeroed=zero_state(o, m.W_g))
+
+
+def make_trigger(task, seed, info, opt_of, last, max_splits=MAX_SPLITS, gap=GAP, thr=ACC_THR, rise=RISE, op="split"):
+    """Batch 17's make_trigger line for line; op="reset" applies reset_op where the rule fires (the control)."""
+    data = probe_data(task)
+    rprobe = probe_batch(task, seed)
+    st = dict(prev=None, n=0, last=None)
+
+    def trig(m, step):
+        if step % EVERY or step < REF_AT or step > last:
+            return
+        acc, _ = tbo.evaluate(m, task, data)
+        (kc, k0, km), (ac, a0, am) = select(read_gate(m, data), task.S, task.P)
+        cmap = tsa.routing_k(m, task, rprobe)["ch_map"]
+        row = dict(step=step, acc=acc, prev=st["prev"], map_before=cmap,
+                   key_masses=[round(float(v), 5) for v in km], all_masses=[round(float(v), 5) for v in am],
+                   key_cs=kc, key_c0=k0, all_cs=ac, all_c0=a0,
+                   key_ok=targeting(cmap, kc, k0), all_ok=targeting(cmap, ac, a0), fired=False, blocked=False)
+        eligible = step >= FIRST and st["prev"] is not None and acc < thr and acc - st["prev"] < rise
+        capped = st["n"] >= max_splits or (st["last"] is not None and step - st["last"] < gap)
+        row["eligible"] = eligible
+        if eligible and capped:
+            row["blocked"] = True
+            row["blocked_by"] = "cap" if st["n"] >= max_splits else "gap"
+        elif eligible:
+            res = (split_op(m, opt_of(), kc, k0, NOISE_BASE + 1000 * seed + st["n"]) if op == "split"
+                   else reset_op(m, opt_of()))
+            st["n"] += 1
+            st["last"] = step
+            row.update(fired=True, map_after=tsa.routing_k(m, task, rprobe)["ch_map"],
+                       key_masses_after=[round(float(v), 5) for v in select(read_gate(m, data), task.S, task.P)[0][2]],
+                       **res)
+        st["prev"] = acc
+        info["checks"].append(row)
+    return trig
+
+
+def with_trigger(rc, trig):
+    def rc2(kw):
+        kw = rc(kw)
+        c0 = kw.get("check")
+
+        def check(m, step, data):
+            if c0 is not None:
+                c0(m, step, data)
+            trig(m, step)
+        kw["check"] = check
+        return kw
+    return rc2
+
+
+def one_run(a, seed, iters, sched, keep=None, thr=ACC_THR):
+    """A run of arm a: (record, hinge state or trigger info or None). Part D's trigger looks ahead to the part's full
+    length (its last check is iters_c - 2400), whatever this run's length."""
     state = None
     if a["kind"] == "early":
         rec, state, _ = ter.one_run(ter.ARM["WIN16_A"], seed, iters, dict(ter.REAL, window=sched["window"], warm=sched["warm"]),
                                     keep=keep)
         return rec, state
-    if a["kind"] == "local":
+    ctx = contextlib.nullcontext()
+    if a["kind"] in ("local", "split", "reset"):
         rc, holder = make_local_rc(a["slow"], warm=sched["warm"], keep=keep)
+        if a["kind"] != "local":
+            state = dict(checks=[])
+            rc = with_trigger(rc, make_trigger(tscur.TASK48, seed, state, lambda: holder["opts"][0], sched["iters_c"] - EVERY,
+                                               thr=thr, op=a["kind"]))
+            ctx = adam_capture(holder)
     elif a["kind"] == "hinge":
         rc, state = tss.make_recipe(True, TAU, warm=sched["warm"], keep=keep)
     else:
         rc = None if keep is None else (lambda kw: dict(kw, keep=keep))
-    rec = run_path(a, seed, iters, rc)
+    with ctx:
+        rec = run_path(a, seed, iters, rc)
     if rec.get("ok"):
         rec.update(arm=a["key"], cpu=cpu_model())
-        if a["kind"] == "local" and a["slow"]:
+        if a["kind"] != "hinge" and a["slow"]:
             rec["group_names"] = holder.get("names")
+        if a["kind"] in ("split", "reset"):
+            rec.update(checks=state["checks"], splits=sum(1 for c in state["checks"] if c["fired"]), max_splits=MAX_SPLITS,
+                       trigger_op=a["kind"])
     return tss.norm(rec), state
 
 
@@ -334,10 +534,38 @@ def spec(key, seed, sched):
     return dict(arm=key, seed=seed, sched=dict(sched))
 
 
-def check_job(key, seed, iters):
-    rec, state = one_run(ARM[key], seed, iters, REAL)
+def check_job(key, seed, iters, thr=ACC_THR):
+    rec, state = one_run(ARM[key], seed, iters, REAL, thr=thr)
     st = state or {}
-    return dict(rec=rec, fired_at=list(st.get("fired_at", [])), diag=list(st.get("firing_diag", [])))
+    return dict(rec=rec, fired_at=list(st.get("fired_at", [])), diag=list(st.get("firing_diag", [])),
+                checks=list(st.get("checks", [])))
+
+
+def trigger_job(op):
+    """CHECK 142: Part C's LOCAL3 model (seed 260) after one Adam step (so W_g has Adam state), the trigger called at
+    each check with no training in between, threshold above 1 and rise 1 (every check from 4800 eligible)."""
+    task = tscur.TASK48
+    m = to_local(build_plain("C", D8_SEED), D8_SEED)
+    opt = ter._ADAM(m.parameters(), lr=LR)
+    x = task.make_batch(8, torch.Generator().manual_seed(11))[0]
+    inp, tgt = x[:, :-1], x[:, 1:]
+    ql, qt, _ = task.select(tbo.logits_of(m, inp), tgt, None)
+    loss = F.cross_entropy(ql, qt)
+    opt.zero_grad()
+    loss.backward()
+    opt.step()
+    info = dict(checks=[])
+    trig = make_trigger(task, D8_SEED, info, lambda: opt, 26400, thr=1.01, rise=1.0, op=op)
+    before = {k: float(v.abs().max()) for k, v in opt.state[m.W_g].items() if torch.is_tensor(v)}
+    wg0 = m.W_g.detach().clone()
+    for t in range(EVERY, 26400 + 1, EVERY):
+        trig(m, t)
+    after = {k: float(v.abs().max()) for k, v in opt.state[m.W_g].items() if torch.is_tensor(v)}
+    rows = info["checks"]
+    return dict(fired=[r["step"] for r in rows if r["fired"]], gap=[r["step"] for r in rows if r.get("blocked_by") == "gap"],
+                cap=[r["step"] for r in rows if r.get("blocked_by") == "cap"], before=before, after=after,
+                wg_same=torch.equal(wg0, m.W_g.detach()), dist=[r.get("row_dist_after") for r in rows if r["fired"]],
+                targets=[(r["key_cs"], r["key_c0"], r["key_ok"]) for r in rows if r["fired"]])
 
 
 def time_job(key):
@@ -355,7 +583,11 @@ def projection(cost, sched, workers):
 
 # ── Verification ─────────────────────────────────────────────────────────────
 def screen_record(fname, prefix):
-    src = subprocess.run(["git", "-C", HERE, "show", f"{SCREEN_SHA}:explore_out/{fname}"], capture_output=True, text=True,
+    return screen_record_at(SCREEN_SHA, fname, prefix)
+
+
+def screen_record_at(sha, fname, prefix):
+    src = subprocess.run(["git", "-C", HERE, "show", f"{sha}:explore_out/{fname}"], capture_output=True, text=True,
                          check=True).stdout
     runs = json.loads(src)["runs"]
     ks = [k for k in runs if k == prefix or k.startswith(prefix + "|")]
@@ -479,8 +711,36 @@ def check_also(machine, also):
                   f"{oth}'s ranges: {in_range}; overlap with this machine's: {sorted(mine & theirs) or 'none'}")
 
 
-def verify(pool, files, machine, early, also):
+def check_144(f, cached):
+    """CHECK 144: cached Part A-C records reproduce under this code through WARM (f: futures keyed ("144", arm))."""
+    print("CHECK 144 (a resume) Part A-C records cached by an earlier start reproduce under this code through "
+          f"{WARM}:")
+    ok = True
+    if not cached:
+        print("     no cached Part A-C record (a first start)")
+    for k in ("WIN3_SLOW", "WIN3_SLOW_D8"):
+        if k not in cached:
+            continue
+        s0, rec_old = cached[k]
+        r = f["144", k].result()["rec"]
+        g = subset_equal(trunc(r, WARM), trunc(rec_old, WARM)) and subset_equal(trunc(rec_old, WARM), trunc(r, WARM))
+        ok &= g
+        print(f"     {k}|{s0}: curve {r['curve']} vs {[x for x in rec_old['curve'] if x[0] <= WARM]}; curve, statistics and "
+              f"gradient norms equal {g}  -> {'IDENTICAL' if g else 'DIFFERS'}")
+    return ok
+
+
+def verify(pool, files, machine, early, also, cached=None):
     f = {}
+    f["141"] = pool.submit(check_job, "WIN3_SPLIT_D8", SPLIT_SEED, SPLIT_THROUGH)
+    for k in ("WIN3_SPLIT_D8", "WIN3_RESET_D8", "WIN3_SLOW_D8"):
+        f["143", k] = pool.submit(check_job, k, 1, 6000, 0.0)
+    for op in ("split", "reset"):
+        f["142", op] = pool.submit(trigger_job, op)
+    cached = cached or {}
+    for k in ("WIN3_SLOW", "WIN3_SLOW_D8"):
+        if k in cached:
+            f["144", k] = pool.submit(check_job, k, cached[k][0], WARM)
     f["135", "WIN3_SLOW"] = pool.submit(check_job, "WIN3_SLOW", REPRO_SEED, WARM)
     f["135", "WIN3"] = pool.submit(check_job, "WIN3", REPRO_SEED, WARM)
     for part in "ABC":
@@ -567,13 +827,15 @@ def verify(pool, files, machine, early, also):
 
     print(f"CHECK 139 the seeds (machine {machine}):")
     rg = RANGES[machine]
-    parts_ok = all(SEEDS[k] == tuple(rg[ARM[k]["part"]]) for k in ARMS_RUN)
+    parts_ok = all(SEEDS[k] == (tuple(rg[ARM[k]["part"]])[:RESET_N] if k == "WIN3_RESET_D8" else tuple(rg[ARM[k]["part"]]))
+                   for k in ARMS_RUN)
     ceil_ok = all(SEEDS[k] == tuple(rg[p])[:VALID_N] for p, k in CEILS)
     mine = {s for k in KEYS for s in SEEDS[k]}
     other = {s for p in "ABC" for s in RANGES[other_of(machine)][p]}
     earlier = earlier_seeds()
     g = parts_ok and ceil_ok and not (mine & earlier) and not (mine & other)
-    print(f"     this machine's seeds {tsr.ranges(sorted(mine))}: every arm on its part's range {parts_ok}; the perfect gates on "
+    print(f"     this machine's seeds {tsr.ranges(sorted(mine))}: every arm on its part's range (WIN3_RESET_D8 on its first "
+          f"{RESET_N}) {parts_ok}; the perfect gates on "
           f"each part's first two seeds {ceil_ok}; disjoint from the other machine's ranges {not (mine & other)} and from every "
           f"earlier main-line seed {not (mine & earlier)} (earlier: {tsr.ranges(sorted(earlier))})")
     if also is not None:
@@ -597,6 +859,59 @@ def verify(pool, files, machine, early, also):
               f"{'IDENTICAL' if g else 'DIFFERS'}")
     ok &= good
     print()
+
+    print(f"CHECK 141 WIN3_SPLIT_D8 seed {SPLIT_SEED} vs batch 17's W_SPLIT|{SPLIT_SEED} (window_d8_results.json on "
+          f"claude/outside-ideas at {SPLIT_SHA}) through {SPLIT_THROUGH} (asserted on machine X, printed on L; this machine "
+          f"{machine}):")
+    r = f["141"].result()
+    k_old, old = screen_record_at(SPLIT_SHA, "window_d8_results.json", f"W_SPLIT|{SPLIT_SEED}")
+    c, g_, s_, shared = same_through(r["rec"], old, SPLIT_THROUGH)
+    rn = [x for x in r["checks"] if x["step"] <= SPLIT_THROUGH]
+    ro = [x for x in old["checks"] if x["step"] <= SPLIT_THROUGH]
+    rows_eq = len(rn) == len(ro) > 0 and all(all(a[k] == b[k] for k in set(a) & set(b)) for a, b in zip(rn, ro))
+    g = c and g_ and s_ and rows_eq and r["rec"]["ok"]
+    print(f"     {k_old} (written on {old.get('cpu')}): curve {r['rec']['curve']} vs {[x for x in old['curve'] if x[0] <= SPLIT_THROUGH]}; "
+          f"curve equal {c}; gradient norms equal {g_}; statistics equal {s_} ({shared}); the trigger's rows at "
+          f"{[x['step'] for x in ro]} equal {rows_eq} (fired at {[x['step'] for x in rn if x['fired']]} vs "
+          f"{[x['step'] for x in ro if x['fired']]}; targets {[(x['key_cs'], x['key_c0'], x['key_ok']) for x in rn if x['fired']]})  -> "
+          f"{'IDENTICAL' if g else 'DIFFERS'}")
+    if machine == "X":
+        ok &= g
+    else:
+        print(f"     (machine {machine}: printed, not asserted)")
+    print()
+
+    print("CHECK 142 the trigger's mechanics (Part C's LOCAL3 model, seed 260, after one Adam step; checks 2400..26400 with no "
+          "training between; threshold above 1):")
+    good = True
+    for op in ("split", "reset"):
+        r = f["142", op].result()
+        zeroed = all(v == 0.0 for v in r["after"].values()) and any(v > 0 for k, v in r["before"].items() if k != "step")
+        g = (r["fired"] == [4800, 9600, 14400] and r["gap"] == [7200, 12000] and r["cap"] == [16800, 19200, 21600, 24000, 26400]
+             and zeroed and (all(d > 0 for d in r["dist"]) and not r["wg_same"] if op == "split" else r["wg_same"]))
+        good &= g
+        print(f"     {op:<5}: fired at {r['fired']}, blocked by the gap at {r['gap']}, by the cap at {r['cap']}; W_g's Adam state "
+              f"max |.| before {r['before']} -> after {r['after']} (zeroed {zeroed}); W_g unchanged {r['wg_same']}"
+              + (f"; rows c*, c0 apart after each split {r['dist']}; targets {r['targets']}" if op == "split" else "")
+              + f"  -> {'OK' if g else 'WRONG'}")
+    ok &= good
+    print()
+
+    print("CHECK 143 with the threshold at 0 (never eligible) the Part D arms equal WIN3_SLOW_D8 (seed 1) bit for bit through 6000:")
+    base = f["143", "WIN3_SLOW_D8"].result()["rec"]
+    good = True
+    for k in ("WIN3_SPLIT_D8", "WIN3_RESET_D8"):
+        r = f["143", k].result()
+        same = subset_equal(trunc(r["rec"], 6000), trunc(base, 6000)) and subset_equal(trunc(base, 6000), trunc(r["rec"], 6000))
+        g = same and r["rec"]["ok"] and not any(x["fired"] for x in r["checks"]) and len(r["checks"]) == 2
+        good &= g
+        print(f"     {k}: curve, statistics and gradient norms equal {same}; trigger checks at {[x['step'] for x in r['checks']]}, "
+              f"none fired  -> {'IDENTICAL' if g else 'DIFFERS'}")
+    ok &= good
+    print()
+
+    ok &= check_144(f, cached)
+    print()
     print(f"{'ALL VERIFICATION CHECKS PASSED' if ok else 'SOME VERIFICATION CHECKS FAILED'}\n")
     assert ok, "verification failed — do not trust the results below"
     return dict(cpu=cpu_model())
@@ -612,15 +927,27 @@ def validity(store, seeds):
 
 
 def tally(store, seeds):
+    seeds = {k: tuple(seeds.get(k, ())) for k in KEYS}
     rA = {k: runs_of(store, k, seeds[k]) for k in KEYS}
     valid = validity(store, seeds)
-    out = dict(rA=rA, valid=valid, seeds=seeds, claims={}, bands={})
+    out = dict(rA=rA, valid=valid, seeds=seeds, claims={}, bands={}, printed={})
     for name, new, old, part in CLAIMS + (G3,):
         out["claims"][name] = dict(paired_by(rA[new], rA[old], seeds[new], lambda r, k=new: success(k, r)), valid=valid[part][1])
     for k in ARMS_RUN:
         out["bands"][k] = dict(c=sum(success(k, r) for r in rA[k].values()), n=len(seeds[k]), valid=valid[ARM[k]["part"]][1])
-    out["printed"] = paired_by(rA["WIN3_SLOW"], rA["WIN3"], seeds["WIN3_SLOW"], lambda r: success("WIN3_SLOW", r))
+    for name, new, old, part in PRINTED:
+        out["printed"][name] = paired_by(rA[new], rA[old], seeds[new], lambda r, k=new: success(k, r))
     return out
+
+
+def reading_d(claims, bands):
+    """The pooled reading: WIN3_SPLIT_D8 RELIABLE pooled and G2 and G4 SHOWN pooled."""
+    b = bands["WIN3_SPLIT_D8"]
+    band = "UNTESTED" if not b["valid"] else tscur.band_n(b["c"], b["n"])
+    why = [f"WIN3_SPLIT_D8 {band} {b['c']}/{b['n']}" + ("" if band == "RELIABLE" else " (needs RELIABLE)")]
+    why += [f"{g} {verdict(claims[g])}" for g in ("G2", "G4")]
+    holds = band == "RELIABLE" and all(verdict(claims[g]) == "SHOWN" for g in ("G2", "G4"))
+    return holds, "; ".join(why)
 
 
 def pool_claim(ds):
@@ -645,17 +972,25 @@ def band_str(b):
 
 
 def print_claims(cl, who):
-    for name, new, old, part in CLAIMS:
+    for name, new, old, part in sorted(CLAIMS + (G3,)):
         d = cl[name]
+        if name == G3[0]:
+            print(f"  {name}  {new} not worse than {old} by more than {G3_BOUND} discordant pairs ({OUTCOME[part]}): "
+                  f"{d['new']}/{d['n']} vs {d['old']}/{d['n']}; {old} only {d['c']}, {new} only {d['b']}; d = {d['c'] - d['b']} "
+                  f"(bound: d <= {G3_BOUND}; no p-value)" + ("" if d["valid"] else f"   (Part {part} not valid{who})"))
+            print(f"     *** {name}{' (pooled)' if who == ' on a machine' else ''}: {g3_verdict(d)} ***")
+            continue
         print(f"  {name}  {new} beats {old} ({OUTCOME[part]}): {d['new']}/{d['n']} vs {d['old']}/{d['n']}; {new} only {d['b']}, "
               f"{old} only {d['c']}; p = {d['p']:.4g}" + ("" if d["valid"] else f"   (Part {part} not valid{who})"))
         print(f"     *** {name}{' (pooled)' if who == ' on a machine' else ''}: {verdict(d)} ***")
-    name, new, old, part = G3
-    d = cl[name]
-    print(f"  {name}  {new} not worse than {old} by more than {G3_BOUND} discordant pairs ({OUTCOME[part]}): {d['new']}/{d['n']} vs "
-          f"{d['old']}/{d['n']}; {old} only {d['c']}, {new} only {d['b']}; d = {d['c'] - d['b']} (bound: d <= {G3_BOUND}; no "
-          f"p-value)" + ("" if d["valid"] else f"   (Part {part} not valid{who})"))
-    print(f"     *** {name}{' (pooled)' if who == ' on a machine' else ''}: {g3_verdict(d)} ***")
+
+
+def print_printed(pr, label):
+    for name, new, old, part in PRINTED:
+        d = pr[name]
+        print(f"  Printed, not a claim{label}: {name}, {new} vs {old} ({OUTCOME[part]}): {d['new']}/{d['n']} vs {d['old']}/{d['n']}; "
+              f"{new} only {d['b']}, {old} only {d['c']}; one-sided p = {d['p']:.4g} ({new} higher), "
+              f"{mcnemar_greater(d['c'], d['b']):.4g} ({old} higher)")
 
 
 def print_bands(bands, label):
@@ -732,10 +1067,10 @@ def report(store, seeds, machine, wall, path, also):
         pb = {k: dict(c=sum(both[m_]["bands"][k]["c"] for m_ in MACHINES), n=sum(both[m_]["bands"][k]["n"] for m_ in MACHINES),
                       valid=all(both[m_]["bands"][k]["valid"] for m_ in MACHINES)) for k in ARMS_RUN}
         print_bands(pb, "pooled ")
-        d = pool_claim([both[m_]["printed"] for m_ in MACHINES])
-        print(f"  Printed, not a claim (pooled): WIN3_SLOW vs WIN3 (DISCOVERED): {d['new']}/{d['n']} vs {d['old']}/{d['n']}; "
-              f"WIN3_SLOW only {d['b']}, WIN3 only {d['c']}; one-sided p = {d['p']:.4g} (WIN3_SLOW higher), "
-              f"{mcnemar_greater(d['c'], d['b']):.4g} (WIN3 higher)")
+        holds, why = reading_d(pc, pb)
+        print("  READING (pooled):")
+        print(f"     {'' if holds else 'not '}\"{READING_D}\" ({why})")
+        print_printed({name: pool_claim([both[m_]["printed"][name] for m_ in MACHINES]) for name, *_ in PRINTED}, " (pooled)")
         print()
     else:
         print("POOLED (PRIMARY): not computed here — it needs --also with the other machine's complete file")
@@ -743,10 +1078,8 @@ def report(store, seeds, machine, wall, path, also):
     print(f"PER MACHINE (SECONDARY): machine {machine}")
     print_claims(t["claims"], " on this machine")
     print_bands(t["bands"], "")
-    d = t["printed"]
-    print(f"  Printed, not claims: WIN3_SLOW vs WIN3 (DISCOVERED): {d['new']}/{d['n']} vs {d['old']}/{d['n']}; WIN3_SLOW only "
-          f"{d['b']}, WIN3 only {d['c']}; one-sided p = {d['p']:.4g} (WIN3_SLOW higher), {mcnemar_greater(d['c'], d['b']):.4g} "
-          f"(WIN3 higher)")
+    print(f"  (the reading \"{READING_D}\" is pooled only)")
+    print_printed(t["printed"], "")
     for k in ARMS_RUN:
         trs_ = [r["transition"] for r in rA[k].values() if ok_r(r) and r["transition"] is not None]
         print(f"     median transition {k:<12} {med_int(trs_) if trs_ else 'none bound'} ({len(trs_)} bound)")
@@ -794,6 +1127,29 @@ def report(store, seeds, machine, wall, path, also):
             ta = f"{tag(TPART[part], a_)} ({fmt_step(a_['transition']) if ok_r(a_) else '--'})"
             tb = f"{tag(TPART[part], b_)} ({fmt_step(b_['transition']) if ok_r(b_) else '--'})"
             print(f"    s{s}  {ta:<40} | {tb}")
+        print()
+    def outc(r):
+        return f"{tag('C', r)} ({fmt_step(r['transition']) if ok_r(r) else '--'})"
+    print("  Part D per seed: HINGE_D8 | WIN3_SLOW_D8 | WIN3_SPLIT_D8 | WIN3_RESET_D8 (transition):")
+    for s in seeds["WIN3_SPLIT_D8"]:
+        print(f"    s{s}  " + " | ".join(f"{outc(rA[k].get(s)) if rA[k].get(s) else '--':<34}"
+                                     for k in ("HINGE_D8", "WIN3_SLOW_D8", "WIN3_SPLIT_D8", "WIN3_RESET_D8")))
+    print()
+    for k in ("WIN3_SPLIT_D8", "WIN3_RESET_D8"):
+        rows_all = [(s, r) for s, r in sorted(rA[k].items()) if ok_r(r)]
+        fired = [c for _, r in rows_all for c in r.get("checks", []) if c["fired"]]
+        print(f"  {k}: the trigger's {'splits' if k == 'WIN3_SPLIT_D8' else 'resets'} — {len(fired)} in {len(rows_all)} runs "
+              f"(per run {[sum(1 for c in r.get('checks', []) if c['fired']) for _, r in rows_all]}); targets labelled ok "
+              f"{sum(1 for c in fired if c['key_ok'])}/{len(fired)}")
+        for s, r in rows_all:
+            ch = r.get("checks", [])
+            ev = [f"{c['step']}: {c['key_cs']}->{c['key_c0']} {'ok' if c['key_ok'] else 'NOT labelled'} "
+                  f"(map {groups_str(c['map_before'])} -> {groups_str(c.get('map_after'))})" for c in ch if c["fired"]]
+            bl = [f"{c['step']} ({c.get('blocked_by')})" for c in ch if c["blocked"]]
+            print(f"    s{s}  {tag('C', r)} (transition {fmt_step(r['transition'])}); fired: {'; '.join(ev) or 'none'}; "
+                  f"blocked: {', '.join(bl) or 'none'}")
+            print(f"           maps at the checks (step: distinct channels / probe acc): "
+                  + " ".join(f"{c['step']}:{len(set(c['map_before']))}/{c['acc']:.2f}{'*' if c['fired'] else ''}" for c in ch))
         print()
     done = [r for r in rA["WIN16_A"].values() if ok_r(r) and firings(r)[0] is not None]
     fa = [firings(r)[0] for r in done]
@@ -902,15 +1258,28 @@ def main():
 
     ctx = mp.get_context("spawn")
     with ProcessPoolExecutor(max_workers=args.workers, mp_context=ctx, initializer=init_worker) as pool:
-        verify(pool, files, args.machine, early, also)
         store = load_store(args.results)
         old_m = store.get("meta", {})
         if old_m and old_m.get("machine") not in (None, args.machine):
             print(f"STOP: {args.results} holds machine {old_m.get('machine')}'s runs")
             sys.exit(2)
-        store["meta"] = dict(machine=args.machine, torch=torch.__version__, cpu=cpu_model(), workers=args.workers, git=head,
-                             lr=LR, lr_warm=LR_WARM, tau=TAU, sched=sched, early=dict(path=early_path, git=early["meta"].get("git")),
-                             seeds={k: list(v) for k, v in SEEDS.items()}, drop="", started=time.strftime("%Y-%m-%d %H:%M:%S"))
+        cached = {}
+        for k in ("WIN3_SLOW", "WIN3_SLOW_D8"):
+            hit = [(s, get(store, k, s)) for s in SEEDS[k] if ok_r(get(store, k, s))]
+            if hit and not args.force:
+                cached[k] = hit[0]
+        verify(pool, files, args.machine, early, also, cached)
+        now = time.strftime("%Y-%m-%d %H:%M:%S")
+        meta = dict(machine=args.machine, torch=torch.__version__, cpu=cpu_model(), workers=args.workers, git=head,
+                    lr=LR, lr_warm=LR_WARM, tau=TAU, sched=sched, early=dict(path=early_path, git=early["meta"].get("git")),
+                    seeds={k: list(v) for k, v in SEEDS.items()}, drop="", started=now)
+        if old_m.get("started") and not args.force:
+            added = [k for k in KEYS if k not in (old_m.get("seeds") or {})]
+            meta.update(git=old_m.get("git"), started=old_m["started"],
+                        starts=list(old_m.get("starts", [])) + [dict(git=head, started=now, workers=args.workers, arms_added=added)])
+            print(f"  resuming {args.results}: first started {old_m['started']} at {old_m.get('git')}; this start {now} at {head}; "
+                  f"arms added {added or 'none'}")
+        store["meta"] = meta
         t0 = time.time()
 
         print("=" * 100)
@@ -940,7 +1309,9 @@ def main():
             mid = (f"map [{','.join(str(c) for c in rec['end']['ch_map'])}]" if part != "0" and rec["end"].get("ch_map")
                    else f"VALcos {rec['val_cos']:.3f}" if rec.get("val_cos") is not None else "")
             return (f"{'BOUND at ' + str(tr) if tr else 'not bound':<16} acc={rec['acc']:.4f} @{rec['stopped_at']:<5} {mid}  "
-                    f"{tag(part, rec)}  hinge {hstr(rec)}")
+                    f"{tag(part, rec)}  hinge {hstr(rec)}" + (f"  {rec.get('trigger_op')}s at "
+                                                               f"{[c['step'] for c in rec['checks'] if c['fired']]}"
+                                                               if rec.get("checks") is not None else ""))
 
         def record(sp, rec):
             store["runs"][f"{sp['arm']}|{sp['seed']}"] = rec
