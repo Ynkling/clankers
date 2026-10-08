@@ -1,0 +1,31 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — session H: H/collapse
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git bbfea60 | python 3.13.16 | torch threads 1
+====================================================================================================
+  code SHA H/collapse: e9a4290c85d0 over 43 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b18_gates explore_common explore_common2 explore_h_collapse_child explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  CPU Intel(R) Xeon(R) Processor @ 2.10GHz; git bbfea60; torch 2.14.0+cu130
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (37s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK H/collapse: mcnemar1 equals test_conv_lr.mcnemar_greater on b, c in 0..11: ok
+  CHECK H/collapse: fisher1 equals test_router_confirm.fisher_greater on a, b in 0..10 of 10: ok
+  CHECK H/collapse: wilson(18, 20) = [0.6990, 0.9721] (the audit: lower bound 0.70): ok
+  CHECK H/collapse: bands at n = 20: 18 RELIABLE, 17 MAJORITY, 10 MAJORITY, 9 MINORITY, 0 NEVER (test_stream_channels: 18 / 10): ok
+  CHECK H/collapse: Gumbel(0,1) sampler: mean 0.5773 (Euler-Mascheroni 0.5772), variance 1.6428 (pi^2/6 = 1.6449), all finite: ok
+  CHECK H/collapse: GUMBEL_W: on a training forward the noise is on the write gate only (read gate = LOCAL3) (True); without grad and in eval mode both gates equal LOCAL3's (True); the global RNG is untouched (True); one noisy forward counted (1): ok
+  CHECK H/collapse: GUMBEL_W at noise scale 0: both gates bitwise LOCAL3's on a training forward: ok
+  CHECK H/collapse: GUMBEL_RW: on a training forward the noise is on the read and write gates, one draw (True); without grad and in eval mode both gates equal LOCAL3's (True); the global RNG is untouched (True); one noisy forward counted (1): ok
+  CHECK H/collapse: GUMBEL_RW at noise scale 0: both gates bitwise LOCAL3's on a training forward: ok
+  CHECK H/collapse: Switch loss: equals 1e-3 * k * sum f_c P_c computed by hand (0.00114898 vs 0.00114898); a uniform gate gives alpha exactly 0.001; d/dg = alpha * k * f_c / (B*T) (f not differentiated): True: ok
+  CHECK H/collapse: Switch hook: fires on training forwards only (count 1 after one training and one eval forward); the logits equal the hook-free model's from the same RNG state (True): ok
+  CHECK H/collapse: RESET's operation zeroes W_g's Adam state ['step', 'exp_avg', 'exp_avg_sq'] (True) and leaves W_g unchanged (True): ok
+  CHECK H/collapse: RESET's trigger with S36's split as the operation equals S48's make_trigger row for row on config k16 (fired at [4800, 9600, 14400] vs [4800, 9600, 14400]; W_g equal after): ok
+  CHECK H/collapse: RESET's trigger fires at [4800, 9600, 14400] (cap 3, gap 4800) and leaves W_g as after one step (the reset copies no row: True): ok
+  CHECK H/collapse: key_routing on the perfect gate: KEY-position map [0, 1, 2, 3] (identity, one-to-one): ok
+  CHECK H/collapse: NONE (as is) equals batch 16's LOCAL3_SLOW16_A|240 (code 01767493e840, Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 2400 (curve [[1200, 0.18310546875, 2.688394546508789], [2400, 0.2958984375, 2.3940179347991943]]; statistics): ok
+  CHECK H/collapse: GUMBEL_W (noise scale 0) equals batch 16's LOCAL3_SLOW16_A|240 (code 01767493e840, Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 2400 (curve [[1200, 0.18603515625, 2.6894521713256836], [2400, 0.2998046875, 2.383822202682495]]; statistics); noisy-path forwards 2400: FAIL
+  CHECK H/collapse: GUMBEL_RW (noise scale 0) equals batch 16's LOCAL3_SLOW16_A|240 (code 01767493e840, Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 2400 (curve [[1200, 0.18310546875, 2.688394546508789], [2400, 0.2958984375, 2.3940179347991943]]; statistics); noisy-path forwards 2400: ok
+  CHECK H/collapse: SWITCH (alpha 0) equals batch 16's LOCAL3_SLOW16_A|240 (code 01767493e840, Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 2400 (curve [[1200, 0.18310546875, 2.688394546508789], [2400, 0.2958984375, 2.3940179347991943]]; statistics); Switch hook calls 2400: ok
+  CHECK H/collapse: SPLIT (threshold 0) equals batch 16's LOCAL3_SLOW16_A|240 (code 01767493e840, Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 6000 (curve [[1200, 0.18310546875, 2.688394546508789], [2400, 0.2958984375, 2.3940179347991943], [3600, 1.0, 0.017380939796566963], [4800, 1.0, 0.005454994738101959], [6000, 1.0, 0.0023829597048461437]]; statistics); trigger checks at [2400, 4800], fired 0: ok
+  CHECK H/collapse: RESET (threshold 0) equals batch 16's LOCAL3_SLOW16_A|240 (code 01767493e840, Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 6000 (curve [[1200, 0.18310546875, 2.688394546508789], [2400, 0.2958984375, 2.3940179347991943], [3600, 1.0, 0.017380939796566963], [4800, 1.0, 0.005454994738101959], [6000, 1.0, 0.0023829597048461437]]; statistics); trigger checks at [2400, 4800], fired 0: ok
+  ! CHECK failed in H/collapse; stopping before any screen run.

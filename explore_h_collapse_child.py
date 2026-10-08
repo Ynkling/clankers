@@ -30,6 +30,8 @@ ARMS (each = NONE + one change):
              hinge's injection node, through a forward hook), with P_c = the mean of g_t[c] and f_c = the fraction of tokens
              whose argmax_c g_t = c, both over every input position of the training batch (B x T); g = the gate (read =
              write for LOCAL3). f is not differentiated (Switch's form).
+  TWO_NODE   CHECK control only: LOCAL3 with the read and write gates as two separate softmax(z) nodes (see GUMBEL_W's
+             CHECK in the parent).
   ORACLE     the perfect gate (test_stream_recipe.ARM["ceiling4k16"]: stream s -> channel s at every position, channels
              4-15 unused) + conv on the same path with its own recipe (one Adam at 1e-3 for every parameter), main's ceiling
              arms' recipe. Validity only.
@@ -77,6 +79,7 @@ ARM = {
     "GUMBEL_RW": dict(gumbel="rw"),
     "SWITCH": dict(switch=SWITCH_ALPHA),
     "ORACLE": dict(oracle=True),
+    "TWO_NODE": dict(two_node=True),                                # CHECK control only (no screen runs)
 }
 
 
@@ -102,6 +105,24 @@ class GumbelLocalBDH(g16.LocalBDH):
             self.gumbel_calls += 1
             return (g, gn) if self.gumbel_side == "w" else (gn, gn)
         return g, g
+
+
+class TwoNodeLocalBDH(g16.LocalBDH):
+    """CHECK control: LOCAL3 with the read and write gates computed as two separate softmax(z) nodes (no noise code). The
+    forward is LOCAL3's bit for bit; the backward sums the two gates' gradients at z instead of at one shared softmax
+    output, so float summation order differs from LOCAL3's. GUMBEL_W at noise scale 0 must equal this bit for bit."""
+
+    def local_gates(self, v):
+        u = self.gate_conv(v)
+        h = torch.tanh(u @ self.W_in.T)
+        z = h @ self.W_g.T
+        return F.softmax(z, dim=-1), F.softmax(z, dim=-1)
+
+
+def to_two_node(m, seed):
+    assert type(m) is g16.LocalBDH, type(m)
+    m.__class__ = TwoNodeLocalBDH
+    return m
 
 
 def to_gumbel(side, scale=1.0):
@@ -217,6 +238,8 @@ def build_rc(arm_name, p, holder, out, info, log):
     convert = [g16.to_local]
     if arm.get("gumbel"):
         convert.append(to_gumbel(arm["gumbel"], p.get("gumbel_scale", 1.0)))
+    if arm.get("two_node"):
+        convert.append(to_two_node)
     if arm.get("switch") is not None:
         convert.append(attach_switch(p.get("alpha", arm["switch"]), log))
     rc, _ = b16.make_rc("adam", holder, b16.GATE_LOCAL, tau=None, convert=tuple(convert), probe=probe, keep=p.get("keep"))

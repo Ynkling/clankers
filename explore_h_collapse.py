@@ -66,8 +66,13 @@ stated side, global RNG untouched; noise scale 0 gives LOCAL3's gates bitwise; t
 hand; the Switch hook fires on training forwards only and leaves the logits unchanged; RESET's operation zeroes W_g's Adam
 state and copies no row; RESET's trigger with the split as its operation equals S48's row for row; the KEY-position map of
 the perfect gate is the identity); and, with each new code path disabled, a run equal BIT FOR BIT to batch 16's recorded
-LOCAL3_SLOW16_A|240 (curve and every statistic): NONE through 2400; GUMBEL_W and GUMBEL_RW at noise scale 0 through 2400;
-SWITCH at alpha 0 through 2400; SPLIT and RESET with the trigger's threshold at 0 (never fires) through 6000.
+LOCAL3_SLOW16_A|240 (curve and every statistic): NONE through 2400; GUMBEL_RW at noise scale 0 through 2400; SWITCH at
+alpha 0 through 2400; SPLIT and RESET with the trigger's threshold at 0 (never fires) through 6000. GUMBEL_W (CHECK
+amended after the first CHECK pass, before any screen run; arms and readings unchanged): at noise scale 0 its forward is
+LOCAL3's bit for bit (unit check), but its read and write gates are two autograd nodes, so the backward sums their
+gradients at z in a different float order and the run does not equal the record bit for bit (it did not: 0.1860 vs
+0.1831 at 1200). Its CHECK is therefore: GUMBEL_W at noise scale 0 equals BIT FOR BIT through 2400 the child's TWO_NODE
+control (LOCAL3 with the two gates as two separate softmax(z) calls, no noise code), i.e. the noise path is inert.
 """
 
 import os
@@ -148,6 +153,7 @@ def check():
     rows = [tuple(x) for x in hc.check_stats()]
     jobs = [("NONE", dict(arm="NONE", seed=REC_SEED, iters=CHECK_SHORT), CHECK_SHORT, "as is"),
             ("GUMBEL_W", dict(arm="GUMBEL_W", seed=REC_SEED, iters=CHECK_SHORT, gumbel_scale=0.0), CHECK_SHORT, "noise scale 0"),
+            ("TWO_NODE", dict(arm="TWO_NODE", seed=REC_SEED, iters=CHECK_SHORT), CHECK_SHORT, "control"),
             ("GUMBEL_RW", dict(arm="GUMBEL_RW", seed=REC_SEED, iters=CHECK_SHORT, gumbel_scale=0.0), CHECK_SHORT, "noise scale 0"),
             ("SWITCH", dict(arm="SWITCH", seed=REC_SEED, iters=CHECK_SHORT, alpha=0.0), CHECK_SHORT, "alpha 0"),
             ("SPLIT", dict(arm="SPLIT", seed=REC_SEED, iters=CHECK_TRIG, thr=0.0, total=ITERS), CHECK_TRIG, "threshold 0"),
@@ -156,7 +162,13 @@ def check():
         fu = ex.submit(child, "checks", {})
         res = list(ex.map(lambda j: (j, child("run", j[1])), jobs))
         rows += [tuple(x) for x in fu.result()]
+    two = next(r for (j, r) in res if j[0] == "TWO_NODE")
     for (arm, p, t, how), r in res:
+        if arm == "TWO_NODE":
+            eq, c = eq_upto(r, ref, t)
+            print(f"  (TWO_NODE control vs the record through {t}: {'equal' if eq else 'differs'} (float order of the backward); "
+                  f"curve {c})", flush=True)
+            continue
         eq, c = eq_upto(r, ref, t) if ref is not None else (False, None)
         extra = ""
         if arm in ("SPLIT", "RESET"):
@@ -166,6 +178,11 @@ def check():
             gc = (r.get("keyroute") or {}).get("end", {}).get("gumbel_calls")
             extra = f"; noisy-path forwards {gc}"
             eq = eq and gc == t
+        if arm == "GUMBEL_W":
+            eq2, c2_ = eq_upto(r, two, t)
+            rows.append((f"GUMBEL_W (noise scale 0) equals the TWO_NODE control bit for bit through {t} (curve {c2_}; statistics); "
+                         f"noisy-path forwards {gc}", eq2 and gc == t))
+            continue
         if arm == "SWITCH":
             extra = f"; Switch hook calls {r.get('switch_n')}"
             eq = eq and r.get("switch_n") == t
