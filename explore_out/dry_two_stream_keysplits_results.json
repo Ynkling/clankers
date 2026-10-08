@@ -1,0 +1,47 @@
+{
+ "meta": {
+  "arms": {
+   "W2_K4": {
+    "iters": 2400,
+    "key": "W2_K4",
+    "label": "LOCAL3 + SLOW with k=4 (two spare channels)",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "outcome": "BOUND ROUTED",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); k=4",
+    "seeds": [
+     160
+    ]
+   },
+   "W2_KEYHINGE": {
+    "iters": 2400,
+    "key": "W2_KEYHINGE",
+    "label": "LOCAL3 + SLOW, k=2, + the hinge's key term on updates 1-2400",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "outcome": "DISCOVERED",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only",
+    "seeds": [
+     160
+    ]
+   }
+  },
+  "code_shas": [
+   "bd2ad99c5016027b9badc68894d24d6d5251967d"
+  ],
+  "cut": [],
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "7ef4e15",
+   "python": "3.11.15",
+   "started": "2026-10-08 01:17:17",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

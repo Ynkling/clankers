@@ -34,3 +34,76 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   lr for dry_split_k4 W4k4_SPLIT: 0.001; iters 2400; seeds 240-240 (1)
   lr for dry_two_stream_keysplits W2_K4: 0.001; iters 2400; seeds 160-160 (1)
   lr for dry_two_stream_keysplits W2_KEYHINGE: 0.001; iters 2400; seeds 160-160 (1)
+  CHECK dry_two_stream_keysplits: routing_k, eta2_multi, fail_class_k, stream_acc, routed, outcome, shared_max, merged and ROUTED_ACC are main's at 9c5939e line for line (syntax trees equal: {'eta2_multi': True, 'routing_k': True, 'fail_class_k': True, 'stream_acc': True, 'routed': True, 'outcome': True, 'shared_max': True, 'merged': True, 'ROUTED_ACC': True}): ok
+  CHECK dry_two_stream_keysplits: at k = 2 the pooled eta^2 (routing_k) equals routing_stats' channel-0 eta^2 by key, stream and half, and the hinge's eta2_key equals S19's key_penalty and eta_key_by_key, at init and with W_g x 20 (last: pooled / channel-0 / eta2_key / S19 = (0.501046, 0.501046, 0.501043, 0.501046); max |diff| 2.7e-05 <= 1e-4: float32, and eta2_key keeps test_slow_start's uncentred group means where S19's key_penalty centres them): ok
+  CHECK dry_two_stream_keysplits: the key term's gradient reaches only ['W_g', 'W_in', 'embed.weight', 'gate_conv.conv_w']: ok
+  CHECK dry_two_stream_keysplits: W2_K4's model: W_g (4, 32) (4 channels), the seed's window (equal to batch 1's: True), W_h frozen (True): ok
+  CHECK dry_two_stream_keysplits: W2_KEYHINGE's weight at updates [1, 2399, 2400, 2401, 2402]: {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}; training forwards counted 2402 = updates 2402; fired on 2 of the first 2400 updates: ok
+  CHECK dry_two_stream_keysplits: with weight 0 (window 0) W2_KEYHINGE|160 equals S43's LOCAL3_SLOW|160 bit for bit through 1200 (curve [[1200, 0.482421875, 2.1559665203094482]]; statistics and decoder equal True): ok
+  CHECK dry_two_stream_keysplits: W2_K4|160: the dense measurements are inert through 1200 (curve [[1200, 0.47607421875, 2.155621290206909]]; statistics and decoder equal True; 49 measurements; routing_k map at 1200 [3, 1]): ok
+  CHECK dry_two_stream_keysplits: validity: with k = 4 the perfect gate (streams 0, 1 -> channels 0, 1; this layout's validity arm, test_short_conv's ceiling_conv: the perfect gate + conv 'layer') binds and routes on seeds [160, 161]: 160: BOUND ROUTED, transition 1200, map [0, 1], per-stream accuracy [1.0, 1.0], k 4; 161: BOUND ROUTED, transition 1200, map [0, 1], per-stream accuracy [1.0, 1.0], k 4: ok
+  CHECK dry_two_stream_keysplits: the plain perfect gate (no convolution) padded to k = 4 equals it at k = 2 bit for bit through 2400 (curves [[1200, 0.2802734375, 1.9369794130325317], [2400, 0.5205078125, 1.2320829629898071]] vs [[1200, 0.2802734375, 1.9369794130325317], [2400, 0.5205078125, 1.2320829629898071]]): the padding is inert; it does not bind on this layout at either k (outcome STREAM-PARTIAL one-to-one), which is why the validity check above uses the layout's own validity arm: ok
+  CHECK dry_two_stream_keysplits: the key term is test_slow_start's eta2 code restricted to key identity: explore_b18_gates.eta2_pool with eta2_hinge's groupings (index, half) equals test_slow_start.eta2_hinge (main, in a main-line child; EPS 1e-12) on random gates: [(2, 2, [0.014883, 0.014883], [0.000364, 0.000364]), (2, 4, [0.01395, 0.01395], [0.001544, 0.001544]), (4, 4, [0.015079, 0.015079], [0.000722, 0.000722]), (8, 16, [0.012686, 0.012686], [0.000293, 0.000293])]; max |diff| 7.1e-09 <= 1e-6: ok
+  CHECK dry_two_stream_keysplits: the paired records are present: S43's LOCAL3_SLOW 40/40 (DISCOVERED 31), S13's SLOW_HINGE 40/40 (DISCOVERED 34): ok
+  CHECK dry_split_k4: config a (S=4, P=4, k=4): LOCAL3's conversion keeps every parameter of the run path's model bitwise (9), adds only ['gate_conv.conv_w'] = batch 1's window for the seed (True); W_h frozen (True): ok
+  CHECK dry_split_k4: config a W4k4 / W4k4_SPLIT: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK dry_split_k4: config a: the trigger at cap 2 equals S37's make_trigger row for row on LOCAL3 (fired at [4800, 9600] vs [4800, 9600]): ok
+  CHECK dry_split_k4: S37's HINGE4k4_A|240 reproduces its record through 1200 on this machine (curve [[1200, 0.11962890625, 2.7629148960113525]] vs [[1200, 0.11962890625, 2.7629148960113525]]; statistics at [0, 1200] equal True): ok
+  CHECK dry_split_k4: with the threshold at 0, W4k4_SPLIT|240 equals W4k4|240 bit for bit through 3600 (curve [[1200, 0.18798828125, 2.6824586391448975], [2400, 0.79541015625, 1.7325929403305054], [3600, 1.0, 0.01549401693046093]]; statistics and decoder equal True; checks logged at [2400]): ok
+  CHECK dry_window_recipe_ablation: the reset zeroes the same optimizer-state tensors of W_g as S36's split_op (['exp_avg', 'exp_avg_sq', 'step'] vs ['exp_avg', 'exp_avg_sq', 'step'], all zero after: True) and leaves W_g unchanged (True; split_op changes it: True): ok
+  CHECK dry_window_recipe_ablation: W_SPLIT_W4: the width-4 gate at t = 30 cannot see token t-4 (True) and can see t-3 (True); window shape (32, 4): ok
+  CHECK dry_window_recipe_ablation: W_SPLIT_NOSLOW: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.001], 2400 [0.001, 0.001], 2401 [0.001, 0.001]; window width 3: ok
+  CHECK dry_window_recipe_ablation: W_SPLIT_W4: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]; window width 4: ok
+  CHECK dry_window_recipe_ablation: W_RESET: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]; window width 3: ok
+  CHECK dry_window_recipe_ablation: W_SPLIT_M: W_g on Muon; the trigger fired at [4800] and zeroed W_g's Muon state ['momentum_buffer'] (True): ok
+  CHECK dry_window_recipe_ablation: with the threshold at 0, W_SPLIT_NOSLOW|260 equals S48's single-rate recipe W_NOSLOW|260 bit for bit through 3600 (curve [[1200, 0.0712890625, 2.7779958248138428], [2400, 0.06103515625, 2.7742843627929688], [3600, 0.06396484375, 2.7757694721221924]]; statistics and decoder equal True; trigger checks logged at [2400], 0 splits): ok
+  CHECK dry_window_recipe_ablation: with the threshold at 0, W_SPLIT_W4|260 equals S48's width-4 recipe W_WIDTH4|260 bit for bit through 3600 (curve [[1200, 0.060546875, 2.8092617988586426], [2400, 0.0693359375, 2.7833924293518066], [3600, 0.095703125, 2.747572898864746]]; statistics and decoder equal True; trigger checks logged at [2400], 0 splits): ok
+  CHECK dry_window_recipe_ablation: W_RESET|261 (resets at [4800, 14400]) equals batch 16's LOCAL3_SLOW_D8_A|261 bit for bit through its first reset (4800: True); the reset there zeroed ['step', 'exp_avg', 'exp_avg_sq'] (max before {'step': 4800.0, 'exp_avg': 0.00013158982619643211, 'exp_avg_sq': 3.403164328119601e-07}, W_g unchanged True); the run differs from the record after it (True); curve [[1200, 0.0625, 2.8097100257873535], [2400, 0.05810546875, 2.7863547801971436], [3600, 0.06298828125, 2.776287078857422], [4800, 0.0986328125, 2.7389070987701416], [6000, 0.0888671875, 2.734951972961426]]: ok
+  CHECK dry_window_recipe_ablation: W_RESET's reset updates per seed are batch 17's W_SPLIT split updates (10 records of code 375b30d487df): {260: [12000, 16800], 261: [4800, 14400], 262: [19200], 263: [4800, 12000], 264: [9600, 14400], 265: [14400, 19200], 266: [14400], 267: [4800, 9600, 16800], 268: [4800, 12000], 269: [7200, 16800]}: ok
+  CHECK dry_window_recipe_ablation: with the threshold at 0, W_SPLIT_M|260 equals its Muon pair (W_M_REF) bit for bit through 3600 (curve [[1200, 0.068359375, 2.9911153316497803], [2400, 0.2373046875, 2.4884212017059326], [3600, 0.43359375, 1.5793131589889526]]; True): ok
+  CHECK batch 18: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (13.5 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_window_recipe_ablation
+  idea    ablate the window recipe at eight streams (reset-only control, no slow phase, width 4, Muon)
+  source  batch 17's S48 (W_SPLIT 9/10); the audit, section 2.3 (no reset-only control); the user's batch 18
+  change  W_RESET: the split's optimizer reset without the copy; W_SPLIT_NOSLOW: one rate; W_SPLIT_W4: width-4 window; W_SPLIT_M: Muon
+  arm W_RESET      lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_A + W_g's Adam-state reset at W_SPLIT's split updates, no copy
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; W_g's Adam state zeroed after the evaluations at batch 17's W_SPLIT split updates (per seed)
+  arm W_SPLIT_NOSLOW lr 0.001  iters 2400  seeds 260-260 (1)  — W_SPLIT at a single rate
+                   schedule: every trainable parameter 0.001 throughout; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_SPLIT_W4   lr 0.001  iters 2400  seeds 260-260 (1)  — W_SPLIT with a width-4 window
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; window width 4; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_SPLIT_M    lr 0.001  iters 2400  seeds 260-260 (1)  — W_SPLIT under Muon (LOCAL3_SLOW_D8_M + the trigger)
+                   schedule: Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed
+  arm W_M_REF      lr 0.001  iters 2400  seeds 260-260 (1)  — LOCAL3_SLOW_D8_M, fresh on this CPU (W_SPLIT_M's reference)
+                   schedule: Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge
+  pairing seeds 260-269 with batch 17's W_SPLIT (9/10); W_SPLIT_M also with its Muon reference on this CPU; same initial parameters (+ the window) and batches
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_split_k4
+  idea    the window recipe and its split at the old merge configuration: S=4, P=4, k=4 (no spare channel)
+  source  S37 (batch 13): HINGE4k4_A 7/10 bound, 5/10 routed; batch 17's W_SPLIT 9/10 at S=8, k=16; the user's batch 18
+  change  LOCAL3 + SLOW on configuration a (k=4); W4k4_SPLIT: + the KEYMASS trigger (<= 2 splits)
+  arm W4k4         lr 0.001  iters 2400  seeds 240-240 (1)  — LOCAL3 + SLOW, no hinge (S=4, P=4, k=4, conv)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm W4k4_SPLIT   lr 0.001  iters 2400  seeds 240-240 (1)  — W4k4 + the KEYMASS trigger (<= 2 splits)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed
+  pairing seeds 240-249 with S37's HINGE4k4_A records (same initial parameters, + the window, and batches); W4k4_SPLIT with W4k4
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_two_stream_keysplits
+  idea    attack the window gate's two-stream key splits: two spare channels (k=4), or the hinge's key term on updates 1-2400
+  source  S43 (LOCAL3_SLOW 31/40) and S49 (its KEY splits form before update 600); S19 / S22's key term; the user's batch 18
+  change  W2_K4: LOCAL3 + SLOW with k=4; W2_KEYHINGE: LOCAL3 + SLOW, k=2, + 1.0 x relu(eta2_key - 0.2) on updates 1-2400
+  arm W2_K4        lr 0.001  iters 2400  seeds 160-160 (1)  — LOCAL3 + SLOW with k=4 (two spare channels)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); k=4
+  arm W2_KEYHINGE  lr 0.001  iters 2400  seeds 160-160 (1)  — LOCAL3 + SLOW, k=2, + the hinge's key term on updates 1-2400
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only
+  pairing seeds 160-199 with S43's LOCAL3_SLOW and S13's SLOW_HINGE (same batches; KEYHINGE also the same initial parameters)
+----------------------------------------------------------------------------------------------------
+  9 runs queued on 4 workers (1 torch thread each)
+  start    0.0 min  dry_window_recipe_ablation W_SPLIT_M                seed 260  (projected worst case 3 min)
+  start    0.0 min  dry_window_recipe_ablation W_M_REF                  seed 260  (projected worst case 3 min)
+  start    0.0 min  dry_window_recipe_ablation W_SPLIT_W4               seed 260  (projected worst case 3 min)
+  start    0.0 min  dry_window_recipe_ablation W_SPLIT_NOSLOW           seed 260  (projected worst case 3 min)
