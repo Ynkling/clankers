@@ -10,3 +10,27 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
   S50 MUON REFERENCE: batch 16's LOCAL3_SLOW_D8_M|260 (record on Intel(R) Xeon(R) Processor @ 2.80GHz) rerun here on Intel(R) Xeon(R) Processor @ 2.10GHz through 1200: does not reproduce (here [[1200, 0.068359375, 2.9911153316497803]] vs record [[1200, 0.068359375, 2.990344285964966]]; 93s) -> W_M_REF (LOCAL3_SLOW_D8_M fresh on this CPU) runs as the pair (dry run: not stored)
+  PROJECTION OF THIS DRY RUN: 9 runs, 0.28 h of runs
+  PROJECTION OF THE FULL BATCH (worst case: every run to its iters; pool-load timing, 1 thread each, this machine):
+    window_recipe_ablation  W_RESET         10 runs x   31.5 min  (step 61.9 ms, evaluation 4.5 s, decoder 0.8 s)
+    window_recipe_ablation  W_SPLIT_NOSLOW  10 runs x   31.9 min  (step 62.7 ms, evaluation 4.4 s, decoder 0.8 s)
+    window_recipe_ablation  W_SPLIT_W4      10 runs x   32.1 min  (step 63.0 ms, evaluation 4.5 s, decoder 0.8 s)
+    window_recipe_ablation  W_SPLIT_M       10 runs x   33.1 min  (step 64.6 ms, evaluation 5.1 s, decoder 0.7 s)
+    window_recipe_ablation  W_M_REF         10 runs x   30.8 min  (step 59.7 ms, evaluation 5.2 s, decoder 0.8 s)
+    split_k4                W4k4            10 runs x   13.9 min  (step 27.2 ms, evaluation 2.0 s, decoder 0.3 s)
+    split_k4                W4k4_SPLIT      10 runs x   13.4 min  (step 26.3 ms, evaluation 1.9 s, decoder 0.3 s)
+    two_stream_keysplits    W2_K4           40 runs x    5.4 min  (step 12.6 ms, evaluation 0.9 s, decoder 0.1 s, gate cells 0.09 s)
+    two_stream_keysplits    W2_KEYHINGE     40 runs x    5.3 min  (step 12.5 ms, evaluation 0.7 s, decoder 0.1 s, gate cells 0.08 s)
+    total 38.25 h of runs; makespan on 4 workers 9.58 h; the packing simulation needs 6 segment(s) (first 82 min, then 113 min each)
+  RUNTIME RULE: the packing simulation needs 6 segment(s) (makespan 9.58 h) > 4: cut, re-simulating after each: window_recipe_ablation W_SPLIT_W4 -> 5 segment(s), 8.23 h; split_k4 W4k4 -> 5 segment(s), 7.67 h; window_recipe_ablation W_SPLIT_NOSLOW -> 4 segment(s), 6.32 h (dry run: not stored)
+  dry run: the runtime rule's decision is printed, not applied (every arm is exercised)
+  recipe read in children from main at 9c5939e: test_slow_start.LR 0.001, test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001 (Adam groups), WARM 2400; the warm lr 0.0001; the trigger: every 2400 from 4800 (reference 2400), acc < 0.95, rise < 0.02, gap 4800; <= 3 splits (S50), <= 2 (S51, S37's cap); S52: the branch's test_channel_binding.SUB_LR 0.001, test_short_conv.MAX_ITERS 24000, the key term 1.0 x relu(eta2_key - 0.2) on updates 1-2400; Muon lr 0.005; 1 torch thread per run
+  lr for dry_window_recipe_ablation W_RESET: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_window_recipe_ablation W_SPLIT_NOSLOW: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_window_recipe_ablation W_SPLIT_W4: 0.001; iters 2400; seeds 260-260 (1)
+  lr for dry_window_recipe_ablation W_SPLIT_M: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
+  lr for dry_window_recipe_ablation W_M_REF: 0.001; Muon lr 0.005; iters 2400; seeds 260-260 (1)
+  lr for dry_split_k4 W4k4: 0.001; iters 2400; seeds 240-240 (1)
+  lr for dry_split_k4 W4k4_SPLIT: 0.001; iters 2400; seeds 240-240 (1)
+  lr for dry_two_stream_keysplits W2_K4: 0.001; iters 2400; seeds 160-160 (1)
+  lr for dry_two_stream_keysplits W2_KEYHINGE: 0.001; iters 2400; seeds 160-160 (1)
