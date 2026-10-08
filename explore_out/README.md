@@ -46,7 +46,7 @@ for a pre-registered test.
 | `batch17_dry.log`, `batch17_dry_check_failed.log`, `dry_<screen>_results.json` (S48 window_d8, S49 window_fail) | batch 17's labelled DRY RUN (Intel Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run). The first attempt stopped at a CHECK (`batch17_dry_check_failed.log`, with an addendum): in the threshold-0 check of W_SPLIT, the trigger's last check was the 6000-update check run's length minus 2400, so only the reference check ran and the condition 'at least two checks' failed; fixed (the check passes the full run's length for the trigger's horizon; the arms' runs are unchanged) and rerun. Second attempt (code of git f91f08b): each screen's code SHA computed; the repro check bit-identical to X; the projection with pool-load timing (eight-stream steps 68-74 ms, S49 13.5 ms): the full batch 12.83 h worst case on 4 workers, 11.32 h after cutting W_WIDTH4, 9.89 h after W_NOSLOW, printed and not stored or applied (the first attempt's timing gave 10.27 h at that point and would also have cut W_SPLIT_M with W_M_REF: the decision sits near 10 h and is taken once, from the first real segment's timing); every CHECK passed (9.0 min), among them W_SPLIT|260 at threshold 0 equal bit for bit through 6000 to batch 16's LOCAL3_SLOW_D8_A|260 (run on 2.80GHz), W_SPLIT_M|260 at threshold 0 equal to W_M_REF through 3600, the trigger at cap 2 equal to S37's row for row and at cap 3 firing at 4800, 9600, 14400, the width-4 window's causality and initialisation, decay 0.98 entering the decay mask only, W_NOSLOW / W_WIDTH4 / W_D98's lrs, S49's dense measurements inert (LOCAL3_SLOW|163 through 2400), and S49's seeds equal to S43's nine unbound seeds; then 9 runs (1 seed per arm, capped at 2400 steps), none failed; S49's rerun of 163 reproduces S43's record through 2400. After it, report-only changes (no run code SHA changed): the Muon reference's comparison label, and S49 marks runs whose eta^2 by key sits on the 0.5 threshold (a gate that splits the streams on two keys and puts the other two on different channels has exactly 0.5). It exercises the code; its numbers are not for interpretation. |
 | `batch17.log`, `batch17_checks.json`, `batch17_runtime_results.json`, `window_d8_results.json`, `window_fail_results.json` (S48 window_d8, S49 window_fail) | batch 17 (the user's specification of 7 October 2026), complete: 49/49 runs, none failed or retried, in 4 segments (each RESUME banner's wording is generic: every segment ended itself when no remaining run fitted its budget; segment 3 started about 35 min late because the wait loop meant to start it matched its own command line, which affected no run). Code of git 2531480 (the last commit touching explore_*.py); the run code SHAs (window_d8 375b30d487df, window_fail 3d097ab8b5cc) never changed, so segments 2-4 skipped the CHECK suite after segment 1's full pass (8.9 min). Every run on the batch's CPU, a Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run; the repro check (X's arm A, seed 160, 2400 steps) bit-identical in every segment. Segment 1 applied the runtime rule (projection 13.78 h on 4 workers > 10 h: cut W_WIDTH4 -> 12.17 h, W_NOSLOW -> 10.63 h, W_SPLIT_M with its reference W_M_REF -> 7.35 h, re-projecting after each). The Adam arms pair with batch 16's LOCAL3_SLOW_D8_A records (run on 2.80GHz): W_SPLIT equals them bit for bit through its first split on 10/10 seeds and W_LONG through 28800 on 10/10; W_SPLIT_D98 equals W_D98 through its first split on 10/10. S49's nine reruns reproduce S43's records bit for bit. GitHub refused pushes for about 15 min during segment 1 (HTTP 500); the commits went up when it recovered. Reports, readings and SUMMARY at the end of the log; verdicts below. |
 | `batch18_dry.log`, `dry_<screen>_results.json` (S50 window_recipe_ablation, S51 split_k4, S52 two_stream_keysplits) | batch 18's labelled DRY RUN (code of git 7ef4e15, Intel Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run). Before it, the CHECK functions were run once on their own: S52's validity check as first written (with k = 4 the perfect gate binds on seeds 160-161) could not pass — the plain perfect gate (no convolution) does not bind on the grouped two-stream layout at k = 2 or k = 4 (bit-identical curves; seed 160 at 0.54, 161 at 0.33 after 9600) — so it is run with this layout's recorded validity arm, test_short_conv's ceiling_conv (the perfect gate + conv 'layer'), padded to k = 4, which binds and routes on both seeds at 1200; a CHECK prints the plain gate's outcome and that the padding is inert. Also fixed then: the copy check named the wrong main file for stream_acc (it is test_scale_axes'), and eta2_key against S19's centred key_penalty has a float32 tolerance of 1e-4 (2.7e-5 seen). No arm or reading changed. The dry run: each screen's code SHA computed; the repro check bit-identical to X; S50's Muon reference decided (batch 16's LOCAL3_SLOW_D8_M|260, made on 2.80GHz, does not reproduce here through 1200: equal accuracy, loss 2.99112 vs 2.99034 — so W_M_REF runs as W_SPLIT_M's pair); the projection with pool-load timing (eight-stream steps 60-65 ms, S=4 k=4 26-27 ms, S=2 12.5 ms): 38.25 h of runs, makespan 9.58 h, the packing simulation 6 segments; the rule would cut W_SPLIT_W4 (5), W4k4 (5), W_SPLIT_NOSLOW (4: fits), printed and not stored or applied; every CHECK passed (13.5 min), among them W_RESET|261 equal to batch 16's LOCAL3_SLOW_D8_A|261 through its first reset and different after, W_SPLIT_NOSLOW and W_SPLIT_W4 at threshold 0 equal to S48's no-split recipes through 3600, W_SPLIT_M at threshold 0 equal to W_M_REF through 3600, S37's HINGE4k4_A|240 reproducing its record through 1200, W4k4_SPLIT at threshold 0 equal to W4k4 through 3600, the key term's weight 1 at update 2400 and 0 at 2401, W2_KEYHINGE at weight 0 equal to LOCAL3_SLOW through 1200, the copied main functions' syntax trees, and the key term equal to test_slow_start's eta2 code (7e-9); then 9 runs (1 seed per arm, capped at 2400 steps), none failed. It exercises the code; its numbers are not for interpretation. |
-| `batch18.log` (S50 window_recipe_ablation, S51 split_k4, S52 two_stream_keysplits) | batch 18 (the user's specification of 8 October 2026), code of git 7ef4e15, 1 thread per run, on Intel(R) Xeon(R) Processor @ 2.10GHz. **IN PROGRESS: 119 of 120 runs saved (window_recipe_ablation 30/30, split_k4 9/10, two_stream_keysplits 80/80); cut by the runtime rule: W_SPLIT_W4, W4k4, W_SPLIT_NOSLOW).** Run in segments, each resumed after the session's background time limit stops it; pushed after every saved run. No report, reading or label until the SUMMARY at the end of the log. |
+| `batch18.log`, `batch18_checks.json`, `batch18_runtime_results.json`, `window_recipe_ablation_results.json`, `split_k4_results.json`, `two_stream_keysplits_results.json` (S50 window_recipe_ablation, S51 split_k4, S52 two_stream_keysplits) | batch 18 (the user's specification of 8 October 2026), complete: 120/120 runs, none failed or retried, in 3 segments (each RESUME banner's wording is generic: every segment ended itself when no remaining run fitted its budget, or when none was left). Code of git 7ef4e15 (the last commit touching explore_*.py); the run code SHAs (window_recipe_ablation 300b8e0ba54a, split_k4 6c8051a868ff, two_stream_keysplits bd2ad99c5016) never changed, so segments 2-3 skipped the CHECK suite after segment 1's full pass (9.1 min, every CHECK ok). Every run on the batch's CPU, a Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run; the repro check (X's arm A, seed 160, 2400 steps) bit-identical in every segment. Segment 1 first stored S50's Muon reference decision (batch 16's LOCAL3_SLOW_D8_M|260, made on 2.80GHz, does not reproduce here through 1200: loss 2.99112 vs 2.99034, so W_M_REF ran fresh as W_SPLIT_M's pair), then applied the runtime rule (the packing simulation: 6 segments, 9.94 h makespan > 4 segments: cut W_SPLIT_W4 -> 5, W4k4 -> 5, W_SPLIT_NOSLOW -> 4 segments, 6.58 h, re-simulating after each; W2_KEYHINGE kept all 40 seeds). Muon arms ran first. W_RESET equals batch 16's LOCAL3_SLOW_D8_A bit for bit through its first reset on 10/10 seeds; W_SPLIT_M equals W_M_REF through its first split (or throughout when none fired) on 10/10. Reports, readings and SUMMARY at the end of the log; verdicts below. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -540,3 +540,69 @@ Handed back as promising for a pre-registered test on the main branch: S48's W_S
 memory, no hinge and S37's KEYMASS split trigger (<= 3 splits) at eight streams: 9/10 BOUND ROUTED against 3/10 for the same
 seeds without the trigger (6 / 0 discordant, p = 0.031), every split targeted as labelled. W_SPLIT_D98 (8/10) adds nothing
 the splits do not. Not: W_D98, W_LONG. Cut: W_NOSLOW, W_WIDTH4, W_SPLIT_M. Descriptive: S49.
+
+## Batch 18 verdicts (the user's specification of 8 October 2026; rules fixed before any run)
+
+S50: S=8, P=4, k=16, conv, 28800, seeds 260-269, BOUND ROUTED, paired with batch 17's W_SPLIT (9/10; all but 267). S51:
+S=4, P=4, k=4, conv, 28800, seeds 240-249, BOUND ROUTED, paired with S37's HINGE4k4_A (5/10 routed). S52: S=2, P=4, no conv,
+24000, seeds 160-199, paired with S43's LOCAL3_SLOW (31/40 DISCOVERED) and S13's SLOW_HINGE (34/40). Exact McNemar two-sided.
+
+| screen / arm | outcome count | paired reference | arm only / ref only | McNemar p | reading / verdict |
+|---|---|---|---|---|---|
+| S50 W_RESET (reset of W_g's Adam state at W_SPLIT's 19 split updates, no copy) | BOUND ROUTED 2/10 (264, 267) | W_SPLIT 9/10 | 1 / 8 | 0.0391 | "the copy does the work"; verdict: not (the reset alone; against batch 16's LOCAL3_SLOW_D8_A, 3/10, 1 / 2, p = 1) |
+| S50 W_SPLIT_M (W_SPLIT under Muon) | BOUND ROUTED 9/10 (all but 262) | W_M_REF 2/10 (261, 264) | 7 / 0 | 0.0156 | "the recipe carries to Muon" (>= 7/10 and +7 >= 4; vs W_SPLIT 1 / 1, p = 1); verdict: promising |
+| S50 W_M_REF (LOCAL3_SLOW_D8_M fresh on 2.10GHz) | BOUND ROUTED 2/10 | batch 16's record (2.80GHz) 3/10 | 0 / 1 (267) | 1 | reference, no reading |
+| S50 W_SPLIT_NOSLOW, W_SPLIT_W4 | cut by the runtime rule | | | | no reading |
+| S51 W4k4_SPLIT (LOCAL3 + SLOW, k=4, + the trigger, <= 2 splits) | BOUND ROUTED 8/10 (all but 244, 245) | HINGE4k4_A 5/10 | 5 / 2 | 0.453 | "the split fixes four-stream merges at k=4" (8 = the threshold); verdict: promising for the window recipe at k=4, not shown for the split (below) |
+| S51 W4k4 | cut by the runtime rule | | | | no reading (bounded below by 7/10, see below) |
+| S52 W2_K4 (k=4, two spare channels) | BOUND ROUTED 36/40; KEY failures 2 | LOCAL3_SLOW 31/40 / SLOW_HINGE 34/40 | 6 / 1 ; 5 / 3 | 0.125 ; 0.727 | "neither" (36 >= 36 but KEY 2 > 1); verdict: inconclusive |
+| S52 W2_KEYHINGE (k=2, the hinge's key term on updates 1-2400) | DISCOVERED 36/40; KEY failures 1 | LOCAL3_SLOW 31/40 / SLOW_HINGE 34/40 | 7 / 2 ; 6 / 4 | 0.18 ; 0.754 | "removes the key splits"; verdict: promising, weak (three on-threshold runs decide it, below) |
+
+S50, observations (not readings):
+- W_RESET zeroed W_g's Adam state (step, exp_avg, exp_avg_sq) at exactly batch 17's split updates, 19 resets, W_g unchanged
+  each time, and equals LOCAL3_SLOW_D8_A bit for bit up to each seed's first reset. Eight runs ended MERGED (6 x 2 share,
+  2 x 3 share) at accuracy 0.63-0.88. It bound 267, the one seed W_SPLIT missed. With the split's reset but without its
+  row copy, the reference's merges hold, so W_SPLIT's gain comes from the copy.
+- W_SPLIT_M: 17 splits, all but one labelled ok. The exception is 266's third split at 21600: its map was already one-to-one,
+  probe 0.86, and the map was unchanged. 261 and 264 bound with no split, as W_M_REF did. Transitions 8400-26400 (median
+  13200) against W_SPLIT's 14400-22800. Under Muon the maps were already pair merges at 2400 (2+2+2+1+1, 2+2+1+1+1+1); W_M_REF
+  kept such pair merges to 28800 on 8 seeds. The splits took them apart one pair at a time. The gate state decodes the stream at KEY / VAL
+  at 1.00 / 1.00 (median) by 2400 in both Muon arms, so here too the merge is not a decodability problem.
+- W_M_REF reproduces batch 16's Muon record's classes on 9/10 seeds; 267 bound there (2.80GHz) and not here.
+
+S51, observations:
+- 7 of the 8 bound runs fired no split. They had accuracy 1.0 at the first check (4800) and bound at 3600-4800. They are
+  W4k4's runs bit for bit, because the trigger's checks do not perturb training: with the threshold at 0, W4k4_SPLIT equals
+  W4k4 through 3600 (CHECK); W_SPLIT_M equals W_M_REF through 12000 and 10800 on the two seeds where no split fired, with checks
+  at 4800-9600; and batch 17's W_SPLIT equals D8_A up to each first split.
+  So the cut W4k4 arm would have bound at least 7/10 against HINGE4k4_A's 5/10. The gain over the recurrent gate comes from the
+  window gate with slow memory, not the split.
+- The split fired on 3 seeds. 243: one split at 7200, labelled ok, bound at 8400 (W4k4's outcome there is unknown). 244: the
+  first split fired with all four streams on one channel (4 -> 4: they moved together to another channel), the second took
+  3+1 to 2+2, which held (accuracy 0.49). 245: the first split was labelled ok and the map reached 1+1+1+1 by 12000. The second
+  fired at 14400 on that one-to-one map (probe 0.92, no rise), labelled NOT ok: at k=4 no channel is empty, so c0 was a bound
+  stream's channel. That split put the run back to 2+1+1 for good (accuracy 0.81). At k=4 the split can overwrite a bound stream.
+
+S52, observations:
+- W2_K4: all four failures (169 and 196 MERGED; 186 and 197 non-stream KEY) held a key split from update 325, 0, 200 and 150,
+  before 600 as S49 found. The two spare channels do not prevent it.
+- W2_KEYHINGE: the key term was active (eta^2 by key > 0.2) on a median of 3 of the first 2400 updates (0-8), all at the
+  start. eta^2 by key fell from 0.35-0.38 at the start to 0.05 by update 100 and 0.03 at 600 and 2400 (medians).
+  - Of S49's four KEY runs, 169, 173 and 192 DISCOVERED and 186 failed. Of its five STREAM-PARTIAL runs, 183, 185, 188 and
+    197 DISCOVERED and 163 failed. New failures: 170 and 182.
+  - Every failure formed after the term had switched off. 170 (KEY: eta^2 0.73 / 0.07) held a key split from 3600; 163, 182
+    and 186 first crossed 0.5 at 4800. So the key term removed the early (< 600) key splits. Later ones still form.
+  - 163, 182 and 186 end at eta^2 by key 0.500 and by stream 0.250. These are exactly the values a hard gate gives for S49's 2-of-4 pattern:
+    streams separated on two keys, each of the other two keys wholly on a different channel. main's classifier labels them
+    STREAM-PARTIAL. Labelled KEY, they would make KEY failures 4 and the reading "neither". The "removes" reading therefore
+    rests on where that discrete configuration falls against the 0.5 threshold.
+
+Handed back as promising for a pre-registered test on the main branch:
+- S50's W_SPLIT_M: the window recipe with the split under Muon, 9/10 against 2/10 without the split on the same CPU (7 / 0,
+  p = 0.016).
+- S51's window recipe at k=4 (LOCAL3 + SLOW), with a no-trigger arm, since 7/10 bound before any split could fire and one
+  split at k=4 undid a one-to-one map.
+- S52's W2_KEYHINGE, weakly: 36/40 against 31/40 (p = 0.18), with the on-threshold class decided before the test. A longer
+  key-term window is worth considering, since every remaining failure formed after 2400.
+
+Not: W_RESET (the reset-only control: the copy does the work). Inconclusive: W2_K4. Cut: W_SPLIT_NOSLOW, W_SPLIT_W4, W4k4.
