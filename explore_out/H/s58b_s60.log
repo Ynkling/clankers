@@ -116,3 +116,42 @@ EXPLORATORY, NOT A RESULT — session H: H/eight, H/stability
   [ 28]  306.5 min  H/eight          ORACLE                   seed 460  lr 0.001  (one Adam 1e-3 for every parameter)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 74a82e7+dirty, code 91494b36315e, attempt 1: acc 0.986  trans  3600  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
   start  306.5 min  H/eight          ORACLE                   seed 461  (projected worst case 720 min)
+  [ 29]  311.9 min  H/eight          ORACLE                   seed 461  lr 0.001  (one Adam 1e-3 for every parameter)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d, code 91494b36315e, attempt 1: acc 0.988  trans  2400  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
+  start  311.9 min  H/stability      REF                      seed 470  (projected worst case 400 min)
+  [ 30]  317.8 min  H/eight          GUMBEL_W                 seed 467  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 91494b36315e, attempt 1: acc 0.615  trans  None  outcome MERGED (3 share); map [7, 9, 15, 8, 8, 7, 8, 6] key [7, 9, 15, 8, 8, 7, 8, 6]
+  start  317.8 min  H/stability      REF                      seed 471  (projected worst case 400 min)
+  [ 31]  318.3 min  H/stability      REF                      seed 470  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 0.877  trans  None  outcome None
+  start  318.3 min  H/stability      REF                      seed 472  (projected worst case 400 min)
+  [ 32]  319.0 min  H/stability      REF                      seed 471  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  2400  outcome None
+  start  319.0 min  H/stability      REF                      seed 473  (projected worst case 400 min)
+  [ 33]  320.2 min  H/stability      REF                      seed 473  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  2400  outcome None
+  start  320.2 min  H/stability      REF                      seed 474  (projected worst case 400 min)
+  [ 34]  321.3 min  H/eight          GUMBEL_W                 seed 468  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 91494b36315e, attempt 1: acc 0.641  trans  None  outcome MERGED (2 share); map [5, 3, 3, 2, 2, 6, 15, 15] key [5, 3, 3, 2, 2, 6, 15, 15]
+  start  321.3 min  H/stability      REF                      seed 475  (projected worst case 400 min)
+  [ 35]  321.3 min  H/stability      REF                      seed 474  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  2400  outcome None
+  start  321.3 min  H/stability      REF                      seed 476  (projected worst case 400 min)
+  [ 36]  322.4 min  H/stability      REF                      seed 475  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  2400  outcome None
+  start  322.4 min  H/stability      REF                      seed 477  (projected worst case 400 min)
+  [ 37]  322.8 min  H/stability      REF                      seed 476  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  3600  outcome None
+  start  322.8 min  H/stability      REF                      seed 478  (projected worst case 400 min)
+  [ 38]  323.9 min  H/stability      REF                      seed 477  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  3600  outcome None
+  start  323.9 min  H/stability      REF                      seed 479  (projected worst case 400 min)
+  [ 39]  323.9 min  H/stability      REF                      seed 478  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  2400  outcome None
+  start  323.9 min  H/stability      TEMP_FLOOR               seed 470  (projected worst case 400 min)
+  [ 40]  324.0 min  H/stability      REF                      seed 472  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 0.489  trans  None  outcome None
+  start  324.0 min  H/stability      TEMP_FLOOR               seed 471  (projected worst case 400 min)
+  [ 41]  325.1 min  H/stability      REF                      seed 479  lr 0.001  (None)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ac87d+dirty, code 49ece189ac1a, attempt 1: acc 1.000  trans  2400  outcome None
+  start  325.1 min  H/stability      TEMP_FLOOR               seed 472  (projected worst case 400 min)
