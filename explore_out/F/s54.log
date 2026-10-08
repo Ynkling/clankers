@@ -200,3 +200,75 @@ EXPLORATORY, NOT A RESULT — Session F s54 (F/window_delta, F/window_delta_scal
 ==============================================================================================================
   code SHA F/window_delta: 30feac285d87 over 25 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_delta_fast, explore_f_tasks, explore_f_window_delta_child, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
   code SHA F/window_delta_scale: c8612c854acc over 44 modules (bdh, bdh_recurrent, explore_aux_gate, explore_b16_gates, explore_b16_main, explore_common, explore_common2, explore_delta_mem, explore_f_delta_fast, explore_f_window_delta_scale_child, explore_main9c, explore_muon_k16_child, explore_muon_recipe, explore_muon_scale_child, explore_slow_hinge, explore_slow_mem, explore_slow_pos, explore_split_child, explore_split_target_child, explore_stream_knobs_child, explore_window_d8_child, test_binding_capacity@main, test_binding_onset, test_binding_recipe, test_channel_binding, test_conv_lr, test_curriculum_confirm@main, test_instrument_v2, test_interference, test_load_curriculum, test_multilayer_binding, test_p_scaling, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_scale_axes@main, test_short_conv@main, test_slow_start@main, test_stream_channels@main, test_stream_curriculum@main, test_stream_recipe@main)
+  CHECK C1 parallel = sequential over 24 cases (beta 0 / 0.5 / 1 / per token, write tied / 1, decay fixed / routed / per-channel): forward max |diff| 4.44e-16 <= 1e-10, gradients 2.22e-15 <= 1e-8: ok
+  CHECK C2 LOCAL3 S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 2.38e-06 (relative 2.4e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.49e-07, attention outputs 3.81e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 perfect S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.27e-07, attention outputs 6.68e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 single k=1 (arm B), parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 8.58e-06 (relative 5.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.19e-07, attention outputs 5.96e-07 (relative 3.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.79e-07, attention outputs 4.77e-07 (relative 3.9e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C3 oracle gate, grouped, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C4 overwrite (beta 1, L2 keys, one channel, decay 0.95, float32): ‖S k̂ − v2‖ = 1.56e-06 after (k, v1), (k, v2); 1.09e-06 with 6 other writes between; the parallel read at a later key-k position equals 0.95·v2 to 1.59e-06 / 1.46e-06; all < 1e-5: ok
+  CHECK C5 learned beta = 0.5 exactly at init (True); to_delta keeps every existing parameter (True) and adds ['attn.w_b', 'attn.b_b']: ok
+  CHECK C5 routed decay at init: alpha at g = 1 0.9500000 (0.95 to 1e-6), at g = 0 1.0 (exactly 1), at g = 0.3 / 0.7 0.98473 / 0.96473; delta0 -2.6037: ok
+  CHECK C5 GDN decay init (seed 350, k = 2): A [2.198, 13.653], dt [0.06425, 0.00468] (softplus(b_dt) recovers dt), alpha at init [0.8683, 0.9381]; w_a = 0; same seed same draw, another seed another: ok
+  CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.10GHz (41 s): ok
+  ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
+  (explore_f_delta_checks: 47 s, all passed)
+/home/user/clankers/explore_f_delta_fast.py:175: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  rel = float((of - op).abs().max() / op.abs().max())
+  CHECK F/window_delta: explore_f_delta_fast: fast = parallel in float64 (beta 1 / 0.5 / per token, write tied / 1, k = 5): forward 0.0e+00 <= 1e-12, gradients 8.9e-16 <= 1e-10: ok
+  CHECK F/window_delta: explore_f_delta_fast: fast = parallel in float32 at B 32, T 99, k 16: forward relative 0.0e+00 <= 1e-5, gradients relative 4.9e-07 <= 1e-4: ok
+  CHECK F/window_delta: explore_f_delta_fast, grouped LOCAL3: model (DeltaLocalGateBDH, k 2): impl fast vs parallel, logits max |diff| 0.0e+00 <= 1e-5, parameter gradients relative 5.9e-05 <= 1e-4 over 10 tensors; fast memory class FastDeltaMemory: ok
+  CHECK F/window_delta: explore_f_delta_fast, grouped LOCAL3: batch chunking (296 sequences, chunks of 256) vs batches of 40: max |diff| 0.0e+00 <= 1e-5: ok
+  CHECK F/window_delta: RandHeaderTask: every (stream, key) appears exactly once in the body: ok
+  CHECK F/window_delta: RandHeaderTask: S distinct values per key: ok
+  CHECK F/window_delta: RandHeaderTask: each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK F/window_delta: RandHeaderTask: exactly one CTX per block, at its start; 4 blocks per sequence: ok
+  CHECK F/window_delta: RandHeaderTask: each stream has 2 blocks whose lengths are a composition of P = 8 with parts in 2..6: ok
+  CHECK F/window_delta: RandHeaderTask: block-length frequencies {2: 0.201, 3: 0.198, 4: 0.202, 5: 0.198, 6: 0.201} each within 0.03 of 0.20: ok
+  CHECK F/window_delta: RandHeaderTask: the stream order of the blocks varies (6 distinct orders over 4096 sequences): ok
+  CHECK F/window_delta: RandHeaderTask: stream_labels = the latest CTX token's stream at every position: ok
+  CHECK F/window_delta: RandHeaderTask: L = 39 = S(NB + 2P) + 3 n_q, qpos = [37]; select reads the query's KEY position and targets its value: ok
+  CHECK F/window_delta: A_DELTA = S43's LOCAL3_SLOW model + to_delta(learned beta): shares every parameter (True), adds ['attn.w_b', 'attn.b_b']; W_h frozen (True); memory FastDeltaMemory beta learned, L2 keys True, decay 0.95: ok
+  CHECK F/window_delta: D_HEBB / D_DELTA: LOCAL3 on RandHeaderTask's vocabulary (26; embed (26, 32), lm_head (32, 26)), share every initial parameter (True); gate group names present: ok
+  CHECK F/window_delta: the window gate on RandHeaderTask ignores token t-3 (True) and sees t-2 (True): ok
+  CHECK F/window_delta: A_DELTA: two groups cover every trainable parameter once (True); gate group = W_in, W_g, window (True); the memory's parameters ['attn.w_b', 'attn.b_b'] in the rest group (True); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/window_delta: D_DELTA: two groups cover every trainable parameter once (True); gate group = W_in, W_g, window (True); the memory's parameters ['attn.w_b', 'attn.b_b'] in the rest group (True); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/window_delta: D_HEBB: two groups cover every trainable parameter once (True); gate group = W_in, W_g, window (True); the memory's parameters [] in the rest group (True); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/window_delta: the perfect gate on RandHeaderTask: margin 1.0000, eta2 by stream at KEY / VAL 1.0000 / 1.0000: ok
+/home/user/clankers/explore_f_delta_fast.py:175: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  rel = float((of - op).abs().max() / op.abs().max())
+  CHECK F/window_delta_scale: b: C_HEBB (memory impl fast) on seed 260 reproduces W_SPLIT|260|375b30d487df|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit (curve [[1200, 0.060546875, 2.809293270111084], [2400, 0.1005859375, 2.770794153213501]] vs [[1200, 0.060546875, 2.809293270111084], [2400, 0.1005859375, 2.770794153213501]]; statistics equal True; decoder at 1200/2400 equal True; 196 s): ok
+  CHECK F/window_delta_scale: b: C_DELTA (memory impl hebb) on seed 260 reproduces W_SPLIT|260|375b30d487df|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit (curve [[1200, 0.060546875, 2.809293270111084], [2400, 0.1005859375, 2.770794153213501]] vs [[1200, 0.060546875, 2.809293270111084], [2400, 0.1005859375, 2.770794153213501]]; statistics equal True; decoder at 1200/2400 equal True; 192 s): ok
+  CHECK F/window_delta_scale: k16: B_HEBB (memory impl fast) on seed 242 reproduces LOCAL3_SLOW16_A|242|01767493e840|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit (curve [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]] vs [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]]; statistics equal True; decoder at 1200/2400 equal True; 88 s): ok
+  CHECK F/window_delta_scale: k16: B_DELTA (memory impl hebb) on seed 242 reproduces LOCAL3_SLOW16_A|242|01767493e840|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit (curve [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]] vs [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]]; statistics equal True; decoder at 1200/2400 equal True; 90 s): ok
+  CHECK F/window_delta_scale: explore_f_delta_fast: fast = parallel in float64 (beta 1 / 0.5 / per token, write tied / 1, k = 5): forward 0.0e+00 <= 1e-12, gradients 8.9e-16 <= 1e-10: ok
+  CHECK F/window_delta_scale: explore_f_delta_fast: fast = parallel in float32 at B 32, T 99, k 16: forward relative 0.0e+00 <= 1e-5, gradients relative 4.9e-07 <= 1e-4: ok
+  CHECK F/window_delta_scale: explore_f_delta_fast, S=8 k=16 LOCAL3 + conv: model (DeltaLocalBDH, k 16): impl fast vs parallel, logits max |diff| 0.0e+00 <= 1e-5, parameter gradients relative 1.3e-05 <= 1e-4 over 11 tensors; fast memory class FastDeltaMemory: ok
+  CHECK F/window_delta_scale: explore_f_delta_fast, S=8 k=16 LOCAL3 + conv: batch chunking (296 sequences, chunks of 256) vs batches of 40: max |diff| 0.0e+00 <= 1e-5: ok
+  CHECK F/window_delta_scale: k16: DELTA model DeltaLocalBDH, memory FastDeltaMemory; groups gate ['W_in', 'W_g', 'gate_conv.conv_w'], rest includes ['attn.w_b', 'attn.b_b']; every trainable parameter once: ok
+  CHECK F/window_delta_scale: b: DELTA model DeltaLocalBDH, memory FastDeltaMemory; groups gate ['W_in', 'W_g', 'gate_conv.conv_w'], rest includes ['attn.w_b', 'attn.b_b']; every trainable parameter once: ok
+  CHECK F/window_delta_scale: k16: the perfect gate (k 16) on the delta memory: read gate equal to the Hebbian model's and one-hot (True, True): ok
+  CHECK F/window_delta_scale: b: the perfect gate (k 16) on the delta memory: read gate equal to the Hebbian model's and one-hot (True, True): ok
+  timings reused from explore_out/F/s54_runtime.json
+  156 runs queued; projected worst case 89.36 h of runs, makespan 22.36 h on 4 workers
+  start    0.0 min  F/window_delta_scale C_DELTA                  seed 310  (projected worst case 173 min)
+  start    0.0 min  F/window_delta_scale C_DELTA                  seed 311  (projected worst case 173 min)
+  start    0.0 min  F/window_delta_scale C_DELTA                  seed 312  (projected worst case 173 min)
+  start    0.0 min  F/window_delta_scale C_DELTA                  seed 313  (projected worst case 173 min)
