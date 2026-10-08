@@ -275,3 +275,9 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [  1]  293.9 min  F/window_delta_scale C_DELTA                  seed 312  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git d7ae05c, code c8612c854acc, attempt 1: acc 0.427  trans  None  STREAM-PARTIAL one-to-one  splits 3  map --
   start  293.9 min  F/window_delta_scale C_DELTA                  seed 314  (projected worst case 173 min)
+  [  2]  363.8 min  F/window_delta_scale C_DELTA                  seed 310  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 0268500, code c8612c854acc, attempt 1: acc 0.327  trans  None  STREAM-PARTIAL one-to-one  splits 3  map --
+  start  363.8 min  F/window_delta_scale C_DELTA                  seed 315  (projected worst case 173 min)
+  [  3]  371.6 min  F/window_delta_scale C_DELTA                  seed 313  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 0268500+dirty, code c8612c854acc, attempt 1: acc 0.319  trans  None  STREAM-PARTIAL one-to-one  splits 3  map --
+  start  371.6 min  F/window_delta_scale C_DELTA                  seed 316  (projected worst case 173 min)
