@@ -76,6 +76,8 @@ def configure():
     st = ec.load_store(NAME)
     sel = st["meta"].get("selected")
     if sel is None:
+        c16.STATE["shas"].setdefault(s58.NAME, ec.load_store(s58.NAME)["meta"]["code_shas"][-1])
+        c16.STATE["batch_cpu"] = c16.STATE["batch_cpu"] or ec.cpu_model()
         res, _ = s58.report()
         if not (res["complete"] and res["valid"]):
             print(f"  S58b: S58 complete {res['complete']}, valid {res['valid']}: no selection, S58b does not run", flush=True)
