@@ -1,0 +1,94 @@
+{
+ "meta": {
+  "arms": {
+   "W_M_REF": {
+    "iters": 28800,
+    "key": "W_M_REF",
+    "label": "LOCAL3_SLOW_D8_M, fresh on this CPU (W_SPLIT_M's reference)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "needed_by": [
+     [
+      "window_recipe_ablation",
+      "W_SPLIT_M"
+     ]
+    ],
+    "opt": "muon",
+    "ref": true,
+    "sched": "Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "W_RESET": {
+    "iters": 28800,
+    "key": "W_RESET",
+    "label": "LOCAL3_SLOW_D8_A + W_g's Adam-state reset at W_SPLIT's split updates, no copy",
+    "lr": 0.001,
+    "muon_lr": null,
+    "opt": "adam",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; W_g's Adam state zeroed after the evaluations at batch 17's W_SPLIT split updates (per seed)",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   },
+   "W_SPLIT_M": {
+    "iters": 28800,
+    "key": "W_SPLIT_M",
+    "label": "W_SPLIT under Muon (LOCAL3_SLOW_D8_M + the trigger)",
+    "lr": 0.001,
+    "muon_lr": 0.005,
+    "opt": "muon",
+    "sched": "Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed",
+    "seeds": [
+     260,
+     261,
+     262,
+     263,
+     264,
+     265,
+     266,
+     267,
+     268,
+     269
+    ]
+   }
+  },
+  "code_shas": [
+   "300b8e0ba54a16ba8aa2c3677dc1e27badcec8a3"
+  ],
+  "cut": [
+   "W_SPLIT_NOSLOW",
+   "W_SPLIT_W4"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "2afa02f+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-08 01:41:02",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
