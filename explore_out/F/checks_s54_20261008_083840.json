@@ -1,0 +1,116 @@
+{
+ "provenance": {
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "torch": "2.14.0+cu130",
+  "git": "3de49ae+dirty",
+  "threads": 1,
+  "started": "2026-10-08 08:38:42"
+ },
+ "ok": true,
+ "rows": [
+  [
+   "C1 parallel = sequential over 24 cases (beta 0 / 0.5 / 1 / per token, write tied / 1, decay fixed / routed / per-channel): forward max |diff| 4.44e-16 <= 1e-10, gradients 2.22e-15 <= 1e-8",
+   true
+  ],
+  [
+   "C2 LOCAL3 S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 2.38e-06 (relative 2.4e-07) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 LOCAL3 S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.49e-07, attention outputs 3.81e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 LOCAL3 S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model",
+   true
+  ],
+  [
+   "C2 perfect S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 perfect S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.27e-07, attention outputs 6.68e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 perfect S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model",
+   true
+  ],
+  [
+   "C2 single k=1 (arm B), parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 single k=1 (arm B), sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 8.58e-06 (relative 5.8e-07) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 single k=1 (arm B), impl hebb (beta 1 set, path disabled): logits bit-identical to the current model",
+   true
+  ],
+  [
+   "C2 LOCAL3 S=8 k=16 conv, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.19e-07, attention outputs 5.96e-07 (relative 3.8e-07) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 LOCAL3 S=8 k=16 conv, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.79e-07, attention outputs 4.77e-07 (relative 3.9e-07) over 3 layers, all <= 1e-5",
+   true
+  ],
+  [
+   "C2 LOCAL3 S=8 k=16 conv, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model",
+   true
+  ],
+  [
+   "C3 oracle gate, grouped, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C3 oracle gate, grouped, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C3 oracle gate, grouped, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C3 oracle gate, grouped, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C3 oracle gate, header, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C3 oracle gate, header, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C3 oracle gate, header, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C3 oracle gate, header, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True)",
+   true
+  ],
+  [
+   "C4 overwrite (beta 1, L2 keys, one channel, decay 0.95, float32): \u2016S k\u0302 \u2212 v2\u2016 = 1.56e-06 after (k, v1), (k, v2); 1.09e-06 with 6 other writes between; the parallel read at a later key-k position equals 0.95\u00b7v2 to 1.59e-06 / 1.46e-06; all < 1e-5",
+   true
+  ],
+  [
+   "C5 learned beta = 0.5 exactly at init (True); to_delta keeps every existing parameter (True) and adds ['attn.w_b', 'attn.b_b']",
+   true
+  ],
+  [
+   "C5 routed decay at init: alpha at g = 1 0.9500000 (0.95 to 1e-6), at g = 0 1.0 (exactly 1), at g = 0.3 / 0.7 0.98473 / 0.96473; delta0 -2.6037",
+   true
+  ],
+  [
+   "C5 GDN decay init (seed 350, k = 2): A [2.198, 13.653], dt [0.06425, 0.00468] (softplus(b_dt) recovers dt), alpha at init [0.8683, 0.9381]; w_a = 0; same seed same draw, another seed another",
+   true
+  ],
+  [
+   "C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.10GHz (49 s)",
+   true
+  ]
+ ]
+}
