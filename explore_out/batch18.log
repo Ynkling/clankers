@@ -592,3 +592,6 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [ 11]   99.8 min  window_recipe_ablation W_RESET                  seed 264  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; W_g's Adam state zeroed after the evaluations at batch 17's W_SPLIT split updates (per seed))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5deedce, code 300b8e0ba54a, attempt 1: acc 1.000  trans 28800  outcome BOUND ROUTED; decoder at 28800: h CTX/KEY/VAL 0.73/1.00/1.00; resets at [9600, 14400]
   start   99.8 min  two_stream_keysplits W2_KEYHINGE              seed 162  (projected worst case 6 min)
+  [ 12]  100.2 min  two_stream_keysplits W2_KEYHINGE              seed 160  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git d22081c, code bd2ad99c5016, attempt 1: acc 1.000  trans  4800  DISCOVERED; key term fired on 2 updates
+  start  100.2 min  two_stream_keysplits W2_KEYHINGE              seed 163  (projected worst case 6 min)
