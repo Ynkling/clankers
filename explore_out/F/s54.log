@@ -305,3 +305,6 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 11]  793.4 min  F/window_delta_scale C_DELTA                  seed 318  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git c7359e5+dirty, code c8612c854acc, attempt 1: acc 0.430  trans  None  MERGED (2 share)  splits 3  map --
   start  793.4 min  F/window_delta_scale C_HEBB                   seed 312  (projected worst case 58 min)
+  [ 12]  814.2 min  F/window_delta_scale C_HEBB                   seed 311  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 0442f35, code c8612c854acc, attempt 1: acc 1.000  trans 18000  BOUND ROUTED  splits 2  map --
+  start  814.2 min  F/window_delta_scale C_HEBB                   seed 313  (projected worst case 58 min)
