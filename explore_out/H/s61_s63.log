@@ -23,3 +23,12 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
   start    0.0 min  H/copy2x2        SPLIT                    seed 481  (projected worst case 720 min)
   start    0.0 min  H/copy2x2        SPLIT                    seed 482  (projected worst case 720 min)
   start    0.0 min  H/copy2x2        SPLIT                    seed 483  (projected worst case 720 min)
+  [  1]   33.2 min  H/copy2x2        SPLIT                    seed 480  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise + reset)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 05d8cb6, code 0b17627cb1b8, attempt 1: acc 1.000  trans 22800  outcome BOUND ROUTED; map [7, 10, 5, 2, 11, 4, 13, 3]; None fired at [12000, 19200]
+  start   33.2 min  H/copy2x2        SPLIT                    seed 484  (projected worst case 720 min)
+  [  2]   36.4 min  H/copy2x2        SPLIT                    seed 481  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise + reset)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 05d8cb6+dirty, code 0b17627cb1b8, attempt 1: acc 1.000  trans 22800  outcome BOUND ROUTED; map [6, 4, 10, 0, 13, 12, 9, 15]; None fired at [7200]
+  start   36.4 min  H/copy2x2        SPLIT                    seed 485  (projected worst case 720 min)
+  [  3]   36.7 min  H/copy2x2        SPLIT                    seed 482  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise + reset)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 05d8cb6+dirty, code 0b17627cb1b8, attempt 1: acc 1.000  trans 25200  outcome BOUND ROUTED; map [15, 7, 2, 6, 0, 9, 14, 4]; None fired at [14400, 19200, 24000]
+  start   36.7 min  H/copy2x2        SPLIT                    seed 486  (projected worst case 720 min)
