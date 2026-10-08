@@ -56,3 +56,9 @@ EXPLORATORY, NOT A RESULT — session H: H/eight, H/stability
   [  8]   69.0 min  H/eight          SPLIT                    seed 466  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git f47bf50+dirty, code 91494b36315e, attempt 1: acc 1.000  trans 25200  outcome BOUND ROUTED; map [1, 15, 9, 10, 11, 0, 13, 7] key [1, 15, 9, 10, 11, 0, 13, 7]; split fired at [9600, 14400, 19200]
   start   69.0 min  H/eight          RESET                    seed 461  (projected worst case 720 min)
+  [  9]   71.1 min  H/eight          SPLIT                    seed 467  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 6e896fc, code 91494b36315e, attempt 1: acc 1.000  trans 26400  outcome BOUND ROUTED; map [5, 3, 8, 11, 1, 7, 0, 15] key [5, 3, 8, 11, 1, 7, 0, 15]; split fired at [14400, 19200, 24000]
+  start   71.1 min  H/eight          RESET                    seed 462  (projected worst case 720 min)
+  [ 10]   79.4 min  H/eight          SPLIT                    seed 469  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 6e896fc+dirty, code 91494b36315e, attempt 1: acc 1.000  trans 18000  outcome BOUND ROUTED; map [11, 6, 1, 8, 12, 7, 9, 5] key [11, 6, 1, 8, 12, 7, 9, 5]; split fired at [9600, 14400]
+  start   79.4 min  H/eight          RESET                    seed 463  (projected worst case 720 min)
