@@ -1,0 +1,130 @@
+==============================================================================================================
+EXPLORATORY, NOT A RESULT — Session F s53 (F/delta_controls)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git bb906e5 | python 3.11.17 | torch threads 1 | started 2026-10-08 04:14:55
+==============================================================================================================
+  code SHA F/delta_controls: 429221e60279 over 23 modules (bdh, bdh_recurrent, explore_common, explore_common2, explore_delta_mem, explore_f_delta_controls_child, explore_f_tasks, explore_far_cue, explore_local_gate, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  CHECK C1 parallel = sequential over 24 cases (beta 0 / 0.5 / 1 / per token, write tied / 1, decay fixed / routed / per-channel): forward max |diff| 4.44e-16 <= 1e-10, gradients 2.22e-15 <= 1e-8: ok
+  CHECK C2 LOCAL3 S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 2.38e-06 (relative 2.4e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.49e-07, attention outputs 3.81e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 perfect S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.27e-07, attention outputs 6.68e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 single k=1 (arm B), parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 8.58e-06 (relative 5.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.19e-07, attention outputs 5.96e-07 (relative 3.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.79e-07, attention outputs 4.77e-07 (relative 3.9e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C3 oracle gate, grouped, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C4 overwrite (beta 1, L2 keys, one channel, decay 0.95, float32): ‖S k̂ − v2‖ = 1.56e-06 after (k, v1), (k, v2); 1.09e-06 with 6 other writes between; the parallel read at a later key-k position equals 0.95·v2 to 1.59e-06 / 1.46e-06; all < 1e-5: ok
+  CHECK C5 learned beta = 0.5 exactly at init (True); to_delta keeps every existing parameter (True) and adds ['attn.w_b', 'attn.b_b']: ok
+  CHECK C5 routed decay at init: alpha at g = 1 0.9500000 (0.95 to 1e-6), at g = 0 1.0 (exactly 1), at g = 0.3 / 0.7 0.98473 / 0.96473; delta0 -2.6037: ok
+  CHECK C5 GDN decay init (seed 350, k = 2): A [2.198, 13.653], dt [0.06425, 0.00468] (softplus(b_dt) recovers dt), alpha at init [0.8683, 0.9381]; w_a = 0; same seed same draw, another seed another: ok
+  CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.10GHz (38 s): ok
+  ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
+  (explore_f_delta_checks: 44 s, all passed)
+  CHECK F/delta_controls: grouped: models as stated (k, gate, memory, beta, no conv); SINGLE_DELTA and SINGLE_HEBB share every initial parameter (True); SINGLE_DELTA_L shares them and adds attn.w_b, attn.b_b (True); ORACLE_DELTA and ORACLE_HEBB share every initial parameter (True): ok
+  CHECK F/delta_controls: header: models as stated (k, gate, memory, beta, no conv); SINGLE_DELTA and SINGLE_HEBB share every initial parameter (True); SINGLE_DELTA_L shares them and adds attn.w_b, attn.b_b (True); ORACLE_DELTA and ORACLE_HEBB share every initial parameter (True): ok
+  CHECK F/delta_controls: header8: models as stated (k, gate, memory, beta, no conv); SINGLE_DELTA and SINGLE_HEBB share every initial parameter (True); SINGLE_DELTA_L shares them and adds attn.w_b, attn.b_b (True); ORACLE_DELTA and ORACLE_HEBB share every initial parameter (True): ok
+  CHECK F/delta_controls: P = 8 header task: L = 37, qpos = [35], vocab 26: ok
+  timings measured (26 s): F/delta_controls:SINGLE_HEBB_G 13.1 ms/step, F/delta_controls:SINGLE_HEBB_H 10.9 ms/step, F/delta_controls:SINGLE_DELTA_G 18.7 ms/step, F/delta_controls:SINGLE_DELTA_H 15.1 ms/step, F/delta_controls:SINGLE_DELTA_L_G 19.2 ms/step, F/delta_controls:SINGLE_DELTA_L_H 15.3 ms/step, F/delta_controls:ORACLE_HEBB_G 13.4 ms/step, F/delta_controls:ORACLE_HEBB_H 11.1 ms/step, F/delta_controls:ORACLE_DELTA_G 20.1 ms/step, F/delta_controls:ORACLE_DELTA_H 16.2 ms/step, F/delta_controls:ORACLE_HEBB_P8 17.4 ms/step, F/delta_controls:ORACLE_DELTA_P8 29.4 ms/step
+  106 runs queued; projected worst case 13.19 h of runs, makespan 3.32 h on 4 workers; segment budget 115 min
+  start    0.0 min  F/delta_controls ORACLE_DELTA_P8          seed 300  (projected worst case 25 min)
+  start    0.0 min  F/delta_controls ORACLE_DELTA_P8          seed 301  (projected worst case 25 min)
+  start    0.0 min  F/delta_controls ORACLE_DELTA_P8          seed 302  (projected worst case 25 min)
+  start    0.0 min  F/delta_controls ORACLE_HEBB_P8           seed 300  (projected worst case 15 min)
+  [  1]    3.6 min  F/delta_controls ORACLE_DELTA_P8          seed 301  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5, code 429221e60279, attempt 1: acc 0.996  trans  2400  BOUND  last/notlast 1.00/1.00
+  start    3.6 min  F/delta_controls ORACLE_HEBB_P8           seed 301  (projected worst case 15 min)
+  [  2]    5.0 min  F/delta_controls ORACLE_DELTA_P8          seed 302  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5, code 429221e60279, attempt 1: acc 1.000  trans  4800  BOUND  last/notlast 1.00/1.00
+  start    5.0 min  F/delta_controls ORACLE_HEBB_P8           seed 302  (projected worst case 15 min)
+  [  3]    5.9 min  F/delta_controls ORACLE_DELTA_P8          seed 300  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5, code 429221e60279, attempt 1: acc 1.000  trans  6000  BOUND  last/notlast 1.00/1.00
+  start    5.9 min  F/delta_controls ORACLE_DELTA_G           seed 300  (projected worst case 9 min)
+  [  4]    7.8 min  F/delta_controls ORACLE_DELTA_G           seed 300  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start    7.8 min  F/delta_controls ORACLE_DELTA_G           seed 301  (projected worst case 9 min)
+  [  5]    9.7 min  F/delta_controls ORACLE_DELTA_G           seed 301  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start    9.7 min  F/delta_controls ORACLE_DELTA_G           seed 302  (projected worst case 9 min)
+  [  6]   10.8 min  F/delta_controls ORACLE_HEBB_P8           seed 301  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 0.998  trans 14400  BOUND  last/notlast 1.00/1.00
+  start   10.8 min  F/delta_controls ORACLE_DELTA_G           seed 303  (projected worst case 9 min)
+  [  7]   11.5 min  F/delta_controls ORACLE_HEBB_P8           seed 300  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 0.996  trans 24000  BOUND  last/notlast 1.00/0.99
+  start   11.5 min  F/delta_controls ORACLE_DELTA_G           seed 304  (projected worst case 9 min)
+  [  8]   11.7 min  F/delta_controls ORACLE_DELTA_G           seed 302  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   11.7 min  F/delta_controls ORACLE_DELTA_G           seed 305  (projected worst case 9 min)
+  [  9]   12.7 min  F/delta_controls ORACLE_DELTA_G           seed 303  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   12.7 min  F/delta_controls ORACLE_DELTA_G           seed 306  (projected worst case 9 min)
+  [ 10]   13.5 min  F/delta_controls ORACLE_DELTA_G           seed 304  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   13.5 min  F/delta_controls ORACLE_DELTA_G           seed 307  (projected worst case 9 min)
+  [ 11]   13.7 min  F/delta_controls ORACLE_DELTA_G           seed 305  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   13.7 min  F/delta_controls ORACLE_DELTA_G           seed 308  (projected worst case 9 min)
+  [ 12]   14.3 min  F/delta_controls ORACLE_HEBB_P8           seed 302  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans 18000  BOUND  last/notlast 1.00/1.00
+  start   14.3 min  F/delta_controls ORACLE_DELTA_G           seed 309  (projected worst case 9 min)
+  [ 13]   14.7 min  F/delta_controls ORACLE_DELTA_G           seed 306  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   14.7 min  F/delta_controls SINGLE_DELTA_L_G         seed 300  (projected worst case 8 min)
+  [ 14]   15.5 min  F/delta_controls ORACLE_DELTA_G           seed 307  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   15.5 min  F/delta_controls SINGLE_DELTA_L_G         seed 301  (projected worst case 8 min)
+  [ 15]   15.7 min  F/delta_controls ORACLE_DELTA_G           seed 308  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   15.7 min  F/delta_controls SINGLE_DELTA_L_G         seed 302  (projected worst case 8 min)
+  [ 16]   16.3 min  F/delta_controls ORACLE_DELTA_G           seed 309  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bb906e5+dirty, code 429221e60279, attempt 1: acc 1.000  trans  1200  BOUND  last/notlast 1.00/1.00
+  start   16.3 min  F/delta_controls SINGLE_DELTA_L_G         seed 303  (projected worst case 8 min)
+  [ 17]   26.3 min  F/delta_controls SINGLE_DELTA_L_G         seed 300  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.225  trans  None  unbound  last/notlast 0.22/0.23
+  start   26.3 min  F/delta_controls SINGLE_DELTA_L_G         seed 304  (projected worst case 8 min)
+  [ 18]   27.4 min  F/delta_controls SINGLE_DELTA_L_G         seed 301  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.212  trans  None  unbound  last/notlast 0.22/0.21
+  start   27.4 min  F/delta_controls SINGLE_DELTA_L_G         seed 305  (projected worst case 8 min)
+  [ 19]   27.5 min  F/delta_controls SINGLE_DELTA_L_G         seed 302  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.210  trans  None  unbound  last/notlast 0.20/0.22
+  start   27.5 min  F/delta_controls SINGLE_DELTA_L_G         seed 306  (projected worst case 8 min)
+  [ 20]   28.1 min  F/delta_controls SINGLE_DELTA_L_G         seed 303  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.225  trans  None  unbound  last/notlast 0.25/0.21
+  start   28.1 min  F/delta_controls SINGLE_DELTA_L_G         seed 307  (projected worst case 8 min)
+  [ 21]   37.7 min  F/delta_controls SINGLE_DELTA_L_G         seed 304  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.218  trans  None  unbound  last/notlast 0.22/0.22
+  start   37.7 min  F/delta_controls SINGLE_DELTA_L_G         seed 308  (projected worst case 8 min)
+  [ 22]   38.4 min  F/delta_controls SINGLE_DELTA_L_G         seed 305  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.221  trans  None  unbound  last/notlast 0.22/0.22
+  start   38.4 min  F/delta_controls SINGLE_DELTA_L_G         seed 309  (projected worst case 8 min)
+  [ 23]   38.8 min  F/delta_controls SINGLE_DELTA_L_G         seed 306  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.218  trans  None  unbound  last/notlast 0.22/0.21
+  start   38.8 min  F/delta_controls SINGLE_DELTA_G           seed 300  (projected worst case 8 min)
+  [ 24]   39.1 min  F/delta_controls SINGLE_DELTA_L_G         seed 307  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81, code 429221e60279, attempt 1: acc 0.218  trans  None  unbound  last/notlast 0.21/0.23
+  start   39.1 min  F/delta_controls SINGLE_DELTA_G           seed 301  (projected worst case 8 min)
+  [ 25]   46.8 min  F/delta_controls SINGLE_DELTA_L_G         seed 308  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81+dirty, code 429221e60279, attempt 1: acc 0.220  trans  None  unbound  last/notlast 0.22/0.22
+  start   46.8 min  F/delta_controls SINGLE_DELTA_G           seed 302  (projected worst case 8 min)
+  [ 26]   47.6 min  F/delta_controls SINGLE_DELTA_L_G         seed 309  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81+dirty, code 429221e60279, attempt 1: acc 0.208  trans  None  unbound  last/notlast 0.21/0.20
+  start   47.6 min  F/delta_controls SINGLE_DELTA_G           seed 303  (projected worst case 8 min)
+  [ 27]   47.7 min  F/delta_controls SINGLE_DELTA_G           seed 300  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9ddda81+dirty, code 429221e60279, attempt 1: acc 0.495  trans  None  unbound  last/notlast 0.54/0.45
+  start   47.7 min  F/delta_controls SINGLE_DELTA_G           seed 304  (projected worst case 8 min)
+  [ 28]   48.2 min  F/delta_controls SINGLE_DELTA_G           seed 301  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git da4f065, code 429221e60279, attempt 1: acc 0.491  trans  None  unbound  last/notlast 0.44/0.54
+  start   48.2 min  F/delta_controls SINGLE_DELTA_G           seed 305  (projected worst case 8 min)
+  [ 29]   51.2 min  F/delta_controls SINGLE_DELTA_G           seed 305  lr 0.001  (Adam 0.001 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 93ddb60, code 429221e60279, attempt 1: acc 1.000  trans  4800  BOUND  last/notlast 1.00/1.00
+  start   51.2 min  F/delta_controls SINGLE_DELTA_G           seed 306  (projected worst case 8 min)
