@@ -150,3 +150,6 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [ 18]   92.0 min  two_stream_keysplits W2_K4                    seed 161  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); k=4)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5ea3490, code bd2ad99c5016, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED
   start   92.0 min  two_stream_keysplits W2_K4                    seed 162  (projected worst case 6 min)
+  [ 19]   92.1 min  split_k4         W4k4_SPLIT               seed 243  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 2 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 452ad45, code 6c8051a868ff, attempt 1: acc 1.000  trans  8400  outcome BOUND ROUTED; decoder at 10800: h CTX/KEY/VAL 0.43/1.00/1.00; splits 1 at [7200]
+  start   92.1 min  two_stream_keysplits W2_K4                    seed 163  (projected worst case 6 min)
