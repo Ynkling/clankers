@@ -598,3 +598,6 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [ 13]  101.2 min  two_stream_keysplits W2_KEYHINGE              seed 161  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 697a546, code bd2ad99c5016, attempt 1: acc 1.000  trans  3600  DISCOVERED; key term fired on 1 updates
   start  101.2 min  two_stream_keysplits W2_KEYHINGE              seed 164  (projected worst case 6 min)
+  [ 14]  101.5 min  two_stream_keysplits W2_KEYHINGE              seed 162  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); + 1.0 x relu(eta2_key - 0.2) on the read gate at key positions, updates 1-2400 only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git ad233f0, code bd2ad99c5016, attempt 1: acc 1.000  trans  3600  DISCOVERED; key term fired on 2 updates
+  start  101.5 min  two_stream_keysplits W2_KEYHINGE              seed 165  (projected worst case 6 min)
