@@ -1,5 +1,107 @@
 {
  "meta": {
+  "cut": {
+   "budgets_min": [
+    82.45204971234004,
+    113.0
+   ],
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "cut": [
+    [
+     "window_recipe_ablation",
+     "W_SPLIT_W4"
+    ],
+    [
+     "split_k4",
+     "W4k4"
+    ],
+    [
+     "window_recipe_ablation",
+     "W_SPLIT_NOSLOW"
+    ]
+   ],
+   "makespan_h": 6.58041286629744,
+   "makespan_h0": 9.941614237707855,
+   "segments": 4,
+   "segments0": 6,
+   "steps": [
+    {
+     "cut": [
+      "window_recipe_ablation",
+      "W_SPLIT_W4"
+     ],
+     "makespan_h": 8.559492051948103,
+     "segments": 5
+    },
+    {
+     "cut": [
+      "split_k4",
+      "W4k4"
+     ],
+     "makespan_h": 7.974264609623283,
+     "segments": 5
+    },
+    {
+     "cut": [
+      "window_recipe_ablation",
+      "W_SPLIT_NOSLOW"
+     ],
+     "makespan_h": 6.58041286629744,
+     "segments": 4
+    }
+   ],
+   "time": "2026-10-08 01:44:35 UTC",
+   "timings": {
+    "split_k4|W4k4": [
+     0.028794636000384344,
+     1.997720718383789,
+     0.2993888854980469
+    ],
+    "split_k4|W4k4_SPLIT": [
+     0.028674036000211345,
+     2.1148953437805176,
+     0.29249024391174316
+    ],
+    "two_stream_keysplits|W2_K4": [
+     0.012917216000005283,
+     0.8893115520477295,
+     0.1305675506591797,
+     0.09589533805847168
+    ],
+    "two_stream_keysplits|W2_KEYHINGE": [
+     0.012671908999891457,
+     0.9656531810760498,
+     0.16209769248962402,
+     0.11161398887634277
+    ],
+    "window_recipe_ablation|W_M_REF": [
+     0.06188992700026574,
+     4.5157105922698975,
+     0.7409496307373047
+    ],
+    "window_recipe_ablation|W_RESET": [
+     0.061585346999891044,
+     4.362306594848633,
+     0.7041308879852295
+    ],
+    "window_recipe_ablation|W_SPLIT_M": [
+     0.0643942359997709,
+     4.631913185119629,
+     0.7093572616577148
+    ],
+    "window_recipe_ablation|W_SPLIT_NOSLOW": [
+     0.06297501200015176,
+     4.902661085128784,
+     0.7006247043609619
+    ],
+    "window_recipe_ablation|W_SPLIT_W4": [
+     0.06296482200013997,
+     4.531517744064331,
+     0.71022629737854
+    ]
+   },
+   "workers": 4
+  },
   "muon_ref": {
    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
    "curve": [
