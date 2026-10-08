@@ -33,9 +33,13 @@ CHECKS: the copied functions equal main's (syntax trees); at k = 2 the pooled et
 and the hinge's eta2_key equals S19's key_penalty; the term's gradient reaches only the gate and the embedding; the term
 equals test_slow_start's eta2 code restricted to key identity (explore_b18_gates.eta2_pool with eta2_hinge's own groupings
 equals eta2_hinge, in a main-line child); weight 1 at update 2400, 0 at 2401; with weight 0 the arm equals LOCAL3_SLOW bit
-for bit (1200 updates); the dense measurements are inert; W2_K4's model has 4 channels and the seed's window; with k = 4
-the perfect gate (streams 0, 1 -> channels 0, 1) binds and routes on seeds 160-161 (validity); the paired records are all
-present.
+for bit (1200 updates); the dense measurements are inert; W2_K4's model has 4 channels and the seed's window; the paired
+records are all present; VALIDITY: with k = 4 the perfect gate (streams 0, 1 -> channels 0, 1) binds and routes on seeds
+160-161. Run as this layout's own recorded validity arm, test_short_conv's ceiling_conv (the perfect gate + conv "layer",
+mult 8; 5/5 at 1200 in test_short_conv), padded to k = 4: found in the CHECK pass before the dry run, the plain perfect gate
+(no convolution) does not bind on this grouped two-stream layout at k = 2 or k = 4 (seed 160 at 0.54, 161 at 0.33 after
+9600 updates; k = 2 and k = 4 bit-identical), so the check as first written could not pass at any k; a CHECK prints that
+the padding is inert (k = 4 equals k = 2 bit for bit) and the plain gate's outcome.
 """
 
 import math
@@ -59,7 +63,7 @@ LR = ec.SUB_LR
 ITERS = ec.MAX_ITERS
 SEEDS = tuple(range(160, 200))
 S43, S43_SHA = "window_recipe", "46867e792241"
-PERFECT_SEEDS, PERFECT_ITERS = (160, 161), 9600
+PERFECT_SEEDS, PERFECT_ITERS, PLAIN_ITERS = (160, 161), 9600, 2400
 SHOW = (0, 100, 200, 300, 400, 600, 800, 1200, 2400, 4800, 12000, 24000)
 _sl = (f"gate W_in/W_g/window {LR:g} throughout; every other trainable parameter {LR / 10:g} for updates 1-2400, {LR:g} "
        f"after; W_h frozen (unused)")
@@ -120,14 +124,23 @@ def check():
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=3) as ex:
         f1 = ex.submit(child, "checks", {})
-        f2 = ex.submit(child, "perfect_k4", dict(seeds=list(PERFECT_SEEDS), iters=PERFECT_ITERS))
+        f2 = ex.submit(child, "perfect_k4", dict(seeds=list(PERFECT_SEEDS), iters=PERFECT_ITERS, arm="ceiling_conv", k=4))
+        f4 = ex.submit(lambda: (child("perfect_k4", dict(seeds=[PERFECT_SEEDS[0]], iters=PLAIN_ITERS, arm="ceiling", k=4)),
+                                child("perfect_k4", dict(seeds=[PERFECT_SEEDS[0]], iters=PLAIN_ITERS, arm="ceiling", k=2))))
         f3 = ex.submit(c16.run_child, "explore_b18_gates", "check_vs_slow_start", {}, True)
         rows = [tuple(x) for x in f1.result()]
         pk, vs = f2.result(), f3.result()
-    rows.append((f"with k = 4 the perfect gate (streams 0, 1 -> channels 0, 1) binds and routes on seeds {list(PERFECT_SEEDS)}: "
+        p4, p2 = f4.result()
+    rows.append((f"validity: with k = 4 the perfect gate (streams 0, 1 -> channels 0, 1; this layout's validity arm, test_short_conv's "
+                 f"ceiling_conv: the perfect gate + conv 'layer') binds and routes on seeds {list(PERFECT_SEEDS)}: "
                  + "; ".join(f"{s}: {v['outcome']}, transition {v['transition']}, map {v['ch_map']}, per-stream accuracy "
                              f"{[round(x, 3) for x in v['stream_acc'] or []]}, k {v['k']}" for s, v in pk.items()),
                  all(v["outcome"] == "BOUND ROUTED" and v["k"] == 4 for v in pk.values()) and len(pk) == len(PERFECT_SEEDS)))
+    a4, a2 = p4[str(PERFECT_SEEDS[0])], p2[str(PERFECT_SEEDS[0])]
+    rows.append((f"the plain perfect gate (no convolution) padded to k = 4 equals it at k = 2 bit for bit through {PLAIN_ITERS} (curves "
+                 f"{a4['curve']} vs {a2['curve']}): the padding is inert; it does not bind on this layout at either k (outcome "
+                 f"{a4['outcome']}), which is why the validity check above uses the layout's own validity arm",
+                 a4["curve"] == a2["curve"] and a4["k"] == 4 and a2["k"] == 2))
     rows.append((f"the key term is test_slow_start's eta2 code restricted to key identity: explore_b18_gates.eta2_pool with "
                  f"eta2_hinge's groupings (index, half) equals test_slow_start.eta2_hinge (main, in a main-line child; EPS "
                  f"{vs['tss_eps']}) on random gates: {[(r['S'], r['k'], r['index'], r['half']) for r in vs['rows']]}; max |diff| "

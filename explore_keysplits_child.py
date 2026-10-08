@@ -22,7 +22,7 @@ pooled eta^2 at KEY and VAL positions, routing_stats' margin and channel-0 eta^2
 optimizer step post-hook (no gradient, eval mode: training untouched).
 
 COPIED FROM MAIN at 9c5939e, line for line (CHECK: their syntax trees equal main's): test_scale_axes.eta2_multi, routing_k,
-fail_class_k; test_stream_curriculum.stream_acc; test_stream_recipe.routed, outcome (ROUTED_ACC 0.9);
+fail_class_k, stream_acc; test_stream_recipe.routed, outcome (ROUTED_ACC 0.9);
 test_stream_channels.shared_max, merged. The branch has no test_scale_axes; these are pure computations on the model's
 gates, and every name they use is a module both trees share unchanged.
 """
@@ -56,7 +56,7 @@ ARM = {"W2_K4": dict(k=4), "W2_KEYHINGE": dict(k=2, hinge=True)}
 DENSE = tuple(range(25, 1201, 25)) + tuple(range(1300, 2401, 100))
 W_LOG_AT = (1, WINDOW - 1, WINDOW, WINDOW + 1, WINDOW + 2)
 COPIED = {"eta2_multi": "test_scale_axes.py", "routing_k": "test_scale_axes.py", "fail_class_k": "test_scale_axes.py",
-          "stream_acc": "test_stream_curriculum.py", "routed": "test_stream_recipe.py", "outcome": "test_stream_recipe.py",
+          "stream_acc": "test_scale_axes.py", "routed": "test_stream_recipe.py", "outcome": "test_stream_recipe.py",
           "shared_max": "test_stream_channels.py", "merged": "test_stream_channels.py"}
 
 
@@ -255,17 +255,24 @@ def run(p):
 
 
 def perfect_k4(p):
-    """The perfect gate with k = 4: test_instrument_v2.perfect_gate_general with the context tokens padded by two ids that
-    never occur, so streams 0, 1 go to channels 0, 1 and channels 2, 3 stay empty; the perfect gate's plain recipe (one
-    Adam at 1e-3, as batch 1's ceiling); W2_K4's statistics."""
+    """The perfect gate with k = p["k"] (default 4): test_instrument_v2.perfect_gate_general with the context tokens padded
+    by k - 2 ids that never occur, so streams 0, 1 go to channels 0, 1 and the other channels stay empty; p["arm"]:
+    "ceiling_conv" = test_short_conv.ARM["ceiling_conv"] (the perfect gate + conv "layer", mult 8: this layout's recorded
+    validity arm, 5/5 at 1200) or "ceiling" = test_multilayer_binding's plain perfect gate (no convolution, mult 2); the
+    perfect gate's plain recipe (one Adam at 1e-3); W2_K4's statistics."""
     task = ec.TASK
-    ceil = dict(next(a for a in arms_for(task) if a["key"] == "ceiling"), n_ch=4)
+    k = p.get("k", 4)
+    base = tsc.ARM["ceiling_conv"] if p.get("arm", "ceiling_conv") == "ceiling_conv" else \
+        next(a for a in arms_for(task) if a["key"] == "ceiling")
+    ceil = dict(base, n_ch=k)
+    pad = tuple(-1 - i for i in range(k - task.S))
 
     def builder(aa, s):
         def make():
             torch.manual_seed(s)
             return MultiBDH(task.vocab, ARCH["n_layer"], aa["gate"], aa["n_ch"], ARCH["positional"], gate_to_readout=aa["g2r"],
-                            h_gate=aa["h_gate"], mult=aa["mult"], ctx_tokens=tuple(task.ctx_tokens) + (-1, -2))
+                            h_gate=aa["h_gate"], mult=aa["mult"], ctx_tokens=tuple(task.ctx_tokens) + pad,
+                            **aa.get("model_kw", {}))
         return make
     out = {}
     for s in p["seeds"]:
@@ -327,7 +334,8 @@ def checks(p):
         last = (round(rk["etak_key_by_key"], 6), round(rs["eta_key_by_key"], 6), round(e18, 6), round(e19, 6))
     rows.append((f"at k = 2 the pooled eta^2 (routing_k) equals routing_stats' channel-0 eta^2 by key, stream and half, and the "
                  f"hinge's eta2_key equals S19's key_penalty and eta_key_by_key, at init and with W_g x 20 (last: pooled / channel-0 / "
-                 f"eta2_key / S19 = {last}; max |diff| {worst:.1e} <= 1e-5)", worst <= 1e-5 and last[0] > 0.01))
+                 f"eta2_key / S19 = {last}; max |diff| {worst:.1e} <= 1e-4: float32, and eta2_key keeps test_slow_start's "
+                 f"uncentred group means where S19's key_penalty centres them)", worst <= 1e-4 and last[0] > 0.01))
     # the key term's gradient reaches only the gate and the embedding
     m = g16.freeze_wh(s1.make_model(s43c.A, seed))
     x = task.make_batch(16, torch.Generator().manual_seed(3))[0][:, :-1]
