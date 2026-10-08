@@ -62,3 +62,12 @@ EXPLORATORY, NOT A RESULT — session H: H/eight, H/stability
   [ 10]   79.4 min  H/eight          SPLIT                    seed 469  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 6e896fc+dirty, code 91494b36315e, attempt 1: acc 1.000  trans 18000  outcome BOUND ROUTED; map [11, 6, 1, 8, 12, 7, 9, 5] key [11, 6, 1, 8, 12, 7, 9, 5]; split fired at [9600, 14400]
   start   79.4 min  H/eight          RESET                    seed 463  (projected worst case 720 min)
+  [ 11]  118.9 min  H/eight          RESET                    seed 460  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + reset only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git cdb86de, code 91494b36315e, attempt 1: acc 0.874  trans  None  outcome MERGED (2 share); map [14, 7, 5, 13, 9, 15, 11, 15] key [14, 7, 5, 13, 9, 15, 11, 15]; reset fired at [4800, 12000, 19200]
+  start  118.9 min  H/eight          RESET                    seed 464  (projected worst case 720 min)
+  [ 12]  119.8 min  H/eight          RESET                    seed 462  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + reset only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git cdb86de+dirty, code 91494b36315e, attempt 1: acc 1.000  trans 36000  outcome BOUND ROUTED; map [11, 12, 10, 8, 13, 6, 14, 4] key [11, 12, 10, 8, 13, 6, 14, 4]; reset fired at [12000, 19200, 24000]
+  start  119.8 min  H/eight          RESET                    seed 465  (projected worst case 720 min)
+  [ 13]  120.1 min  H/eight          RESET                    seed 461  lr 0.001  (LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + reset only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git cdb86de+dirty, code 91494b36315e, attempt 1: acc 0.750  trans  None  outcome MERGED (2 share); map [9, 1, 9, 15, 7, 7, 11, 13] key [9, 1, 9, 15, 7, 7, 11, 13]; reset fired at [9600, 14400, 19200]
+  start  120.1 min  H/eight          RESET                    seed 466  (projected worst case 720 min)
