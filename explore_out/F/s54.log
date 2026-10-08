@@ -281,3 +281,9 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [  3]  371.6 min  F/window_delta_scale C_DELTA                  seed 313  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 0268500+dirty, code c8612c854acc, attempt 1: acc 0.319  trans  None  STREAM-PARTIAL one-to-one  splits 3  map --
   start  371.6 min  F/window_delta_scale C_DELTA                  seed 316  (projected worst case 173 min)
+  [  4]  487.1 min  F/window_delta_scale C_DELTA                  seed 311  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f241dc2, code c8612c854acc, attempt 1: acc 0.496  trans  None  STREAM-PARTIAL one-to-one  splits 3  map --
+  start  487.1 min  F/window_delta_scale C_DELTA                  seed 317  (projected worst case 173 min)
+  [  5]  487.3 min  F/window_delta_scale C_DELTA                  seed 316  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f241dc2+dirty, code c8612c854acc, attempt 1: acc 1.000  trans 18000  BOUND ROUTED  splits 1  map --
+  start  487.3 min  F/window_delta_scale C_DELTA                  seed 318  (projected worst case 173 min)
