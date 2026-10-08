@@ -1,0 +1,111 @@
+{
+ "meta": {
+  "arms": {
+   "EMA_EVAL": {
+    "iters": 24000,
+    "label": "evaluation with EMA 0.999 weights",
+    "lr": 0.001,
+    "opt": "adam",
+    "seeds": [
+     470,
+     471,
+     472,
+     473,
+     474,
+     475,
+     476,
+     477,
+     478,
+     479
+    ]
+   },
+   "ORACLE_CONV": {
+    "iters": 24000,
+    "label": "ceiling_conv (validity)",
+    "lr": 0.001,
+    "opt": "adam",
+    "seeds": [
+     470,
+     471
+    ]
+   },
+   "ORACLE_PLAIN": {
+    "iters": 24000,
+    "label": "plain perfect gate (printed)",
+    "lr": 0.001,
+    "opt": "adam",
+    "seeds": [
+     470,
+     471
+    ]
+   },
+   "REF": {
+    "iters": 24000,
+    "label": "S43's LOCAL3_SLOW (tau = 1)",
+    "lr": 0.001,
+    "opt": "adam",
+    "seeds": [
+     470,
+     471,
+     472,
+     473,
+     474,
+     475,
+     476,
+     477,
+     478,
+     479
+    ]
+   },
+   "STABLEMAX": {
+    "iters": 24000,
+    "label": "stable-max gate",
+    "lr": 0.001,
+    "opt": "adam",
+    "seeds": [
+     470,
+     471,
+     472,
+     473,
+     474,
+     475,
+     476,
+     477,
+     478,
+     479
+    ]
+   },
+   "TEMP_FLOOR": {
+    "iters": 24000,
+    "label": "learned tau, softmax(z / max(tau, 0.5))",
+    "lr": 0.001,
+    "opt": "adam",
+    "seeds": [
+     470,
+     471,
+     472,
+     473,
+     474,
+     475,
+     476,
+     477,
+     478,
+     479
+    ]
+   }
+  },
+  "code_shas": [
+   "49ece189ac1a87af1301613609298ed5aff4c786"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "d9baf09",
+   "python": "3.13.16",
+   "started": "2026-10-08 10:43:16",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

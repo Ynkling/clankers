@@ -1,5 +1,87 @@
 {
  "meta": {
+  "arms": {
+   "GUMBEL_W": {
+    "iters": 43200,
+    "label": "+ Gumbel(0,1) on write-gate logits",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + Gumbel write",
+    "seeds": [
+     460,
+     461,
+     462,
+     463,
+     464,
+     465,
+     466,
+     467,
+     468,
+     469
+    ]
+   },
+   "ORACLE": {
+    "iters": 43200,
+    "label": "perfect gate ceil8_D8 + conv",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3 for every parameter",
+    "seeds": [
+     460,
+     461
+    ]
+   },
+   "RESET": {
+    "iters": 43200,
+    "label": "+ the trigger, W_g Adam reset only",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + reset only",
+    "seeds": [
+     460,
+     461,
+     462,
+     463,
+     464,
+     465,
+     466,
+     467,
+     468,
+     469
+    ]
+   },
+   "SPLIT": {
+    "iters": 43200,
+    "label": "+ S48's KEYMASS split (<= 3)",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate W_in/W_g/window 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; + split",
+    "seeds": [
+     460,
+     461,
+     462,
+     463,
+     464,
+     465,
+     466,
+     467,
+     468,
+     469
+    ]
+   }
+  },
+  "code_shas": [
+   "91494b36315ee7f83927ec1681a713899a5412b9"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "d9baf09",
+   "python": "3.13.16",
+   "started": "2026-10-08 10:43:16",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  },
   "selected": [
    "RESET",
    "GUMBEL_W"
