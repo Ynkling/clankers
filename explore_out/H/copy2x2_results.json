@@ -1,0 +1,125 @@
+{
+ "meta": {
+  "arms": {
+   "COPY": {
+    "iters": 43200,
+    "label": "trigger: copy + noise",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise",
+    "seeds": [
+     480,
+     481,
+     482,
+     483,
+     484,
+     485,
+     486,
+     487,
+     488,
+     489
+    ]
+   },
+   "COPY_NONOISE": {
+    "iters": 43200,
+    "label": "trigger: exact copy",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: exact copy",
+    "seeds": [
+     480,
+     481,
+     482,
+     483,
+     484,
+     485,
+     486,
+     487,
+     488,
+     489
+    ]
+   },
+   "NONE": {
+    "iters": 43200,
+    "label": "no trigger",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; no trigger",
+    "seeds": [
+     480,
+     481,
+     482,
+     483,
+     484,
+     485,
+     486,
+     487,
+     488,
+     489
+    ]
+   },
+   "ORACLE": {
+    "iters": 43200,
+    "label": "perfect gate ceil8_D8 + conv",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3",
+    "seeds": [
+     480,
+     481
+    ]
+   },
+   "RESET": {
+    "iters": 43200,
+    "label": "trigger: reset only",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: reset only",
+    "seeds": [
+     480,
+     481,
+     482,
+     483,
+     484,
+     485,
+     486,
+     487,
+     488,
+     489
+    ]
+   },
+   "SPLIT": {
+    "iters": 43200,
+    "label": "trigger: copy + noise + reset",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise + reset",
+    "seeds": [
+     480,
+     481,
+     482,
+     483,
+     484,
+     485,
+     486,
+     487,
+     488,
+     489
+    ]
+   }
+  },
+  "code_shas": [
+   "0b17627cb1b8f1aae94f83fbef87123cb9e5e38e"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "3e4212d",
+   "python": "3.13.16",
+   "started": "2026-10-08 20:32:11",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

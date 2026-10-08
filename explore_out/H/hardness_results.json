@@ -1,0 +1,87 @@
+{
+ "meta": {
+  "arms": {
+   "ANNEAL": {
+    "iters": 43200,
+    "label": "+ tau 1 -> 0.25 over 2400-24000",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + KEYMASS (<= 3); no hinge; annealed tau",
+    "seeds": [
+     490,
+     491,
+     492,
+     493,
+     494,
+     495,
+     496,
+     497,
+     498,
+     499
+    ]
+   },
+   "HARD_W": {
+    "iters": 43200,
+    "label": "+ one-hot write gate from 2400",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + KEYMASS (<= 3); no hinge; hard write",
+    "seeds": [
+     490,
+     491,
+     492,
+     493,
+     494,
+     495,
+     496,
+     497,
+     498,
+     499
+    ]
+   },
+   "ORACLE": {
+    "iters": 43200,
+    "label": "perfect gate ceil8_D8 + conv",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3",
+    "seeds": [
+     490,
+     491
+    ]
+   },
+   "REF": {
+    "iters": 43200,
+    "label": "LOCAL3 + SLOW + KEYMASS",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + KEYMASS (<= 3); no hinge",
+    "seeds": [
+     490,
+     491,
+     492,
+     493,
+     494,
+     495,
+     496,
+     497,
+     498,
+     499
+    ]
+   }
+  },
+  "code_shas": [
+   "8240313e68222c35707a92bc16d1a4f85665f6a1"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "3e4212d",
+   "python": "3.13.16",
+   "started": "2026-10-08 20:32:11",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
