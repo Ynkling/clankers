@@ -565,3 +565,6 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   [  2]   32.5 min  window_recipe_ablation W_M_REF                  seed 268  lr 0.001, Muon lr 0.005  (Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 6c238f3, code 300b8e0ba54a, attempt 1: acc 0.600  trans  None  outcome MERGED (2 share); decoder at 28800: h CTX/KEY/VAL 0.17/0.88/0.91
   start   32.5 min  window_recipe_ablation W_RESET                  seed 260  (projected worst case 35 min)
+  [  3]   32.9 min  window_recipe_ablation W_M_REF                  seed 265  lr 0.001, Muon lr 0.005  (Muon lr 0.005: W_in/W_g throughout, other Muon weights x0.1 for updates 1-2400; Adam: the window 0.001 throughout, embedding/conv/1-D 0.0001 for 1-2400, 0.001 after; W_h frozen; no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 6c08610, code 300b8e0ba54a, attempt 1: acc 0.873  trans  None  outcome MERGED (2 share); decoder at 28800: h CTX/KEY/VAL 0.19/0.92/0.96
+  start   32.9 min  window_recipe_ablation W_RESET                  seed 261  (projected worst case 35 min)
