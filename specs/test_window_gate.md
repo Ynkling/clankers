@@ -116,3 +116,76 @@ runs cached; a resume keeps the stored schedule.
 **Output.** Per-seed raw values first, then validity, counts, claims (pooled with --also, then per machine),
 bands, diagnostics, curves. Results: window_gate_results.json (gitignored; each machine's copy in
 results/X or results/L). A report-only mode (--report) recomputes the report from a finished file.
+
+## Amendment of 8 October 2026 (the full run had started at 2f98f06: added as Part D)
+
+### The user's amendment (verbatim)
+
+> Amendment to test_window_gate (before any run, or as Part D if it has started):
+> - Part C/D (S=8, P=4, k=16, conv, 28800; seeds 540-559 on X, 1540-1559 on L): add
+>   WIN3_SPLIT_D8 = WIN3_SLOW_D8 + batch 17's W_SPLIT trigger (S37's KEYMASS; checks every 2400
+>   from 4800 on the 64-sequence probe; fire if probe acc < 0.95 and rose < 0.02; at most 3
+>   splits, >= 4800 apart; copy W_g[c*] to W_g[c0] + noise 0.1 std; reset W_g's Adam state).
+> - Claims (pooled, primary; per machine secondary): G2 becomes WIN3_SPLIT_D8 beats HINGE_D8
+>   (exact McNemar one-sided). Add G4: WIN3_SPLIT_D8 beats WIN3_SLOW_D8. Bands with Wilson for
+>   both window arms; the reading "eight streams bind without labels or restarts" if
+>   WIN3_SPLIT_D8 is RELIABLE pooled (>= 36/40) and G2 and G4 are SHOWN.
+> - Diagnostics: every split's update and labelled target; maps at each check; a reset-only
+>   control on 5 seeds per machine (the Adam-state reset at the same checks, no copy), printed
+>   not claimed. Never cut the split arm.
+
+The user's answers (AskUserQuestion, before any Part D code): Part D runs **43200** steps, matching Part C, so G2 and
+G4 pair on equal budgets; the original G2 (WIN3_SLOW_D8 beats HINGE_D8) is **printed, not a claim**.
+
+### Interpretation, fixed here before any Part D code
+
+**Part D** (S=8, P=4, k=16, conv; Part C's path, run_sc with D8, 43200 steps; Part C's seeds; validity is Part C's
+CEIL_C, same configuration and seeds):
+- WIN3_SPLIT_D8: WIN3_SLOW_D8 + batch 17's W_SPLIT trigger (explore_window_d8_child.make_trigger at 992e320, which
+  is S37's explore_split_target_child.make_trigger with the cap as a parameter; copied with S36's probe_data, split_op
+  and with_trigger and S37's read_gate, select and targeting). Checks after the evaluations at 2400 (reference only),
+  4800, 7200, ... through 40800 (total - 2400), after the run path's check and the lr switch, on the 64-sequence probe
+  (generator seeded 12345): fire if the probe accuracy is < 0.95 and it rose < 0.02 since the previous check; at most
+  3 splits per run, none within 4800 updates of the previous one (a check that meets the rule but is capped or gapped is
+  logged as blocked, with the reason). The split: c* = the channel with the largest mean read-gate mass over the probe's
+  key positions, c0 = the smallest; w = W_g[c*]; W_g[c0] = w + n2, W_g[c*] = w + n1, n1, n2 ~ N(0, (0.1 std(w))^2) from a
+  generator seeded 12_000_000 + 1000 x seed + the split count; then W_g's Adam state (exp_avg, exp_avg_sq, step) zeroed
+  in place. onset_run's Adam is built through a capturing factory (the same constructor and arguments).
+- WIN3_RESET_D8 (the reset-only control): WIN3_SLOW_D8 + the same trigger rule on its own run (same probe, checks, cap
+  3 and gap); where the rule fires, W_g's Adam state is zeroed and W_g is not touched (no copy, no noise). Seeds: Part
+  C's first five (X 540-544, L 1540-1544). Printed, not claimed.
+- Labelled target: a split is labelled ok if c* holds >= 2 streams and c0 none on the labelled map before it
+  (test_scale_axes.routing_k on the run's probe batch; S37's targeting).
+
+**Claims** (pooled primary, per machine secondary, as before):
+- G1 unchanged (WIN3_SLOW16 beats WIN16_A).
+- G2: WIN3_SPLIT_D8 beats HINGE_D8 (BOUND ROUTED, exact McNemar one-sided).
+- G3 unchanged (the bound, Part A).
+- G4: WIN3_SPLIT_D8 beats WIN3_SLOW_D8 (BOUND ROUTED, exact McNemar one-sided).
+- Printed, not a claim: the original G2, WIN3_SLOW_D8 vs HINGE_D8 (McNemar); WIN3_RESET_D8 vs WIN3_SLOW_D8 on its
+  five seeds per machine.
+- Bands with Wilson for every arm, the two window arms of Part D included.
+- Reading (pooled): "eight streams bind without labels or restarts" if WIN3_SPLIT_D8 is RELIABLE pooled (>= 36/40) and
+  G2 and G4 are SHOWN (pooled); otherwise the reading does not apply (printed with what fails).
+- Validity: Part D's claims (G2, G4) are UNTESTED where Part C is not valid (its CEIL_C).
+
+**Diagnostics** (not part of the verdict): every split's update, c* and c0 and whether the target is labelled ok;
+blocked checks and why; the labelled map at every check (and after each split); the reset-only control's resets.
+
+**CHECKs** (added after 140):
+- 141 WIN3_SPLIT_D8 at seed 263 equals batch 17's W_SPLIT|263 (explore_out/window_d8_results.json on
+  claude/outside-ideas at 992e320; written on a Xeon @ 2.10GHz; its first split at 4800) bit for bit through 7200: the
+  curve, gradient norms, every statistic both records hold, and the trigger's rows at 2400, 4800 and 7200 (the fields
+  both hold). Asserted on machine X, printed on L.
+- 142 The trigger's mechanics on a model after one Adam step, the trigger called at each check with no training in
+  between and the threshold above 1 (every check from 4800 eligible): fires at 4800, 9600 and 14400, blocked by the gap
+  at 7200 and 12000 and by the cap from 16800; each split leaves W_g's rows c* and c0 apart (noise) and zeroes W_g's Adam
+  state; the reset-only variant at the same checks zeroes the state and leaves W_g unchanged.
+- 143 With the threshold at 0 (never eligible), WIN3_SPLIT_D8 and WIN3_RESET_D8 at seed 1 equal WIN3_SLOW_D8 bit for
+  bit through 6000 (the capture, the probe and the measurements are inert).
+- 139 extended: WIN3_SPLIT_D8 on Part C's range; WIN3_RESET_D8 on its first five seeds.
+
+**Runtime and the resume.** Never cut the split arm (nothing is cut). On X the run started at 2f98f06 finishes Parts A-C
+untouched; the amended test then resumes the same results file at its own commit: the full verification again (with
+141-143), the projection, and only Part D's runs (the cached Parts A-C records are kept). The meta keeps the first
+start's commit and time and records the amendment's start (commit, time, arms). L runs the amended test from the start.
