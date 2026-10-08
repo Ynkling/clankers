@@ -63,6 +63,11 @@ def main():
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     screens = [importlib.import_module(MODS[s]) for s in args.screens]
+    for m in list(screens):
+        if hasattr(m, "configure") and not m.configure():
+            screens.remove(m)
+    if not screens:
+        sys.exit(0)
     cpu = ec.cpu_model()
     pv = ec.print_banner("session H: " + ", ".join(m.NAME for m in screens))
     c16.STATE["batch_cpu"] = cpu

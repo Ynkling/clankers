@@ -268,11 +268,13 @@ def checks(p):
     rows.append((f"TEMP_FLOOR: tau 0.2 gives the gate at tau 0.5 bitwise (the floor: {torch.equal(g02, g05)}); tau 2 gives "
                  f"softmax(z / 2) ({torch.allclose(g2, F.softmax(hh / 2, -1))})",
                  torch.equal(g02, g05) and torch.allclose(g2, F.softmax(hh / 2, -1))))
-    pg = groups({})(m1)
-    names = [[n for n, q in m1.named_parameters() if any(q is r for r in g["params"])] for g in pg]
-    rows.append((f"TEMP_FLOOR: gate_tau is in the gate group ({names[0]}), registered after every other parameter "
-                 f"({list(dict(m1.named_parameters()))[-1]}); W_h frozen", "gate_tau" in names[0]
-                 and list(dict(m1.named_parameters()))[-1] == "gate_tau" and not m1.W_h.requires_grad))
+    h1, h0 = {}, {}
+    groups(h1)(m1)
+    groups(h0)(g16.freeze_wh(s1.make_model(a, seed)))
+    rows.append((f"TEMP_FLOOR: gate group {h1['names'][0]} = REF's {h0['names'][0]} + gate_tau; the other group equals REF's "
+                 f"({h1['names'][1] == h0['names'][1]}, {len(h1['names'][1])} tensors); W_h frozen",
+                 h1["names"][0] == h0["names"][0] + ["gate_tau"] and h1["names"][1] == h0["names"][1]
+                 and not m1.W_h.requires_grad))
     # EMA swap is bit-exact and the shadow follows the weights
     m2 = g16.freeze_wh(s1.make_model(a, seed))
     e = EMA(0.5)
