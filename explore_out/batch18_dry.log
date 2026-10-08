@@ -9,3 +9,4 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (39s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  S50 MUON REFERENCE: batch 16's LOCAL3_SLOW_D8_M|260 (record on Intel(R) Xeon(R) Processor @ 2.80GHz) rerun here on Intel(R) Xeon(R) Processor @ 2.10GHz through 1200: does not reproduce (here [[1200, 0.068359375, 2.9911153316497803]] vs record [[1200, 0.068359375, 2.990344285964966]]; 93s) -> W_M_REF (LOCAL3_SLOW_D8_M fresh on this CPU) runs as the pair (dry run: not stored)
