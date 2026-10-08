@@ -107,3 +107,9 @@ EXPLORATORY, NOT A RESULT — batch 18: window_recipe_ablation (S50), split_k4 (
   start    0.0 min  dry_window_recipe_ablation W_M_REF                  seed 260  (projected worst case 3 min)
   start    0.0 min  dry_window_recipe_ablation W_SPLIT_W4               seed 260  (projected worst case 3 min)
   start    0.0 min  dry_window_recipe_ablation W_SPLIT_NOSLOW           seed 260  (projected worst case 3 min)
+  [  1]    2.9 min  dry_window_recipe_ablation W_SPLIT_W4               seed 260  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; window width 4; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a4429e5, code 300b8e0ba54a, attempt 1: acc 0.069  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.23/0.48/0.41; splits 0 at []
+  start    2.9 min  dry_window_recipe_ablation W_RESET                  seed 260  (projected worst case 3 min)
+  [  2]    3.0 min  dry_window_recipe_ablation W_SPLIT_NOSLOW           seed 260  lr 0.001  (every trainable parameter 0.001 throughout; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's optimizer state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a4429e5+dirty, code 300b8e0ba54a, attempt 1: acc 0.061  trans  None  outcome non-stream OTHER; decoder at 2400: h CTX/KEY/VAL 0.80/0.78/0.67; splits 0 at []
+  start    3.0 min  dry_split_k4     W4k4                     seed 240  (projected worst case 1 min)
