@@ -1,9 +1,9 @@
 ====================================================================================================
 EXPLORATORY, NOT A RESULT — Session G S57 latch
-  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 4507865+dirty | python 3.13.16 | torch threads 1
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 9d76e8f+dirty | python 3.13.16 | torch threads 1
 ====================================================================================================
   S57 trigger (from S56's summary): TRIGGERED
-  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (63s)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (40s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
 /home/user/clankers/explore_g_latch_child.py:160: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
