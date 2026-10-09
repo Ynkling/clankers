@@ -22,3 +22,123 @@ EXPLORATORY, NOT A RESULT — Session G S55 probe
   [  4/22]   10.0 min  FAR_L3_P4    seed 163  acc 1.000 trans 10800 BOUND unrouted  probe L2 0.68/0.58 L3 0.64/0.63 final 0.66/0.68 repro True
   [  5/22]   10.1 min  ORACLE_P8    seed 360  acc 0.988 trans 24000 DISCOVERED      probe L2 0.53/0.54 L3 0.51/0.53 final 0.55/0.55
   [  6/22]   10.3 min  ORACLE_P8    seed 361  acc 0.840 trans  None STREAM-PARTIAL  probe L2 0.56/0.55 L3 0.55/0.55 final 0.56/0.58
+  [  7/22]   14.5 min  FAR_L3_P4    seed 164  acc 0.439 trans  None POSITION        probe L2 0.58/0.52 L3 0.64/0.54 final 0.62/0.56 repro True
+  [  8/22]   15.2 min  FAR_L3_P4    seed 165  acc 0.741 trans  None KEY             probe L2 0.69/0.71 L3 0.93/0.78 final 0.93/0.85 repro True
+  [  9/22]   15.2 min  FAR_L3_P4    seed 166  acc 0.511 trans  None KEY             probe L2 0.63/0.52 L3 0.65/0.51 final 0.67/0.55 repro True
+  [ 10/22]   15.3 min  FAR_L3_P4    seed 167  acc 0.445 trans  None OTHER           probe L2 0.67/0.73 L3 0.87/0.78 final 0.90/0.75 repro True
+  [ 11/22]   19.6 min  FAR_L3_P4    seed 168  acc 0.336 trans  None KEY             probe L2 0.63/0.66 L3 0.70/0.78 final 0.83/0.80 repro True
+  [ 12/22]   20.3 min  FAR_L3_P4    seed 169  acc 0.420 trans  None OTHER           probe L2 0.60/0.54 L3 0.62/0.54 final 0.61/0.55 repro True
+  [ 13/22]   24.0 min  L3S_P8       seed 361  acc 0.228 trans  None OTHER           probe L2 0.55/0.56 L3 0.54/0.56 final 0.57/0.56
+  [ 14/22]   24.8 min  L3S_P8       seed 360  acc 0.395 trans  None OTHER           probe L2 0.55/0.56 L3 0.52/0.59 final 0.55/0.60
+  [ 15/22]   29.9 min  L3S_P8       seed 362  acc 0.296 trans  None POSITION        probe L2 0.55/0.55 L3 0.54/0.51 final 0.57/0.53
+  [ 16/22]   30.6 min  L3S_P8       seed 363  acc 0.400 trans  None POSITION        probe L2 0.60/0.55 L3 0.58/0.56 final 0.63/0.56
+  [ 17/22]   33.4 min  L3S_P8       seed 364  acc 0.336 trans  None KEY             probe L2 0.51/0.59 L3 0.52/0.54 final 0.51/0.56
+  [ 18/22]   35.7 min  L3S_P8       seed 365  acc 0.265 trans  None OTHER           probe L2 0.58/0.63 L3 0.56/0.57 final 0.53/0.56
+  [ 19/22]   40.5 min  L3S_P8       seed 366  acc 0.264 trans  None OTHER           probe L2 0.54/0.63 L3 0.53/0.59 final 0.53/0.59
+  [ 20/22]   40.9 min  L3S_P8       seed 367  acc 0.255 trans  None OTHER           probe L2 0.55/0.60 L3 0.57/0.54 final 0.57/0.56
+  [ 21/22]   42.4 min  L3S_P8       seed 368  acc 0.271 trans  None KEY             probe L2 0.56/0.74 L3 0.59/0.59 final 0.63/0.61
+  [ 22/22]   46.4 min  L3S_P8       seed 369  acc 0.301 trans  None POSITION        probe L2 0.56/0.54 L3 0.58/0.54 final 0.58/0.56
+  S55 runs done in 47.8 min
+| arm | runs | BOUND | BOUND ROUTED | failures | transitions | emb K / V | L1 K / V | L2 K / V | L3 K / V | final K / V |
+|---|---|---|---|---|---|---|---|---|---|---|
+| L3S_P8 | 10 | 0/10 [0.00, 0.28] NEVER | 0/10 [0.00, 0.28] NEVER | {'OTHER': 5, 'POSITION': 3, 'KEY': 2} | - | 0.50 / 0.49 | 0.50 / 0.49 | 0.55 / 0.58 | 0.55 / 0.56 | 0.57 / 0.56 |
+| FAR_L3_P4 | 10 | 2/10 [0.06, 0.51] MINORITY | 0/10 [0.00, 0.28] NEVER | {'OTHER': 3, 'POSITION': 2, 'KEY': 3} | [7200, 10800] | 0.50 / 0.50 | 0.50 / 0.50 | 0.63 / 0.58 | 0.68 / 0.61 | 0.69 / 0.65 |
+| ORACLE_P8 | 2 | 1/2 [0.09, 0.91] MAJORITY | 1/2 [0.09, 0.91] MAJORITY | {'STREAM-PARTIAL': 1} | [24000] | 0.50 / 0.49 | 0.50 / 0.49 | 0.54 / 0.54 | 0.53 / 0.54 | 0.55 / 0.56 |
+
+L3S_P8: reading: absent (S56's register is mandatory); runs with K and V >= 0.9: L2 0/10 [0.00, 0.28] NEVER, L3 0/10 [0.00, 0.28] NEVER, final 0/10 [0.00, 0.28] NEVER; at init (median) L2 0.70/0.66, L3 0.70/0.66, final 0.69/0.66
+
+FAR_L3_P4: reading: partial at L3; partial at final; runs with K and V >= 0.9: L2 0/10 [0.00, 0.28] NEVER, L3 0/10 [0.00, 0.28] NEVER, final 0/10 [0.00, 0.28] NEVER; at init (median) L2 0.81/0.69, L3 0.80/0.71, final 0.78/0.71
+
+ORACLE_P8: reading: absent (S56's register is mandatory); runs with K and V >= 0.9: L2 0/2 [0.00, 0.66] NEVER, L3 0/2 [0.00, 0.66] NEVER, final 0/2 [0.00, 0.66] NEVER; at init (median) L2 0.74/0.70, L3 0.76/0.72, final 0.79/0.74
+
+per run (held-out accuracy K / V; Wilson on positions; by index within block = V accuracy for pairs 0..P-1):
+  L3S_P8 360: OTHER            acc 0.395 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.07/1.00 map V [0, 0]
+      L2    K 0.552 [0.540, 0.564]  V 0.562 [0.550, 0.574]  V by index [0.61, 0.63, 0.59, 0.55, 0.52, 0.56, 0.49, 0.55]
+      L3    K 0.524 [0.512, 0.536]  V 0.592 [0.580, 0.604]  V by index [0.68, 0.66, 0.59, 0.56, 0.57, 0.55, 0.55, 0.56]
+      final K 0.551 [0.539, 0.563]  V 0.596 [0.584, 0.608]  V by index [0.67, 0.68, 0.59, 0.61, 0.55, 0.58, 0.55, 0.55]
+  L3S_P8 361: OTHER            acc 0.228 trans None margin -0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.15/1.00 map V [0, 0]
+      L2    K 0.554 [0.542, 0.566]  V 0.559 [0.547, 0.571]  V by index [0.68, 0.62, 0.57, 0.56, 0.53, 0.51, 0.49, 0.53]
+      L3    K 0.537 [0.525, 0.550]  V 0.557 [0.545, 0.569]  V by index [0.7, 0.61, 0.59, 0.55, 0.5, 0.51, 0.49, 0.51]
+      final K 0.571 [0.559, 0.583]  V 0.564 [0.552, 0.576]  V by index [0.71, 0.63, 0.58, 0.56, 0.5, 0.51, 0.51, 0.51]
+  L3S_P8 362: POSITION         acc 0.296 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.05/1.00 map V [0, 0]
+      L2    K 0.553 [0.541, 0.565]  V 0.553 [0.541, 0.565]  V by index [0.56, 0.56, 0.54, 0.56, 0.54, 0.56, 0.57, 0.55]
+      L3    K 0.539 [0.527, 0.551]  V 0.512 [0.500, 0.524]  V by index [0.48, 0.52, 0.48, 0.51, 0.5, 0.53, 0.53, 0.55]
+      final K 0.569 [0.557, 0.581]  V 0.529 [0.517, 0.541]  V by index [0.64, 0.54, 0.53, 0.5, 0.48, 0.51, 0.52, 0.53]
+  L3S_P8 363: POSITION         acc 0.400 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.04/1.00 map V [0, 0]
+      L2    K 0.602 [0.590, 0.614]  V 0.553 [0.541, 0.566]  V by index [0.59, 0.58, 0.56, 0.54, 0.55, 0.53, 0.53, 0.54]
+      L3    K 0.584 [0.571, 0.596]  V 0.560 [0.548, 0.573]  V by index [0.61, 0.57, 0.57, 0.55, 0.55, 0.55, 0.53, 0.54]
+      final K 0.626 [0.614, 0.638]  V 0.560 [0.548, 0.572]  V by index [0.67, 0.6, 0.57, 0.54, 0.54, 0.54, 0.5, 0.52]
+  L3S_P8 364: KEY              acc 0.336 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 1.00/1.00 map V [1, 1]
+      L2    K 0.508 [0.496, 0.520]  V 0.589 [0.577, 0.601]  V by index [0.64, 0.61, 0.59, 0.6, 0.57, 0.58, 0.57, 0.55]
+      L3    K 0.523 [0.511, 0.535]  V 0.536 [0.523, 0.548]  V by index [0.52, 0.55, 0.55, 0.54, 0.53, 0.55, 0.51, 0.53]
+      final K 0.510 [0.498, 0.523]  V 0.563 [0.551, 0.575]  V by index [0.66, 0.61, 0.59, 0.59, 0.54, 0.52, 0.48, 0.51]
+  L3S_P8 365: OTHER            acc 0.265 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.07/1.00 map V [0, 0]
+      L2    K 0.576 [0.564, 0.588]  V 0.630 [0.618, 0.642]  V by index [0.63, 0.63, 0.65, 0.63, 0.62, 0.65, 0.62, 0.6]
+      L3    K 0.562 [0.550, 0.574]  V 0.573 [0.561, 0.585]  V by index [0.64, 0.61, 0.62, 0.58, 0.56, 0.52, 0.54, 0.52]
+      final K 0.527 [0.515, 0.539]  V 0.562 [0.550, 0.574]  V by index [0.64, 0.62, 0.62, 0.56, 0.54, 0.51, 0.51, 0.51]
+  L3S_P8 366: OTHER            acc 0.264 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.07/1.00 map V [0, 0]
+      L2    K 0.537 [0.525, 0.549]  V 0.629 [0.617, 0.641]  V by index [0.61, 0.61, 0.65, 0.63, 0.64, 0.64, 0.61, 0.65]
+      L3    K 0.531 [0.519, 0.543]  V 0.590 [0.578, 0.602]  V by index [0.62, 0.6, 0.6, 0.6, 0.58, 0.58, 0.56, 0.58]
+      final K 0.527 [0.514, 0.539]  V 0.587 [0.575, 0.599]  V by index [0.69, 0.66, 0.6, 0.56, 0.58, 0.54, 0.53, 0.53]
+  L3S_P8 367: OTHER            acc 0.255 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.07/1.00 map V [1, 1]
+      L2    K 0.547 [0.535, 0.559]  V 0.598 [0.585, 0.609]  V by index [0.58, 0.61, 0.61, 0.6, 0.6, 0.58, 0.58, 0.61]
+      L3    K 0.569 [0.557, 0.581]  V 0.543 [0.531, 0.555]  V by index [0.55, 0.53, 0.56, 0.55, 0.57, 0.54, 0.52, 0.53]
+      final K 0.575 [0.563, 0.587]  V 0.558 [0.546, 0.571]  V by index [0.57, 0.58, 0.57, 0.57, 0.56, 0.53, 0.53, 0.56]
+  L3S_P8 368: KEY              acc 0.271 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 1.00/1.00 map V [0, 0]
+      L2    K 0.560 [0.547, 0.572]  V 0.740 [0.729, 0.750]  V by index [0.75, 0.78, 0.73, 0.73, 0.75, 0.71, 0.75, 0.72]
+      L3    K 0.587 [0.575, 0.599]  V 0.591 [0.579, 0.603]  V by index [0.55, 0.54, 0.59, 0.58, 0.57, 0.59, 0.65, 0.65]
+      final K 0.633 [0.621, 0.644]  V 0.607 [0.595, 0.618]  V by index [0.66, 0.63, 0.65, 0.61, 0.58, 0.53, 0.61, 0.59]
+  L3S_P8 369: POSITION         acc 0.301 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.06/1.00 map V [0, 0]
+      L2    K 0.560 [0.548, 0.572]  V 0.540 [0.528, 0.552]  V by index [0.53, 0.53, 0.54, 0.54, 0.54, 0.53, 0.55, 0.56]
+      L3    K 0.583 [0.571, 0.595]  V 0.539 [0.527, 0.552]  V by index [0.56, 0.52, 0.54, 0.54, 0.53, 0.56, 0.53, 0.55]
+      final K 0.583 [0.571, 0.595]  V 0.557 [0.545, 0.569]  V by index [0.62, 0.56, 0.55, 0.55, 0.55, 0.55, 0.54, 0.54]
+  FAR_L3_P4 160: OTHER            acc 0.438 trans None margin -0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.15/1.00 map V [1, 1]
+      L2    K 0.609 [0.592, 0.626]  V 0.588 [0.571, 0.605]  V by index [0.65, 0.59, 0.58, 0.52]
+      L3    K 0.768 [0.753, 0.782]  V 0.613 [0.596, 0.630]  V by index [0.68, 0.62, 0.58, 0.57]
+      final K 0.791 [0.777, 0.805]  V 0.658 [0.642, 0.674]  V by index [0.77, 0.69, 0.62, 0.55]
+  FAR_L3_P4 161: POSITION         acc 0.439 trans None margin -0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.05/1.00 map V [1, 1]
+      L2    K 0.680 [0.663, 0.696]  V 0.591 [0.574, 0.608]  V by index [0.67, 0.58, 0.57, 0.54]
+      L3    K 0.617 [0.600, 0.634]  V 0.607 [0.590, 0.623]  V by index [0.72, 0.59, 0.57, 0.53]
+      final K 0.586 [0.568, 0.603]  V 0.607 [0.590, 0.624]  V by index [0.74, 0.58, 0.57, 0.54]
+  FAR_L3_P4 162: BOUND NOT routed acc 1.000 trans 7200 margin -0.00 eta_stream K/V 0.00/0.00 eta_key K/V 1.00/1.00 map V [0, 0]
+      L2    K 0.634 [0.618, 0.651]  V 0.530 [0.513, 0.547]  V by index [0.53, 0.53, 0.52, 0.54]
+      L3    K 0.713 [0.697, 0.728]  V 0.581 [0.564, 0.598]  V by index [0.65, 0.6, 0.55, 0.53]
+      final K 0.701 [0.685, 0.717]  V 0.636 [0.619, 0.653]  V by index [0.7, 0.66, 0.62, 0.57]
+  FAR_L3_P4 163: BOUND NOT routed acc 1.000 trans 10800 margin -0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.88/1.00 map V [1, 1]
+      L2    K 0.675 [0.659, 0.691]  V 0.582 [0.565, 0.599]  V by index [0.63, 0.59, 0.55, 0.55]
+      L3    K 0.638 [0.621, 0.655]  V 0.630 [0.613, 0.647]  V by index [0.67, 0.67, 0.61, 0.58]
+      final K 0.660 [0.643, 0.676]  V 0.682 [0.665, 0.697]  V by index [0.72, 0.72, 0.67, 0.62]
+  FAR_L3_P4 164: POSITION         acc 0.439 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.04/1.00 map V [1, 1]
+      L2    K 0.583 [0.566, 0.600]  V 0.519 [0.501, 0.536]  V by index [0.53, 0.5, 0.54, 0.51]
+      L3    K 0.640 [0.624, 0.657]  V 0.540 [0.523, 0.557]  V by index [0.59, 0.56, 0.52, 0.49]
+      final K 0.625 [0.608, 0.641]  V 0.561 [0.544, 0.578]  V by index [0.63, 0.57, 0.55, 0.5]
+  FAR_L3_P4 165: KEY              acc 0.741 trans None margin -0.00 eta_stream K/V 0.00/0.00 eta_key K/V 1.00/1.00 map V [0, 1]
+      L2    K 0.687 [0.671, 0.703]  V 0.712 [0.696, 0.727]  V by index [0.73, 0.69, 0.73, 0.7]
+      L3    K 0.925 [0.915, 0.934]  V 0.778 [0.763, 0.792]  V by index [0.81, 0.79, 0.75, 0.76]
+      final K 0.927 [0.917, 0.935]  V 0.851 [0.838, 0.863]  V by index [0.88, 0.85, 0.85, 0.82]
+  FAR_L3_P4 166: KEY              acc 0.511 trans None margin -0.00 eta_stream K/V 0.00/0.00 eta_key K/V 1.00/1.00 map V [0, 1]
+      L2    K 0.627 [0.610, 0.644]  V 0.516 [0.498, 0.533]  V by index [0.52, 0.51, 0.53, 0.5]
+      L3    K 0.650 [0.633, 0.666]  V 0.509 [0.492, 0.527]  V by index [0.52, 0.5, 0.5, 0.51]
+      final K 0.674 [0.658, 0.690]  V 0.546 [0.528, 0.563]  V by index [0.59, 0.56, 0.52, 0.52]
+  FAR_L3_P4 167: OTHER            acc 0.445 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.14/1.00 map V [0, 0]
+      L2    K 0.675 [0.658, 0.691]  V 0.733 [0.717, 0.748]  V by index [0.67, 0.8, 0.78, 0.68]
+      L3    K 0.866 [0.853, 0.877]  V 0.779 [0.764, 0.793]  V by index [0.78, 0.81, 0.81, 0.71]
+      final K 0.899 [0.888, 0.909]  V 0.749 [0.733, 0.763]  V by index [0.8, 0.79, 0.78, 0.62]
+  FAR_L3_P4 168: KEY              acc 0.336 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 1.00/1.00 map V [1, 1]
+      L2    K 0.629 [0.612, 0.646]  V 0.657 [0.641, 0.674]  V by index [0.73, 0.66, 0.63, 0.61]
+      L3    K 0.701 [0.685, 0.717]  V 0.781 [0.767, 0.795]  V by index [0.85, 0.77, 0.74, 0.75]
+      final K 0.828 [0.814, 0.840]  V 0.802 [0.788, 0.816]  V by index [0.82, 0.81, 0.8, 0.79]
+  FAR_L3_P4 169: OTHER            acc 0.420 trans None margin 0.00 eta_stream K/V 0.00/0.00 eta_key K/V 0.15/1.00 map V [0, 0]
+      L2    K 0.602 [0.584, 0.618]  V 0.544 [0.526, 0.561]  V by index [0.57, 0.55, 0.51, 0.55]
+      L3    K 0.620 [0.603, 0.637]  V 0.538 [0.521, 0.555]  V by index [0.57, 0.54, 0.53, 0.52]
+      final K 0.614 [0.597, 0.631]  V 0.552 [0.535, 0.569]  V by index [0.6, 0.58, 0.54, 0.49]
+  ORACLE_P8 360: BOUND ROUTED     acc 0.988 trans 24000 margin 1.00 eta_stream K/V 1.00/1.00 eta_key K/V 0.00/0.00 map V [0, 1]
+      L2    K 0.526 [0.513, 0.538]  V 0.542 [0.529, 0.554]  V by index [0.56, 0.58, 0.57, 0.52, 0.52, 0.51, 0.53, 0.53]
+      L3    K 0.510 [0.498, 0.523]  V 0.525 [0.513, 0.537]  V by index [0.59, 0.52, 0.53, 0.49, 0.52, 0.49, 0.55, 0.51]
+      final K 0.545 [0.533, 0.557]  V 0.545 [0.533, 0.557]  V by index [0.55, 0.55, 0.56, 0.53, 0.5, 0.55, 0.58, 0.56]
+  ORACLE_P8 361: STREAM-PARTIAL   acc 0.840 trans None margin 1.00 eta_stream K/V 1.00/1.00 eta_key K/V 0.00/0.00 map V [0, 1]
+      L2    K 0.563 [0.551, 0.575]  V 0.545 [0.533, 0.558]  V by index [0.62, 0.66, 0.55, 0.51, 0.49, 0.52, 0.52, 0.5]
+      L3    K 0.547 [0.534, 0.559]  V 0.546 [0.533, 0.558]  V by index [0.52, 0.54, 0.52, 0.59, 0.57, 0.55, 0.54, 0.54]
+      final K 0.564 [0.552, 0.576]  V 0.579 [0.566, 0.591]  V by index [0.58, 0.65, 0.61, 0.54, 0.51, 0.6, 0.59, 0.56]
+
+VALIDITY: ORACLE_P8 bound 1/2 -> L3S_P8's outcome VALID
