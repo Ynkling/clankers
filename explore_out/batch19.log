@@ -558,3 +558,216 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   [ 15]  110.6 min  scale_width  D128           seed 272  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 98bb4c1, code 17e56410a1db, attempt 1: acc 1.000  trans  2400  stop 8400  outcome BOUND ROUTED
   start  110.6 min  scale_width  D128           seed 276  (projected worst case 62 min)
+  segment budget reached: 4 run(s) stopped, each to resume from its last checkpoint: scale_width:D128|273 at step 7200, scale_width:D128|274 at step 6000, scale_width:D128|275 at step 4800, scale_width:D128|276 at step 1200
+  15 runs saved in this segment; batch wall clock 114.2 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_width
+  idea    does the window recipe survive width? N = 256, 512, 1024 at D = 32; D = 64, 128 at N = 256
+  source  batch 16's S44(a) LOCAL3_SLOW16_A (20/20 at S=4, k=16, N=256, D=32); the user's batch 19
+  change  only the model's size (mult = N/D, the embedding width D); every recipe and initial scale rule as is
+  arm ORC_N256     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 8), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N256         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 8), D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N512     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=512 (mult 16), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N512         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=512 (mult 16), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N1024    lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=1024 (mult 32), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N1024        lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=1024 (mult 32), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D64      lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 4), D=64, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D64          lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 4), D=64, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D128     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 2), D=128, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D128         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 2), D=128, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 270-279 with N256 (the same batches); oracles on 270-271
+----------------------------------------------------------------------------------------------------
+  ORACLES (the perfect gate; BOUND = held-out accuracy >= 0.95 held to the end):
+    ORC_N256     N=256 (mult 8), D=32, 3 layers     bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_N512     N=512 (mult 16), D=32, 3 layers    bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_N1024    N=1024 (mult 32), D=32, 3 layers   bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_D64      N=256 (mult 4), D=64, 3 layers     bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_D128     N=256 (mult 2), D=128, 3 layers    bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+  ARM N256 (LOCAL3 + SLOW at N=256 (mult 8), D=32, 3 layers (the reference)), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 32) std 0.0201, encoder (1, 32, 256) std 0.0200, encoder_v (1, 32, 256) std 0.0201, decoder (256, 32) std 0.0199, lm_head (32, 24) std 0.0199, W_in (32, 32) std 0.0986, W_g (16, 32) std 0.0994, gate_conv.conv_w (32, 3) std 0.3278
+    seed | outcome                  trans  stop   acc          end map | 
+     270 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     272 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | 
+     273 | MERGED (2 share)          None 28800  0.80            2+1+1 |   [resumed at [24000]]
+     274 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     275 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     276 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     277 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     278 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     279 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | 
+    BOUND ROUTED 9/10; bound 9/10; transition median (BOUND ROUTED) 3600 [3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 4800]; stop median 8400.0; classes {'BOUND ROUTED': 9, 'MERGED (2 share)': 1}; trainable parameters 27872
+  ARM N512 (LOCAL3 + SLOW at N=512 (mult 16), D=32, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (no run yet): --
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | not run
+     271 | not run
+     272 | not run
+     273 | not run
+     274 | not run
+     275 | not run
+     276 | not run
+     277 | not run
+     278 | not run
+     279 | not run
+    BOUND ROUTED 0/0; bound 0/0; transition median (BOUND ROUTED) None []; stop median None; classes {}; trainable parameters None
+    vs N256: N512 0/0, N256 0/0; N512 only 0, N256 only 0; d = +0; McNemar two-sided p = 1
+  ARM N1024 (LOCAL3 + SLOW at N=1024 (mult 32), D=32, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 32) std 0.0202, encoder (1, 32, 1024) std 0.0200, encoder_v (1, 32, 1024) std 0.0199, decoder (1024, 32) std 0.0199, lm_head (32, 24) std 0.0194, W_in (32, 32) std 0.1020, W_g (16, 32) std 0.1003, gate_conv.conv_w (32, 3) std 0.3278
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     272 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+     273 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | MERGED (2 share) (trans None)
+     274 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     275 | BOUND ROUTED              6000  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     276 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     277 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     278 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     279 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [2400, 2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 6000]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 101600
+    vs N256: N1024 10/10, N256 9/10; N1024 only 1, N256 only 0; d = +1; McNemar two-sided p = 1
+  ARM D64 (LOCAL3 + SLOW at N=256 (mult 4), D=64, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (no run yet): --
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | not run
+     271 | not run
+     272 | not run
+     273 | not run
+     274 | not run
+     275 | not run
+     276 | not run
+     277 | not run
+     278 | not run
+     279 | not run
+    BOUND ROUTED 0/0; bound 0/0; transition median (BOUND ROUTED) None []; stop median None; classes {}; trainable parameters None
+    vs N256: D64 0/0, N256 0/0; D64 only 0, N256 only 0; d = +0; McNemar two-sided p = 1
+  ARM D128 (LOCAL3 + SLOW at N=256 (mult 2), D=128, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 128) std 0.0196, encoder (1, 128, 256) std 0.0200, encoder_v (1, 128, 256) std 0.0199, decoder (256, 128) std 0.0199, lm_head (128, 24) std 0.0201, W_in (32, 128) std 0.0995, W_g (16, 32) std 0.1049, gate_conv.conv_w (128, 3) std 0.3288
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     272 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+     273 | not run
+     274 | not run
+     275 | not run
+     276 | not run
+     277 | not run
+     278 | not run
+     279 | not run
+    BOUND ROUTED 3/3; bound 3/3; transition median (BOUND ROUTED) 2400 [2400, 2400, 3600]; stop median 8400; classes {'BOUND ROUTED': 3}; trainable parameters 109952
+    vs N256: D128 3/3, N256 3/3; D128 only 0, N256 only 0; d = +0; McNemar two-sided p = 1
+  transition medians per size (BOUND ROUTED runs): N256 3600, N512 None, N1024 3600.0, D64 None, D128 2400
+  READING scale_width: INCOMPLETE, no reading
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_depth
+  idea    does the window recipe survive depth? 2, 4 and 6 layers against 3 (one gate shared across layers)
+  source  batch 16's S44(a) (3 layers); the user's batch 19; RES6: Session G's design (docs/reading/distant_cues_2026-10.md 4.3)
+  change  only ARCH's n_layer (the shared BDH layer applied n times); RES6 adds a per-layer gate over the residual stream
+  arm ORC_L2       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 2 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L2           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 2 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L3       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 3 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L3           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L4       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 4 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L4           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 4 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L6       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 6 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L6           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 6 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 280-289 with L3 (the same batches and initial parameters); oracles on 280-281
+----------------------------------------------------------------------------------------------------
+  ORACLES (the perfect gate; BOUND = held-out accuracy >= 0.95 held to the end):
+    ORC_L2       N=256, D=32, 2 layers              bound 0/0 of 2  transitions []  stop []  -> pending
+    ORC_L3       N=256, D=32, 3 layers              bound 0/0 of 2  transitions []  stop []  -> pending
+    ORC_L4       N=256, D=32, 4 layers              bound 0/0 of 2  transitions []  stop []  -> pending
+    ORC_L6       N=256, D=32, 6 layers              bound 0/0 of 2  transitions []  stop []  -> pending
+  ARM L2 (LOCAL3 + SLOW at N=256, D=32, 2 layers), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (no run yet): --
+    seed | outcome                  trans  stop   acc          end map | L3
+     280 | not run
+     281 | not run
+     282 | not run
+     283 | not run
+     284 | not run
+     285 | not run
+     286 | not run
+     287 | not run
+     288 | not run
+     289 | not run
+    BOUND ROUTED 0/0; bound 0/0; transition median (BOUND ROUTED) None []; stop median None; classes {}; trainable parameters None
+    vs L3: L2 0/0, L3 0/0; L2 only 0, L3 only 0; d = +0; McNemar two-sided p = 1
+  ARM L3 (LOCAL3 + SLOW at N=256, D=32, 3 layers (the reference)), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (no run yet): --
+    seed | outcome                  trans  stop   acc          end map | 
+     280 | not run
+     281 | not run
+     282 | not run
+     283 | not run
+     284 | not run
+     285 | not run
+     286 | not run
+     287 | not run
+     288 | not run
+     289 | not run
+    BOUND ROUTED 0/0; bound 0/0; transition median (BOUND ROUTED) None []; stop median None; classes {}; trainable parameters None
+  ARM L4 (LOCAL3 + SLOW at N=256, D=32, 4 layers), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (no run yet): --
+    seed | outcome                  trans  stop   acc          end map | L3
+     280 | not run
+     281 | not run
+     282 | not run
+     283 | not run
+     284 | not run
+     285 | not run
+     286 | not run
+     287 | not run
+     288 | not run
+     289 | not run
+    BOUND ROUTED 0/0; bound 0/0; transition median (BOUND ROUTED) None []; stop median None; classes {}; trainable parameters None
+    vs L3: L4 0/0, L3 0/0; L4 only 0, L3 only 0; d = +0; McNemar two-sided p = 1
+  ARM L6 (LOCAL3 + SLOW at N=256, D=32, 6 layers), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (no run yet): --
+    seed | outcome                  trans  stop   acc          end map | L3
+     280 | not run
+     281 | not run
+     282 | not run
+     283 | not run
+     284 | not run
+     285 | not run
+     286 | not run
+     287 | not run
+     288 | not run
+     289 | not run
+    BOUND ROUTED 0/0; bound 0/0; transition median (BOUND ROUTED) None []; stop median None; classes {}; trainable parameters None
+    vs L3: L6 0/0, L3 0/0; L6 only 0, L3 only 0; d = +0; McNemar two-sided p = 1
+  transition medians per size (BOUND ROUTED runs): L2 None, L3 None, L4 None, L6 None
+  READING scale_depth: INCOMPLETE, no reading
+
+  DIAGNOSTIC RES6 (Session G's per-layer residual gate at 6 layers (diagnostic; only if L6 fails)): waiting for the oracle ORC_L6
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S64 scale_width: INCOMPLETE, no reading
+  S65 scale_depth: INCOMPLETE, no reading; RES6: waiting for the oracle ORC_L6
+  S66, S67: not configured yet (phase 1 incomplete)
+####################################################################################################
