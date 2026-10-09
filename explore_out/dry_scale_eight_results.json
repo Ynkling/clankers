@@ -1,0 +1,158 @@
+{
+ "meta": {
+  "arms": {
+   "D128_L3": {
+    "iters": 1200,
+    "key": "D128_L3",
+    "label": "S64's best width D128: N=256, D=128, 3 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed",
+    "seeds": [
+     290
+    ],
+    "spec": {
+     "cfg": "b",
+     "gate": "local",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P4S8",
+     "trigger": true
+    }
+   },
+   "N256_L2": {
+    "iters": 1200,
+    "key": "N256_L2",
+    "label": "S65's best depth: N=256, D=32, 2 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed",
+    "seeds": [
+     290
+    ],
+    "spec": {
+     "cfg": "b",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      2
+     ],
+     "task": "P4S8",
+     "trigger": true
+    }
+   },
+   "N256_L3": {
+    "iters": 1200,
+    "key": "N256_L3",
+    "label": "N=256, D=32, 3 layers (the reference)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "ref",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed",
+    "seeds": [
+     290
+    ],
+    "spec": {
+     "cfg": "b",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P4S8",
+     "trigger": true
+    }
+   }
+  },
+  "decision": {
+   "best_depth": 2,
+   "best_width": "D128",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "depth_summary": {
+    "L2": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    },
+    "L3": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    },
+    "L4": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    },
+    "L6": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    }
+   },
+   "reading_s64": "scale-free (d = arm - N256 BOUND ROUTED: N512 +0, N1024 +0, D64 +0, D128 +1; scale-free: every d >= -1; width-sensitive: any d <= -4)",
+   "reading_s65": "scale-free (d = arm - L3 BOUND ROUTED: L2 +0, L4 +0, L6 +0; scale-free: every d >= -1; depth-sensitive: any d <= -4)",
+   "rule": "the rule",
+   "time": "2026-10-09 07:56:39 UTC",
+   "width_summary": {
+    "D128": {
+     "br": 1,
+     "n": 1,
+     "params": 109952,
+     "tested": true,
+     "trans_med": 2400
+    },
+    "D64": {
+     "br": 0,
+     "n": 1,
+     "params": 55232,
+     "tested": true,
+     "trans_med": null
+    },
+    "N1024": {
+     "br": 0,
+     "n": 1,
+     "params": 101600,
+     "tested": true,
+     "trans_med": null
+    },
+    "N256": {
+     "br": 0,
+     "n": 1,
+     "params": 27872,
+     "tested": true,
+     "trans_med": null
+    },
+    "N512": {
+     "br": 0,
+     "n": 1,
+     "params": 52448,
+     "tested": true,
+     "trans_med": null
+    }
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "883b982+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-09 07:56:39",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

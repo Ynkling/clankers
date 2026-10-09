@@ -1,0 +1,269 @@
+{
+ "meta": {
+  "arms": {
+   "ORC_P16_D128": {
+    "iters": 1200,
+    "key": "ORC_P16_D128",
+    "label": "oracle, P=16, D128 (N=256, D=128)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "ORC_P16_N256": {
+    "iters": 1200,
+    "key": "ORC_P16_N256",
+    "label": "oracle, P=16, N256 (N=256, D=32)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "ORC_P8_D128": {
+    "iters": 1200,
+    "key": "ORC_P8_D128",
+    "label": "oracle, P=8, D128 (N=256, D=128)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P8S4"
+    }
+   },
+   "ORC_P8_N256": {
+    "iters": 1200,
+    "key": "ORC_P8_N256",
+    "label": "oracle, P=8, N256 (N=256, D=32)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P8S4"
+    }
+   },
+   "P16_D128": {
+    "iters": 1200,
+    "key": "P16_D128",
+    "label": "LOCAL3 + SLOW, P=16, D128 (N=256, D=128)",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_P16_D128",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "P16_N256": {
+    "iters": 1200,
+    "key": "P16_N256",
+    "label": "LOCAL3 + SLOW, P=16, N256 (N=256, D=32)",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_P16_N256",
+    "role": "ref",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "P8_D128": {
+    "iters": 1200,
+    "key": "P8_D128",
+    "label": "LOCAL3 + SLOW, P=8, D128 (N=256, D=128)",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_P8_D128",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P8S4"
+    }
+   },
+   "P8_N256": {
+    "iters": 1200,
+    "key": "P8_N256",
+    "label": "LOCAL3 + SLOW, P=8, N256 (N=256, D=32)",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_P8_N256",
+    "role": "ref",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P8S4"
+    }
+   }
+  },
+  "decision": {
+   "best_depth": 2,
+   "best_width": "D128",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "depth_summary": {
+    "L2": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    },
+    "L3": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    },
+    "L4": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    },
+    "L6": {
+     "br": 0,
+     "n": 1,
+     "tested": true,
+     "trans_med": null
+    }
+   },
+   "reading_s64": "scale-free (d = arm - N256 BOUND ROUTED: N512 +0, N1024 +0, D64 +0, D128 +1; scale-free: every d >= -1; width-sensitive: any d <= -4)",
+   "reading_s65": "scale-free (d = arm - L3 BOUND ROUTED: L2 +0, L4 +0, L6 +0; scale-free: every d >= -1; depth-sensitive: any d <= -4)",
+   "rule": "the rule",
+   "time": "2026-10-09 07:56:39 UTC",
+   "width_summary": {
+    "D128": {
+     "br": 1,
+     "n": 1,
+     "params": 109952,
+     "tested": true,
+     "trans_med": 2400
+    },
+    "D64": {
+     "br": 0,
+     "n": 1,
+     "params": 55232,
+     "tested": true,
+     "trans_med": null
+    },
+    "N1024": {
+     "br": 0,
+     "n": 1,
+     "params": 101600,
+     "tested": true,
+     "trans_med": null
+    },
+    "N256": {
+     "br": 0,
+     "n": 1,
+     "params": 27872,
+     "tested": true,
+     "trans_med": null
+    },
+    "N512": {
+     "br": 0,
+     "n": 1,
+     "params": 52448,
+     "tested": true,
+     "trans_med": null
+    }
+   }
+  },
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "883b982+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-09 07:56:39",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
