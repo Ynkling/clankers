@@ -296,3 +296,9 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
   [ 91]  927.7 min  H/hardness       HARD_W                   seed 496  lr 0.001  (LOCAL3 + SLOW + KEYMASS (<= 3); no hinge; hard write)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 784a118, code 8240313e6822, attempt 1: acc 0.950  trans  None  outcome non-stream KEY; map [7, 5, 5, 5, 5, 5, 7, 5]; None fired at [9600, 26400, 31200]
   start  927.7 min  H/hardness       ORACLE                   seed 490  (projected worst case 720 min)
+  [ 92]  935.8 min  H/hardness       ORACLE                   seed 490  lr 0.001  (one Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 4768dbd, code 8240313e6822, attempt 1: acc 0.958  trans  3600  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
+  start  935.8 min  H/hardness       ORACLE                   seed 491  (projected worst case 720 min)
+  [ 93]  945.6 min  H/hardness       ORACLE                   seed 491  lr 0.001  (one Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 4768dbd+dirty, code 8240313e6822, attempt 1: acc 0.985  trans  4800  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
+  start  945.6 min  H/query_gate     collapse.GUMBEL_RW       seed 441  (projected worst case 480 min)
