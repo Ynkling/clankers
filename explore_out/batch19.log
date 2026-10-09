@@ -1321,3 +1321,6 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   [ 25]   89.0 min  scale_depth  L4             seed 280  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 1d713dd, code 17e56410a1db, attempt 1: acc 1.000  trans  3600  stop 8400  outcome BOUND ROUTED
   start   89.0 min  scale_depth  L4             seed 281  (projected worst case 39 min)
+  [ 26]   90.8 min  scale_depth  L6             seed 288  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 671410e, code 17e56410a1db, attempt 1: acc 0.995  trans  4800  stop 8400  outcome BOUND ROUTED
+  start   90.8 min  scale_depth  L4             seed 282  (projected worst case 39 min)
