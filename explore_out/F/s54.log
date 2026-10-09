@@ -377,3 +377,15 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 35]  999.1 min  F/window_delta_scale B_DELTA                  seed 322  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 4fd5694+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
   start  999.1 min  F/window_delta_scale B_DELTA                  seed 324  (projected worst case 49 min)
+  [ 36] 1009.8 min  F/window_delta_scale B_DELTA                  seed 316  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 007c33b, code c8612c854acc, attempt 1: acc 1.000  trans 22800  BOUND ROUTED  splits 3  map --
+  start 1009.8 min  F/window_delta_scale B_DELTA                  seed 325  (projected worst case 49 min)
+  [ 37] 1012.8 min  F/window_delta_scale B_DELTA                  seed 323  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 007c33b+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  9600  BOUND ROUTED  splits 0  map --
+  start 1012.8 min  F/window_delta_scale B_DELTA                  seed 326  (projected worst case 49 min)
+  [ 38] 1018.2 min  F/window_delta_scale B_DELTA                  seed 324  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 007c33b+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  8400  BOUND ROUTED  splits 1  map --
+  start 1018.2 min  F/window_delta_scale B_DELTA                  seed 327  (projected worst case 49 min)
+  [ 39] 1023.9 min  F/window_delta_scale B_DELTA                  seed 325  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 007c33b+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
+  start 1023.9 min  F/window_delta_scale B_DELTA                  seed 328  (projected worst case 49 min)
