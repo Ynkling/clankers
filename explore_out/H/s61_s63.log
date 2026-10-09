@@ -185,3 +185,6 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
   [ 54]  530.1 min  H/copy2x2        NONE                     seed 489  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; no trigger)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 305cee6, code 0b17627cb1b8, attempt 1: acc 0.748  trans  None  outcome MERGED (3 share); map [10, 3, 10, 10, 11, 5, 7, 0]
   start  530.1 min  H/query_gate     eight.SPLIT              seed 463  (projected worst case 720 min)
+  [ 55]  542.0 min  H/query_gate     eight.RESET              seed 462  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 493f95f, code fb7f8b77db6a, attempt 1: acc 1.000  trans 36000  outcome BOUND ROUTED; map [11, 12, 10, 8, 13, 6, 14, 4]
+  start  542.0 min  H/query_gate     eight.SPLIT              seed 464  (projected worst case 720 min)
