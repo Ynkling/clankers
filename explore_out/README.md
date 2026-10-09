@@ -540,3 +540,30 @@ Handed back as promising for a pre-registered test on the main branch: S48's W_S
 memory, no hinge and S37's KEYMASS split trigger (<= 3 splits) at eight streams: 9/10 BOUND ROUTED against 3/10 for the same
 seeds without the trigger (6 / 0 discordant, p = 0.031), every split targeted as labelled. W_SPLIT_D98 (8/10) adds nothing
 the splits do not. Not: W_D98, W_LONG. Cut: W_NOSLOW, W_WIDTH4, W_SPLIT_M. Descriptive: S49.
+
+## Session F
+
+Delta-rule channels (branch `claude/explore-F`; seeds 300-359; outputs and reports in `explore_out/F/`: `report_1.md`
+for S53, `report_2.md` for S54 and S59). EXPLORATORY, not a result. Intel Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread
+per run; cache keys arm|seed|code SHA|CPU. `explore_delta_mem.py` (TASK 0) passed its CHECKs at every batch start:
+β = 0 equals the Hebbian memory to 1e-5; with the new path disabled, LOCAL3_SLOW|160, W_SPLIT|260 and LOCAL3_SLOW16_A|242
+reproduce bit for bit through 2400; oracle cross-stream contributions are exactly 0; the β = 1 overwrite holds.
+Readings fixed in each screen's docstring before any run.
+
+| screen | outcome | delta | Hebbian | reading |
+|---|---|---|---|---|
+| S53 single channel, grouped / header P=4 (300-309) | BOUND | 4/10 / 8/10 | 0/10 / 1/10 | R1 "neither" (the single delta channel binds *more*) |
+| S53 perfect gate, header P=8, 48000 (300-302) | BOUND | 3/3 (median 4800) | 3/3 (median 18000) | R2 "neither" |
+| S54(a) LOCAL3+SLOW, S=2 (310-349) | DISCOVERED | 36/40 | recorded 31/40 (counts) | "delta better" |
+| S54(b) W_SPLIT recipe, S=4 k=16 (310-329) | BOUND ROUTED | 20/20 | 19/20 | "delta not worse" |
+| S54(c) W_SPLIT recipe, S=8 k=16 (310-319) | BOUND ROUTED | 3/10 | 9/10 (0 / 6, p = 0.016) | "delta worse" |
+| S54(d) RandHeaderTask (330-349) | DISCOVERED | 0/20 | 0/20 | UNTESTED (both oracles 0/2): no BASELINE |
+| S59 decay, header P=8 (350-359) | oracle gap | single binds FIXED 3/10, ROUTED 9/10, GDN 8/10 | — | "it does not" (the gap shrinks) |
+
+Two observations that cut against the plan of distant_cues §4.1, both descriptive:
+- A single delta channel is not a negative control. It binds the header layout by learning near-orthogonal, stream-tagged
+  keys at layer 3 (S53, post hoc), and with a learned decay by clearing at CTX tokens (S59).
+- Learned β alone collapses towards not writing.
+At eight streams the delta memory is slower for the perfect gate and loses to the Hebbian memory under the learned gate.
+Not handed back as promising: S54(c). S54(a) and (b) are consistent with "delta not worse". S54(d) must be redone with a
+lighter RandHeaderTask or a longer budget before Session G uses it.
