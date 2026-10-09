@@ -134,6 +134,74 @@ budgets); the original G2 is printed, not a claim.
 - Runtime: the split arm is never cut (nothing is cut). On X the run started at 2f98f06 finishes Parts A-C untouched;
   this code then resumes the same results file: the full verification, the projection, and only Part D's runs. The meta
   keeps the first start's commit and time and records the amendment's start (commit, time, arms). L runs it all at once.
+
+RESULT (X; results/X/window_gate_results.json)
+Run conditions:
+- First start 2026-10-07 23:30 at 2f98f06: verification passed, the six perfect-gate runs were recorded, then a
+  container restart killed the run (its in-flight Part C runs were lost; nothing else recorded). The amended test
+  (886a668, Part D) resumed the same file at 2026-10-08 11:48: the full verification passed (inherited CHECKs 1-134,
+  own 135-144; CHECK 144 had no cached Part A-C learned-gate record to compare), the six perfect-gate records were kept
+  (their code is unchanged) and the other 225 runs ran: 231/231 records, none failed, 1851.5 min of training after
+  verification, 4 workers x 1 thread, detached with setsid (two worker restarts of the session did not touch it).
+  Every record on the 2.80GHz Xeon. Projection 49.86 h on 4 workers; nothing cut.
+- Validity: CEIL_A 2/2 (1200), CEIL_B 2/2 (1200), CEIL_C 2/2 (4800) -> Parts A, B, C (and D) VALID.
+Claims:
+- Pooled (primary): not computed on X alone; it needs L's complete file (--also).
+- Per machine (secondary):
+  - G1 WIN3_SLOW16 19/20 vs WIN16_A 15/20 BOUND ROUTED, 5 vs 1, p = 0.11: NOT SHOWN.
+  - G2 WIN3_SPLIT_D8 18/20 vs HINGE_D8 0/20 BOUND ROUTED, 18 vs 0, p = 3.8e-6: SHOWN.
+  - G3 WIN3_SLOW 33/40 vs HINGE0 33/40 DISCOVERED, HINGE0 only 6, WIN3_SLOW only 6, d = 0 <= 2: HOLDS.
+  - G4 WIN3_SPLIT_D8 18/20 vs WIN3_SLOW_D8 6/20 BOUND ROUTED, 12 vs 0, p = 0.00024: SHOWN.
+- Bands (Wilson 95%): WIN3 MAJORITY 33/40 [0.681, 0.913]; WIN3_SLOW MAJORITY 33/40 [0.681, 0.913]; HINGE0 MAJORITY
+  33/40 [0.681, 0.913]; WIN3_SLOW16 RELIABLE 19/20 [0.764, 0.991]; WIN16_A MAJORITY 15/20 [0.531, 0.888]; WIN3_SLOW_D8
+  MINORITY 6/20 [0.145, 0.519]; HINGE_D8 NEVER 0/20 [0, 0.161]; WIN3_SPLIT_D8 RELIABLE 18/20 [0.699, 0.972];
+  WIN3_RESET_D8 NEVER 0/5 [0, 0.434].
+- The reading ("eight streams bind without labels or restarts") is pooled only; on X, WIN3_SPLIT_D8 is RELIABLE and G2
+  and G4 are SHOWN.
+- Printed, not claims: the original G2, WIN3_SLOW_D8 6/20 vs HINGE_D8 0/20 (6 vs 0, p = 0.016); the reset-only control
+  WIN3_RESET_D8 0/5 vs WIN3_SLOW_D8 1/5 on 540-544; WIN3_SLOW vs WIN3 33/40 vs 33/40 (3 vs 3). Median transitions:
+  WIN3 2400, WIN3_SLOW 2400, HINGE0 2400, WIN3_SLOW16 3600 [3600, 10800], WIN16_A 4800 [3600, 18000], WIN3_SLOW_D8 27600
+  [20400, 33600], WIN3_SPLIT_D8 21600 [14400, 42000].
+Diagnostics (not part of the verdict):
+- The trigger fired 47 splits in WIN3_SPLIT_D8's 20 runs (1-3 per run); every target was labelled ok (c* held >= 2
+  streams, c0 none). Its two failures, s555 and s556, ended MERGED (2 share). The reset-only control fired 15 resets in
+  its 5 runs (3 each, all labelled ok) and bound none: on these seeds the row copy, not the Adam reset, made the
+  difference.
+- HINGE_D8 bound none of 20 (8 collapsed, 7 non-stream OTHER, 5 merged). WIN3_SLOW_D8's 14 failures are all merges (8
+  two-share, 6 three-share).
+- Part A: no POSITION failure in any arm; WIN3 KEY 5 + STREAM-PARTIAL 2, WIN3_SLOW KEY 4 + STREAM-PARTIAL 3, HINGE0
+  KEY 7. Part B: WIN16_A's failures 3 non-stream POSITION and 2 merges; WIN3_SLOW16's one failure (s557) bound, not
+  routed.
+
+RESULT (L; results/L/window_gate_results.json, recorded by another session at 1cd20a1; recomputed here with this file's
+report())
+- 231/231 records, none failed; 12th Gen Intel(R) Core(TM) i7-12650H, torch 2.14.0, 6 workers, test commit 886a668
+  (all parts in one start), started 2026-10-08 11:33; projection 17.30 h; nothing cut. CHECK 139's --also part holds
+  both ways (each file names the other machine, seeds in the other's ranges, CPUs differ, no overlap).
+- Validity: CEIL_A 2/2, CEIL_B 2/2, CEIL_C 2/2 (3600, 6000) -> all parts VALID.
+- Per machine: G1 WIN3_SLOW16 19/20 vs WIN16_A 12/20, 8 vs 1, p = 0.020: SHOWN. G2 WIN3_SPLIT_D8 20/20 vs HINGE_D8 0/20,
+  20 vs 0, p = 9.5e-7: SHOWN. G3 WIN3_SLOW 36/40 vs HINGE0 34/40, HINGE0 only 3, WIN3_SLOW only 5, d = -2: HOLDS. G4
+  WIN3_SPLIT_D8 20/20 vs WIN3_SLOW_D8 9/20, 11 vs 0, p = 0.00049: SHOWN.
+- Bands: WIN3 MAJORITY 32/40, WIN3_SLOW RELIABLE 36/40, HINGE0 MAJORITY 34/40, WIN3_SLOW16 RELIABLE 19/20, WIN16_A
+  MAJORITY 12/20, WIN3_SLOW_D8 MINORITY 9/20, HINGE_D8 NEVER 0/20, WIN3_SPLIT_D8 RELIABLE 20/20, WIN3_RESET_D8 MAJORITY
+  3/5 (equal to WIN3_SLOW_D8 on its five seeds, 0 vs 0 discordant).
+- Diagnostics: 38 splits in 20 runs (0-3 per run), every target labelled ok; 10 resets in the control's 5 runs; HINGE_D8
+  0/20 (7 collapsed); WIN3_SLOW_D8's 11 failures all merges. Median transitions: WIN3_SPLIT_D8 18600 [13200, 30000],
+  WIN3_SLOW_D8 32400 [13200, 38400].
+
+POOLED (primary; X + L, b and c summed over both machines' pairs; identical from either machine's side)
+- G1 WIN3_SLOW16 38/40 vs WIN16_A 27/40 BOUND ROUTED, 13 vs 2 (X 5 vs 1, L 8 vs 1), p = 0.0037: SHOWN.
+- G2 WIN3_SPLIT_D8 38/40 vs HINGE_D8 0/40 BOUND ROUTED, 38 vs 0, p = 3.6e-12: SHOWN.
+- G3 WIN3_SLOW 69/80 vs HINGE0 67/80 DISCOVERED, HINGE0 only 9, WIN3_SLOW only 11, d = -2 <= 2: HOLDS.
+- G4 WIN3_SPLIT_D8 38/40 vs WIN3_SLOW_D8 15/40 BOUND ROUTED, 23 vs 0 (X 12 vs 0, L 11 vs 0), p = 1.2e-7: SHOWN.
+- Bands (Wilson 95%): WIN3 MAJORITY 65/80 [0.713, 0.883]; WIN3_SLOW MAJORITY 69/80 [0.770, 0.921]; HINGE0 MAJORITY 67/80
+  [0.742, 0.903]; WIN3_SLOW16 RELIABLE 38/40 [0.835, 0.986]; WIN16_A MAJORITY 27/40 [0.520, 0.799]; WIN3_SLOW_D8 MINORITY
+  15/40 [0.242, 0.530]; HINGE_D8 NEVER 0/40 [0, 0.088]; WIN3_SPLIT_D8 RELIABLE 38/40 [0.835, 0.986]; WIN3_RESET_D8
+  MINORITY 3/10 [0.108, 0.603].
+- READING (pooled): "eight streams bind without labels or restarts" (WIN3_SPLIT_D8 RELIABLE 38/40; G2 and G4 SHOWN).
+- Printed, not claims: the original G2, WIN3_SLOW_D8 15/40 vs HINGE_D8 0/40 (15 vs 0, p = 3.1e-5); the reset-only
+  control WIN3_RESET_D8 3/10 vs WIN3_SLOW_D8 4/10 on its seeds (0 vs 1); WIN3_SLOW vs WIN3 69/80 vs 65/80 (7 vs 3,
+  p = 0.17).
 """
 
 import argparse
