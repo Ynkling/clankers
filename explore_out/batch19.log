@@ -513,3 +513,6 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   start    0.0 min  scale_width  N256           seed 279  (projected worst case 30 min)
   start    0.0 min  scale_width  N1024          seed 270  (projected worst case 116 min)
   start    0.0 min  scale_width  N1024          seed 271  (projected worst case 116 min)
+  [  1]    5.8 min  scale_width  N256           seed 273  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 76a060a, code 17e56410a1db, attempt 1, resumed at [24000]: acc 0.798  trans  None  stop 28800  outcome MERGED (2 share)
+  start    5.8 min  scale_width  N1024          seed 272  (projected worst case 116 min)
