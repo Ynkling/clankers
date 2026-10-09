@@ -1,5 +1,77 @@
 {
  "meta": {
+  "phase2": {
+   "best_depth": 2,
+   "best_width": "D128",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "depth_summary": {
+    "L2": {
+     "br": 10,
+     "n": 10,
+     "tested": true,
+     "trans_med": 3600.0
+    },
+    "L3": {
+     "br": 10,
+     "n": 10,
+     "tested": true,
+     "trans_med": 3600.0
+    },
+    "L4": {
+     "br": 10,
+     "n": 10,
+     "tested": true,
+     "trans_med": 3600.0
+    },
+    "L6": {
+     "br": 9,
+     "n": 10,
+     "tested": true,
+     "trans_med": 4800
+    }
+   },
+   "reading_s64": "scale-free (d = arm - N256 BOUND ROUTED: N512 +1, N1024 +1, D64 +1, D128 +1; scale-free: every d >= -1; width-sensitive: any d <= -4)",
+   "reading_s65": "scale-free (d = arm - L3 BOUND ROUTED: L2 +0, L4 +0, L6 -1; scale-free: every d >= -1; depth-sensitive: any d <= -4)",
+   "rule": "the rule",
+   "time": "2026-10-09 16:40:29 UTC",
+   "width_summary": {
+    "D128": {
+     "br": 10,
+     "n": 10,
+     "params": 109952,
+     "tested": true,
+     "trans_med": 3600.0
+    },
+    "D64": {
+     "br": 10,
+     "n": 10,
+     "params": 55232,
+     "tested": true,
+     "trans_med": 3600.0
+    },
+    "N1024": {
+     "br": 10,
+     "n": 10,
+     "params": 101600,
+     "tested": true,
+     "trans_med": 3600.0
+    },
+    "N256": {
+     "br": 9,
+     "n": 10,
+     "params": 27872,
+     "tested": true,
+     "trans_med": 3600
+    },
+    "N512": {
+     "br": 10,
+     "n": 10,
+     "params": 52448,
+     "tested": true,
+     "trans_med": 3600.0
+    }
+   }
+  },
   "projection_cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
   "projection_time": "2026-10-09 08:33:09 UTC",
   "provenance": {
