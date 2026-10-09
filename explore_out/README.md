@@ -567,3 +567,18 @@ Two observations that cut against the plan of distant_cues §4.1, both descripti
 At eight streams the delta memory is slower for the perfect gate and loses to the Hebbian memory under the learned gate.
 Not handed back as promising: S54(c). S54(a) and (b) are consistent with "delta not worse". S54(d) must be redone with a
 lighter RandHeaderTask or a longer budget before Session G uses it.
+
+### Session F, follow-up (S68-S70; `explore_out/F/report_3.md`)
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| S68 one delta channel (β = 1), grouped + conv, S=4 / S=8 (300-309, 43200) | BOUND | 2/10 / 0/10 (oracles 2/2, 2/2; recorded gated Hebbian 19/20, 9/10) | "neither": stream-tagged keys do not scale |
+| S69 one Hebbian channel, header P=8, FIXED / ROUTED / GDN decay (350-359) | BOUND | 0/10 / 0/10 / 0/10 (S59's delta channel on the same seeds: 3 / 9 / 8) | "the forget gate needs the delta rule" |
+| S70 RandHeaderTask-lite (4 keys per stream, 2 blocks of 1-3 pairs, L 23), LOCAL3+SLOW (330-349, 24000) | DISCOVERED / BOUND | HEBB 0/20 / 1/20 (KEY 19); DELTA 0/20 / 6/20 (unrouted) | **BASELINE for Session G: HEBB DISCOVERED 0/20, BOUND 1/20, ROUTED*@end 0/20** (oracles 3/3, 3/3) |
+
+Descriptive summary. The single delta channel's tricks are limited:
+- Its stream-tagged keys do not carry to four or eight streams.
+- Its learned reset at CTX tokens needs the delta rule; a Hebbian channel with the same forget gate learns no reset and
+  binds nothing.
+On the lighter randomised header task the window gate key-splits on both memories, because its 3-token window does not
+see the block's CTX beyond the first pair.
