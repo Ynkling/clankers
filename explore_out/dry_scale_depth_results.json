@@ -1,0 +1,233 @@
+{
+ "meta": {
+  "arms": {
+   "L2": {
+    "iters": 2400,
+    "key": "L2",
+    "label": "LOCAL3 + SLOW at N=256, D=32, 2 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_L2",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     280
+    ],
+    "size": "L2",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      2
+     ],
+     "task": "P4S4"
+    }
+   },
+   "L3": {
+    "iters": 2400,
+    "key": "L3",
+    "label": "LOCAL3 + SLOW at N=256, D=32, 3 layers (the reference)",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_L3",
+    "role": "ref",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     280
+    ],
+    "size": "L3",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "L4": {
+    "iters": 2400,
+    "key": "L4",
+    "label": "LOCAL3 + SLOW at N=256, D=32, 4 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_L4",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     280
+    ],
+    "size": "L4",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      4
+     ],
+     "task": "P4S4"
+    }
+   },
+   "L6": {
+    "iters": 2400,
+    "key": "L6",
+    "label": "LOCAL3 + SLOW at N=256, D=32, 6 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_L6",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     280
+    ],
+    "size": "L6",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      6
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_L2": {
+    "iters": 2400,
+    "key": "ORC_L2",
+    "label": "oracle at N=256, D=32, 2 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     280
+    ],
+    "size": "L2",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      8,
+      32,
+      2
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_L3": {
+    "iters": 2400,
+    "key": "ORC_L3",
+    "label": "oracle at N=256, D=32, 3 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     280
+    ],
+    "size": "L3",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_L4": {
+    "iters": 2400,
+    "key": "ORC_L4",
+    "label": "oracle at N=256, D=32, 4 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     280
+    ],
+    "size": "L4",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      8,
+      32,
+      4
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_L6": {
+    "iters": 2400,
+    "key": "ORC_L6",
+    "label": "oracle at N=256, D=32, 6 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     280
+    ],
+    "size": "L6",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      8,
+      32,
+      6
+     ],
+     "task": "P4S4"
+    }
+   },
+   "RES6": {
+    "iters": 2400,
+    "key": "RES6",
+    "label": "Session G's per-layer residual gate at 6 layers (diagnostic; only if L6 fails)",
+    "lr": 0.001,
+    "needs": "res6_state",
+    "opt": "adam",
+    "oracle": "ORC_L6",
+    "role": "diag",
+    "sched": "gate W_in/W_g/window/A 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     280
+    ],
+    "size": "L6",
+    "spec": {
+     "cfg": "k16",
+     "gate": "resgate",
+     "size": [
+      8,
+      32,
+      6
+     ],
+     "task": "P4S4"
+    }
+   }
+  },
+  "code_shas": [
+   "17e56410a1db4118a12d829484c7999eac8c0bc7"
+  ],
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "2b1dac4",
+   "python": "3.11.15",
+   "started": "2026-10-09 06:51:30",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
