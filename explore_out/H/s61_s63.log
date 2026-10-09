@@ -101,3 +101,15 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
   [ 26]  270.4 min  H/copy2x2        COPY                     seed 485  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 29f4154+dirty, code 0b17627cb1b8, attempt 1: acc 1.000  trans 25200  outcome BOUND ROUTED; map [5, 10, 2, 14, 11, 3, 4, 12]; None fired at [12000, 24000]
   start  270.4 min  H/copy2x2        COPY                     seed 489  (projected worst case 720 min)
+  [ 27]  286.0 min  H/copy2x2        COPY                     seed 483  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a87351d, code 0b17627cb1b8, attempt 1: acc 0.625  trans  None  outcome MERGED (2 share); map [7, 1, 1, 8, 9, 12, 15, 15]; None fired at [14400, 24000, 28800]
+  start  286.0 min  H/copy2x2        COPY_NONOISE             seed 480  (projected worst case 720 min)
+  [ 28]  288.3 min  H/copy2x2        COPY                     seed 488  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a87351d+dirty, code 0b17627cb1b8, attempt 1: acc 1.000  trans 15600  outcome BOUND ROUTED; map [0, 10, 4, 6, 5, 14, 9, 3]; None fired at [14400]
+  start  288.3 min  H/copy2x2        COPY_NONOISE             seed 481  (projected worst case 720 min)
+  [ 29]  294.6 min  H/copy2x2        COPY                     seed 487  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a87351d+dirty, code 0b17627cb1b8, attempt 1: acc 1.000  trans 20400  outcome BOUND ROUTED; map [10, 11, 3, 1, 15, 8, 0, 7]; None fired at [4800, 19200]
+  start  294.6 min  H/copy2x2        COPY_NONOISE             seed 482  (projected worst case 720 min)
+  [ 30]  299.8 min  H/copy2x2        COPY                     seed 489  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git a87351d+dirty, code 0b17627cb1b8, attempt 1: acc 1.000  trans 19200  outcome BOUND ROUTED; map [10, 3, 8, 14, 11, 5, 7, 0]; None fired at [12000, 16800]
+  start  299.8 min  H/copy2x2        COPY_NONOISE             seed 483  (projected worst case 720 min)
