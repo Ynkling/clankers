@@ -558,3 +558,14 @@ Handed back for a pre-registered test: at eight streams the split's row copy, no
 (SPLIT 10/10 vs RESET 2/10 on the same trigger). Not promising: Gumbel gate noise (on the read side it collapses even
 four streams), the Switch loss (it moves KEY and VAL routing onto different channels; margin 0.46), the temperature floor,
 stable-max.
+
+### Session H follow-up (S61-S63, seeds 480-499)
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S61 copy2x2 (S=8, k=16, 43200; 10 paired seeds) | BOUND ROUTED: SPLIT 9, COPY 9, COPY_NONOISE 9, RESET 4, NONE 3; oracle 2/2 | the copy alone suffices; the noise does not matter (0 vs 0); the reset adds nothing |
+| S62 query_gate (216 reruns of S58/S58b's bound runs, 216/216 bit for bit) | query map = body VAL and KEY maps in 32-36 bound runs per arm, 12/12 at eight streams; SWITCH: 2 = VAL, 24 = KEY only, 10 neither | descriptive |
+| S63 hardness (S=8, k=16, 43200; 10 seeds) | REF (LOCAL3 + SLOW + KEYMASS) 10, ANNEAL 9, HARD_W 0; oracle 2/2 | hardness does not help (either arm) |
+
+Handed back for a pre-registered test: the KEYMASS split reduced to an exact row copy onto the idle channel (no noise, no
+Adam reset). Report: `explore_out/H/report_3.md`.

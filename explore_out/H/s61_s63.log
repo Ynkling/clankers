@@ -915,3 +915,11 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34f9034+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [1, 10, 6, 3]
   [298] 1261.2 min  H/query_gate     collapse.SWITCH          seed 457  lr 0.001  (as saved)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 34f9034+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [0, 9, 13, 1]
+  [299] 1264.7 min  H/query_gate     collapse.SWITCH          seed 459  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f69bac8, code fb7f8b77db6a, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [12, 6, 5, 10]
+  [300] 1267.4 min  H/query_gate     collapse.SWITCH          seed 453  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git f69bac8+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans 27600  outcome BOUND NOT routed; map [10, 13, 10, 11]
+  wall clock 1267.4 min
+  H/copy2x2: readings {'R1': 'the copy alone suffices (SPLIT only 0 - COPY only 0 = 0 [<= 1])', 'R2': 'does not apply (COPY vs COPY_NONOISE 0 vs 0 [>= 4 vs 0])', 'R3': 'the reset adds nothing (|SPLIT only 0 - COPY only 0| = 0 [<= 1])'}; complete True; valid True
+  H/query_gate: readings {'S62': 'descriptive'}; complete True; valid True
+  H/hardness: readings {'ANNEAL': 'does not help (ANNEAL vs REF 0 vs 1 [>= 4 vs 0: False]; earlier on 5/10 with BR 9 vs 10 [>= 8 and no loss: False])', 'HARD_W': 'does not help (HARD_W vs REF 0 vs 10 [>= 4 vs 0: False]; earlier on 0/10 with BR 0 vs 10 [>= 8 and no loss: False])'}; complete True; valid True
