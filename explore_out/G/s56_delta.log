@@ -1,0 +1,22 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — Session G S56 register (delta)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 484b9ed | python 3.13.16 | torch threads 1
+====================================================================================================
+  S56 read path: res_layers [2, 3] (neither L2 nor L3 present; decided 2026-10-09 15:25:17 UTC)
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (43s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK S56: recorded run, new path disabled: S43 LOCAL3_SLOW|160 (batch 16) through 2400 with RegBDH(gated=()) reproduces its curve bit for bit ([[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]) and its decoder at 1200/2400: ok
+  CHECK S56: RegBDH(gated=()) equals LOCAL3's logits bit for bit on H8: ok
+  CHECK S56: REG init: existing parameters unchanged; A_v = W_in, W_g2 = W_g; beta^R in [0.0998, 0.1002] (about 0.1); with A_r = A_R = 0 every gated layer's gate = softmax(W_g tanh(W_in v)) (max |diff| 0.0e+00): ok
+  CHECK S56: register causality: changing token 20's register write leaves every gated layer's gate at positions <= 20 bit-identical and changes it at 21: ok
+  CHECK S56: strict causality: changing token 20 leaves logits and every layer's gate at positions < 20 unchanged: ok
+  CHECK S56: SG and NOSG: the same forward; the gated layers' gates send no gradient into the stack (encoder) under SG and a non-zero one under NOSG: ok
+  CHECK S56: RESGATE_ONLY: no register parameters; reg = False: ok
+  CHECK S56: SLOW groups: gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A_v', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R'] at 1e-3, rest ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight'] at 1e-4; every trainable tensor once; W_h frozen: ok
+  CHECK S56: nudge moves only ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'w_R'] (a subset of GATE_NEW); stream lean |p0(s0) - p0(s1)| after it at the gated layers [0.044, 0.043] (> 0.02): ok
+  CHECK S56: delta path with beta 0, write 1, raw keys equals the Hebbian RegBDH (max |diff| 1.5e-07 <= 1e-5): ok
+  CHECK S56: ORACLE_H and ORACLE_D: the query's logits are bit-identical when every VAL token of the other stream changes: ok
+  CHECK S56: SINGLE_GDN: k = 1, DeltaMemory(beta 0, write 1, raw keys, decay gdn): ok
+  s56_register: code SHA 70304e0e7121 (26 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  32 runs queued on 4 workers
