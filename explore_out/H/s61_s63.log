@@ -83,3 +83,12 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
   [ 20]  222.6 min  H/copy2x2        COPY                     seed 480  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git a1e58f2, code 0b17627cb1b8, attempt 1: acc 1.000  trans 25200  outcome BOUND ROUTED; map [7, 10, 5, 2, 9, 11, 4, 3]; None fired at [12000, 19200, 24000]
   start  222.6 min  H/copy2x2        COPY                     seed 483  (projected worst case 720 min)
+  [ 21]  234.2 min  H/copy2x2        COPY                     seed 481  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 724500e, code 0b17627cb1b8, attempt 1: acc 1.000  trans 24000  outcome BOUND ROUTED; map [15, 10, 4, 0, 13, 1, 3, 9]; None fired at [7200]
+  start  234.2 min  H/copy2x2        COPY                     seed 484  (projected worst case 720 min)
+  [ 22]  235.7 min  H/copy2x2        RESET                    seed 489  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: reset only)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 724500e+dirty, code 0b17627cb1b8, attempt 1: acc 0.742  trans  None  outcome MERGED (3 share); map [10, 3, 10, 10, 11, 5, 7, 0]; None fired at [12000, 24000, 28800]
+  start  235.7 min  H/copy2x2        COPY                     seed 485  (projected worst case 720 min)
+  [ 23]  236.6 min  H/copy2x2        COPY                     seed 482  lr 0.001  (LOCAL3 + SLOW (gate 1e-3 throughout; the rest 1e-4 for 1-2400, 1e-3 after); no hinge; trigger: copy + noise)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 724500e+dirty, code 0b17627cb1b8, attempt 1: acc 1.000  trans 27600  outcome BOUND ROUTED; map [15, 1, 14, 6, 0, 9, 2, 4]; None fired at [14400, 21600, 26400]
+  start  236.6 min  H/copy2x2        COPY                     seed 486  (projected worst case 720 min)
