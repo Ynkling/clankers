@@ -7,3 +7,55 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (108s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  PROJECTION (worst case: every run to its iters; pool-load timing on 4 parallel children, 1 thread each, this machine; 656s to measure):
+    scale_width  ORC_N256   2 runs x   28.2 min (step   56.0 ms, evaluation  3.26 s)
+    scale_width  N256      10 runs x   29.8 min (step   59.6 ms, evaluation  3.07 s)  [only if its oracle binds]
+    scale_width  ORC_N512   2 runs x   49.4 min (step   99.5 ms, evaluation  4.00 s)
+    scale_width  N512      10 runs x   49.5 min (step  100.0 ms, evaluation  3.84 s)  [only if its oracle binds]
+    scale_width  ORC_N1024  2 runs x  113.5 min (step  224.5 ms, evaluation 14.37 s)
+    scale_width  N1024     10 runs x  115.6 min (step  229.0 ms, evaluation 14.22 s)  [only if its oracle binds]
+    scale_width  ORC_D64    2 runs x   42.2 min (step   85.4 ms, evaluation  2.89 s)
+    scale_width  D64       10 runs x   45.5 min (step   92.4 ms, evaluation  2.88 s)  [only if its oracle binds]
+    scale_width  ORC_D128   2 runs x   59.5 min (step  119.2 ms, evaluation  5.63 s)
+    scale_width  D128      10 runs x   61.6 min (step  124.0 ms, evaluation  5.32 s)  [only if its oracle binds]
+    scale_depth  ORC_L2     2 runs x   19.3 min (step   38.9 ms, evaluation  1.66 s)
+    scale_depth  L2        10 runs x   20.1 min (step   40.5 ms, evaluation  1.68 s)  [only if its oracle binds]
+    scale_depth  ORC_L3     2 runs x   28.2 min (step   56.0 ms, evaluation  3.26 s)
+    scale_depth  L3        10 runs x   29.8 min (step   59.6 ms, evaluation  3.07 s)  [only if its oracle binds]
+    scale_depth  ORC_L4     2 runs x   35.6 min (step   71.4 ms, evaluation  3.43 s)
+    scale_depth  L4        10 runs x   39.3 min (step   79.0 ms, evaluation  3.58 s)  [only if its oracle binds]
+    scale_depth  ORC_L6     2 runs x   55.9 min (step  113.1 ms, evaluation  3.96 s)
+    scale_depth  L6        10 runs x   58.4 min (step  117.9 ms, evaluation  4.44 s)  [only if its oracle binds]
+    scale_depth  RES6      10 runs x   67.2 min (step  136.2 ms, evaluation  4.71 s)  [only if 6 layers fails]  [only if its oracle binds]
+    PHASE 1 (S64 + S65, RES6 included): 100.6 h of runs, makespan on 4 workers 25.2 h worst case; 7.4 h if every run stops at 8400 (batch 16's S44(a) stopped 18 of 20 runs there)
+    PHASE 2 per candidate (worst case; S66 10 runs x 43200, S67 per width 2 oracles x 2 P + 10 learned x 2 P, x 43200):
+      fixed: S66 N256_L3 15.4 h; S67 at N256 67.9 h (P=8 oracle 1.58 h/run, P=16 oracle 3.95 h/run)
+      best width N512  : S66   30.3 h + S67  116.8 h (P=16 learned run 6.98 h)
+      best width N1024 : S66   56.4 h + S67  234.7 h (P=16 learned run 13.81 h)
+      best width D64   : S66   21.2 h + S67   87.3 h (P=16 learned run 5.27 h)
+      best width D128  : S66   31.7 h + S67  119.6 h (P=16 learned run 7.21 h)
+      best depth L2: S66   11.3 h
+      best depth L4: S66   20.7 h
+      best depth L6: S66   32.1 h
+    PHASE 2 total, worst case: 203-407 h of runs (51-102 h on 4 workers if perfectly packed); a run binding early stops early (an oracle that binds at 1200 stops at 8400)
+    no budget was given: nothing is cut (and the reference arms never are); the decision is the user's
+  recipe read in a child from main at 9c5939e: test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001; SLOW: gate 0.001 throughout, others 0.0001 for updates 1-2400; window width 3; the model: ARCH {'n_layer': 3, 'positional': 'decay'}, D 32, A4k16's mult 8 (N = 256), h_gate None, {'conv': 'layer', 'conv_k': 4}; evaluation every 1200, bound at 0.95 held, early stop after 3 in a row (after 4800 on the k16 path); the trigger: every 2400 from 4800 (reference 2400), acc < 0.95, rise < 0.02, gap 4800, <= 3 splits; tasks {'P4S4': {'S': 4, 'P': 4, 'vocab': 24, 'n_vals': 16, 'n_q': 1}, 'P4S8': {'S': 8, 'P': 4, 'vocab': 28, 'n_vals': 16, 'n_q': 1}, 'P8S4': {'S': 4, 'P': 8, 'vocab': 28, 'n_vals': 16, 'n_q': 1}, 'P16S4': {'S': 4, 'P': 16, 'vocab': 36, 'n_vals': 16, 'n_q': 1}}; 1 torch thread per run
+  lr for scale_width ORC_N256: 0.001; iters 28800; seeds 270-271 (2); size [8, 32, 3]
+  lr for scale_width N256: 0.001; iters 28800; seeds 270-279 (10); size [8, 32, 3]
+  lr for scale_width ORC_N512: 0.001; iters 28800; seeds 270-271 (2); size [16, 32, 3]
+  lr for scale_width N512: 0.001; iters 28800; seeds 270-279 (10); size [16, 32, 3]
+  lr for scale_width ORC_N1024: 0.001; iters 28800; seeds 270-271 (2); size [32, 32, 3]
+  lr for scale_width N1024: 0.001; iters 28800; seeds 270-279 (10); size [32, 32, 3]
+  lr for scale_width ORC_D64: 0.001; iters 28800; seeds 270-271 (2); size [4, 64, 3]
+  lr for scale_width D64: 0.001; iters 28800; seeds 270-279 (10); size [4, 64, 3]
+  lr for scale_width ORC_D128: 0.001; iters 28800; seeds 270-271 (2); size [2, 128, 3]
+  lr for scale_width D128: 0.001; iters 28800; seeds 270-279 (10); size [2, 128, 3]
+  lr for scale_depth ORC_L2: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 2]
+  lr for scale_depth L2: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 2]
+  lr for scale_depth ORC_L3: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 3]
+  lr for scale_depth L3: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 3]
+  lr for scale_depth ORC_L4: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 4]
+  lr for scale_depth L4: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 4]
+  lr for scale_depth ORC_L6: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 6]
+  lr for scale_depth L6: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 6]
+  lr for scale_depth RES6: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 6]
