@@ -392,3 +392,24 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 40] 1027.2 min  F/window_delta_scale B_DELTA                  seed 326  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5532430, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
   start 1027.2 min  F/window_delta_scale B_DELTA                  seed 329  (projected worst case 49 min)
+  [ 41] 1032.8 min  F/window_delta_scale B_DELTA                  seed 327  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 98cad4c, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
+  start 1032.8 min  F/window_delta_scale B_ORACLE_DELTA           seed 310  (projected worst case 48 min)
+  [ 42] 1038.3 min  F/window_delta_scale B_DELTA                  seed 328  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 98cad4c+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
+  start 1038.3 min  F/window_delta_scale B_ORACLE_DELTA           seed 311  (projected worst case 48 min)
+  [ 43] 1041.5 min  F/window_delta_scale C_DELTA                  seed 319  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 98cad4c+dirty, code c8612c854acc, attempt 1: acc 0.339  trans  None  STREAM-PARTIAL one-to-one  splits 3  map --
+  start 1041.5 min  F/window_delta_scale B_ORACLE_HEBB            seed 310  (projected worst case 18 min)
+  [ 44] 1041.6 min  F/window_delta_scale B_DELTA                  seed 329  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 98cad4c+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
+  start 1041.6 min  F/window_delta_scale B_ORACLE_HEBB            seed 311  (projected worst case 18 min)
+  [ 45] 1046.1 min  F/window_delta_scale B_ORACLE_HEBB            seed 310  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 98cad4c+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  1200  BOUND ROUTED  splits 0  map --
+  start 1046.1 min  F/window_delta_scale B_HEBB                   seed 310  (projected worst case 18 min)
+  [ 46] 1046.3 min  F/window_delta_scale B_ORACLE_HEBB            seed 311  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 98cad4c+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  1200  BOUND ROUTED  splits 0  map --
+  start 1046.3 min  F/window_delta_scale B_HEBB                   seed 311  (projected worst case 18 min)
+  [ 47] 1046.8 min  F/window_delta_scale B_ORACLE_DELTA           seed 310  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 98cad4c+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  1200  BOUND ROUTED  splits 0  map --
+  start 1046.8 min  F/window_delta_scale B_HEBB                   seed 312  (projected worst case 18 min)
