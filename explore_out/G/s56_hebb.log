@@ -66,3 +66,109 @@ EXPLORATORY, NOT A RESULT — Session G S56 register (hebb)
   [ 44/62]  112.3 min  SINGLE_GDN   seed 376  acc 0.520 trans  None unbound
   [ 45/62]  119.7 min  RESGATE_ONLY seed 377  acc 0.404 trans  None KEY
   [ 46/62]  120.3 min  BASELINE     seed 377  acc 0.303 trans  None POSITION
+  [ 47/62]  123.2 min  REG          seed 377  acc 0.462 trans  None KEY
+  [ 48/62]  123.6 min  REG_NOSG     seed 377  acc 0.275 trans  None KEY
+  [ 49/62]  130.1 min  SINGLE_GDN   seed 377  acc 0.163 trans  None unbound
+  [ 50/62]  131.3 min  REG_NUDGE    seed 377  acc 0.318 trans  None OTHER
+  [ 51/62]  132.6 min  BASELINE     seed 378  acc 0.278 trans  None KEY
+  [ 52/62]  133.4 min  RESGATE_ONLY seed 378  acc 0.404 trans  None KEY
+  [ 53/62]  141.2 min  REG          seed 378  acc 0.303 trans  None KEY
+  [ 54/62]  142.5 min  REG_NOSG     seed 378  acc 0.259 trans  None KEY
+  [ 55/62]  142.8 min  SINGLE_GDN   seed 378  acc 0.196 trans  None unbound
+  [ 56/62]  143.8 min  REG_NUDGE    seed 378  acc 0.198 trans  None OTHER
+  [ 57/62]  151.2 min  BASELINE     seed 379  acc 0.386 trans  None POSITION
+  [ 58/62]  152.1 min  RESGATE_ONLY seed 379  acc 0.886 trans  None KEY
+  [ 59/62]  153.6 min  REG          seed 379  acc 0.484 trans  None KEY
+  [ 60/62]  154.8 min  REG_NOSG     seed 379  acc 0.270 trans  None KEY
+  [ 61/62]  161.1 min  SINGLE_GDN   seed 379  acc 0.196 trans  None unbound
+  [ 62/62]  162.1 min  REG_NUDGE    seed 379  acc 0.311 trans  None STREAM-PARTIAL
+  S56 (hebb) runs done in 163.6 min
+| arm | n | BOUND | BOUND ROUTED | failures (unbound) | transitions | median acc |
+|---|---|---|---|---|---|---|
+| ORACLE_H | 2 | 1/2 [0.09, 0.91] MAJORITY | 1/2 [0.09, 0.91] MAJORITY | {'STREAM-PARTIAL': 1} | [15600] | 0.680 |
+| BASELINE | 10 | 0/10 [0.00, 0.28] NEVER | 0/10 [0.00, 0.28] NEVER | {'POSITION': 4, 'OTHER': 1, 'KEY': 5} | - | 0.345 |
+| RESGATE_ONLY | 10 | 0/10 [0.00, 0.28] NEVER | 0/10 [0.00, 0.28] NEVER | {'KEY': 10} | - | 0.415 |
+| REG | 10 | 0/10 [0.00, 0.28] NEVER | 0/10 [0.00, 0.28] NEVER | {'KEY': 9, 'OTHER': 1} | - | 0.337 |
+| REG_NOSG | 10 | 0/10 [0.00, 0.28] NEVER | 0/10 [0.00, 0.28] NEVER | {'KEY': 10} | - | 0.264 |
+| REG_NUDGE | 10 | 0/10 [0.00, 0.28] NEVER | 0/10 [0.00, 0.28] NEVER | {'STREAM-PARTIAL': 8, 'OTHER': 2} | - | 0.319 |
+| SINGLE_GDN | 10 | 0/10 [0.00, 0.28] NEVER | -- | {'unbound': 10} | - | 0.164 |
+
+VALIDITY: ORACLE_H bound 1/2 -> VALID
+  REG vs BASELINE BOUND: REG only 0, BASELINE only 0, one-sided McNemar p = 1
+  REG_NOSG vs BASELINE BOUND: REG_NOSG only 0, BASELINE only 0, one-sided McNemar p = 1
+  REG vs SINGLE_GDN BOUND: REG only 0, SINGLE_GDN only 0, p = 1
+  ORACLE_H margin at VAL (median) L1 1.00, L2 1.00, L3 1.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[1.0, 0.0], [0.0, 1.0]], KEY [[1.0, 0.0], [0.0, 1.0]], VAL [[1.0, 0.0], [0.0, 1.0]]; L3: CTX [[1.0, 0.0], [0.0, 1.0]], KEY [[1.0, 0.0], [0.0, 1.0]], VAL [[1.0, 0.0], [0.0, 1.0]]
+  BASELINE margin at VAL (median) L1 -0.00, L2 -0.00, L3 -0.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.514, 0.486], [0.494, 0.506]], KEY [[0.537, 0.463], [0.536, 0.464]], VAL [[0.5, 0.5], [0.5, 0.5]]; L3: CTX [[0.514, 0.486], [0.494, 0.506]], KEY [[0.537, 0.463], [0.536, 0.464]], VAL [[0.5, 0.5], [0.5, 0.5]]
+  RESGATE_ONLY margin at VAL (median) L1 0.00, L2 -0.00, L3 -0.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.36, 0.64], [0.306, 0.694]], KEY [[0.497, 0.503], [0.497, 0.503]], VAL [[0.563, 0.437], [0.563, 0.437]]; L3: CTX [[0.339, 0.661], [0.423, 0.577]], KEY [[0.483, 0.517], [0.482, 0.518]], VAL [[0.683, 0.317], [0.764, 0.236]]
+  REG beta^R CTX/KEY/VAL (median over runs): 0 0.10/0.10/0.10; 1200 0.12/0.12/0.12; 2400 0.25/0.26/0.24; 4800 0.44/0.52/0.47; 9600 0.50/0.65/0.56; end 0.57/0.82/0.70
+  REG margin at VAL (median) L1 0.00, L2 -0.00, L3 0.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.399, 0.601], [0.295, 0.705]], KEY [[0.441, 0.559], [0.441, 0.559]], VAL [[0.5, 0.5], [0.5, 0.5]]; L3: CTX [[0.375, 0.625], [0.289, 0.711]], KEY [[0.44, 0.56], [0.445, 0.555]], VAL [[0.5, 0.5], [0.5, 0.5]]
+  REG_NOSG beta^R CTX/KEY/VAL (median over runs): 0 0.10/0.10/0.10; 1200 0.11/0.11/0.11; 2400 0.13/0.13/0.13; 4800 0.21/0.25/0.21; 9600 0.25/0.41/0.32; end 0.37/0.69/0.50
+  REG_NOSG margin at VAL (median) L1 0.00, L2 -0.00, L3 -0.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.511, 0.489], [0.248, 0.752]], KEY [[0.494, 0.506], [0.5, 0.5]], VAL [[0.5, 0.5], [0.5, 0.5]]; L3: CTX [[0.518, 0.483], [0.44, 0.56]], KEY [[0.469, 0.531], [0.496, 0.504]], VAL [[0.438, 0.562], [0.438, 0.562]]
+  REG_NUDGE beta^R CTX/KEY/VAL (median over runs): 0 0.09/0.05/0.06; 1200 0.21/0.07/0.08; 2400 0.24/0.07/0.08; 4800 0.60/0.04/0.08; 9600 0.83/0.03/0.07; end 0.96/0.02/0.05
+  REG_NUDGE margin at VAL (median) L1 0.00, L2 1.00, L3 1.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.0, 1.0], [0.725, 0.275]], KEY [[1.0, 0.0], [0.0, 1.0]], VAL [[1.0, 0.0], [0.0, 1.0]]; L3: CTX [[0.0, 1.0], [0.725, 0.275]], KEY [[1.0, 0.0], [0.0, 1.0]], VAL [[1.0, 0.0], [0.0, 1.0]]
+
+READINGS: R1: architecture insufficient; R2: not discovered; R3: the single GDN channel is at least as good; R4: it does not; R5: SG does not matter; S57: TRIGGERED (R2 not discovered; REG median beta^R at CTX at the end 0.57)
+
+per run:
+  ORACLE_H 370: STREAM-PARTIAL   acc 0.378 trans None stream_acc [0.38, 0.38] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00
+  ORACLE_H 371: BOUND ROUTED     acc 0.981 trans 15600 stream_acc [0.98, 0.98] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00
+  BASELINE 370: POSITION         acc 0.394 trans None stream_acc [0.38, 0.41] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.04 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.04
+  BASELINE 371: POSITION         acc 0.404 trans None stream_acc [0.41, 0.4] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.04 | L3 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.04
+  BASELINE 372: OTHER            acc 0.281 trans None stream_acc [0.28, 0.28] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.12 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.12
+  BASELINE 373: KEY              acc 0.281 trans None stream_acc [0.26, 0.3] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00
+  BASELINE 374: KEY              acc 0.416 trans None stream_acc [0.4, 0.43] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.86 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.86
+  BASELINE 375: KEY              acc 0.305 trans None stream_acc [0.32, 0.29] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 0.93 | L3 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 0.93
+  BASELINE 376: KEY              acc 0.386 trans None stream_acc [0.37, 0.4] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00
+  BASELINE 377: POSITION         acc 0.303 trans None stream_acc [0.28, 0.32] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.06 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.06
+  BASELINE 378: KEY              acc 0.278 trans None stream_acc [0.28, 0.28] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00
+  BASELINE 379: POSITION         acc 0.386 trans None stream_acc [0.38, 0.39] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.04 | L3 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.04
+  RESGATE_ONLY 370: KEY              acc 0.867 trans None stream_acc [0.87, 0.86] | L2 map [1, 1] m -0.01 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.98
+  RESGATE_ONLY 371: KEY              acc 0.435 trans None stream_acc [0.45, 0.42] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.01 etaS K/V 0.00/0.08 etaK 1.00
+  RESGATE_ONLY 372: KEY              acc 0.609 trans None stream_acc [0.61, 0.61] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.87 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.85
+  RESGATE_ONLY 373: KEY              acc 0.323 trans None stream_acc [0.33, 0.32] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00
+  RESGATE_ONLY 374: KEY              acc 0.307 trans None stream_acc [0.31, 0.3] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.99 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.89
+  RESGATE_ONLY 375: KEY              acc 0.415 trans None stream_acc [0.41, 0.42] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 0.71 | L3 map [1, 1] m -0.04 etaS K/V 0.00/0.00 etaK 0.81
+  RESGATE_ONLY 376: KEY              acc 0.416 trans None stream_acc [0.4, 0.43] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m -0.01 etaS K/V 0.00/0.03 etaK 1.00
+  RESGATE_ONLY 377: KEY              acc 0.404 trans None stream_acc [0.39, 0.41] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 0.99 | L3 map [1, 1] m -0.04 etaS K/V 0.00/0.00 etaK 0.95
+  RESGATE_ONLY 378: KEY              acc 0.404 trans None stream_acc [0.39, 0.42] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00
+  RESGATE_ONLY 379: KEY              acc 0.886 trans None stream_acc [0.88, 0.89] | L2 map [1, 1] m 0.01 etaS K/V 0.00/0.00 etaK 0.95 | L3 map [1, 1] m 0.01 etaS K/V 0.00/0.00 etaK 0.85
+  REG 370: KEY              acc 0.469 trans None stream_acc [0.46, 0.48] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.65/0.83/0.74
+  REG 371: OTHER            acc 0.562 trans None stream_acc [0.58, 0.55] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.40 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.46 | beta C/K/V 0.81/0.80/0.83
+  REG 372: KEY              acc 0.206 trans None stream_acc [0.18, 0.23] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.67 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.64 | beta C/K/V 0.77/0.83/0.61
+  REG 373: KEY              acc 0.368 trans None stream_acc [0.36, 0.38] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.99 | beta C/K/V 0.64/0.79/0.71
+  REG 374: KEY              acc 0.272 trans None stream_acc [0.27, 0.27] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.41/0.83/0.67
+  REG 375: KEY              acc 0.307 trans None stream_acc [0.31, 0.3] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.45/0.73/0.61
+  REG 376: KEY              acc 0.229 trans None stream_acc [0.2, 0.26] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 0.99 | beta C/K/V 0.45/0.82/0.66
+  REG 377: KEY              acc 0.462 trans None stream_acc [0.46, 0.46] | L2 map [0, 1] m 0.01 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.99 | beta C/K/V 0.49/0.81/0.75
+  REG 378: KEY              acc 0.303 trans None stream_acc [0.29, 0.32] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.74/0.91/0.82
+  REG 379: KEY              acc 0.484 trans None stream_acc [0.44, 0.53] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.50/0.83/0.69
+  REG_NOSG 370: KEY              acc 0.729 trans None stream_acc [0.7, 0.75] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.95 | L3 map [1, 1] m -0.02 etaS K/V 0.00/0.00 etaK 0.83 | beta C/K/V 0.50/0.79/0.73
+  REG_NOSG 371: KEY              acc 0.371 trans None stream_acc [0.37, 0.37] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.99 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.97 | beta C/K/V 0.27/0.66/0.50
+  REG_NOSG 372: KEY              acc 0.240 trans None stream_acc [0.23, 0.25] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.03 etaS K/V 0.00/0.04 etaK 0.86 | beta C/K/V 0.50/0.71/0.60
+  REG_NOSG 373: KEY              acc 0.239 trans None stream_acc [0.23, 0.25] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.01 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.36/0.72/0.53
+  REG_NOSG 374: KEY              acc 0.257 trans None stream_acc [0.25, 0.27] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.03 etaS K/V 0.00/0.00 etaK 0.90 | beta C/K/V 0.09/0.25/0.14
+  REG_NOSG 375: KEY              acc 0.272 trans None stream_acc [0.28, 0.26] | L2 map [1, 1] m -0.01 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [1, 1] m -0.01 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.13/0.38/0.21
+  REG_NOSG 376: KEY              acc 0.223 trans None stream_acc [0.2, 0.24] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.97 | beta C/K/V 0.43/0.74/0.50
+  REG_NOSG 377: KEY              acc 0.275 trans None stream_acc [0.25, 0.29] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.74 | L3 map [1, 1] m -0.01 etaS K/V 0.01/0.18 etaK 0.57 | beta C/K/V 0.29/0.36/0.30
+  REG_NOSG 378: KEY              acc 0.259 trans None stream_acc [0.23, 0.29] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 0.92 | L3 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.88 | beta C/K/V 0.43/0.72/0.53
+  REG_NOSG 379: KEY              acc 0.270 trans None stream_acc [0.26, 0.28] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.99 | L3 map [1, 1] m 0.01 etaS K/V 0.00/0.00 etaK 0.67 | beta C/K/V 0.38/0.67/0.39
+  REG_NUDGE 370: STREAM-PARTIAL   acc 0.327 trans None stream_acc [0.31, 0.34] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.95/0.02/0.04
+  REG_NUDGE 371: STREAM-PARTIAL   acc 0.436 trans None stream_acc [0.43, 0.45] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.98/0.02/0.04
+  REG_NUDGE 372: STREAM-PARTIAL   acc 0.320 trans None stream_acc [0.3, 0.34] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.99/0.07/0.07
+  REG_NUDGE 373: STREAM-PARTIAL   acc 0.323 trans None stream_acc [0.31, 0.33] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.98/0.01/0.06
+  REG_NUDGE 374: STREAM-PARTIAL   acc 0.317 trans None stream_acc [0.29, 0.35] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.98/0.02/0.05
+  REG_NUDGE 375: STREAM-PARTIAL   acc 0.316 trans None stream_acc [0.31, 0.32] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.90/0.01/0.05
+  REG_NUDGE 376: STREAM-PARTIAL   acc 0.340 trans None stream_acc [0.34, 0.34] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.98/0.00/0.05
+  REG_NUDGE 377: OTHER            acc 0.318 trans None stream_acc [0.33, 0.31] | L2 map [1, 1] m 0.00 etaS K/V 0.12/0.10 etaK 0.03 | L3 map [1, 1] m 0.00 etaS K/V 0.12/0.12 etaK 0.01 | beta C/K/V 0.49/0.06/0.05
+  REG_NUDGE 378: OTHER            acc 0.198 trans None stream_acc [0.19, 0.21] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.00 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.00 | beta C/K/V 0.77/0.03/0.08
+  REG_NUDGE 379: STREAM-PARTIAL   acc 0.311 trans None stream_acc [0.29, 0.33] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.95/0.00/0.06
+  SINGLE_GDN 370: unbound          acc 0.155 trans None stream_acc [0.15, 0.16]
+  SINGLE_GDN 371: unbound          acc 0.210 trans None stream_acc [0.2, 0.22]
+  SINGLE_GDN 372: unbound          acc 0.153 trans None stream_acc [0.14, 0.16]
+  SINGLE_GDN 373: unbound          acc 0.148 trans None stream_acc [0.15, 0.15]
+  SINGLE_GDN 374: unbound          acc 0.153 trans None stream_acc [0.14, 0.16]
+  SINGLE_GDN 375: unbound          acc 0.165 trans None stream_acc [0.15, 0.18]
+  SINGLE_GDN 376: unbound          acc 0.520 trans None stream_acc [0.51, 0.53]
+  SINGLE_GDN 377: unbound          acc 0.163 trans None stream_acc [0.15, 0.17]
+  SINGLE_GDN 378: unbound          acc 0.196 trans None stream_acc [0.18, 0.21]
+  SINGLE_GDN 379: unbound          acc 0.196 trans None stream_acc [0.17, 0.22]
