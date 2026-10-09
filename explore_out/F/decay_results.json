@@ -270,6 +270,326 @@
     "n_notlast": 1045
    }
   },
+  "ORACLE_FIXED|351|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.9990234375,
+   "arm": "ORACLE_FIXED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.1923828125,
+     2.482374668121338
+    ],
+    [
+     2400,
+     0.36962890625,
+     1.8532302379608154
+    ],
+    [
+     3600,
+     0.54931640625,
+     1.219662070274353
+    ],
+    [
+     4800,
+     0.5712890625,
+     1.0547362565994263
+    ],
+    [
+     6000,
+     0.5654296875,
+     1.0261213779449463
+    ],
+    [
+     7200,
+     0.99609375,
+     0.03668799251317978
+    ],
+    [
+     8400,
+     1.0,
+     0.003574478207156062
+    ],
+    [
+     9600,
+     0.9990234375,
+     0.007745498325675726
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": null,
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999997653907433,
+    "eta_key_by_half": 0.0087890625,
+    "eta_key_by_index": 0.0087890625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0087890625,
+    "eta_val_by_index": 0.0087890625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.007326401770114899,
+    "key_sep": 0.005231946174587522,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "git": "e900359",
+   "grad": {
+    "1": [
+     0.0,
+     2.3052840673041115,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.7451954564162941,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.0727532091168868,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26240,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 301.73296308517456,
+   "secs_wall": 305.67138051986694,
+   "seed": 351,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "eta_key_by_half": 0.0087890625,
+     "eta_key_by_index": 0.0087890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0087890625,
+     "eta_val_by_index": 0.0087890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "eta_key_by_half": 0.0087890625,
+     "eta_key_by_index": 0.0087890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0087890625,
+     "eta_val_by_index": 0.0087890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "eta_key_by_half": 0.0087890625,
+     "eta_key_by_index": 0.0087890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0087890625,
+     "eta_val_by_index": 0.0087890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 6000,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 7200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 8400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999997653907433,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007326401770114899,
+     "key_sep": 0.005231946174587522,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 9600,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 9600,
+   "torch": "2.14.0+cu130",
+   "transition": 7200,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 0.9990234375,
+    "acc_by_stream": [
+     0.999009907245636,
+     0.9990366101264954
+    ],
+    "acc_last": 0.999002993106842,
+    "acc_notlast": 0.9990430474281311,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
   "ORACLE_FIXED|352|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
    "acc": 0.9931640625,
    "arm": "ORACLE_FIXED",
@@ -793,6 +1113,1586 @@
    "stopped_at": 6000,
    "torch": "2.14.0+cu130",
    "transition": 3600,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "ORACLE_FIXED|354|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.99365234375,
+   "arm": "ORACLE_FIXED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.16845703125,
+     2.5219717025756836
+    ],
+    [
+     2400,
+     0.990234375,
+     0.12959882616996765
+    ],
+    [
+     3600,
+     1.0,
+     0.011033594608306885
+    ],
+    [
+     4800,
+     0.99365234375,
+     0.03128110244870186
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": null,
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.999998334879948,
+    "eta_key_by_half": 0.00494384765625,
+    "eta_key_by_index": 0.00494384765625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.00494384765625,
+    "eta_val_by_index": 0.00494384765625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.010097719728946686,
+    "key_sep": 0.007793204060622624,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.910263940239531,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.5645040677619078,
+     0.0
+    ],
+    "100": [
+     0.0,
+     0.8854715507924804,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26240,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 155.6749665737152,
+   "secs_wall": 159.71132278442383,
+   "seed": 354,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999998334879948,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.010097719728946686,
+     "key_sep": 0.007793204060622624,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999998334879948,
+     "eta_key_by_half": 0.00494384765625,
+     "eta_key_by_index": 0.00494384765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00494384765625,
+     "eta_val_by_index": 0.00494384765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.010097719728946686,
+     "key_sep": 0.007793204060622624,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999998334879948,
+     "eta_key_by_half": 0.00494384765625,
+     "eta_key_by_index": 0.00494384765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00494384765625,
+     "eta_val_by_index": 0.00494384765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.010097719728946686,
+     "key_sep": 0.007793204060622624,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999998334879948,
+     "eta_key_by_half": 0.00494384765625,
+     "eta_key_by_index": 0.00494384765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00494384765625,
+     "eta_val_by_index": 0.00494384765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.010097719728946686,
+     "key_sep": 0.007793204060622624,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999998334879948,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.010097719728946686,
+     "key_sep": 0.007793204060622624,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 4800,
+   "torch": "2.14.0+cu130",
+   "transition": 2400,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 0.99365234375,
+    "acc_by_stream": [
+     0.9900990128517151,
+     0.9971098303794861
+    ],
+    "acc_last": 0.9980059862136841,
+    "acc_notlast": 0.9894737005233765,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "ORACLE_FIXED|355|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.99951171875,
+   "arm": "ORACLE_FIXED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.29931640625,
+     2.3114864826202393
+    ],
+    [
+     2400,
+     0.99951171875,
+     0.021196365356445312
+    ],
+    [
+     3600,
+     0.99755859375,
+     0.015037572011351585
+    ],
+    [
+     4800,
+     0.99951171875,
+     0.0026454823091626167
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": null,
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999907055063206,
+    "eta_key_by_half": 0.00152587890625,
+    "eta_key_by_index": 0.00152587890625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.00152587890625,
+    "eta_val_by_index": 0.00152587890625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.006927579641342163,
+    "key_sep": 0.0052183520581041065,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.3227721384586695,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.408868238434056,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.1432984681583978,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26240,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 156.7173924446106,
+   "secs_wall": 160.76952004432678,
+   "seed": 355,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999907055063206,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.006927579641342163,
+     "key_sep": 0.0052183520581041065,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999907055063206,
+     "eta_key_by_half": 0.00152587890625,
+     "eta_key_by_index": 0.00152587890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00152587890625,
+     "eta_val_by_index": 0.00152587890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.006927579641342163,
+     "key_sep": 0.0052183520581041065,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999907055063206,
+     "eta_key_by_half": 0.00152587890625,
+     "eta_key_by_index": 0.00152587890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00152587890625,
+     "eta_val_by_index": 0.00152587890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.006927579641342163,
+     "key_sep": 0.0052183520581041065,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999907055063206,
+     "eta_key_by_half": 0.00152587890625,
+     "eta_key_by_index": 0.00152587890625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00152587890625,
+     "eta_val_by_index": 0.00152587890625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.006927579641342163,
+     "key_sep": 0.0052183520581041065,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999907055063206,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.006927579641342163,
+     "key_sep": 0.0052183520581041065,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 4800,
+   "torch": "2.14.0+cu130",
+   "transition": 2400,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 0.99951171875,
+    "acc_by_stream": [
+     0.999009907245636,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 0.9990430474281311,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "ORACLE_FIXED|356|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "ORACLE_FIXED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.17626953125,
+     2.5550973415374756
+    ],
+    [
+     2400,
+     0.9931640625,
+     0.049232952296733856
+    ],
+    [
+     3600,
+     0.99267578125,
+     0.04960394650697708
+    ],
+    [
+     4800,
+     1.0,
+     0.003429895034059882
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": null,
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999811688302134,
+    "eta_key_by_half": 0.0009765625,
+    "eta_key_by_index": 0.0009765625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0009765625,
+    "eta_val_by_index": 0.0009765625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.009689763188362122,
+    "key_sep": 0.006938844387020383,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     3.426720171917631,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.3112671005826737,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.0186788916636906,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26240,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 156.93678736686707,
+   "secs_wall": 161.03951811790466,
+   "seed": 356,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999811688302134,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.009689763188362122,
+     "key_sep": 0.006938844387020383,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999811688302134,
+     "eta_key_by_half": 0.0009765625,
+     "eta_key_by_index": 0.0009765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0009765625,
+     "eta_val_by_index": 0.0009765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.009689763188362122,
+     "key_sep": 0.006938844387020383,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999811688302134,
+     "eta_key_by_half": 0.0009765625,
+     "eta_key_by_index": 0.0009765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0009765625,
+     "eta_val_by_index": 0.0009765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.009689763188362122,
+     "key_sep": 0.006938844387020383,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999811688302134,
+     "eta_key_by_half": 0.0009765625,
+     "eta_key_by_index": 0.0009765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0009765625,
+     "eta_val_by_index": 0.0009765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.009689763188362122,
+     "key_sep": 0.006938844387020383,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999811688302134,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.009689763188362122,
+     "key_sep": 0.006938844387020383,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 4800,
+   "torch": "2.14.0+cu130",
+   "transition": 2400,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "ORACLE_FIXED|357|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "ORACLE_FIXED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.57275390625,
+     1.527576208114624
+    ],
+    [
+     2400,
+     0.99951171875,
+     0.01617348939180374
+    ],
+    [
+     3600,
+     1.0,
+     0.0051036011427640915
+    ],
+    [
+     4800,
+     1.0,
+     0.0030232754070311785
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": null,
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999847450784245,
+    "eta_key_by_half": 0.0009765625,
+    "eta_key_by_index": 0.0009765625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0009765625,
+    "eta_val_by_index": 0.0009765625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.00872427225112915,
+    "key_sep": 0.0055064143879073,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.6215130716434865,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.195873406269897,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.0020913989318043,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26240,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 156.51051926612854,
+   "secs_wall": 160.51725125312805,
+   "seed": 357,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999847450784245,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00872427225112915,
+     "key_sep": 0.0055064143879073,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999847450784245,
+     "eta_key_by_half": 0.0009765625,
+     "eta_key_by_index": 0.0009765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0009765625,
+     "eta_val_by_index": 0.0009765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00872427225112915,
+     "key_sep": 0.0055064143879073,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999847450784245,
+     "eta_key_by_half": 0.0009765625,
+     "eta_key_by_index": 0.0009765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0009765625,
+     "eta_val_by_index": 0.0009765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00872427225112915,
+     "key_sep": 0.0055064143879073,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999847450784245,
+     "eta_key_by_half": 0.0009765625,
+     "eta_key_by_index": 0.0009765625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0009765625,
+     "eta_val_by_index": 0.0009765625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00872427225112915,
+     "key_sep": 0.0055064143879073,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999847450784245,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00872427225112915,
+     "key_sep": 0.0055064143879073,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 4800,
+   "torch": "2.14.0+cu130",
+   "transition": 2400,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "ORACLE_FIXED|358|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "ORACLE_FIXED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.15185546875,
+     2.5557198524475098
+    ],
+    [
+     2400,
+     0.47509765625,
+     1.6101531982421875
+    ],
+    [
+     3600,
+     0.79541015625,
+     0.5856487154960632
+    ],
+    [
+     4800,
+     1.0,
+     0.010259822942316532
+    ],
+    [
+     6000,
+     1.0,
+     0.003495333716273308
+    ],
+    [
+     7200,
+     1.0,
+     0.0016359837027266622
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": null,
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999933281002222,
+    "eta_key_by_half": 0.00054931640625,
+    "eta_key_by_index": 0.00054931640625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.00054931640625,
+    "eta_val_by_index": 0.00054931640625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.00730007141828537,
+    "key_sep": 0.005723070353269577,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.5510572252049633,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.2094581704779555,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.307398032725241,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26240,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 232.44747281074524,
+   "secs_wall": 236.52854657173157,
+   "seed": 358,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999933281002222,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00730007141828537,
+     "key_sep": 0.005723070353269577,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999933281002222,
+     "eta_key_by_half": 0.00054931640625,
+     "eta_key_by_index": 0.00054931640625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00054931640625,
+     "eta_val_by_index": 0.00054931640625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00730007141828537,
+     "key_sep": 0.005723070353269577,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999933281002222,
+     "eta_key_by_half": 0.00054931640625,
+     "eta_key_by_index": 0.00054931640625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00054931640625,
+     "eta_val_by_index": 0.00054931640625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00730007141828537,
+     "key_sep": 0.005723070353269577,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999933281002222,
+     "eta_key_by_half": 0.00054931640625,
+     "eta_key_by_index": 0.00054931640625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00054931640625,
+     "eta_val_by_index": 0.00054931640625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00730007141828537,
+     "key_sep": 0.005723070353269577,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999933281002222,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00730007141828537,
+     "key_sep": 0.005723070353269577,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999933281002222,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00730007141828537,
+     "key_sep": 0.005723070353269577,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 6000,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999933281002222,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.00730007141828537,
+     "key_sep": 0.005723070353269577,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 7200,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 7200,
+   "torch": "2.14.0+cu130",
+   "transition": 4800,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "ORACLE_FIXED|359|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "ORACLE_FIXED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.18603515625,
+     2.512913465499878
+    ],
+    [
+     2400,
+     0.88134765625,
+     0.33635199069976807
+    ],
+    [
+     3600,
+     0.888671875,
+     0.2560184597969055
+    ],
+    [
+     4800,
+     0.99951171875,
+     0.007834762334823608
+    ],
+    [
+     6000,
+     1.0,
+     0.002481206087395549
+    ],
+    [
+     7200,
+     1.0,
+     0.0011404961114749312
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "other": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     },
+     "own": {
+      "ctx": 0.949999988079071,
+      "key": 0.9499997496604919,
+      "val": 0.9499998688697815
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": null,
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.999963049270891,
+    "eta_key_by_half": 0.00390625,
+    "eta_key_by_index": 0.00390625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.00390625,
+    "eta_val_by_index": 0.00390625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.007348276674747467,
+    "key_sep": 0.004853871251855578,
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.7879546286532055,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.794016874544176,
+     0.0
+    ],
+    "100": [
+     0.0,
+     0.9986271121020746,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 2,
+   "key_cos": 0.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26240,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 230.25635766983032,
+   "secs_wall": 234.39711499214172,
+   "seed": 359,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999963049270891,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007348276674747467,
+     "key_sep": 0.004853871251855578,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999963049270891,
+     "eta_key_by_half": 0.00390625,
+     "eta_key_by_index": 0.00390625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00390625,
+     "eta_val_by_index": 0.00390625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007348276674747467,
+     "key_sep": 0.004853871251855578,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999963049270891,
+     "eta_key_by_half": 0.00390625,
+     "eta_key_by_index": 0.00390625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00390625,
+     "eta_val_by_index": 0.00390625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007348276674747467,
+     "key_sep": 0.004853871251855578,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999963049270891,
+     "eta_key_by_half": 0.00390625,
+     "eta_key_by_index": 0.00390625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00390625,
+     "eta_val_by_index": 0.00390625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007348276674747467,
+     "key_sep": 0.004853871251855578,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999963049270891,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007348276674747467,
+     "key_sep": 0.004853871251855578,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999963049270891,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007348276674747467,
+     "key_sep": 0.004853871251855578,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 6000,
+     "val_cos": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999963049270891,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.007348276674747467,
+     "key_sep": 0.004853871251855578,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 7200,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 7200,
+   "torch": "2.14.0+cu130",
+   "transition": 4800,
    "val_cos": 0.0,
    "write_order": {
     "acc": 1.0,
@@ -7014,6 +8914,1278 @@
     ],
     "acc_last": 1.0,
     "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "SINGLE_ROUTED|350|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.98974609375,
+   "arm": "SINGLE_ROUTED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 1.0,
+   "curve": [
+    [
+     1200,
+     0.11474609375,
+     2.7149405479431152
+    ],
+    [
+     2400,
+     0.11962890625,
+     2.704256296157837
+    ],
+    [
+     3600,
+     0.1943359375,
+     2.5354740619659424
+    ],
+    [
+     4800,
+     0.9912109375,
+     0.12553733587265015
+    ],
+    [
+     6000,
+     0.99853515625,
+     0.0179962906986475
+    ],
+    [
+     7200,
+     0.98974609375,
+     0.04834311828017235
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.7055687308311462,
+      "key": 0.9938163757324219,
+      "val": 0.9952099323272705
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.7118468284606934,
+      "key": 0.9989901185035706,
+      "val": 0.9806743264198303
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.8966544270515442,
+      "key": 0.9975794553756714,
+      "val": 0.999526858329773
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": {
+    "delta": -2.634373903274536,
+    "w": [
+     0.11746785789728165,
+     0.17513932287693024,
+     0.23253506422042847,
+     -0.3474540114402771,
+     0.21555949747562408,
+     0.4581914246082306,
+     -0.018101142719388008,
+     -0.15196487307548523,
+     -0.192575141787529,
+     0.41611772775650024,
+     -0.443307489156723,
+     -0.06347336620092392,
+     -0.12337059527635574,
+     0.010960977524518967,
+     0.5766409039497375,
+     0.22343288362026215,
+     0.15657740831375122,
+     0.3597581386566162,
+     -1.2952274084091187,
+     -0.7378148436546326,
+     -0.649758517742157,
+     0.3068016767501831,
+     -0.1853155940771103,
+     0.8625827431678772,
+     0.2617650628089905,
+     -0.6628038287162781,
+     -0.362026184797287,
+     0.03216687962412834,
+     0.027858586981892586,
+     0.6231143474578857,
+     0.26228493452072144,
+     -0.017351800575852394
+    ]
+   },
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "routed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": 1.0,
+    "k": 1,
+    "key_cos": 1.0,
+    "step": "end",
+    "val_cos": 1.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.9598197045001196,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.4469909588926442,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.4774732675502356,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 1,
+   "key_cos": 1.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26273,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 215.99511528015137,
+   "secs_wall": 219.82504439353943,
+   "seed": 350,
+   "stats": [
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 0,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 1200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 2400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 3600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 4800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 6000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 7200,
+     "val_cos": 1.0
+    }
+   ],
+   "stopped_at": 7200,
+   "torch": "2.14.0+cu130",
+   "transition": 4800,
+   "val_cos": 1.0,
+   "write_order": {
+    "acc": 0.98974609375,
+    "acc_by_stream": [
+     0.9930692911148071,
+     0.9865125417709351
+    ],
+    "acc_last": 0.999002993106842,
+    "acc_notlast": 0.980861246585846,
+    "lastval_notlast": 0.013397129252552986,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "SINGLE_ROUTED|351|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.99658203125,
+   "arm": "SINGLE_ROUTED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 1.0,
+   "curve": [
+    [
+     1200,
+     0.09765625,
+     2.713501214981079
+    ],
+    [
+     2400,
+     0.10107421875,
+     2.7163264751434326
+    ],
+    [
+     3600,
+     0.1015625,
+     2.7093660831451416
+    ],
+    [
+     4800,
+     0.1328125,
+     2.671485185623169
+    ],
+    [
+     6000,
+     0.13671875,
+     2.646897792816162
+    ],
+    [
+     7200,
+     0.15869140625,
+     2.5952625274658203
+    ],
+    [
+     8400,
+     0.1708984375,
+     2.5398483276367188
+    ],
+    [
+     9600,
+     0.173828125,
+     2.51712965965271
+    ],
+    [
+     10800,
+     0.19580078125,
+     2.4732444286346436
+    ],
+    [
+     12000,
+     0.21533203125,
+     2.4288508892059326
+    ],
+    [
+     13200,
+     0.22705078125,
+     2.3692760467529297
+    ],
+    [
+     14400,
+     0.25146484375,
+     2.267592191696167
+    ],
+    [
+     15600,
+     0.267578125,
+     2.194463014602661
+    ],
+    [
+     16800,
+     0.26611328125,
+     2.166574239730835
+    ],
+    [
+     18000,
+     0.294921875,
+     1.9945515394210815
+    ],
+    [
+     19200,
+     0.30908203125,
+     1.9001494646072388
+    ],
+    [
+     20400,
+     0.31591796875,
+     1.899915337562561
+    ],
+    [
+     21600,
+     0.3232421875,
+     1.8927879333496094
+    ],
+    [
+     22800,
+     0.38818359375,
+     1.6514863967895508
+    ],
+    [
+     24000,
+     0.51171875,
+     1.3184664249420166
+    ],
+    [
+     25200,
+     0.716796875,
+     0.723251223564148
+    ],
+    [
+     26400,
+     0.8759765625,
+     0.332469642162323
+    ],
+    [
+     27600,
+     0.9794921875,
+     0.1162106990814209
+    ],
+    [
+     28800,
+     0.99365234375,
+     0.03693344071507454
+    ],
+    [
+     30000,
+     0.99658203125,
+     0.024156983941793442
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.26625606417655945,
+      "key": 0.9996790289878845,
+      "val": 0.997628390789032
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.42496466636657715,
+      "key": 0.9999862909317017,
+      "val": 0.9983419179916382
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.7475826144218445,
+      "key": 0.9999710321426392,
+      "val": 0.9998849630355835
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": {
+    "delta": -2.188309907913208,
+    "w": [
+     0.8237400650978088,
+     -0.08125439286231995,
+     0.22527718544006348,
+     1.1336135864257812,
+     -0.4500132203102112,
+     0.7000017166137695,
+     0.11326470226049423,
+     -1.156296968460083,
+     -1.3571281433105469,
+     -0.006457338575273752,
+     -1.0572972297668457,
+     -0.9891602993011475,
+     0.20922976732254028,
+     -1.151455283164978,
+     0.796150803565979,
+     -0.42832523584365845,
+     -0.0383349284529686,
+     0.17796511948108673,
+     -1.2162556648254395,
+     -0.47978487610816956,
+     -0.6789937615394592,
+     -0.7915882468223572,
+     -0.3498270511627197,
+     0.46204620599746704,
+     -0.09763064980506897,
+     -0.028125595301389694,
+     0.3185221254825592,
+     0.9677109718322754,
+     1.1590431928634644,
+     -0.6563235521316528,
+     0.8417467474937439,
+     0.474332332611084
+    ]
+   },
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "routed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": 1.0,
+    "k": 1,
+    "key_cos": 1.0,
+    "step": "end",
+    "val_cos": 1.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.1869048310510926,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.7032764513668035,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.0631712725809679,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 1,
+   "key_cos": 1.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26273,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 910.6075663566589,
+   "secs_wall": 914.3908483982086,
+   "seed": 351,
+   "stats": [
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 0,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 1200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 2400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 3600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 4800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 6000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 7200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 8400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 9600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 10800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 12000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 13200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 14400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 15600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 16800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 18000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 19200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 20400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 21600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 22800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 24000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 25200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 26400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 27600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 28800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 30000,
+     "val_cos": 1.0
+    }
+   ],
+   "stopped_at": 30000,
+   "torch": "2.14.0+cu130",
+   "transition": 27600,
+   "val_cos": 1.0,
+   "write_order": {
+    "acc": 0.99658203125,
+    "acc_by_stream": [
+     0.997029721736908,
+     0.9961464405059814
+    ],
+    "acc_last": 0.9980059862136841,
+    "acc_notlast": 0.9952152967453003,
+    "lastval_notlast": 0.001913875574246049,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "SINGLE_ROUTED|352|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "SINGLE_ROUTED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 1.0,
+   "curve": [
+    [
+     1200,
+     0.099609375,
+     2.729416608810425
+    ],
+    [
+     2400,
+     0.11572265625,
+     2.7150840759277344
+    ],
+    [
+     3600,
+     0.10986328125,
+     2.704561471939087
+    ],
+    [
+     4800,
+     0.126953125,
+     2.67531681060791
+    ],
+    [
+     6000,
+     0.13720703125,
+     2.632777214050293
+    ],
+    [
+     7200,
+     0.15771484375,
+     2.566843032836914
+    ],
+    [
+     8400,
+     0.19921875,
+     2.4443306922912598
+    ],
+    [
+     9600,
+     0.271484375,
+     2.2489707469940186
+    ],
+    [
+     10800,
+     0.46533203125,
+     1.6366758346557617
+    ],
+    [
+     12000,
+     0.66845703125,
+     0.7628498673439026
+    ],
+    [
+     13200,
+     0.6904296875,
+     0.7024058699607849
+    ],
+    [
+     14400,
+     1.0,
+     0.01529439352452755
+    ],
+    [
+     15600,
+     1.0,
+     0.004267851822078228
+    ],
+    [
+     16800,
+     1.0,
+     0.0017407565610483289
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.2334796041250229,
+      "key": 0.9984270930290222,
+      "val": 0.9993739724159241
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.3966059982776642,
+      "key": 0.9995583891868591,
+      "val": 0.9719206690788269
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.7338737845420837,
+      "key": 0.9999304413795471,
+      "val": 0.9989021420478821
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": {
+    "delta": -2.111961603164673,
+    "w": [
+     0.3770443797111511,
+     -0.01536332443356514,
+     0.1613435000181198,
+     -0.23273572325706482,
+     1.3300098180770874,
+     0.5116931200027466,
+     -0.25448551774024963,
+     0.29391413927078247,
+     -1.579638123512268,
+     0.9336777329444885,
+     -0.8477048873901367,
+     -0.2219923734664917,
+     0.1880277544260025,
+     -0.9645929336547852,
+     -0.11945533752441406,
+     -0.7071155905723572,
+     -0.6663529872894287,
+     -0.04070835933089256,
+     -0.7753390669822693,
+     0.6819375157356262,
+     0.14947929978370667,
+     -0.8428389430046082,
+     0.15033189952373505,
+     0.31232887506484985,
+     0.38129377365112305,
+     0.047359615564346313,
+     -0.5908386707305908,
+     0.6282427310943604,
+     1.2359211444854736,
+     1.5734186172485352,
+     -0.09441356360912323,
+     -0.4747791886329651
+    ]
+   },
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "routed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": 1.0,
+    "k": 1,
+    "key_cos": 1.0,
+    "step": "end",
+    "val_cos": 1.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.352953629326925,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.3419687103498277,
+     0.0
+    ],
+    "100": [
+     0.0,
+     0.9386453756487794,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 1,
+   "key_cos": 1.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26273,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 511.20326566696167,
+   "secs_wall": 514.8233261108398,
+   "seed": 352,
+   "stats": [
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 0,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 1200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 2400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 3600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 4800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 6000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 7200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 8400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 9600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 10800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 12000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 13200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 14400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 15600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 16800,
+     "val_cos": 1.0
+    }
+   ],
+   "stopped_at": 16800,
+   "torch": "2.14.0+cu130",
+   "transition": 14400,
+   "val_cos": 1.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1003,
+    "n_notlast": 1045
+   }
+  },
+  "SINGLE_ROUTED|354|55653f2b2a4e|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.998046875,
+   "arm": "SINGLE_ROUTED",
+   "attempts": 1,
+   "code_sha": "55653f2b2a4e0a79c2b37e8043d4f1a3ad44e17a",
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 1.0,
+   "curve": [
+    [
+     1200,
+     0.10302734375,
+     2.726043939590454
+    ],
+    [
+     2400,
+     0.1162109375,
+     2.703974723815918
+    ],
+    [
+     3600,
+     0.21240234375,
+     2.4367072582244873
+    ],
+    [
+     4800,
+     0.48583984375,
+     1.3353736400604248
+    ],
+    [
+     6000,
+     0.56005859375,
+     0.9910544753074646
+    ],
+    [
+     7200,
+     1.0,
+     0.015641359612345695
+    ],
+    [
+     8400,
+     0.99951171875,
+     0.012065483257174492
+    ],
+    [
+     9600,
+     0.998046875,
+     0.012251703068614006
+    ]
+   ],
+   "decay_by_role": [
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.976978600025177,
+      "key": 0.9979169368743896,
+      "val": 0.9958395957946777
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.9922535419464111,
+      "key": 0.9999839663505554,
+      "val": 0.9999781847000122
+     }
+    },
+    {
+     "beta": {
+      "ctx": 1.0,
+      "key": 1.0,
+      "val": 1.0
+     },
+     "ch0": {
+      "ctx": 0.9922771453857422,
+      "key": 0.9999225735664368,
+      "val": 0.9987682104110718
+     }
+    }
+   ],
+   "decay_init": null,
+   "decay_params": {
+    "delta": -2.961886405944824,
+    "w": [
+     0.18575581908226013,
+     -0.24906058609485626,
+     0.49613267183303833,
+     -0.2713373303413391,
+     -0.07299566268920898,
+     -0.047610923647880554,
+     1.0809268951416016,
+     -0.12502525746822357,
+     0.5657516121864319,
+     -0.02362651377916336,
+     -0.21918782591819763,
+     0.18139706552028656,
+     0.914431095123291,
+     0.02896067500114441,
+     -0.06318013370037079,
+     -0.41539379954338074,
+     0.29798194766044617,
+     -0.2512480318546295,
+     0.45105093717575073,
+     0.10223571956157684,
+     0.08097031712532043,
+     0.2720962166786194,
+     -0.20997419953346252,
+     -0.3749792277812958,
+     0.4992252290248871,
+     -0.29889050126075745,
+     -0.9276974201202393,
+     -0.16240060329437256,
+     -0.41758444905281067,
+     0.22203676402568817,
+     -0.37021660804748535,
+     -0.08736507594585419
+    ]
+   },
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "routed",
+    "impl": "parallel",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": 1.0,
+    "k": 1,
+    "key_cos": 1.0,
+    "step": "end",
+    "val_cos": 1.0
+   },
+   "git": "e900359+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.8844066085049267,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.5228924397275267,
+     0.0
+    ],
+    "100": [
+     0.0,
+     0.8672874663857713,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 48000,
+   "k": 1,
+   "key_cos": 1.0,
+   "lr": 0.001,
+   "muon_lr": null,
+   "ok": true,
+   "params": 26273,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 293.6573328971863,
+   "secs_wall": 297.662478685379,
+   "seed": 354,
+   "stats": [
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 0,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 1200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 2400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 3600,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 4800,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 6000,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 7200,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 8400,
+     "val_cos": 1.0
+    },
+    {
+     "ctx_cos": 1.0,
+     "k": 1,
+     "key_cos": 1.0,
+     "step": 9600,
+     "val_cos": 1.0
+    }
+   ],
+   "stopped_at": 9600,
+   "torch": "2.14.0+cu130",
+   "transition": 7200,
+   "val_cos": 1.0,
+   "write_order": {
+    "acc": 0.998046875,
+    "acc_by_stream": [
+     0.998019814491272,
+     0.9980732202529907
+    ],
+    "acc_last": 0.9980059862136841,
+    "acc_notlast": 0.9980860948562622,
     "lastval_notlast": 0.0,
     "n": 2048,
     "n_last": 1003,

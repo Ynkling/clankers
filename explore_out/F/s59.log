@@ -118,3 +118,86 @@ EXPLORATORY, NOT A RESULT — Session F s59 (F/decay)
   [ 23]   18.1 min  F/decay          ORACLE_FIXED             seed 353  lr 0.001  (Adam 1e-3 throughout)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git b77e8bb+dirty, code 55653f2b2a4e, attempt 1: acc 1.000  trans  3600  BOUND
   start   18.1 min  F/decay          ORACLE_FIXED             seed 356  (projected worst case 25 min)
+  [ 24]   19.1 min  F/decay          ORACLE_FIXED             seed 351  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359, code 55653f2b2a4e, attempt 1: acc 0.999  trans  7200  BOUND
+  start   19.1 min  F/decay          ORACLE_FIXED             seed 357  (projected worst case 25 min)
+  [ 25]   19.4 min  F/decay          ORACLE_FIXED             seed 354  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 0.994  trans  2400  BOUND
+  start   19.4 min  F/decay          ORACLE_FIXED             seed 358  (projected worst case 25 min)
+  [ 26]   20.0 min  F/decay          ORACLE_FIXED             seed 355  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 1.000  trans  2400  BOUND
+  start   20.0 min  F/decay          ORACLE_FIXED             seed 359  (projected worst case 25 min)
+  [ 27]   20.7 min  F/decay          ORACLE_FIXED             seed 356  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 1.000  trans  2400  BOUND
+  [ 28]   21.8 min  F/decay          ORACLE_FIXED             seed 357  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 1.000  trans  2400  BOUND
+  [ 29]   23.4 min  F/decay          ORACLE_FIXED             seed 358  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 1.000  trans  4800  BOUND
+  [ 30]   23.9 min  F/decay          ORACLE_FIXED             seed 359  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 1.000  trans  4800  BOUND
+  segment saved 30 runs
+  runs left: 50
+exit 0
+=== queue: S59 single arms Fri Oct  9 06:08:09 UTC 2026
+==============================================================================================================
+EXPLORATORY, NOT A RESULT — Session F s59 (F/decay)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git e900359+dirty | python 3.11.17 | torch threads 1 | started 2026-10-09 06:08:10
+==============================================================================================================
+  code SHA F/decay: 55653f2b2a4e over 27 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_decay_child, explore_f_delta_fast, explore_f_tasks, explore_f_window_delta_child, explore_far_cue, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  CHECK C1 parallel = sequential over 24 cases (beta 0 / 0.5 / 1 / per token, write tied / 1, decay fixed / routed / per-channel): forward max |diff| 4.44e-16 <= 1e-10, gradients 2.22e-15 <= 1e-8: ok
+  CHECK C2 LOCAL3 S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 2.38e-06 (relative 2.4e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.49e-07, attention outputs 3.81e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 perfect S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.27e-07, attention outputs 6.68e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 single k=1 (arm B), parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 8.58e-06 (relative 5.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.19e-07, attention outputs 5.96e-07 (relative 3.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.79e-07, attention outputs 4.77e-07 (relative 3.9e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C3 oracle gate, grouped, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C4 overwrite (beta 1, L2 keys, one channel, decay 0.95, float32): ‖S k̂ − v2‖ = 1.56e-06 after (k, v1), (k, v2); 1.09e-06 with 6 other writes between; the parallel read at a later key-k position equals 0.95·v2 to 1.59e-06 / 1.46e-06; all < 1e-5: ok
+  CHECK C5 learned beta = 0.5 exactly at init (True); to_delta keeps every existing parameter (True) and adds ['attn.w_b', 'attn.b_b']: ok
+  CHECK C5 routed decay at init: alpha at g = 1 0.9500000 (0.95 to 1e-6), at g = 0 1.0 (exactly 1), at g = 0.3 / 0.7 0.98473 / 0.96473; delta0 -2.6037: ok
+  CHECK C5 GDN decay init (seed 350, k = 2): A [2.198, 13.653], dt [0.06425, 0.00468] (softplus(b_dt) recovers dt), alpha at init [0.8683, 0.9381]; w_a = 0; same seed same draw, another seed another: ok
+  CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.10GHz (39 s): ok
+  ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
+  (explore_f_delta_checks: 45 s, all passed)
+  CHECK F/decay: ORACLE_FIXED: k 2, memory DeltaMemory, decay fixed, beta 1.0, parameters added []: ok
+  CHECK F/decay: ORACLE_ROUTED: k 2, memory DeltaMemory, decay routed, beta 1.0, parameters added ['attn.decay_mod.w', 'attn.decay_mod.delta']: ok
+  CHECK F/decay: ORACLE_GDN: k 2, memory DeltaMemory, decay gdn, beta 1.0, parameters added ['attn.decay_mod.A_log', 'attn.decay_mod.dt_bias', 'attn.decay_mod.w_a']: ok
+  CHECK F/decay: SINGLE_FIXED: k 1, memory DeltaMemory, decay fixed, beta 1.0, parameters added []: ok
+  CHECK F/decay: SINGLE_ROUTED: k 1, memory DeltaMemory, decay routed, beta 1.0, parameters added ['attn.decay_mod.w', 'attn.decay_mod.delta']: ok
+  CHECK F/decay: SINGLE_GDN: k 1, memory DeltaMemory, decay gdn, beta 1.0, parameters added ['attn.decay_mod.A_log', 'attn.decay_mod.dt_bias', 'attn.decay_mod.w_a']: ok
+  CHECK F/decay: D_DELTA_ROUTED: k 2, memory DeltaMemory, decay routed, beta learned, parameters added ['attn.w_b', 'attn.b_b', 'attn.decay_mod.w', 'attn.decay_mod.delta']: ok
+  CHECK F/decay: D_DELTA_GDN: k 2, memory DeltaMemory, decay gdn, beta learned, parameters added ['attn.w_b', 'attn.b_b', 'attn.decay_mod.A_log', 'attn.decay_mod.dt_bias', 'attn.decay_mod.w_a']: ok
+  CHECK F/decay: the oracle arms share every initial parameter but the decay's (True); at init the routed decay gives 0.95 on the written channel and 1 on the other: logits differ from FIXED's (max 0.171 > 0: the unwritten channel no longer decays): ok
+  CHECK F/decay: D_DELTA_ROUTED: the memory's parameters ['attn.w_b', 'attn.b_b', 'attn.decay_mod.w', 'attn.decay_mod.delta'] are in the rest group; lrs at 1 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/decay: D_DELTA_GDN: the memory's parameters ['attn.w_b', 'attn.b_b', 'attn.decay_mod.A_log', 'attn.decay_mod.dt_bias', 'attn.decay_mod.w_a'] are in the rest group; lrs at 1 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  timings reused from explore_out/F/s59_runtime.json
+  30 runs queued; projected worst case 11.84 h of runs, makespan 3.14 h on 4 workers
+  start    0.0 min  F/decay          SINGLE_ROUTED            seed 350  (projected worst case 25 min)
+  start    0.0 min  F/decay          SINGLE_ROUTED            seed 351  (projected worst case 25 min)
+  start    0.0 min  F/decay          SINGLE_ROUTED            seed 352  (projected worst case 25 min)
+  start    0.0 min  F/decay          SINGLE_ROUTED            seed 353  (projected worst case 25 min)
+  [  1]    3.7 min  F/decay          SINGLE_ROUTED            seed 350  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 0.990  trans  4800  BOUND
+  start    3.7 min  F/decay          SINGLE_ROUTED            seed 354  (projected worst case 25 min)
+  [  2]    8.6 min  F/decay          SINGLE_ROUTED            seed 352  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 1.000  trans 14400  BOUND
+  start    8.6 min  F/decay          SINGLE_ROUTED            seed 355  (projected worst case 25 min)
+  [  3]    8.6 min  F/decay          SINGLE_ROUTED            seed 354  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 0.998  trans  7200  BOUND
+  start    8.6 min  F/decay          SINGLE_ROUTED            seed 356  (projected worst case 25 min)
+  [  4]   15.2 min  F/decay          SINGLE_ROUTED            seed 351  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git e900359+dirty, code 55653f2b2a4e, attempt 1: acc 0.997  trans 27600  BOUND
+  start   15.2 min  F/decay          SINGLE_ROUTED            seed 357  (projected worst case 25 min)
