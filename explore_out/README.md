@@ -48,7 +48,7 @@ for a pre-registered test.
 | `batch18_dry.log`, `dry_<screen>_results.json` (S50 window_recipe_ablation, S51 split_k4, S52 two_stream_keysplits) | batch 18's labelled DRY RUN (code of git 7ef4e15, Intel Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run). Before it, the CHECK functions were run once on their own: S52's validity check as first written (with k = 4 the perfect gate binds on seeds 160-161) could not pass — the plain perfect gate (no convolution) does not bind on the grouped two-stream layout at k = 2 or k = 4 (bit-identical curves; seed 160 at 0.54, 161 at 0.33 after 9600) — so it is run with this layout's recorded validity arm, test_short_conv's ceiling_conv (the perfect gate + conv 'layer'), padded to k = 4, which binds and routes on both seeds at 1200; a CHECK prints the plain gate's outcome and that the padding is inert. Also fixed then: the copy check named the wrong main file for stream_acc (it is test_scale_axes'), and eta2_key against S19's centred key_penalty has a float32 tolerance of 1e-4 (2.7e-5 seen). No arm or reading changed. The dry run: each screen's code SHA computed; the repro check bit-identical to X; S50's Muon reference decided (batch 16's LOCAL3_SLOW_D8_M|260, made on 2.80GHz, does not reproduce here through 1200: equal accuracy, loss 2.99112 vs 2.99034 — so W_M_REF runs as W_SPLIT_M's pair); the projection with pool-load timing (eight-stream steps 60-65 ms, S=4 k=4 26-27 ms, S=2 12.5 ms): 38.25 h of runs, makespan 9.58 h, the packing simulation 6 segments; the rule would cut W_SPLIT_W4 (5), W4k4 (5), W_SPLIT_NOSLOW (4: fits), printed and not stored or applied; every CHECK passed (13.5 min), among them W_RESET|261 equal to batch 16's LOCAL3_SLOW_D8_A|261 through its first reset and different after, W_SPLIT_NOSLOW and W_SPLIT_W4 at threshold 0 equal to S48's no-split recipes through 3600, W_SPLIT_M at threshold 0 equal to W_M_REF through 3600, S37's HINGE4k4_A|240 reproducing its record through 1200, W4k4_SPLIT at threshold 0 equal to W4k4 through 3600, the key term's weight 1 at update 2400 and 0 at 2401, W2_KEYHINGE at weight 0 equal to LOCAL3_SLOW through 1200, the copied main functions' syntax trees, and the key term equal to test_slow_start's eta2 code (7e-9); then 9 runs (1 seed per arm, capped at 2400 steps), none failed. It exercises the code; its numbers are not for interpretation. |
 | `batch18.log`, `batch18_checks.json`, `batch18_runtime_results.json`, `window_recipe_ablation_results.json`, `split_k4_results.json`, `two_stream_keysplits_results.json` (S50 window_recipe_ablation, S51 split_k4, S52 two_stream_keysplits) | batch 18 (the user's specification of 8 October 2026), complete: 120/120 runs, none failed or retried, in 3 segments (each RESUME banner's wording is generic: every segment ended itself when no remaining run fitted its budget, or when none was left). Code of git 7ef4e15 (the last commit touching explore_*.py); the run code SHAs (window_recipe_ablation 300b8e0ba54a, split_k4 6c8051a868ff, two_stream_keysplits bd2ad99c5016) never changed, so segments 2-3 skipped the CHECK suite after segment 1's full pass (9.1 min, every CHECK ok). Every run on the batch's CPU, a Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run; the repro check (X's arm A, seed 160, 2400 steps) bit-identical in every segment. Segment 1 first stored S50's Muon reference decision (batch 16's LOCAL3_SLOW_D8_M|260, made on 2.80GHz, does not reproduce here through 1200: loss 2.99112 vs 2.99034, so W_M_REF ran fresh as W_SPLIT_M's pair), then applied the runtime rule (the packing simulation: 6 segments, 9.94 h makespan > 4 segments: cut W_SPLIT_W4 -> 5, W4k4 -> 5, W_SPLIT_NOSLOW -> 4 segments, 6.58 h, re-simulating after each; W2_KEYHINGE kept all 40 seeds). Muon arms ran first. W_RESET equals batch 16's LOCAL3_SLOW_D8_A bit for bit through its first reset on 10/10 seeds; W_SPLIT_M equals W_M_REF through its first split (or throughout when none fired) on 10/10. Reports, readings and SUMMARY at the end of the log; verdicts below. |
 | `batch19_dry.log`, `batch19_dry_oom_failed.log`, `dry_<screen>_results.json`, `dry_batch19_runtime_results.json` (S64 scale_width, S65 scale_depth, S66 scale_eight, S67 capacity) | batch 19's labelled DRY RUN (code SHA 17e56410a1db, git 2b1dac4 + report-only fixes; Intel Xeon @ 2.80GHz, torch 2.14.0+cu130, 1 thread per run). The first attempt (`batch19_dry_oom_failed.log`, with an addendum) stopped in the projection: a timing child ran out of memory, because the 2048-sequence held-out evaluation in one forward needs 10.6 GB at P=16, N=1024 (15 GB machine, 4 children); from then on gradient-free forwards of more than 256 sequences run in chunks of 256, bit-identical to one forward (a CHECK). The second: the repro check bit-identical to X; the projection (pool-load timing of every arm and every phase-2 candidate; worst case): phase 1 (S64 + S65) 93 h of runs, 23.3 h on 4 workers, 6.8 h if every run stops at 8400 as batch 16's S44(a) runs did; phase 2 47-90 h on 4 workers worst case depending on the widths chosen (S67's P=16 learned runs at N=1024 11.6 h each); nothing cut (no budget given). Every CHECK passed (39, 27.5 min), among them: the sized builder at N=256, D=32, 3 layers equals the run path's model bit for bit (k16, the oracle, S=8, P=8, P=16); every size's shapes (N = mult x D; BDH shares its layer's weights, so 2/4/6 layers have 3 layers' parameters); the LOCAL3 window at D > 32 extends the D = 32 window; RES6 (Session G's 4.3) starts with A = [0 | W_in] and its layer loop equals forward_conv; groups and lrs through the real path; the chunked evaluation bit-identical; and three resume checks (S=4; S=8 with a forced split at 4800 just before the checkpoint; RES6): a run halted after a checkpoint and resumed equals the uninterrupted run in all 15 compared fields (curve, statistics, gradient norms, end statistics, the trigger's rows, final weights' SHA-1, ...). Then 30 runs (1 seed per arm, phase 1 capped at 2400 updates, phase 2 at 1200, every arm marked ready so RES6 ran too), none failed; the phase-2 rule ran on the dry results (D128 / L2; dry, not stored for the batch). It exercises the code; its numbers are not for interpretation. |
-| `batch19.log` (S64 scale_width, S65 scale_depth, S66 scale_eight, S67 capacity) | batch 19 (the user's specification of 9 October 2026), code of git 8cff21e, 1 thread per run, on Intel(R) Xeon(R) Processor @ 2.80GHz. **IN PROGRESS: 108 runs saved (scale_width 60 of up to 60; scale_depth 48 of up to 58; scale_eight 0 of up to 30; capacity 0 of up to 48); phase 2 decided: best width D128, best depth 2.** Run in segments; runs longer than a segment resume from checkpoints; pushed after every saved run. Arms whose oracle does not bind are not run, so the totals are upper bounds. No report, reading or label until the SUMMARY at the end of the log. |
+| `batch19.log` (S64 scale_width, S65 scale_depth, S66 scale_eight, S67 capacity) | batch 19 (the user's specification of 9 October 2026), code of git 8cff21e, 1 thread per run, on Intel(R) Xeon(R) Processor @ 2.80GHz. **IN PROGRESS: 108 runs saved (scale_width 60 of up to 60; scale_depth 48 of up to 58; scale_eight 0 of up to 30; capacity 0 of up to 48); phase 2 decided: best width D128, best depth 2.** Run in segments; runs longer than a segment resume from checkpoints; pushed after every saved run. Arms whose oracle does not bind are not run, so the totals are upper bounds. S64 + S65 reported (the log's REPORT AFTER S64 + S65; readings in the Batch 19 verdicts below); S66 + S67: no report, reading or label until the SUMMARY at the end of the log. |
 | `<screen>_results.json` | every run's record (run_one's fields plus `lr`, `secs_wall`); `meta.provenance` holds CPU, torch, git, threads. |
 
 ## Batch 1 verdicts (screen rule in `explore_batch1.py`, fixed before any run)
@@ -608,3 +608,60 @@ Handed back as promising for a pre-registered test on the main branch:
   key-term window is worth considering, since every remaining failure formed after 2400.
 
 Not: W_RESET (the reset-only control: the copy does the work). Inconclusive: W2_K4. Cut: W_SPLIT_NOSLOW, W_SPLIT_W4, W4k4.
+
+## Batch 19 verdicts (the user's specification of 9 October 2026; rules fixed before any run) — S64 + S65; S66 + S67 to follow
+
+S64: S=4, P=4, k=16, conv, 28800, LOCAL3 + SLOW unchanged (gate 1e-3; other groups 1e-4 for 1-2400, then 1e-3; window 3),
+seeds 270-279, paired with N256 (rerun here). S65: the same at N=256, D=32 with n_layer 2 / 4 / 6 against 3 (one gate shared
+across layers), seeds 280-289, paired with L3. Oracle (the perfect gate, a single Adam at 1e-3) on 2 seeds per size and per
+depth, first. Outcome BOUND ROUTED; d = arm - reference over the paired seeds. Exact McNemar two-sided. Code of git 8cff21e
+(SHA 17e56410a1db), Intel Xeon @ 2.80GHz, torch 2.14.0+cu130, 1 thread per run, lr 0.001 (the S44(a) recipe's constants).
+
+| screen / arm | outcome count | paired reference | arm only / ref only | McNemar p | transition median | reading / verdict |
+|---|---|---|---|---|---|---|
+| S64 oracles (5 sizes) | BOUND 10/10 (all at 1200) | | | | 1200 | every size tested |
+| S64 N256 (mult 8, D 32; the reference, 27872 parameters) | BOUND ROUTED 9/10 (273 MERGED, 2 share, acc 0.80 at 28800) | | | | 3600 | reference |
+| S64 N512 (mult 16, D 32; 52448) | BOUND ROUTED 10/10 | N256 9/10 | 1 / 0 | 1 | 3600 | d = +1 |
+| S64 N1024 (mult 32, D 32; 101600) | BOUND ROUTED 10/10 | N256 9/10 | 1 / 0 | 1 | 3600 | d = +1 |
+| S64 D64 (mult 4, D 64, N 256; 55232) | BOUND ROUTED 10/10 | N256 9/10 | 1 / 0 | 1 | 3600 | d = +1 |
+| S64 D128 (mult 2, D 128, N 256; 109952) | BOUND ROUTED 10/10 | N256 9/10 | 1 / 0 | 1 | 3600 | d = +1 |
+| **S64 reading** | | | | | | **"scale-free"** (every d >= -1); verdict: promising (the recipe needs no retuning from N=256 to 1024 or D=32 to 128 at S=4) |
+| S65 oracles (4 depths) | BOUND 8/8 (L2-L4 at 1200, L6 at 2400) | | | | | every depth tested |
+| S65 L3 (the reference) | BOUND ROUTED 10/10 | | | | 3600 | reference |
+| S65 L2 | BOUND ROUTED 10/10 | L3 10/10 | 0 / 0 | 1 | 3600 | d = 0 |
+| S65 L4 | BOUND ROUTED 10/10 | L3 10/10 | 0 / 0 | 1 | 3600 | d = 0 |
+| S65 L6 | BOUND ROUTED 9/10 (283 BOUND NOT routed) | L3 10/10 | 0 / 1 | 1 | 4800 | d = -1 |
+| **S65 reading** | | | | | | **"scale-free"** (every d >= -1); verdict: promising to 4 layers; at 6 layers inside the margin but slower (below) |
+| S65 RES6 (Session G's per-layer residual gate) | not run | | | | | its condition (L6 - L3 <= -2) did not hold (d = -1) |
+
+S64, observations (not readings):
+- The only failure among the 50 learned width runs is the reference's seed 273 (MERGED, 2+1+1 at 28800, accuracy 0.80;
+  resumed from a checkpoint at 24000). Every other size bound 273 (3600-4800). The four d = +1 rest on that seed.
+- Transitions are 3600 for most runs at every size. Late ones: N512 277 at 12000 (N256 3600), N512 278, N1024 275 and D128
+  278 at 6000. Every run but those two stopped at 8400 (the early stop after 4800 with accuracy held).
+- Initial scales are the code's defaults at every size (recorded per arm in the log): std 0.020 for the embedding, encoder,
+  encoder_v, decoder and lm_head; W_in (32 x D) and W_g (16 x 32) std 0.10; the window +-1/sqrt(3) (std 0.33). The gate's
+  hidden width stays 32 at every D.
+- Read with care: the reading's margin (-1) is a count margin. With 10 seeds and a reference at 9/10, the screen rules out
+  a large drop at the larger sizes, not a small one.
+
+S65, observations:
+- BDH shares one layer's weights across depth, so 2, 4 and 6 layers have the same parameters as 3 and, for a seed, the same
+  initial values (the logged initial scales are identical). Depth here is how many times the shared layer is applied.
+- 6 layers is the one depth that moved: oracle transitions 2400 (1200 elsewhere), learned transition median 4800 (3600
+  elsewhere; 7 of its 9 BOUND ROUTED runs at >= 4800), 284 at 7200, and 287 bound only at 25200 (resumed at 24000; L3 3600).
+- L6 283 is BOUND NOT routed: held-out accuracy 1.00 on a 2+1+1 end map (transition 6000, stop 8400). Two streams share one
+  channel and the model still answers both. The separation happens after the gate; how was not measured.
+
+Phase-2 decision (the pre-registered rule; stored before any S66 / S67 run):
+- Best width D128. N512, N1024, D64 and D128 tie at 10/10 with transition median 3600. The rule's last term, "the larger
+  model (more trainable parameters)", picks D128 (109952 against N1024's 101600).
+- Best depth L2. **L2 and L4 tie on every term of the rule:** 10/10, median 3600, and 27872 parameters each, because
+  the layers share weights. The code then kept the arms' order, which lists L2 first. That last step is not in the
+  pre-registered rule.
+  - L2's transitions are no later than L4's: one at 2400 and nine at 3600, against L4's eight at 3600, one at 4800 and one
+    at 6000. An earlier-transition tie-break would also give L2.
+  - A "larger model by compute" tie-break would give L4.
+  - The stored decision stands unless the user changes it before S66's N256_L2 runs start.
+- S66 arms: N256_L3 (reference), D128_L3, N256_L2. S67 widths: N256 and D128.
+- Phase-2 projection (worst case): 246 h of runs, a makespan of 61.6 h on 4 workers. Nothing is cut; no budget was given.
