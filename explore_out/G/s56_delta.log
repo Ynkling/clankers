@@ -51,3 +51,56 @@ EXPLORATORY, NOT A RESULT — Session G S56 register (delta)
   [ 29/32]   84.3 min  REG_D        seed 398  acc 1.000 trans  8400 BOUND NOT routed
   [ 30/32]   87.1 min  REG_NUDGE_D  seed 399  acc 1.000 trans  3600 BOUND ROUTED
   [ 31/32]   88.4 min  REG_D        seed 399  acc 0.997 trans  7200 BOUND ROUTED
+  [ 32/32]   92.8 min  BASELINE_D   seed 399  acc 1.000 trans 22800 BOUND NOT routed
+  S56 (delta) runs done in 94.3 min
+| arm | n | BOUND | BOUND ROUTED | failures (unbound) | transitions | median acc |
+|---|---|---|---|---|---|---|
+| ORACLE_D | 2 | 2/2 [0.34, 1.00] RELIABLE | 2/2 [0.34, 1.00] RELIABLE | - | [2400, 18000] | 1.000 |
+| BASELINE_D | 10 | 2/10 [0.06, 0.51] MINORITY | 0/10 [0.00, 0.28] NEVER | {'POSITION': 4, 'OTHER': 3, 'KEY': 1} | [13200, 22800] | 0.608 |
+| REG_D | 10 | 6/10 [0.31, 0.83] MAJORITY | 2/10 [0.06, 0.51] MINORITY | {'POSITION': 2, 'MERGED': 1, 'OTHER': 1} | [4800, 6000, 7200, 7200, 8400, 18000] | 0.981 |
+| REG_NUDGE_D | 10 | 8/10 [0.49, 0.94] MAJORITY | 7/10 [0.40, 0.89] MAJORITY | {'OTHER': 2} | [3600, 3600, 3600, 3600, 4800, 4800, 4800, 6000] | 0.999 |
+
+VALIDITY: ORACLE_D bound 2/2 -> VALID
+  REG_D vs BASELINE_D BOUND: REG_D only 4, BASELINE_D only 0, one-sided McNemar p = 0.0625
+  ORACLE_D margin at VAL (median) L1 1.00, L2 1.00, L3 1.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[1.0, 0.0], [0.0, 1.0]], KEY [[1.0, 0.0], [0.0, 1.0]], VAL [[1.0, 0.0], [0.0, 1.0]]; L3: CTX [[1.0, 0.0], [0.0, 1.0]], KEY [[1.0, 0.0], [0.0, 1.0]], VAL [[1.0, 0.0], [0.0, 1.0]]
+  BASELINE_D margin at VAL (median) L1 0.00, L2 0.00, L3 0.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.517, 0.483], [0.496, 0.504]], KEY [[0.686, 0.314], [0.686, 0.314]], VAL [[0.562, 0.438], [0.563, 0.437]]; L3: CTX [[0.517, 0.483], [0.496, 0.504]], KEY [[0.686, 0.314], [0.686, 0.314]], VAL [[0.562, 0.438], [0.563, 0.437]]
+  REG_D beta^R CTX/KEY/VAL (median over runs): 0 0.10/0.10/0.10; 1200 0.11/0.10/0.11; 2400 0.14/0.13/0.13; 4800 0.17/0.16/0.15; 9600 0.26/0.13/0.12; end 0.36/0.13/0.13
+  REG_D margin at VAL (median) L1 0.00, L2 0.00, L3 0.01; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.738, 0.262], [0.954, 0.046]], KEY [[0.683, 0.317], [0.562, 0.438]], VAL [[0.749, 0.251], [0.595, 0.405]]; L3: CTX [[0.783, 0.217], [0.939, 0.061]], KEY [[0.804, 0.196], [0.663, 0.337]], VAL [[0.81, 0.19], [0.686, 0.314]]
+  REG_NUDGE_D beta^R CTX/KEY/VAL (median over runs): 0 0.09/0.06/0.06; 1200 0.11/0.06/0.07; 2400 0.17/0.07/0.08; 4800 0.53/0.05/0.05; end 0.67/0.05/0.05
+  REG_NUDGE_D margin at VAL (median) L1 0.00, L2 1.00, L3 1.00; table (mean g, [stream0, stream1] x [ch0, ch1]) L2: CTX [[0.552, 0.448], [0.637, 0.363]], KEY [[0.999, 0.001], [0.232, 0.768]], VAL [[0.999, 0.001], [0.262, 0.738]]; L3: CTX [[0.521, 0.479], [0.637, 0.363]], KEY [[1.0, 0.001], [0.235, 0.765]], VAL [[1.0, 0.0], [0.24, 0.76]]
+
+READINGS: R1: neither; R2: discovered (REG_D)
+
+per run:
+  ORACLE_D 390: BOUND ROUTED     acc 0.999 trans 18000 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00
+  ORACLE_D 391: BOUND ROUTED     acc 1.000 trans 2400 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00
+  BASELINE_D 390: POSITION         acc 0.490 trans None stream_acc [0.48, 0.5] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.05 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.05
+  BASELINE_D 391: OTHER            acc 0.592 trans None stream_acc [0.59, 0.59] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.07 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.07
+  BASELINE_D 392: POSITION         acc 0.489 trans None stream_acc [0.48, 0.5] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.05 | L3 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.05
+  BASELINE_D 393: OTHER            acc 0.625 trans None stream_acc [0.62, 0.63] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.06 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.06
+  BASELINE_D 394: POSITION         acc 0.520 trans None stream_acc [0.54, 0.5] | L2 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.05 | L3 map [1, 1] m 0.00 etaS K/V 0.00/0.00 etaK 0.05
+  BASELINE_D 395: KEY              acc 0.811 trans None stream_acc [0.8, 0.82] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 1.00
+  BASELINE_D 396: OTHER            acc 0.661 trans None stream_acc [0.66, 0.66] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.07 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.07
+  BASELINE_D 397: POSITION         acc 0.500 trans None stream_acc [0.49, 0.51] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.05 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.05
+  BASELINE_D 398: BOUND NOT routed acc 1.000 trans 13200 stream_acc [1.0, 1.0] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.97 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.97
+  BASELINE_D 399: BOUND NOT routed acc 1.000 trans 22800 stream_acc [1.0, 1.0] | L2 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.99 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 0.99
+  REG_D 390: BOUND NOT routed acc 0.966 trans 18000 stream_acc [0.96, 0.97] | L2 map [0, 0] m 0.02 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.95 | beta C/K/V 0.48/0.68/0.59
+  REG_D 391: POSITION         acc 0.458 trans None stream_acc [0.46, 0.46] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.28 | L3 map [0, 0] m -0.01 etaS K/V 0.00/0.00 etaK 0.04 | beta C/K/V 0.31/0.09/0.10
+  REG_D 392: MERGED           acc 0.195 trans None stream_acc [0.2, 0.19] | L2 map [0, 0] m -0.01 etaS K/V 0.00/0.00 etaK 0.00 | L3 map [0, 0] m 0.28 etaS K/V 0.00/0.00 etaK 0.00 | beta C/K/V 0.06/0.03/0.05
+  REG_D 393: OTHER            acc 0.326 trans None stream_acc [0.31, 0.34] | L2 map [1, 1] m 0.01 etaS K/V 0.00/0.00 etaK 0.09 | L3 map [1, 1] m 0.01 etaS K/V 0.00/0.00 etaK 0.09 | beta C/K/V 0.76/0.86/0.71
+  REG_D 394: BOUND ROUTED     acc 1.000 trans 4800 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.36/0.10/0.08
+  REG_D 395: BOUND NOT routed acc 1.000 trans 6000 stream_acc [1.0, 1.0] | L2 map [1, 1] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m -0.00 etaS K/V 0.00/0.00 etaK 1.00 | beta C/K/V 0.50/0.63/0.61
+  REG_D 396: POSITION         acc 0.185 trans None stream_acc [0.17, 0.19] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.03 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.03 | beta C/K/V 0.10/0.40/0.23
+  REG_D 397: BOUND NOT routed acc 1.000 trans 7200 stream_acc [1.0, 1.0] | L2 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.19 | L3 map [0, 0] m 0.00 etaS K/V 0.00/0.00 etaK 0.03 | beta C/K/V 0.37/0.16/0.15
+  REG_D 398: BOUND NOT routed acc 1.000 trans 8400 stream_acc [1.0, 1.0] | L2 map [0, 0] m -0.01 etaS K/V 0.00/0.00 etaK 0.87 | L3 map [0, 0] m 0.02 etaS K/V 0.00/0.00 etaK 0.28 | beta C/K/V 0.05/0.07/0.06
+  REG_D 399: BOUND ROUTED     acc 0.997 trans 7200 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.40/0.09/0.10
+  REG_NUDGE_D 390: BOUND ROUTED     acc 0.994 trans 4800 stream_acc [0.99, 1.0] | L2 map [1, 0] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [1, 0] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.55/0.04/0.04
+  REG_NUDGE_D 391: OTHER            acc 0.367 trans None stream_acc [0.4, 0.34] | L2 map [0, 0] m 0.09 etaS K/V 0.41/0.33 etaK 0.02 | L3 map [0, 1] m 0.09 etaS K/V 0.38/0.37 etaK 0.00 | beta C/K/V 0.65/0.01/0.02
+  REG_NUDGE_D 392: BOUND ROUTED     acc 1.000 trans 4800 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.71/0.06/0.06
+  REG_NUDGE_D 393: BOUND ROUTED     acc 1.000 trans 4800 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.66/0.05/0.05
+  REG_NUDGE_D 394: BOUND ROUTED     acc 1.000 trans 3600 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.41/0.06/0.06
+  REG_NUDGE_D 395: BOUND NOT routed acc 1.000 trans 6000 stream_acc [1.0, 1.0] | L2 map [0, 0] m 0.01 etaS K/V 0.00/0.00 etaK 1.00 | L3 map [0, 0] m 0.02 etaS K/V 0.00/0.00 etaK 0.99 | beta C/K/V 0.32/0.10/0.03
+  REG_NUDGE_D 396: OTHER            acc 0.291 trans None stream_acc [0.29, 0.3] | L2 map [0, 0] m 0.00 etaS K/V 0.43/0.07 etaK 0.11 | L3 map [0, 0] m 0.00 etaS K/V 0.05/0.00 etaK 0.15 | beta C/K/V 0.78/0.01/0.06
+  REG_NUDGE_D 397: BOUND ROUTED     acc 0.997 trans 3600 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.67/0.04/0.05
+  REG_NUDGE_D 398: BOUND ROUTED     acc 0.981 trans 3600 stream_acc [0.99, 0.98] | L2 map [1, 0] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [1, 0] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.82/0.03/0.02
+  REG_NUDGE_D 399: BOUND ROUTED     acc 1.000 trans 3600 stream_acc [1.0, 1.0] | L2 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | L3 map [0, 1] m 1.00 etaS K/V 1.00/1.00 etaK 0.00 | beta C/K/V 0.70/0.06/0.05

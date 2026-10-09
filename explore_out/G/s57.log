@@ -1,0 +1,34 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — Session G S57 latch
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 9d76e8f+dirty | python 3.13.16 | torch threads 1
+====================================================================================================
+  S57 trigger (from S56's summary): TRIGGERED
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (40s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+/home/user/clankers/explore_g_latch_child.py:160: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  float(u.abs().max()) < 1 and float(m.b_R) == 0.0))
+  CHECK S57: S56: recorded run, new path disabled: S43 LOCAL3_SLOW|160 (batch 16) through 2400 with RegBDH(gated=()) reproduces its curve bit for bit ([[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]) and its decoder at 1200/2400: ok
+  CHECK S57: S56: RegBDH(gated=()) equals LOCAL3's logits bit for bit on H8: ok
+  CHECK S57: S56: REG init: existing parameters unchanged; A_v = W_in, W_g2 = W_g; beta^R in [0.0998, 0.1002] (about 0.1); with A_r = A_R = 0 every gated layer's gate = softmax(W_g tanh(W_in v)) (max |diff| 0.0e+00): ok
+  CHECK S57: S56: register causality: changing token 20's register write leaves every gated layer's gate at positions <= 20 bit-identical and changes it at 21: ok
+  CHECK S57: S56: strict causality: changing token 20 leaves logits and every layer's gate at positions < 20 unchanged: ok
+  CHECK S57: S56: SG and NOSG: the same forward; the gated layers' gates send no gradient into the stack (encoder) under SG and a non-zero one under NOSG: ok
+  CHECK S57: S56: RESGATE_ONLY: no register parameters; reg = False: ok
+  CHECK S57: S56: SLOW groups: gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A_v', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R'] at 1e-3, rest ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight'] at 1e-4; every trainable tensor once; W_h frozen: ok
+  CHECK S57: S56: nudge moves only ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'w_R'] (a subset of GATE_NEW); stream lean |p0(s0) - p0(s1)| after it at the gated layers [0.044, 0.043] (> 0.02): ok
+  CHECK S57: S56: delta path with beta 0, write 1, raw keys equals the Hebbian RegBDH (max |diff| 1.5e-07 <= 1e-5): ok
+  CHECK S57: S56: ORACLE_H and ORACLE_D: the query's logits are bit-identical when every VAL token of the other stream changes: ok
+  CHECK S57: S56: SINGLE_GDN: k = 1, DeltaMemory(beta 0, write 1, raw keys, decay gdn): ok
+  CHECK S57: dead-STE guard at step 0: max |u| = 2.36e-03 < 1 (b_z = 0, w_z small); a = 1.0: ok
+  CHECK S57: a schedule: a(1) = 1.0, a(8000) = 1.0, a(16000) = 3.0, a(24000) = 5.0: ok
+  CHECK S57: STE: z = [0.0, 0.0, 1.0, 1.0] binary; dz/du = [0.0, 1.0, 1.0, 0.0] (a/2 = 1 inside, 0 outside): ok
+  CHECK S57: latch recurrence: Rprev_{t+1} = W_r v_t where z_t = 1, Rprev_t where z_t = 0 (the gate at t reads r_{t-1}): ok
+  CHECK S57: latch causality: gates at <= 20 unchanged when token 20's latch input changes: ok
+  CHECK S57: prior: on a training forward a zero loss on the logits still sends the prior's gradient to w_z (|grad| 4.97e-04 > 0); update counter 1 = 1: ok
+  CHECK S57: LATCH shares every initial parameter with S56's REG for the seed except b_R (0 vs logit 0.1): ok
+  CHECK S57: LATCH_NUDGE: the nudge moves only ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'w_R']; the update counter starts at 0 after it: ok
+  CHECK S57: ORACLE23: layers 2 and 3 = the perfect gate, layer 1 = LOCAL3's gate: ok
+  s57_latch: code SHA 0440fcc975a6 (28 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  45 runs queued on 4 workers
