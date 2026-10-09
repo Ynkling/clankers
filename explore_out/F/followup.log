@@ -405,3 +405,76 @@ EXPLORATORY, NOT A RESULT — Session F followup (F/premise, F/hebb_decay, F/rh_
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 328fe2d+dirty, code ff908bdbc0b2, attempt 1: acc 0.502  trans  None  KEY
   [ 95]  522.6 min  F/rh_lite        S70_HEBB                 seed 348  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 328fe2d+dirty, code ff908bdbc0b2, attempt 1: acc 0.500  trans  None  KEY
+  [ 96]  524.8 min  F/rh_lite        S70_HEBB                 seed 349  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git ac147b4, code ff908bdbc0b2, attempt 1: acc 0.489  trans  None  KEY
+  segment saved 96 runs
+  runs left: 0
+### S68 premise — counts (BOUND; Wilson 95%; band)
+
+| arm | n | BOUND | transitions: median (all) | final acc median | write order acc last / not-last |
+|---|---|---|---|---|---|
+| S68_SINGLE_S4 | 10/10 | 2/10 [0.06, 0.51] MINORITY | 25800 (18000, 33600) | 0.41 | 0.42 / 0.41 |
+| S68_ORACLE_S4 | 2/2 | 2/2 [0.34, 1.00] RELIABLE | 1200 (1200, 1200) | 1.00 | 1.00 / 1.00 |
+| S68_SINGLE_S8 | 10/10 | 0/10 [0.00, 0.28] NEVER | -- | 0.42 | 0.47 / 0.42 |
+| S68_ORACLE_S8 | 2/2 | 2/2 [0.34, 1.00] RELIABLE | 1200 (1200, 1200) | 1.00 | 1.00 / 1.00 |
+
+Validity S=4: S68_ORACLE_S4 2/2 (transitions [1200, 1200]) -> VALID
+
+Validity S=8: S68_ORACLE_S8 2/2 (transitions [1200, 1200]) -> VALID
+
+READING S68: **neither** (SINGLE_DELTA S=4 2/10, S=8 0/10; rules: scale >= 7/10 at S=8; number of streams <= 3/10 at S=8 with >= 7/10 at S=4)
+- S=4: one delta channel BOUND 2/10 [0.06, 0.51] MINORITY vs recorded gated Hebbian S54 B_HEBB BOUND ROUTED 19/20 [0.76, 0.99] RELIABLE (BOUND 20/20); counts only, other seeds; Fisher one-sided p(gated > single) = 6.36e-05
+- S=8: one delta channel BOUND 0/10 [0.00, 0.28] NEVER vs recorded gated Hebbian S54 C_HEBB BOUND ROUTED 9/10 [0.60, 0.98] RELIABLE (BOUND 9/10); counts only, other seeds; Fisher one-sided p(gated > single) = 5.95e-05
+
+Per seed (B@transition or final acc): S68_SINGLE_S4 300 0.26, 301 B@33600, 302 0.23, 303 0.25, 304 0.22, 305 0.55, 306 B@18000, 307 0.26, 308 0.74, 309 0.75; S68_SINGLE_S8 300 0.32, 301 0.30, 302 0.59, 303 0.29, 304 0.39, 305 0.46, 306 0.54, 307 0.56, 308 0.29, 309 0.53
+
+Runs: 24 ok (failed records 0), 18.63 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.10GHz']; code SHA ff908bdbc0b2
+### S69 forget gate on a single Hebbian channel — counts (BOUND; Wilson 95%; band)
+
+| arm | n | BOUND | transitions: median (all) | final acc median | write order acc last / not-last | S59 delta, same seeds |
+|---|---|---|---|---|---|---|
+| S69_FIXED | 10/10 | 0/10 [0.00, 0.28] NEVER | -- | 0.22 | 0.21 / 0.23 | 3/10 |
+| S69_ROUTED | 10/10 | 0/10 [0.00, 0.28] NEVER | -- | 0.17 | 0.17 / 0.16 | 9/10 |
+| S69_GDN | 10/10 | 0/10 [0.00, 0.28] NEVER | -- | 0.17 | 0.17 / 0.16 | 8/10 |
+| S69_ORACLE | 2/2 | 1/2 [0.09, 0.91] MAJORITY | 31200 (31200) | 0.88 | 0.88 / 0.88 | --/10 |
+
+Validity: S69_ORACLE 1/2 (transitions [None, 31200]) -> VALID
+
+READING S69: **the forget gate needs the delta rule** (Hebbian FIXED 0/10, ROUTED 0/10, GDN 0/10; rules: needs delta if ROUTED and GDN <= FIXED + 1; alone suffices if either >= 8/10)
+
+Paired with S59's delta single channel on the same seeds and batches (BOUND; delta only / hebb only): FIXED: S59 delta 3/10 vs Hebbian 0/10; ROUTED: S59 delta 9/10 vs Hebbian 0/10; GDN: S59 delta 8/10 vs Hebbian 0/10
+
+Learned decay at the end (median α per layer at CTX/KEY/VAL):
+
+- S69_FIXED: L1 ch0 0.950/0.950/0.950; L2 ch0 0.950/0.950/0.950; L3 ch0 0.950/0.950/0.950
+- S69_ROUTED: L1 ch0 0.975/0.999/0.982; L2 ch0 0.944/0.997/0.966; L3 ch0 0.886/0.990/0.914
+- S69_GDN: L1 ch0 0.988/0.999/0.990; L2 ch0 0.943/0.997/0.952; L3 ch0 0.684/0.994/0.926
+- S69_ORACLE: L1 other 0.950/0.950/0.950, own 0.950/0.950/0.950; L2 other 0.950/0.950/0.950, own 0.950/0.950/0.950; L3 other 0.950/0.950/0.950, own 0.950/0.950/0.950
+
+Runs: 32 ok (failed records 0), 11.28 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.10GHz']; code SHA ff908bdbc0b2
+### S70 RandHeaderTask-lite — counts (Wilson 95%; band)
+
+Phase 1 (oracle first): {'phase1': 'bound', 'oracle_24k': {'HEBB': 3, 'DELTA': 3}, 'budget': 24000}
+
+| arm | n | BOUND | DISCOVERED | ROUTED*@end | failures (unbound) | transitions: median (all) | final acc median |
+|---|---|---|---|---|---|---|---|
+| S70_ORACLE_HEBB | 3/3 | 3/3 [0.44, 1.00] RELIABLE | -- | -- | -- | 1200 (1200, 1200, 8400) | 1.00 |
+| S70_ORACLE_DELTA | 3/3 | 3/3 [0.44, 1.00] RELIABLE | -- | -- | -- | 1200 (1200, 1200, 1200) | 1.00 |
+| S70_HEBB | 20/20 | 1/20 [0.01, 0.24] MINORITY | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | {'KEY': 19} | 13200 (13200) | 0.50 |
+| S70_DELTA | 20/20 | 6/20 [0.15, 0.52] MINORITY | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | {'KEY': 14} | 5400 (3600, 3600, 4800, 6000, 7200, 16800) | 0.87 |
+
+**BASELINE for Session G (S70_HEBB, LOCAL3 + SLOW, Hebbian, RandHeaderTask-lite, 24000 updates, seeds 330-349): DISCOVERED 0/20 [0.00, 0.16] NEVER; BOUND 1/20 [0.01, 0.24] MINORITY; ROUTED*@end 0/20 [0.00, 0.16] NEVER; failures {'KEY': 19}**
+- paired DISCOVERED: DELTA 0/20 vs HEBB 0/20: delta only 0, hebb only 0; p(delta > hebb) = 1, p(hebb > delta) = 1
+- paired BOUND: DELTA 6/20 vs HEBB 1/20: delta only 5, hebb only 0; p(delta > hebb) = 0.0312, p(hebb > delta) = 1
+- paired ROUTED*@end: DELTA 0/20 vs HEBB 0/20: delta only 0, hebb only 0; p(delta > hebb) = 1, p(hebb > delta) = 1
+
+η² of the read gate at the end (median; by stream / key / half / index), KEY and VAL; margin:
+
+- S70_HEBB: KEY 0.00/1.00/0.00/0.00; VAL 0.00/1.00/0.00/0.00; margin 0.00
+- S70_DELTA: KEY 0.00/1.00/0.00/0.01; VAL 0.00/1.00/0.00/0.00; margin 0.00
+
+Per seed: S70_HEBB 330 KEY 0.50, 331 KEY 0.52, 332 KEY 0.51, 333 KEY 0.50, 334 KEY 0.47, 335 BOUND unrouted@13200, 336 KEY 0.52, 337 KEY 0.50, 338 KEY 0.48, 339 KEY 0.52, 340 KEY 0.50, 341 KEY 0.50, 342 KEY 0.49, 343 KEY 0.51, 344 KEY 0.49, 345 KEY 0.51, 346 KEY 0.47, 347 KEY 0.50, 348 KEY 0.50, 349 KEY 0.49; S70_DELTA 330 KEY 0.87, 331 KEY 0.74, 332 BOUND unrouted@6000, 333 KEY 0.86, 334 BOUND unrouted@7200, 335 BOUND unrouted@4800, 336 KEY 0.77, 337 BOUND unrouted@3600, 338 BOUND unrouted@16800, 339 KEY 0.88, 340 KEY 0.75, 341 KEY 0.86, 342 KEY 0.88, 343 KEY 0.76, 344 KEY 0.74, 345 KEY 0.75, 346 KEY 0.87, 347 KEY 0.88, 348 KEY 0.76, 349 BOUND unrouted@3600
+
+Runs: 46 ok (failed records 0), 5.01 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.10GHz']; code SHA ff908bdbc0b2
+exit 0
+=== done Fri Oct  9 23:11:21 UTC 2026
