@@ -163,3 +163,6 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 542eb33+dirty, code 17e56410a1db, attempt 1: acc 1.000  trans  1200  stop 8400  outcome BOUND
   start   18.7 min  scale_width  ORC_N512       seed 270  (projected worst case 49 min)
   start   18.7 min  scale_width  ORC_N512       seed 271  (projected worst case 49 min)
+  [  3]   33.7 min  scale_width  ORC_N1024      seed 271  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 4dc7e71, code 17e56410a1db, attempt 1: acc 1.000  trans  1200  stop 8400  outcome BOUND
+  start   33.7 min  scale_width  ORC_D64        seed 270  (projected worst case 42 min)
