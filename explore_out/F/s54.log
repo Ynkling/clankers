@@ -467,3 +467,24 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 65] 1070.8 min  F/window_delta_scale B_HEBB                   seed 326  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git f2db36e+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
   start 1070.8 min  F/window_delta   D_ORACLE_DELTA           seed 330  (projected worst case 16 min)
+  [ 66] 1073.6 min  F/window_delta_scale B_HEBB                   seed 327  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1af0eae, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
+  start 1073.6 min  F/window_delta   D_ORACLE_DELTA           seed 331  (projected worst case 16 min)
+  [ 67] 1075.1 min  F/window_delta_scale B_HEBB                   seed 328  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1af0eae+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  3600  BOUND ROUTED  splits 0  map --
+  start 1075.1 min  F/window_delta   D_DELTA                  seed 330  (projected worst case 16 min)
+  [ 68] 1075.2 min  F/window_delta_scale B_HEBB                   seed 329  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger <= 3 splits)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1af0eae+dirty, code c8612c854acc, attempt 1: acc 1.000  trans  4800  BOUND ROUTED  splits 0  map --
+  start 1075.2 min  F/window_delta   D_DELTA                  seed 331  (projected worst case 16 min)
+  [ 69] 1084.0 min  F/window_delta   D_ORACLE_DELTA           seed 330  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1af0eae+dirty, code 30feac285d87, attempt 1: acc 0.243  trans  None  VALcos 0.000  margin 1.00  unbound
+  start 1084.0 min  F/window_delta   D_DELTA                  seed 332  (projected worst case 16 min)
+  [ 70] 1086.8 min  F/window_delta   D_ORACLE_DELTA           seed 331  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1af0eae+dirty, code 30feac285d87, attempt 1: acc 0.233  trans  None  VALcos 0.000  margin 1.00  unbound
+  start 1086.8 min  F/window_delta   D_DELTA                  seed 333  (projected worst case 16 min)
+  [ 71] 1089.7 min  F/window_delta   D_DELTA                  seed 330  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1af0eae+dirty, code 30feac285d87, attempt 1: acc 0.203  trans  None  VALcos 1.000  margin 0.00  KEY
+  start 1089.7 min  F/window_delta   D_DELTA                  seed 334  (projected worst case 16 min)
+  [ 72] 1091.5 min  F/window_delta   D_DELTA                  seed 331  lr 0.001  (gate W_in/W_g/window 1e-3 throughout; rest (incl. attn.w_b, attn.b_b) 1e-4 for 1-2400, 1e-3 after)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1af0eae+dirty, code 30feac285d87, attempt 1: acc 0.228  trans  None  VALcos 1.000  margin -0.00  KEY
+  start 1091.5 min  F/window_delta   D_DELTA                  seed 335  (projected worst case 16 min)
