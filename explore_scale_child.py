@@ -142,7 +142,7 @@ def run(p):
         out["outcome"] = "BOUND" if out.get("transition") is not None else "not bound"
     if p.get("ckpt") and out.get("ok"):
         import os
-        for f in (p["ckpt"], p["ckpt"] + ".tmp"):
+        for f in (p["ckpt"], p["ckpt"] + ".tmp", p["ckpt"] + ".step"):
             if os.path.exists(f):
                 os.remove(f)
     return out
