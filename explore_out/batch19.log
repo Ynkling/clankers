@@ -1246,3 +1246,6 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   start    0.0 min  scale_depth  ORC_L6         seed 281  (resuming from its checkpoint at step 6000)  (projected worst case 56 min)
   start    0.0 min  scale_depth  ORC_L4         seed 281  (resuming from its checkpoint at step 4800)  (projected worst case 36 min)
   start    0.0 min  scale_depth  ORC_L3         seed 280  (resuming from its checkpoint at step 2400)  (projected worst case 28 min)
+  [  1]    2.8 min  scale_depth  ORC_L6         seed 280  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 2137298, code 17e56410a1db, attempt 1, resumed at [7200]: acc 1.000  trans  2400  stop 8400  outcome BOUND
+  start    2.8 min  scale_depth  ORC_L3         seed 281  (projected worst case 28 min)
