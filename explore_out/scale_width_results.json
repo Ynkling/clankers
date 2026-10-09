@@ -1,0 +1,305 @@
+{
+ "meta": {
+  "arms": {
+   "D128": {
+    "iters": 28800,
+    "key": "D128",
+    "label": "LOCAL3 + SLOW at N=256 (mult 2), D=128, 3 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_D128",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "size": "D128",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "D64": {
+    "iters": 28800,
+    "key": "D64",
+    "label": "LOCAL3 + SLOW at N=256 (mult 4), D=64, 3 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_D64",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "size": "D64",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      4,
+      64,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "N1024": {
+    "iters": 28800,
+    "key": "N1024",
+    "label": "LOCAL3 + SLOW at N=1024 (mult 32), D=32, 3 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_N1024",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "size": "N1024",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      32,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "N256": {
+    "iters": 28800,
+    "key": "N256",
+    "label": "LOCAL3 + SLOW at N=256 (mult 8), D=32, 3 layers (the reference)",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_N256",
+    "role": "ref",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "size": "N256",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "N512": {
+    "iters": 28800,
+    "key": "N512",
+    "label": "LOCAL3 + SLOW at N=512 (mult 16), D=32, 3 layers",
+    "lr": 0.001,
+    "opt": "adam",
+    "oracle": "ORC_N512",
+    "role": "arm",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "size": "N512",
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "size": [
+      16,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_D128": {
+    "iters": 28800,
+    "key": "ORC_D128",
+    "label": "oracle at N=256 (mult 2), D=128, 3 layers (S=4, P=4, k=16, conv)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270,
+     271
+    ],
+    "size": "D128",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_D64": {
+    "iters": 28800,
+    "key": "ORC_D64",
+    "label": "oracle at N=256 (mult 4), D=64, 3 layers (S=4, P=4, k=16, conv)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270,
+     271
+    ],
+    "size": "D64",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      4,
+      64,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_N1024": {
+    "iters": 28800,
+    "key": "ORC_N1024",
+    "label": "oracle at N=1024 (mult 32), D=32, 3 layers (S=4, P=4, k=16, conv)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270,
+     271
+    ],
+    "size": "N1024",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      32,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_N256": {
+    "iters": 28800,
+    "key": "ORC_N256",
+    "label": "oracle at N=256 (mult 8), D=32, 3 layers (S=4, P=4, k=16, conv)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270,
+     271
+    ],
+    "size": "N256",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   },
+   "ORC_N512": {
+    "iters": 28800,
+    "key": "ORC_N512",
+    "label": "oracle at N=512 (mult 16), D=32, 3 layers (S=4, P=4, k=16, conv)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270,
+     271
+    ],
+    "size": "N512",
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      16,
+      32,
+      3
+     ],
+     "task": "P4S4"
+    }
+   }
+  },
+  "code_shas": [
+   "17e56410a1db4118a12d829484c7999eac8c0bc7"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "c4aa26a+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-09 08:20:22",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

@@ -59,3 +59,101 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   lr for scale_depth ORC_L6: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 6]
   lr for scale_depth L6: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 6]
   lr for scale_depth RES6: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 6]
+  CHECK batch 19: k16 P4S4 local: the sized builder at N=256, D=32, 3 layers equals test_stream_recipe.builder_for bit for bit (10 tensors; task S=4 P=4, length 51): ok
+  CHECK batch 19: k16 P4S4 perfect: the sized builder at N=256, D=32, 3 layers equals test_stream_recipe.builder_for bit for bit (7 tensors; task S=4 P=4, length 51): ok
+  CHECK batch 19: b P4S8 local: the sized builder at N=256, D=32, 3 layers equals test_stream_recipe.builder_for bit for bit (10 tensors; task S=8 P=4, length 99): ok
+  CHECK batch 19: k16 P8S4 local: the sized builder at N=256, D=32, 3 layers equals test_stream_recipe.builder_for bit for bit (10 tensors; task S=4 P=8, length 99): ok
+  CHECK batch 19: k16 P16S4 perfect: the sized builder at N=256, D=32, 3 layers equals test_stream_recipe.builder_for bit for bit (7 tensors; task S=4 P=16, length 195): ok
+  CHECK batch 19: to_local_any at D=32 is explore_b16_gates.to_local's conversion (same window, same class): ok
+  CHECK batch 19: size N=256 (mult 8) D=32 L=3 on k16: n_embd 32, N 256, layers 3, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [1, 11, 9, 7]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 8) D=32 L=3 on b: n_embd 32, N 256, layers 3, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [7, 7, 5, 6, 9, 4, 9, 2]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=512 (mult 16) D=32 L=3 on k16: n_embd 32, N 512, layers 3, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [3, 1, 6, 3]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=1024 (mult 32) D=32 L=3 on k16: n_embd 32, N 1024, layers 3, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [8, 7, 10, 4]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=1024 (mult 32) D=32 L=3 on b: n_embd 32, N 1024, layers 3, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [11, 1, 3, 6, 11, 11, 2, 9]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 4) D=64 L=3 on k16: n_embd 64, N 256, layers 3, W_in (32, 64), window (64, 3) (first 32 rows = the D=32 window), stack conv (64, 4); one backward on the task, statistics map [1, 15, 9, 8]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 4) D=64 L=3 on b: n_embd 64, N 256, layers 3, W_in (32, 64), window (64, 3) (first 32 rows = the D=32 window), stack conv (64, 4); one backward on the task, statistics map [14, 15, 15, 7, 11, 10, 10, 0]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 2) D=128 L=3 on k16: n_embd 128, N 256, layers 3, W_in (32, 128), window (128, 3) (first 32 rows = the D=32 window), stack conv (128, 4); one backward on the task, statistics map [10, 1, 14, 5]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 8) D=32 L=2 on k16: n_embd 32, N 256, layers 2, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [1, 11, 9, 7]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 8) D=32 L=4 on k16: n_embd 32, N 256, layers 4, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [1, 11, 9, 7]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 8) D=32 L=6 on k16: n_embd 32, N 256, layers 6, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [1, 11, 9, 7]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: size N=256 (mult 8) D=32 L=6 on b: n_embd 32, N 256, layers 6, W_in (32, 32), window (32, 3) (first 32 rows = the D=32 window), stack conv (32, 4); one backward on the task, statistics map [7, 7, 5, 6, 9, 4, 9, 2]; test_multilayer_binding.D restored (32): ok
+  CHECK batch 19: P8S4 (S=4, P=8, vocab 28, length 99) oracle at N=256: perfect gate k=16, channels 4..15 at 0, the first block on its stream's channel: ok
+  CHECK batch 19: P8S4 (S=4, P=8, vocab 28, length 99) oracle at N=1024: perfect gate k=16, channels 4..15 at 0, the first block on its stream's channel: ok
+  CHECK batch 19: P16S4 (S=4, P=16, vocab 36, length 195) oracle at N=256: perfect gate k=16, channels 4..15 at 0, the first block on its stream's channel: ok
+  CHECK batch 19: P16S4 (S=4, P=16, vocab 36, length 195) oracle at N=1024: perfect gate k=16, channels 4..15 at 0, the first block on its stream's channel: ok
+  CHECK batch 19: RES6 (L=6): A (32, 64) = [0 | W_in] at init (a parameter: True); layer 1's gate equals LOCAL3's (True); layers 2-6 at init equal softmax(W_g tanh(W_in v)) (max |diff| 0.0e+00); 6 layer gates: ok
+  CHECK batch 19: RES6's forward_res with every layer's gate forced to layer 1's equals LocalBDH's forward (max |logit diff| 0.0e+00 == 0): ok
+  CHECK batch 19: k16 P4S4 N=1024: the evaluation forward in chunks of 256 equals the one forward on 1024 held-out sequences bit for bit (logits True; evaluate (0.037109375, 3.1889023780822754) vs (0.037109375, 3.1889023780822754)): ok
+  CHECK batch 19: k16 P16S4 N=256: the evaluation forward in chunks of 256 equals the one forward on 1024 held-out sequences bit for bit (logits True; evaluate (0.0302734375, 3.5900678634643555) vs (0.0302734375, 3.5900678634643555)): ok
+  CHECK batch 19: b P4S8 N=256: the evaluation forward in chunks of 256 equals the one forward on 1024 held-out sequences bit for bit (logits True; evaluate (0.03125, 3.3485045433044434) vs (0.03125, 3.3485045433044434)): ok
+  CHECK batch 19: k16 P8S4 N=256: the evaluation forward in chunks of 256 equals the one forward on 1024 held-out sequences bit for bit (logits True; evaluate (0.0263671875, 3.351694345474243) vs (0.0263671875, 3.351694345474243)): ok
+  CHECK batch 19: local at N=256 D=64 L=3: groups [('gate', 3), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK batch 19: resgate at N=256 D=32 L=4: groups [('gate', 4), ('rest', 6)] cover every trainable parameter once, gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A']; lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK batch 19: perfect at N=512 D=32 L=3: one group at [0.001] throughout: ok
+  CHECK batch 19: S=4 k16 LOCAL3 N256 L3, seed 270: halted after the checkpoint at 2400, resumed, against 3600 uninterrupted: halted at 2400, resumed from [2400]; fields differing [] of 15 compared (curve, statistics, gradient norms, end statistics, transition, early curve, the trigger's rows and splits [] / [], final weights' SHA-1, outcome, initial scales): ok
+  CHECK batch 19: S=8 D8 LOCAL3 + trigger (threshold above 1: a split fires at 4800), seed 290: halted after the checkpoint at 4800 (after the split), resumed, against 6000 uninterrupted: halted at 4800, resumed from [4800]; fields differing [] of 15 compared (curve, statistics, gradient norms, end statistics, transition, early curve, the trigger's rows and splits [4800] / [4800], final weights' SHA-1, outcome, initial scales): ok
+  CHECK batch 19: RES gate at 3 layers, seed 280: halted at 1200, resumed, against 2400 uninterrupted: halted at 1200, resumed from [1200]; fields differing [] of 15 compared (curve, statistics, gradient norms, end statistics, transition, early curve, the trigger's rows and splits [] / [], final weights' SHA-1, outcome, initial scales): ok
+  CHECK batch 19: S64/S65 reading: d = (0, -1, -1, 0) -> scale-free; (0, -4) -> width-sensitive; (-2, 0) -> neither; incomplete -> no reading; an untested arm takes no part: ok
+  CHECK batch 19: phase-2 rule: most BOUND ROUTED, then the earlier median transition, then the larger model; never the reference or an untested arm (synthetic: D64, N1024, N512 == D64, N1024, N512): ok
+  CHECK batch 19: S67 reading: P=16 oracle 0/2 at N256 and 1/2 at W -> capacity-bound; 1/2 at N256 -> not; 0 and 0 -> neither width: ok
+  CHECK batch 19: S65's RES6 condition: L6 - L3 <= -2 (misses the scale-free margin of 1); S66 carries at d >= -1; S64 scale-free at d >= -1, width-sensitive at d <= -4: ok
+  CHECK batch 19: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (28.3 min)
+  recorded the full CHECK pass (code SHA, the batch's CPU Intel(R) Xeon(R) Processor @ 2.80GHz) in /home/user/clankers/explore_out/batch19_checks.json
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_width
+  idea    does the window recipe survive width? N = 256, 512, 1024 at D = 32; D = 64, 128 at N = 256
+  source  batch 16's S44(a) LOCAL3_SLOW16_A (20/20 at S=4, k=16, N=256, D=32); the user's batch 19
+  change  only the model's size (mult = N/D, the embedding width D); every recipe and initial scale rule as is
+  arm ORC_N256     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 8), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N256         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 8), D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N512     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=512 (mult 16), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N512         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=512 (mult 16), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N1024    lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=1024 (mult 32), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N1024        lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=1024 (mult 32), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D64      lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 4), D=64, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D64          lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 4), D=64, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D128     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 2), D=128, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D128         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 2), D=128, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 270-279 with N256 (the same batches); oracles on 270-271
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_depth
+  idea    does the window recipe survive depth? 2, 4 and 6 layers against 3 (one gate shared across layers)
+  source  batch 16's S44(a) (3 layers); the user's batch 19; RES6: Session G's design (docs/reading/distant_cues_2026-10.md 4.3)
+  change  only ARCH's n_layer (the shared BDH layer applied n times); RES6 adds a per-layer gate over the residual stream
+  arm ORC_L2       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 2 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L2           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 2 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L3       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 3 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L3           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L4       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 4 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L4           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 4 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L6       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 6 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L6           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 6 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm RES6         lr 0.001  iters 28800  seeds 280-289 (10)  — Session G's per-layer residual gate at 6 layers (diagnostic; only if L6 fails)
+                   schedule: gate W_in/W_g/window/A 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 280-289 with L3 (the same batches and initial parameters); oracles on 280-281
+----------------------------------------------------------------------------------------------------
+  pool: 4 workers (1 torch thread each); segment budget 75 min left
+  start    0.0 min  scale_width  ORC_N1024      seed 270  (projected worst case 114 min)
+  start    0.0 min  scale_width  ORC_N1024      seed 271  (projected worst case 114 min)
+  start    0.0 min  scale_width  ORC_D128       seed 270  (projected worst case 59 min)
+  start    0.0 min  scale_width  ORC_D128       seed 271  (projected worst case 59 min)
