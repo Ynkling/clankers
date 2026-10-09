@@ -389,3 +389,21 @@ REPORT AFTER S64 + S65 — EXPLORATORY, not a result — DRY RUN (shortened: 1 s
   start   25.8 min  dry_scale_eight D128_L3        seed 290  (projected worst case 5 min)
   start   25.8 min  dry_scale_eight N256_L2        seed 290  (projected worst case 2 min)
   start   25.8 min  dry_capacity ORC_P16_D128   seed 270  (projected worst case 10 min)
+  [ 20]   27.9 min  dry_scale_eight N256_L2        seed 290  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git c7b6be2, code 17e56410a1db, attempt 1: acc 0.058  trans  None  stop 1200  outcome non-stream OTHER; splits 0 at []
+  start   27.9 min  dry_capacity ORC_P16_N256   seed 270  (projected worst case 6 min)
+  [ 21]   28.8 min  dry_scale_eight N256_L3        seed 290  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git c7b6be2+dirty, code 17e56410a1db, attempt 1: acc 0.059  trans  None  stop 1200  outcome non-stream OTHER; splits 0 at []
+  start   28.8 min  dry_capacity ORC_P8_D128    seed 270  (projected worst case 5 min)
+  [ 22]   31.5 min  dry_scale_eight D128_L3        seed 290  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git c7b6be2+dirty, code 17e56410a1db, attempt 1: acc 0.105  trans  None  stop 1200  outcome non-stream OTHER; splits 0 at []
+  start   31.5 min  dry_capacity ORC_P8_N256    seed 270  (projected worst case 2 min)
+  [ 23]   34.3 min  dry_capacity ORC_P8_D128    seed 270  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git c7b6be2+dirty, code 17e56410a1db, attempt 1: acc 0.280  trans  None  stop 1200  outcome not bound
+  start   34.3 min  dry_capacity P16_N256       seed 270  (projected worst case 6 min)
+  [ 24]   34.4 min  dry_capacity ORC_P8_N256    seed 270  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git c7b6be2+dirty, code 17e56410a1db, attempt 1: acc 0.149  trans  None  stop 1200  outcome not bound
+  start   34.4 min  dry_capacity P8_N256        seed 270  (projected worst case 3 min)
+  [ 25]   35.5 min  dry_capacity ORC_P16_N256   seed 270  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git c7b6be2+dirty, code 17e56410a1db, attempt 1: acc 0.087  trans  None  stop 1200  outcome not bound
+  start   35.5 min  dry_capacity P16_D128       seed 270  (projected worst case 10 min)
