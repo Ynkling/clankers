@@ -38,3 +38,94 @@ EXPLORATORY, NOT A RESULT — Session F s70o (F/rh_lite)
   start    0.0 min  F/rh_lite        S70_ORACLE_DELTA         seed 331  (projected worst case 9 min)
   start    0.0 min  F/rh_lite        S70_ORACLE_DELTA         seed 332  (projected worst case 9 min)
   start    0.0 min  F/rh_lite        S70_ORACLE_HEBB          seed 330  (projected worst case 6 min)
+  [  1]    1.7 min  F/rh_lite        S70_ORACLE_DELTA         seed 330  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520, code ff908bdbc0b2, attempt 1: acc 1.000  trans  1200  BOUND
+  start    1.7 min  F/rh_lite        S70_ORACLE_HEBB          seed 331  (projected worst case 6 min)
+  [  2]    1.7 min  F/rh_lite        S70_ORACLE_DELTA         seed 332  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520+dirty, code ff908bdbc0b2, attempt 1: acc 1.000  trans  1200  BOUND
+  start    1.7 min  F/rh_lite        S70_ORACLE_HEBB          seed 332  (projected worst case 6 min)
+  [  3]    1.7 min  F/rh_lite        S70_ORACLE_DELTA         seed 331  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520+dirty, code ff908bdbc0b2, attempt 1: acc 1.000  trans  1200  BOUND
+  [  4]    2.7 min  F/rh_lite        S70_ORACLE_HEBB          seed 331  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520+dirty, code ff908bdbc0b2, attempt 1: acc 1.000  trans  1200  BOUND
+  [  5]    2.8 min  F/rh_lite        S70_ORACLE_HEBB          seed 332  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520+dirty, code ff908bdbc0b2, attempt 1: acc 1.000  trans  1200  BOUND
+  [  6]    3.2 min  F/rh_lite        S70_ORACLE_HEBB          seed 330  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520+dirty, code ff908bdbc0b2, attempt 1: acc 1.000  trans  8400  BOUND
+  segment saved 6 runs
+  runs left: 0
+### S70 RandHeaderTask-lite — counts (Wilson 95%; band)
+
+Phase 1 (oracle first): {}
+
+| arm | n | BOUND | DISCOVERED | ROUTED*@end | failures (unbound) | transitions: median (all) | final acc median |
+|---|---|---|---|---|---|---|---|
+| S70_ORACLE_HEBB | 3/3 | 3/3 [0.44, 1.00] RELIABLE | -- | -- | -- | 1200 (1200, 1200, 8400) | 1.00 |
+| S70_ORACLE_DELTA | 3/3 | 3/3 [0.44, 1.00] RELIABLE | -- | -- | -- | 1200 (1200, 1200, 1200) | 1.00 |
+
+Runs: 6 ok (failed records 0), 0.17 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.10GHz']; code SHA ff908bdbc0b2
+  code SHA F/rh_lite: ff908bdbc0b2 over 28 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_decay_child, explore_f_delta_fast, explore_f_followup_child, explore_f_tasks, explore_f_window_delta_child, explore_far_cue, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  S70 decision: {'phase1': 'bound', 'oracle_24k': {'HEBB': 3, 'DELTA': 3}, 'budget': 24000}
+=== S68, S69, S70 phase 2 Fri Oct  9 14:24:25 UTC 2026
+==============================================================================================================
+EXPLORATORY, NOT A RESULT — Session F followup (F/premise, F/hebb_decay, F/rh_lite)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 9899520+dirty | python 3.11.17 | torch threads 1 | started 2026-10-09 14:24:27
+==============================================================================================================
+  code SHA F/premise: ff908bdbc0b2 over 28 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_decay_child, explore_f_delta_fast, explore_f_followup_child, explore_f_tasks, explore_f_window_delta_child, explore_far_cue, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  code SHA F/hebb_decay: ff908bdbc0b2 over 28 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_decay_child, explore_f_delta_fast, explore_f_followup_child, explore_f_tasks, explore_f_window_delta_child, explore_far_cue, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  code SHA F/rh_lite: ff908bdbc0b2 over 28 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_decay_child, explore_f_delta_fast, explore_f_followup_child, explore_f_tasks, explore_f_window_delta_child, explore_far_cue, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  CHECK C1 parallel = sequential over 24 cases (beta 0 / 0.5 / 1 / per token, write tied / 1, decay fixed / routed / per-channel): forward max |diff| 4.44e-16 <= 1e-10, gradients 2.22e-15 <= 1e-8: ok
+  CHECK C2 LOCAL3 S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 2.38e-06 (relative 2.4e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.49e-07, attention outputs 3.81e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 perfect S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.27e-07, attention outputs 6.68e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 single k=1 (arm B), parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 8.58e-06 (relative 5.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.19e-07, attention outputs 5.96e-07 (relative 3.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.79e-07, attention outputs 4.77e-07 (relative 3.9e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C3 oracle gate, grouped, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C4 overwrite (beta 1, L2 keys, one channel, decay 0.95, float32): ‖S k̂ − v2‖ = 1.56e-06 after (k, v1), (k, v2); 1.09e-06 with 6 other writes between; the parallel read at a later key-k position equals 0.95·v2 to 1.59e-06 / 1.46e-06; all < 1e-5: ok
+  CHECK C5 learned beta = 0.5 exactly at init (True); to_delta keeps every existing parameter (True) and adds ['attn.w_b', 'attn.b_b']: ok
+  CHECK C5 routed decay at init: alpha at g = 1 0.9500000 (0.95 to 1e-6), at g = 0 1.0 (exactly 1), at g = 0.3 / 0.7 0.98473 / 0.96473; delta0 -2.6037: ok
+  CHECK C5 GDN decay init (seed 350, k = 2): A [2.198, 13.653], dt [0.06425, 0.00468] (softplus(b_dt) recovers dt), alpha at init [0.8683, 0.9381]; w_a = 0; same seed same draw, another seed another: ok
+  CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.10GHz (50 s): ok
+  ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
+  (explore_f_delta_checks: 57 s, all passed)
+  CHECK F/premise: S68 S=4: SINGLE k=1 conv layer, delta beta 1 L2 keys; ORACLE k=4 conv, perfect gate one-hot on each position's stream (True); L = 51: ok
+  CHECK F/premise: S68 S=8: SINGLE k=1 conv layer, delta beta 1 L2 keys; ORACLE k=8 conv, perfect gate one-hot on each position's stream (True); L = 99: ok
+  CHECK F/premise: S69: FIXED (beta 0, write 1, raw keys) equals the unconverted Hebbian single channel (logits max |diff| 0.0e+00 <= 1e-5); ROUTED at init equals it too (k = 1, g = 1: alpha 0.95; 1.2e-07 <= 1e-5); the memory skips the erase (True); GDN's init equals S59's for the seed: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: every (stream, key) appears exactly once in the body: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: S distinct values per key: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: exactly one CTX per block, at its start; 4 blocks per sequence: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: block-length frequencies {1: 0.338, 2: 0.324, 3: 0.338} each within 0.03 of 0.33: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: the stream order of the blocks varies (6 distinct orders over 4096 sequences): ok
+  CHECK F/premise: S70 RandHeaderTask-lite: stream_labels = the latest CTX token's stream at every position: ok
+  CHECK F/premise: S70 RandHeaderTask-lite: L = 23 = S(NB + 2P) + 3 n_q, qpos = [21]; select reads the query's KEY position and targets its value: ok
+  CHECK F/premise: S70 RandHeaderTask-lite compositions [(1, 3), (2, 2), (3, 1)] (first block 1, 2 or 3; the remainder in the second): ok
+  CHECK F/premise: S70: HEBB and DELTA share every initial parameter (True; beta 1 adds none); DELTA memory FastDeltaMemory beta 1.0, L2 keys True; window gate on vocab 22: ok
+  CHECK F/premise: S70: the perfect gate routes perfectly (margin 1.000, eta2 by stream KEY / VAL 1.000 / 1.000): ok
+  timings measured (60 s): F/premise:S68_SINGLE_S4 49.8 ms/step, F/premise:S68_ORACLE_S4 63.6 ms/step, F/premise:S68_SINGLE_S8 100.3 ms/step, F/premise:S68_ORACLE_S8 159.1 ms/step, F/hebb_decay:S69_FIXED 23.7 ms/step, F/hebb_decay:S69_ROUTED 24.9 ms/step, F/hebb_decay:S69_GDN 28.9 ms/step, F/hebb_decay:S69_ORACLE 28.7 ms/step, F/rh_lite:S70_ORACLE_HEBB 17.0 ms/step, F/rh_lite:S70_ORACLE_DELTA 23.2 ms/step, F/rh_lite:S70_HEBB 16.4 ms/step, F/rh_lite:S70_DELTA 26.1 ms/step
+  96 runs queued; projected worst case 42.68 h of runs, makespan 10.73 h on 4 workers
+  start    0.0 min  F/premise        S68_ORACLE_S8            seed 300  (projected worst case 121 min)
+  start    0.0 min  F/premise        S68_ORACLE_S8            seed 301  (projected worst case 121 min)
+  start    0.0 min  F/premise        S68_SINGLE_S8            seed 300  (projected worst case 77 min)
+  start    0.0 min  F/premise        S68_SINGLE_S8            seed 301  (projected worst case 77 min)
+  [  1]   10.9 min  F/premise        S68_ORACLE_S8            seed 300  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520+dirty, code ff908bdbc0b2, attempt 1: acc 1.000  trans  1200  BOUND
+  start   10.9 min  F/premise        S68_SINGLE_S8            seed 302  (projected worst case 77 min)
+  [  2]   11.0 min  F/premise        S68_ORACLE_S8            seed 301  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9899520+dirty, code ff908bdbc0b2, attempt 1: acc 1.000  trans  1200  BOUND
+  start   11.0 min  F/premise        S68_SINGLE_S8            seed 303  (projected worst case 77 min)
