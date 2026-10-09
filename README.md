@@ -1,33 +1,32 @@
 # Multi-Channel Hebbian Plasticity in Multilayer BDH
 
-**Solves context-conditional binding by partitioning memory.** An early-training recipe finds the partition without restarts in most runs for two streams, and for four with spare channels; at eight streams the gate forgets the context.
+**Solves context-conditional binding by partitioning memory.** A window gate, slow memory and a targeted channel split find an eight-way partition without labels or restarts, on two machines with disjoint seeds.
 
-This repository is a research fork of Pathway's [BDH (Dragon Hatchling)](https://github.com/pathwaycom/bdh). It extends BDH's Hebbian working memory with several memory channels and a gate that spreads each token's write over the channels and blends its read from them. The research sections below follow Revision 7 (preliminary) of the project's technical report: the PDF is [`multichannel_hebbian_report_v7.pdf`](multichannel_hebbian_report_v7.pdf), with its LaTeX source alongside. Revision 6's fuller account of Phases I–IV is kept in [`docs/revision6.md`](docs/revision6.md). The original BDH README from Pathway follows the research part, [unchanged](#about-bdh-upstream-readme-from-pathway).
+This repository is a research fork of Pathway's [BDH (Dragon Hatchling)](https://github.com/pathwaycom/bdh). It extends BDH's Hebbian working memory with several memory channels and a gate that spreads each token's write over the channels and blends its read from them. The research sections below follow Revision 8 (draft) of the project's technical report: the PDF is [`multichannel_hebbian_report_v8.pdf`](multichannel_hebbian_report_v8.pdf), with its LaTeX source alongside. Revision 7's account of Phase V is kept in [`docs/revision7.md`](docs/revision7.md) and Revision 6's account of Phases I–IV in [`docs/revision6.md`](docs/revision6.md). The October 2026 audit of the project's records is [`docs/audit_2026-10.md`](docs/audit_2026-10.md); the twelve-paper review of context routing and memory is in [`docs/reading/`](docs/reading/). The original BDH README from Pathway follows the research part, [unchanged](#about-bdh-upstream-readme-from-pathway).
 
 ---
 
 ## Contents
 
 - [Summary](#summary)
-- [Status, machines and the Phase V tests](#status-machines-and-the-phase-v-tests)
+- [Status, machines and the Phase VI tests](#status-machines-and-the-phase-vi-tests)
 - [1. Background](#1-background)
 - [2. Earlier phases in brief](#2-earlier-phases-in-brief)
 - [3. The task, the outcomes and the recipes](#3-the-task-the-outcomes-and-the-recipes)
-- [4. Four streams: spare channels and an early check](#4-four-streams-spare-channels-and-an-early-check)
-- [5. Eight streams by a stream curriculum](#5-eight-streams-by-a-stream-curriculum)
-- [6. Screens: what decides the gate's first move](#6-screens-what-decides-the-gates-first-move)
-- [7. Slow memory and a hinge, confirmed](#7-slow-memory-and-a-hinge-confirmed)
-- [8. Which part of the recipe matters](#8-which-part-of-the-recipe-matters)
-- [9. The hinge is an early kick; Muon](#9-the-hinge-is-an-early-kick-muon)
-- [10. Merges with four channels](#10-merges-with-four-channels)
-- [11. Eight streams: the gate forgets the context](#11-eight-streams-the-gate-forgets-the-context)
-- [12. Distant cues](#12-distant-cues)
-- [13. Where the mechanism stands](#13-where-the-mechanism-stands)
-- [14. Retrospective](#14-retrospective)
-- [15. Methodological findings](#15-methodological-findings)
-- [16. Limitations](#16-limitations)
-- [17. Distance to a language model](#17-distance-to-a-language-model)
-- [18. Conclusion and next steps](#18-conclusion-and-next-steps)
+- [4. The window gate](#4-the-window-gate)
+- [5. The main result: `test_window_gate`](#5-the-main-result-test_window_gate)
+- [6. The split: the copy, not the reset](#6-the-split-the-copy-not-the-reset)
+- [7. Muon is not an ingredient](#7-muon-is-not-an-ingredient)
+- [8. The recurrent gate's eight-stream failure, closed](#8-the-recurrent-gates-eight-stream-failure-closed)
+- [9. Two-stream key splits](#9-two-stream-key-splits)
+- [10. Scale](#10-scale)
+- [11. Distant cues and the memory rule](#11-distant-cues-and-the-memory-rule)
+- [12. Where the mechanism stands](#12-where-the-mechanism-stands)
+- [13. Retrospective](#13-retrospective)
+- [14. Methodological findings](#14-methodological-findings)
+- [15. Limitations](#15-limitations)
+- [16. Distance to a language model](#16-distance-to-a-language-model)
+- [17. Conclusion and next steps](#17-conclusion-and-next-steps)
 - [Repository layout and how to run the tests](#repository-layout-and-how-to-run-the-tests)
 - [Provenance](#provenance)
 - [References](#references)
@@ -37,420 +36,281 @@ This repository is a research fork of Pathway's [BDH (Dragon Hatchling)](https:/
 
 ## Summary
 
-Revision 6 showed, on a context-conditional binding task, that:
-- two Hebbian memory channels with a hand-set routing bind two conflicting streams where one channel cannot;
-- a gate trained from the task loss alone finds that routing on about half of its runs;
-- a label-free restart rule made two streams reliable.
+Revision 7 left eight streams unsolved: no learned-gate run trained on all eight from the start had bound, and screens traced the failure to the gate's recurrent state, which stops carrying the context before any routing forms. This revision replaces the gate.
 
-Four streams were the open problem. Revision 7 adds Phase V: five pre-registered tests, each run on two machines, and thirteen batches of exploratory screens.
+**A window gate.** A width-3 causal convolution of the token embeddings with no recurrence was screened in the first exploratory batch, beat the recurrent gate there, and was dropped because it cannot see a distant cue. An audit of the project's records brought it back. Combined with slow memory for the first 2400 updates and a plateau-triggered *channel split* that copies the busiest channel's gate row onto the idlest, it binds eight streams with one channel per stream in **38/40** runs of a pre-registered test:
+- against 0/40 for the recurrent-gate recipe (38 vs 0 discordant pairs, p = 3.6×10⁻¹²);
+- against 15/40 for the window gate without the split (23 vs 0, p = 1.2×10⁻⁷);
+- the two machines ran disjoint seeds, so the pooled test is a test;
+- the recipe uses no labels, no restarts and no hinge; its reading, fixed before the run, was "eight streams bind without labels or restarts".
 
-**An early-training recipe finds the partition without restarts.** For the first 2400 updates the memory trains at a tenth of the gate's learning rate, and a hinge penalizes the gate when its channel choice at key positions is explained by position.
-- At two streams the recipe discovered the routing on 19/20 and 20/20 fresh seeds on the two machines, against 8/20 on each for the plain gate.
-- Slowing the memory alone beat the plain gate on both machines, and dropping the slow phase weakened the hinge on both. The hinge's gain over slow memory alone was shown on one machine (4 vs 0, p = 0.0625, on the other).
-- The recipe carried to eight keys (20/20, 17/20, beating the plain gate on both machines).
-- At four streams with sixteen channels it bound 17/20 and 18/20 without restarts, beating the plain gate on L but not on X (7 vs 2, p = 0.09).
+At four streams with sixteen channels the window gate binds 38/40 against 27/40 for the recurrent gate (13 vs 2, p = 0.004); at two streams it is within the pre-registered bound of the previous recipe, and better by two pairs.
 
-**The hinge fires rarely and early.** In screens each firing was a push on the gate hundreds of times larger than the task gradient. Switched off after update 2400, the hinge lost one of 80 screened runs.
+**The split's mechanism.** Three exploratory looks at eight streams, on 30 seeds (one of them the test's own printed control), agree that the split's row copy is its active part and that the optimizer reset bundled with it adds nothing. Two anti-collapse devices borrowed from the literature did not help: Gumbel noise on the read gate collapses routing and on the write gate worsens eight-stream merges, and a load-balancing loss changed the shape of the routing at four streams without changing its count.
 
-**Muon.** Under the Muon optimizer the recipe also works, and binds four streams sooner. A pre-registered test showed both on one machine. On the other, with the same seeds and the four-stream part cut to 12 of them, both effects pointed the same way without reaching significance.
+**Scale, Muon.** At four streams the recipe's constants survive a fourfold change of width and a doubling of depth without retuning, on ten seeds per size. Muon is not an ingredient: the recipe binds eight streams at 9/10 under either optimizer, and a pooled test of Muon's four-stream speed, shown on one machine in Revision 7, was not shown.
 
-**Eight streams remain unsolved.** No learned-gate run trained on all eight streams from the start has bound, and a curriculum over the number of streams reaches at most 15/36, mostly without one channel per stream. Screens trace the failure to the gate:
-- its recurrent state carries the stream at initialization (median decodability 0.91, chance 0.125) and loses it within the first 600–1200 updates;
-- over the same period its recurrent term grows from 0.04 to 5–7 by update 2400, while its input term stays between 0.06 and 0.34;
-- in a later screen the stream was lost, within 100 updates, in each of the seven of ten runs where the spectral radius of the gate's recurrent weights rose clearly above one.
+**Distant cues and the memory rule.** None of twelve papers reviewed carries an inferred context cue across distance without labels; our own distant-cue task remains unsolved. Screens found that a single memory channel with a delta-rule write binds the two-stream header layout by routes that need no partition (context-tagged keys at a fixed decay; a learned forget gate that partly clears at the context token), so the partition's claim is about the number of contexts: at eight streams the gated recipe binds 38/40, and no single-channel run has yet been made there.
 
-A cap on that recurrence is being screened.
+**Corrections.** Among them: the gate does not "need only one token of memory" (one at the read, two at the write), and Muon does not "bind four streams sooner".
 
-**Corrections.** Revision 7 also corrects several of our own errors, among them pooled cross-machine p-values in Revision 6 that treated the two machines as independent although they ran the same seeds.
+## Status, machines and the Phase VI tests
 
-## Status, machines and the Phase V tests
+**Revision 8 (draft).** This revision adds Phase VI: two pre-registered tests run on two machines with disjoint seeds, an audit of the project's records (`docs/audit_2026-10.md`), five exploratory batches on the side branch, three further exploratory sessions run in parallel on their own branches, and a reading of twelve papers on context routing and memory (`docs/reading/`). Two machines ran every main-line test: **X**, a cloud container on Intel Xeon hosts at 2.10 and 2.80 GHz, and **L**, an Intel i7-12650H. From the Muon-recipe test on, X and L run disjoint seeds, and the pooled claim is primary. The exploratory sessions are **E** (branch `claude/outside-ideas`, batches 1–19), and **F**, **G** and **H** (branches `claude/explore-F/G/H`); F and H ran on 2.10 GHz Xeons; E's batches ran mostly on 2.10 GHz Xeons, with batch 15's first segment, most of batch 16 (every Muon run among them) and batch 19 on 2.80 GHz hosts. Every verdict was fixed before its run and printed mechanically. The revision is a draft: E's batch 19 is running, a follow-up to F and a session G on the distant-cue task were launched after the runs reported here, and everything remains one small model on a synthetic task.
 
-Phase IV is condensed in [Section 2](#2-earlier-phases-in-brief); Revision 6 has its full account ([`docs/revision6.md`](docs/revision6.md)).
+**Table 1.** Phase VI. Main-line tests are files `test_<name>.py` whose docstring records the pre-registered design and, after the run, the result on each machine and pooled; their specifications are committed to `specs/` before the test is written. Exploratory batches and sessions write only new files on their own branches and label every output "exploratory, not a result". Appendix [Provenance](#provenance) lists the commits.
 
-Machines:
-- **X:** a cloud container. It ran every Phase V test, on two Intel Xeon hosts (2.10 and 2.80 GHz). Adam runs reproduce bit for bit across them, and X's results recorded after the stream-recipe test come from the 2.80 GHz host.
-- **L:** an Intel i7-12650H. It also ran every Phase V test.
-- **E:** a third container that runs the exploratory screens on a separate branch ([Section 6](#6-screens-what-decides-the-gates-first-move)). Its batches 2–14 ran on a 2.10 GHz Xeon, apart from two segments of batch 7. Batch 15 also runs there, after a first segment on a 2.80 GHz Xeon whose Muon runs were set aside.
-
-Every verdict is per machine. Both machines run the same seeds, so pooled counts are descriptive and carry no p-value ([Section 15](#15-methodological-findings)). L's results for four of the five tests are not yet committed to the repository; their verdicts were regenerated from L's results files with each test's own report function ([Provenance](#provenance)).
-
-Revision 7 is preliminary in three respects:
-- batch 15 is still running (its spectrum screen has finished, and we read that screen's saved records ourselves, before E's report);
-- the screens are screens, not results;
-- everything is one small model on a synthetic task.
-
-[Section 14](#14-retrospective) gives the status of Revision 6's claims and the errors made in Phase V.
-
-**Table 1. Phase V.** Each test is a file `test_<name>.py` whose docstring records its pre-registered design and, after the run, its result. Every verdict was fixed before the test ran and printed mechanically. Interpretation beyond the verdict is labelled as diagnostic or post hoc wherever it appears. The [Provenance](#provenance) section lists the commits.
-
-| test | question | verdict on X | verdict on L | § |
-|---|---|---|---|---|
-| `stream_recipe` | four streams: sixteen channels plus an early check and restarts | R1 MAJORITY; R2 NOT PRECISE; R3 SHOWN; R4 NOT SHOWN | R1 RELIABLE; R2 PRECISE; R3 SHOWN; R4 NOT SHOWN | [4](#4-four-streams-spare-channels-and-an-early-check) |
-| `stream_curriculum` | eight streams by a 2 → 4 → 8 stream curriculum | VALID; C1 NOT SHOWN; C2 MINORITY; C3 UNTESTABLE | same | [5](#5-eight-streams-by-a-stream-curriculum) |
-| `slow_start` | slow memory plus a hinge, no restarts | H0, HA, S0 SHOWN; HB, H0S NOT SHOWN | H0, HA, HB, S0, H0S SHOWN | [7](#7-slow-memory-and-a-hinge-confirmed) |
-| `recipe_scope` | does the hinge need the slow phase; the recipe on the curriculum | Q2 SHOWN; Q1, Q3, Q4, Q5 NOT SHOWN | Q2, Q3 SHOWN; Q1, Q4, Q5 NOT SHOWN | [8](#8-which-part-of-the-recipe-matters) |
-| `early_recipe` | the hinge in updates 1–2400 only; Muon | E1, E2 NOT SHOWN | E1, E2 SHOWN | [9.2](#92-the-early-recipe-test) |
-| exploratory batches 2–14 (E) | 34 screens of outside ideas and diagnostics | — | — | [6](#6-screens-what-decides-the-gates-first-move), [9](#9-the-hinge-is-an-early-kick-muon)–[12](#12-distant-cues) |
-| batch 15 (E) | the gate's recurrence at eight streams: a cap (S41), its spectrum (S42) | S41 running; S42 finished | — | [11](#11-eight-streams-the-gate-forgets-the-context) |
+| test or batch                | question                                                                                  | verdict                                                                                    |                                                                                                                                                                        § |
+|:-----------------------------|:------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| `muon_recipe` (X, L, pooled) | the early hinge window under Muon; Muon's speed at four streams and eight keys            | M1 SHOWN pooled (and on L); M2, M3 NOT SHOWN pooled; reading not met                       |                                                                                            [7](#7-muon-is-not-an-ingredient) |
+| `window_gate` (X, L, pooled) | the window gate with slow memory, no hinge, at 2, 4 and 8 streams; the split at 8         | G1, G2, G4 SHOWN pooled; G3 HOLDS; reading "eight streams bind without labels or restarts" |                                                                                            [5](#5-the-main-result-test_window_gate) |
+| batch 15 (E)                 | a cap on the recurrent gate's gain                                                        | no arm bound: not                                                                          |                                                                                  [8](#8-the-recurrent-gates-eight-stream-failure-closed) |
+| batch 16 (E)                 | the window gate with slow memory at 2, 4, 8 streams; a reservoir gate; eight-stream knobs | 20/20 at four streams; 3/10 at eight, the first ever                                   |                                                                                        [4](#4-the-window-gate) |
+| batch 17 (E)                 | the targeted split on the window gate at eight streams                                    | 9/10 vs 3/10 (6 vs 0, *p* = 0.031)                                                     |                                                                                        [4](#4-the-window-gate) |
+| batch 18 (E)                 | reset-only control; Muon; the split at *k* = 4; two-stream key splits                     | copy does the work; recipe carries to Muon; key splits unresolved                          | [6](#6-the-split-the-copy-not-the-reset), [9](#9-two-stream-key-splits) |
+| batch 19 (E)                 | width and depth                                                                           | scale-free to *N* = 1024, *D* = 128, 4 layers                                              |                                                                                         [10](#10-scale) |
+| session H                    | Gumbel noise, balance loss, reset-only at 4 and 8 streams; gate temperature               | nothing replaces the split; the copy, not the reset                                        |                                                                                          [6](#6-the-split-the-copy-not-the-reset) |
+| session F                    | delta-rule channels; learned forget gates; the header layout                              | a single delta channel binds the two-stream header layout; worse at eight streams          |                                                                                             [11](#11-distant-cues-and-the-memory-rule) |
 
 ---
 
 ## 1. Background
 
-BDH [1] stores working memory in synaptic state updated by a Hebbian rule. In its GPU form the operation is linear attention: the score between a query position *t* and a past position *s* is a content match $x_t \cdot x_s$ between sparse positive neuron activations, weighted by a positional operator (scalar decay or RoPE). The public implementation, `bdh.py`, ties queries to keys (Q = K), shares weights across layers, and LayerNorms the attention output.
+BDH \[1\] stores working memory in synaptic state updated by a Hebbian rule. In its GPU form the operation is linear attention: the score between a query position *t* and a past position *s* is a content match $x_t \cdot x_s$ between sparse positive neuron activations, weighted by a positional operator (scalar decay or RoPE). The public implementation, `bdh.py`, ties queries to keys (Q = K), shares one layer's weights across depth, and LayerNorms the attention output. Its state update, in the paper's notation, is $\rho_{t} = \rho_{t-1} + \mathrm{LN}(E y_{t})\, x_{t}^{\top} U$: a pure additive write.
 
 The extension gives every synapse *k* channels and every token a gate $g_t \in \Delta^{k-1}$ that distributes its write over the channels and blends its read from them. With one distribution for both, the effective score becomes
 
 $$
-\underbrace{(x_t \cdot x_s)}_{\text{content match}} \times \underbrace{(g_t \cdot g_s)}_{\text{context-gate match}} \qquad (1)
+\underbrace{(x_t \cdot x_s)}_{\text{content match}} \times \underbrace{(g_t \cdot g_s)}_{\text{context-gate match}} \times \mathrm{decay}^{\,t-s} \qquad (1)
 $$
 
-so tokens sharing a context can read each other's memory while tokens in different contexts are isolated. With *k* = 1 the model is single-channel BDH. The learned gate (arm `A`) is a small recurrence over the token embeddings $v_t$,
+strictly causal (*s* < *t*), so tokens sharing a context can read each other's memory while tokens in different contexts are isolated. The score is the three-factor form of Triadic Linear Attention \[3\] with g as the second key; there the second key is a learned projection of the token, here it is a routing distribution inferred from context, and the subject is its label-free discovery. With *k* = 1 the model is single-channel BDH. One gate $g_t$ is computed per token from the raw token embedding $v_t$ (not LayerNormed, not convolved, not the residual stream) and applied at every layer. The hand-set *perfect gate* sends every token of stream *s* to channel *s*; it is used only as a validity ceiling.
+
+**Two learned gates.** The *recurrent gate* of Phases II–V,
 
 $$
 h_t = \tanh\bigl(W_{\mathrm{in}}\,v_t + W_h\,h_{t-1}\bigr), \qquad g_t = \mathrm{softmax}(W_g\,h_t) \qquad (2)
 $$
 
-with 32 units in $h_t$. We call $W_{\mathrm{in}} v_t$ the gate's *input term* and $W_h h_{t-1}$ its *recurrent term*. The hand-set *perfect gate* sends every token of stream *s* to channel *s*.
-
-**The uniform gate is a stationary point.** Writing each gate as a deviation from uniform, $g_t = \tfrac{1}{k}\mathbf{1} + \delta_t$ with $\sum_c \delta_t[c] = 0$,
+with 32 units in $h_t$ and $W_{\mathrm{in}}, W_h, W_g \sim \mathcal{N}(0, 0.1^2)$ (so that $\rho(W_h) \approx 0.6$ and $\sigma_{\max}(W_h) \approx 1.08$ at initialization). The *window gate* of this revision,
 
 $$
-g_t \cdot g_s  =  \tfrac{1}{k} + \delta_t \cdot \delta_s \qquad (3)
+h_t = \tanh\Bigl(W_{\mathrm{in}} \sum_{j<3} w_j \odot v_{t-j}\Bigr), \qquad g_t = \mathrm{softmax}(W_g\,h_t) \qquad (3)
 $$
 
-The constant is cancelled by the LayerNorm after attention, so routing enters only through products of deviations, and at the uniform gate the task loss exerts no first-order pull toward any routing. The recurrent gate starts almost exactly uniform; its gradient norm at step 1 is below 10⁻⁵, against about 2.6 for the rest of the model. Because the gate's output passes through a softmax, the *k* rows of the gradient into $W_g$ add up to zero, so its rank is at most *k* − 1.
+a depthwise causal convolution of width 3 over the embeddings (weights drawn uniformly in $\pm 1/\sqrt{3}$, no bias), with no recurrence. It sees the current token and the two before it, which in the grouped layout is enough to see each key's stream token at the key, the value and the query. It cannot see anything further back, and it has no notion of position.
 
-**A short causal convolution.** Since Phase IV most arms include the short convolution that Mamba and most modern linear-attention models place before their token mixer [2]: a depthwise causal filter of width 4 at every layer, initialized to the identity. It feeds the queries and the values; the residual stream and the gate's input are not convolved.
+**The uniform gate is a stationary point.** Writing each gate as a deviation from uniform, $g_t = \tfrac{1}{k}\mathbf{1} + \delta_t$, gives $g_t \cdot g_s = \tfrac{1}{k} + \delta_t \cdot \delta_s$. The constant is cancelled by the LayerNorm after attention, so routing enters only through products of deviations, and at the uniform gate the task loss exerts no first-order pull toward any routing. This is why discovery is a race between the gate's first commitment and whatever the memory learns first, and why the recipes below act in the first few thousand updates.
 
-**Two optimizers.** All main-line tests before Phase V used Adam. Phase V adds Muon [3, 4], which replaces each 2-D weight's momentum by an approximately orthogonalized version (five Newton–Schulz steps), so the size of an update does not depend on the size of the gradient. We use it on every 2-D weight and on each head slice of a 3-D weight, with Adam on the embedding, the convolution and any 1-D parameters.
+**A short causal convolution.** Most arms include the short convolution that Mamba and most linear-attention models place before their token mixer \[4\]: a depthwise causal filter of width 4 at every layer, initialized to the identity, feeding the queries and the values. In the two-stream configuration without it, the perfect gate failed to bind on the four seeds tried in batch 18 and session H, while session F found it binding 10/10 on ten other seeds: seed-dependent, which is itself a sign that the convolution carries part of the binding, not only the gate's input.
 
 ## 2. Earlier phases in brief
 
-**Phases I–III (Revisions 1–5).** A gate that was a function of token identity could not express the routing (Phase I). A recurrent gate could, and separated two streams (Phase II). On the binding task of Section [3](#3-the-task-the-outcomes-and-the-recipes), two channels with the perfect gate bind two streams where no single-channel model binds, and a label-free learned gate finds the routing on about half its runs, beating every single-channel reference on both machines (Phase III).
+**Phases I–IV (Revisions 1–6).** A gate that was a function of token identity could not express the routing (Phase I); a recurrent gate could (Phase II). On the binding task of Section [3](#3-the-task-the-outcomes-and-the-recipes), two channels with the perfect gate bind two streams where no single-channel model binds, and a label-free learned gate finds the routing on about half its runs (Phase III). A restart rule made two streams reliable; four streams with four channels mostly failed by merging streams into a shared channel, and spare channels removed most merges (Phase IV).
 
-**Phase IV (Revision 6).** Ten pre-registered tests, each on both machines. A readout from the gate's state into the residual stream harms the gate through its gradient. At two streams, more channels did not raise the gate's rate, but a restart rule that reads only held-out accuracy at step 2400 succeeded in 60/60 trials. A short convolution does not replace the gate at the working learning rate 10⁻³ (one channel 7/80, gate 51/80). At 4×10⁻³, though, one channel with the convolution binds 34/80, by carrying the context to the value position through its lag-2 weight. With eight keys per stream the gate binds from scratch in 49/70 runs at 10⁻³, while one channel with the same fast-weight memory and 1.8 times the parameters binds 0/24: the advantage is the partition, not the memory. With four streams and four channels the gate bound 14/40, mostly failing by merging streams into a shared channel; eight or sixteen channels removed most merges. What remained was an early commitment to a split by something other than the stream.
+**Phase V (Revision 7).** An early-training recipe replaced restarts at two streams and at four with sixteen channels: for the first 2400 updates the memory trains at a tenth of the gate's rate (**SLOW**), and a hinge penalizes the gate when its channel choice at key positions is explained by position (**HINGE**; **WINDOW** switches the hinge off after update 2400). Eight streams failed in every arm (none of more than 100 runs), and screens located the failure in the recurrent gate: its state carries the stream at initialization and loses it within the first 600–1200 updates, as its recurrent term grows and, in seven of ten runs, the spectral radius of $W_h$ rises above one. Revision 7 ended with a cap on that recurrence being screened.
 
 ## 3. The task, the outcomes and the recipes
 
-**Task.** There are *S* streams, each with a context token $\mathrm{CTX}_s$. For each of *P* keys, *S* distinct values are drawn from 16 value tokens, so every key is bound to a different value in every stream. In the *grouped* layout the body is *S·P* triples $[\mathrm{CTX}_s, \mathrm{KEY}_i, \mathrm{VAL}_{i,s}]$, grouped by key, with keys in random order and stream order random within each key's group; every key is immediately preceded by its own stream's token. One query $[\mathrm{CTX}_q, \mathrm{KEY}_q, ?]$ ends the sequence. Chance among values is 1/16; a model that binds keys to values but cannot tell streams apart scores 1/S. The *header* layout, used only in screens, gives each stream one block that starts with its context token, so most items are far from it. The model has three layers, decay 0.95, *N* = 256, embedding width 32 and one head, and trains at batch 32 for at most a budget set per test, usually 24,000 or 28,800 steps, with evaluation every 1200 steps on 2048 held-out queries; a run stops early after three consecutive evaluations at or above 0.95.
+**Task.** There are *S* streams, each with a context token $\mathrm{CTX}_s$. For each of *P* keys, *S* distinct values are drawn from 16 value tokens, so every key is bound to a different value in every stream. In the *grouped* layout the body is *S* *P* triples $[\mathrm{CTX}_s, \mathrm{KEY}_i, \mathrm{VAL}_{i,s}]$, grouped by key, keys in random order and stream order random within each key's group. One query $[\mathrm{CTX}_q, \mathrm{KEY}_q, ?]$ ends the sequence; the model predicts the value from the query's KEY position, where $\mathrm{CTX}_q$ is one token back. The write that must carry the stream is at the VAL position, where CTX is two tokens back. Chance among values is 1/16; a model that binds keys to values but cannot tell streams apart scores 1/S. The *header* layout, used in screens, gives each stream one block $[\mathrm{CTX}_s, \mathrm{KEY}, \mathrm{VAL}, \mathrm{KEY}, \mathrm{VAL}, \ldots]$ with the stream token once at the start, so most writes are far from their cue. The model has three layers, decay 0.95 (half-life about 14 tokens), *N* = 256, embedding width 32 and one head, and trains at batch 32 for a budget set per test (24,000, 28,800 or 43,200 updates), with evaluation every 1200 updates on 2048 held-out queries; a run stops early after three consecutive evaluations at or above 0.95.
 
 **Outcomes.**
 
-- **Bound:** an evaluation reaches 0.95 and every later one stays there; the *transition* is the first such step.
+- **Bound:** an evaluation reaches 0.95 and every later one stays there; the *transition* is the first such step. A run that reaches its budget counts as bound on a single final evaluation; this has happened in 11 of 1028 bound runs in the project's records.
 
 - **Discovered** (*k* = *S* = 2): bound, with the streams' read gates separated at value positions.
 
-- **Bound routed** (*k* ≥ *S* > 2): bound, every stream has its own channel (a one-to-one *stream-to-channel map*), and every stream's accuracy is at least 0.9. At *S* = 4, *k* = 4 the memory occasionally binds without the partition (one screened run bound with all four streams on one channel), so routing, not binding, is the outcome that counts there.
+- **Bound routed** (*k* ≥ *S* > 2): bound, every stream has its own channel (a one-to-one *stream-to-channel map*, measured at value positions, where the writes are), and every stream's accuracy is at least 0.9.
 
-- **Failure classes:** POSITION or KEY when the gate's channel choice at key positions is explained (η² ≥ 0.5) by position (triple index or sequence half) or by key identity; STREAM-PARTIAL; OTHER. For *S* > 2: MERGED (j share) when j streams share a channel, non-stream when the gate does not split by stream, *collapsed* when final accuracy is below 0.15.
-
-- **ROUTED\*** (screens): routing margin at least 0.9 and the gate's η² by stream above 0.9, measured at a given step.
+- **Failure classes:** POSITION or KEY when the gate's channel choice at key positions is explained (η² ≥ 0.5) by position or by key identity; STREAM-PARTIAL; OTHER. For *S* > 2: MERGED (j share) when j streams share a channel, non-stream when the gate does not split by stream, *collapsed* when final accuracy is below 0.15.
 
 **Recipes.**
 
-- **SLOW:** one Adam optimizer with two groups. The gate ($W_{\mathrm{in}}$, $W_h$, $W_g$) trains at 10⁻³ throughout; every other parameter, embedding and convolution included, at 10⁻⁴ for updates 1–2400 and 10⁻³ after.
+- **SLOW:** one Adam optimizer with two groups. The gate's parameters train at 10⁻³ throughout; every other parameter, embedding and convolution included, at 10⁻⁴ for updates 1–2400 and 10⁻³ after.
 
-- **HINGE:** SLOW plus $1.0 \times [\mathrm{relu}(\eta^2_{\mathrm{index}} - 0.2) + \mathrm{relu}(\eta^2_{\mathrm{half}} - 0.2)]$, where the η² terms measure how much of the read gate's variance at key positions is explained by triple index and by sequence half, on each training batch, pooled over channels. Its gradient reaches the gate and the embedding. It uses no stream labels, but it needs to know where the key positions are. We say the hinge *fires* on a batch when a term is above zero.
+- **HINGE, WINDOW:** Revision 7's position hinge, on the recurrent gate; kept here only as the comparison.
 
-- **WINDOW:** the hinge with weight 1 on updates 1–2400 and 0 after.
+- **SPLIT (KEYMASS):** at checks every 2400 updates from 4800, on a fixed 64-sequence probe, if the probe's accuracy is below 0.95 and rose by less than 0.02 since the previous check, copy the gate row $W_g[c^*]$ of the channel with the largest mean read-gate mass at key positions onto the row $W_g[c_0]$ of the channel with the smallest, add noise of 0.1 times the row's standard deviation to both, and zero $W_g$'s Adam state; at most three splits per run, at least 4800 updates apart. It uses no stream labels; it needs to know where the key positions are.
 
-- **MUON:** Muon at learning rate 0.005 on every 2-D weight (momentum 0.95, Nesterov); the gate group at 0.005 throughout, the other Muon weights at a tenth of that and the Adam groups at 10⁻⁴ for updates 1–2400, then the full rate. Of the screened rates 0.005, 0.01 and 0.02, it was the smallest, and the only one at which the perfect gate bound on both screening seeds.
+- **MUON:** Muon at learning rate 0.005 on every 2-D weight (momentum 0.95, Nesterov), with Adam on the rest, and SLOW's schedule.
 
-**Statistics.** Paired comparisons use exact McNemar tests, unpaired ones Fisher's exact test; "b vs c" gives the discordant pairs. Tests reuse seeds on purpose, so that a new arm pairs with a run recorded earlier on the same machine. Every such test first reproduces a recorded run exactly before using the file.
+**Statistics.** Paired comparisons in the main-line tests use exact one-sided McNemar tests on the discordant pairs ("b vs c"), unpaired ones Fisher's exact test; E's exploratory batches report two-sided McNemar *p*-values and session H one-sided ones, as marked where quoted; bands are RELIABLE at ≥ 90% and MAJORITY at ≥ 50% of runs, with Wilson 95% intervals. From the Muon-recipe test on, X and L run disjoint seeds (X 400–559, L 1400–1559), the pooled claim over both machines' pairs is primary and each machine's is secondary. About sixty pre-registered one-sided claims have been made per machine at $\alpha = 0.05$ over the project, so two or three false positives are expected under the global null; the conclusions that matter below are those replicated on both machines or pooled over disjoint seeds.
 
-## 4. Four streams: spare channels and an early check
+## 4. The window gate
 
-Revision 6 found, post hoc, that at four streams with spare channels a held-out accuracy of at least 0.4 at step 4800 picked binders with 38/38 precision. The stream-recipe test put that into a restart rule on fresh seeds 240–259 (*S* = 4, *P* = 4, convolution, Adam 10⁻³, up to five attempts per trial), with sixteen channels and with four as a control.
+**History.** The window gate was the first screen of the first exploratory batch (S1, batch 1): on seeds 160–179 with plain Adam and no recipe it discovered 15/20 against the recurrent gate's 7/20 and bound faster; its five failures were four key splits and one run routed but not bound (it cannot position-split, having no position). Batch 2 ran it on the header layout, where it bound 2/10, both by key splits, and it was dropped: a gate that cannot see a cue three tokens back seemed the wrong direction for a language model. It was never combined with slow memory and never run at four or eight streams. The October audit of the project's records (`docs/audit_2026-10.md`, Section 3.1) noticed that every obstacle of Phase V was a property of the recurrent parameterization: position splits are the recurrence counting triples, and the eight-stream loss of the stream is the recurrence becoming expansive. A window gate can do neither. The audit fixed a prediction before any run: with slow memory, at two streams ≥ 36/40 with key failures gone; at eight streams, binding on some seeds where every recurrent arm bound none.
 
-**Table 2.** The stream-recipe test. R1 (the recipe is reliable): MAJORITY on X (17/20), RELIABLE on L (19/20). R2 (the check is precise, at least 0.9 of passing attempts bind): NOT PRECISE on X (17/20, 0.85), PRECISE on L (19/19). R3 (spare channels make restarts work, `A4k16_R` vs `A4k4_R`): SHOWN on both (Fisher *p* = 0.020 on X, 2×10⁻⁴ on L). R4 (spare channels alone, on fresh seeds): NOT SHOWN on both (5 vs 3, *p* = 0.36; 8 vs 4, *p* = 0.19).
+**Batch 16 (E).** The window gate with SLOW and no hinge (`LOCAL3_SLOW`): at two streams 31/40 on seeds 160–199 (STREAM-PARTIAL 5, KEY 4, no POSITION), inconclusive against the hinge recipe's 34/40 (5 vs 8). At four streams with sixteen channels, 20/20 bound routed against X's recorded `HINGE4k16` 15/20 (5 vs 0, two-sided *p* = 0.0625). At eight streams, 3/10 under Adam and 3/10 under Muon, where every recurrent arm in batches 13–16 had bound 0/10; the seven unbound Adam runs ended with two or three streams sharing a channel at accuracy 0.73–0.88. The window gate's state decodes the stream at both key and value positions (1.00 at four streams from update 4800; at eight, 0.93–1.00 under Muon and, under Adam, 0.55–0.67 at updates 2400–4800 recovering to 0.87–0.88 by 9600), where the recurrent gate's reads 0.14–0.28. So the audit's first prediction was partly met (no position failures; key failures reduced, not gone, and 31/40 short of 36), and its second was met.
 
-| bound, of 20                      |  X   |  L   |  both   |
-|:----------------------------------|:----:|:----:|:-------:|
-| `A4k16`, *k* = 16, plain          | 12 | 9  | 21/40 |
-| `A4k16_R`, *k* = 16, restart rule | 17 | 19 | 36/40 |
-| `A4k4`, *k* = 4, plain            | 10 | 5  | 15/40 |
-| `A4k4_R`, *k* = 4, restart rule   | 10 | 8  | 18/40 |
-| perfect gate, *k* = 16 (of 3)     | 3  | 3  |  6/6  |
+**Batch 17 (E).** The failures at eight streams were merges, so batch 17 added the targeted split of Section [3](#3-the-task-the-outcomes-and-the-recipes) (S37's KEYMASS rule, at most three splits). `W_SPLIT` bound routed 9/10 against 3/10 for the same seeds without it (6 vs 0, two-sided *p* = 0.031); every one of its 19 splits was on target by the labels (the busy channel held two to five streams, the idle one none), and in six of nine bound runs the transition came at the evaluation right after the last split. Decay 0.98 alone bound 1/10 (it settled the merges early) and a longer budget alone 4/10: the splits, not the decay or the time, do the work. The screen handed `W_SPLIT` back for a pre-registered test.
 
-The check works only with spare channels. At *k* = 4 every attempt that passed the check and then failed was a merge (9 of 9 on X, 12 of 12 on L), because a run with two streams sharing a channel already reaches about 0.75, and one with three about 0.5. On X the three passing attempts that failed at *k* = 16 were also merges. With restarts, four streams bind on 36 of 40 runs. Part 2 looked at eight streams descriptively on L: the perfect gate bound 2/2, and the restart arm 0/5, with all 25 attempts at 0.06–0.09 at step 4800 (X dropped Part 2 under its time rule).
+## 5. The main result: `test_window_gate`
 
-## 5. Eight streams by a stream curriculum
+The test's specification was committed before the test was written (`specs/test_window_gate.md`) and amended, before any Part D run, to add the split. Both machines ran it on their own seeds (X 500–559, L 1500–1559). Part A (*S* = 2, *P* = 4, *k* = 2, no convolution, 24,000 updates, 40 seeds per machine): the window gate with one learning rate (`WIN3`), with slow memory (`WIN3_SLOW`), and the recurrent-gate recipe (`HINGE0`). Part B (*S* = 4, *P* = 4, *k* = 16, convolution, 28,800, 20 seeds): `WIN3_SLOW16` against `WIN16_A`, the recurrent gate under Adam with the early hinge window. Parts C and D (*S* = 8, *P* = 4, *k* = 16, convolution, 43,200, 20 seeds): `WIN3_SLOW_D8`, `HINGE_D8` (the recurrent recipe) and `WIN3_SPLIT_D8` (the window gate with the split), with a reset-only control (`WIN3_RESET_D8`: the Adam-state reset at the same trigger, no copy) on five seeds per machine, printed and not claimed. The perfect gate on two seeds per part was the validity arm, and bound on every one (Part C at 4800 and 3600–6000). Every CHECK passed on X, including bit-for-bit reproductions of batch 1's window gate, batch 16's `LOCAL3_SLOW` and batch 17's `W_SPLIT` (its split at 4800 included); L's file carries the metadata the test writes only after its verification passes. Nothing was cut; X ran its 225 learned-gate records in 30.9 h of training (its six perfect-gate records came from an earlier start that a container restart ended), L its 231 records in one start (projected 17.3 h).
 
-From scratch, eight streams (*S* = 8, *P* = 4, *k* = 16, convolution, 99 tokens) did not bind. The stream-curriculum test trained on 2 of the 8 streams per sequence for updates 1–4800, on 4 for 4801–9600, then on all 8, at 10⁻³ with one optimizer throughout. Arms: `SC8` (curriculum), `SC8_R` (curriculum with a restart rule on two-stream accuracy at step 2400), `D8` (all eight from step 1), and a perfect-gate validity arm. On X a time rule cut `D8` to seeds 260–265 and the curriculum arms to 260–275; L ran 260–269 and 260–279.
+**Table 2.** `test_window_gate`. Pooled claims (primary, exact one-sided McNemar over both machines' pairs): G1, `WIN3_SLOW16` beats `WIN16_A`: 13 vs 2 (X 5 vs 1, L 8 vs 1), *p* = 0.0037, SHOWN. G2, `WIN3_SPLIT_D8` beats `HINGE_D8`: 38 vs 0, *p* = 3.6×10⁻¹², SHOWN. G3, `WIN3_SLOW` not worse than `HINGE0` by more than two discordant pairs: `HINGE0` only 9, `WIN3_SLOW` only 11, *d* = -2, HOLDS (a bound, no *p*-value). G4, `WIN3_SPLIT_D8` beats `WIN3_SLOW_D8`: 23 vs 0 (X 12 vs 0, L 11 vs 0), *p* = 1.2×10⁻⁷, SHOWN. Per machine every claim is SHOWN or HOLDS on both, except G1 on X (5 vs 1, *p* = 0.11; on L 8 vs 1, *p* = 0.020). Bands, pooled: `WIN3_SPLIT_D8` RELIABLE, Wilson [0.835, 0.986]; `WIN3_SLOW16` RELIABLE [0.835, 0.986]; `WIN3_SLOW` MAJORITY [0.770, 0.921]; `WIN3_SLOW_D8` MINORITY [0.242, 0.530]; `HINGE_D8` NEVER [0, 0.088]. The pre-registered reading, "eight streams bind without labels or restarts" (`WIN3_SPLIT_D8` RELIABLE pooled and G2, G4 SHOWN), applies.
 
-Both machines were VALID (the perfect gate bound 3/3 on each). C1 (the curriculum beats training from scratch) was NOT SHOWN on either: `SC8` bound 6/16 on X and 4/20 on L, `D8` 0/6 and 0/10 (3 vs 0, *p* = 0.125; 2 vs 0, *p* = 0.25). C2 was MINORITY on both (`SC8_R` 7/16, 5/20), and C3 UNTESTABLE on both, because no run was routed at step 4800. No `D8` run bound: all of X's six and eight of L's ten ended below 0.15, and L's other two near 0.2, with streams merged four or three to a channel. On X every curriculum binder bound at step 10,800 or 12,000, soon after the switch to eight streams, and three of its binders had no one-to-one map. Pooled over both machines (descriptively), `SC8`'s failures were 8 collapses onto one channel, all position splits, and 18 merges.
+| part                                     | arm                                     |    X    |    L    |      pooled      |
+|:-----------------------------------------|:----------------------------------------|:-------:|:-------:|:----------------:|
+| A: *S*=2, *P*=4, *k*=2, discovered | `WIN3`                                  | 33/40 | 32/40 |     65/80      |
+|                                          | `WIN3_SLOW`                             | 33/40 | 36/40 |     69/80      |
+|                                          | `HINGE0` (recurrent, Rev. 7's recipe)   | 33/40 | 34/40 |     67/80      |
+| B: *S*=4, *k*=16, bound routed       | `WIN3_SLOW16`                           | 19/20 | 19/20 |     38/40      |
+|                                          | `WIN16_A` (recurrent, early window)     | 15/20 | 12/20 |     27/40      |
+| C, D: *S*=8, *k*=16, bound routed    | `WIN3_SPLIT_D8` (the recipe)            | 18/20 | 20/20 | **38/40** |
+|                                          | `WIN3_SLOW_D8` (no split)               | 6/20  | 9/20  |     15/40      |
+|                                          | `HINGE_D8` (recurrent, Rev. 7's recipe) | 0/20  | 0/20  |      0/40      |
+|                                          | `WIN3_RESET_D8` (control, of 5)         |  0/5  |  3/5  |      3/10      |
+|                                          | perfect gate (of 2)                     |  2/2  |  2/2  |      4/4       |
 
-## 6. Screens: what decides the gate's first move
+**What the runs show (diagnostics, not claims).** The recurrent-gate recipe bound none of 40 eight-stream runs (15 collapsed, 17 non-stream, 8 merged). The window gate alone bound 15/40, and every one of its 25 failures was a merge of two, three or four streams on one channel. The split raised that to 38/40: the trigger fired 85 splits in 40 runs (none to three per run), every target labelled on target, and brought the median time to bind forward (X: 21,600 against 27,600; L: 18,600 against 32,400; medians over bound runs). The two failures (X's seeds 555 and 556) ended with two streams sharing a channel. The reset-only control matched the window gate without the split seed for seed on L (3/5 and 3/5, 0 vs 0 discordant) and bound 0/5 against 1/5 on X: on these seeds the row copy, not the Adam reset, made the difference (Section [6](#6-the-split-the-copy-not-the-reset)). At four streams, `WIN3_SLOW16`'s two failures were one unrouted bind (X) and one merge (L); `WIN16_A`'s thirteen were four position splits, three merges, four unrouted binds and two others. At two streams no arm failed by position; `WIN3`'s failures were key splits (12 of 15), `WIN3_SLOW`'s key splits and partial streams (6 and 5 of 11), and `HINGE0`'s key splits (10 of 13), with two OTHER and one partial. Slow memory on the window gate at two streams is printed, not claimed: 69/80 against 65/80 (7 vs 3, *p* = 0.17).
 
-A separate session screens ideas on its own branch, writes only new files, and labels every output "exploratory, not a result". A promising screen returns to the main line for a pre-registered test. Most screens in batches 2–9 asked how to move the gate's first commitment toward the stream at two streams, four keys, *k* = 2, without the convolution, on seeds 160–199 (Table 3); others looked at distant cues (Section [12](#12-distant-cues)) and at merges (Section [10](#10-merges-with-four-channels)). Each arm is paired by seed with X's recorded arm `A`, or with an earlier screen. A typical rule, fixed before the run, called a screen promising if it won at least 4 more discordant pairs than its comparison with McNemar *p* < 0.1.
+**What is and is not established.** The result is a pre-registered, two-machine, disjoint-seed test of a recipe that uses no stream labels, no restarts and no hinge, and that finds an eight-way partition of the memory with one channel per stream in 38 of 40 runs where the previous recipe found none. The split needs to know where the key positions are (as the hinge did); the window gate needs the cue within two tokens; and the task is the grouped layout, where it is. Neither limitation is new. The audit's over-prediction for two streams ("≥ 36/40 with KEY failures gone") was not met on X (33/40) and KEY failures were reduced, not removed; what was claimed, G3, holds.
 
-**Table 3.** Two-stream screens on seeds 160–199 (Adam, 10⁻³, no convolution); 20-seed screens use 160–179. ᵃS5 on 160–179 was inconclusive, S7 on 180–199 promising; pooled here, with no verdict on the pool. ᵇRun on the 20 seeds where the hinge fired; "a kick of that size suffices" by its rule (≥ 12/20), on the boundary. The untimed kick and the gate noise were each compared with SLOW by their rules (27 vs 24 of 40, inconclusive) and with HINGE as printed.
+## 6. The split: the copy, not the reset
 
-| screen                 | change                                                           | discovered |      comparison       | verdict          |
-|:-----------------------|:-----------------------------------------------------------------|:----------:|:---------------------:|:-----------------|
-| `A` (X, recorded)      | —                                                                |  12/40   |           —           | —                |
-| kWTA warm-up (S4)      | sparse codes in the memory for 2400 updates                      |   7/20   |      `A` 7/20       | not              |
-| slow memory (S5, S7)   | SLOW                                                             |  24/40   | `A` 12/40; 15 vs 3  | —ᵃ          |
-| gate reset (S11)       | reset the gate if position or key explains it at 1200            |  10/20   |  `A` 7/20; 3 vs 0   | inconclusive     |
-| position penalty (S12) | SLOW + a linear penalty on η² by position                  |  15/20   |  `A` 7/20; 9 vs 1   | promising        |
-| hinge (S13)            | HINGE                                                            |  34/40   | SLOW 24/40; 10 vs 0 | promising        |
-| random kick (S16)      | a random push of the hinge's size, on the batches where it fires |  12/20   | HINGE 14/20; 1 vs 3 | "suffices"ᵇ |
-| untimed kick (S20)     | one random push at update 120                                    |  27/40   | HINGE 34/40; 0 vs 7 | inconclusive     |
-| gate noise (S26)       | SLOW + decaying Gaussian noise on the gate                       |  27/40   | HINGE 34/40; 0 vs 7 | inconclusive     |
+The split bundles two actions, a row copy and an optimizer-state reset, and Revision 7's screens had no reset-only control (audit, Section 2.3). Phase VI ran four looks at it, on disjoint seeds and with two different implementations of the reset.
 
-Two observations from batches 1–4 shaped the rest. First, routing at step 1200 predicts routing at the end (first seen in batch 1), though not binding. Sparse codes in the memory made the gate route early (ROUTED\* at 1200 in 15/20 against 6/20) without making it bind, and slowing the memory moved the first commitment toward the stream (23/40 against 11/40 routed at 1200). We read early training as a race between the gate finding the stream split and the memory exploiting a non-stream one. Second, slowing the memory left the gate's failures as position splits (11 of 16 failures over seeds 160–199). The hinge targets exactly those, and it removed them: on the same seeds it discovered on 10 seeds where slow memory alone did not, and on none where it lost.
+**Table 3.** The split's two actions. In the eight-stream looks the reset-only arm fired under the live rule (S58b, the test's control) or at the recorded split updates (S50), on targets labelled on target where labelling was recorded (S58b, X's control), and, where a no-intervention arm exists (S50, the test's control), bound no more often than it. At four streams with sixteen channels nothing is needed, so S58 cannot tell the actions apart.
 
-The hinge acts rarely. It never fired on 20 of 40 seeds, whose runs are bit-identical to slow memory alone; where it fired, it usually did so on 1–3 of the roughly 5000 batches before binding. A random push of the same size on the same batches did most of what the hinge does (12/20 against 14/20), and a single random push at a fixed update did not (27/40 against 34/40, 0 vs 7). Timing appears to do most of the work; whether the hinge's direction adds anything was not resolved (the random push against the hinge was 1 vs 3, *p* = 0.63; Section [9](#9-the-hinge-is-an-early-kick-muon)).
+| where                 | configuration                                                                           |  split  | reset only | discordant, *p*                                     |
+|:----------------------|:----------------------------------------------------------------------------------------|:-------:|:----------:|:----------------------------------------------------|
+| batch 18, S50 (E)     | *S*=8, *k*=16, 260–269; the Adam-state reset replayed at the recorded split updates | 9/10  |   2/10   | 8 vs 1, two-sided *p* = 0.039                         |
+| session H, S58b       | *S*=8, *k*=16, 460–469; live trigger                                                | 10/10 |   2/10   | 8 vs 0, one-sided *p* = 0.0039                        |
+| `window_gate` control | *S*=8, *k*=16, 540–544 and 1540–1544; live trigger                                  |    —    |   3/10   | vs no split 4/10 on the same seeds, 0 vs 1        |
+| session H, S58        | *S*=4, *k*=16, 420–459                                                              | 39/40 |  39/40   | 0 vs 0; uninformative (no split needed: NONE 38/40) |
 
-## 7. Slow memory and a hinge, confirmed
+Pooled over the two ten-seed screens, which differ in budget and in how the reset was applied, 19/20 against 4/20. The copy puts the idle channel's gate logits in a near-tie with the busy channel's, so the next gradient step can separate two merged streams; a reset leaves the idle channel where it was. "The copy, not the reset" remains printed, not claimed; it will be a pre-registered claim in the next main-line test.
 
-The slow-start test confirmed the recipe on fresh seeds and carried it to the working configurations, with no restarts. Part 0 ran arm `A`, SLOW and HINGE at two streams, in the screens' configuration on fresh seeds 280–299. Parts A and B added the hinge to recorded runs: eight keys (`DIRECT8`, *S* = 2, *P* = 8, convolution, seeds 220–239), and four streams with sixteen channels (`A4k16`, seeds 240–259). Part C looked at eight streams descriptively.
+**What does not replace it (session H).** Two devices the literature uses against router collapse were run beside the split and the reset at four streams, *k* = 16 (40 paired seeds), where every arm but one sat at the ceiling (NONE 38/40) and no reading could apply; a rule fixed beforehand then carried the two best-scoring arms, which were the reset and write-gate noise, to eight streams (10 seeds). Gumbel(0,1) noise on the gate's logits during training, Raven's sole anti-collapse device \[13\]: on both the read and write gates it collapsed routing even at four streams (33 of 40 runs merged), consistent with our read being routed where Raven's is dense; on the write gate alone it bound 37/40 at four streams with a later transition (median 6000 against 3600) and a lower margin, and at eight streams it made the merges worse (0/10, with up to six streams sharing a channel; 10 vs 0 against the split). A Switch-style balance loss, as Mixture-of-Memories uses \[12, 17\]: 36/40 at four streams, routed by stream, but in 34 of those 36 runs the streams were mapped to different channels at key positions than at value positions and the routing margin fell from 0.87 to 0.46; it changed the routing's shape, not its count, and was not carried to eight streams. At two streams (*k* = 2, no convolution, ten seeds), a learned gate temperature with a floor ran to the floor in every run, and a stable-max softmax changed nothing: the gate wants to be sharper, not softer, and in those runs a saturated gate marked a committed wrong partition, not a plateau before binding.
 
-**Table 4.** The slow-start test (no restarts). On X: H0 (`HINGE0` beats `A0`) SHOWN, 11 vs 0, *p* = 5×10⁻⁴; HA (`HINGE8` beats `DIRECT8`) SHOWN, 7 vs 0, *p* = 0.008; HB (`HINGE4k16` beats `A4k16`) NOT SHOWN, 7 vs 2, *p* = 0.09; S0 (`SLOW0` beats `A0`) SHOWN, 9 vs 2, *p* = 0.033; H0S (`HINGE0` beats `SLOW0`) NOT SHOWN, 4 vs 0, *p* = 0.0625. On L all five SHOWN: 12 vs 0, *p* = 2×10⁻⁴; 5 vs 0, *p* = 0.031; 11 vs 2, *p* = 0.011; 10 vs 3, *p* = 0.046; 5 vs 0, *p* = 0.031. Bands: `HINGE0` RELIABLE on both; `HINGE8` RELIABLE on X, MAJORITY on L; `HINGE4k16` MAJORITY on X, RELIABLE on L. Part C: 4 of 10 `HINGE_D8` runs collapsed on each machine, so its reading was "it does not" (prevent the collapse).
+**A guard the split needs at *k* = *S*.** With no spare channel (batch 18, S51, *S* = *k* = 4), the trigger once fired on a correctly routed map, found no empty channel, overwrote a live one and merged the run; in seven of its eight bound runs it never fired. Spare channels remain the default (Phase IV), and the trigger should not fire when its target channel already carries key mass.
 
-| part                                 | arm                  |    X    |    L    |  both   |
-|:-------------------------------------|:---------------------|:-------:|:-------:|:-------:|
-| 0: *S*=2, *P*=4, discovered      | `A0`, arm `A`        | 8/20  | 8/20  | 16/40 |
-|                                      | `SLOW0`              | 15/20 | 15/20 | 30/40 |
-|                                      | `HINGE0`             | 19/20 | 20/20 | 39/40 |
-| A: *S*=2, *P*=8, bound           | `DIRECT8` (recorded) | 13/20 | 12/20 | 25/40 |
-|                                      | `HINGE8`             | 20/20 | 17/20 | 37/40 |
-| B: *S*=4, *P*=4, *k*=16, bound | `A4k16` (recorded)   | 12/20 | 9/20  | 21/40 |
-|                                      | `HINGE4k16`          | 17/20 | 18/20 | 35/40 |
-| C: *S*=8, *k*=16, bound          | `D8` (recorded)      |  0/6  | 0/10  | 0/16  |
-|                                      | `HINGE_D8`           | 0/10  | 0/10  | 0/20  |
+## 7. Muon is not an ingredient
 
-The readings were "the screen replicates on fresh seeds" on both machines. The second reading was "it carries to eight keys only" on X and "it carries to the working configuration" on L. Over both machines a single `HINGE0` run failed (X's seed 287, an OTHER failure on which the hinge fired 950 times). Plain arm `A` failed mostly by position splits (9 of 12 failures on X, 8 of 12 on L), and SLOW alone almost only by position splits (4 of 5 on X, the fifth OTHER; 5 of 5 on L). The hinge fired rarely here too: it never fired on 11 of X's 20 `HINGE0` runs (9 of L's), and on X no run saw more than two firings in the first 2400 updates. At four streams `HINGE4k16` had no non-stream failures on X, where `A4k16` had four; it lost two of `A4k16`'s late binders, and HB missed on X by 7 vs 2. At eight streams no `HINGE_D8` run bound and four of ten collapsed on each machine, although six of ten on each ended above 0.15 (up to 0.47 on X and 0.50 on L), where X's `D8` runs ended at 0.08–0.10.
+Revision 7 reported, from one machine, that under Muon the recipe "binds four streams sooner". The Muon-recipe test (`test_muon_recipe`, the first on disjoint seeds) asked three questions. M1, the early hinge window under Muon at two streams: `WIN_M` 79/80 against `SLOW_M` 69/80 pooled, 10 vs 0, *p* = 0.001, SHOWN (on L 6 vs 0, SHOWN; on X 4 vs 0, *p* = 0.0625). M2, Muon binds four streams by update 4800 more often than Adam: 12 vs 8 pooled, *p* = 0.25, NOT SHOWN; per machine it was shown on X (7 vs 1, *p* = 0.035) and reversed on L (5 vs 7), so Revision 7's one-machine result did not replicate on the other machine's seeds. M3, the same at eight keys: 7 vs 5 over 30 pairs (X's time rule cut its Adam arm to ten seeds), *p* = 0.39, NOT SHOWN. The test's reading, "the Muon recipe is reliable at the working configurations", was not met: `WIN16_M` was MAJORITY pooled (33/40). Batch 18 then ran the window recipe with the split under Muon at eight streams: 9/10, the same as under Adam (1 vs 1), and 9/10 against a fresh Muon reference without the split at 2/10 (7 vs 0, two-sided *p* = 0.016). The eight-stream result is the recipe's, not the optimizer's. Muon's bf16 Newton–Schulz step does not reproduce across processors, which cost the project paired comparisons; nothing in the main line now needs it.
 
-## 8. Which part of the recipe matters
+## 8. The recurrent gate's eight-stream failure, closed
 
-The recipe-scope test asked whether the hinge needs the slow phase (`HONLY`: the hinge with one learning rate throughout), and whether the recipe helps the stream curriculum (`SC8_H`: the stream curriculum with HINGE, the hinge reading each stage's key positions).
+Revision 7's reading was that the recurrent gate's state stops carrying the stream when its recurrence becomes expansive, and it left a cap on that recurrence being screened. Batch 15 (S41) ran the cap at 0.5 on the spectral norm of $W_h$ under Muon, alone, with a previous-token input, and with the previous-token input and no recurrence, and the capped previous-token input under Adam: the three Muon arms bound 0/10 and the Adam arm 0/5. With the look-back the capped gate's state kept the stream at key positions throughout (decodability 0.93–1.00) and still ended with the eight streams on three to seven channels; final accuracy rose in every pair (median 0.61 against 0.37) but no run bound. Batch 16 added a frozen reservoir recurrence (0/10), decay 0.98, a tenth of the rate on $W_h$, and a higher learning rate: none bound (the perfect gate binds at decay 0.98, so the decay is valid). The window gate then bound where all of these had not. Two corrections to Revision 7 follow: the gate's state must carry the stream at the *write* position, where CTX is two tokens back, not only at the read, where it is one back, so the sentence "the gate needs only one token of memory" was wrong (the audit noted it; batch 16's S47 measured the write positions, which S38–S41 had not); and S41's no-recurrence arm, whose input is $(v_t, v_{t-1})$, cannot by construction see the stream token at value positions, so its ten key splits were a property of that window and not evidence about recurrence (audit, Section 2.3). The cap, as specified, also acted from update 1 ($\sigma_{\max}(W_h) \approx 1.08$ at initialization), not only after the crossing. The diagnosis stands as a description of the recurrent gate; the remedy was to remove the recurrence.
 
-**Table 5.** The recipe-scope test, with the recorded runs on the same seeds in parentheses. Q1 (`HONLY0` beats `A0`) NOT SHOWN on both (6 vs 2, *p* = 0.14; 6 vs 1, *p* = 0.0625). Q2 (`HINGE0` beats `HONLY0`) SHOWN on both (8 vs 1, *p* = 0.020; 7 vs 0, *p* = 0.008). Q3 (`HONLY4k16` beats `A4k16`) NOT SHOWN on X (6 vs 2, *p* = 0.14), SHOWN on L (9 vs 0, *p* = 0.002). Q4 (`HINGE4k16` beats `HONLY4k16`) NOT SHOWN on both (4 vs 3; 2 vs 2). Q5 (`SC8_H` beats `SC8`) NOT SHOWN on both (6 vs 4, *p* = 0.38; 6 vs 3, *p* = 0.25). `SC8_H` band: MAJORITY on X, MINORITY on L. Reading on both: "both parts are needed".
+## 9. Two-stream key splits
 
-|                                                              |          X           |          L          |
-|:-------------------------------------------------------------|:--------------------:|:-------------------:|
-| `HONLY0`, *S*=2, discovered (`A0`; `HINGE0`)               | 12/20 (8; 19)  | 13/20 (8; 20) |
-| `HONLY4k16`, *S*=4, *k*=16, bound (`A4k16`; `HINGE4k16`) | 16/20 (12; 17) | 18/20 (9; 18) |
-| `SC8_H`, *S*=8 curriculum, bound (`SC8`)                   |     8/16 (6)     |    7/20 (4)     |
+At two streams with two channels and no convolution, the window gate fails by routing on key identity: its key splits form within the first 600 updates, while the memory is still at 10⁻⁴ (batch 17, S49). Slow memory reduces them (`WIN3` KEY 12 of 15 failures pooled; `WIN3_SLOW` KEY 6 of 11), and batch 18 screened two further devices on seeds 160–199: two spare channels (*k* = 4: 36/40, with four key splits still formed by update 325) and the hinge's key term on updates 1–2400 (36/40 discovered, one KEY failure, but three "STREAM-PARTIAL" failures at exactly η² = 0.5 by key, the signature of a hard two-of-four key pattern, which relabelled would make the reading "neither"). Neither is carried to the main line. The classifier's handling of that boundary case is to be fixed before any two-stream claim is read again. The configuration is the project's hardest relative to its size and the one with the least headroom (65–69/80 for every arm); it is also the only one where the window recipe's margin over the hinge recipe is small (two pairs pooled) and where the hinge recipe won a screen (batch 16: 34/40 against 31/40 on seeds 160–199).
 
-At two streams the hinge without the slow phase removed the position splits, but key splits took their place: `HONLY0`'s failures were 5 KEY of 8 on X and 5 of 7 on L. Slowing the memory prevents those. At sixteen channels the hinge alone did about as well as the full recipe (Q4), and on neither machine did a hinge-only run fail by a key or position split. The slow phase may matter only when channels are few; this is an observation, not a tested claim. On the eight-stream curriculum the hinge removed the collapses (X: 0 against `SC8`'s 4; L: 1 against 4), but merges took their place, and most binders bound without one channel per stream (five of X's eight, six of L's seven). On X, nine of 16 `SC8_H` gates held the eight streams in two channels of four at step 4800.
+## 10. Scale
 
-## 9. The hinge is an early kick; Muon
+Batch 19 (E, running) asked whether the recipe's constants are tuned to *N* = 256, *D* = 32, three layers. At four streams with sixteen channels (seeds 270–289, the oracle binding at every size and depth), with every constant unchanged: *N* = 512 and 1024 at *D* = 32, and *D* = 64 and 128 at *N* = 256, bound routed 10/10 each against the reference's 9/10, all with median transition 3600; 2, 4 and 6 applications of the shared layer bound 10/10, 10/10 and 9/10 against 10/10 for three, with six layers slower (median 4800). Both readings were "scale-free" by their pre-fixed rule (every *d* ≥ -1), at four streams only; with ten seeds the screen rules out a large drop, not a small one. Eight streams and larger key loads at the larger widths are running.
 
-### 9.1 Screens
+## 11. Distant cues and the memory rule
 
-The screens then asked what the hinge does, and whether the recipe survives a different optimizer.
+**What the literature holds.** Twelve papers on routing, memory and context were read in full (`docs/reading/`): the test-time-regression framework \[5\], Gated DeltaNet \[6\], the Tiny Recursive Model and recurrent-depth language models \[7, 8\], Flesch et al.'s Hebbian context gating \[9\], Active Dendrites \[10\], Context-Gated Associative Retrieval \[11\], Mixture-of-Memories \[12\], Raven \[13\], a study of content-based routing \[14\], the Hierarchical Multiscale RNN \[15\] and Nested Learning \[16\]. None of the twelve carries an inferred context cue across distance without labels: each hands the context over (a task identifier, a prototype readable off every input, a clamped context layer), carries it with softmax attention, or routes by token type. The study of content-based routing is the sharpest statement of why our header-layout runs failed: routers fed raw embeddings, recurrent summaries or pooled summaries reach 0.9–29% even with the correct route supervised, and 98–99.7% once an upstream, jointly trained mixing step has written the context into each token's representation. Flesch et al. supply the rest: a slow integrator must receive only the cue, slow integration merges interleaved contexts, and inside a block the loss exerts no pressure to use a constant cue. Our window gate reads three raw embeddings; our fading-memory gates pooled everything; our header layout is positionally solvable at fixed block length. Those are the failures the papers predict.
 
-- **Muon** (S25, seeds 160–179). Muon with SLOW and the hinge discovered 20/20, all routed at step 1200. Without SLOW and without the hinge it discovered 9/20, and all 11 failures were position splits.
+**BDH-CQ.** Pathway's follow-up \[2\] describes its memory as "linear correction rules on *S*" with linear attention as the special case $S_t = S_{t-1} + U_\theta(D_t)$, and its reasoning as $H_{r+1} = F_\theta(H_r, S_K)$ over a frozen memory; "dimensions, exact update rules, and implementation details remain proprietary". Our reading (`docs/reading/`, an inference, not a finding): in the taxonomy of \[5\] and \[16\], the rules that are affine in *S* and read *S* before writing are the delta-rule family (DeltaNet, Longhorn, Gated DeltaNet, DeltaProduct), and the loop matches the recursive-refinement models \[7, 8\], of which \[8\] explains why the frozen memory must enter every step. Neither is a distant-cue mechanism. The 97.4% Sudoku figure sometimes attached to BDH is from Pathway's blog, on internal data with an unstated protocol, and is not comparable to the Sudoku-Extreme numbers of \[7\].
 
-- **The hinge under Muon** (S32, 160–199). Without the hinge, Muon with SLOW discovered 31/40; with it, 39/40 (8 vs 0, *p* = 0.008). On every rescued seed the hinge first fired between updates 50 and 168. In both arms routing appeared between updates 600 and 900 (ROUTED\* at 900: 38/40 with the hinge, 27/40 without).
+**Session F: delta-rule channels.** Session F replaced the channel write by Gated DeltaNet's rule, $S^c_t = S^c_{t-1}\bigl(\alpha^c_t(I - g^c_t \beta_t \hat{x}_t \hat{x}_t^\top)\bigr) + g^c_t \beta_t v_t \hat{x}_t^\top$ with unit keys; at $\beta = 0$ its logits agree with the Hebbian model's to 10⁻⁷, and with the new path disabled it reproduces a recorded run bit for bit. We had predicted that a single delta channel would be the negative control the project lacks, since the rule overwrites a key's value. It was not: with $\beta = 1$ and the fixed decay, on the two-stream header layout at *P* = 4 a single delta channel bound 8/10 (Hebbian 1/10), and on the grouped layout 4/10 against 0/10; a post-hoc look at one rerun (seed 307) found the keys at the third layer tagged by stream and nearly orthogonal across streams. With a learned forget gate (Raven's routed decay, or Gated DeltaNet's) a single delta channel bound the *P* = 8 header layout 9/10 and 8/10 against 3/10 with the fixed decay, and, post hoc, had learned to partly clear its memory at the context token (median $\alpha$ of 0.18–0.26 at CTX in the first layer, 0.72–0.74 in the third, 1.00 at keys and values). Under the window gate, with a learned $\beta$, the delta rule was ahead at two streams (36/40 against the recorded 31/40 on other seeds; Fisher *p* = 0.11, a bound by the screen's rule), equal at four (20/20 against 19/20) and worse at eight (3/10 against 9/10, 0 vs 6, *p* = 0.016), where even the delta perfect gate takes 22,800–28,800 updates against 2400–4800 for Hebbian, at about three times the compute per step. A learned write strength $\beta$ collapsed toward "do not write" whenever it was the only change. The Hebbian write stays on the main line.
 
-- **An early window** (S34, 160–199). With the hinge on updates 1–2400 only, Muon discovered 38/40 against 39/40 for the full hinge (1 vs 0) and Adam 34/40 against 34/40 (0 vs 0). The one loss, a Muon seed, had needed 277 late firings.
+**What this changes.** At two streams the memory has routes to conflicting bindings that need no partition: make the key context-dependent through the stack, so that one delta memory holds both (the route Nested Learning's self-modifying key projections describe \[16\]; Gated DeltaNet itself overwrites), or clear the memory at the context switch (Gated DeltaNet's $\alpha_t \to 0$ \[6\]). So "the partition is necessary" is a claim about the number of contexts, not about two: at eight streams the gated Hebbian recipe binds 38/40, the same recipe on delta channels stalls at 3/10, and a single delta channel has not yet been run. That premise test, one delta channel at four and eight streams on the grouped task, is the next screen. If the one-seed observation of stream-tagged keys at the third layer holds up, the context *is* reaching depth in the header layout, which is what the per-layer residual-stream gate of the audit (Section 3.3) requires; Session G's first task is to probe it directly.
 
-- **Four streams under Muon** (S35, 240–259, *k* = 16). Muon with HINGE bound 17/20, the same as X's `HINGE4k16`, with 15 runs bound by update 2400. X's transitions ranged from 3600 to 21,600.
+**The distant-cue task.** A header layout with random block lengths and eight keys per stream exceeded the oracle's budget (neither perfect gate bound within 24,000 updates), so Session G has no baseline from it yet; a lighter version with four keys per stream is the next step. What a distant-cue test needs is now clear: random block lengths (so that position cannot route), a budget the oracle meets, and routing reported at write positions, so that "bound" is not mistaken for "routed".
 
-**What a firing does.** At a firing, the hinge's gradient on the gate was a median 850 times the task gradient under Muon and 726 times under Adam (S34). Under Muon the gate's momentum stayed aligned with that push (cosine at least 0.5) for a median of 59 updates; because Muon's step size does not depend on the gradient's size, the gate moves in the hinge's direction for that stretch. Under Adam a gradient far above its running average gives a sign-like full step. Either way a firing is a large, directional push on the gate, delivered early: the first firings came at updates 50–168, and no run was routed at update 300 or 600 (S32), so the gate was presumably still near the uniform stationary point of equation (3). A batch 7 screen had measured Adam's second moment for $W_g$ rising by a factor of 10⁷ or more at a firing, and we had suggested that this then froze the gate. Muon has no second moment and the hinge still works, so the freeze is not needed.
+## 12. Where the mechanism stands
 
-### 9.2 The early-recipe test
+**Table 4.** The main configurations in `test_window_gate` (pooled over X and L, disjoint seeds; bound routed, or discovered at *S* = 2). ʷWith the early hinge window (`WIN16_A`); Revision 7's full-hinge arm bound 35/40 on shared seeds, with routing recorded only on X (15/20). ᵉSession H's S58, exploratory, 40 seeds. The one-channel column is Phase III's; one channel has not been run at four or eight streams on the grouped layout.
 
-The early-recipe test tested two screened findings on fresh seeds. Part A (*S* = 2, seeds 300–339) compared MUON alone (`SLOW_M`) with MUON and WINDOW (`WIN_M`). Part B (*S* = 4, *k* = 16, seeds 340–359) compared WINDOW under Adam (`WIN16_A`) and under Muon (`WIN16_M`). On X a time rule cut Part B to seeds 340–351.
+| setting                           | perfect gate | recurrent gate, Rev. 7 recipe | window gate + SLOW | window gate + SLOW + split | one channel   |
+|:----------------------------------|:-------------|:------------------------------|:-------------------|:---------------------------|:--------------|
+| *S*=2, *P*=4, no conv.        | 4/4        | 67/80                       | 69/80            | —                          | 0 of >200 |
+| *S*=4, *P*=4, *k*=16, conv. | 4/4        | 27/40ʷ                   | 38/40            | 39/40ᵉ                | —             |
+| *S*=8, *P*=4, *k*=16, conv. | 4/4        | 0/40                        | 15/40            | **38/40**           | —             |
 
-**Table 6.** The early-recipe test. E1 (`WIN_M` beats `SLOW_M`): NOT SHOWN on X (4 vs 0, *p* = 0.0625), SHOWN on L (6 vs 0, *p* = 0.016). E2 (`WIN16_M` bound by update 4800 more often than `WIN16_A`): NOT SHOWN on X (5 vs 1, *p* = 0.11), SHOWN on L (7 vs 0, *p* = 0.008). Bands: `WIN_M` RELIABLE on both; `WIN16_M` RELIABLE on both; `WIN16_A` MAJORITY on both. Readings on L: "the early hinge window works under Muon" and "Muon binds four streams sooner".
+**The partition does what one Hebbian channel cannot, and the gate finds it.** Given the partition, every grouped-layout configuration tried binds; one Hebbian channel does not, where it was run (two streams at four and eight keys; four streams with four channels). A gate that reads three tokens, trained with the memory held slow for 2400 updates and with a channel split when binding stalls, finds the partition at two, four and eight streams without labels or restarts.
 
-|                                        |       X        |       L        |
-|:---------------------------------------|:--------------:|:--------------:|
-| `SLOW_M`, discovered                   |    36/40     |    34/40     |
-| `WIN_M`, discovered                    |    40/40     |    40/40     |
-| `WIN16_A`, bound (by update 4800)      | 10/12 (6)  | 17/20 (12) |
-| `WIN16_M`, bound (by update 4800)      | 11/12 (10) | 19/20 (19) |
-| perfect gate under Muon, Parts A and B |  2/2, 2/2  |  2/2, 2/2  |
+**Discovery is a race, and the recipe's parts each remove one way of losing it.** Slow memory keeps the memory from exploiting a non-stream split first; the window gate cannot count positions, so position splits are gone; the split breaks the merges that remain at eight streams by giving an idle channel the busy channel's logits. The recurrent gate's pathologies (position splits, the expansive recurrence) were not obstacles to the mechanism; they were obstacles of that gate.
 
-On X all four `SLOW_M` failures were position splits, and `WIN_M` rescued them with firings between updates 88 and 230; on L it rescued all six, five position splits and one STREAM-PARTIAL. Under Muon the four-stream binders bound at a median of update 2400 on both machines, against 4800 under Adam, and by step 4800 the four streams sat on four distinct channels in 11 of 12 runs on X and 19 of 20 on L (Adam: 6 of 12, 12 of 20).
+**Two routes, and the partition's claim.** A single delta-rule channel binds the two-stream header layout (8/10 at a fixed decay; 9/10 and 8/10 with a learned forget gate at eight keys) and the grouped two-stream layout on 4/10. The partition's advantage, so far, is in the number of contexts; one channel at eight streams is untested.
 
-The two machines are not independent replicates. They ran the same seeds, so each pair of runs started from the same weights and saw the same batches, and seed-level outcomes largely agree (38/40 for `SLOW_M`, 40/40 for `WIN_M`, 9 of 12 and 10 of 12 for the Part B arms). Their numerics differ, though: no run reproduced across the two machines in any arm, the Adam-only arm included, and Muon's bf16 Newton–Schulz step differs even between X's two Xeon hosts. What the test establishes is one pre-registered success on L, and the same direction on X with no reversals in E1. Two things weakened X's run. The screens had shown 31/40 without the hinge, while the fresh seeds gave `SLOW_M` 36/40 on X (34/40 on L), leaving less room. And the time rule cut Part B to 12 seeds.
+## 13. Retrospective
 
-## 10. Merges with four channels
+### 13.1 Revision 7's claims
 
-At four streams with four channels the failures are merges, and spare channels are the main fix (Section [4](#4-four-streams-spare-channels-and-an-early-check); descriptively, plain runs merged in 32/80 at *k* = 4 against 9/80 at *k* = 16 over the two tests). The screens asked whether a merge, once formed, can be broken, using X's eight recorded four-channel runs that were merged at update 9600 and still merged at the end, and continuing each for 9600 updates.
+**"At eight streams the gate forgets the context" (subtitle).** **Superseded.** True of the recurrent gate; the window gate carries the context at every write position by construction and binds 38/40.
 
-- Repeated large pushes on the gate (S21): 0/8 split. A router z-loss [5] (S27): 2/8. The z-loss did lower the logits' scale, but by lowering all logits together, along the one direction the softmax ignores.
+**Revision 7's recipe (slow memory and a hinge) binds without restarts at two streams and at four with sixteen channels.** **Stands**, and is replaced by a recipe without the hinge, which equals it at two streams (within the bound), beats its early-window form at four (G1) and beats it at eight (G2).
 
-- Copying the busiest channel's gate row onto the idlest one, with a little noise and a reset of that weight's optimizer state (S24): 8/8 split, against 1/8 for the noise and reset alone. The merged streams' gate states were nearly identical, yet the copy, which puts the idle channel level with the shared one, let small differences grow.
+**"The gate needs only one token of memory" (Section 11 of Revision 7).** **Corrected.** One at the read, two at the write; the write-position decoders were not measured in Revision 7's screens S38–S41 (batch 16, S47, measured them).
 
-- A label-free trigger for that copy (S36, from scratch, Muon, *k* = 4): bound 5/10 against 4/10. The trigger split when probe accuracy stalled below 0.95, aiming at the channels with the most and least read-gate mass over all positions. That aim was wrong in about half of its 31 splits, because a channel that holds no stream at key positions can carry the most mass elsewhere. In three runs held-out accuracy fell from about 0.75 to 0.35–0.51 after a split, before returning to the plateau.
+**"Under Muon the recipe binds four streams sooner."** **Not shown** on disjoint seeds pooled (12 vs 8, *p* = 0.25), and the machines disagreed. The one-machine result was a seed effect.
 
-- Aiming by the mass at key positions instead (S37): under Muon 10 of 11 splits were on target, against 5 of 11 by the all-position rule; under Adam the two rules aimed about equally well. Bound with one channel per stream: Muon 6/10 against 3/10 without splitting; Adam 6/10 against 5/10.
+**"A cap on the gate's recurrence is being screened."** **Resolved: not.** No capped arm bound (0/10, 0/10, 0/10 and 0/5); the cap acted from update 1.
 
-Muon on its own did not break merges: at *k* = 4 it bound 3/10 and 4/10 from scratch (S33a), and of the 15 runs merged at update 4800, 14 were still merged at the end. Aiming is not the whole problem: in the four Muon runs that stayed merged under S37, both splits were on target and the stream-to-channel map did not change.
+**The row copy breaks merges (Section 10 of Revision 7, from S36/S37, which scored BOUND).** **Supported** with the right outcome (bound routed) and a reset-only control, at eight streams, in three exploratory looks; printed, not yet claimed.
 
-## 11. Eight streams: the gate forgets the context
+### 13.2 Errors made during Phase VI
 
-Every learned-gate arm trained on all eight streams from step 1 has failed, under Adam and Muon, with and without the hinge, with plateau-triggered splits, and with restarts. That is none of more than 100 runs, while the perfect gate binds. Four screens located the failure, and a fifth checked our reading of it.
+**Predictions that the data overturned.** We predicted that a single delta channel could not bind conflicting streams (it binds the two-stream header layout 8/10); that Gumbel noise on the gate's logits could replace the split (on the read gate it collapsed routing; on the write gate it worsened eight-stream merges); that a balance loss would attack merges (where it was run there were no merges to attack, and it changed the key- and value-position maps instead); that a learned forget gate would widen the gap between the oracle and one channel (it shrank it, on the eight-key header layout); and, in the audit, that the window gate with slow memory would reach ≥ 36/40 on seeds 160–199 with no key failures (it reached 31/40 there, and 33 and 36 of 40 on the main test's seeds, with key failures reduced).
 
-- **Splitting does not help** (S36b, 43,200 updates): 0/10 under each optimizer. Every run split 7–12 times, but a split's new channel rarely held a stream by the next check.
+**A distant-cue task that exceeded its oracle.** Session F's randomized header layout did not bind under the perfect gate within its budget, so it gave Session G no baseline. The specification fixed the block lengths and left the key load open; F's resolution, eight keys per stream, matched the eight-key header layout that the oracle already binds slowly.
 
-- **The gate's state does not carry the stream** (S38). A nearest-class-mean decoder of stream identity read the stream from *h* at key positions at a median of 0.13 (Muon) and 0.14 (Adam) at update 4800, against a chance level of 0.125. At four streams it read 0.84 (*k* = 4) and 1.00 (*k* = 16). Since each key's own stream token sits one position earlier, the gate needs only one token of memory.
+**A classifier at its own threshold.** Three batch-18 runs sit at exactly η² = 0.5 by key and are labelled STREAM-PARTIAL; the hard two-of-four key pattern should be KEY. The reading that depended on them is withdrawn until the classifier is fixed.
 
-- **The stream is there at the start and is lost** (S39, Table 7). At initialization the decoder reads 0.91: with small initial weights, *h* at a key still carries the stream token one step back. Training removes this memory. The loss coincides with the recurrent term overtaking the input term, by update 400 under Muon (0.20 against 0.10) and 600 under Adam (0.14 against 0.08), and then growing past 1.9 (Muon, update 600) and 3.7 (Adam, update 1600). By update 2400 the state at a stream token no longer decodes that token either. This is mostly not tanh saturation: at update 2400 the median share of saturated units is at most 15% (one run reached 57%). The hinge only brings the loss forward slightly. At four streams the input term at stream tokens grows instead (from 0.06 to 0.55), and the memory survives.
+**Attribution of a number.** An earlier working note put Pathway's 97.4% Sudoku figure beside TRM's 87.4% as if on one protocol; the figure is from Pathway's blog, on internal data, and the protocols differ.
 
-- **Feeding the gate the previous token** (S40). Adding $W_{\mathrm{prev}} v_{t-1}$ to the gate's pre-activation gives it the stream directly: its input decodes the stream at 0.97–1.00 under Muon. Its state still reads only 0.53–0.64, diluted by the recurrent term. No run bound (0/10 under each optimizer). The failures shifted from non-stream splits to merges on three or four channels (9 of 10 under Muon), and final accuracy rose in 9 of 10 Muon pairs.
+**Process.** Container restarts cost in-flight runs on X (the test's first start), on F (twice, while the session was idle with only detached processes running) and on E in several batches (batch 16's segments 2, 6 and 7 among them); on F a harness-tracked keepalive stopped it, and some form of it should be in every long run. Every resumed segment began by reproducing a recorded run bit for bit. Batch 18's Muon reference did not reproduce across hosts and was rerun fresh, as the rules require.
 
-**Table 7.** Screen S39: medians over five reruns, each reproducing its recorded curve. Chance is 0.125 at eight streams. Under Muon without the hinge the decodability is the same through update 200, higher at 400 and 600 (0.51, 0.26) and the same from 1200; its recurrent term at 600 is 2.28.
+## 14. Methodological findings
 
-| update | 0 | 200 | 400 | 600 | 1200 | 2400 |
-|:---|:-:|:-:|:-:|:-:|:-:|:-:|
-| ***Muon, S = 8, k = 16, HINGE (seeds 260–264)*** | | | | | | |
-| decodability of the stream from *h* at keys | 0.91 | 0.70 | 0.39 | 0.18 | 0.15 | 0.13 |
-| recurrent term $\lvert W_h h_{t-1}\rvert$ at keys | 0.04 | 0.08 | 0.20 | 1.91 | 4.02 | 6.93 |
-| input term $\lvert W_{\mathrm{in}} v_t\rvert$ at keys | 0.06 | 0.07 | 0.10 | 0.11 | 0.15 | 0.13 |
-| ***Adam, S = 8, k = 16, HINGE (seeds 260–264)*** | | | | | | |
-| decodability | 0.91 | 0.88 | 0.79 | 0.50 | 0.24 | 0.14 |
-| recurrent term | 0.04 | 0.05 | 0.06 | 0.14 | 0.32 | 5.08 |
-| ***Muon, S = 4, k = 4, HINGE (seeds 240–244; chance 0.25)*** | | | | | | |
-| decodability | 0.95 | 0.84 | 0.62 | 0.61 | 0.85 | 0.83 |
-| recurrent term | 0.04 | 0.10 | 0.49 | 0.58 | 1.67 | 2.27 |
+Revisions 5–7 recorded sixteen lessons; Phase VI adds five.
 
-The jump in the recurrent term between updates 400 and 600 under Muon is sudden. Our reading was that the recurrence's gain crosses one: past that point the state sustains itself and ignores its input. At eight streams the gate's output stays near uniform (entropy 2.70 of a possible 2.77 at update 2400 under Muon), so the task gives its input weights little reason to grow.
+**Disjoint seeds make the pooled test a test.** From the Muon-recipe test on, each machine has its own seeds and the pooled McNemar is the primary claim. The window-gate test's G1 is the case this was for: not shown on X alone, shown on L and pooled.
 
-**The gain crossing (S42, batch 15).** This screen reran the two eight-stream configurations of Table 7 to update 1600 on seeds 260–264 and logged the spectral radius ρ of $W_h$ every 50 updates. Every rerun reproduced its recorded run through update 1200, so these are S39's runs, measured more finely. (A first attempt ran on a 2.80 GHz host, where Muon runs do not reproduce, Section [15](#15-methodological-findings); its Muon runs were set aside.) At initialization ρ was 0.52–0.63.
+**Audit the records before the next screen.** The window gate had been screened, had won, and had been dropped for a reason unrelated to the obstacle at hand; one reading of the records found it. A fixed prediction before the rerun made the audit falsifiable.
 
-- In seven of the ten runs ρ rose clearly above one (peaks 1.28–2.03), first crossing it between updates 300 and 1400. In each of them, the stream's decodability from *h* at keys fell to 0.13–0.23 within 100 updates of the crossing, and the recurrent term passed 1 within 100 updates.
+**Control for the bundled action.** A split that copies and resets needed a reset-only arm; so does every intervention with two parts.
 
-- In the other three (one Muon, two Adam) ρ peaked at 0.88–1.02, and the stream was only partly lost (0.31–0.73 at update 1600).
+**Score routing at the write positions.** A stream's channel at key positions can differ from its channel at value positions in a bound run (session H: 34 of the balance-loss arm's 36 bound-routed runs, and two to five runs per arm elsewhere); the writes are at the values.
 
-The screen's pre-set rule asks whether, in at least four of five runs, the recurrent term first exceeds 1 within 150 updates after ρ first does. It labels the Muon configuration "gain crossing" (4 of 5) and the Adam configuration "not" (3 of 5; in its two other runs ρ never exceeded one). We applied that rule to the saved records ourselves, before E's report. The pattern is what the gain-crossing reading predicts, but it is a correlation in ten runs. The intervention is S41, still running: a cap of 0.5 on the spectral norm of $W_h$, the cap together with the previous-token input, and the previous-token input with no recurrence at all. Five of its 35 runs are saved; none bound, and five runs cannot be read.
+**Borrowed devices need the model's read path.** Gumbel noise works for a dense read and fails for a routed one; a balance loss balances whatever is cheapest to balance.
 
-## 12. Distant cues
+## 15. Limitations
 
-A language model's context cues are usually far from the tokens they govern. The header layout puts each stream's token once, at the start of its block. In screens:
+**The task.** Synthetic, with explicit context tokens; in the grouped layout each key's stream token is within the window gate's reach. Distant cues are unresolved, here and in the literature we read.
 
-- The plain gate discovered 0/10 there (S6). The perfect gate bound 3/3. Trained on the routing directly, the recurrent, fading-memory and selective gates could express it; the local gate could not (S10).
+**The recipe needs task structure.** The split reads the key positions (as the hinge did). A language model has no marked keys; the analogue is untested.
 
-- A local gate, fading-memory gates and a selective gate failed (S6, S8: 0/10 each). The latter two also failed in the grouped layout (S9).
+**The model.** Three layers (two to six screened), one head, *d* = 32 (to 128 screened), *N* = 256 (to 1024 screened), sequences of at most 99 tokens, a fixed memory half-life of about 14 tokens.
 
-- A 5% labelled nudge toward the stream split discovered 5/10, and 10/10 with slow memory (S10, S15). Those are not label-free.
+**Two streams.** The hardest configuration relative to its size; every arm is at 65–69/80 and key splits remain.
 
-- Slow memory with the hinge discovered 0/10, failing by key splits (S17). A third hinge term on key identity discovered 6/10 (S19) and 4/10 on new seeds (S22), with 7 of 20 fully routed.
+**Screens.** Exploratory sessions use 10–40 runs per arm and lenient rules; their readings are labelled, and nothing from them is a claim until a main-line test repeats it.
 
-These screens cannot show that a gate routes, for a reason S23 found: a single channel binds the header layout (3/10, and 7/10 with slow memory), so binding there is no evidence of the partition. At eight keys the header task (S28) did not bind even with the perfect gate within 24,000 updates (final accuracy 0.55–0.87, against 0.20–0.24 for one channel). That screen was invalid by its own rule, although it suggests the partition matters there. A distant-cue task that one channel provably cannot solve is still needed.
+## 16. Distance to a language model
 
-## 13. Where the mechanism stands
+**What Phase VI adds to the case.** The gate is now a convolution: parallel, cheap, the form every modern linear-attention model already uses. The recipe is two learning-rate groups and a plateau rule. It finds an eight-way partition without labels, and its constants hold to four times the width and twice the depth.
 
-**Table 8.** The main Phase III–V configurations, counted over both machines; bound unless marked. The machines ran the same seeds, so these counts are descriptive, not independent samples. ᵈDiscovered. ᶜWith a curriculum (load at *P* = 8, streams at *S* = 8). ᵐOne channel with the same fast-weight memory. ˢNot run on the main line; a ten-seed screen of HINGE under Adam bound 7/10, 5/10 with one channel per stream.
+**What stands in the way,** in order:
 
-| setting                           | perfect gate     | plain gate    | recipe, no restarts                                      | restarts           | one channel   |
-|:----------------------------------|:-----------------|:--------------|:---------------------------------------------------------|:-------------------|:--------------|
-| *S*=2, *P*=4, no conv.        | 10/10          | 223/400ᵈ | HINGE 39/40ᵈ; Muon + WINDOW 80/80ᵈ             | 60/60            | 0 of >200 |
-| *S*=2, *P*=8, conv.           | 6/6            | 49/70       | HINGE 37/40                                            | 40/40ᶜ        | 0/24ᵐ    |
-| *S*=4, *P*=4, *k*=4, conv.  | 10/10          | 29/80       | —ˢ                                                  | 18/40            | 0/20        |
-| *S*=4, *P*=4, *k*=16, conv. | 6/6            | 44/80       | HINGE 35/40; hinge only 34/40; Muon + WINDOW 30/32 | 36/40            | —             |
-| *S*=8, *P*=4, *k*=16, conv. | 2/2; 6/6ᶜ | 0/16        | HINGE 0/20; with the curriculum 15/36                | 0/5; 12/36ᶜ | —             |
+1.  *Context cues at a distance.* Open in this project and in the literature. The next steps are a probe of where the cue is in the residual stream, a register that overwrites on the cue and holds otherwise, and a per-layer gate over the residual stream (audit, Section 3.3; `docs/reading/`, Section 4). The risk is that an end-of-sequence loss gives too little pressure to discover the cue label-free; language supplies a denser loss.
 
-**The partition does what one channel cannot.** Unchanged from Revision 6: given the partition, every grouped-layout configuration tried binds; one channel with the same memory does not. (In the header layout at eight keys the perfect gate did not bind within its budget; Section [12](#12-distant-cues).)
+2.  *The split's nuisance variable.* The key positions come from the task.
 
-**Discovery is decided in the first few hundred updates, and can be steered.** Revision 6 saw outcomes settled early and suspected that they depend on what the memory learns first. Phase V supports both. Slowing the memory for 2400 updates shifts the race toward the stream split (S0, shown on both machines), and a hinge that fires when the gate's choice becomes positional delivers a few large, well-timed pushes that remove the position splits. Together they bind without restarts at two streams with four and eight keys and at four streams with sixteen channels; under Muon, where eight keys were not tried, at two streams with four keys and at four streams. The recipe's work is done by update 2400.
+3.  *Memory horizon.* A fixed decay; session F's learned forget gates are the first step, and at eight streams the memory rule that carries them is slower.
 
-**At eight streams the obstacle moves upstream.** Before any routing can form, the gate's recurrent state stops reflecting its input, and in a screen the full loss came when its recurrence became expansive (spectral radius above one). No change to the gate's readout (hinge, split, optimizer) can route by a stream its state does not carry.
+4.  *Baselines.* Mixture-of-Memories, Raven and Gated DeltaNet route or forget at scale; the comparison that matters is whether their routers discover *contexts* rather than token types, which none of their papers tests.
 
-**Merges remain at four channels.** Spare channels prevent most of them. In screens, a copy of the shared channel's gate row, aimed by key-position mass, breaks some of the rest; why it fails on the others, even when on target, is open.
+**A staged path.** \(i\) On CPUs: the distant-cue task, the premise test (one delta channel at four and eight streams), eight streams at the larger widths. (ii) A GPU port as a small package, with a chunkwise delta memory, the recall benchmarks \[18\] and the baselines above, on disjoint seeds. (iii) Small language models, asking one question: do the channels specialize by context or by token type.
 
-## 14. Retrospective
+## 17. Conclusion and next steps
 
-### 14.1 Revision 6's claims
-
-**"Multi-channel Hebbian plasticity solves context-conditional binding by partitioning memory" (title).** **Stands.**
-
-**"A learned gate finds the partition, reliably with restarts for two streams; four streams are the open problem" (subtitle).** **Superseded.** With the HINGE recipe, two streams, and four with sixteen channels, now bind without restarts in at least 85% of runs on each machine; eight streams are the open problem.
-
-**"A simple early check at four streams picked binders with 38/38 precision" (post hoc).** **Partly confirmed:** precise on L (19/19), not on X (17/20, the three exceptions merges).
-
-**"Exploratory screens suggest it depends on what the memory learns first."** **Supported** by a pre-registered test on both machines (S0).
-
-**"Restarts are the working recipe."** **Replaced** at two streams, and at four with sixteen channels, by an early-training recipe.
-
-**Pooled post-hoc *p*-values across X and L.** **Corrected.** Revision 6 pooled the two machines' discordant pairs and gave *p*-values (for example *p* = 0.002 for the layout comparison and *p* = 0.049 for sixteen channels at four streams). The two machines ran the same seeds, so these pairs are not independent and the *p*-values overstate the evidence. Read them as descriptive. No pre-registered verdict depended on them.
-
-### 14.2 Errors made during Phase V
-
-**Replicates treated as independent.** Besides Revision 6's pooled *p*-values, our first account of the early-recipe test called X and L "independent replicates". The agent that recorded L's result corrected the wording before committing it.
-
-**"The hinge barely takes part."** After the first Muon screen we read the hinge's 0–4 firings per run (on 19 of 20 runs) as a sign that Muon with slow memory might not need it. The next screen showed the hinge rescuing 8 of 40 runs. A few firings, at the right moment, were the mechanism.
-
-**A merge breaker over-claimed, then mis-specified.** We called S24's row copy a label-free merge breaker before any trigger existed. The trigger we then specified, "one channel holds more than 1.5/k of the mass", would fire on a correctly routed eight-stream gate at *k* = 16 (each channel in use holds 1/8 > 1.5/16 of the mass). We replaced it with a plateau trigger, but kept an aiming rule, all-position mass, that missed half the time (Section [10](#10-merges-with-four-channels)).
-
-**An underpowered confirmation.** We planned the early-recipe test with the screens' numbers in mind. On fresh seeds the baseline was higher, and our own time rule cut Part B to 12 seeds on X.
-
-**Machine differences misattributed.** We first attributed X–L differences under Muon to its bf16 kernels alone. X and L never reproduce each other, under Adam either; only X's two hosts did.
-
-**Specifications lost between sessions.** The full specification of the slow-start test, and those of three queued screens (S29–S31), never reached the sessions meant to run them. The test was run from a complete replacement specification sent after the session asked for it; the screens were dropped or deferred.
-
-**A validity arm without the budget.** The eight-key header screen's perfect gate did not bind within its budget, so the screen gave no answer.
-
-**Process.** A screening bug let two continuations share optimizer state (S14); it was found and rerun, with no reading changed. Container restarts and two-hour session limits interrupted most long runs; every resumed segment began by reproducing a recorded run bit for bit, and runs in flight restarted from the beginning. On L, X's short-convolution results file replaced L's own, and the early-recipe results file first sent from L was a copy of X's. The test's pairing checks stopped that run before any training; L's own file was restored and the test rerun.
-
-## 15. Methodological findings
-
-Revisions 5 and 6 recorded eleven lessons; Phase V adds five.
-
-**Shared seeds make machines dependent.** Reusing seeds across machines is right when each machine pairs with its own recorded runs. A fresh-seed confirmation should give each machine its own seeds, so that a result shown on both is two independent confirmations and pooled counts mean something.
-
-**Bit-for-bit determinism depends on the processor and its kernels.** Adam reproduced across X's two Xeon hosts, but not between X and L. Muon's bf16 Newton–Schulz step differed even between the two Xeon hosts. Pair only on one host, and record the kernel path in every results file.
-
-**Probe the mechanism before designing the fix.** Splits failed at eight streams for a reason no outcome count could reveal. A decoder on the gate's state and two norms located it in two screens.
-
-**Score routing, not binding, wherever the memory has another route.** Four streams on four channels and the header layout both let the memory bind without the partition.
-
-**Power a confirmation from the baseline it will meet.** A screen's baseline can be low by chance; a time rule should not cut the arms a claim depends on.
-
-## 16. Limitations
-
-**The task.** Synthetic, with explicit context tokens; in the grouped layout each key's stream token is the previous token. Distant cues are unresolved.
-
-**The recipe needs task structure.** The hinge uses no stream labels, but it needs the key positions and their triple index. A language model has no marked keys, so the analogue (for example, absolute position as the nuisance) is untested.
-
-**The model.** Three layers, one head, *d* = 32, *N* = 256, sequences of at most 99 tokens, memory half-life about 14 tokens. Every learned-gate Muon run used one learning rate (0.005).
-
-**Streams.** Two streams, and four with sixteen channels, have a recipe; eight have none.
-
-**Replication.** The second machine reruns the same seeds: it replicates the procedure, but neither the numerics nor independent samples (Section [15](#15-methodological-findings)).
-
-**Screens.** One container, 3 to 40 runs per arm, lenient rules, and several post hoc readings, labelled as such.
-
-## 17. Distance to a language model
-
-**What Phase V adds to the case.** Discovery no longer needs per-run restarts at two streams, or at four with sixteen channels: an early phase of 2400 updates suffices, so a single training run can use it. It works under Muon, an optimizer already used to pretrain large language models [4], and on one machine Muon bound four streams sooner.
-
-**What stands in the way,** roughly in order of risk:
-
-1.  *Many contexts.* Eight streams fail. The diagnosis points at the gate's recurrence, which will need redesign or constraint.
-
-2.  *The hinge's nuisance variables.* They come from the task's structure. A language model needs a generic version.
-
-3.  *Context cues at a distance.* Unresolved; the header layout cannot tell routing from single-channel binding.
-
-4.  *Gate compute.* The recurrent gate runs token by token. A contractive or parallel gate, which may also be what eight streams need, would remove that cost.
-
-5.  *Memory horizon.* A half-life of about 14 tokens is far below a language model's context.
-
-6.  *Prior art.* Mixture-of-Memories [6] already routes tokens among linear-attention memories at the billion-parameter scale.
-
-**A staged path.** (i) On CPUs: eight streams (batch 15 first), then a distant-cue task that one channel provably cannot solve. (ii) A GPU port, with Muon and a parallel or contractive gate, on the multi-query associative recall benchmark [7] against linear-attention baselines that include a Mixture-of-Memories router. (iii) Small language models. (iv) Scaling. Stages (i) and (ii) remain cheap and are where the idea is most likely to fail.
-
-## 18. Conclusion and next steps
-
-Multi-channel Hebbian plasticity in multilayer BDH solves context-conditional binding by partitioning memory, and a label-free gate can now find the partition without restarts at two streams and at four streams with sixteen channels. Two changes do it, both confined to the first 2400 updates: slow the memory, and push the gate away from positional splits when it starts to make them. The obstacle at eight streams is earlier still: the gate's recurrent state loses the context before any routing forms, and in a screen the full loss came when its recurrence became expansive.
+Multi-channel Hebbian plasticity in multilayer BDH solves context-conditional binding by partitioning memory, and a label-free gate finds the partition at eight streams: a window gate, slow memory for 2400 updates, and a channel split when binding stalls, in 38 of 40 runs on two machines with disjoint seeds, where the previous recipe bound none. In every look so far the split's row copy, not its reset, is what works. The obstacle Revision 7 named, the gate's recurrence, was removed rather than fixed.
 
 Next:
 
-- Batch 15's cap screen (running): a cap on the gate's recurrent gain, alone and with a previous-token input, and the previous-token input without recurrence. If the cap keeps the stream in the gate's state and binds, a pre-registered eight-stream test follows, with each machine on its own seeds.
+- A pre-registered "copy, not reset" claim and the classifier fix, in the next main-line test.
 
-- Then the targeted split on the merges that remain, and a distant-cue task that one channel cannot solve.
+- Session G's probe and register on the header layout; session F's premise test; batch 19's eight-stream width runs.
 
-- Commit L's results for the stream-recipe, stream-curriculum, slow-start and recipe-scope tests to `results/L/`.
-
-- Then the GPU port and the recall benchmark of Section [17](#17-distance-to-a-language-model).
+- Revision 9 after those, then the GPU package.
 
 ---
 
@@ -458,81 +318,87 @@ Next:
 
 - **`bdh.py`:** Pathway's BDH model, used unmodified. The multi-channel model subclasses it:
   - it replaces the attention module, multiplying each score by the gate match at every layer;
-  - it adds the gate's parameters;
+  - it adds the gate's parameters (the recurrent gate of Phases II–V, or the window gate of Phase VI, converted in place);
   - with the convolution, it runs a copy of BDH's layer loop with the causal convolution inserted.
 - **`test_*.py`:** one file per experiment.
-  - Each test's docstring holds its pre-registered design (background, arms, seeds, claims and thresholds), and after the run, its recorded result.
-  - Every Phase III–V test first runs its inherited verification chain and its own numbered CHECKs, then prints a runtime projection, then trains.
-  - Phase V's tests are `test_stream_recipe.py`, `test_stream_curriculum.py`, `test_slow_start.py`, `test_recipe_scope.py` and `test_early_recipe.py`.
+  - Each test's docstring holds its pre-registered design (background, arms, seeds, claims and thresholds), and after the run, its recorded result on each machine and pooled.
+  - Every Phase III–VI test first runs its inherited verification chain and its own numbered CHECKs, then prints a runtime projection, then trains.
+  - Phase VI's tests are `test_muon_recipe.py` and `test_window_gate.py`; Phase V's are `test_stream_recipe.py`, `test_stream_curriculum.py`, `test_slow_start.py`, `test_recipe_scope.py` and `test_early_recipe.py`.
   - Tests from Phases I–II (for example `test_interference*.py`, `test_asymmetric_routing.py`, `test_instrument_v2.py`) and earlier modules (`bdh_multichannel.py`, `bdh_mc.py`, `bdh_recurrent.py`) are kept for the record.
-- **`results/X/`, `results/L/`:** copies of each machine's result JSON files, with `results/README.md` recording each file's machine, commit and start time. Results files are gitignored where they are written. `results/L/` holds only `early_recipe` so far.
-- **`multichannel_hebbian_report_v7.pdf`** and **`multichannel_hebbian_report_v7.tex`:** Revision 7 of the technical report, which this README follows. `multichannel_hebbian_report.pdf` and `multichannel_hebbian_report_v2.pdf` are earlier revisions.
-- **`docs/revision6.md`:** this README's research text as of Revision 6, kept for its full account of Phases I–IV.
-- **Branch `claude/outside-ideas`:** the exploratory screens (`explore_*.py`, outputs and per-batch logs in `explore_out/`). Nothing there is a result.
+- **`specs/`:** each Phase VI test's specification, committed before the test was written (and amended, with the amendment dated, before any affected run).
+- **`results/X/`, `results/L/`:** copies of each machine's result JSON files, with `results/README.md` recording each file's machine, commit and start time. Results files are gitignored where they are written. Both machines' files for every Phase V and VI test are recorded.
+- **`multichannel_hebbian_report_v8.pdf`** and **`multichannel_hebbian_report_v8.tex`:** Revision 8 of the technical report, which this README follows. `multichannel_hebbian_report_v7.pdf`, `multichannel_hebbian_report.pdf` and `multichannel_hebbian_report_v2.pdf` are earlier revisions.
+- **`docs/audit_2026-10.md`:** the October 2026 audit of the project's records (code, beliefs, literature, process), whose Section 3.1 brought the window gate back.
+- **`docs/reading/`:** notes on twelve papers on context routing and memory, read in full, with the synthesis `distant_cues_2026-10.md` and the prompts for the parallel exploratory sessions.
+- **`docs/revision7.md`**, **`docs/revision6.md`:** this README's research text as of Revisions 7 and 6, kept for their full accounts of Phase V and of Phases I–IV.
+- **Branch `claude/outside-ideas`:** the exploratory screens (`explore_*.py`, outputs and per-batch logs in `explore_out/`, verdicts in `explore_out/README.md`). **Branches `claude/explore-F`, `claude/explore-G`, `claude/explore-H`:** the parallel exploratory sessions (delta-rule channels and forget gates; distant cues; anti-collapse devices), each with its reports under `explore_out/<session>/`. Nothing on these branches is a result.
 
-**Running a test** (it runs the CHECKs, the projection, then the full test; runs are cached, so an interrupted test resumes):
+**Running a test** (it runs the CHECKs, the projection, then the full test; runs are cached, so an interrupted test resumes). Phase VI tests take a required `--machine X|L` flag, and each machine runs its own seed block:
 
 ```bash
 pip install -r requirements.txt
-python3 -u test_early_recipe.py --workers 4
+python3 -u test_window_gate.py --machine L --workers 6
 ```
 
-**To print the other machine's counts alongside** (descriptive only):
+**To compute the pooled claims** once both machines' files are complete (the pooled block is identical from either side):
 
 ```bash
-python3 -u test_early_recipe.py --workers 4 --also results/X/early_recipe_results.json
+python3 -u test_window_gate.py --machine L --report --also results/X/window_gate_results.json
 ```
 
-**Tests that pair with earlier recorded runs** read *this machine's* own earlier results files: by default from the working directory, or from flags such as `--slow`, `--recipe` or `--short`. Before pairing, they reproduce a recorded run from each file bit for bit. If a file does not reproduce, the test stops before training, or reports the paired claims as UNTESTED.
+**Tests that pair with earlier recorded runs** read *this machine's* own earlier results files: by default from the working directory, or from flags such as `--early`, `--slow`, `--recipe` or `--short`. Before pairing, they reproduce a recorded run from each file bit for bit. If a file does not reproduce, the test stops before training, or reports the paired claims as UNTESTED.
 
 Training is deterministic for a given processor, kernel path and thread count; workers run one thread each. To detach a long run from the terminal:
 
 ```bash
-setsid nohup python3 -u test_early_recipe.py --workers 4 > early_recipe.log 2>&1 &
+setsid nohup python3 -u test_window_gate.py --machine L --workers 6 > window_gate.log 2>&1 &
 ```
+
+Long runs in cloud containers have been lost to container restarts; keep a watcher that commits and pushes progress at short intervals, and resume from the cached results file.
 
 ## Provenance
 
-**Table 9.** Phase V commits on branch `claude/bdh-growth-hebbian-inference-w90069`. The L commit is the one recorded in L's results file; L's test code equals X's test commit. Only L's `early_recipe` result is in `results/L/` (committed in `00ac0f2`); L's other four are not yet committed. Their verdicts here were regenerated with each test's own report function from L's results files, and for `recipe_scope` they match L's full log. X: Intel Xeon at 2.10 GHz through `stream_recipe`, 2.80 GHz after; L: Intel i7-12650H; PyTorch 2.14.0 throughout.
+**Table 5.** Phase VI main-line tests on branch `claude/bdh-growth-hebbian-inference-w90069`. L's results files for the Phase V tests are now in `results/L/` (`00ac0f2`, `d0e6c85`; the Phase IV scale-axes file at `42af095`). X: Intel Xeon at 2.80 GHz for both tests; L: Intel i7-12650H; PyTorch 2.14.0.
 
-| test                | X: test commit / result commit | L: commit (results file) | runs, X; L |
-|:--------------------|:-------------------------------|:-------------------------|:-----------|
-| `stream_recipe`     | `092937b` / `18d5ae1`          | `092937b`                | 83; 90     |
-| `stream_curriculum` | `ffdf0aa` / `520fe51`          | `631fd62`                | 41; 53     |
-| `slow_start`        | `9c5939e` / `b8c6007`          | `9c5939e`                | 110; 110   |
-| `recipe_scope`      | `a429af9` / `c69f1e6`          | `c69f1e6`                | 56; 60     |
-| `early_recipe`      | `9f25dc8` / `9437e01`          | `9437e01`                | 108; 124   |
+| test          | X: test commit / result commit                                                  | L: results file (commit recorded)                            | runs, X; L |
+|:--------------|:--------------------------------------------------------------------------------|:-------------------------------------------------------------|:-----------|
+| `muon_recipe` | `74f5907` / `3e2d171`; pooled `2a6ba3d`                                         | `L/muon_recipe_results.json` (`74f5907`)                     | ; 166      |
+| `window_gate` | spec `9a769c7`, amended `d05f0ca`; test `2f98f06`, Part D `886a668` / `628eb7c` | `L/window_gate_results.json` (`886a668`; recorded `1cd20a1`) | ; 231      |
 
-**Table 10.** Exploratory batches on branch `claude/outside-ideas`, container E, one thread per run. Every batch began each segment with a check that reproduced one of X's recorded runs bit for bit. Batches 2–15 ran on a 2.10 GHz Xeon, apart from two segments of batch 7 and batch 15's first segment; that segment ran on a 2.80 GHz Xeon, and its eight Muon runs were set aside because Muon does not reproduce across processors. Batch 15's count is at the time of writing: all 10 of S42's runs and 5 of S41's 35. S29 and S30 were deferred and S31 dropped; none has run.
+**Table 6.** Exploratory work in Phase VI, one thread per run, each segment opened by a bit-for-bit reproduction of a recorded run. The audit is `docs/audit_2026-10.md` (`b22da04`); the reading notes and synthesis are `docs/reading/` (`ad8a92e`).
 
-| batch | screens                                                            | code commit |     runs |
-|:------|:-------------------------------------------------------------------|:------------|---------:|
-| 2     | S4 kWTA warm-up, S5 slow memory, S6 distant cue                    | `6f529b5`   |       83 |
-| 3     | S7 slow memory (new seeds), S8 distant-cue gates, S9 near check    | `3e70887`   |       70 |
-| 4     | S10 expressibility and nudge, S11 gate reset, S12 position penalty | `fdd1a46`   |       50 |
-| 5     | S13 hinge, S14 stalled runs, S15 nudge with slow memory            | `98b2441`   |       59 |
-| 6     | S16 random kick, S17 hinge at a distance, S18 stuck memory         | `8407985`   |       38 |
-| 7     | S19 key-term hinge, S20 untimed kick, S21 kicks on merges          | `cea4756`   |       78 |
-| 8     | S22 key-term check, S23 one channel at a distance, S24 row copy    | `572a00d`   |       78 |
-| 9     | S25 Muon, S26 gate noise, S27 z-loss, S28 eight keys at a distance | `d0c31ce`   |      117 |
-| 10    | S32 Muon without the hinge, S33 Muon at four and eight streams     | `d16ec61`   |      124 |
-| 11    | S34 early window, S35 Muon at sixteen channels                     | `9f47868`   |      102 |
-| 12    | S36 plateau-triggered split                                        | `faa1926`   |       30 |
-| 13    | S37 targeted split, S38 gate-state probe                           | `c2b30dc`   |       50 |
-| 14    | S39 gate memory over time, S40 previous-token input                | `07ccfb7`   |       40 |
-| 15    | S41 gate cap (running), S42 $W_h$ spectrum                         | `90c3a28`   | 15 of 45 |
+| batch or session       | screens                                                                   | code commit                    |       runs |
+|:-----------------------|:--------------------------------------------------------------------------|:-------------------------------|-----------:|
+| \(E\)                  | S41 gate cap, S42 $W_h$ spectrum                                          | `90c3a28`                      |         45 |
+| \(E\)                  | S43–S44 window gate + slow memory, S45 reservoir, S46 knobs, S47 decoders | `93bdfe6` (verdicts `092f355`) |        165 |
+| \(E\)                  | S48 split on the window gate, S49 key splits                              | `2531480` (verdicts `992e320`) |         49 |
+| \(E\)                  | S50 reset control and Muon, S51 split at *k*=4, S52 key splits          | `7ef4e15` (verdicts `ac2d3ba`) |        120 |
+| (E, running)           | S64 width, S65 depth; S66 eight streams and S67 capacity under way        | `8cff21e`                      | 116 so far |
+| H (`claude/explore-H`) | S58 anti-collapse, S58b at eight streams, S60 temperature                 | branch head                    |        318 |
+| F (`claude/explore-F`) | delta memory, S53, S54, S59                                               | branch head                    |        322 |
 
-For Phases I–IV, see the [Provenance section of `docs/revision6.md`](docs/revision6.md#provenance).
+For Phase V, see the [Provenance section of `docs/revision7.md`](docs/revision7.md#provenance); for Phases I–IV, that of [`docs/revision6.md`](docs/revision6.md#provenance).
 
 ## References
 
 1. A. Kosowski, P. Uznański, J. Chorowski, Z. Stamirowska, M. Bartoszkiewicz. *The Dragon Hatchling: The Missing Link between the Transformer and Models of the Brain.* [arXiv:2509.26507](https://arxiv.org/abs/2509.26507), 2025.
-2. A. Gu, T. Dao. *Mamba: Linear-Time Sequence Modeling with Selective State Spaces.* [arXiv:2312.00752](https://arxiv.org/abs/2312.00752), 2023.
-3. K. Jordan et al. *Muon: An optimizer for hidden layers in neural networks.* [Blog post](https://kellerjordan.github.io/posts/muon/), 2024.
-4. J. Liu et al. *Muon is Scalable for LLM Training.* [arXiv:2502.16982](https://arxiv.org/abs/2502.16982), 2025.
-5. B. Zoph et al. *ST-MoE: Designing Stable and Transferable Sparse Expert Models.* [arXiv:2202.08906](https://arxiv.org/abs/2202.08906), 2022.
-6. J. Du et al. *MoM: Linear Sequence Modeling with Mixture-of-Memories.* [arXiv:2502.13685](https://arxiv.org/abs/2502.13685), 2025.
-7. S. Arora et al. *Zoology: Measuring and Improving Recall in Efficient Language Models.* [arXiv:2312.04927](https://arxiv.org/abs/2312.04927), 2023.
+2. B. Engdahl, A. Kosowski, J. Chorowski, Z. Stamirowska, P. Uznański, J. Jiang, R. Phadke, R. Kinas, R. Zhong. *BDH-CQ: In-Context Learning with Recurrent Latent Reasoning.* [arXiv:2608.09888](https://arxiv.org/abs/2608.09888), 2026.
+3. O. Sieberling et al. *Triadic Linear Attention.* [arXiv:2609.36529](https://arxiv.org/abs/2609.36529), 2026.
+4. A. Gu, T. Dao. *Mamba: Linear-Time Sequence Modeling with Selective State Spaces.* [arXiv:2312.00752](https://arxiv.org/abs/2312.00752), 2023.
+5. K. A. Wang, J. Shi, E. B. Fox. *Test-time regression: a unifying framework for designing sequence models with associative memory.* [arXiv:2501.12352](https://arxiv.org/abs/2501.12352), 2025.
+6. S. Yang, J. Kautz, A. Hatamizadeh. *Gated Delta Networks: Improving Mamba2 with Delta Rule.* [arXiv:2412.06464](https://arxiv.org/abs/2412.06464), 2025.
+7. A. Jolicoeur-Martineau. *Less is More: Recursive Reasoning with Tiny Networks.* [arXiv:2510.04871](https://arxiv.org/abs/2510.04871), 2025.
+8. J. Geiping et al. *Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach.* [arXiv:2502.05171](https://arxiv.org/abs/2502.05171), 2025.
+9. T. Flesch, D. G. Nagy, A. Saxe, C. Summerfield. *Modelling continual learning in humans with Hebbian context gating and exponentially decaying task signals.* [arXiv:2203.11560](https://arxiv.org/abs/2203.11560), 2022.
+10. A. Iyer et al. *Avoiding Catastrophe: Active Dendrites Enable Multi-Task Learning in Dynamic Environments.* [arXiv:2201.00042](https://arxiv.org/abs/2201.00042), 2022.
+11. M. Choraria et al. *Context-Gated Associative Retrieval: From Theory to Transformers.* [arXiv:2605.10970](https://arxiv.org/abs/2605.10970), 2026.
+12. J. Du et al. *MoM: Linear Sequence Modeling with Mixture-of-Memories.* [arXiv:2502.13685](https://arxiv.org/abs/2502.13685), 2025.
+13. A. Afzal, A. Bick et al. *Raven: High-Recall Sequence Modeling with Sparse Memory Routing.* [arXiv:2607.25357](https://arxiv.org/abs/2607.25357), 2026.
+14. A. Basu. *When Does Content-Based Routing Work? Representation Requirements for Selective Attention in Hybrid Sequence Models.* [arXiv:2603.20997](https://arxiv.org/abs/2603.20997), 2026.
+15. J. Chung, S. Ahn, Y. Bengio. *Hierarchical Multiscale Recurrent Neural Networks.* [arXiv:1609.01704](https://arxiv.org/abs/1609.01704), 2017.
+16. A. Behrouz et al. *Nested Learning: The Illusion of Deep Learning Architectures.* [arXiv:2512.24695](https://arxiv.org/abs/2512.24695), 2025.
+17. W. Fedus, B. Zoph, N. Shazeer. *Switch Transformers.* JMLR 23(120), 2022.
+18. S. Arora et al. *Zoology: Measuring and Improving Recall in Efficient Language Models.* [arXiv:2312.04927](https://arxiv.org/abs/2312.04927), 2023.
 
 ---
 
