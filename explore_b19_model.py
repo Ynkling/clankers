@@ -28,6 +28,13 @@ read gate = write gate at every layer (LOCAL3's symmetry); no stop-gradient (the
 l-1"). A trains in the gate group. The model returns layer 1's gate as its read/write gate (the run path's statistics and
 outcome are layer 1's); layer_maps() gives every layer's routing (test_scale_axes.routing_k on that layer's gate).
 
+EVALUATION IN CHUNKS (memory). test_binding_onset.evaluate and test_scale_axes.stream_acc run the 2048-sequence held-out
+batch through the model in one forward; at P=16 and N=1024 that needs about 10.6 GB, more than four parallel runs can
+have. install() makes test_binding_onset.logits_of run a gradient-free forward of more than CHUNK sequences in chunks of
+CHUNK and concatenate the logits; training forwards (gradient on) are unchanged. On this machine the chunked logits are
+bit-identical to the one-forward logits (CHECK in explore_scale_child, several sizes and tasks), so every number is
+unchanged.
+
 CHECKPOINTS (runs longer than a segment). A run executes in one child process; a segment ends by killing it. Every
 evaluation of test_binding_onset.onset_run is followed by a checkpoint (onset_run_ckpt: onset_run line for line plus the
 save, written atomically), and a run started with a checkpoint present resumes from it:
@@ -247,6 +254,15 @@ class Recorder:
 REC = Recorder()
 CK = dict(path=None, halt_at=None, resumed=[], saved=0)
 ORIG_ONSET = tbo.onset_run
+ORIG_LOGITS = tbo.logits_of
+CHUNK = 256
+
+
+def logits_chunked(model, x):
+    """test_binding_onset.logits_of, in chunks of CHUNK sequences when no gradient is taken (evaluation)."""
+    if x.shape[0] <= CHUNK or torch.is_grad_enabled():
+        return ORIG_LOGITS(model, x)
+    return torch.cat([ORIG_LOGITS(model, x[i:i + CHUNK]) for i in range(0, x.shape[0], CHUNK)])
 
 
 def _params(opt):
@@ -376,6 +392,7 @@ def install(wrap_mods):
     """In the child, before the run: onset_run -> onset_run_ckpt; the listed (module, attribute, keep) measurements
     wrapped by the recorder (once)."""
     tbo.onset_run = onset_run_ckpt
+    tbo.logits_of = logits_chunked
     for mod, attr, keep in wrap_mods:
         f = getattr(mod, attr)
         if getattr(f, "_b19_orig", None) is None:

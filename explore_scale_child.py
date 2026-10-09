@@ -238,7 +238,29 @@ def checks(p):
     df = float((lf - ll_).abs().max())
     rows.append((f"RES6's forward_res with every layer's gate forced to layer 1's equals LocalBDH's forward (max |logit diff| "
                  f"{df:.1e} == 0)", df == 0.0))
-    # (5) groups and lrs through the real run path at D=64 and for RES6 (forward and evaluation stubbed), 2401 updates
+    # (5) the chunked evaluation forward equals the one-forward logits bit for bit (and evaluate's accuracy and loss)
+    from test_instrument_v2 import TAU_END
+    for tk, mult, cfg in (("P4S4", 32, "k16"), ("P16S4", 8, "k16"), ("P4S8", 8, "b"), ("P8S4", 8, "k16")):
+        spec = dict(cfg=cfg, task=tk, gate="local", size=[mult, 32, 3])
+        a = base_arm(spec)
+        m = b19.to_local_any(b19.builder_of(mult, 32, 3)(a, seed)(), seed)
+        task = task_of(spec)
+        data = tbo.eval_batch(task)[:1024]
+        m.eval()
+        with torch.no_grad():
+            one = b19.ORIG_LOGITS(m, data[:, :-1])
+            ch = b19.logits_chunked(m, data[:, :-1])
+        m.train()
+        old = tbo.logits_of
+        tbo.logits_of = b19.ORIG_LOGITS
+        ev_one = b19.orig(tbo.evaluate)(m, task, data)
+        tbo.logits_of = b19.logits_chunked
+        ev_ch = b19.orig(tbo.evaluate)(m, task, data)
+        tbo.logits_of = old
+        rows.append((f"{cfg} {tk} N={mult * 32}: the evaluation forward in chunks of {b19.CHUNK} equals the one forward on 1024 held-out "
+                     f"sequences bit for bit (logits {torch.equal(one, ch)}; evaluate {ev_one} vs {ev_ch})",
+                     torch.equal(one, ch) and ev_one == ev_ch))
+    # (6) groups and lrs through the real run path at D=64 and for RES6 (forward and evaluation stubbed), 2401 updates
     W = b16.WARM
     tbo.onset_run = b19.ORIG_ONSET                                  # stub_lrs needs run_one's keep (no checkpoints)
     for spec in (dict(cfg="k16", task="P4S4", gate="local", size=[4, 64, 3]), dict(cfg="k16", task="P4S4", gate="resgate", size=[8, 32, 4]),

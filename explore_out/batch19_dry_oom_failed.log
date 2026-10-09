@@ -1,0 +1,49 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), scale_eight (S66), capacity (S67) — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git 617681d | python 3.11.15 | torch threads 1
+====================================================================================================
+  code SHA (one child for all four screens): cd16a93b6f84 over 43 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b19_model explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  this segment's CPU: Intel(R) Xeon(R) Processor @ 2.80GHz; the batch's CPU (the full CHECK pass): Intel(R) Xeon(R) Processor @ 2.80GHz; checkpoints in /tmp/claude-0/-home-user-clankers/db3e70a0-5544-5116-802e-293fdfffc055/scratchpad/b19_ckpt_dry
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (94s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+Traceback (most recent call last):
+  File "/home/user/clankers/explore_batch19.py", line 486, in <module>
+    main()
+  File "/home/user/clankers/explore_batch19.py", line 446, in main
+    projection(args.workers, args.dry, t_start)
+  File "/home/user/clankers/explore_batch19.py", line 146, in projection
+    tm = measure_timings(workers)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/clankers/explore_batch19.py", line 125, in measure_timings
+    res = list(ex.map(lambda ch: c16.run_child(CHILD, "timing", dict(which={k: specs[k] for k in ch}, steps=steps), main=True)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/usr/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/clankers/explore_batch19.py", line 125, in <lambda>
+    res = list(ex.map(lambda ch: c16.run_child(CHILD, "timing", dict(which={k: specs[k] for k in ch}, steps=steps), main=True)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/clankers/explore_common16.py", line 99, in run_child
+    raise RuntimeError(f"child {module}.{func} failed (exit {r.returncode})")
+RuntimeError: child explore_scale_child.timing failed (exit -9)
+
+#### ADDENDUM (written after this run; EXPLORATORY, not a result) ####
+This first dry run stopped in the projection: one timing child was killed by the kernel (exit -9, out of memory).
+test_binding_onset.evaluate runs the 2048-sequence held-out batch in one forward; measured peak memory per process:
+P=16 N=1024 10.6 GB, P=8 N=1024 5.8 GB, P=16 N=256 3.7 GB, P=4 N=1024 3.2 GB, on a 15 GB machine with 4 parallel
+children. Fix (explore_b19_model.logits_chunked, before any real run): gradient-free forwards of more than 256 sequences
+run in chunks of 256; the chunked logits are bit-identical to the one-forward logits on this machine (tested at chunks
+256/128/64 on P4S4, P16S4, P8S4 N1024, S=8 N256 and N1024, and the oracle; now a CHECK), so no number changes. No run
+was made by this dry run.
