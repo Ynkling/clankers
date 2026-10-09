@@ -311,3 +311,27 @@ EXPLORATORY, NOT A RESULT — session H: H/copy2x2, H/query_gate, H/hardness
   [ 96]  976.4 min  H/query_gate     collapse.GUMBEL_RW       seed 443  lr 0.001  (as saved)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5101300+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  6000  outcome BOUND ROUTED; map [4, 1, 3, 7]
   start  976.4 min  H/query_gate     collapse.GUMBEL_RW       seed 452  (projected worst case 480 min)
+  [ 97]  978.7 min  H/hardness       HARD_W                   seed 497  lr 0.001  (LOCAL3 + SLOW + KEYMASS (<= 3); no hinge; hard write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd, code 8240313e6822, attempt 1: acc 0.121  trans  None  outcome non-stream KEY; map [10, 10, 10, 10, 10, 10, 10, 10]; None fired at [7200, 12000, 16800]
+  start  978.7 min  H/query_gate     collapse.GUMBEL_RW       seed 453  (projected worst case 480 min)
+  [ 98]  979.1 min  H/hardness       HARD_W                   seed 498  lr 0.001  (LOCAL3 + SLOW + KEYMASS (<= 3); no hinge; hard write)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd+dirty, code 8240313e6822, attempt 1: acc 0.373  trans  None  outcome MERGED (5 share); map [9, 12, 12, 9, 12, 9, 12, 12]; None fired at [4800, 16800, 21600]
+  start  979.1 min  H/query_gate     collapse.GUMBEL_RW       seed 459  (projected worst case 480 min)
+  [ 99]  982.0 min  H/query_gate     collapse.GUMBEL_RW       seed 452  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  6000  outcome BOUND ROUTED; map [14, 9, 13, 12]
+  start  982.0 min  H/query_gate     collapse.GUMBEL_W        seed 420  (projected worst case 480 min)
+  [100]  984.2 min  H/query_gate     collapse.GUMBEL_RW       seed 453  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  4800  outcome BOUND ROUTED; map [8, 5, 11, 6]
+  start  984.2 min  H/query_gate     collapse.GUMBEL_W        seed 421  (projected worst case 480 min)
+  [101]  984.7 min  H/query_gate     collapse.GUMBEL_RW       seed 459  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  4800  outcome BOUND ROUTED; map [7, 6, 13, 4]
+  start  984.7 min  H/query_gate     collapse.GUMBEL_W        seed 422  (projected worst case 480 min)
+  [102]  987.5 min  H/query_gate     collapse.GUMBEL_W        seed 420  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  4800  outcome BOUND ROUTED; map [2, 1, 15, 8]
+  start  987.5 min  H/query_gate     collapse.GUMBEL_W        seed 423  (projected worst case 480 min)
+  [103]  991.7 min  H/query_gate     collapse.GUMBEL_W        seed 422  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  8400  outcome BOUND ROUTED; map [2, 12, 3, 8]
+  start  991.7 min  H/query_gate     collapse.GUMBEL_W        seed 424  (projected worst case 480 min)
+  [104]  991.9 min  H/query_gate     collapse.GUMBEL_W        seed 421  lr 0.001  (as saved)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c3e04fd+dirty, code fb7f8b77db6a, attempt 1: acc 1.000  trans  9600  outcome BOUND NOT routed; map [14, 2, 2, 4]
+  start  991.9 min  H/query_gate     collapse.GUMBEL_W        seed 425  (projected worst case 480 min)
