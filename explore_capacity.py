@@ -75,10 +75,11 @@ def cap_reading(o256, ow, w):
     if not w:
         return "UNTESTED (S64 gave no larger width)"
     if o256["bound"] == 0 and ow["bound"] >= 1:
-        return f"capacity-bound at N=256 (the oracle binds P=16 at {w} {ow['bound']}/2 and at N256 0/2)"
+        return f"capacity-bound at N=256 (the oracle binds P=16 at {w} {ow['bound']}/{ow.get('n', 2)} and at N256 0/{o256.get('n', 2)})"
     if o256["bound"] >= 1:
-        return f"not capacity-bound at N=256 (the oracle binds P=16 at N256 {o256['bound']}/2; at {w} {ow['bound']}/2)"
-    return f"the oracle binds P=16 at neither width (N256 0/2, {w} 0/2)"
+        return (f"not capacity-bound at N=256 (the oracle binds P=16 at N256 {o256['bound']}/{o256.get('n', 2)}; at {w} "
+                f"{ow['bound']}/{ow.get('n', 2)})")
+    return f"the oracle binds P=16 at neither width (N256 0/{o256.get('n', 2)}, {w} 0/{ow.get('n', 2)})"
 
 
 def report():

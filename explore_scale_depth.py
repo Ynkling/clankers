@@ -85,11 +85,14 @@ def res6_block(me):
     st = ec.load_store(me.NAME)
     state, why = c19.arm_state(me, "RES6", st, False)
     runs = c16.runs_of(me, "RES6", store=st)
-    print(f"  DIAGNOSTIC RES6 ({ARMS['RES6']['label']}): {why or state}")
+    dry = me.NAME.startswith("dry_")
+    print(f"  DIAGNOSTIC RES6 ({me.ARMS['RES6']['label']}): {why or state}"
+          + (" (the dry run ran it regardless, to exercise the code)" if dry and runs and state != "ready" else ""))
     if not runs:
         return dict(state=state, why=why)
-    c19.arm_table("RES6", runs, SEEDS, c16.runs_of(me, "L6", store=st), "L6")
-    d = c19.counts_vs(runs, c16.runs_of(me, "L6", store=st), SEEDS)
+    seeds = me.ARMS["RES6"]["seeds"]
+    c19.arm_table("RES6", runs, seeds, c16.runs_of(me, "L6", store=st), "L6")
+    d = c19.counts_vs(runs, c16.runs_of(me, "L6", store=st), seeds)
     tm, tl = c19.trans_med(runs)
     print(f"    BOUND ROUTED (layer 1's gate) {d['new']}/{d['n']}; bound {sum(c19.bound(r) for r in runs.values())}/{len(runs)}; vs L6: "
           f"RES6 only {d['b']}, L6 only {d['c']}, p = {d['p']:.3g}; transitions {tl}; classes {c19.classes(runs)} (printed, no reading)")
