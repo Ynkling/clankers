@@ -608,3 +608,24 @@ Handed back as promising for a pre-registered test on the main branch:
   key-term window is worth considering, since every remaining failure formed after 2400.
 
 Not: W_RESET (the reset-only control: the copy does the work). Inconclusive: W2_K4. Cut: W_SPLIT_NOSLOW, W_SPLIT_W4, W4k4.
+
+## Session G
+
+Branch `claude/explore-G` (distant cues: make the header-layout cue reach the gate). EXPLORATORY, not a result. Seeds
+360-419. Outputs in `explore_out/G/`; reports `G/report_1.md` (S55) and `G/report_2.md` (S56, S57). Task: the fixed header
+layout at P = 8, S = 2, 24000 updates (the user's instruction of 9 October).
+
+| screen / arm | outcome | reference | reading |
+|---|---|---|---|
+| S55 probe, L3S_P8 (LOCAL3+SLOW, 360-369) | stream decodable at L2 / L3 / final: 0.55-0.58 (K and V; init 0.66-0.70) | – | "absent": the register is mandatory |
+| S55 probe, FAR_L3_P4 (batch 2 reproduced bit for bit, 160-169) | 0.63 / 0.58 at L2, 0.68 / 0.61 at L3 | – | "partial at L3 and final" |
+| S56 Hebbian REG_NUDGE (370-379) | BOUND ROUTED 0/10 | – | R1 "architecture insufficient" (write and read path both perfect; layer 1 unrouted) |
+| S56 Hebbian REG / REG_NOSG | BOUND 0/10, 0/10 | BASELINE 0/10 | R2 not discovered; R3 single GDN at least as good (0/10); R4 no; R5 SG does not matter |
+| S56 delta REG_NUDGE_D (390-399) | BOUND 8/10, ROUTED 7/10 | – | R1 "neither" |
+| S56 delta REG_D | BOUND 6/10, ROUTED 2/10 | BASELINE_D 2/10 (4 / 0, p = 0.0625) | R2 "discovered" by the rule as coded; 3 of the 6 bound by key splits, so "not discovered" if those count |
+| S57 latch (410-419) | LATCH, LATCH_NUDGE, LATCH_PRIOR BOUND 0/10 each | BASELINE_L 0/10 | R1 "architecture insufficient"; R2 not discovered (z collapses to always or never writing) |
+| ORACLE23, post hoc (370-372) | perfect gate at layers 2-3, LOCAL3 at layer 1: BOUND 0/3 | ORACLE_H 1/2 | not a reading: points at the unrouted layer-1 Hebbian memory |
+
+Validity: the Hebbian perfect gate bound 3 of 6 seeds at 24000 (marginal), the delta one 2/2. Handed back as worth a
+pre-registered look: a register-driven gate on delta channels (REG_D, REG_NUDGE_D), with routing (not BOUND) as the
+outcome. Not: the per-layer gate and the register or latch on Hebbian channels at this budget.
