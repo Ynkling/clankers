@@ -1,0 +1,50 @@
+{
+ "provenance": {
+  "banner": "EXPLORATORY, not a result",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "torch": "2.14.0+cu130",
+  "git": "e4d8107",
+  "python": "3.13.16",
+  "threads": 1,
+  "started": "2026-10-09 14:37:15"
+ },
+ "rows": [
+  [
+   "FAR_L3_P4|160 through 2400 reproduces batch 2's far_L3 record bit for bit ([[1200, 0.25634765625, 2.066574811935425], [2400, 0.2880859375, 1.84093177318573]] vs [[1200, 0.25634765625, 2.066574811935425], [2400, 0.2880859375, 1.84093177318573]])",
+   true
+  ],
+  [
+   "FAR_L3_P4: the residual loop's logits equal model(x)'s bit for bit; layer-1 input = LN(embedding)",
+   true
+  ],
+  [
+   "L3S_P8: the residual loop's logits equal model(x)'s bit for bit; layer-1 input = LN(embedding)",
+   true
+  ],
+  [
+   "ORACLE_P8: the residual loop's logits equal model(x)'s bit for bit; layer-1 input = LN(embedding)",
+   true
+  ],
+  [
+   "probe labels at KEY and VAL = the block's CTX token; 2000 sequences, split 1600/400 by sequence, disjoint",
+   true
+  ],
+  [
+   "synthetic probe: informative feature 0.998 >= 0.99; random feature 0.474 in [0.4, 0.6]",
+   true
+  ],
+  [
+   "L3S_P8: arm A's initial parameters for the seed, batch 1's window (window_init), W_h frozen",
+   true
+  ],
+  [
+   "L3S_P8 groups: gate ['W_in', 'W_g', 'gate_conv.conv_w'] at 1e-3, the other 5 at 1e-4, every trainable tensor once",
+   true
+  ],
+  [
+   "H8: L = 37 (37), qpos [35] ([35]), vocab 26 (26)",
+   true
+  ]
+ ],
+ "secs": 82.15327739715576
+}

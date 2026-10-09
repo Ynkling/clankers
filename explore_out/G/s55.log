@@ -1,0 +1,24 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — Session G S55 probe
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git e4d8107 | python 3.13.16 | torch threads 1
+====================================================================================================
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (44s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK S55: FAR_L3_P4|160 through 2400 reproduces batch 2's far_L3 record bit for bit ([[1200, 0.25634765625, 2.066574811935425], [2400, 0.2880859375, 1.84093177318573]] vs [[1200, 0.25634765625, 2.066574811935425], [2400, 0.2880859375, 1.84093177318573]]): ok
+  CHECK S55: FAR_L3_P4: the residual loop's logits equal model(x)'s bit for bit; layer-1 input = LN(embedding): ok
+  CHECK S55: L3S_P8: the residual loop's logits equal model(x)'s bit for bit; layer-1 input = LN(embedding): ok
+  CHECK S55: ORACLE_P8: the residual loop's logits equal model(x)'s bit for bit; layer-1 input = LN(embedding): ok
+  CHECK S55: probe labels at KEY and VAL = the block's CTX token; 2000 sequences, split 1600/400 by sequence, disjoint: ok
+  CHECK S55: synthetic probe: informative feature 0.998 >= 0.99; random feature 0.474 in [0.4, 0.6]: ok
+  CHECK S55: L3S_P8: arm A's initial parameters for the seed, batch 1's window (window_init), W_h frozen: ok
+  CHECK S55: L3S_P8 groups: gate ['W_in', 'W_g', 'gate_conv.conv_w'] at 1e-3, the other 5 at 1e-4, every trainable tensor once: ok
+  CHECK S55: H8: L = 37 (37), qpos [35] ([35]), vocab 26 (26): ok
+  s55_probe: code SHA 0c559dc511fe (24 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  22 runs queued on 4 workers
+  [  1/22]    6.1 min  FAR_L3_P4    seed 161  acc 0.439 trans  None POSITION        probe L2 0.68/0.59 L3 0.62/0.61 final 0.59/0.61 repro True
+  [  2/22]    6.1 min  FAR_L3_P4    seed 160  acc 0.438 trans  None OTHER           probe L2 0.61/0.59 L3 0.77/0.61 final 0.79/0.66 repro True
+  [  3/22]    8.9 min  FAR_L3_P4    seed 162  acc 1.000 trans  7200 BOUND unrouted  probe L2 0.63/0.53 L3 0.71/0.58 final 0.70/0.64 repro True
+  [  4/22]   10.0 min  FAR_L3_P4    seed 163  acc 1.000 trans 10800 BOUND unrouted  probe L2 0.68/0.58 L3 0.64/0.63 final 0.66/0.68 repro True
+  [  5/22]   10.1 min  ORACLE_P8    seed 360  acc 0.988 trans 24000 DISCOVERED      probe L2 0.53/0.54 L3 0.51/0.53 final 0.55/0.55
+  [  6/22]   10.3 min  ORACLE_P8    seed 361  acc 0.840 trans  None STREAM-PARTIAL  probe L2 0.56/0.55 L3 0.55/0.55 final 0.56/0.58
