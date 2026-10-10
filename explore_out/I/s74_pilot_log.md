@@ -56,3 +56,22 @@ piloted within the day at any configuration whose bound allows usability, so **S
 **C1** (first pilot configuration): S = 2, V = 4, LMIN..LMAX = 6..14, NB = 16, M = 176, L = 384, B = 32; NOMIX S = 1,
 NB = 32, M = 352. Reason: the shortest L with a margin of the bound above 0.9 (0.93); the faded learner predicts ORACLE
 ≈ 0.85, so C1 tests whether the model's memory reaches past the faded horizon. Usable only if it does.
+
+## C1 result (2026-10-10, 04:38-08:22; 8 runs)
+
+| arm | 800 | 801 | 802 | 803 | minutes per run |
+|---|---|---|---|---|---|
+| ORACLE SET | 0.918 | 0.910 | 0.910 | 0.913 | 111 |
+| SINGLE SET | 0.746 | 0.741 | 0.662 | 0.661 | 106 |
+| ORACLE − 0.2 | 0.718 | 0.710 | 0.710 | 0.713 | |
+
+ORACLE ≥ 0.9 on 4/4 (it beats the faded learner's 0.85 and sits 0.02 under the bound 0.93: the model's memory reaches
+past the faded horizon); SINGLE ≤ ORACLE − 0.2 on 2/4 (800 and 801 end above, and SINGLE was still rising at 12000:
+0.70 → 0.75 on 800 from 6000). **C1 NOT USABLE.** Two SINGLE seeds beat the mixed learner (0.74 against 0.65-0.67), so
+one channel separates the sources partly (by recency, or by content); its source probe stayed at 0.49-0.54. The NOMIX
+wave (4 runs) was stopped after the decision to free the CPUs (descriptive only; C2 runs NOMIX).
+
+**C2**: S = 2, V = 4, LMIN..LMAX = 3..7, NB = 40, M = 200, L = 480, B = 32; NOMIX S = 1, NB = 80, M = 400. Reason:
+shorter blocks switch sources more often, so the mixed memory's interference rises (mixed_fade 0.599 against C1's
+0.667); the longer L keeps the bound at 0.936 (C1: 0.932; ORACLE ran 0.02 under it). Shorter blocks at L = 384 put the
+bound at 0.92 and ORACLE at ~0.90, too close. Cost ~1.6x C1 per update.

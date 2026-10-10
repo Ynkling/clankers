@@ -27,6 +27,10 @@ CONFIGURATIONS (each appended here, with its reason, before it runs; see the log
       leaves any margin above 0.9; the faded ideal learner (memory 0.95 per token, evidence >= 0.05) predicts ORACLE
       ~0.85 and SINGLE ~0.67, and on a 3600-update smoke test at L = 96 the models matched the ideal learners within
       0.01, so C1 asks whether the model's memory reaches past the faded learner's horizon. NOMIX: NB = 32, M = 352.
+      RESULT: NOT USABLE (ORACLE >= 0.9 on 4/4; SINGLE <= ORACLE - 0.2 on 2/4); NOMIX stopped after the decision.
+  C2  S = 2, V = 4, LMIN..LMAX = 3..7, NB = 40, M = 200 (L = 480), B = 32: shorter blocks raise the mixed memory's
+      interference (faded mixed learner 0.60 against C1's 0.67) and the longer L keeps the bound at 0.936. NOMIX:
+      NB = 80, M = 400.
 
 Run:  python explore_i_pilot.py --config C1 [--workers 4] [--report-only]
 """
@@ -49,6 +53,7 @@ SEEDS = (800, 801, 802, 803)
 ITERS = 12000
 CONFIGS = {
     "C1": dict(S=2, V=4, NB=16, lmin=6, lmax=14, M=176),
+    "C2": dict(S=2, V=4, NB=40, lmin=3, lmax=7, M=200),
 }
 SPECS = {
     "ORACLE": lambda S: dict(gate="perfect", k=S, recipe="adam"),
