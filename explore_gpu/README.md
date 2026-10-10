@@ -57,9 +57,14 @@ On CPU (`checks_cpu_output.txt`, this container) these are asserted bit for bit:
   include a split that fires.
 - K5: the ICMC trainer equals `explore_i_common.run_one`, and the register's scan equals its loop.
 
-K3c (the criterion's controls) also runs on CPU. A neuron-permuted twin of arm A (same function, another summation
-order) passes 2400 updates. Zeroed or 1%-scaled gate gradients fail within 20 updates, including W_in at L = 768, where
-its gradient is ~1e-7 of the largest.
+K3c (the criterion's controls) also runs on CPU.
+- **Positive control.** A neuron-permuted twin of arm A (same function, another summation order) fails both tests at
+  5 of 2400 updates (0.2%). Each failure is an isolated rounding flip in the twin's own float32 path, with arbitration
+  scores 1.4–18 (1 is the limit). The twin passes within the 0.5% budget.
+- **Negative controls.** A zeroed W_in, W_h or W_g gradient, or W_g's gradient scaled by 1.01, fails at every update
+  from the first, with scores 70–9000. This includes W_in at L = 768, where its gradient is ~1e-7 of the largest.
+
+On CPU the delta memory's GDN case also passes: 6 of 900 updates needed arbitration and none failed.
 
 K7 checks the data path. K8 runs every forward on fake CUDA tensors to show that no CPU tensor is mixed in.
 
