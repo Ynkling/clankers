@@ -75,3 +75,27 @@ wave (4 runs) was stopped after the decision to free the CPUs (descriptive only;
 shorter blocks switch sources more often, so the mixed memory's interference rises (mixed_fade 0.599 against C1's
 0.667); the longer L keeps the bound at 0.936 (C1: 0.932; ORACLE ran 0.02 under it). Shorter blocks at L = 384 put the
 bound at 0.92 and ORACLE at ~0.90, too close. Cost ~1.6x C1 per update.
+
+## C2 result (2026-10-10, 08:27-14:00; 8 runs, NOMIX running)
+
+| arm | 800 | 801 | 802 | 803 | minutes per run |
+|---|---|---|---|---|---|
+| ORACLE SET | 0.916 | 0.917 | 0.917 | 0.918 | 165 |
+| SINGLE SET | 0.812 | 0.812 | 0.654 | 0.863 | 155 |
+| ORACLE − 0.2 | 0.716 | 0.717 | 0.717 | 0.718 | |
+| SINGLE probe L2 / L3 at the end | 0.87 / 0.98 | 0.87 / 0.98 | 0.52 / 0.51 | 0.91 / 0.98 | |
+
+**C2 NOT USABLE** (1/4). Three SINGLE runs made a step transition: at the same evaluation (803 at 2400, 800 at 9600,
+801 at 10800) SET jumped by 0.10-0.21 and the logistic probe from the residual entering layer 3 to the source went from
+0.52-0.58 to 0.98. The single channel's stack learned to carry the block's source token; the gap to ORACLE then closed
+by 60-80%. Seed 802 never made the transition (SET 0.65, the mixed learner's level; probe 0.51).
+
+## Decision: stop (2026-10-10 ~14:00, after ~9.5 h of the pilot's day)
+
+The configurations that keep the Bayes bound high enough for ORACLE ≥ 0.9 all have V = 4 and long sequences, and the
+two ways a single channel escapes interference cover the range of block lengths: with long blocks (C1, 6..14) the recent
+memory is mostly the current source and SINGLE drifts up to 0.74 on 2/4 seeds; with short blocks (C2, 3..7) the
+interference is stronger and SINGLE learns to tag its memory by source on 3/4 seeds. The one remaining knob that would
+make SINGLE fail by the end of 12000 updates is to starve it (a smaller B), which would only move the transition past the
+pilot's budget and inside S75's 24000; that would rig the control, so it is not tried. Nothing usable was found; per the
+rule, report and stop. S75 is not run; its draft (explore_i_dense.py) keeps its placeholders.
