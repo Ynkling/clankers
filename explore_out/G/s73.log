@@ -47,3 +47,6 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   CHECK S73: BASELINE_D: LOCAL3 + delta (beta 1, L2 keys, tied write, decay 0.95): ok
   s73_register3_delta: code SHA 5366c9b9a792 (30 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
   90 runs queued on 4 workers
+  [  1/90]    1.9 min  REG3_NUDGE_D seed 700  acc 0.989 trans  1200 ROUTED-BOUND
+  [  2/90]    2.9 min  BASELINE_D   seed 700  acc 1.000 trans  4800 BOUND unrouted
+  [  3/90]    4.8 min  LATCH3_NUDGE_D seed 700  acc 1.000 trans  1200 ROUTED-BOUND
