@@ -93,6 +93,29 @@ CHECKS (before any run unless stated)
 RUNTIME: projection with pool-load timing before the first run (longrun.projection: all runs and the runs still to
 do). Nothing is cut. Perfect gates first, then longest first. Runs are cached in split_copy_results.json (gitignored,
 written atomically after each run); a restart resumes from the cached records (longrun.resume_meta).
+
+RESULT (X) — test commit 1f52cd5, run 2026-10-10 (started 05:06 UTC through longrun.py; runs from 07:49 after the
+verification), Intel(R) Xeon(R) Processor @ 2.10GHz, torch 2.14.0+cu130, 4 workers x 1 thread, one start, nothing cut,
+54/54 runs, none failed; 14.7 h wall clock (projection 17.2 h worst case).
+- Verification: every inherited and own CHECK passed. test_muon_recipe's CHECK 130 (Muon, X's 2.80GHz
+  test_early_recipe file) differs here and was printed, not asserted (the early_assert knob; CHECK 145 inert). CHECK
+  146 reproduced the 2.80GHz test_window_gate records at seed 540 bit for bit through 7200 (printed: other CPU).
+  CHECK 150 reproduced F's S68_SINGLE_S8|300 through 2400 (asserted: same CPU). CHECK 151(a): 65 Part C/D records,
+  v1 = v2; 151(b): 30 Part A records, no disagreement (PASS).
+- Validity: CEIL_C bound 2/2 (4800, 3600); CEIL_DELTA_D8 bound 2/2 (1200, 1200). Parts A and B VALID on X.
+- Counts: WIN3_SPLIT_D8 BOUND ROUTED 10/10 (transition median 22200, 13200-25200); WIN3_RESET_D8 3/10 (s561, s564,
+  s568); WIN3_SLOW_D8 5/10 (s561, s564, s566, s568, s569); SINGLE_DELTA_D8 BOUND 0/10 (final accuracy 0.08-0.76);
+  SINGLE_HEBB_D8 BOUND 0/10 (0.08-0.12).
+- Per machine (SECONDARY; the pooled claims and the readings wait for L):
+  C1 SHOWN: 10/10 vs 3/10, split only 7, reset only 0, p = 0.0078.
+  C2 HOLDS: 3/10 vs 5/10, reset only 0, slow only 2, d = -2 (bound d <= 2).
+  C3 SHOWN: 10/10 vs 0/10, 10 vs 0, p = 0.00098.
+  Bands: WIN3_SPLIT_D8 RELIABLE [0.722, 1.000]; WIN3_RESET_D8 MINORITY [0.108, 0.603]; WIN3_SLOW_D8 MAJORITY
+  [0.237, 0.763]; SINGLE_DELTA_D8 NEVER [0, 0.278]; SINGLE_HEBB_D8 NEVER [0, 0.278].
+- Printed: SINGLE_DELTA_D8 vs SINGLE_HEBB_D8 0 vs 0 (both 0/10). Splits: 22 in 10 runs, every target labelled ok
+  (22/22). Resets: 27 in 10 runs, all targets labelled ok. Every reset seed that bound also bound without a trigger
+  (s561, s564, s568); s566 and s569 bound under SLOW but not under RESET. The failures of RESET and SLOW are all
+  merges (MERGED 2 share; SLOW also 3 and 4 share once each).
 """
 
 import argparse

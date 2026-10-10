@@ -27,6 +27,7 @@ Commit = the git head each run was started from (its `meta.git`); date = its `me
 | X/early_recipe_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 9f25dc8 | 2026-10-04 06:26 |
 | X/muon_recipe_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 74f5907 | 2026-10-06 06:19 |
 | X/window_gate_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 886a668 (first start 2f98f06: its six perfect-gate runs kept) | 2026-10-07 23:30 |
+| X/split_copy_results.json | X: Intel(R) Xeon(R) Processor @ 2.10GHz | 1f52cd5 | 2026-10-10 07:49 |
 | L/channel_binding_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 93b227c (rerun at 886a668 on 2026-10-10; the test's code is unchanged between the two, only its docstring) | 2026-10-10 10:28 |
 | L/router_discovery_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 4422dc4 (run at a9b3112) | 2026-09-25 12:42 |
 | L/router_confirm_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 2271b55 (run at 5ba7c1d) | 2026-09-25 22:31 |
