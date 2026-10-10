@@ -41,3 +41,9 @@ EXPLORATORY, NOT A RESULT — Session F s81 (F/trigger)
   CHECK F/trigger: DELTA* = O_B1_L2 (beta 1.0, L2 keys True) as committed; this child uses {'beta': 1.0, 'normalize': True}: ok
   CHECK F/trigger: trigger mechanics (untrained model, threshold 1.1, rise 1): BASE fires at [4800, 9600, 14400] (expect 4800, 9600, 14400); GUARD (probe 0.078 < 0.5) fires at [] (expect none; guarded 7); GUARD_EVAL on fake held-out readings 0.3 then 0.6 from 7200 fires at [7200, 12000, 16800] (expect 7200, 12000, 16800): ok
   CHECK F/trigger: the perfect gate on DELTA* (k 16): one-hot (True), equal to the Hebbian model's (True): ok
+  timings measured (119 s): F/trigger:BASE 206.4 ms/step, F/trigger:GUARD 208.0 ms/step, F/trigger:EVAL 204.2 ms/step, F/trigger:GUARD_EVAL 207.3 ms/step, F/trigger:O_DELTA_C 186.1 ms/step
+  42 runs queued; projected worst case 114.30 h of runs, makespan 29.81 h on 4 workers
+  start    0.0 min  F/trigger        GUARD                    seed 2020  (projected worst case 165 min)
+  start    0.0 min  F/trigger        GUARD                    seed 2021  (projected worst case 165 min)
+  start    0.0 min  F/trigger        GUARD                    seed 2022  (projected worst case 165 min)
+  start    0.0 min  F/trigger        GUARD                    seed 2023  (projected worst case 165 min)
