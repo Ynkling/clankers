@@ -171,3 +171,9 @@ EXPLORATORY, NOT A RESULT — Session F s76 (F/eight)
   [  7]  237.4 min  F/eight          DELTA_SPLIT              seed 1317  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7e176ea, code 2336ceff7760, attempt 1: acc 1.000  trans 14400  BOUND ROUTED  splits 1  map 1+1+1+1+1+1+1+1
   start  237.4 min  F/eight          O_B1_RAW                 seed 1300  (projected worst case 169 min)
+  [  8]  257.1 min  F/eight          O_B1_RAW                 seed 1300  lr 0.001  (Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7e1e09a, code 2336ceff7760, attempt 3: FAILED Diverged: DIVERGED (non-finite held-out loss nan)
+  start  257.1 min  F/eight          HEBB_SPLIT               seed 1310  (projected worst case 61 min)
+  [  9]  261.6 min  F/eight          DELTA_SPLIT              seed 1318  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7e1e09a+dirty, code 2336ceff7760, attempt 1: acc 1.000  trans  9600  BOUND ROUTED  splits 0  map 1+1+1+1+1+1+1+1
+  start  261.6 min  F/eight          HEBB_SPLIT               seed 1311  (projected worst case 61 min)
