@@ -9,7 +9,10 @@ TASK: ICMC (explore_i_task.ICMCTask) S = 4 sources, V = 4 words, blocks of LMIN.
   source, M = 176 words per source, L = 768 (the model reads 767). Per source this is S74's C1 exactly (C1: S = 2, same
   V, block lengths, NB and M at L = 384), whose Bayes bound on SET accuracy is 0.932 and where ORACLE reached
   0.910-0.918 on 4/4 seeds at 12000 updates; at S = 4 the same per-source chain needs L = 768 (S74's bound table: "S = 4
-  needs L ≈ 768"). Usability at S = 4 was not piloted (S74 excluded S = 4 on CPU cost); VALIDITY below guards it.
+  needs L ≈ 768"). Usability at S = 4 was not piloted (S74 excluded S = 4 on CPU cost). VALIDITY below guards only the
+  ORACLE half of S74's usability rule (ORACLE >= 0.9); the SINGLE half (SINGLE <= ORACLE - 0.2 on >= 3/4 seeds), which
+  C1 failed at S = 2 (2/4), is printed beside the reading, not a condition of it: S75's reading is about ROUTED, which
+  does not depend on how close SINGLE comes, and GAP is reported as it falls.
 MODEL: the project's BDH (N = 256, D = 32, 3 layers, decay 0.95, conv "layer" width 4), k = S = 4 channels for the gated
   arms. B = 32, Adam 1e-3, evaluation every 1200 updates on 1024 held-out sequences (explore_i_common.evaluate: masked loss,
   SET accuracy overall / by bin / by source, routing per gate layer, the source probe at every layer).
@@ -25,7 +28,8 @@ ARMS (seeds 830-839; ORACLE on 830-831; 24000 updates):
   token only at the first two words of a block; at a block's later words its gate is a function of three word tokens,
   which carry no source, so it cannot reach eta^2 >= 0.9 over all word positions. WIDE_SLOW is WIDE_SPLIT without the
   split. --extended adds WIN3_SPLIT, WIDE_SLOW and REG3_NUDGE (10 seeds each), printed, never
-  read.
+  read. REG3_NUDGE's nudge runs on CPU while the model is built (300 Adam steps of a full REG3 forward / backward at
+  B = 64, L = 767: some minutes per run before its GPU training).
   SPLIT_THR (the trigger's probe SET accuracy threshold; rise 0.02; checks every 2400 from 4800 to 21600; <= 3 splits,
   >= 4800 apart): 0.88 = C1's lowest ORACLE final SET (0.910) minus 0.03, so a run routed as well as the oracle does not
   fire and a merged run does. At k = S there is no spare channel: a split that fires on a routed run overwrites a live
@@ -76,6 +80,7 @@ ORACLE_SEEDS = (830, 831)
 READ_ARMS = ("WIDE_SPLIT", "REG3")
 EXTENDED = ("WIN3_SPLIT", "WIDE_SLOW", "REG3_NUDGE")
 HI = 8
+RPB_6GB, RPB_8GB = 1, 2               # default runs per batch; from explore_gpu/runtime_estimate.md (see its R column)
 
 
 def task():
@@ -145,16 +150,23 @@ def runs_of(st, arm, sha):
 
 
 def drive(device, rpb, extended, only=None, log=print, stats_workers=None):
+    """Runs every planned (arm, seed) without an ok record under this code SHA on this GPU; returns the list of planned
+    runs still without one (main exits non-zero if any)."""
     dev = dv.setup(device)
     info = dv.device_info(dev)
     sha, mods = code_sha()
     hw = info["gpu"] or info["cpu"]
     st = load(hw)
     st["meta"].setdefault("started", time.strftime("%Y-%m-%d %H:%M:%S"))
-    st["meta"].update(sha=sha, modules=mods, device=info, config=CONFIG, iters=ITERS, split_thr=SPLIT_THR)
-    save(st, hw)
+    st["meta"] = {k: v for k, v in st["meta"].items() if not k.startswith("retried_")}
     T = task()
-    log(f"[S75 S=4] {T.label}; code SHA {sha}; {info}")
+    t0 = time.time()
+    chk = it.check_task(T, n=512)                       # the task's CHECKs at the screen's configuration (explore_i_task)
+    assert all(chk.values()), f"task CHECK failed: {chk}"
+    st["meta"].update(sha=sha, modules=mods, device=info, config=CONFIG, iters=ITERS, split_thr=SPLIT_THR,
+                      task_check=dict(ok=True, n=512, secs=round(time.time() - t0, 1)))
+    save(st, hw)
+    log(f"[S75 S=4] {T.label}; code SHA {sha}; {info}; task CHECK ok")
     for arm in arms(extended):
         if only and arm not in only:
             continue
@@ -175,7 +187,7 @@ def drive(device, rpb, extended, only=None, log=print, stats_workers=None):
                 if rec.get("ok"):
                     e = rec["end"]
                     log(f"    {arm} {rec['seed']}: SET {e['set']:.3f} ROUTED {idense.routed(rec)} "
-                        f"train {rec['train_secs'] / 60:.0f} min, peak {rec.get('peak_mem_gb')} GB")
+                        f"train {rec['train_secs'] / 60:.0f} min per run, peak {rec.get('peak_mem_gb_batch')} GB (R = {rec['R']})")
                 else:
                     log(f"    {arm} {rec['seed']}: FAILED {rec.get('error')}")
             if bad:
@@ -187,10 +199,16 @@ def drive(device, rpb, extended, only=None, log=print, stats_workers=None):
                     st["meta"][f"retried_{arm}_{bad}"] = True
                     save(st, hw)
                     todo = bad + todo
-    report(log, sha)
+    st = load(hw)
+    missing = [(a, s_) for a in arms(extended) if not only or a in only for s_ in seeds_of(a)
+               if not (st["runs"].get(f"{a}|{s_}|{sha}|{hw}") or {}).get("ok")]
+    report(log, sha, summary=f"{NAME}_{hw_slug(hw)}_summary.md")
+    if missing:
+        log(f"[S75 S=4] {len(missing)} planned runs have no ok record: {missing}")
+    return missing
 
 
-def report(log=print, sha=None):
+def report(log=print, sha=None, summary=None):
     st = load_all()
     sha = sha or code_sha()[0]
     T = task()
@@ -199,6 +217,20 @@ def report(log=print, sha=None):
     gpus = sorted({r.get("hw") for rr in R.values() for r in rr.values()})
     L = [f"S75 at S = 4 (EXPLORATORY): {T.label}; {ITERS} updates; split threshold {SPLIT_THR}; code SHA {sha}; "
          f"GPUs {gpus}", ""]
+    other = {}
+    for k, r in st["runs"].items():
+        a, s_, sh = k.split("|")[:3]
+        if sh != sha:
+            other[(sh, r.get("hw"))] = other.get((sh, r.get("hw")), 0) + 1
+    if other:
+        L.append("NOT COUNTED (another code SHA): " + "; ".join(f"{n} records with SHA {sh} on {hw}"
+                                                              for (sh, hw), n in sorted(other.items())))
+    failed = [(k.split("|")[0], k.split("|")[1], r.get("error")) for k, r in st["runs"].items()
+              if not r.get("ok") and k.split("|")[2] == sha]
+    if failed:
+        L.append("FAILED RUNS (last error; a later ok record for the same seed supersedes): " +
+                 "; ".join(f"{a} {s_}: {e}" for a, s_, e in failed))
+    L.append("")
     orc = list(R["ORACLE"].values())
     valid = len(orc) == 2 and all(r["end"]["set"] >= 0.9 for r in orc)
     oset = {f: (statistics.fmean(r["end"][f] for r in orc) if orc else None)
@@ -252,8 +284,9 @@ def report(log=print, sha=None):
               idense.fmt(idense.med([r.get("beta_word") for r in rr.values()])))
         L.append(f"  {a:<11} eta 1-2 {idense.fmt(e12)} / 5+ {idense.fmt(e5)}; probe " + " / ".join(idense.fmt(v) for v in pr) +
                  (f"; beta {bt[0]} / {bt[1]}" if a.startswith("REG3") else "") +
-                 f"; train {idense.fmt(idense.med([r.get('train_secs', 0) / 60 for r in rr.values()]), 0)} min; peak "
-                 f"{idense.med([r.get('peak_mem_gb') for r in rr.values()])} GB")
+                 f"; train {idense.fmt(idense.med([r.get('train_secs', 0) / 60 for r in rr.values()]), 0)} min per run; "
+                 f"peak {idense.med([r.get('peak_mem_gb_batch') for r in rr.values()])} GB per batch of "
+                 f"{idense.med([r.get('R') for r in rr.values()])}")
     L += ["", "PER RUN: arm seed ROUTED SET GAP maps / eta / margin per layer, splits"]
     for a, rr in R.items():
         for s, r in sorted(rr.items()):
@@ -266,7 +299,7 @@ def report(log=print, sha=None):
     txt = "\n".join(L)
     log(txt)
     os.makedirs(OUT, exist_ok=True)
-    with open(os.path.join(OUT, f"{NAME}_summary.md"), "w") as f:
+    with open(os.path.join(OUT, summary or f"{NAME}_summary.md"), "w") as f:
         f.write(txt + "\n")
 
 
@@ -283,13 +316,19 @@ def main():
     if a.report_only:
         report()
         return
+    only = None
+    if a.arms is not None:
+        only = {x.strip() for x in a.arms.split(",") if x.strip()}
+        bad = only - set(arms(True))
+        assert not bad, f"unknown arms {bad}; arms are {arms(True)}"
     rpb = a.runs_per_batch
     if rpb is None:
         dev = dv.setup(a.device)
         mem = dv.device_info(dev).get("gpu_mem_gb") or 0
-        rpb = 2 if mem >= 7.5 else 1
-    drive(a.device, rpb, a.extended, only=None if a.arms is None else set(a.arms.split(",")),
-          log=lambda s: print(s, flush=True), stats_workers=a.stats_workers)
+        rpb = RPB_8GB if mem >= 7.5 else RPB_6GB
+    missing = drive(a.device, rpb, a.extended, only=only, log=lambda s: print(s, flush=True),
+                    stats_workers=a.stats_workers)
+    sys.exit(1 if missing else 0)
 
 
 if __name__ == "__main__":

@@ -23,8 +23,9 @@ Instrument.gates / LocalBDH.local_gates / RegBDH.layer_gate (the gates) and Gate
 (the memory), with every activation carrying the run dimension: (R, B, T, ·). The register's recurrence
 R_t = R_{t-1}(1 - beta_t) + beta_t W_R v_t has two forms: "loop" (RegBDH.register's loop, the same operations) and
 "scan" (default on CUDA: R_{t-1} = sum_{s<t} exp(C_{t-1} - C_s) beta_s W_R v_s with C = cumsum log(1 - beta) in float64,
-log(1 - beta) floored at -60; equal to the loop to float32 rounding, CHECKed), because a 767-step Python loop of tiny
-kernels would dominate a GPU step.
+log(1 - beta) = -softplus(z) computed from the gate's logit z, so a saturated beta = 1.0 stays finite with a finite
+gradient; equal to the loop to float32 rounding, CHECKed also with saturated beta), because a 767-step Python loop of
+tiny kernels would dominate a GPU step.
 NUMERICS: the same float32 operations as the sequential path; matrix products run as batched GEMMs over (R, B) or over R
 with B·T rows, so results may differ from the sequential path in the last bits (the CHECKs bound the difference).
 StackedAdam is torch.optim.Adam's single-tensor update (lerp_, mul_/addcmul_, Python-float bias corrections,
@@ -49,9 +50,6 @@ from test_instrument_v2 import decay_mask, perfect_gate_general
 import explore_b16_gates as g16
 import explore_g_regmodel as rm
 import explore_delta_mem as dm
-
-REG_FLOOR = -60.0
-
 
 # ── architecture signature ────────────────────────────────────────────────────
 def signature(m):
@@ -85,6 +83,10 @@ def supported(s):
     assert s["kind"] in ("none", "perfect", "recurrent", "window", "reg"), s["kind"]
     if s["kind"] == "reg":
         assert s["conv"] in (None, "layer") and s["mem"] in ("hebb", "delta")
+        # RegBDH must have been built for the memory it has: to_reg(mem="delta") then delta attention. A Reg3 model built
+        # Hebbian and converted by to_delta afterwards feeds LOCAL3's gate to every layer sequentially (to_delta wraps
+        # local_gates), which is not what the batched per-layer gates compute: rejected.
+        assert s["delta"] == (s["mem"] == "delta"), "RegBDH: mem and the attention's memory disagree (convert with mem='delta')"
 
 
 # ── small batched helpers ─────────────────────────────────────────────────────
@@ -126,6 +128,12 @@ def ln(x):
 class BatchedBDH(nn.Module):
     def __init__(self, models, device, register="auto"):
         super().__init__()
+        for m in models:                    # transient forward state (a nudge's last attn.G is a non-leaf: no deepcopy)
+            m.attn.G = None
+            if hasattr(m, "diag"):
+                m.diag = None
+            if hasattr(m.attn, "_gates"):
+                m.attn._gates, m.attn._layer = None, 0
         sigs = [signature(m) for m in models]
         assert all(s == sigs[0] for s in sigs), "every stacked run must have the same architecture"
         self.sig = s = sigs[0]
@@ -182,7 +190,8 @@ class BatchedBDH(nn.Module):
 
     def register(self, v):
         """(Rprev (R,B,T,R_DIM), beta (R,B,T)); RegBDH.register per run."""
-        beta = torch.sigmoid(mv_runs(v, self.P("w_R")) + self.P("b_R").view(-1, 1, 1))
+        z = mv_runs(v, self.P("w_R")) + self.P("b_R").view(-1, 1, 1)
+        beta = torch.sigmoid(z)
         w = bmm_rows(v, self.P("W_R").mT)
         R_, B, T, _ = v.shape
         if self.register_mode == "loop":
@@ -193,7 +202,7 @@ class BatchedBDH(nn.Module):
                 b = beta[:, :, t:t + 1]
                 Rs = Rs * (1 - b) + b * w[:, :, t]
             return torch.stack(prev, 2), beta
-        lg = torch.log1p(-beta.double()).clamp(min=REG_FLOOR)                  # (R, B, T)
+        lg = -F.softplus(z.double())                                            # log(1 - sigmoid z): finite, smooth
         C = lg.cumsum(-1)
         Cprev = torch.cat([torch.zeros_like(C[..., :1]), C[..., :-1]], -1)      # C_{t-1}
         diff = Cprev.unsqueeze(-1) - C.unsqueeze(-2)                            # C_{t-1} - C_s
@@ -351,8 +360,10 @@ class StackedAdam:
                     continue
                 st = self.state.get(p)
                 if st is None:
-                    st = self.state[p] = dict(step=[0] * self.R, exp_avg=torch.zeros_like(p),
-                                              exp_avg_sq=torch.zeros_like(p))
+                    # step: one count per run, an (R,) float64 CPU tensor, so a view of run r's entry can be zeroed in
+                    # place by test_window_gate / explore_i_common's zero_state (as torch.optim.Adam's step tensor is)
+                    st = self.state[p] = dict(step=torch.zeros(self.R, dtype=torch.float64),
+                                              exp_avg=torch.zeros_like(p), exp_avg_sq=torch.zeros_like(p))
                 keep = None
                 if act is not None:
                     idx = [r for r in range(self.R) if not act[r]]
@@ -363,7 +374,7 @@ class StackedAdam:
                 grad, m, v = p.grad, st["exp_avg"], st["exp_avg_sq"]
                 m.lerp_(grad, 1 - b1)
                 v.mul_(b2).addcmul_(grad, grad, value=1 - b2)
-                steps = st["step"]
+                steps = [int(x) for x in st["step"].tolist()]
                 if all(x == steps[0] for x in steps) and steps[0] > 0:
                     step = float(steps[0])
                     step_size = lr / (1 - b1 ** step)
@@ -389,10 +400,18 @@ class StackedAdam:
         st = self.state.get(p)
         if not st:
             return []
+        st["step"][r] = 0
         st["exp_avg"][r].zero_()
         st["exp_avg_sq"][r].zero_()
-        st["step"][r] = 0
         return ["step", "exp_avg", "exp_avg_sq"]
+
+    def run_state(self, p, r):
+        """Run r's state of stacked parameter p as views (step (1,), exp_avg, exp_avg_sq), in torch.optim.Adam's key
+        order: zeroing them in place is test_window_gate.zero_state on that run's Adam state."""
+        st = self.state.get(p)
+        if not st:
+            return None
+        return {"step": st["step"][r:r + 1], "exp_avg": st["exp_avg"][r], "exp_avg_sq": st["exp_avg_sq"][r]}
 
 
 def adam_groups(bm, gate_names=None, lr=1e-3, lr_rest=None):

@@ -6,6 +6,11 @@ explore_gpu/mainline.py — run any main-line test's arm on a device, with the t
     python -m explore_gpu.mainline --test test_short_conv --arm A --seeds 160 --iters 2400 --device cpu    (a CHECK)
     python -m explore_gpu.mainline --list test_split_copy                                                    (its arms)
 
+SUPPORTED: the tests with run_job and spec (16 at this commit): test_short_conv, test_conv_lr, test_p_scaling,
+test_scale_axes, test_stream_channels, test_router_layout, test_load_curriculum, test_curriculum_confirm (Part 2 arms on
+its SCHED16), test_stream_recipe, test_stream_curriculum, test_slow_start, test_early_recipe, test_recipe_scope,
+test_muon_recipe, test_window_gate, test_split_copy. Tests without them (Phase I-III, test_router_reliability,
+test_readout_path) are not.
 HOW: every main-line test that trains exposes run_job(sp) and spec(key, seed, iters | sched); its runs end in
 test_binding_onset.onset_run. Inside explore_gpu.device.device_scope(device) the test's own run_job runs unchanged: its
 model is built on CPU by its own builder under its own seeding (so initial parameters do not depend on the device), then
@@ -15,7 +20,9 @@ float32 with TF32 off. spec's third argument is the test's own default: iters = 
 the arm's part length) unless --iters is given; sched = the test's REAL schedule, with --iters setting its total where
 the schedule has one ("total", "iters", "iters_a/b/c", "iters0").
 RECORDS: in the test's own format (run_job's record), keyed "ARM|seed", plus rec["device"] (explore_gpu.device.device_info:
-device, GPU model, capability, memory, CUDA, cuDNN, torch, CPU) and rec["gpu"]. Written atomically after every run to
+device, GPU model, capability, memory, CUDA, cuDNN, torch, CPU), rec["gpu"], rec["spec"] and rec["code_sha"] (a record is
+reused only for the same spec and code: a shortened run never stands in for the full one); Muon arms' "host" fingerprint
+is computed on the CPU by the test and annotated (host_note). Written atomically after every run to
 explore_out/I/gpu/mainline/<test>_<hardware>_results.json — never into results/X or results/L, and the meta names the
 machine "GPU:<model>" so that no test's --also pooling can take these records for machine X's or L's. A record from a
 CUDA run is a new run of that arm and seed (CUDA does not reproduce CPU records bit for bit: explore_gpu/checks.py, K0);
@@ -64,8 +71,10 @@ def _default_iters(mod, arm):
     raise ValueError(f"{mod.__name__}: no default iteration count; pass --iters")
 
 
-def _sched(mod, iters):
+def _sched(mod, iters, arm=None):
     base = getattr(mod, "REAL", None) or getattr(mod, "SCHED", None)
+    if arm is not None and arm in getattr(mod, "PART2", ()) and hasattr(mod, "REAL16"):
+        base = mod.REAL16                                  # test_curriculum_confirm's Part 2 arms run on SCHED16
     assert isinstance(base, dict), f"{mod.__name__}: no REAL / SCHED schedule"
     s = dict(base)
     if iters is not None:
@@ -82,7 +91,7 @@ def make_spec(mod, arm, seed, iters):
     if third == "iters":
         return mod.spec(arm, seed, int(iters) if iters is not None else _default_iters(mod, arm))
     if third == "sched":
-        return mod.spec(arm, seed, _sched(mod, iters))
+        return mod.spec(arm, seed, _sched(mod, iters, arm))
     raise ValueError(f"{mod.__name__}.spec{sig}: unsupported signature")
 
 
@@ -93,7 +102,8 @@ def run_arm(test, arm, seed, device, iters=None):
     if torch.device(device).type == "cpu":
         torch.set_num_threads(1)
     mod = importlib.import_module(test)
-    assert hasattr(mod, "run_job") and hasattr(mod, "spec"), f"{test} has no run_job / spec"
+    assert hasattr(mod, "run_job") and hasattr(mod, "spec"), (
+        f"{test} has no run_job / spec: supported are the tests with both (this module's docstring lists them)")
     sp = make_spec(mod, arm, seed, iters)
     t0 = time.time()
     try:
@@ -104,6 +114,9 @@ def run_arm(test, arm, seed, device, iters=None):
         info = dv.device_info(device)
         rec = dict(ok=False, seed=seed, error=f"{type(e).__name__}: {e}", traceback=traceback.format_exc()[-3000:])
     rec = dict(rec, device=info, gpu=info.get("gpu"), wall_secs=time.time() - t0, spec=json.loads(json.dumps(sp, default=str)))
+    if isinstance(rec.get("host"), dict) and info.get("gpu"):
+        rec["host_note"] = (f"'host' was computed on this machine's CPU by the test's host_info(); this run's arithmetic "
+                            f"(Muon's bf16 Newton-Schulz included) ran on {info['gpu']}")
     return json.loads(json.dumps(rec, default=float))
 
 
@@ -144,7 +157,18 @@ def main():
     st["meta"].setdefault("started", time.strftime("%Y-%m-%d %H:%M:%S"))
     st["meta"].update(test=a.test, machine=f"GPU:{info.get('gpu') or info['cpu']}", device=info,
                       note="explore_gpu.mainline: the test's own run_job on this device; not machine X's or L's records")
-    seeds = [s for s in parse_seeds(a.seeds) if not (st["runs"].get(f"{a.arm}|{s}") or {}).get("ok")]
+    from explore_gpu import run as gr
+    sha = gr.code_sha(a.test)[0]
+    mod = importlib.import_module(a.test)
+    seeds = []
+    for s in parse_seeds(a.seeds):
+        old = st["runs"].get(f"{a.arm}|{s}") or {}
+        want = json.loads(json.dumps(make_spec(mod, a.arm, s, a.iters), default=str))
+        if old.get("ok") and old.get("spec") == want and old.get("code_sha") == sha:
+            continue                                       # cached: same spec (length, schedule) and same code
+        if old:
+            print(f"  {a.arm} {s}: the stored record has another spec or code; it will be replaced", flush=True)
+        seeds.append(s)
     print(f"[mainline] {a.test} {a.arm} seeds {seeds} on {info} -> {path}", flush=True)
 
     def save():
@@ -160,6 +184,7 @@ def main():
         pool = mp.get_context("spawn").Pool(a.workers)
         results = pool.imap_unordered(_job, jobs)
     for rec in results:
+        rec["code_sha"] = sha
         st["runs"][f"{a.arm}|{rec['seed']}"] = rec
         save()
         c = rec.get("curve") or []

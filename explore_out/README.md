@@ -16,3 +16,10 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   0.98 at one evaluation, SET +0.10-0.21). Under a dense loss the stack does carry the cue, where the sparse-loss stacks
   did not.
 - **S75: not run** (no usable configuration). Options for the user are listed at the end of report_1.md.
+- **GPU package (explore_gpu/, its README; tooling, no result).** A device-agnostic runner for the project's model and
+  tasks. The sequential path is the project's own code with the model on the GPU; it also runs a main-line test's arm,
+  through `explore_gpu.mainline`. The batched path stacks R runs of one arm, with a per-run Adam. Its CHECKs ran here on
+  CPU (explore_gpu/checks_cpu_output.txt): X's record A|160 is reproduced bit for bit, and the batched path equals the
+  sequential path bit for bit over 2400 free-running updates. The CUDA CHECK is lock-step, with stated tolerances, and is
+  for the user to run. S75 at S = 4 (seeds 830-839, L = 768) is fixed in explore_gpu/s75_s4.py, to run on the user's GPU
+  once the CUDA CHECK passes. Its outputs go to explore_out/I/gpu/. The runtime estimate is explore_gpu/runtime_estimate.md.

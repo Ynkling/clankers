@@ -225,6 +225,15 @@ def _onset_wrapper(orig, dev):
     return onset_run
 
 
+def noise_on_device(nf):
+    """noise_for(w, seed) -> (sd, n1, n2) drawn exactly as nf draws them (from the row's CPU copy, the CPU generator), then
+    moved to the row's device."""
+    def noise_dev(w, seed):
+        sd, n1, n2 = nf(w.cpu(), seed)
+        return sd.to(w.device) if torch.is_tensor(sd) else sd, n1.to(w.device), n2.to(w.device)
+    return noise_dev
+
+
 def _split_wrapper(orig):
     """op(m, o, cs, c0, seed): the noise is drawn exactly as the op draws it (CPU generator) and then moved."""
     @functools.wraps(orig)
@@ -236,11 +245,7 @@ def _split_wrapper(orig):
         nf = getattr(mod, "noise_for", None)
         if nf is None:
             return orig(m, o, *a, **kw)
-
-        def noise_dev(w, seed):
-            sd, n1, n2 = nf(w.cpu(), seed)
-            return sd.to(w.device) if torch.is_tensor(sd) else sd, n1.to(w.device), n2.to(w.device)
-        mod.noise_for = noise_dev
+        mod.noise_for = noise_on_device(nf)
         try:
             return orig(m, o, *a, **kw)
         finally:

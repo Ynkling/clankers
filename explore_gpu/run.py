@@ -13,19 +13,23 @@ TASKS (task_from): "icmc:S=4,V=4,NB=16,lmin=6,lmax=14,M=176" (explore_i_task.ICM
 (RandHeaderTask-lite: explore_f_tasks.RandHeaderTask(P=4, nb=2, lmin=1, lmax=3), Session F's S70 / Session G's S71-S73),
 "grouped:P=4,S=2" (test_binding_capacity.BindTask, grouped, n_vals 16, n_q 1; "grouped" alone = test_short_conv.TASK).
 ARMS (spec dicts; arm_spec): gate none / perfect / recurrent / win3 / wide / reg3, k, conv (None or "layer"), mem "hebb"
-or "delta" (+ delta keyword arguments of explore_delta_mem.to_delta), recipe "adam" (Adam 1e-3 throughout) or "slow"
-(SLOW: gate group at 1e-3, the rest 1e-4 for updates 1-2400, 1e-3 after the evaluation at 2400), split None / "split"
-(the KEYMASS row copy with noise and W_g's Adam state zeroed: explore_i_common.make_split on ICMC, test_window_gate's
-make_trigger rule otherwise) / "reset" (the state zeroed, W_g untouched), nudge (REG3's 5% labelled nudge).
-TRAINERS
+or "delta" (+ delta keyword arguments of explore_delta_mem.to_delta; not with reg3), recipe "adam" (Adam 1e-3
+throughout) or "slow" (SLOW: gate group at 1e-3, the rest 1e-4 for updates 1-2400, 1e-3 after the evaluation at 2400),
+split None / "split" (ICMC: explore_i_common.make_split), nudge (REG3's 5% labelled nudge, run on CPU while the model is
+built: 300 Adam steps of a full REG3 forward/backward at B = 64, minutes per run at L = 767).
+TRAINERS (what each supports)
   run_sequential_icmc  explore_i_common.run_one, transcribed with the model on the device (CHECKed equal to run_one on CPU
-                       bit for bit); one run.
-  run_batched_icmc     R runs of one arm stacked (explore_gpu.batched): one forward, one backward, StackedAdam; each
-                       run's evaluation, statistics and split read through its view (the run's own sequential model,
-                       parameters aliasing the stacked slices), with explore_i_common's own functions.
-  run_sequential_bind  test_router_reliability.run_one (the harness) inside explore_gpu.device.device_scope.
-  run_batched_bind     R runs of a BindTask / RandHeaderTask arm stacked; run_one's record fields (curve, transition,
-                       stats, gradient norms at 1, 10, 100, ...); early stop per run (a stopped run is frozen).
+                       bit for bit); ICMC; ADAM / SLOW / split; one run.
+  run_batched_icmc     R runs of one ICMC arm stacked (explore_gpu.batched): one forward, one backward, StackedAdam;
+                       ADAM / SLOW / split (explore_i_common.make_split, the row copy + W_g's Adam state of that run
+                       zeroed, step included); each run's evaluation, statistics and split read through its view (the
+                       run's own sequential model, parameters aliasing the stacked slices), with explore_i_common's own
+                       functions; the evaluation's CPU part optionally in worker processes.
+  run_sequential_bind  test_router_reliability.run_one (the harness) inside explore_gpu.device.device_scope: every
+                       BindTask / RandHeaderTask arm and recipe the harness has (main-line arms: explore_gpu.mainline).
+  run_batched_bind     R runs of a BindTask / RandHeaderTask arm stacked, ADAM only; run_one's record fields; early stop
+                       per run (a stopped run is frozen).
+  Reset-only (the split's control) is a main-line recipe: it runs on the sequential path (test_window_gate's arms).
 RECORDS carry device, gpu (or CPU) model, torch and CUDA versions (device.device_info) besides the harness's fields.
 """
 
@@ -151,6 +155,7 @@ def make_model(spec, task, seed):
         else:
             assert gate == "recurrent", gate
     if spec.get("mem", "hebb") == "delta":
+        assert gate != "reg3", "REG3 on the delta memory is built by to_reg(mem='delta'), not supported here"
         m = dm.to_delta(m, seed=seed, **spec.get("delta", dict(beta=1.0)))
     return m
 
@@ -212,11 +217,8 @@ class _RunState:
 
     def get(self, p, default=None):
         sp = self.by_id.get(id(p))
-        st = None if sp is None else self.opt.state.get(sp)
-        if not st:
-            return default
-        return {"step": st["step"][self.r:self.r + 1], "exp_avg": st["exp_avg"][self.r],
-                "exp_avg_sq": st["exp_avg_sq"][self.r]}
+        st = None if sp is None else self.opt.run_state(sp, self.r)
+        return default if st is None else st
 
 
 class RunOpt:
@@ -500,8 +502,12 @@ def run_batched_icmc(task, spec, seeds, iters, device="cpu", split_thr=None, wit
         names = None
         if slow:
             gnames = gate_names(models[0])
+        if dev.type == "cuda":
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats(dev)
         bm = BatchedBDH(models, dev, register=register)
         groups, names = adam_groups(bm, gnames if slow else None, LR, LR_WARM)
+        names = names if slow else None                     # explore_i_common.run_one records None for ADAM arms
         opt = StackedAdam(groups, R)
         views = [bm.view(r, wrap=lambda m: dv.to_device(m, dev)) for r in range(R)]
         ropts = [RunOpt(opt, r, views[r], bm) for r in range(R)]
@@ -554,11 +560,15 @@ def run_batched_icmc(task, spec, seeds, iters, device="cpu", split_thr=None, wit
                         _tag_print(f"{tag}|{seeds[r]}", e["step"], e)
                 astats = None
             recs = []
+            peak = round(torch.cuda.max_memory_allocated(dev) / 2 ** 30, 3) if dev.type == "cuda" else None
             for r, s in enumerate(seeds):
-                rec = _icmc_record(curves[r], ts, iters, views[r].n_ch, names, trigs[r], views[r], task, ev)
-                rec.update(seed=s, batched_with=seeds, train_secs=t_train,
-                           peak_mem_gb=(round(torch.cuda.max_memory_allocated(dev) / 2 ** 30, 3)
-                                        if dev.type == "cuda" else None))
+                try:                                         # each run's record on its own (one run's failure is its own)
+                    rec = _icmc_record(curves[r], ts, iters, views[r].n_ch, names, trigs[r], views[r], task, ev)
+                except Exception as e:
+                    rec = dict(ok=False, error=f"{type(e).__name__}: {e}", traceback=traceback.format_exc()[-2000:],
+                               secs=time.time() - ts)
+                rec.update(seed=s, batched_with=seeds, R=R, register=bm.register_mode, train_secs=t_train / R,
+                           train_secs_batch=t_train, peak_mem_gb_batch=peak)
                 recs.append(rec)
     except Exception as e:
         err = dict(ok=False, error=f"{type(e).__name__}: {e}", traceback=traceback.format_exc()[-2000:],
@@ -586,32 +596,20 @@ def run_sequential_bind(arm, seed, iters, device="cpu", **run_one_kw):
 
 
 # ── BindTask / RandHeaderTask: batched ────────────────────────────────────────
-def _grad_norms_batched(bm, r):
-    """test_short_conv.conv_grad_norms for run r from the stacked gradients (same grouping and order)."""
-    gate = rest = conv = 0.0
-    for n, p in bm.stacked_named():
-        if p.grad is None or n == "W_ro":
-            continue
-        v = float(p.grad[r].detach().pow(2).sum())
-        if n in tsc.GATE_PARAMS:
-            gate += v
-        elif n.startswith("short_conv."):
-            conv += v
-        else:
-            rest += v
-    return math.sqrt(gate), math.sqrt(rest), math.sqrt(conv)
-
-
 def run_batched_bind(task, builder, seeds, iters, device="cpu", eval_every=EVAL_EVERY, early_stop=True, stats_fn=None,
-                     grad_steps=(1, 10, 100), lr=LR, on_eval_extra=None, prefetch=False):
-    """R runs of a BindTask-family arm: builder(seed) -> make() (as test_router_reliability.make_fn(a, seed)); ADAM.
-    Records with run_one's fields (curve [step, acc, loss], transition, stopped_at, stats, grad, acc, ...)."""
+                     grad_fn=None, grad_steps=(1, 10, 100), lr=LR, on_eval_extra=None, prefetch=False):
+    """R runs of a BindTask-family arm: builder(seed) -> make() (as test_router_reliability.make_fn(a, seed)); ADAM only
+    (no recipe, no trigger: main-line recipes run on the sequential path, explore_gpu.mainline). Records with run_one's
+    fields (curve [step, acc, loss], transition, stopped_at, stats, grad, acc, ...); stats_fn and grad_fn as run_one's
+    (defaults gate_stats_k and test_readout_path.grad_norms), grad_fn reading run r's gradients through its view; a run
+    with a non-finite evaluation is ok = False (test_binding_onset.attempt's rule)."""
     import test_router_reliability as trr
     dev = dv.setup(device)
     ts = time.time()
     seeds = list(seeds)
     R = len(seeds)
     stats_fn = stats_fn or trr.gate_stats_k
+    grad_fn = grad_fn or trr.grad_norms
     data_eval = eval_batch(task)
     probes = [probe_batch(task, s) for s in seeds]
     models, stats = [], [[] for _ in seeds]
@@ -642,7 +640,13 @@ def run_batched_bind(task, builder, seeds, iters, device="cpu", eval_every=EVAL_
             if step in grad_steps:
                 for r in range(R):
                     if active[r]:
-                        grads[r][str(step)] = _grad_norms_batched(bm, r)
+                        vp = dict(views[r].named_parameters())
+                        for n in bm.names:
+                            g = bm.P(n).grad
+                            vp[n].grad = None if g is None else g[r]
+                        grads[r][str(step)] = grad_fn(views[r])
+                        for n in bm.names:
+                            vp[n].grad = None
             opt.step(active)
             if step % eval_every == 0:
                 for r in range(R):
@@ -665,7 +669,8 @@ def run_batched_bind(task, builder, seeds, iters, device="cpu", eval_every=EVAL_
     for r, s in enumerate(seeds):
         c = curves[r]
         end = stats_fn(views[r], task, probes[r], "end")
-        rec = dict(ok=True, seed=s, curve=c, transition=tbo.transition(c), stopped_at=c[-1][0] if c else 0,
+        finite = all(math.isfinite(a_) and math.isfinite(l_) for _, a_, l_ in c)
+        rec = dict(ok=finite, seed=s, curve=c, transition=tbo.transition(c), stopped_at=c[-1][0] if c else 0,
                    params=sum(p.numel() for p in models[r].parameters() if p.requires_grad), secs=time.time() - ts,
                    key_cos=end.get("key_cos"), val_cos=end.get("val_cos"), ctx_cos=end.get("ctx_cos"), end=end,
                    stats=stats[r], grad=grads[r], iters=iters, k=models[r].n_ch, device=info, path="batched",
@@ -673,5 +678,7 @@ def run_batched_bind(task, builder, seeds, iters, device="cpu", eval_every=EVAL_
         rec["acc"] = c[-1][1] if c else float("nan")
         rec["collapsed"] = rec["acc"] < trr.COLLAPSE
         rec["discovered"] = bool(rec["transition"] is not None and (rec["val_cos"] or 1.0) < trr.DISC_COS)
+        if not finite:
+            rec["error"] = "ValueError: non-finite accuracy or loss in the curve"
         recs.append(json.loads(json.dumps(rec, default=float)))
     return recs

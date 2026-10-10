@@ -3,7 +3,7 @@
 explore_gpu/checks.py — the GPU package's CHECKs. EXPLORATORY tooling, not a result.
 
     python -m explore_gpu.checks --device cpu      (run here; output committed: explore_gpu/checks_cpu_output.txt / .json)
-    python -m explore_gpu.checks --device cuda     (the user's CUDA CHECK; writes explore_gpu/checks_cuda_<gpu>.txt / .json)
+    python -m explore_gpu.checks --device cuda     (the user's CUDA CHECK; writes explore_gpu/checks_cuda_<gpu>_output.txt / .json)
 
 WHY TWO KINDS OF CHECK (measured here, CHECK K0): training is chaotic. Arm A seed 160 (X's recorded run) with every initial
 parameter multiplied by (1 + u), |u| <= 1.2e-7 (one float32 ulp), differs from the unperturbed run by 2.9e-3 in its logits
@@ -16,9 +16,10 @@ O(1) within ~200 updates: two free-running paths agree to 1e-5 for 2400 updates 
   - LOCK-STEP (the CUDA CHECK): at EVERY one of 2400 updates the batched path's forward and backward are computed from the
     sequential path's own parameters on the same batch (the sequential path trains; the batched model is re-synchronised
     to it before each update), so the comparison follows the real training trajectory without the chaos. Tolerances,
-    stated: same device (batched vs sequential): max |dlogits| <= 1e-5 and gradient max |d| / max |g| <= 1e-4 per
-    parameter; CUDA vs CPU (sequential, the CPU trajectory as reference): max |dlogits| <= 1e-4 and gradients <= 1e-3
-    relative (cuBLAS and MKL sum in different orders; float32, TF32 off).
+    stated: same device (batched vs sequential): max |dlogits| <= 1e-5 and gradients <= 1e-4 relative; CUDA vs CPU
+    (sequential, the CPU trajectory as reference): max |dlogits| <= 1e-4 and gradients <= 1e-3 relative (cuBLAS and MKL
+    sum in different orders; float32, TF32 off). "Relative" for a parameter is max |d| / max(max |g|, 1e-2 G), G the
+    run's largest gradient entry at that update (_grad_cmp's docstring says why).
 
 CHECKS
   K0  (printed) the chaos calibration above, recomputed (arm A 160, two perturbation sizes, every 100 updates).          cpu
@@ -33,20 +34,28 @@ CHECKS
       the perfect gate, one channel (600 updates, R = 3): cpu asserted (bit for bit), cuda printed.
   K3  LOCK-STEP batched vs sequential, arm A, seeds 160-163, 2400 updates, every update: logits <= 1e-5, gradients
       <= 1e-4 relative per parameter. Asserted on every device.
+  K2c a split that FIRES (threshold 1.01: at 4800) and SLOW's lr switch, ICMC LOCAL3 + SLOW + split, 7200 updates,
+      free-running batched vs sequential: logits every 600 updates, the trigger's rows (state_zeroed = step, exp_avg,
+      exp_avg_sq) equal (cpu: asserted, bit for bit; cuda: printed).
   K3b LOCK-STEP batched vs sequential on ICMC (S = 4, L = 768, the S75 configuration) for each S75 arm (ORACLE, SINGLE,
-      WIDE_SPLIT, REG3 with the register "scan" on CUDA / "loop" on CPU, WIN3_SPLIT, WIDE_SLOW), 20 updates (cpu) / 300
-      (cuda), and for the delta memory (LOCAL3 + delta on RandHeaderTask-lite; one delta channel with learned beta and
-      GDN decay), 300 updates. Asserted on every device, same tolerances.
-  K4  CUDA vs CPU LOCK-STEP (cuda only): arm A 160, 2400 updates; and each S75 arm at L = 768 for 20 updates: the CUDA
-      sequential path's forward/backward from the CPU trajectory's parameters. Asserted, tolerances above.
+      WIDE_SPLIT, REG3 with the register "scan" on CUDA / "loop" on CPU, WIN3_SPLIT, WIDE_SLOW; on CPU also REG3 with
+      the scan against the sequential loop), 20 updates (cpu) / 300 (cuda), and for the delta memory (LOCAL3 + delta on
+      RandHeaderTask-lite; one delta channel with learned beta and GDN decay), 300 updates. Asserted on every device,
+      same tolerances.
+  K4  CUDA BATCHED vs CPU sequential LOCK-STEP (cuda only): arm A 160, 2400 updates; each S75 arm at L = 768 for 20
+      updates. Asserted, tolerances above.
+  K4b CUDA SEQUENTIAL (as real runs use it: to_device with cpu_io, the loss on CPU) vs CPU sequential LOCK-STEP (cuda
+      only): arm A 160, 2400 updates; each S75 arm at L = 768 for 20 updates. Asserted, tolerances above.
   K5  the ICMC trainer: explore_gpu.run.run_sequential_icmc equals explore_i_common.run_one bit for bit on CPU (curve,
       split rows, beta) for LOCAL3 + SLOW + split and REG3; the register's "scan" equals its "loop" (forward and gradients
-      <= 1e-5 relative); the evaluation split into its device part and its CPU part equals explore_i_common.evaluate bit
+      <= 1e-5 relative), also with the write gate saturated (beta = 1.0: both finite); the evaluation split into its
+      device part and its CPU part equals explore_i_common.evaluate bit
       for bit (WIDE, REG3, one channel); the batched trainer with the CPU part in worker processes gives the very curves
       of the in-line evaluation.                                                                                    cpu
   K6  StackedAdam: with equal step counts bit for bit torch.optim.Adam (single-tensor path) over 50 steps; after zeroing
       one run's state (test_window_gate.zero_state semantics) bit for bit a torch Adam whose state was zeroed; inactive
-      runs unchanged.                                                                                     cpu (cuda: 1e-6)
+      runs unchanged; and the split's reset as the runner does it (explore_i_common.zero_state through run.RunOpt on a
+      run's view) against zero_state on torch Adam, 40 steps.                                 cpu: bit for bit; cuda: 1e-6
   K7  data: the vectorised ICMC loss mask equals ICMCTask.loss_mask (4096 sequences, S = 1, 2, 4); the prefetch process
       yields the very batches of the direct generators.                                                              cpu
   K8  fake-CUDA device audit (torch FakeTensorMode, no GPU needed): the forward of every model class wrapped by
@@ -223,6 +232,8 @@ def k2b_free(device, iters=600):
         ("ICMC REG3 (loop)", lambda: free_icmc(SMALL, dict(gate="reg3", k=2, recipe="slow"), (7, 8, 9), iters, device)),
         ("ICMC perfect", lambda: free_icmc(SMALL, dict(gate="perfect", k=2, recipe="adam"), (7, 8, 9), iters, device)),
         ("ICMC single", lambda: free_icmc(SMALL, dict(gate="none", k=1, recipe="adam"), (7, 8, 9), iters, device)),
+        ("ICMC REG3_NUDGE (loop)", lambda: free_icmc(SMALL, dict(gate="reg3", k=2, recipe="slow", nudge=True), (7, 8),
+                                                     iters, device)),
     ]
     cpu = torch.device(device).type == "cpu"
     for name, f in cases:
@@ -230,6 +241,44 @@ def k2b_free(device, iters=600):
         out[name] = dict(max=max(d.values()), by_step=d)
     ok = all(v["max"] <= FREE_TOL for v in out.values()) if cpu else True
     return dict(ok=ok, asserted=cpu, cases=out)
+
+
+def k2c_split(device, iters=7200):
+    """A split that FIRES (threshold 1.01: every eligible check fires; the first at 4800) and SLOW's lr switch at 2400,
+    batched vs sequential, free-running, on ICMC LOCAL3 + SLOW + split: every run's logits at every 600 updates, the
+    trigger's rows (step, c*, c0, noise seed, state_zeroed, row distances, maps) equal. CPU: asserted (bit for bit);
+    CUDA: printed (free-running)."""
+    task = SMALL
+    spec = dict(gate="win3", k=2, recipe="slow", split="split")
+    seeds = (7, 8)
+    ev = ic.eval_set(task)
+    x = ev["tokens"][:256, :-1]
+    seq, seq_rows = {}, {}
+    for sd in seeds:
+        store = seq.setdefault(sd, {})
+
+        def ex_seq(m, step, store=store):
+            with torch.no_grad():
+                store[step] = ic.logits_chunked(m, x)
+        r = gr.run_sequential_icmc(task, spec, sd, iters, device=device, split_thr=1.01, with_probe=False,
+                                   eval_every=600, on_eval_extra=ex_seq)
+        seq_rows[sd] = r.get("checks")
+    diffs = {}
+
+    def ex_b(bm, views, step):
+        with torch.no_grad():
+            diffs[step] = max(float((ic.logits_chunked(views[r], x) - seq[sd][step]).abs().max())
+                              for r, sd in enumerate(seeds))
+    b = gr.run_batched_icmc(task, spec, seeds, iters, device=device, split_thr=1.01, with_probe=False, eval_every=600,
+                            on_eval_extra=ex_b, stats_workers=0)
+    fired = {sd: [c["step"] for c in seq_rows[sd] if c["fired"]] for sd in seeds}
+    rows_same = all(rb.get("checks") == seq_rows[sd] for rb, sd in zip(b, seeds))
+    zeroed = [c.get("state_zeroed") for rb in b for c in rb.get("checks", []) if c["fired"]]
+    mx = max(diffs.values())
+    cpu = torch.device(device).type == "cpu"
+    ok = (mx <= FREE_TOL and rows_same and all(len(v) >= 1 for v in fired.values())
+          and all(z == ["step", "exp_avg", "exp_avg_sq"] for z in zeroed)) if cpu else True
+    return dict(ok=ok, asserted=cpu, max=mx, fired=fired, rows_same=rows_same, state_zeroed=zeroed, by_step=diffs)
 
 
 # ── lock-step ─────────────────────────────────────────────────────────────────
@@ -240,15 +289,23 @@ def _sync(bm, models):
 
 
 def _grad_cmp(bm, models):
+    """max over runs and parameters of max|g_batched - g_sequential| / max(max|g_sequential|, 1e-2 G), G = the run's
+    largest gradient entry: a parameter whose whole gradient is two orders below the model's largest (a scalar bias whose
+    gradient is a sum that cancels) is compared at 1e-2 of the model's scale, not at its own (where float32 rounding of
+    the cancelling sum alone gives relative differences ~1e-2)."""
     worst = 0.0
-    for n in bm.names:
-        for r, m in enumerate(models):
-            p = dict(m.named_parameters())[n]
+    for r, m in enumerate(models):
+        named = dict(m.named_parameters())
+        G = max((float(p.grad.abs().max()) for p in named.values() if p.grad is not None), default=0.0)
+        for n in bm.names:
+            p = named[n]
             if p.grad is None:
                 continue
             gb = bm.P(n).grad
+            if gb is None:
+                return float("inf")
             ref = p.grad.detach().to(gb.device)
-            worst = max(worst, float((gb[r] - ref).abs().max() / (ref.abs().max() + 1e-30)))
+            worst = max(worst, float((gb[r] - ref).abs().max()) / max(float(ref.abs().max()), 1e-2 * G, 1e-30))
     return worst
 
 
@@ -330,6 +387,12 @@ def k3b_lockstep(device, iters_icmc=None, iters_delta=300):
         wl, wg = lockstep(task, lambda s, spec=spec: gr.make_model(spec, task, s), (830, 831), iters_icmc, dev, dev,
                           loss="icmc", slow_gate=slow)
         out[arm] = dict(logits=wl, grad=wg, updates=iters_icmc)
+    if not cuda:                                          # on CUDA REG3 above already uses the scan
+        spec = gr.arm_spec("REG3", task.S)
+        slow = ic.gate_names(gr.make_model(spec, task, 1))
+        wl, wg = lockstep(task, lambda s: gr.make_model(spec, task, s), (830, 831), iters_icmc, dev, dev, loss="icmc",
+                          slow_gate=slow, register="scan")
+        out["REG3, register scan (batched) vs loop (sequential)"] = dict(logits=wl, grad=wg, updates=iters_icmc)
     for name, mk in (("LOCAL3 + delta (beta 1)", lambda s: dm.to_delta(g16.to_local(build(RHL, ARM_A, ARCH, s), s), beta=1.0)),
                      ("one delta channel, learned beta, GDN decay",
                       lambda s: dm.to_delta(build(RHL, tsc.ARM["B"], ARCH, s), beta="learned", decay="gdn", seed=s))):
@@ -352,6 +415,57 @@ def k4_device_vs_cpu(device, iters=2400):
         slow = ic.gate_names(gr.make_model(spec, task, 1)) if spec["recipe"] == "slow" else None
         wl, wg = lockstep(task, lambda s, spec=spec: gr.make_model(spec, task, s), (830,), 20, torch.device("cpu"), dev,
                           loss="icmc", slow_gate=slow)
+        out[f"S75 {arm} (20 updates)"] = dict(logits=wl, grad=wg)
+    ok = all(v["logits"] <= TOL_DEV["logits"] and v["grad"] <= TOL_DEV["grad"] for v in out.values())
+    return dict(ok=ok, tol=TOL_DEV, cases=out)
+
+
+def k4b_seq_device(device, iters=2400):
+    """The SEQUENTIAL path as real runs use it (explore_gpu.device.to_device, cpu_io: the forward on the GPU, the logits
+    back on CPU, the loss and the backward through the copy), lock-step against the CPU path (the CPU model trains; before
+    every update the GPU model is set to its parameters; both compute logits and gradients on the same batch): arm A 160
+    for 2400 updates, and each S75 arm at L = 768 for 20 updates. cuda only; tolerances TOL_DEV."""
+    dev = dv.setup(device)
+    if dev.type != "cuda":
+        return dict(ok=True, skipped="cuda only")
+
+    def run(task, make, seed, n, loss):
+        torch.manual_seed(seed)
+        m = make(seed)
+        g = dv.to_device(copy.deepcopy(m), dev)              # cpu_io = True, as in every real run
+        opt = torch.optim.Adam(m.parameters(), lr=1e-3)
+        rng = torch.Generator().manual_seed(seed + 10_000)
+        wl = wg = 0.0
+        for _ in range(n):
+            tok = task.make_batch(gr.BATCH, rng)[0]
+            with torch.no_grad():
+                for (n_, p), (_, q) in zip(m.named_parameters(), g.named_parameters()):
+                    q.copy_(p)
+            outs = []
+            for model in (m, g):
+                lo = model(tok[:, :-1])[0]
+                if loss == "select":
+                    ql, qt, _ = task.select(lo, tok[:, 1:], None)
+                    L = F.cross_entropy(ql, qt)
+                else:
+                    mask = task.loss_mask(tok)
+                    L = F.cross_entropy(lo[mask], tok[:, 1:][mask])
+                model.zero_grad()
+                L.backward()
+                outs.append(lo.detach())
+            wl = max(wl, float((outs[0] - outs[1]).abs().max()))
+            G = max(float(p.grad.abs().max()) for p in m.parameters() if p.grad is not None)
+            for p, q in zip(m.parameters(), g.parameters()):
+                if p.grad is not None:
+                    wg = max(wg, float((q.grad.cpu() - p.grad).abs().max()) / max(float(p.grad.abs().max()), 1e-2 * G))
+            opt.step()
+        return wl, wg
+    out = {}
+    wl, wg = run(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), 160, iters, "select")
+    out["arm A 160 (2400 updates)"] = dict(logits=wl, grad=wg)
+    task = it.ICMCTask(**S75_CFG)
+    for arm in ("ORACLE", "SINGLE", "WIDE_SPLIT", "REG3"):
+        wl, wg = run(task, lambda s, arm=arm: gr.make_model(gr.arm_spec(arm, task.S), task, s), 830, 20, "icmc")
         out[f"S75 {arm} (20 updates)"] = dict(logits=wl, grad=wg)
     ok = all(v["logits"] <= TOL_DEV["logits"] and v["grad"] <= TOL_DEV["grad"] for v in out.values())
     return dict(ok=ok, tol=TOL_DEV, cases=out)
@@ -387,6 +501,22 @@ def k5_icmc(device):
              for n in worst["loop"][1])
     out["register scan = loop"] = dl <= 1e-5 and dg <= 1e-5
     out["scan_vs_loop"] = dict(logits=dl, grad_rel=dg)
+    # saturated write gate (beta = 1.0 in float32 at SRC tokens: b_R large): both forms finite, still equal
+    sat = {}
+    for mode in ("loop", "scan"):
+        ms2 = [copy.deepcopy(m) for m in ms]
+        for m in ms2:
+            with torch.no_grad():
+                m.b_R.fill_(30.0)
+        bm = BatchedBDH(ms2, "cpu", register=mode)
+        lg, _ = bm(x)
+        lg.square().mean((1, 2, 3)).sum().backward()
+        sat[mode] = (lg.detach(), {n: bm.P(n).grad.clone() for n in bm.names if bm.P(n).grad is not None})
+    finite = all(torch.isfinite(sat[m_][0]).all() and all(torch.isfinite(g).all() for g in sat[m_][1].values())
+                 for m_ in sat)
+    dls = float((sat["loop"][0] - sat["scan"][0]).abs().max())
+    out["register scan = loop with beta saturated (finite)"] = bool(finite) and dls <= 1e-5
+    out["saturated"] = dict(finite=bool(finite), logits=dls)
     # the evaluation split in two (device part + CPU part) equals explore_i_common.evaluate bit for bit
     ev, pdata = ic.eval_set(SMALL), ic.probe_set(SMALL)
     same = True
@@ -441,7 +571,41 @@ def k6_adam(device):
                 d = float((p.detach()[r] - per[r][i].detach()).abs().max())
                 worst = max(worst, d)
     ok = worst == 0.0 if exact else worst <= 1e-6
-    return dict(ok=ok, worst=worst, exact=exact)
+    # the split's state reset through the runner's proxy (explore_gpu.run.RunOpt + explore_i_common.zero_state) on
+    # StackedAdam vs zero_state on torch.optim.Adam, then 20 more steps
+    task = SMALL
+    ms = []
+    for sd in (7, 8):
+        torch.manual_seed(sd)
+        ms.append(gr.make_model(dict(gate="win3", k=2), task, sd))
+    seqm = [dv.to_device(copy.deepcopy(m), dev, cpu_io=False) for m in ms]
+    bm = BatchedBDH([copy.deepcopy(m) for m in ms], dev)
+    sopt = [torch.optim.Adam([q for q in m.parameters() if q.requires_grad], lr=1e-3) for m in seqm]
+    bopt = StackedAdam([dict(params=[q for q in bm.ps if q.requires_grad], lr=1e-3)], 2)
+    views = [bm.view(r, wrap=lambda m: dv.to_device(m, dev, cpu_io=False)) for r in range(2)]
+    g2 = torch.Generator().manual_seed(3)
+    w2 = 0.0
+    for step in range(1, 41):
+        grads = {n: torch.randn((2,) + tuple(q.shape[1:]), generator=g2) for n, q in bm.stacked_named() if q.requires_grad}
+        for n, q in bm.stacked_named():
+            if q.requires_grad:
+                q.grad = grads[n].to(dev)
+        for r, m in enumerate(seqm):
+            for n, q in m.named_parameters():
+                if q.requires_grad:
+                    q.grad = grads[n][r].to(dev)
+        if step == 20:
+            za = ic.zero_state(gr.RunOpt(bopt, 1, views[1], bm), views[1].W_g)
+            zb = ic.zero_state(sopt[1], seqm[1].W_g)
+            assert za == zb, (za, zb)
+        bopt.step()
+        for o in sopt:
+            o.step()
+        for r, m in enumerate(seqm):
+            for n, q in m.named_parameters():
+                w2 = max(w2, float((bm.P(n).detach()[r] - q.detach()).abs().max()))
+    ok2 = w2 == 0.0 if exact else w2 <= 1e-6
+    return dict(ok=ok and ok2, worst=worst, exact=exact, split_reset_through_runopt=w2)
 
 
 # ── K7 ────────────────────────────────────────────────────────────────────────
@@ -467,57 +631,92 @@ def k7_data(device):
     return dict(ok=all(out.values()), **out)
 
 
-# ── K8 ────────────────────────────────────────────────────────────────────────
+# ── K8 ──────────────────────────────────────────────────────────────────────
 def k8_fake_cuda(device):
+    """Forward passes on fake CUDA tensors (torch FakeTensorMode: no GPU, CUDA's device rules): each model's parameters
+    and buffers become fake cuda tensors (torch.func.functional_call), the sequential path runs the wrapped class
+    (device.device_class) and the batched path BatchedBDH; any CPU tensor created in a forward and combined with a cuda
+    one raises FakeTensorDeviceMismatchError. A negative control (a forward that adds a CPU torch.ones(3)) must raise.
+    The split's noise path (device._split_wrapper over explore_i_common.split_op and test_window_gate.split_op) runs on a
+    fake cuda W_g."""
     if torch.device(device).type != "cpu":
         return dict(ok=True, skipped="cpu only (on CUDA the real checks above run)")
-    from torch._subclasses.fake_tensor import FakeTensorMode
+    import logging
+    from torch._subclasses.fake_tensor import FakeTensorMode, FakeTensorDeviceMismatchError
+    from torch.func import functional_call
+    logging.getLogger("torch._subclasses.fake_tensor").setLevel(logging.CRITICAL)
     task = it.ICMCTask(**dict(S75_CFG, NB=4, M=44))
-    out = {}
     cases = {
         "MultiBDH recurrent (arm A)": (tsc.TASK, lambda s: trr.make_fn(ARM_A, s)()),
-        "MultiBDH perfect + conv": (task, lambda s: gr.make_model(gr.arm_spec("ORACLE", 4), task, s)),
-        "MultiBDH none + conv": (task, lambda s: gr.make_model(gr.arm_spec("SINGLE", 4), task, s)),
-        "LocalBDH WIDE": (task, lambda s: gr.make_model(gr.arm_spec("WIDE_SPLIT", 4), task, s)),
-        "Reg3Conv": (task, lambda s: gr.make_model(gr.arm_spec("REG3", 4), task, s)),
+        "MultiBDH perfect + conv (ORACLE)": (task, lambda s: gr.make_model(gr.arm_spec("ORACLE", 4), task, s)),
+        "MultiBDH none + conv (SINGLE)": (task, lambda s: gr.make_model(gr.arm_spec("SINGLE", 4), task, s)),
+        "LocalBDH LOCAL3 (WIN3_SPLIT)": (task, lambda s: gr.make_model(gr.arm_spec("WIN3_SPLIT", 4), task, s)),
+        "LocalBDH WIDE (WIDE_SPLIT)": (task, lambda s: gr.make_model(gr.arm_spec("WIDE_SPLIT", 4), task, s)),
+        "Reg3Conv (REG3)": (task, lambda s: gr.make_model(gr.arm_spec("REG3", 4), task, s)),
         "LocalBDH + delta": (RHL, lambda s: dm.to_delta(g16.to_local(build(RHL, ARM_A, ARCH, s), s), beta=1.0)),
         "delta learned beta + GDN": (RHL, lambda s: dm.to_delta(build(RHL, tsc.ARM["B"], ARCH, s), beta="learned",
                                                                 decay="gdn", seed=s)),
+        "delta routed decay + perfect gate": (RHL, lambda s: dm.to_delta(build(RHL, dict(tsc.ARM["ceiling_conv"], model_kw={}),
+                                                                              ARCH, s), beta=1.0, decay="routed")),
     }
+    out = {}
+    cuda = torch.device("cuda")
     for name, (tk, mk) in cases.items():
-        res = {}
         try:
             torch.manual_seed(1)
             m = mk(1)
-            m2 = copy.deepcopy(m)
             x = tk.make_batch(2, torch.Generator().manual_seed(1))[0][:, :-1]
+            bm = BatchedBDH([copy.deepcopy(m)], "cpu", register="scan")
+            m.__class__ = dv.device_class(type(m))
+            m._dev, m._cpu_io = cuda, False
             with FakeTensorMode(allow_non_fake_inputs=True) as mode:
-                mf = mode.from_tensor
-                for p in list(m.parameters()) + list(m.buffers()):
-                    p.data = mf(p.data).to("cuda") if False else p.data
-                fm = dv.to_device(m, "cuda", cpu_io=False)
-                logits = fm(x)[0]
-                res["sequential"] = str(logits.device)
-                bm = BatchedBDH([m2], "cuda", register="scan")
-                lb, _ = bm(x.unsqueeze(0).to("cuda"))
-                res["batched"] = str(lb.device)
-            res["ok"] = res["sequential"].startswith("cuda") and res["batched"].startswith("cuda")
+                sd = {n: mode.from_tensor(t).to(cuda) for n, t in list(m.named_parameters()) + list(m.named_buffers())}
+                seq = functional_call(m, sd, (x,))[0].device
+                bm.device, bm._masks = cuda, {}
+                sdb = {n: mode.from_tensor(t).to(cuda) for n, t in bm.named_parameters()}
+                bat = functional_call(bm, sdb, (x.unsqueeze(0).to(cuda),))[0].device
+            out[name] = dict(ok=seq.type == "cuda" and bat.type == "cuda", sequential=str(seq), batched=str(bat))
         except Exception as e:
-            res = dict(ok=False, error=f"{type(e).__name__}: {str(e)[:300]}")
-        out[name] = res
-    # the split's noise path on a fake-cuda W_g
-    try:
-        with FakeTensorMode(allow_non_fake_inputs=True):
-            m = gr.make_model(gr.arm_spec("WIDE_SPLIT", 4), task, 1)
-            m = dv.to_device(m, "cuda")
-            op = dv._split_wrapper(ic.split_op)
+            out[name] = dict(ok=False, error=f"{type(e).__name__}: {str(e)[:300]}")
 
-            class O:
-                state = {}
-            op(m, O(), 0, 1, 123)
-        out["split noise on cuda W_g"] = dict(ok=True)
-    except Exception as e:
-        out["split noise on cuda W_g"] = dict(ok=False, error=f"{type(e).__name__}: {str(e)[:300]}")
+    class Bad(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.w = torch.nn.Parameter(torch.ones(3))
+
+        def forward(self, x):
+            return x.float()[..., :3] * self.w + torch.ones(3)
+    try:
+        b = Bad()
+        with FakeTensorMode(allow_non_fake_inputs=True) as mode:
+            functional_call(b, {"w": mode.from_tensor(b.w.detach()).to(cuda)}, (torch.zeros(2, 5).to(cuda),))
+        out["negative control (a CPU tensor in a forward must raise)"] = dict(ok=False, error="did not raise")
+    except FakeTensorDeviceMismatchError:
+        out["negative control (a CPU tensor in a forward must raise)"] = dict(ok=True)
+
+    import test_window_gate as twg
+    for nm, nf in (("explore_i_common.noise_for", ic.noise_for), ("test_window_gate.noise_for", twg.noise_for)):
+        # the device-relevant lines of split_op (its float() diagnostics are data-dependent: fake tensors have no values):
+        # the noise drawn on CPU and moved, then W_g's rows written
+        try:
+            with FakeTensorMode(allow_non_fake_inputs=True) as mode:
+                W = mode.from_tensor(torch.randn(4, 32)).to(cuda)
+                w = W[0].clone()
+                sd, n1, n2 = dv.noise_on_device(nf)(w, 123)
+                W[1] = w + n2
+                W[0] = w + n1
+            out[f"split noise on a cuda W_g ({nm})"] = dict(ok=n1.device.type == "cuda" and n2.device.type == "cuda")
+        except Exception as e:
+            out[f"split noise on a cuda W_g ({nm})"] = dict(ok=False, error=f"{type(e).__name__}: {str(e)[:300]}")
+    try:                                                   # and the same lines without the wrapper must raise
+        with FakeTensorMode(allow_non_fake_inputs=True) as mode:
+            W = mode.from_tensor(torch.randn(4, 32)).to(cuda)
+            w = W[0].clone()
+            sd, n1, n2 = ic.noise_for(w, 123)
+            W[1] = w + n2
+        out["negative control (split noise unwrapped must raise)"] = dict(ok=False, error="did not raise")
+    except Exception:
+        out["negative control (split noise unwrapped must raise)"] = dict(ok=True)
     return dict(ok=all(v["ok"] for v in out.values()), cases=out)
 
 
@@ -564,7 +763,10 @@ def k9_bench(device, steps=20):
             except torch.cuda.OutOfMemoryError:
                 out[f"{arm} R={R}"] = dict(oom=True)
             finally:
-                del_ = [n for n in ("bm", "opt") if n in locals()]
+                bm = opt = lb = ce = mf = ms = None
+                import gc
+                gc.collect()
+                torch.cuda.empty_cache()
     # projection: 2 ORACLE + 10 SINGLE + 10 WIDE_SPLIT + 10 REG3 runs x 24000 updates; evaluation not included
     proj = {}
     for R in (1, 2):
@@ -600,9 +802,11 @@ def main():
         ("K1", "record reproduction, arm A 160", lambda: k1_record(dev)),
         ("K2", "free-running batched vs sequential, arm A 160-163, 2400 updates", lambda: k2_free(dev, 600 if q else 2400)),
         ("K2b", "free-running, other classes, 600 updates", lambda: k2b_free(dev, 200 if q else 600)),
+        ("K2c", "a split that fires, batched vs sequential, 7200 updates", lambda: k2c_split(dev, 7200)),
         ("K3", "lock-step batched vs sequential, arm A 160-163, 2400 updates", lambda: k3_lockstep(dev, 300 if q else 2400)),
         ("K3b", "lock-step, S75 arms at L = 768 and the delta memory", lambda: k3b_lockstep(dev, 5 if q else None, 50 if q else 300)),
-        ("K4", "CUDA vs CPU lock-step", lambda: k4_device_vs_cpu(dev, 300 if q else 2400)),
+        ("K4", "CUDA batched vs CPU sequential lock-step", lambda: k4_device_vs_cpu(dev, 300 if q else 2400)),
+        ("K4b", "CUDA sequential (cpu_io) vs CPU sequential lock-step", lambda: k4b_seq_device(dev, 300 if q else 2400)),
         ("K5", "ICMC trainer = explore_i_common.run_one; register scan = loop", lambda: k5_icmc(dev)),
         ("K6", "StackedAdam = torch Adam", lambda: k6_adam(dev)),
         ("K7", "loss mask, prefetch", lambda: k7_data(dev)),
