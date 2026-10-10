@@ -1,0 +1,32 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — Session G S71
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 9114843 | python 3.13.16 | torch threads 1
+====================================================================================================
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (51s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): every (stream, key) appears exactly once in the body: ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): S distinct values per key: ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): exactly one CTX per block, at its start; 4 blocks per sequence: ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3: ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): block-length frequencies {1: 0.338, 2: 0.324, 3: 0.338} each within 0.03 of 0.33: ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): the stream order of the blocks varies (6 distinct orders over 4096 sequences): ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): stream_labels = the latest CTX token's stream at every position: ok
+  CHECK S71: RandHeaderTask-lite (F's check_rand_header): L = 23 = S(NB + 2P) + 3 n_q, qpos = [21]; select reads the query's KEY position and targets its value: ok
+  CHECK S71: RHL as F's S70: P 4, nb 2, lengths 1..3, compositions [(1, 3), (2, 2), (3, 1)], L 23, qpos [21], vocab 22: ok
+  CHECK S71: in-run probe: hook-captured residuals (L1-L3, final) and logits equal S55's extraction bit for bit on LOCAL3: ok
+  CHECK S71: in-run probe on per-layer gates: logits from the hooked forward equal model(x)'s; layer 1's input is LN(embedding): ok
+  CHECK S71: acc_by_cell covers 12 (stream, block, index) cells, 2048 queries; blocks 0/1, index 0-2: ok
+  CHECK S71: ORACLE_ALL: one-hot on the stream at layers (1, 2, 3), LOCAL3's gate at the others: ok
+  CHECK S71: ORACLE_23: one-hot on the stream at layers (2, 3), LOCAL3's gate at the others: ok
+  CHECK S71: ORACLE_1: one-hot on the stream at layers (1,), LOCAL3's gate at the others: ok
+  CHECK S71: ORACLE_ALL_D: one-hot on the stream at layers (1, 2, 3), LOCAL3's gate at the others: ok
+  CHECK S71: ORACLE_23_D: one-hot on the stream at layers (2, 3), LOCAL3's gate at the others: ok
+  CHECK S71: ORACLE_ALL equals S56's ORACLE_H code path (parameters and logits): ok
+  CHECK S71: ORACLE_ALL_D equals S56's ORACLE_D code path (parameters and logits): ok
+  CHECK S71: the oracle arms share every stack parameter for the seed (paired): ok
+  CHECK S71: ORACLE_ALL: the query's logits are bit-identical when every VAL token of the other stream changes: ok
+  CHECK S71: ORACLE_ALL_D: the query's logits are bit-identical when every VAL token of the other stream changes: ok
+  s71_layers: code SHA 5366c9b9a792 (30 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  50 runs queued on 4 workers

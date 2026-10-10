@@ -1,0 +1,106 @@
+{
+ "provenance": {
+  "banner": "EXPLORATORY, not a result",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "torch": "2.14.0+cu130",
+  "git": "9114843",
+  "python": "3.13.16",
+  "threads": 1,
+  "started": "2026-10-10 00:23:53"
+ },
+ "rows": [
+  [
+   "RandHeaderTask-lite (F's check_rand_header): every (stream, key) appears exactly once in the body",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): S distinct values per key",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): each query is answered by its own stream's value; make_batch returns the query streams",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): exactly one CTX per block, at its start; 4 blocks per sequence",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): block-length frequencies {1: 0.338, 2: 0.324, 3: 0.338} each within 0.03 of 0.33",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): the stream order of the blocks varies (6 distinct orders over 4096 sequences)",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): stream_labels = the latest CTX token's stream at every position",
+   true
+  ],
+  [
+   "RandHeaderTask-lite (F's check_rand_header): L = 23 = S(NB + 2P) + 3 n_q, qpos = [21]; select reads the query's KEY position and targets its value",
+   true
+  ],
+  [
+   "RHL as F's S70: P 4, nb 2, lengths 1..3, compositions [(1, 3), (2, 2), (3, 1)], L 23, qpos [21], vocab 22",
+   true
+  ],
+  [
+   "in-run probe: hook-captured residuals (L1-L3, final) and logits equal S55's extraction bit for bit on LOCAL3",
+   true
+  ],
+  [
+   "in-run probe on per-layer gates: logits from the hooked forward equal model(x)'s; layer 1's input is LN(embedding)",
+   true
+  ],
+  [
+   "acc_by_cell covers 12 (stream, block, index) cells, 2048 queries; blocks 0/1, index 0-2",
+   true
+  ],
+  [
+   "ORACLE_ALL: one-hot on the stream at layers (1, 2, 3), LOCAL3's gate at the others",
+   true
+  ],
+  [
+   "ORACLE_23: one-hot on the stream at layers (2, 3), LOCAL3's gate at the others",
+   true
+  ],
+  [
+   "ORACLE_1: one-hot on the stream at layers (1,), LOCAL3's gate at the others",
+   true
+  ],
+  [
+   "ORACLE_ALL_D: one-hot on the stream at layers (1, 2, 3), LOCAL3's gate at the others",
+   true
+  ],
+  [
+   "ORACLE_23_D: one-hot on the stream at layers (2, 3), LOCAL3's gate at the others",
+   true
+  ],
+  [
+   "ORACLE_ALL equals S56's ORACLE_H code path (parameters and logits)",
+   true
+  ],
+  [
+   "ORACLE_ALL_D equals S56's ORACLE_D code path (parameters and logits)",
+   true
+  ],
+  [
+   "the oracle arms share every stack parameter for the seed (paired)",
+   true
+  ],
+  [
+   "ORACLE_ALL: the query's logits are bit-identical when every VAL token of the other stream changes",
+   true
+  ],
+  [
+   "ORACLE_ALL_D: the query's logits are bit-identical when every VAL token of the other stream changes",
+   true
+  ]
+ ],
+ "secs": 54.06813359260559
+}
