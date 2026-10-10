@@ -32,7 +32,7 @@ Each new file names L's CPU, the i7-12650H; none is a copy of X's file. The earl
    | L, Phases III–VI | 53 | **51** (was 40) | 32 | **13** (was 11) | **27** (was 23) | short_conv K2 (0.034), stream_channels MG (0.027), slow_start HA (0.031), H0S (0.031), S0 (0.046) |
 
    The four positives the registry listed as having no printed p (conv_lr LR1, p_scaling M1-P8, load_curriculum C2, C3) all survive BH with their stored p.
-3. **The sentence on L** ("On L 37 are primary records, 16 are second-hand, and only 40 have a printed p") should read: 37 primary in a docstring or results file, 16 confirmed by the results files that arrived on 10 October, and 51 with a p.
+3. **The sentence on L** (`claims_registry.md:38`, "On L 37 are primary records, 16 are second-hand, and only 40 have a printed p") should read: 37 primary in a docstring or results file, 16 confirmed by the results files that arrived on 10 October, and 51 with a p.
 
 ## What this does not settle
 
