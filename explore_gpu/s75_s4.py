@@ -285,8 +285,8 @@ def report(log=print, sha=None, summary=None):
         L.append(f"  {a:<11} eta 1-2 {idense.fmt(e12)} / 5+ {idense.fmt(e5)}; probe " + " / ".join(idense.fmt(v) for v in pr) +
                  (f"; beta {bt[0]} / {bt[1]}" if a.startswith("REG3") else "") +
                  f"; train {idense.fmt(idense.med([r.get('train_secs', 0) / 60 for r in rr.values()]), 0)} min per run; "
-                 f"peak {idense.med([r.get('peak_mem_gb_batch') for r in rr.values()])} GB per batch of "
-                 f"{idense.med([r.get('R') for r in rr.values()])}")
+                 f"peak {idense.fmt(idense.med([r.get('peak_mem_gb_batch') for r in rr.values()]))} GB per batch of "
+                 f"R = {sorted({r.get('R') for r in rr.values()}, key=str)}")
     L += ["", "PER RUN: arm seed ROUTED SET GAP maps / eta / margin per layer, splits"]
     for a, rr in R.items():
         for s, r in sorted(rr.items()):
