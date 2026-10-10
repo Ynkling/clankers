@@ -46,3 +46,11 @@ EXPLORATORY, NOT A RESULT — Session F s80 (F/configs_a, F/configs_b)
   CHECK F/configs_a: probe on the grouped layout: KEY positions [1, 4, 7, 10, 13, 16, 19, 22] hold keys, VAL positions hold values, the label at both is the preceding CTX token; 1600 / 400 sequences, disjoint: ok
   CHECK F/configs_a: G's synthetic probe check: informative feature 0.9975 (G 0.998) >= 0.99; random 0.474 in [0.4, 0.6]: ok
   CHECK F/configs_a: the perfect gate on DELTA* (k 2): read gate one-hot (True) and equal to the Hebbian model's (True): ok
+  CHECK F/configs_b: DELTA* = O_B1_L2 (beta 1.0, L2 keys True) as committed; this child uses {'beta': 1.0, 'normalize': True}: ok
+  CHECK F/configs_b: HEBB_B (memory impl fast) on seed 242 reproduces batch 16's LOCAL3_SLOW16_A|242|01767493e840|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit: curve [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]] vs [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]]; statistics equal True: ok
+  CHECK F/configs_b: DELTA_B (memory impl hebb) on seed 242 reproduces batch 16's LOCAL3_SLOW16_A|242|01767493e840|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit: curve [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]] vs [[1200, 0.20068359375, 2.687786102294922], [2400, 0.30810546875, 2.3297181129455566]]; statistics equal True: ok
+  CHECK F/configs_b: HEBB_B on seed 2010 with the threshold at 0 (checks at [2400, 4800, 7200], fired 0) equals the path without a trigger bit for bit through 7200: curve True, statistics True: ok
+  CHECK F/configs_b: copy_nonoise_op at k = 16: W_g[c0] = W_g[c*] exactly, c*'s and the other rows unchanged, Adam state untouched: ok
+  CHECK F/configs_b: explore_f_fail_class_v2.py minus its note equals fail_class_v2.py at ba8901a byte for byte: ok
+  CHECK F/configs_b: v2 equals v1 on 319 stored Session F records (212 two-stream, 107 multichannel) except where eta2 by key >= 0.5 and margin >= 0.25, all STREAM-PARTIAL -> KEY: 1 differ: window_delta_scale:B_HEBB|323 (bound) STREAM-PARTIAL -> KEY (eta2 by key 0.6762, margin 0.362); violations []: ok
+  CHECK F/configs_b: the perfect gate on DELTA* (k 16): read gate one-hot (True) and equal to the Hebbian model's (True); memory FastDeltaMemory beta 1.0 L2 True: ok
