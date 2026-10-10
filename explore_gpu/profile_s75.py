@@ -14,9 +14,10 @@ L = 768; B = 32; N = 256, D = 32, 3 layers, k = 4):
     reads and writes (input shapes recorded by the profiler, outputs taken as the largest input for element-wise /
     reduction ops and m x n for matmuls; 4 bytes per element);
   - the number of kernel-launching operations (ATen ops that are not views / metadata);
-  - peak memory: the resident-memory high-water mark added by one update (forward, backward, Adam) in a fresh process
-    (ru_maxrss; the CUDA caching allocator's peak for the same tensors is close to it), the same for one evaluation
-    forward of 32 sequences, and the bytes autograd saves for backward (saved_tensors_hooks, distinct storages);
+  - peak memory of one update of one run: the parameters, gradients and Adam state plus the peak of the tensors the
+    forward, backward and Adam step allocate, counted storage by storage as they are created and freed (LiveBytes: what
+    the CUDA caching allocator must hold for the same tensors, before block rounding); the same for one evaluation
+    forward of 32 sequences; and the bytes autograd saves for backward (saved_tensors_hooks, distinct storages);
   - the CPU time of one update (median of 3), and of one evaluation's CPU part (explore_gpu.run.eval_cpu_part).
 THE GPU MODEL (stated assumptions; low / high bracket): per op, time = max(FLOPs / (peak FLOP/s x e_gemm), bytes / (memory
 bandwidth x e_bw)), plus one launch per kernel-launching op (8 us low, 15 us high; PyTorch eager on Linux). GTX 1660 SUPER
@@ -33,6 +34,7 @@ import os
 import statistics
 import sys
 import time
+import weakref
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if HERE not in sys.path:
@@ -41,6 +43,8 @@ if HERE not in sys.path:
 import torch
 import torch.nn.functional as F
 from torch.profiler import profile, ProfilerActivity
+from torch.utils._python_dispatch import TorchDispatchMode
+from torch.utils._pytree import tree_flatten
 
 import explore_i_task as it
 import explore_i_common as ic
@@ -115,14 +119,10 @@ def profile_arm(arm, task):
     del lb
     act_gb = sum(saved.values()) / 2 ** 30
     # profile
-    with profile(activities=[ProfilerActivity.CPU], record_shapes=True, with_flops=True, profile_memory=True) as prof:
+    with profile(activities=[ProfilerActivity.CPU], record_shapes=True, with_flops=True) as prof:
         step()
     ops, flops, bytes_, launches = [], 0.0, 0.0, 0
-    mem_events = []
     for e in prof.events():
-        if e.name == "[memory]":
-            mem_events.append((e.time_range.start, e.cpu_memory_usage))
-            continue
         if not e.name.startswith("aten::") or e.name in VIEW_OPS:
             continue
         if e.cpu_parent is not None and e.cpu_parent.name.startswith("aten::") and e.cpu_parent.name not in VIEW_OPS:
@@ -142,64 +142,79 @@ def profile_arm(arm, task):
         flops += fl
         bytes_ += by
         launches += 1
-    mem_events.sort()
-    cur, peak = 0, 0
-    for _, d in mem_events:
-        cur += d
-        peak = max(peak, cur)
     return dict(arm=arm, cpu_secs=statistics.median(times), flops=flops, bytes=bytes_, launches=launches,
-                peak_gb=peak / 2 ** 30, act_gb=act_gb, ops=ops)
+                act_gb=act_gb, ops=ops)
 
 
-MEM_PROG = r"""
-import sys, resource, json, torch
-sys.path.insert(0, %r)
-torch.set_num_threads(1)
-import torch.nn.functional as F
-import explore_i_task as it
-from explore_gpu import run as gr
-from explore_gpu.batched import BatchedBDH, StackedAdam
-task = it.ICMCTask(**%r)
-spec = gr.arm_spec(%r, task.S)
-torch.manual_seed(830)
-m = gr.make_model(spec, task, 830)
-bm = BatchedBDH([m], "cpu", register="scan")
-opt = StackedAdam([dict(params=[p for p in bm.ps if p.requires_grad], lr=1e-3)], 1)
-tok = task.make_batch(gr.BATCH, torch.Generator().manual_seed(1))[0].unsqueeze(0)
-mask = gr.icmc_loss_mask(task, tok[0]).unsqueeze(0)
-base = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-lb, _ = bm(tok[..., :-1])
-ce = F.cross_entropy(lb.reshape(-1, lb.shape[-1]), tok[..., 1:].reshape(-1), reduction="none").view(mask.shape)
-mf = mask.float()
-loss = ((ce * mf).sum((1, 2)) / mf.sum((1, 2))).sum()
-loss.backward()
-opt.step()
-peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-with torch.no_grad():
-    del lb, ce, loss
-    import gc; gc.collect()
-    e0 = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-print(json.dumps(dict(step_gb=(peak - base) / 2 ** 20)))
-"""
+class LiveBytes(TorchDispatchMode):
+    """Bytes held by live tensor storages created inside the mode: every ATen op's outputs (forward, autograd's backward
+    on this thread, the optimiser), each storage counted once and released when it is freed. This is what the CUDA
+    caching allocator must hold for the same program (before its block rounding and fragmentation: SLACK)."""
+
+    def __init__(self):
+        super().__init__()
+        self.cur, self.peak, self.seen = 0, 0, {}
+
+    def _add(self, x):
+        st = x.untyped_storage()
+        k = id(st)
+        if k in self.seen:
+            return
+        n = st.nbytes()
+        self.seen[k] = n
+        self.cur += n
+        self.peak = max(self.peak, self.cur)
+
+        def free(k=k, n=n):
+            if self.seen.pop(k, None) is not None:
+                self.cur -= n
+        weakref.finalize(st, free)
+
+    def __torch_dispatch__(self, func, types, args=(), kwargs=None):
+        out = func(*args, **(kwargs or {}))
+        for x in tree_flatten(out)[0]:
+            if isinstance(x, torch.Tensor) and x.device.type != "meta":
+                self._add(x)
+        return out
 
 
-def mem_of(arm):
-    """Peak resident memory added by one training update (forward, backward, Adam), in a fresh process (ru_maxrss)."""
-    import subprocess
-    out = subprocess.run([sys.executable, "-c", MEM_PROG % (HERE, CFG, arm)], capture_output=True, text=True, check=True)
-    return json.loads(out.stdout.strip().splitlines()[-1])["step_gb"]
+def _storages_gb(ts):
+    seen = {}
+    for t in ts:
+        if t is not None:
+            st = t.untyped_storage()
+            seen[id(st)] = st.nbytes()
+    return sum(seen.values()) / 2 ** 30
 
 
-def eval_mem_of(arm, n=32):
-    """Peak resident memory of one evaluation forward of n sequences (no gradients), in a fresh process."""
-    import subprocess
-    prog = MEM_PROG.split("base = ")[0] + (
-        "base = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss\n"
-        "x = task.make_batch(%d, torch.Generator().manual_seed(2))[0][:, :-1]\n"
-        "with torch.no_grad():\n    m.eval(); m(x)\n"
-        "print(json.dumps(dict(step_gb=(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss - base) / 2 ** 20)))\n" % n)
-    out = subprocess.run([sys.executable, "-c", prog % (HERE, CFG, arm)], capture_output=True, text=True, check=True)
-    return json.loads(out.stdout.strip().splitlines()[-1])["step_gb"]
+def mem_of(arm, task):
+    """Peak memory of one training update of one run: the parameters, their gradients and the Adam state (resident across
+    updates, after a warm-up update) plus the peak of the tensors that the forward, the backward and the Adam step
+    allocate (LiveBytes), in GB."""
+    torch.manual_seed(830)
+    m = gr.make_model(gr.arm_spec(arm, task.S), task, 830)
+    bm = BatchedBDH([m], "cpu", register="scan")
+    opt = StackedAdam([dict(params=[p for p in bm.ps if p.requires_grad], lr=1e-3)], 1)
+    tok = task.make_batch(gr.BATCH, torch.Generator().manual_seed(1))[0].unsqueeze(0)
+    mask = gr.icmc_loss_mask(task, tok[0]).unsqueeze(0)
+    step = one_update_parts(bm, opt, tok, mask)
+    step()                                                   # Adam state allocated
+    st = [v for s in opt.state.values() for v in s.values() if isinstance(v, torch.Tensor)]
+    resident = _storages_gb(list(bm.ps) + [p.grad for p in bm.ps] + st + [tok, mask])
+    with LiveBytes() as lb:
+        step()
+    return resident + lb.peak / 2 ** 30
+
+
+def eval_mem_of(arm, task, n=32):
+    """Peak memory of one evaluation forward of n sequences (no gradients; explore_gpu.run.EVAL_CHUNK = 32), in GB."""
+    torch.manual_seed(830)
+    m = gr.make_model(gr.arm_spec(arm, task.S), task, 830)
+    x = task.make_batch(n, torch.Generator().manual_seed(2))[0][:, :-1]
+    m.eval()
+    with torch.no_grad(), LiveBytes() as lb:
+        m(x)
+    return lb.peak / 2 ** 30
 
 
 def eval_cpu_side(task):
@@ -232,8 +247,8 @@ def main():
     task = it.ICMCTask(**CFG)
     res = {a: profile_arm(a, task) for a in ARMS}
     for a in ARMS:
-        res[a]["peak_gb"] = mem_of(a)
-        res[a]["eval_gb"] = eval_mem_of(a)
+        res[a]["peak_gb"] = mem_of(a, task)
+        res[a]["eval_gb"] = eval_mem_of(a, task)
     ev = eval_cpu_side(task)
     out = dict(config=task.label, arms={a: {k: v for k, v in r.items() if k != "ops"} for a, r in res.items()}, eval=ev)
     L = ["# S75 at S = 4 on a GPU: runtime estimate (from a CPU profile; EXPLORATORY)", "",
@@ -247,7 +262,8 @@ def main():
         L.append(f"| {a} | {r['flops'] / 1e9:.1f} | {r['bytes'] / 1e9:.2f} | {r['launches']} | {r['peak_gb']:.2f} | "
                  f"{r['eval_gb']:.2f} | {r['act_gb']:.2f} | {r['cpu_secs']:.2f} |")
     L += ["", "## Estimated GPU time per update and memory", "",
-          "Memory per run: the update's peak resident memory (fresh process) x 1.15; one evaluation chunk of 32 "
+          "Memory per run: the update's peak (parameters, gradients, Adam state and the update's live tensors) x 1.15 "
+          "for the allocator's rounding and fragmentation; one evaluation chunk of 32 "
           "sequences beside it; 0.6 GB CUDA context.", "",
           "| GPU | arm | s/update (low - high) | runs that fit at once (R) | 24k updates, one run (h, low - high) |",
           "|---|---|---|---|---|"]
@@ -280,8 +296,8 @@ def main():
                  f"evaluation statistics run on the CPU alongside). Stacking R runs costs about the same GPU time per run "
                  f"(L = 768 already fills the GPU); it hides Python and launch overhead.")
     L += ["", "Caveats: the bracket is wide because consumer-GPU SGEMM efficiency on these shapes (batched 767 x 767 x 256 "
-          "GEMMs) and the eager-mode launch overhead are not known here; the peak-memory column is the CPU allocator's "
-          "peak, which the CUDA caching allocator matches to within its block rounding; K9 on the GPU replaces all of this "
+          "GEMMs) and the eager-mode launch overhead are not known here; the peak-memory column counts live tensor bytes "
+          "(the CUDA caching allocator adds block rounding and fragmentation, taken as 15%); K9 on the GPU replaces all of this "
           "with measurements in a minute."]
     out["hours"] = tot
     txt = "\n".join(L) + "\n"
