@@ -1,0 +1,43 @@
+{
+ "readings": {
+  "validity": "S71 ORACLE_ALL 10/10 stands; rerun on 2100-2101 bound 2/2; REG3_NUDGE ROUTED-BOUND 2/2 -> VALID",
+  "REG3: discovered (beats BASELINE)": "does not apply (b 2, c 0, p 0.25, n 20)",
+  "REG3_KEYHINGE: discovered (beats BASELINE)": "APPLIES (b 20, c 0, p 9.54e-07, n 20)",
+  "REG3_KEYHINGE: the device helps (p(D > REG3) <= 0.0625)": "APPLIES (b 18, c 0, p 3.81e-06)",
+  "REG3_KEYHINGE: the device hurts (p(REG3 > D) <= 0.0625)": "does not apply (b 0, c 18, p 1)",
+  "REG3_KEYHINGE: a working write without the device's cost": "APPLIES (KEY failures 0; beta^R CTX > KEY, VAL in 20/20)",
+  "REG3_SLOWGATE: discovered (beats BASELINE)": "does not apply (b 0, c 0, p 1, n 20)",
+  "REG3_SLOWGATE: the device helps (p(D > REG3) <= 0.0625)": "does not apply (b 0, c 2, p 1)",
+  "REG3_SLOWGATE: the device hurts (p(REG3 > D) <= 0.0625)": "does not apply (b 2, c 0, p 0.25)",
+  "REG3_SLOWGATE: a working write without the device's cost": "does not apply (KEY failures 18; beta^R CTX > KEY, VAL in 1/20)",
+  "REG3_NOWIN: discovered (beats BASELINE)": "APPLIES (b 5, c 0, p 0.0312, n 20)",
+  "REG3_NOWIN: the device helps (p(D > REG3) <= 0.0625)": "does not apply (b 3, c 0, p 0.125)",
+  "REG3_NOWIN: the device hurts (p(REG3 > D) <= 0.0625)": "does not apply (b 0, c 3, p 1)",
+  "REG3_NOWIN: a working write without the device's cost": "does not apply (KEY failures 12; beta^R CTX > KEY, VAL in 5/20)",
+  "REG3: beta^R CTX > KEY, VAL": "3/20 (printed)",
+  "best device (rule)": "REG3_KEYHINGE ({'REG3_KEYHINGE': [20, 0], 'REG3_SLOWGATE': [0, 18], 'REG3_NOWIN': [5, 12]})",
+  "REG3_KEYHINGE_D vs BASELINE_D (descriptive, 10 seeds)": "REG3_KEYHINGE_D only 10, BASELINE_D only 0, p(REG3_KEYHINGE_D > BASELINE_D) 0.000977, p(BASELINE_D > REG3_KEYHINGE_D) 1",
+  "REG3_KEYHINGE_D vs REG3_D (descriptive, 10 seeds)": "REG3_KEYHINGE_D only 8, REG3_D only 0, p(REG3_KEYHINGE_D > REG3_D) 0.00391, p(REG3_D > REG3_KEYHINGE_D) 1",
+  "REG3_KEYHINGE_D: beta^R CTX > KEY, VAL": "10/10"
+ },
+ "best": {
+  "device": "REG3_KEYHINGE",
+  "routed_bound": 20,
+  "key_failures": 0,
+  "table": {
+   "REG3_KEYHINGE": [
+    20,
+    0
+   ],
+   "REG3_SLOWGATE": [
+    0,
+    18
+   ],
+   "REG3_NOWIN": [
+    5,
+    12
+   ]
+  },
+  "time": "2026-10-10 22:00:26 UTC"
+ }
+}
