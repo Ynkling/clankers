@@ -381,7 +381,7 @@ def check_also(machine, also):
     return good, lines
 
 
-def verify(pool, files, machine, early, also):
+def verify(pool, files, machine, early, also, early_assert=True):
     f = {}
     for part in ("A", "B"):
         for which in ("legacy", "new"):
@@ -440,7 +440,10 @@ def verify(pool, files, machine, early, also):
         print(f"     {k}|{s}: curve {r['rec']['curve']} vs recorded {[c for c in old['curve'] if c[0] <= EVAL_EVERY] if old else None}; "
               f"statistics and gradient norms equal {same}; firings {r['fired_at']} vs {fa_old}; diagnostic rows equal "
               f"{tss.norm(r['diag']) == dg_old}  -> {'IDENTICAL' if g else 'DIFFERS'}")
-    ok &= good
+    if early_assert:
+        ok &= good
+    else:
+        print(f"     (the file was written on {em.get('cpu')}, this machine is {cpu_model()}: printed, not asserted)")
     print()
 
     print(f"CHECK 131 WIN8_A seed {HINGE8_SEED} vs the recorded test_slow_start HINGE8 seed {HINGE8_SEED} ({files['slow_path']}) "
