@@ -500,3 +500,106 @@ Order: S74 → S75 (S=2) → S75 (S=4). Push after each. One report after S74 (o
 and the pilot counts), one after S75 (counts table first, under three pages), and a "Session I"
 section in explore_out/README.md.
 ```
+
+---
+
+## Session F — follow-up 2 (S76-S77; seeds 1000-1059; branch claude/explore-F, output explore_out/F/)
+
+Written 2026-10-10 after F's report 3, G's report 2 and H's report 3. The common rules apply.
+
+```
+Follow-up to your S68-S70. Two screens. Context since your round: Session G (explore_out/G/report_2.md)
+found that on the P=8 header layout the delta memory binds where the Hebbian one does not (its
+oracle 2/2 vs 3 of 6; a nudged register routes 7/10 on delta, 0/10 on Hebbian), so delta memory is
+the live route for distant cues; but your S54(c) has the eight-stream recipe stalling on delta
+channels (3/10 vs 9/10) with a slow delta oracle (22800-28800 against 2400-4800). Session H
+(explore_out/H/report_3.md) found the split is an exact row copy: no noise, no Adam reset needed.
+Your S68 settled the premise (one delta channel 2/10 at S=4, 0/10 at S=8). Seeds 1000-1059 (if any
+appears in explore_out/ or results/, say so and shift the block by 100).
+
+S77 explore_f_probe (seeds 300-309 and 350-359, reruns; cheap, run first): put your one-seed
+ observation of stream-tagged keys on ten seeds. Rerun S53's single delta channel (P=4 header,
+ 300-309) and S59's GDN single channel (P=8 header, 350-359) to their records (bit for bit on this
+ CPU; assert it) and, at the end of each run, fit Session G's S55 probe (logistic regression,
+ held-out 20%, 2000 sequences, from the residual entering layers 1, 2 and 3 and from the final
+ layer, at K and at V positions, to the stream; copy explore_g_probe_child.py's probe from
+ claude/explore-G unchanged if it can be used as is, otherwise reimplement to that specification
+ and pass G's synthetic check: 0.998 on an informative feature, ~0.5 on a random one). Also the
+ same on the Hebbian single channel of S69 (350-359), which bound nothing. Readings fixed now:
+ "the delta stack tags its keys by stream" if, among the bound delta runs, the probe at the
+ residual entering layer 3 is ≥ 0.9 at K and at V on ≥ 8 of them while layer 1's is ≤ 0.6; "the tag
+ is where binding is" if the bound runs' layer-3 probe exceeds the unbound runs' by ≥ 0.2 (median);
+ descriptive otherwise, with the probe by layer for every arm. One page in report_4.md.
+
+S76 explore_f_eight (S=8, P=4, k=16, conv, 43200; test_window_gate's Part C/D path): why the delta
+ recipe stalls at eight streams, and whether it can be made not to.
+ Phase 1, the oracle (seeds 1000-1003): the perfect gate on delta channels with β ∈ {1, 0.25} ×
+ keys ∈ {L2-normalised (yours), raw (the Hebbian model's keys)}, four arms, and the Hebbian perfect
+ gate as the reference. Readings: "the slowness is the overwrite" if both β=0.25 arms bind within
+ 2× the Hebbian oracle's transition on ≥ 3/4 seeds and the β=1 arms do not; "the slowness is the key
+ normalisation" if the raw-key arms do and the L2 arms do not; "neither" otherwise (then report
+ the oracles' accuracy curves and where they sit at 12000 and 24000). Pick the delta variant with the
+ earliest median transition as DELTA* for Phase 2 and say which; commit the choice before Phase 2.
+ Phase 2, the recipe (seeds 1010-1019): LOCAL3 + SLOW + the split in H's simplified form (exact
+ copy of the busiest row onto the idlest at the KEYMASS trigger, no noise, no Adam reset; the rest
+ of the trigger as test_window_gate's Part D) on DELTA* channels (DELTA_SPLIT) and on Hebbian
+ channels (HEBB_SPLIT, the reference; H's S61 COPY_NONOISE bound 9/10 on 480-489), paired. Outcome
+ BOUND ROUTED with the transition. Readings: "the delta recipe keeps eight streams" if DELTA_SPLIT ≥
+ HEBB_SPLIT − 1 discordant pair; "the delta recipe loses eight streams" if HEBB_SPLIT beats
+ DELTA_SPLIT by ≥ 4 vs 0; otherwise "inconclusive". Report the splits (update, target labelled ok)
+ and the MERGED counts per arm. CHECKs: your delta checks (β=0 equals Hebbian; the recorded
+ reproduction with the new path disabled); the simplified split's mechanics equal H's
+ COPY_NONOISE on one recorded run through its first split (copy explore_h_copy2x2_child's split
+ op if that is simpler than rewriting it; cite the SHA).
+Order: S77 → S76. Push after each. report_4.md after S77 (one page), report_5.md after S76
+(counts first, under three pages), and the README section.
+```
+
+## Session H — follow-up 2 (S78-S79; seeds 1100-1159; branch claude/explore-H, output explore_out/H/)
+
+Written 2026-10-10 after H's report 3. The common rules apply.
+
+```
+Follow-up to your S61-S63. Two screens on the split, now that you have shown it is an exact row copy.
+Context: the main line has a classifier fix, fail_class_v2 (commit ba8901a on
+claude/bdh-growth-hebbian-inference-w90069: the key rule ahead of the margin rule; copy the module
+unchanged, do not merge the branch), and is running test_split_copy (the copy vs the reset at eight
+streams, pre-registered). The two-stream configuration (S=2, P=4, k=2, no conv) is the project's
+hardest relative to its size: the main line's WIN3_SLOW discovers 69/80 and its failures are key
+splits, which the KEYMASS split was never applied to because at k=S no channel is idle. Seeds
+1100-1159 (if any appears in explore_out/ or results/, say so and shift the block by 100).
+
+S78 explore_h_two (S=2, P=4, k=2, no conv, 24000; test_window_gate's Part A path; seeds 1100-1119):
+ the split at k=S=2. Arms: REF (WIN3_SLOW, the main-line arm); SPLIT2 (the KEYMASS trigger with c* =
+ the larger key-position read mass and c0 = the other row; W_g[c0] := W_g[c*] exactly, no noise, no
+ Adam reset; checks every 2400 from 4800, cap 3, gap 4800); SPLIT2_NOISE (the main line's form:
+ noise 0.1 std on both rows and the Adam reset; does symmetry need breaking at k=2?); K4 (k=4, the
+ two-spare-channel recipe of batch 18's S52 W2_K4, copied from claude/outside-ideas, under this
+ budget). Outcome DISCOVERED for the k=2 arms; for K4 the outcome S52 used (copy its definition and
+ say so). Failure classes under v1 AND v2, both reported. Validity: the perfect gate on 1100-1101.
+ Readings fixed now: "the split carries to two streams" if SPLIT2 beats REF on DISCOVERED (exact
+ one-sided McNemar p < 0.05 on 20 pairs: 5 vs 0, 7 vs 1, 9 vs 2 or better); "noise is needed at
+ k=2" if SPLIT2_NOISE beats SPLIT2 by ≥ 4 vs 0; "spare channels are the better device" if K4 beats
+ SPLIT2 by ≥ 4 vs 0 on the respective outcomes; "neither device" if no arm beats REF. Diagnostics:
+ for every split, η² by key and by stream at KEY and at VAL before and at the next check after it
+ (did the copy break the key split, and what formed instead?); the v1/v2 disagreements with their
+ η² and margin.
+
+S79 explore_h_constants (S=8, P=4, k=16, conv, 43200; Part C/D path; seeds 1120-1129): which of the
+ split's constants matter, with the simplified copy as the base. The report states them without
+ having varied them, and an independent replication (Session R) will have to guess the ones it does
+ not state. BASE: exact copy, no noise, no reset; checks every 2400 from 4800; fire if probe acc
+ < 0.95 and rose < 0.02; 64-sequence probe; cap 3; gap 4800. One change at a time: INT1200 (checks
+ every 1200 from 2400, gap 2400), CAP1, CAP6 (gap 2400 so it can fire), PROBE16, THR05 (rose < 0.05).
+ Outcome BOUND ROUTED with the transition; record every firing. Readings fixed now, per variant:
+ "robust" if the variant ≥ BASE − 1 discordant pair; "sensitive" if BASE beats the variant by ≥ 4
+ vs 0; "inconclusive" otherwise; and "the extra splits are harmless" if CAP6's bound-routed count
+ ≥ BASE − 1 with its extra firings labelled ok (c* ≥ 2 streams, c0 none). Descriptive: transitions
+ by arm, and for INT1200 whether the first split comes earlier.
+CHECKs: the copied modules' SHAs; SPLIT2 on one seed with the threshold at 0 equals REF bit for bit;
+the trigger's mechanics at k=2 (c0 is a busy row); S52's W2_K4 record reproduced through 2400 on
+this CPU with the copied code; fail_class_v2 equals v1 on every run except where η² by key ≥ 0.5
+and the margin rule fired (list them).
+Order: S78 → S79. Push after each. report_4.md after S78 (counts first, two pages), report_5.md
+after S79, and the README section.
+```
