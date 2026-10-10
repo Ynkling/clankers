@@ -509,22 +509,31 @@ row("T4 synthesis", 246, "footnote: Rev. 7's full-hinge arm bound 35/40 on share
     f"bound {sum(count(hk[m], bound)[0] for m in 'XL')}/40; bound routed X {count(hk['X'], bound_routed)[0]}/20, "
     f"L {count(hk['L'], bound_routed)[0]}/20 (L's records carry stream_gate)", "DISAGREE",
     "the count reproduces; routing is recorded on L too")
-# single channel, no conv, two streams (Table 4 'one channel 0 of >200')
-k1 = Counter()
-k1b = Counter()
-for m in "XL":
-    for fn in [l for l in git("ls-tree", "-r", "--name-only", MAIN, f"results/{m}/").split() if l.endswith(".json")]:
-        for k, r in load(MAIN, fn)["runs"].items():
-            if isinstance(r, dict) and r.get("ok") and "curve" in r and r.get("k") == 1:
-                k1[(fn.split("/")[-1][:-13], k.split("|")[0])] += 1
-                k1b[(fn.split("/")[-1][:-13], k.split("|")[0])] += bound(r)
-noconv = {k: (k1b[k], v) for k, v in k1.items() if k[1] in ("B", "B4", "B_blocked", "B_shuffled")}
-conv = {k: (k1b[k], v) for k, v in k1.items() if k[1] in ("B_conv", "B_conv4", "B_wide_conv4", "B_conv_in")}
+# single channel, no conv, two streams, grouped layout (Table 4 'one channel 0 of >200'). Corrected 10 October after
+# Revision 8.1: the first version counted k=1 records only (missing the Phase III arms 'B', whose records carry no k field)
+# and included the blocked and shuffled layouts of test_router_layout. Arms below are named from the tests' docstrings.
+SINGLE = {  # (file, arm): (layout, conv, lr) — all S=2, P=4 unless named
+    ("short_conv", "B"): "grouped, no conv, 1e-3", ("router_discovery", "B"): "grouped, no conv, 1e-3",
+    ("router_curriculum", "B"): "grouped, no conv, 1e-3", ("router_confirm", "B"): "grouped, no conv, 1e-3",
+    ("conv_lr", "B4"): "grouped, no conv, 4e-3", ("router_layout", "B_blocked"): "blocked, no conv",
+    ("router_layout", "B_shuffled"): "shuffled, no conv", ("short_conv", "B_conv"): "grouped, conv, 1e-3",
+    ("short_conv", "B_conv_in"): "grouped, conv 'in', 1e-3", ("conv_lr", "B_conv4"): "grouped, conv, 4e-3",
+    ("conv_lr", "B_wide_conv4"): "grouped, conv, wide, 4e-3"}
+sc1 = {}
+for (fn, arm), what in SINGLE.items():
+    rs = runs(load(MAIN, f"results/X/{fn}_results.json"), arm)
+    sc1[(fn, arm)] = (count(rs, bound)[0], len(rs), what)
+g_nc = [(c, n) for (fn, arm), (c, n, w) in sc1.items() if w.startswith("grouped, no conv")]
+b4s = {m: runs(load(MAIN, f"results/{m}/scale_axes_results.json"), "B4s") for m in "XL"}
 row("T4 synthesis", 241, "one channel, S=2, P=4, no conv", "0 of >200",
-    f"records with k=1 in results/ (no conv): {sum(b for b, _ in noconv.values())} of {sum(n for _, n in noconv.values())} bound "
-    f"{dict((f'{a}/{b}', v) for (a, b), v in noconv.items())}", "UNVERIFIABLE",
-    "the '>200' predates results/ (Phases I-III); with the conv the single channel binds "
-    + ", ".join(f"{b}: {c}/{n}" for (a, b), (c, n) in conv.items()))
+    f"grouped layout, no conv, in results/: {sum(c for c, _ in g_nc)} of {sum(n for _, n in g_nc)} bound (short_conv B 20, "
+    f"router_discovery/curriculum/confirm B 10 each, conv_lr B4 10 at 4e-3); blocked and shuffled layouts 0/30 more",
+    "UNVERIFIABLE",
+    "the '>200' predates results/; with the conv the single channel binds " + ", ".join(
+        f"{arm}: {c}/{n}" for (fn, arm), (c, n, w) in sc1.items() if "conv" in w and "no conv" not in w))
+row("T4 synthesis", 248, "caption: one channel 'has not been run at four or eight streams on the grouped layout'",
+    "not run at four streams", f"scale_axes B4s (single channel + conv, S=4, grouped): X {count(b4s['X'], bound)[0]}/10, "
+    f"L {count(b4s['L'], bound)[0]}/10", "DISAGREE", "added 10 October; missed in the first version of this file")
 row("S12", 250, "'one Hebbian channel does not [bind], where it was run (two streams at four and eight keys ...)'",
     "does not", "with the convolution at lr 4e-3 one channel binds 18/40 (conv_lr B_conv4) and 10/20 (B_wide_conv4) "
     "at S=2, P=4; at lr 1e-3, 2/40 (short_conv B_conv)", "DISAGREE",
