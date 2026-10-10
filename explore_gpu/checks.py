@@ -10,16 +10,21 @@ parameter multiplied by (1 + u), |u| <= 1.2e-7 (one float32 ulp), differs from t
 after 100 updates and by 1.5-10 (O(1)) from update 200 on. Any difference in rounding between two paths therefore grows to
 O(1) within ~200 updates: two free-running paths agree to 1e-5 for 2400 updates only if they are bit for bit identical.
   - FREE-RUNNING (as specified): on CPU the batched path is bit for bit the sequential path for every Hebbian model (the
-    stacked operations have the sequential path's own shapes: CHECKed K2, K2b), so the specified check holds exactly
+    stacked operations have the sequential path's own shapes: CHECKed K2, K2b, K2c), so the specified check holds exactly
     (asserted: max |dlogits| <= 1e-5; observed 0). On CUDA the batched and sequential paths use different GEMM batchings,
     so they are not bit for bit equal and free-running agreement cannot be a tolerance: it is printed, not asserted.
-  - LOCK-STEP (the CUDA CHECK): at EVERY one of 2400 updates the batched path's forward and backward are computed from the
-    sequential path's own parameters on the same batch (the sequential path trains; the batched model is re-synchronised
-    to it before each update), so the comparison follows the real training trajectory without the chaos. Tolerances,
-    stated: same device (batched vs sequential): max |dlogits| <= 1e-5 and gradients <= 1e-4 relative; CUDA vs CPU
-    (sequential, the CPU trajectory as reference): max |dlogits| <= 1e-4 and gradients <= 1e-3 relative (cuBLAS and MKL
-    sum in different orders; float32, TF32 off). "Relative" for a parameter is max |d| / max(max |g|, 1e-2 G), G the
-    run's largest gradient entry at that update (_grad_cmp's docstring says why).
+  - LOCK-STEP (the CUDA CHECK): at EVERY update the tested path's forward and backward are computed from the reference
+    path's own parameters on the same batch (the reference trains; the tested model is re-synchronised to it before each
+    update), so the comparison follows the real training trajectory without the chaos. The criterion (class Judge):
+    FAST: max |dlogits| <= tol_logits and, per parameter, ||dg|| <= tol_grad ||g_ref|| (Frobenius norm, the parameter's
+    own); where FAST fails, ARBITRATED by a float64 copy of the reference on the same update: the tested path passes if
+    it is no farther from float64 than 4x the reference's own float32 error plus the tolerance (logits, and every
+    parameter). Tolerances, stated: same device (batched vs sequential): tol_logits 1e-5, tol_grad 1e-4; CUDA vs CPU:
+    1e-4, 1e-3 (cuBLAS and MKL sum in different orders; float32, TF32 off). A case passes if at most `budget` of its
+    run-updates fail both (budget stated per case in the output; K3c calibrates it). Why arbitration: float32 rounding of
+    the reference itself exceeds the bare tolerance at some updates (an ill-conditioned solve in the delta memory, a relu
+    at its threshold, cancelling sums: measured, the one-delta-channel GDN case's sequential float32 gradient is 1.3e-2
+    from float64 at one update where the batched one is 4e-7 from it); a fixed bound then fails a correct path.
 
 CHECKS
   K0  (printed) the chaos calibration above, recomputed (arm A 160, two perturbation sizes, every 100 updates).          cpu
@@ -30,10 +35,11 @@ CHECKS
       On CUDA (printed, not asserted): the same run's curve beside the record's.                                       cuda
   K2  FREE-RUNNING batched vs sequential, arm A, seeds 160-163 stacked (R = 4): logits on the 2048-query evaluation
       batch at every 100 updates for 2400 updates, every run, max |d| <= 1e-5 (cpu: asserted; cuda: printed).
-  K2b the same for B_conv, LOCAL3 on RandHeaderTask-lite, and on ICMC: LOCAL3 + SLOW + split, REG3 (register loop),
-      the perfect gate, one channel (600 updates, R = 3): cpu asserted (bit for bit), cuda printed.
-  K3  LOCK-STEP batched vs sequential, arm A, seeds 160-163, 2400 updates, every update: logits <= 1e-5, gradients
-      <= 1e-4 relative per parameter. Asserted on every device.
+  K2b the same for B_conv, LOCAL3 on RandHeaderTask-lite, and on ICMC: LOCAL3 + SLOW (+ split, which cannot fire
+      before 4800: K2c fires it), REG3 (register loop), REG3_NUDGE, the perfect gate, one channel (600 updates, R = 3);
+      a path that fails or stops early fails the case: cpu asserted (bit for bit), cuda printed.
+  K3  LOCK-STEP batched vs sequential, arm A, seeds 160-163, 2400 updates, every update; Judge, tolerances same device.
+      Asserted on every device.
   K2c a split that FIRES (threshold 1.01: at 4800) and SLOW's lr switch, ICMC LOCAL3 + SLOW + split, 7200 updates,
       free-running batched vs sequential: logits every 600 updates, the trigger's rows (state_zeroed = step, exp_avg,
       exp_avg_sq) equal (cpu: asserted, bit for bit; cuda: printed).
@@ -41,13 +47,17 @@ CHECKS
       WIDE_SPLIT, REG3 with the register "scan" on CUDA / "loop" on CPU, WIN3_SPLIT, WIDE_SLOW; on CPU also REG3 with
       the scan against the sequential loop), 20 updates (cpu) / 300 (cuda), and for the delta memory (LOCAL3 + delta on
       RandHeaderTask-lite; one delta channel with learned beta and GDN decay), 300 updates. Asserted on every device,
-      same tolerances.
+      same criterion.
+  K3c the criterion's own CHECK (cpu): it PASSES a correct path that rounds differently (arm A 160 against its
+      neuron-permuted twin: the same function, another float32 summation order over N, 2400 updates) and FAILS wrong
+      gradients within 20 updates (W_in's zeroed, W_g's x 1.01, W_h's zeroed on arm A; W_in's zeroed on the S75
+      WIDE_SPLIT model at L = 768, where its gradient is ~1e-7 of the model's largest).
   K4  CUDA BATCHED vs CPU sequential LOCK-STEP (cuda only): arm A 160, 2400 updates; each S75 arm at L = 768 for 20
-      updates. Asserted, tolerances above.
+      updates. Asserted; Judge, tolerances CUDA vs CPU.
   K4b CUDA SEQUENTIAL (as real runs use it: to_device with cpu_io, the loss on CPU) vs CPU sequential LOCK-STEP (cuda
-      only): arm A 160, 2400 updates; each S75 arm at L = 768 for 20 updates. Asserted, tolerances above.
+      only): arm A 160, 2400 updates; each S75 arm at L = 768 for 20 updates. Asserted; Judge, tolerances CUDA vs CPU.
   K5  the ICMC trainer: explore_gpu.run.run_sequential_icmc equals explore_i_common.run_one bit for bit on CPU (curve,
-      split rows, beta) for LOCAL3 + SLOW + split and REG3; the register's "scan" equals its "loop" (forward and gradients
+      split rows (none fire in 2400 updates: K2c fires one), beta) for LOCAL3 + SLOW + split and REG3; the register's "scan" equals its "loop" (forward and gradients
       <= 1e-5 relative), also with the write gate saturated (beta = 1.0: both finite); the evaluation split into its
       device part and its CPU part equals explore_i_common.evaluate bit
       for bit (WIDE, REG3, one channel); the batched trainer with the CPU part in worker processes gives the very curves
@@ -56,7 +66,8 @@ CHECKS
       one run's state (test_window_gate.zero_state semantics) bit for bit a torch Adam whose state was zeroed; inactive
       runs unchanged; and the split's reset as the runner does it (explore_i_common.zero_state through run.RunOpt on a
       run's view) against zero_state on torch Adam, 40 steps.                                 cpu: bit for bit; cuda: 1e-6
-  K7  data: the vectorised ICMC loss mask equals ICMCTask.loss_mask (4096 sequences, S = 1, 2, 4); the prefetch process
+  K7  data: the vectorised ICMC loss mask equals ICMCTask.loss_mask (4096 sequences at S = 1, 2; 512 at the S75
+      configuration, S = 4, L = 768); the prefetch process
       yields the very batches of the direct generators.                                                              cpu
   K8  fake-CUDA device audit (torch FakeTensorMode, no GPU needed): the forward of every model class wrapped by
       to_device("cuda"), the batched forward, and the split's noise path run on fake cuda tensors with no CPU tensor
@@ -163,6 +174,22 @@ def k1_record(device):
 
 
 # ── K2: free running ──────────────────────────────────────────────────────────
+def _fmax(vals):
+    """max that a NaN cannot hide in (Python's max(0.0, nan) is 0.0): any non-finite value gives inf; empty gives inf."""
+    out = None
+    for v in vals:
+        v = float(v)
+        if not math.isfinite(v):
+            return float("inf")
+        out = v if out is None else max(out, v)
+    return float("inf") if out is None else out
+
+
+def _complete(diffs, every, iters):
+    """the comparison covered every evaluation step (a path that died partway leaves steps out)."""
+    return sorted(diffs) == list(range(every, iters + 1, every))
+
+
 def free_bind(task, builder, seeds, iters, device, every=100, stats_fn=None):
     """Batched vs sequential (each run) logits on the evaluation batch every `every` updates."""
     stats_fn = stats_fn or trr.gate_stats_k
@@ -184,9 +211,11 @@ def free_bind(task, builder, seeds, iters, device, every=100, stats_fn=None):
 
     def ex(bm, views, step, active):
         with torch.no_grad():
-            diffs[step] = max(float((views[r](data)[0] - seq[s][step]).abs().max()) for r, s in enumerate(seeds))
+            diffs[step] = _fmax(float((views[r](data)[0] - seq[s][step]).abs().max()) for r, s in enumerate(seeds))
     gr.run_batched_bind(task, builder, seeds, iters, device=device, eval_every=every, early_stop=False,
                         on_eval_extra=ex, stats_fn=stats_fn)
+    if not _complete(diffs, every, iters):
+        diffs["incomplete"] = float("inf")
     return diffs
 
 
@@ -200,22 +229,28 @@ def free_icmc(task, spec, seeds, iters, device, every=100, register="loop"):
         def ex_seq(m, step, store=store):
             with torch.no_grad():
                 store[step] = ic.logits_chunked(m, x)
-        gr.run_sequential_icmc(task, spec, s, iters, device=device, split_thr=0.99, with_probe=False, eval_every=every,
-                               on_eval_extra=ex_seq)
+        r = gr.run_sequential_icmc(task, spec, s, iters, device=device, split_thr=0.99, with_probe=False,
+                                   eval_every=every, on_eval_extra=ex_seq)
+        if not r.get("ok"):                                # a failed path is a failed comparison, not a shorter one
+            return {"sequential failed": float("inf")}
     diffs = {}
 
     def ex_b(bm, views, step):
         with torch.no_grad():
-            diffs[step] = max(float((ic.logits_chunked(views[r], x) - seq[s][step]).abs().max())
-                              for r, s in enumerate(seeds))
-    gr.run_batched_icmc(task, spec, seeds, iters, device=device, split_thr=0.99, with_probe=False, eval_every=every,
-                        on_eval_extra=ex_b, register=register)
+            diffs[step] = _fmax(float((ic.logits_chunked(views[r], x) - seq[s][step]).abs().max())
+                                for r, s in enumerate(seeds))
+    recs = gr.run_batched_icmc(task, spec, seeds, iters, device=device, split_thr=0.99, with_probe=False,
+                               eval_every=every, on_eval_extra=ex_b, register=register)
+    if not all(r.get("ok") for r in recs):
+        diffs["batched failed"] = float("inf")
+    if not _complete({k: v for k, v in diffs.items() if isinstance(k, int)}, every, iters):
+        diffs["incomplete"] = float("inf")
     return diffs
 
 
 def k2_free(device, iters=2400):
     diffs = free_bind(tsc.TASK, lambda s: trr.make_fn(ARM_A, s), SEEDS4, iters, device)
-    mx = max(diffs.values())
+    mx = _fmax(diffs.values())
     cpu = torch.device(device).type == "cpu"
     return dict(ok=(mx <= FREE_TOL) if cpu else True, asserted=cpu, max=mx, by_step=diffs)
 
@@ -238,7 +273,7 @@ def k2b_free(device, iters=600):
     cpu = torch.device(device).type == "cpu"
     for name, f in cases:
         d = f()
-        out[name] = dict(max=max(d.values()), by_step=d)
+        out[name] = dict(max=_fmax(d.values()), by_step=d)
     ok = all(v["max"] <= FREE_TOL for v in out.values()) if cpu else True
     return dict(ok=ok, asserted=cpu, cases=out)
 
@@ -267,14 +302,14 @@ def k2c_split(device, iters=7200):
 
     def ex_b(bm, views, step):
         with torch.no_grad():
-            diffs[step] = max(float((ic.logits_chunked(views[r], x) - seq[sd][step]).abs().max())
-                              for r, sd in enumerate(seeds))
+            diffs[step] = _fmax(float((ic.logits_chunked(views[r], x) - seq[sd][step]).abs().max())
+                                for r, sd in enumerate(seeds))
     b = gr.run_batched_icmc(task, spec, seeds, iters, device=device, split_thr=1.01, with_probe=False, eval_every=600,
                             on_eval_extra=ex_b, stats_workers=0)
     fired = {sd: [c["step"] for c in seq_rows[sd] if c["fired"]] for sd in seeds}
     rows_same = all(rb.get("checks") == seq_rows[sd] for rb, sd in zip(b, seeds))
     zeroed = [c.get("state_zeroed") for rb in b for c in rb.get("checks", []) if c["fired"]]
-    mx = max(diffs.values())
+    mx = _fmax(diffs.values()) if _complete(diffs, 600, iters) and all(r.get("ok") for r in b) else float("inf")
     cpu = torch.device(device).type == "cpu"
     ok = (mx <= FREE_TOL and rows_same and all(len(v) >= 1 for v in fired.values())
           and all(z == ["step", "exp_avg", "exp_avg_sq"] for z in zeroed)) if cpu else True
@@ -282,73 +317,167 @@ def k2c_split(device, iters=7200):
 
 
 # ── lock-step ─────────────────────────────────────────────────────────────────
-def _sync(bm, models):
-    with torch.no_grad():
-        for n in bm.names:
-            bm.P(n).copy_(torch.stack([dict(m.named_parameters())[n].detach().to(bm.device) for m in models]))
+C_ARB = 4.0            # arbitration: the tested path may be up to C_ARB times as far from float64 as the reference path
 
 
-def _grad_cmp(bm, models):
-    """max over runs and parameters of max|g_batched - g_sequential| / max(max|g_sequential|, 1e-2 G), G = the run's
-    largest gradient entry: a parameter whose whole gradient is two orders below the model's largest (a scalar bias whose
-    gradient is a sum that cancels) is compared at 1e-2 of the model's scale, not at its own (where float32 rounding of
-    the cancelling sum alone gives relative differences ~1e-2)."""
-    worst = 0.0
-    for r, m in enumerate(models):
-        named = dict(m.named_parameters())
-        G = max((float(p.grad.abs().max()) for p in named.values() if p.grad is not None), default=0.0)
-        for n in bm.names:
-            p = named[n]
-            if p.grad is None:
+def _maxabs(a, b):
+    v = float((a.detach().double().cpu() - b.detach().double().cpu()).abs().max())
+    return v if math.isfinite(v) else float("inf")
+
+
+def _nrm(t):
+    v = float(t.detach().double().cpu().norm())
+    return v if math.isfinite(v) else float("inf")
+
+
+def _copy_model(m):
+    """deepcopy of a model that has run a forward: the transient non-leaf tensors its forward leaves on modules (gate
+    diagnostics such as attn.G, diag, _gates) cannot be deep-copied and are set to None in the copy."""
+    memo = {}
+
+    def skip(v):
+        if isinstance(v, torch.Tensor) and v.grad_fn is not None:
+            memo[id(v)] = None
+        elif isinstance(v, (list, tuple)):
+            for x in v:
+                skip(x)
+        elif isinstance(v, dict):
+            for x in v.values():
+                skip(x)
+    for mod in m.modules():
+        for k, v in vars(mod).items():
+            if k not in ("_parameters", "_buffers", "_modules"):
+                skip(v)
+    return copy.deepcopy(m, memo)
+
+
+def to64(m):
+    """A float64 copy of a model (parameters only: buffers keep their dtype, e.g. MultiBDH's float32 freqs, which its
+    forward asserts), on the model's device, gradients cleared."""
+    m = _copy_model(m)
+    for p in m.parameters():
+        p.data = p.data.double()
+        p.grad = None
+    return m
+
+
+class Judge:
+    """The lock-step criterion, per run and update, on the same parameters and batch: TEST (the batched or the device path)
+    against REF (the sequential / CPU path, the one that trains).
+      FAST: max |logits_test - logits_ref| <= tol["logits"] and, for every parameter, ||g_test - g_ref|| <=
+            tol["grad"] * ||g_ref|| (Frobenius norms; the parameter's OWN norm, so a gate or register parameter whose
+            gradient is 1e-9 of the model's largest is checked at its own scale; floor 1e-12 of the model's gradient
+            norm for gradients that are exactly zero).
+      ARBITRATED (only where FAST fails): a float64 copy of REF computes the same update (ref64). TEST passes if it is no
+            farther from ref64 than C_ARB times REF's own float32 error plus the tolerance: max |l_test - l64| <=
+            C_ARB max |l_ref - l64| + tol["logits"], and for every parameter ||g_test - g64|| <= C_ARB ||g_ref - g64|| +
+            tol["grad"] ||g64||. This is for updates where float32 rounding of the reference itself exceeds the tolerance
+            (an ill-conditioned solve in the delta memory, a relu or clamp at its threshold in one path and not in the
+            other, cancelling sums): there the reference is the inaccurate one and TEST is not blamed for it.
+      An update FAILS if it fails both; non-finite values fail. The CHECK allows at most `budget` failed updates in a
+      case (a threshold flip in TEST's own float32 path at one update: calibrated by K3c's positive control); a wrong
+      gradient fails at (nearly) every update (K3c's negative controls)."""
+
+    def __init__(self, tol, budget=0):
+        self.tol, self.budget = tol, budget
+        self.updates, self.arbitrated, self.failed = 0, 0, []
+        self.raw_logits, self.raw_grad, self.raw_grad_name, self.worst_score = 0.0, 0.0, None, 0.0
+
+    def check(self, step, run, lt, ls, gt, gs, ref64):
+        """lt / ls: logits; gt / gs: {name: gradient} (gt[name] None = missing); ref64: () -> (logits64, {name: grad64})."""
+        self.updates += 1
+        el = _maxabs(lt, ls)
+        gn = math.sqrt(sum(_nrm(g) ** 2 for g in gs.values()))
+        eg = {}
+        for n, g in gs.items():
+            t = gt.get(n)
+            eg[n] = float("inf") if t is None else _nrm(t.detach().cpu().double() - g.detach().cpu().double()) / max(
+                _nrm(g), 1e-12 * gn, 1e-30)
+        n_worst = max(eg, key=lambda k: eg[k]) if eg else None
+        self.raw_logits = max(self.raw_logits, el)
+        if n_worst is not None and eg[n_worst] > self.raw_grad:
+            self.raw_grad, self.raw_grad_name = eg[n_worst], n_worst
+        if el <= self.tol["logits"] and (n_worst is None or eg[n_worst] <= self.tol["grad"]):
+            return
+        self.arbitrated += 1
+        l64, g64 = ref64()
+        sc = {"logits": _maxabs(lt, l64) / (C_ARB * _maxabs(ls, l64) + self.tol["logits"])}
+        gn64 = math.sqrt(sum(_nrm(g) ** 2 for g in g64.values()))
+        for n, g in g64.items():
+            t = gt.get(n)
+            if t is None:
+                sc[n] = float("inf")
                 continue
-            gb = bm.P(n).grad
-            if gb is None:
-                return float("inf")
-            ref = p.grad.detach().to(gb.device)
-            worst = max(worst, float((gb[r] - ref).abs().max()) / max(float(ref.abs().max()), 1e-2 * G, 1e-30))
-    return worst
+            e_t = _nrm(t.detach().cpu().double() - g.cpu())
+            e_r = _nrm(gs[n].detach().cpu().double() - g.cpu())
+            sc[n] = e_t / (C_ARB * e_r + self.tol["grad"] * max(_nrm(g), 1e-12 * gn64, 1e-30))
+        k = max(sc, key=lambda x: sc[x] if math.isfinite(sc[x]) else float("inf"))
+        s = sc[k] if math.isfinite(sc[k]) else float("inf")
+        self.worst_score = max(self.worst_score, s)
+        if s > 1.0:
+            self.failed.append(dict(step=step, run=run, score=s, where=k, raw_logits=el, raw_grad=eg.get(k)))
+
+    def result(self):
+        return dict(ok=len(self.failed) <= self.budget, updates=self.updates, logits=self.raw_logits, grad=self.raw_grad,
+                    grad_param=self.raw_grad_name, arbitrated=self.arbitrated, failed=len(self.failed),
+                    budget=self.budget, worst_arbitration=self.worst_score, first_failures=self.failed[:5])
 
 
-def lockstep(task, make, seeds, iters, dev_seq, dev_b, loss="select", register="auto", slow_gate=None):
-    """The sequential models train (Adam 1e-3, or SLOW when slow_gate gives the gate names); before every update the
-    batched model is set to their parameters and computes logits and gradients on the same batch. Returns the worst
-    logits difference and the worst relative gradient difference over all updates."""
+def _loss_fn(task, loss):
+    def f(lo, t):
+        if loss == "select":
+            ql, qt, _ = task.select(lo, t[:, 1:], None)
+            return F.cross_entropy(ql, qt)
+        mask = gr.icmc_loss_mask(task, t.cpu()).to(lo.device)
+        return F.cross_entropy(lo[mask], t[:, 1:][mask])
+    return f
+
+
+def _ref64(model, tok, lossf):
+    def f():
+        m64 = to64(model)
+        lo = m64(tok[:, :-1])[0]
+        lossf(lo, tok).backward()
+        return lo.detach(), {n: p.grad.detach() for n, p in m64.named_parameters() if p.grad is not None}
+    return f
+
+
+def _optimizer(m, slow_gate):
+    if slow_gate is None:
+        return torch.optim.Adam(m.parameters(), lr=1e-3)
+    named = [(n, p) for n, p in m.named_parameters() if p.requires_grad]
+    return torch.optim.Adam([dict(params=[p for n, p in named if n in slow_gate], lr=1e-3),
+                             dict(params=[p for n, p in named if n not in slow_gate], lr=1e-4)], lr=1e-3)
+
+
+def lockstep(task, make, seeds, iters, dev_seq, dev_b, tol, loss="select", register="auto", slow_gate=None, budget=None):
+    """BATCHED (on dev_b) against SEQUENTIAL (on dev_seq). The sequential models train (Adam 1e-3, or SLOW's two groups
+    when slow_gate names the gate parameters); before every update the batched model is set to their parameters and
+    computes logits and gradients on the same batch; Judge decides each run's update. Returns Judge.result()."""
     models = []
     for s in seeds:
         torch.manual_seed(s)
         models.append(make(s))
-    cpu_models = [copy.deepcopy(m) for m in models]
-    bm = BatchedBDH(cpu_models, dev_b, register=register)
+    bm = BatchedBDH([copy.deepcopy(m) for m in models], dev_b, register=register)
     models = [dv.to_device(m, dev_seq, cpu_io=False) for m in models]
-    opts = []
-    for m in models:
-        if slow_gate is None:
-            opts.append(torch.optim.Adam(m.parameters(), lr=1e-3))
-        else:
-            named = [(n, p) for n, p in m.named_parameters() if p.requires_grad]
-            g = [p for n, p in named if n in slow_gate]
-            rest = [p for n, p in named if n not in slow_gate]
-            opts.append(torch.optim.Adam([dict(params=g, lr=1e-3), dict(params=rest, lr=1e-4)], lr=1e-3))
+    opts = [_optimizer(m, slow_gate) for m in models]
     rngs = [torch.Generator().manual_seed(s + 10_000) for s in seeds]
-    wl, wg = 0.0, 0.0
+    lossf = _loss_fn(task, loss)
+    judge = Judge(tol, budget if budget is not None else max(1, iters * len(seeds) // 200))
     for step in range(1, iters + 1):
         toks = [task.make_batch(gr.BATCH, g)[0] for g in rngs]
-        _sync(bm, models)
+        with torch.no_grad():
+            for n in bm.names:
+                bm.P(n).copy_(torch.stack([dict(m.named_parameters())[n].detach().to(bm.device) for m in models]))
         tb = torch.stack(toks).to(dev_b)
         lb, _ = bm(tb[..., :-1])
         lseq = []
         for r, m in enumerate(models):
             t = toks[r].to(dev_seq)
             lo = m(t[:, :-1])[0]
-            lseq.append(lo)
-            if loss == "select":
-                ql, qt, _ = task.select(lo, t[:, 1:], None)
-                L = F.cross_entropy(ql, qt)
-            else:
-                mask = gr.icmc_loss_mask(task, toks[r]).to(dev_seq)
-                L = F.cross_entropy(lo[mask], t[:, 1:][mask])
+            lseq.append(lo.detach())
             opts[r].zero_grad()
-            L.backward()
+            lossf(lo, t).backward()
         R_, B, T, V = lb.shape
         if loss == "select":
             ql, qt, _ = task.select(lb.reshape(R_ * B, T, V), tb[..., 1:].reshape(R_ * B, T), None)
@@ -361,18 +490,55 @@ def lockstep(task, make, seeds, iters, dev_seq, dev_b, loss="select", register="
         for p in bm.ps:
             p.grad = None
         lr_.sum().backward()
-        wl = max(wl, max(float((lb[r].detach() - lseq[r].detach().to(lb.device)).abs().max()) for r in range(R_)))
-        wg = max(wg, _grad_cmp(bm, models))
+        for r, m in enumerate(models):
+            gs = {n: p.grad for n, p in m.named_parameters() if p.grad is not None}
+            gt = {n: (None if bm.P(n).grad is None else bm.P(n).grad[r]) for n in gs}
+            judge.check(step, r, lb[r], lseq[r], gt, gs, _ref64(models[r], toks[r].to(dev_seq), lossf))
         for o in opts:
             o.step()
-    return wl, wg
+    return judge.result()
+
+
+def lockstep_pair(task, make, seed, iters, tol, loss="select", dev_test=None, to_test=None, grads_back=None, budget=None):
+    """TEST = a second sequential model against REF (CPU, trains): before every update to_test(ref, test) sets TEST's
+    parameters from REF's; both compute logits and gradients on the same batch (TEST's forward through cpu_io when it is a
+    device model); grads_back(test) gives TEST's gradients in REF's coordinates. Used by K4b (the device's sequential
+    path: to_test = copy) and K3c's controls (a permuted twin; a wrong gradient)."""
+    torch.manual_seed(seed)
+    ref = make(seed)
+    test = copy.deepcopy(ref)
+    if dev_test is not None:
+        test = dv.to_device(test, dev_test)                  # cpu_io = True, as in every real run
+    to_test = to_test or (lambda a, b: [q.data.copy_(p.data) for p, q in zip(a.parameters(), b.parameters())])
+    grads_back = grads_back or (lambda b: {n: (None if p.grad is None else p.grad.cpu()) for n, p in b.named_parameters()})
+    opt = torch.optim.Adam(ref.parameters(), lr=1e-3)
+    rng = torch.Generator().manual_seed(seed + 10_000)
+    lossf = _loss_fn(task, loss)
+    judge = Judge(tol, budget if budget is not None else max(1, iters // 200))
+    for step in range(1, iters + 1):
+        tok = task.make_batch(gr.BATCH, rng)[0]
+        with torch.no_grad():
+            to_test(ref, test)
+        outs = []
+        for model in (ref, test):
+            lo = model(tok[:, :-1])[0]
+            model.zero_grad()
+            lossf(lo, tok).backward()
+            outs.append(lo.detach())
+        gs = {n: p.grad for n, p in ref.named_parameters() if p.grad is not None}
+        judge.check(step, 0, outs[1], outs[0], grads_back(test), gs, _ref64(ref, tok, lossf))
+        opt.step()
+    return judge.result()
+
+
+def _cases_ok(out):
+    return all(v["ok"] for v in out.values())
 
 
 def k3_lockstep(device, iters=2400):
     dev = dv.setup(device)
-    wl, wg = lockstep(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), SEEDS4, iters, dev, dev)
-    ok = wl <= TOL_SAME["logits"] and wg <= TOL_SAME["grad"]
-    return dict(ok=ok, logits=wl, grad=wg, tol=TOL_SAME, updates=iters)
+    r = lockstep(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), SEEDS4, iters, dev, dev, TOL_SAME)
+    return dict(r, tol=TOL_SAME)
 
 
 def k3b_lockstep(device, iters_icmc=None, iters_delta=300):
@@ -384,22 +550,86 @@ def k3b_lockstep(device, iters_icmc=None, iters_delta=300):
     for arm in ("ORACLE", "SINGLE", "WIDE_SPLIT", "REG3", "WIN3_SPLIT", "WIDE_SLOW"):
         spec = gr.arm_spec(arm, task.S)
         slow = ic.gate_names(gr.make_model(spec, task, 1)) if spec["recipe"] == "slow" else None
-        wl, wg = lockstep(task, lambda s, spec=spec: gr.make_model(spec, task, s), (830, 831), iters_icmc, dev, dev,
-                          loss="icmc", slow_gate=slow)
-        out[arm] = dict(logits=wl, grad=wg, updates=iters_icmc)
+        out[arm] = lockstep(task, lambda s, spec=spec: gr.make_model(spec, task, s), (830, 831), iters_icmc, dev, dev,
+                            TOL_SAME, loss="icmc", slow_gate=slow)
     if not cuda:                                          # on CUDA REG3 above already uses the scan
         spec = gr.arm_spec("REG3", task.S)
         slow = ic.gate_names(gr.make_model(spec, task, 1))
-        wl, wg = lockstep(task, lambda s: gr.make_model(spec, task, s), (830, 831), iters_icmc, dev, dev, loss="icmc",
-                          slow_gate=slow, register="scan")
-        out["REG3, register scan (batched) vs loop (sequential)"] = dict(logits=wl, grad=wg, updates=iters_icmc)
+        out["REG3, register scan (batched) vs loop (sequential)"] = lockstep(
+            task, lambda s: gr.make_model(spec, task, s), (830, 831), iters_icmc, dev, dev, TOL_SAME, loss="icmc",
+            slow_gate=slow, register="scan")
     for name, mk in (("LOCAL3 + delta (beta 1)", lambda s: dm.to_delta(g16.to_local(build(RHL, ARM_A, ARCH, s), s), beta=1.0)),
                      ("one delta channel, learned beta, GDN decay",
                       lambda s: dm.to_delta(build(RHL, tsc.ARM["B"], ARCH, s), beta="learned", decay="gdn", seed=s))):
-        wl, wg = lockstep(RHL, mk, (160, 161, 162), iters_delta, dev, dev)
-        out[name] = dict(logits=wl, grad=wg, updates=iters_delta)
-    ok = all(v["logits"] <= TOL_SAME["logits"] and v["grad"] <= TOL_SAME["grad"] for v in out.values())
-    return dict(ok=ok, tol=TOL_SAME, cases=out)
+        out[name] = lockstep(RHL, mk, (160, 161, 162), iters_delta, dev, dev, TOL_SAME)
+    return dict(ok=_cases_ok(out), tol=TOL_SAME, cases=out)
+
+
+def _perm_twin(n=256, seed=0):
+    """K3c's positive control: the same model with its N neurons permuted (decoder rows, encoder / encoder_v columns):
+    the same function, a different float32 summation order over N (as cuBLAS's against MKL's)."""
+    perm = torch.randperm(n, generator=torch.Generator().manual_seed(seed))
+    inv = torch.argsort(perm)
+
+    def to_test(a, b):
+        pa, pb = dict(a.named_parameters()), dict(b.named_parameters())
+        for k, p in pa.items():
+            q = pb[k]
+            if k == "decoder":
+                q.data.copy_(p.data[perm])
+            elif k in ("encoder", "encoder_v"):
+                q.data.copy_(p.data[..., perm])
+            else:
+                q.data.copy_(p.data)
+
+    def back(b):
+        out = {}
+        for k, q in b.named_parameters():
+            g = q.grad
+            if g is None:
+                out[k] = None
+            elif k == "decoder":
+                out[k] = g[inv]
+            elif k in ("encoder", "encoder_v"):
+                out[k] = g[..., inv]
+            else:
+                out[k] = g
+        return out
+    return to_test, back
+
+
+def k3c_controls(device, iters=2400):
+    """The lock-step criterion's own CHECK (cpu): it must PASS a correct implementation that rounds differently (arm A
+    160 against its neuron-permuted twin, 2400 updates; the one-delta-channel GDN case is K3b's own) and FAIL a wrong
+    one within 20 updates: (i) W_in's gradient zeroed (the window / recurrent gate's input weights: the forward unchanged),
+    (ii) W_g's gradient scaled by 1.01, (iii) W_h's gradient zeroed (the recurrent gate's state weights; as truncating
+    its backpropagation through time would leave it), on arm A; (iv) the S75 WIDE_SPLIT model's W_in gradient zeroed
+    (L = 768, the scale at which its gradient is ~1e-7 of the model's largest)."""
+    dev = dv.setup(device)
+    if dev.type != "cpu":
+        return dict(ok=True, skipped="cpu only")
+    out = {}
+    to_test, back = _perm_twin()
+    out["positive: arm A vs its permuted twin"] = lockstep_pair(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), 160, iters,
+                                                                 TOL_SAME, to_test=to_test, grads_back=back)
+
+    def wrong(names, scale):
+        def back_(b):
+            return {n: (None if p.grad is None else (p.grad * scale if n in names else p.grad))
+                    for n, p in b.named_parameters()}
+        return back_
+    neg = {"negative: W_in gradient zeroed": (("W_in",), 0.0), "negative: W_g gradient x 1.01": (("W_g",), 1.01),
+           "negative: W_h gradient zeroed": (("W_h",), 0.0)}
+    for name, (names, scale) in neg.items():
+        r = lockstep_pair(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), 160, 20, TOL_SAME, grads_back=wrong(names, scale),
+                          budget=0)
+        out[name] = dict(r, ok=not r["ok"], detected_at=(r["first_failures"] or [{}])[0].get("step"))
+    task = it.ICMCTask(**S75_CFG)
+    r = lockstep_pair(task, lambda s: gr.make_model(gr.arm_spec("WIDE_SPLIT", task.S), task, s), 830, 3, TOL_SAME,
+                      loss="icmc", grads_back=wrong(("W_in",), 0.0), budget=0)
+    out["negative: S75 WIDE_SPLIT, W_in gradient zeroed"] = dict(r, ok=not r["ok"],
+                                                                detected_at=(r["first_failures"] or [{}])[0].get("step"))
+    return dict(ok=_cases_ok(out), cases=out)
 
 
 def k4_device_vs_cpu(device, iters=2400):
@@ -407,68 +637,33 @@ def k4_device_vs_cpu(device, iters=2400):
     if dev.type != "cuda":
         return dict(ok=True, skipped="cuda only")
     out = {}
-    wl, wg = lockstep(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), (160,), iters, torch.device("cpu"), dev)
-    out["arm A 160 (2400 updates)"] = dict(logits=wl, grad=wg)
+    out["arm A 160 (2400 updates)"] = lockstep(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), (160,), iters,
+                                               torch.device("cpu"), dev, TOL_DEV)
     task = it.ICMCTask(**S75_CFG)
     for arm in ("ORACLE", "SINGLE", "WIDE_SPLIT", "REG3"):
         spec = gr.arm_spec(arm, task.S)
         slow = ic.gate_names(gr.make_model(spec, task, 1)) if spec["recipe"] == "slow" else None
-        wl, wg = lockstep(task, lambda s, spec=spec: gr.make_model(spec, task, s), (830,), 20, torch.device("cpu"), dev,
-                          loss="icmc", slow_gate=slow)
-        out[f"S75 {arm} (20 updates)"] = dict(logits=wl, grad=wg)
-    ok = all(v["logits"] <= TOL_DEV["logits"] and v["grad"] <= TOL_DEV["grad"] for v in out.values())
-    return dict(ok=ok, tol=TOL_DEV, cases=out)
+        out[f"S75 {arm} (20 updates)"] = lockstep(task, lambda s, spec=spec: gr.make_model(spec, task, s), (830,), 20,
+                                                  torch.device("cpu"), dev, TOL_DEV, loss="icmc", slow_gate=slow)
+    return dict(ok=_cases_ok(out), tol=TOL_DEV, cases=out)
 
 
 def k4b_seq_device(device, iters=2400):
     """The SEQUENTIAL path as real runs use it (explore_gpu.device.to_device, cpu_io: the forward on the GPU, the logits
     back on CPU, the loss and the backward through the copy), lock-step against the CPU path (the CPU model trains; before
     every update the GPU model is set to its parameters; both compute logits and gradients on the same batch): arm A 160
-    for 2400 updates, and each S75 arm at L = 768 for 20 updates. cuda only; tolerances TOL_DEV."""
+    for 2400 updates, and each S75 arm at L = 768 for 20 updates. cuda only; tolerances TOL_DEV, Judge's criterion."""
     dev = dv.setup(device)
     if dev.type != "cuda":
         return dict(ok=True, skipped="cuda only")
-
-    def run(task, make, seed, n, loss):
-        torch.manual_seed(seed)
-        m = make(seed)
-        g = dv.to_device(copy.deepcopy(m), dev)              # cpu_io = True, as in every real run
-        opt = torch.optim.Adam(m.parameters(), lr=1e-3)
-        rng = torch.Generator().manual_seed(seed + 10_000)
-        wl = wg = 0.0
-        for _ in range(n):
-            tok = task.make_batch(gr.BATCH, rng)[0]
-            with torch.no_grad():
-                for (n_, p), (_, q) in zip(m.named_parameters(), g.named_parameters()):
-                    q.copy_(p)
-            outs = []
-            for model in (m, g):
-                lo = model(tok[:, :-1])[0]
-                if loss == "select":
-                    ql, qt, _ = task.select(lo, tok[:, 1:], None)
-                    L = F.cross_entropy(ql, qt)
-                else:
-                    mask = task.loss_mask(tok)
-                    L = F.cross_entropy(lo[mask], tok[:, 1:][mask])
-                model.zero_grad()
-                L.backward()
-                outs.append(lo.detach())
-            wl = max(wl, float((outs[0] - outs[1]).abs().max()))
-            G = max(float(p.grad.abs().max()) for p in m.parameters() if p.grad is not None)
-            for p, q in zip(m.parameters(), g.parameters()):
-                if p.grad is not None:
-                    wg = max(wg, float((q.grad.cpu() - p.grad).abs().max()) / max(float(p.grad.abs().max()), 1e-2 * G))
-            opt.step()
-        return wl, wg
-    out = {}
-    wl, wg = run(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), 160, iters, "select")
-    out["arm A 160 (2400 updates)"] = dict(logits=wl, grad=wg)
+    out = {"arm A 160 (2400 updates)": lockstep_pair(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), 160, iters, TOL_DEV,
+                                                     dev_test=dev)}
     task = it.ICMCTask(**S75_CFG)
     for arm in ("ORACLE", "SINGLE", "WIDE_SPLIT", "REG3"):
-        wl, wg = run(task, lambda s, arm=arm: gr.make_model(gr.arm_spec(arm, task.S), task, s), 830, 20, "icmc")
-        out[f"S75 {arm} (20 updates)"] = dict(logits=wl, grad=wg)
-    ok = all(v["logits"] <= TOL_DEV["logits"] and v["grad"] <= TOL_DEV["grad"] for v in out.values())
-    return dict(ok=ok, tol=TOL_DEV, cases=out)
+        out[f"S75 {arm} (20 updates)"] = lockstep_pair(
+            task, lambda s, arm=arm: gr.make_model(gr.arm_spec(arm, task.S), task, s), 830, 20, TOL_DEV, loss="icmc",
+            dev_test=dev)
+    return dict(ok=_cases_ok(out), tol=TOL_DEV, cases=out)
 
 
 # ── K5 ────────────────────────────────────────────────────────────────────────
@@ -614,9 +809,10 @@ def k7_data(device):
         return dict(ok=True, skipped="cpu only")
     out = {}
     for S in (1, 2, 4):
-        t = it.ICMCTask(S=S, V=4, NB=16 // S if S < 4 else 4, lmin=6, lmax=14, M=176 // S if S > 1 else 176)
-        tok = t.make_batch(4096 if S < 4 else 1024, torch.Generator().manual_seed(S))[0]
-        out[f"mask S={S}"] = torch.equal(gr.icmc_loss_mask(t, tok), t.loss_mask(tok))
+        t = it.ICMCTask(**S75_CFG) if S == 4 else it.ICMCTask(S=S, V=4, NB=16 // S, lmin=6, lmax=14, M=176 // S)
+        n = 512 if S == 4 else 4096
+        tok = t.make_batch(n, torch.Generator().manual_seed(S))[0]
+        out[f"mask S={S} ({n} sequences, L = {tok.shape[1]})"] = torch.equal(gr.icmc_loss_mask(t, tok), t.loss_mask(tok))
     b1 = gr.Batches(SMALL, (7, 8), icmc=True, prefetch=True)
     b2 = gr.Batches(SMALL, (7, 8), icmc=True, prefetch=False)
     same = True
@@ -756,10 +952,16 @@ def k9_bench(device, steps=20):
                         opt.zero_grad()
                     torch.cuda.synchronize()
                     dt = (time.time() - t0) / steps
+                    free, total = torch.cuda.mem_get_info(dev)
                 finally:
                     data.close()
+                # peak_gb: tensors (the caching allocator's peak allocation); peak_reserved_gb: what the allocator held
+                # (allocation + its cached blocks); device_used_gb: the whole card in use after the timed updates (this
+                # process's CUDA context and reserve, plus any other process, e.g. a display), of total_gb
                 out[f"{arm} R={R}"] = dict(secs_per_update=dt, secs_per_run_update=dt / R,
-                                           peak_gb=torch.cuda.max_memory_allocated(dev) / 2 ** 30)
+                                           peak_gb=torch.cuda.max_memory_allocated(dev) / 2 ** 30,
+                                           peak_reserved_gb=torch.cuda.max_memory_reserved(dev) / 2 ** 30,
+                                           device_used_gb=(total - free) / 2 ** 30, total_gb=total / 2 ** 30)
             except torch.cuda.OutOfMemoryError:
                 out[f"{arm} R={R}"] = dict(oom=True)
             finally:
@@ -805,6 +1007,7 @@ def main():
         ("K2c", "a split that fires, batched vs sequential, 7200 updates", lambda: k2c_split(dev, 7200)),
         ("K3", "lock-step batched vs sequential, arm A 160-163, 2400 updates", lambda: k3_lockstep(dev, 300 if q else 2400)),
         ("K3b", "lock-step, S75 arms at L = 768 and the delta memory", lambda: k3b_lockstep(dev, 5 if q else None, 50 if q else 300)),
+        ("K3c", "the lock-step criterion's controls (positive, negative)", lambda: k3c_controls(dev, 300 if q else 2400)),
         ("K4", "CUDA batched vs CPU sequential lock-step", lambda: k4_device_vs_cpu(dev, 300 if q else 2400)),
         ("K4b", "CUDA sequential (cpu_io) vs CPU sequential lock-step", lambda: k4b_seq_device(dev, 300 if q else 2400)),
         ("K5", "ICMC trainer = explore_i_common.run_one; register scan = loop", lambda: k5_icmc(dev)),
@@ -815,7 +1018,8 @@ def main():
     ]
     only = None if a.only is None else set(a.only.split(","))
     results = dict(meta=dict(info, started=time.strftime("%Y-%m-%d %H:%M:%S"), quick=q,
-                             tolerances=dict(free=FREE_TOL, same_device=TOL_SAME, cuda_vs_cpu=TOL_DEV)), checks={})
+                             tolerances=dict(free=FREE_TOL, same_device=TOL_SAME, cuda_vs_cpu=TOL_DEV,
+                                                                    arbitration_factor=C_ARB)), checks={})
     lines = [f"explore_gpu CHECKs on {info}", ""]
     print(lines[0], flush=True)
     for key, name, f in plan:
@@ -835,6 +1039,14 @@ def main():
             {k: v for k, v in r.items() if k not in ("traceback", "by_step", "secs")}, default=str)[:900]
         print(line, flush=True)
         lines.append(line)
+        for cname, c in (r.get("cases") or {}).items():           # one line per case (the line above is cut at 900)
+            if isinstance(c, dict):
+                cl = f"       {cname}: " + json.dumps({k: v for k, v in c.items() if k not in ("by_step", "first_failures")},
+                                                      default=str)[:400]
+                if c.get("first_failures"):
+                    cl += f" first failures: {json.dumps(c['first_failures'][:2], default=str)[:300]}"
+                print(cl, flush=True)
+                lines.append(cl)
         with open(out_json, "w") as fh:
             json.dump(results, fh, indent=1, default=str)
     failed = [k for k, r in results["checks"].items() if not r["ok"]]

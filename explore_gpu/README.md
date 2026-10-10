@@ -28,16 +28,26 @@ both back. A failing CHECK does not stop the others, and the last line names eve
 Training is *chaotic*. A one-ulp change to arm A's initial parameters moves its logits by 3e-3 after 100 updates and by
 O(1) after 200 (K0). So two free-running paths agree to 1e-5 over 2400 updates only if they are bit-identical. On CPU
 they are bit-identical for every Hebbian model (the next paragraph). On CUDA they are not, because cuBLAS batches GEMMs
-differently. The CUDA CHECK is therefore **lock-step**: before every update, the model under test is set to the
-reference's parameters, and both compute logits and gradients on the same batch. "Relative" means max |d| / max(max |g|,
-1e-2·G), where G is the run's largest gradient entry.
+differently.
 
-| CHECK | Comparison on CUDA | Asserted tolerance |
+The CUDA CHECK is therefore **lock-step**: before every update, the model under test is set to the reference's parameters,
+and both compute logits and gradients on the same batch. Each update must pass one of two tests:
+- **Tolerance.** max |Δlogits| ≤ tol_logits, and for each parameter ‖Δg‖ ≤ tol_grad · ‖g_ref‖, using that parameter's
+  own Frobenius norm.
+- **Float64 arbitration.** Where the tolerance fails, a float64 copy of the reference computes the same update. The
+  tested path passes if it is no farther from float64 than 4× the reference's own float32 error, plus the tolerance.
+
+Arbitration is needed because the reference's float32 rounding can exceed the tolerance by itself. In the delta memory's
+ill-conditioned solve, at a relu at its threshold, or in a cancelling sum, it is the reference that is off, so a fixed
+bound would fail a correct path. A case passes if at most 0.5% of its run-updates fail both tests (at least 1 is allowed).
+K3c checks this criterion: it passes a correct path that rounds differently and fails wrong gradients within 20 updates.
+
+| CHECK | Comparison on CUDA | tol_logits, tol_grad |
 |---|---|---|
-| K3 | batched vs sequential, both on the GPU: arm A, seeds 160–163, all 2400 updates | logits ≤ 1e-5, grads ≤ 1e-4 rel. |
-| K3b | the same for each S75 arm at L = 768 and for the delta memory, 300 updates | logits ≤ 1e-5, grads ≤ 1e-4 rel. |
-| K4 | GPU batched vs CPU sequential: arm A 160, 2400 updates; each S75 arm, 20 updates | logits ≤ 1e-4, grads ≤ 1e-3 rel. |
-| K4b | GPU sequential as (c) runs it vs CPU sequential, the same runs | logits ≤ 1e-4, grads ≤ 1e-3 rel. |
+| K3 | batched vs sequential, both on the GPU: arm A, seeds 160–163, all 2400 updates | 1e-5, 1e-4 |
+| K3b | the same for each S75 arm at L = 768 and for the delta memory, 300 updates | 1e-5, 1e-4 |
+| K4 | GPU batched vs CPU sequential: arm A 160, 2400 updates; each S75 arm, 20 updates | 1e-4, 1e-3 |
+| K4b | GPU sequential as (c) runs it vs CPU sequential, the same runs | 1e-4, 1e-3 |
 | K6 | the per-run Adam vs `torch.optim.Adam`, including the split's state reset | 1e-6 |
 | K1, K2, K2b, K2c, K9 | X's record `A\|160`; free-running agreement; the benchmark (time and memory per arm, R = 1 and 2) | printed |
 
@@ -46,6 +56,10 @@ On CPU (`checks_cpu_output.txt`, this container) these are asserted bit for bit:
 - K2, K2b, K2c: batched and sequential agree exactly in free-running training, over 2400, 600 and 7200 updates; the 7200
   include a split that fires.
 - K5: the ICMC trainer equals `explore_i_common.run_one`, and the register's scan equals its loop.
+
+K3c (the criterion's controls) also runs on CPU. A neuron-permuted twin of arm A (same function, another summation
+order) passes 2400 updates. Zeroed or 1%-scaled gate gradients fail within 20 updates, including W_in at L = 768, where
+its gradient is ~1e-7 of the largest.
 
 K7 checks the data path. K8 runs every forward on fake CUDA tensors to show that no CPU tensor is mixed in.
 
