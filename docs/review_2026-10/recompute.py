@@ -503,6 +503,12 @@ syn = {"S=2 perfect": (f"{sum(count(R[m]['CEIL_A'], bound)[0] for m in 'XL')}/4"
        "S=4 split (S58)": (f"{count(S58['SPLIT'], bound_routed)[0]}/40", "39/40")}
 for k, (rec, rep) in syn.items():
     row("T4 synthesis", 240, k, rep, rec)
+hk = {m: runs(load(MAIN, f"results/{m}/slow_start_results.json"), "HINGE4k16") for m in "XL"}
+row("T4 synthesis", 246, "footnote: Rev. 7's full-hinge arm bound 35/40 on shared seeds, routing recorded only on X (15/20)",
+    "35/40; routing only on X, 15/20",
+    f"bound {sum(count(hk[m], bound)[0] for m in 'XL')}/40; bound routed X {count(hk['X'], bound_routed)[0]}/20, "
+    f"L {count(hk['L'], bound_routed)[0]}/20 (L's records carry stream_gate)", "DISAGREE",
+    "the count reproduces; routing is recorded on L too")
 # single channel, no conv, two streams (Table 4 'one channel 0 of >200')
 k1 = Counter()
 k1b = Counter()
@@ -664,7 +670,7 @@ w("- Session H's S60 temperature ('ran to the floor in every run'): the learned 
   "I could identify; S60's counts (REF 8, TEMP_FLOOR 7, STABLEMAX 7, EMA_EVAL 8 of 10) do reproduce.")
 w("- Phase I-III figures quoted in Table 4 ('0 of >200'): most of those runs predate `results/`.")
 w("- The bit-for-bit CHECKs the report cites (135, 141, ...): they ran in the test processes; their logs are not in "
-  "the repository (see review.md for the one reproduction I attempted).")
+  "the repository (preregistration.md, section 1.5, reports the two reproductions I ran).")
 if NOTES:
     w("\n## Stored-field differences\n")
     for n_ in NOTES:
