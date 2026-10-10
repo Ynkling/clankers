@@ -78,3 +78,112 @@ EXPLORATORY, NOT A RESULT — Session G S71
   [ 46/50]   38.0 min  ORACLE_1     seed 708  acc 0.937 trans  None MERGED
   [ 47/50]   38.8 min  ORACLE_ALL_D seed 709  acc 1.000 trans  1200 ROUTED-BOUND
   [ 48/50]   39.5 min  ORACLE_23_D  seed 709  acc 1.000 trans  1200 ROUTED-BOUND
+  [ 49/50]   39.7 min  ORACLE_1     seed 709  acc 0.962 trans 12000 ROUTED-BOUND
+  [ 50/50]   41.8 min  ORACLE_23    seed 709  acc 0.309 trans  None STREAM-PARTIAL
+  S71 runs done in 42.8 min
+| arm | n | BOUND | ROUTED-BOUND | ROUTED*@end | DISCOVERED | BOUND ROUTED (mine) | unbound classes | transitions | median acc |
+|---|---|---|---|---|---|---|---|---|---|
+| ORACLE_ALL | 10 | 10/10 [0.72, 1.00] RELIABLE | 10/10 [0.72, 1.00] RELIABLE | 10/10 | 10/10 | 10/10 | - | median 1200 (1200-4800) | 1.000 |
+| ORACLE_23 | 10 | 0/10 [0.00, 0.28] NEVER | 0/10 [0.00, 0.28] NEVER | 10/10 | 0/10 | 0/10 | STREAM-PARTIAL 10 | - | 0.504 |
+| ORACLE_1 | 10 | 9/10 [0.60, 0.98] RELIABLE | 9/10 [0.60, 0.98] RELIABLE | 10/10 | 9/10 | 0/10 | MERGED 1 | median 16800 (8400-24000) | 0.955 |
+| ORACLE_ALL_D | 10 | 10/10 [0.72, 1.00] RELIABLE | 10/10 [0.72, 1.00] RELIABLE | 10/10 | 10/10 | 10/10 | - | median 1200 (1200-1200) | 1.000 |
+| ORACLE_23_D | 10 | 10/10 [0.72, 1.00] RELIABLE | 10/10 [0.72, 1.00] RELIABLE | 10/10 | 10/10 | 0/10 | - | median 1200 (1200-3600) | 1.000 |
+
+READINGS:
+  validity: Hebbian VALID (ORACLE_ALL 10/10); delta VALID (ORACLE_ALL_D 10/10)
+  layer 1 is the block (ALL beats 23): APPLIES (b 10, c 0, p 0.000977, n 10)
+  layer 1 is not needed (23 >= ALL - 1): does not apply (b 0, c 10, p 1, n 10)
+  layer 1 alone suffices (1 >= ALL - 1): APPLIES (b 0, c 1, p 1, n 10)
+  delta tolerates an unrouted layer 1 (23_D >= ALL_D - 1): APPLIES (b 0, c 0, p 1, n 10)
+
+DIAGNOSTICS:
+- ORACLE_ALL:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  in-run probe (median held-out acc) L2|K 0.64, L2|V 0.51, L3|K 0.67, L3|V 0.53, final|K 0.71, final|V 0.62
+  write order: acc last-written 1.00, not-last 1.00
+- ORACLE_23:
+  margin at VAL by layer (median) L1 -0.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.74, 0.26], [0.77, 0.23]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.62, 0.38], [0.62, 0.38]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  in-run probe (median held-out acc) L2|K 0.61, L2|V 0.51, L3|K 0.64, L3|V 0.51, final|K 0.62, final|V 0.53
+  plateau (10 unbound runs; acc 0.50): acc by (stream|block|index) 0|0|0 0.47, 0|0|1 0.46, 0|0|2 0.47, 0|1|0 0.51, 0|1|1 0.50, 0|1|2 0.49, 1|0|0 0.49, 1|0|1 0.46, 1|0|2 0.48, 1|1|0 0.51, 1|1|1 0.50, 1|1|2 0.48
+  write order: acc last-written 0.52, not-last 0.49
+- ORACLE_1:
+  margin at VAL by layer (median) L1 1.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.2, 0.8], [0.54, 0.46]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.2, 0.8], [0.54, 0.46]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  in-run probe (median held-out acc) L2|K 0.63, L2|V 0.50, L3|K 0.63, L3|V 0.52, final|K 0.60, final|V 0.54
+  plateau (1 unbound runs; acc 0.94): acc by (stream|block|index) 0|0|0 0.88, 0|0|1 0.93, 0|0|2 0.90, 0|1|0 0.97, 0|1|1 0.99, 0|1|2 0.99, 1|0|0 0.90, 1|0|1 0.93, 1|0|2 0.94, 1|1|0 0.95, 1|1|1 0.95, 1|1|2 0.99
+  write order: acc last-written 0.97, not-last 0.94
+- ORACLE_ALL_D:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  in-run probe (median held-out acc) L2|K 0.75, L2|V 0.52, L3|K 0.81, L3|V 0.52, final|K 0.79, final|V 0.57
+  write order: acc last-written 1.00, not-last 1.00
+- ORACLE_23_D:
+  margin at VAL by layer (median) L1 0.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.33, 0.67], [0.34, 0.66]]; KEY [[0.47, 0.53], [0.48, 0.52]]; VAL [[0.5, 0.5], [0.49, 0.51]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  in-run probe (median held-out acc) L2|K 0.61, L2|V 0.51, L3|K 0.73, L3|V 0.51, final|K 0.75, final|V 0.53
+  write order: acc last-written 1.00, not-last 1.00
+
+per run:
+  ORACLE_ALL 700: ROUTED-BOUND    acc 0.994 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.60/0.51
+  ORACLE_ALL 701: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.68/0.53
+  ORACLE_ALL 702: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.73/0.59
+  ORACLE_ALL 703: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.76/0.52
+  ORACLE_ALL 704: ROUTED-BOUND    acc 1.000 trans 2400 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.64/0.52
+  ORACLE_ALL 705: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.59
+  ORACLE_ALL 706: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.54
+  ORACLE_ALL 707: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.71/0.54
+  ORACLE_ALL 708: ROUTED-BOUND    acc 1.000 trans 2400 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.67/0.53
+  ORACLE_ALL 709: ROUTED-BOUND    acc 1.000 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.52
+  ORACLE_23 700: STREAM-PARTIAL  acc 0.319 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m 0.02 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.51
+  ORACLE_23 701: STREAM-PARTIAL  acc 0.530 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m 0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.56
+  ORACLE_23 702: STREAM-PARTIAL  acc 0.540 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.60/0.53
+  ORACLE_23 703: STREAM-PARTIAL  acc 0.328 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.85/0.51
+  ORACLE_23 704: STREAM-PARTIAL  acc 0.499 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.60/0.51
+  ORACLE_23 705: STREAM-PARTIAL  acc 0.316 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m -0.02 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.64/0.52
+  ORACLE_23 706: STREAM-PARTIAL  acc 0.530 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.60/0.51
+  ORACLE_23 707: STREAM-PARTIAL  acc 0.542 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.65/0.50
+  ORACLE_23 708: STREAM-PARTIAL  acc 0.509 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m 0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.62/0.51
+  ORACLE_23 709: STREAM-PARTIAL  acc 0.309 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m -0.02 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.63/0.51
+  ORACLE_1 700: ROUTED-BOUND    acc 0.970 trans 13200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.59/0.51
+  ORACLE_1 701: ROUTED-BOUND    acc 0.953 trans 16800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.65/0.53
+  ORACLE_1 702: ROUTED-BOUND    acc 0.952 trans 24000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.63/0.54
+  ORACLE_1 703: ROUTED-BOUND    acc 0.954 trans 22800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.59/0.52
+  ORACLE_1 704: ROUTED-BOUND    acc 0.953 trans 10800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.64/0.49
+  ORACLE_1 705: ROUTED-BOUND    acc 0.956 trans 8400 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.62/0.50
+  ORACLE_1 706: ROUTED-BOUND    acc 0.959 trans 18000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.64/0.51
+  ORACLE_1 707: ROUTED-BOUND    acc 0.958 trans 19200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.57/0.56
+  ORACLE_1 708: MERGED          acc 0.937 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.63/0.51
+  ORACLE_1 709: ROUTED-BOUND    acc 0.962 trans 12000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.62/0.52
+  ORACLE_ALL_D 700: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.84/0.53
+  ORACLE_ALL_D 701: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.50
+  ORACLE_ALL_D 702: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.76/0.50
+  ORACLE_ALL_D 703: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.77/0.52
+  ORACLE_ALL_D 704: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.74/0.52
+  ORACLE_ALL_D 705: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.77/0.54
+  ORACLE_ALL_D 706: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.85/0.51
+  ORACLE_ALL_D 707: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.90/0.54
+  ORACLE_ALL_D 708: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.91/0.51
+  ORACLE_ALL_D 709: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.99/0.54
+  ORACLE_23_D 700: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.73/0.51
+  ORACLE_23_D 701: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m 0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.74/0.51
+  ORACLE_23_D 702: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m 0.01 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.64/0.52
+  ORACLE_23_D 703: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.68/0.50
+  ORACLE_23_D 704: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m 0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.91/0.54
+  ORACLE_23_D 705: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m -0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.79/0.51
+  ORACLE_23_D 706: ROUTED-BOUND    acc 0.999 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m 0.01 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.77/0.50
+  ORACLE_23_D 707: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m 0.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.96/0.51
+  ORACLE_23_D 708: ROUTED-BOUND    acc 0.987 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 1] m 0.01 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.53
+  ORACLE_23_D 709: ROUTED-BOUND    acc 1.000 trans 1200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 0] m 0.03 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.72/0.51
+SCREEN_DONE
