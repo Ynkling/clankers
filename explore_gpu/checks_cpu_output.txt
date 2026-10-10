@@ -1,0 +1,5 @@
+explore_gpu CHECKs on {'device': 'cpu', 'torch': '2.14.0+cu130', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'threads': 1, 'gpu': None}
+
+ok   K8 fake-CUDA device audit (3 s): {"ok": true, "cases": {"MultiBDH recurrent (arm A)": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "MultiBDH perfect + conv (ORACLE)": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "MultiBDH none + conv (SINGLE)": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "LocalBDH LOCAL3 (WIN3_SPLIT)": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "LocalBDH WIDE (WIDE_SPLIT)": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "Reg3Conv (REG3)": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "LocalBDH + delta": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "delta learned beta + GDN": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "delta routed decay + perfect gate": {"ok": true, "sequential": "cuda:0", "batched": "cuda:0"}, "negative control (a CPU tensor in a forward must raise)": {"ok": true}, "split n
+
+ALL ASSERTED CHECKS PASSED
