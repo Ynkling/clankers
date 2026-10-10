@@ -99,3 +99,5 @@ interference is stronger and SINGLE learns to tag its memory by source on 3/4 se
 make SINGLE fail by the end of 12000 updates is to starve it (a smaller B), which would only move the transition past the
 pilot's budget and inside S75's 24000; that would rig the control, so it is not tried. Nothing usable was found; per the
 rule, report and stop. S75 is not run; its draft (explore_i_dense.py) keeps its placeholders.
+
+C2 NOMIX (finished after the decision): SET 0.967, 0.966, 0.966, 0.966 (157-160 min per run).

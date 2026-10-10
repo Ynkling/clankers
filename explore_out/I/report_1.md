@@ -15,7 +15,8 @@ final SET accuracy ≥ 0.9 and SINGLE's ≤ ORACLE's − 0.2 on ≥ 3/4 seeds. F
 | C1 | 2, 4, 6..14, 16, 384 | 0.932 | 4/4 (0.910-0.918) | 2/4 (0.661-0.746) | **no** (2/4) | 106-111 |
 | C2 | 2, 4, 3..7, 40, 480 | 0.936 | 4/4 (0.916-0.918) | 1/4 (0.654-0.863) | **no** (1/4) | 155-166 |
 
-NOMIX (descriptive): C1 stopped after the decision; C2 __NOMIX__.
+NOMIX (descriptive): C1 stopped after the decision; C2 0.966-0.967 on 4/4 (one source, M = 400 words: the floor
+without interference; ORACLE's 0.917 is below it because each of its sources has half the words).
 S = 4: not run. The exact bound (uniform tables: given the observed successors O, every completing set is equally
 likely) is 0.82 at L = 288 and needs L ≈ 768 for 0.93, ~10 h per 12000-update run here: excluded by the bound.
 
