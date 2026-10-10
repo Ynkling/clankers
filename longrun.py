@@ -176,8 +176,11 @@ def progress(st):
     if n is not None:
         line += f"; records {n}" + (f"/{st['total']}" if st.get("total") else "")
         k0 = s.get("records_at_start") or 0
-        if st.get("total") and n > k0 and n < st["total"]:
-            line += f"; at this start's rate the rest takes ~{el / (n - k0) * (st['total'] - n) / 3600:.1f} h"
+        if n > k0 and "first_seen" not in s:
+            s["first_seen"] = [time.time(), n]              # the rate is measured from the first record seen
+        f = s.get("first_seen")
+        if st.get("total") and f and n > f[1] and n < st["total"]:
+            line += f"; at the rate since the first record ~{(time.time() - f[0]) / (n - f[1]) * (st['total'] - n) / 3600:.1f} h left"
     return line
 
 

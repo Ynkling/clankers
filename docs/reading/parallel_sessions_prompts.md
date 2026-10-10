@@ -603,3 +603,160 @@ and the margin rule fired (list them).
 Order: S78 → S79. Push after each. report_4.md after S78 (counts first, two pages), report_5.md
 after S79, and the README section.
 ```
+
+---
+
+# Third round (10 October, afternoon): F, G, H, I, R, V
+
+Written after F's report 5 (S76), G's reports 3-4 (S71-S73), H's reports 4-5 (S78-S79), I's report 1 (S74), R's
+replication report and V's registry. Seed blocks 2000-2399 are unused on every branch as of this writing; the
+"shift by 100 if any appears" rule stands. The common rules above apply to F, G, H and I.
+
+## Session F — round 3 (S80-S81; seeds 2000-2059)
+
+```
+Follow-up to S76. Your result makes the delta memory a main-line candidate: before a pre-registered test
+can switch the memory rule, the delta recipe needs the main line's other two configurations, and its
+trigger needs to stop firing before the map has merged (6 of your 12 delta splits).
+
+S80 explore_f_configs (DELTA* = β 1, L2 keys; H's exact-copy split; paired with Hebbian; 10 seeds each):
+ (a) two streams, S=2, P=4, k=2, no conv, 24000, test_window_gate's Part A path (WIN3_SLOW; no split
+     at k=S): DELTA_A vs HEBB_A, outcome DISCOVERED, failure classes under fail_class_v2 (copy the
+     module from the main line, ba8901a). Seeds 2000-2009. Main-line reference: WIN3_SLOW 69/80.
+ (b) four streams, S=4, P=4, k=16, conv, 28800, Part B path (WIN3_SLOW16): DELTA_B vs HEBB_B, outcome
+     BOUND ROUTED. Seeds 2010-2019. Reference: WIN3_SLOW16 38/40.
+ Validity: the perfect gate on delta at each configuration, 2 seeds. Readings fixed now, per
+ configuration: "the delta recipe keeps it" if DELTA ≥ HEBB − 1 discordant pair; "loses it" if HEBB
+ beats DELTA by ≥ 4 vs 0; "inconclusive" otherwise. Report transitions and, at two streams, the
+ single-channel probe of S77 at the end of every run (does the delta stack carry the stream here?).
+S81 explore_f_trigger (S=8, P=4, k=16, conv, 43200, seeds 2020-2029; DELTA* channels; paired):
+ the split's trigger on delta memory. Arms: BASE (S76's DELTA_SPLIT: the plateau rule as it stands);
+ GUARD (no split while the probe's accuracy is below 0.5, i.e. until at least one stream has
+ bound — H's flat-start reading); EVAL (the trigger reads the 2048-sequence held-out evaluation it
+ computes anyway instead of the 64-sequence probe — Session R's finding that a 64-query probe can read
+ ≥ 0.95 while the model is at 0.88); GUARD_EVAL (both). Outcome BOUND ROUTED with the transition;
+ record every firing and whether its target was labelled ok. Readings fixed now: "the guard aims the
+ split" if GUARD's firings are labelled ok on ≥ 90% (BASE: 50%) with BOUND ROUTED ≥ BASE − 1 pair;
+ "the evaluation is the better probe" if EVAL ≥ BASE − 1 pair with no firing on a probe-vs-evaluation
+ disagreement; "either device costs binding" if BASE beats it by ≥ 4 vs 0.
+CHECKs: your 26; the v2 classifier equals v1 except where η² by key ≥ 0.5 and the margin rule fired
+(list them); GUARD and EVAL with their condition disabled equal BASE bit for bit through the first
+split. Order: S80 → S81. report_6.md after S80, report_7.md after S81, README section.
+```
+
+## Session G — round 3 (S82; seeds 2100-2159)
+
+```
+Follow-up to S71-S73. The register at all three layers carries the cue 20/20 when nudged and is found
+label-free on 4/20 on each memory; the runs that fail lock into a key split before the register's write
+at CTX appears. S82 tests devices that delay or prevent the key split so the write can emerge. Hebbian
+memory (the main line's), RandHeaderTask-lite, 24000, SLOW, seeds 2100-2119 (20); the best arm also
+on delta (β 1, L2) on 2100-2109.
+Arms: BASELINE (LOCAL3+SLOW); REG3 (your S72 arm, the reference on new seeds); REG3_KEYHINGE (S52's
+ key-term hinge from claude/outside-ideas, on the shared gate for updates 1-2400: a penalty on the
+ gate's dependence on key identity at key positions; copy its definition and constants; it reads key
+ positions and identities, as the split reads key positions — say so); REG3_SLOWGATE (the gate group
+ at 1e-4 for updates 1-1200, then 1e-3, so the gate cannot commit to a key split while the memory is
+ slow; everything else as SLOW); REG3_NOWIN (the gate reads [LN(r^(ℓ)); R_{t−1}] only — no raw window
+ input — so key identity reaches it only through the residual); REG3_NUDGE (2 seeds, validity of the
+ code path, expected 2/2). Outcomes as S73 (ROUTED-BOUND primary; BOUND, DISCOVERED, your BOUND
+ ROUTED printed), with β^R by role and step, the margin per layer, the contingency tables, the probe,
+ and accuracy by (stream, block, pair) for the plateaus.
+Readings fixed now: "discovered" for an arm if it beats BASELINE on ROUTED-BOUND (exact one-sided
+ McNemar p < 0.05; 5 vs 0, 7 vs 1, 9 vs 2 or better); "the device helps" if it beats REG3 by ≥ 4 vs 0;
+ "the device hurts" if REG3 beats it by ≥ 4 vs 0; "a working write without the device's cost" if the
+ arm's unbound runs have no KEY failures and its β^R at CTX exceeds K/V in ≥ 15/20 runs. Validity:
+ S71's ORACLE_ALL on 700-709 stands for the model; rerun it on 2100-2101.
+CHECKs: S73's 37; each device with its switch off equals REG3 bit for bit through 2400; the hinge's
+ gradient and its schedule; the slow-gate groups; NOWIN has no window parameters. report_5.md, README
+ section. Afterwards, if any arm reads "discovered", state in one paragraph what a pre-registered
+ main-line test of it would be (arms, seeds per machine, claims), for the user.
+```
+
+## Session H — round 3 (S84-S85; seeds 2200-2259)
+
+```
+Follow-up to S78-S79. Two screens: the trigger's flat start at eight streams, and the two-stream
+problem by a route that is not the copy.
+S84 explore_h_guard (S=8, P=4, k=16, conv, 43200, Hebbian, exact-copy split; seeds 2200-2209;
+ paired): BASE (S79's BASE); GUARD (no split while the probe's accuracy is below 0.5); GUARD_INT1200
+ (the guard with checks every 1200 from 2400, gap 2400: INT1200's speed without its failures?);
+ EVAL (the trigger reads the 2048-sequence held-out evaluation instead of the 64-sequence probe:
+ Session R found a probe reading ≥ 0.95 at a true 0.88 stops the rule); EVAL_GUARD_INT1200.
+ Outcome BOUND ROUTED with the transition; every firing with its label. Readings fixed now: "the
+ guard aims the split" if GUARD's firings labelled ok ≥ 95% with BOUND ROUTED ≥ BASE − 1 pair;
+ "faster without the cost" if GUARD_INT1200 ≥ BASE − 1 pair and its median transition is earlier
+ by ≥ 2400; "the evaluation is the better probe" if EVAL ≥ BASE − 1 pair; "costs binding" if BASE
+ beats the arm by ≥ 4 vs 0. (Session F runs the same guard on delta channels in its S81; keep the
+ arm names and rules identical so the two pair by name.)
+S85 explore_h_two_b (S=2, P=4, k=2, no conv, 24000, Part A path, seeds 2210-2229; 20 seeds; v1 and
+ v2 classes): the two-stream key split by prevention rather than repair. REF (WIN3_SLOW); SLOWGATE
+ (the gate group at 1e-4 for updates 1-1200, then 1e-3: key splits form within 600 updates while
+ the memory is at 1e-4, so let the gate wait for the memory); KEYHINGE (S52's W2_KEYHINGE from
+ claude/outside-ideas, under v2: it was 36/40 under v1 with three boundary cases); SLOWGATE_KEYHINGE.
+ Outcome DISCOVERED. Readings fixed now: "prevention works" if an arm beats REF by exact one-sided
+ McNemar p < 0.05 on 20 pairs; "the key split only moves" if an arm's KEY failures (v2) are ≥ REF's − 1.
+ Report the update at which η² by key at KEY positions first exceeds 0.5 in every run (when the key
+ split forms), by arm.
+CHECKs: GUARD/EVAL with the condition disabled equal BASE bit for bit through the first split; the
+ S52 hinge reproduces its record through 2400 with the copied code; SLOWGATE's groups. Order: S84 →
+ S85. report_6.md, report_7.md, README section.
+```
+
+## Session I — round 2: the GPU package (branch claude/explore-I; no seeds)
+
+```
+Follow-up to S74. Your pilot found that under the dense loss one channel learns to carry the source
+at two sources, and that four sources need L ≈ 768, about 10 h per run on CPU. The user has CUDA
+machines (an RTX 3070 Mobile laptop; a home server with a GTX 1660 Super). Your next task is a GPU
+package, not a screen: explore_gpu/ on your branch, new files only.
+ 1. A device-agnostic runner for the project's model and tasks: the BDH stack with k channels, the
+    LOCAL3/WIDE window gates, the perfect gate, G's REG3 (your copy), the Hebbian and delta
+    (explore_delta_mem) memories, SLOW, the exact-copy split, ICMC and RandHeaderTask-lite and the
+    grouped BindTask, batched on one GPU, float32, with the same seeding conventions. Reuse the
+    project's modules where they already run on CUDA; wrap, do not edit them.
+ 2. CHECKs, run on CPU here: with device=cpu and 1 thread the runner reproduces X's recorded arm A
+    seed 160 bit for bit; on the same seed the batched path's logits equal the sequential path's to
+    1e-5 at every evaluation for 2400 updates (this is what the user will rerun on CUDA; bit-for-bit
+    is not expected there, so write the CUDA CHECK as a tolerance and state it).
+ 3. A one-page README: install (torch CUDA wheel), the commands to (a) run the CHECKs on CUDA, (b)
+    run S75 at S=4 (the arms and readings of the S75 specification, seeds 830-839, L ≈ 768 by your
+    bound table) and (c) run any main-line test's arm on CUDA with --device cuda, writing records
+    in the harness's format with the device and GPU model in meta.
+ 4. A runtime estimate for S75 at S=4 on a 6 GB and an 8 GB GPU from a CPU profile of one step.
+Commit the package with its CPU CHECK outputs; the user runs the CUDA CHECK and reports. If the
+CUDA CHECK passes, S75 at S=4 runs on the user's GPU with its readings as specified in S75.
+```
+
+## Session R — Phase 4 (seeds 920-939; branch claude/replicate-R)
+
+```
+Phase 4. Your 17/20 cannot tell 0.85 from 0.95. Run WIN3_SPLIT_D8 and WIN3_SLOW_D8 on seeds 920-939
+with the split specified as the main line's (the fixed probe from Generator(12345), body keys only
+for the mass, the oracle under single-rate Adam), so that the 40-seed count tests the recipe as the
+report should have described it. Readings fixed now, on all 40 seeds: "consistent with the report"
+if the Wilson 95% interval of WIN3_SPLIT_D8's rate overlaps [0.835, 0.986] and it beats WIN3_SLOW_D8
+at p < 0.05; "a lower rate" if the interval's upper bound is below 0.835; count also how many checks
+were blocked by a probe-versus-evaluation disagreement (your seed-914 failure mode), now that the
+probe is the report's. Append to replicate_report.md; keep the Phase 2 record untouched.
+```
+
+## Session V — round 3 (branch claude/review-V; docs/review_2026-10/)
+
+```
+Three more, same rules.
+ 1. recompute_sessions.md: every count, discordant pair, p-value, interval and band in F's reports 3-5,
+    G's reports 3-4, H's reports 4-5 and I's report 1 (branches claude/explore-F/G/H/I, heads as of
+    today) recomputed from their JSON records under the readings as their docstrings fix them;
+    disagreements first; and for every screen the commit of its readings against the commit of its
+    first run. These are the numbers Revision 9 will quote.
+ 2. replication_review.md: referee Session R's replicate_report.md, DIFF.md and UNSTATED.md
+    (claude/replicate-R): is "partially replicated" the right reading of 17/20 given its own bar; are
+    its seven additions to the report correct and sufficient; does the isolation disclosure (six
+    filenames seen) matter; what would you require of a second replication.
+ 3. When the user pushes draft specifications for the next main-line tests to specs/ (the delta recipe
+    against the Hebbian one at eight streams; the register against the baseline on
+    RandHeaderTask-lite), review each BEFORE it runs: ambiguous readings (your S61 and REG_D
+    findings), missing CHECKs, outcomes that can be read two ways, power at the planned seeds. One
+    page per spec, spec_review_<name>.md. Say what you could not check and why.
+```
