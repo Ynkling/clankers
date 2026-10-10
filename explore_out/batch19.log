@@ -6585,3 +6585,125 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
 ====================================================================================================
   code SHA (one child for all four screens): 17e56410a1db over 43 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b19_model explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
   this segment's CPU: Intel(R) Xeon(R) Processor @ 2.80GHz; the batch's CPU (the full CHECK pass): Intel(R) Xeon(R) Processor @ 2.80GHz; checkpoints in /tmp/claude-0/-home-user-clankers/db3e70a0-5544-5116-802e-293fdfffc055/scratchpad/b19_ckpt
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (74s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  PROJECTION (stored 2026-10-09 08:33:09 UTC on Intel(R) Xeon(R) Processor @ 2.80GHz; the stored timings are reused)
+  recipe read in a child from main at 9c5939e: test_stream_recipe.LR 0.001, test_stream_curriculum.LR 0.001; SLOW: gate 0.001 throughout, others 0.0001 for updates 1-2400; window width 3; the model: ARCH {'n_layer': 3, 'positional': 'decay'}, D 32, A4k16's mult 8 (N = 256), h_gate None, {'conv': 'layer', 'conv_k': 4}; evaluation every 1200, bound at 0.95 held, early stop after 3 in a row (after 4800 on the k16 path); the trigger: every 2400 from 4800 (reference 2400), acc < 0.95, rise < 0.02, gap 4800, <= 3 splits; tasks {'P4S4': {'S': 4, 'P': 4, 'vocab': 24, 'n_vals': 16, 'n_q': 1}, 'P4S8': {'S': 8, 'P': 4, 'vocab': 28, 'n_vals': 16, 'n_q': 1}, 'P8S4': {'S': 4, 'P': 8, 'vocab': 28, 'n_vals': 16, 'n_q': 1}, 'P16S4': {'S': 4, 'P': 16, 'vocab': 36, 'n_vals': 16, 'n_q': 1}}; 1 torch thread per run
+  lr for scale_width ORC_N256: 0.001; iters 28800; seeds 270-271 (2); size [8, 32, 3]
+  lr for scale_width N256: 0.001; iters 28800; seeds 270-279 (10); size [8, 32, 3]
+  lr for scale_width ORC_N512: 0.001; iters 28800; seeds 270-271 (2); size [16, 32, 3]
+  lr for scale_width N512: 0.001; iters 28800; seeds 270-279 (10); size [16, 32, 3]
+  lr for scale_width ORC_N1024: 0.001; iters 28800; seeds 270-271 (2); size [32, 32, 3]
+  lr for scale_width N1024: 0.001; iters 28800; seeds 270-279 (10); size [32, 32, 3]
+  lr for scale_width ORC_D64: 0.001; iters 28800; seeds 270-271 (2); size [4, 64, 3]
+  lr for scale_width D64: 0.001; iters 28800; seeds 270-279 (10); size [4, 64, 3]
+  lr for scale_width ORC_D128: 0.001; iters 28800; seeds 270-271 (2); size [2, 128, 3]
+  lr for scale_width D128: 0.001; iters 28800; seeds 270-279 (10); size [2, 128, 3]
+  lr for scale_depth ORC_L2: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 2]
+  lr for scale_depth L2: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 2]
+  lr for scale_depth ORC_L3: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 3]
+  lr for scale_depth L3: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 3]
+  lr for scale_depth ORC_L4: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 4]
+  lr for scale_depth L4: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 4]
+  lr for scale_depth ORC_L6: 0.001; iters 28800; seeds 280-281 (2); size [8, 32, 6]
+  lr for scale_depth L6: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 6]
+  lr for scale_depth RES6: 0.001; iters 28800; seeds 280-289 (10); size [8, 32, 6]
+  CHECKs skipped (repro check above still run): the code SHA equals the one at the full CHECK pass (2026-10-09 09:01:31 UTC, git 78817a7+dirty, on Intel(R) Xeon(R) Processor @ 2.80GHz; its output is earlier in this log)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_width
+  idea    does the window recipe survive width? N = 256, 512, 1024 at D = 32; D = 64, 128 at N = 256
+  source  batch 16's S44(a) LOCAL3_SLOW16_A (20/20 at S=4, k=16, N=256, D=32); the user's batch 19
+  change  only the model's size (mult = N/D, the embedding width D); every recipe and initial scale rule as is
+  arm ORC_N256     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 8), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N256         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 8), D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N512     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=512 (mult 16), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N512         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=512 (mult 16), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N1024    lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=1024 (mult 32), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N1024        lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=1024 (mult 32), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D64      lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 4), D=64, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D64          lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 4), D=64, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D128     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 2), D=128, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D128         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 2), D=128, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 270-279 with N256 (the same batches); oracles on 270-271
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_depth
+  idea    does the window recipe survive depth? 2, 4 and 6 layers against 3 (one gate shared across layers)
+  source  batch 16's S44(a) (3 layers); the user's batch 19; RES6: Session G's design (docs/reading/distant_cues_2026-10.md 4.3)
+  change  only ARCH's n_layer (the shared BDH layer applied n times); RES6 adds a per-layer gate over the residual stream
+  arm ORC_L2       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 2 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L2           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 2 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L3       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 3 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L3           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L4       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 4 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L4           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 4 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L6       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 6 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L6           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 6 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm RES6         lr 0.001  iters 28800  seeds 280-289 (10)  — Session G's per-layer residual gate at 6 layers (diagnostic; only if L6 fails)
+                   schedule: gate W_in/W_g/window/A 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 280-289 with L3 (the same batches and initial parameters); oracles on 280-281
+----------------------------------------------------------------------------------------------------
+  phase-2 decision (stored 2026-10-09 16:40:29 UTC): best width D128, best depth 2
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_eight
+  idea    the window recipe with the split at eight streams, at the best width and the best depth of S64 / S65
+  source  batch 17's S48 W_SPLIT (9/10 at N=256, 3 layers); S64 / S65; the user's batch 19
+  change  the model's size (S64's best width; S65's best depth); recipe and trigger unchanged; 43200 updates
+  arm N256_L3      lr 0.001  iters 43200  seeds 290-299 (10)  — N=256, D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed
+  arm D128_L3      lr 0.001  iters 43200  seeds 290-299 (10)  — S64's best width D128: N=256, D=128, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed
+  arm N256_L2      lr 0.001  iters 43200  seeds 290-299 (10)  — S65's best depth: N=256, D=32, 2 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed
+  pairing seeds 290-299 with N256_L3 (the same batches)
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN capacity
+  idea    is four-stream binding capacity-bound at N=256? P = 8 and 16 at N=256 and at S64's best width, oracle first
+  source  the user's batch 19 (budget 43200; the oracle-first rule)
+  change  the task's P (8, 16) and the model's size; recipes unchanged
+  arm ORC_P8_N256  lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=8, N256 (N=256, D=32)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_P8_D128  lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=8, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_P16_N256 lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=16, N256 (N=256, D=32)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_P16_D128 lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm P8_N256      lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=8, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm P8_D128      lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=8, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm P16_N256     lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm P16_D128     lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 270-279: <W> with N256 at each P (the same batches); oracles on 270-271
+----------------------------------------------------------------------------------------------------
+  pool: 4 workers (1 torch thread each); segment budget 115 min left
+  start    0.0 min  capacity     P16_N256       seed 278  (resuming from its checkpoint at step 32400)  (projected worst case 251 min)
+  start    0.0 min  capacity     P16_N256       seed 279  (resuming from its checkpoint at step 31200)  (projected worst case 251 min)
+  start    0.0 min  capacity     P8_N256        seed 273  (resuming from its checkpoint at step 6000)  (projected worst case 90 min)
+  start    0.0 min  capacity     P8_N256        seed 274  (resuming from its checkpoint at step 4800)  (projected worst case 90 min)
+  [  1]   11.2 min  capacity     P8_N256        seed 274  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 3ad057a+dirty, code 17e56410a1db, attempt 1, resumed at [4800]: acc 0.997  trans  8400  stop 10800  outcome BOUND ROUTED
+  start   11.2 min  capacity     P8_N256        seed 275  (projected worst case 90 min)
