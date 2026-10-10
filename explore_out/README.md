@@ -629,3 +629,29 @@ layout at P = 8, S = 2, 24000 updates (the user's instruction of 9 October).
 Validity: the Hebbian perfect gate bound 3 of 6 seeds at 24000 (marginal), the delta one 2/2. Handed back as worth a
 pre-registered look: a register-driven gate on delta channels (REG_D, REG_NUDGE_D), with routing (not BOUND) as the
 outcome. Not: the per-layer gate and the register or latch on Hebbian channels at this budget.
+
+## Session G follow-up
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. Seeds 700-719. Task: RandHeaderTask-lite exactly as Session F's
+S70 (`explore_f_tasks.py` copied unchanged), k = 2, no conv, 24000 updates. Reports: `G/report_3.md` (S71) and
+`G/report_4.md` (S73, S72). Readings use ROUTED-BOUND = BOUND ∧ F's ROUTED*@end (S71: BOUND), paired, with exact
+one-sided McNemar.
+
+| screen / arm | outcome | reference | reading |
+|---|---|---|---|
+| S71 ORACLE_23 (perfect at layers 2-3, LOCAL3 at 1; Hebbian, 700-709) | BOUND 0/10 (acc 0.50 in every cell) | ORACLE_ALL 10/10 (10 / 0, p = 0.001) | "layer 1 is the block" |
+| S71 ORACLE_1 (perfect at layer 1 only) | BOUND 9/10 (median 16800, acc 0.95-0.97) | ORACLE_ALL 10/10 (0 / 1) | "layer 1 alone suffices" |
+| S71 ORACLE_23_D (delta) | BOUND 10/10 at 1200 | ORACLE_ALL_D 10/10 | "delta tolerates an unrouted layer 1" |
+| S73 REG3_NUDGE_D (register gate at all 3 layers, delta) | ROUTED-BOUND 10/10 | – | "the register carries the cue" |
+| S73 REG3_D | ROUTED-BOUND 4/20 | BASELINE_D 0/20 (4 / 0, p = 0.0625) | not "discovered" |
+| S73 RESGATE_ONLY_D, LATCH3_D | ROUTED-BOUND 0/10, 0/10 | BASELINE_D 0/10 | not "discovered" |
+| S73 LATCH3_NUDGE_D | ROUTED-BOUND 9/10; z = 1 / 0 / 0 at CTX / K / V on 9/10 | – | "the latch holds on delta memory" |
+| S73 BASELINE_D probe | stream at layer-3 input ≥ 0.9 on 7/20 (none of them routed) | – | "the delta stack carries the cue" does not apply |
+| S73 SINGLE_D (k = 1, delta) | BOUND 7/10 | – | "the gate is not needed" does not apply (one short) |
+| S72 REG3_NUDGE (Hebbian) | ROUTED-BOUND 20/20 | (S56's layers-2-3 version 0/10) | "the register carries the cue at all three layers" |
+| S72 REG3 | ROUTED-BOUND 4/20 | BASELINE 0/20 (4 / 0, p = 0.0625) | "not discovered" |
+
+Handed back as worth a pre-registered look: the register gate shared by all three layers (REG3), on either memory. With a
+5% nudge it routes and binds 20/20 (Hebbian) and 10/10 (delta). Unnudged it routes 4/20 on each memory against 0/20 for
+either baseline, one pair short of the screens' threshold each time. The open problem is the register's write at CTX
+tokens, which loses the race to an early key split in 16 of 20 seeds. Not: the residual gate alone and the unnudged latch.
