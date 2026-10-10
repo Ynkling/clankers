@@ -116,6 +116,26 @@ class Task:
         return dict(idx=idx, target=target, stream=stream, role=role, qstream=qs)
 
 
+    def sample_theirs(self, B, gen):
+        """PHASE 3 ONLY: the main line's BindTask.make_batch (grouped, n_q=1), draw for draw, re-expressed in this
+        file's vocabulary (their CTX s, KEY i, VAL v -> ctx_tok(s), key_tok(i), v; the query's VAL becomes '?')."""
+        S, P = self.S, self.P
+        vals = torch.rand(B, P, N_VALUES, generator=gen).argsort(-1)[..., :S]
+        korder = torch.rand(B, P, generator=gen).argsort(-1)
+        sorder = torch.rand(B, P, S, generator=gen).argsort(-1)
+        vg = vals.gather(1, korder.unsqueeze(-1).expand(B, P, S)).gather(2, sorder)
+        q = torch.rand(B, S * P, generator=gen).argsort(-1)[:, :1]
+        qs, qk = (q // P).squeeze(1), (q % P).squeeze(1)
+        body = torch.stack([N_VALUES + P + sorder, (N_VALUES + korder).unsqueeze(-1).expand(B, P, S), vg], -1)
+        body = body.reshape(B, 3 * S * P)
+        qrow = torch.stack([N_VALUES + P + qs, N_VALUES + qk, torch.full_like(qs, self.qmark)], -1)
+        idx = torch.cat([body, qrow], 1)
+        target = vals.reshape(B, P * S).gather(1, (qk * S + qs).unsqueeze(1)).squeeze(1)
+        stream = torch.cat([sorder.reshape(B, S * P).repeat_interleave(3, 1), qs.unsqueeze(1).expand(B, 3)], 1)
+        role = torch.tensor([ROLE_CTX, ROLE_KEY, ROLE_VAL] * (S * P) + [ROLE_CTX, ROLE_KEY, ROLE_QMARK])
+        return dict(idx=idx, target=target, stream=stream, role=role.unsqueeze(0).expand(B, -1), qstream=qs)
+
+
 # ----------------------------------------------------------------------------- model
 
 
@@ -303,6 +323,9 @@ ARMS = {
     "ORACLE": ("perfect", False),
     "WIN3_SLOW_D8": ("window", False),
     "WIN3_SPLIT_D8": ("window", True),
+    # Phase 3 reruns: WIN3_SPLIT_D8 with ONE discrepancy (DIFF.md) set to the main line's choice
+    "SPLIT_R1_PROBE": ("window", True),     # D-1: the probe is the main line's, generator 12345, same for every seed
+    "SPLIT_R2_BODYKEYS": ("window", True),  # D-2: key mass over the 32 body key positions only (query key excluded)
 }
 
 EVAL_SEED = 123_457
@@ -347,6 +370,12 @@ def run(arm, seed, S=8, P=4, budget=43_200, batch=32, eval_every=1200, n_eval=20
     opt = torch.optim.Adam(groups)
     data_gen = torch.Generator().manual_seed(seed)
     probe = task.sample(64, torch.Generator().manual_seed(seed + PROBE_SEED_OFFSET))
+    if arm == "SPLIT_R1_PROBE":
+        probe = task.sample_theirs(64, torch.Generator().manual_seed(12345))
+    key_role = (probe["role"] == ROLE_KEY)
+    if arm == "SPLIT_R2_BODYKEYS":
+        key_role = key_role.clone()
+        key_role[:, -3:] = False
     noise_gen = torch.Generator().manual_seed(seed + NOISE_SEED_OFFSET)
     evalset = make_eval_set(task, n_eval)
     split = Split(**(split_kw or {})) if use_split else None
@@ -390,7 +419,7 @@ def run(arm, seed, S=8, P=4, budget=43_200, batch=32, eval_every=1200, n_eval=20
             pacc, _, pg = evaluate(model, probe, S)
             probes.append((u, pacc))
             if split.decide(u, pacc):
-                key_mass = pg[probe["role"] == ROLE_KEY].mean(0)
+                key_mass = pg[key_role].mean(0)
                 c_star, c0 = Split.targets(key_mass)
                 # diagnostics only (labels are not used by the rule): streams on each channel
                 cmap_now = stream_channel_map(pg, probe["stream"], probe["role"], S)
@@ -439,10 +468,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="records/phase2.jsonl")
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--phase", type=int, default=2)
     a = ap.parse_args()
-    jobs = [("ORACLE", 900), ("ORACLE", 901)]
-    for s in range(900, 920):
-        jobs += [("WIN3_SPLIT_D8", s), ("WIN3_SLOW_D8", s)]
+    if a.phase == 2:
+        jobs = [("ORACLE", 900), ("ORACLE", 901)]
+        for s in range(900, 920):
+            jobs += [("WIN3_SPLIT_D8", s), ("WIN3_SLOW_D8", s)]
+    else:  # Phase 3: seeds 900-909, one discrepancy fixed at a time
+        jobs = [(arm, s) for arm in ("SPLIT_R1_PROBE", "SPLIT_R2_BODYKEYS") for s in range(900, 910)]
     done = set()
     if os.path.exists(a.out):
         for line in open(a.out):
