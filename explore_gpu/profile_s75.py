@@ -281,20 +281,35 @@ def main():
             out.setdefault("gpu", {}).setdefault(gname, {})[a] = dict(low=tl, high=th, R=R, per_run_gb=per_run)
         tot[gname] = hours
     cpu_eval = max(ev.values())
+    t_min = min(gpu_time(res[a], g, 0) for a in ARMS for g in GPUS.values())
     L += ["", "## Evaluation", "",
           f"The CPU part of one evaluation (explore_gpu.run.eval_cpu_part: routing on 256 sequences with the float64 margin, "
           f"the probe's four logistic regressions, SET accuracy) took {ev['WIDE_SPLIT']:.0f} s (WIDE_SPLIT) and "
-          f"{ev['REG3']:.0f} s (REG3) here, 1 thread. On the GPU path it runs in --stats-workers CPU processes (default 3) "
-          f"while training continues: one evaluation per run every 1200 updates, i.e. every "
-          f"{1200 * min(gpu_time(res['SINGLE'], g, 0) for g in GPUS.values()):.0f} s or more per run, so three workers keep up "
-          f"(the probe needs {cpu_eval:.0f} s / 3 workers). The evaluation forwards (1024 + 256 + 256 sequences, forward only, "
-          f"~1/3 of an update per 32 sequences) cost ~16 updates' worth of GPU time per evaluation: 20 evaluations add "
-          f"~1.3% to a run."]
+          f"{ev['REG3']:.0f} s (REG3) of one CPU core here (this container's Xeon at 2.1 GHz, shared with other jobs). On the "
+          f"GPU path it runs in --stats-workers CPU processes (default 3) while training continues. A run is evaluated every "
+          f"1200 updates, i.e. every {1200 * t_min:.0f} s or more of GPU time per run (R stacked runs: R evaluations every R "
+          f"times as long), so the workers keep up while {cpu_eval:.0f} s / workers < {1200 * t_min:.0f} s: three workers "
+          f"do; on a slower CPU, add one. The evaluation forwards (1024 + 256 + 256 sequences, forward only, ~1/3 of an "
+          f"update per 32 sequences) cost ~16 updates' worth of GPU time per evaluation: 20 evaluations add ~1.3% to a run."]
     L += ["", "## S75 at S = 4, all 32 runs", ""]
     for gname, (lo, hi) in tot.items():
-        L.append(f"- **{gname}**: {lo:.0f} - {hi:.0f} GPU hours of training (+1.3% for the evaluation forwards; the "
-                 f"evaluation statistics run on the CPU alongside). Stacking R runs costs about the same GPU time per run "
-                 f"(L = 768 already fills the GPU); it hides Python and launch overhead.")
+        L.append(f"- **{gname}** alone: {lo * 1.013:.0f} - {hi * 1.013:.0f} GPU hours (training, plus 1.3% for the "
+                 f"evaluation forwards; the evaluation statistics run on the CPU alongside).")
+    split = {}
+    for gname, grp in (("RTX 3070 Laptop (8 GB)", ("WIDE_SPLIT", "REG3")), ("GTX 1660 SUPER (6 GB)", ("ORACLE", "SINGLE"))):
+        v = out["gpu"][gname]
+        split[gname] = [sum(RUNS[a] * ITERS * v[a][k] / 3600 for a in grp) * 1.013 for k in ("low", "high")]
+        L.append(f"- Both, by arms (README (b)): the 8 GB laptop `--arms WIDE_SPLIT,REG3`, the 6 GB server "
+                 f"`--arms ORACLE,SINGLE`: {split[gname][0]:.1f} - {split[gname][1]:.1f} h on the {gname}"
+                 if gname.startswith("RTX") else
+                 f"  and {split[gname][0]:.1f} - {split[gname][1]:.1f} h on the {gname}, at the same time.")
+    out["two_machines"] = split
+    rmin = {gname: min(v[a]["R"] for a in ARMS) for gname, v in out["gpu"].items()}
+    L += ["", f"Stacking R runs costs about the same GPU time per run (L = 768 already fills the GPU); it hides Python and "
+          f"launch overhead (~{min(r['launches'] for r in res.values())}-{max(r['launches'] for r in res.values())} "
+          f"launches per update, a few ms of {1000 * t_min:.0f}+ ms). explore_gpu/s75_s4.py's default --runs-per-batch is "
+          f"half the smallest R that fits above, rounded down, for margin (a display on the GPU, fragmentation beyond 15%, "
+          f"cuBLAS workspaces): " + ", ".join(f"{max(1, r // 2)} on the {g} (R fits {r})" for g, r in rmin.items()) + "."]
     L += ["", "Caveats: the bracket is wide because consumer-GPU SGEMM efficiency on these shapes (batched 767 x 767 x 256 "
           "GEMMs) and the eager-mode launch overhead are not known here; the peak-memory column counts live tensor bytes "
           "(the CUDA caching allocator adds block rounding and fragmentation, taken as 15%); K9 on the GPU replaces all of this "

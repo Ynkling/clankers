@@ -80,7 +80,7 @@ ORACLE_SEEDS = (830, 831)
 READ_ARMS = ("WIDE_SPLIT", "REG3")
 EXTENDED = ("WIN3_SPLIT", "WIDE_SLOW", "REG3_NUDGE")
 HI = 8
-RPB_6GB, RPB_8GB = 1, 2               # default runs per batch; from explore_gpu/runtime_estimate.md (see its R column)
+RPB_6GB, RPB_8GB = 1, 2               # default runs per batch: half the smallest R that fits by explore_gpu/runtime_estimate.md, rounded down (3 -> 1 on 6 GB, 4 -> 2 on 8 GB)
 
 
 def task():
