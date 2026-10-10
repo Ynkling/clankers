@@ -36,5 +36,49 @@ Each new file names L's CPU, the i7-12650H; none is a copy of X's file. The earl
 
 ## What this does not settle
 
-- **The 32 L rows the registry marks NOT RECORDED.** These are bands, validity gates and readings. The new files store no verdict key for them. Their per-run records would allow recomputing them, but I have not done so here; that is a recount of 15 tests' arms under their own docstrings.
+- **The 32 L rows the registry marks NOT RECORDED.** These are bands, validity gates and readings. They are recounted in the next section.
 - **The registry's own TSVs.** They are not edited, so the tables in `claims_registry.md` still show the old labels. This addendum supersedes the points above.
+
+## The 32 NOT RECORDED L rows, recounted from the records
+
+**Where they come from.** These are the 32 rows of `registry/main_*.tsv` whose L verdict was "NOT RECORDED", "NOT PRINTED" or "not printed …". They span 11 tests (Phases III–IV):
+- 13 validity gates;
+- 9 bands;
+- 10 conditional readings.
+
+**What each row was checked against.** `registry_L_recount.py` recounts each row from the per-run records in `results/L` under the test's own rule; its output is in `registry_L_recount_out.txt`. Each recount is compared with two things:
+- what the results file itself stores for that row, under keys the earlier comparison did not match: `band_*`, `valid`, `validA`/`validB`, `reading(s)`, `gate0`/`gate1`, `counts`;
+- the counts the registry had derived from later text.
+
+**The rules used.**
+- BOUND means the record has a transition (`test_short_conv.py:70`); DISCOVERED means BOUND and a final VAL cos below 0.5 (`test_router_discovery.py:68`).
+- Bands are on BOUND, except `router_layout`'s, which its code computes on DISCOVERED (`test_router_layout.py:630`).
+- Each record's stored transition was recomputed from its curve (the first evaluation ≥ 0.95 that holds to the end): 0 differences.
+
+**Result.**
+- All **32 of 32 agree** with the stored field.
+- Every count the registry had derived from later text (`docs/revision6.md`, the next test's BACKGROUND, or pooled minus X) **matches** the record count.
+- No validity gate fails, no band changes, and each conditional reading applies exactly where the registry said it would.
+
+| test | rows | recount (from `results/L`) |
+|---|---|---|
+| channel_binding | GATE0, GATE1 | S=1 binds 3/3 at P=4 and 3/3 at P=8 (Gate 0 passes at both). Gate 1: P=4 ceiling 5/5 with fit argmax 1.00, **VALID**; P=8 ceiling **3/5**, **EXCLUDED** (seeds 1 and 4 end at 0.943 and 0.940; seeds 0 and 3 bind only at the last evaluation, 38,400). New to the registry, which had "P=8 outcome on L not stated". On X, P=8 failed Gate 0 instead. Either way P=4 is the only scored configuration on both machines, as the registry says. |
+| router_discovery | INVALID, VERDICT | A_ro_nudge discovers **0/10**, so **INVALID**, and no candidate is interpreted (A_ro_lr10 0/10, A_ro_ln 0/10, A_ro_noise 1/10; baseline A_ro 1/10). This confirms the registry's derived "implies INVALID" and fills in the candidate counts. |
+| router_curriculum | INVALID | A_nudge discovers 10/10: the positive control is valid |
+| router_layout | 3 bands | A_grouped 28/40, A_blocked 21/40, A_shuffled 29/40: all **MAJORITY** (BOUND and DISCOVERED give the same counts) |
+| short_conv | VALID, 3 bands, 3 readings | ceiling_conv 5/5, VALID. B_conv 5/40 MINORITY, A_conv 28/40 MAJORITY, A 14/40 MINORITY. K1 NOT SHOWN, so the K1− reading applies and the K1+ readings do not |
+| conv_lr | VALID, 2 bands, 4 readings | ceiling_conv4 5/5 with the pairing CHECK stored true, VALID. B_conv4 16/40 MINORITY, A_conv4 28/40 MAJORITY. LR3 SHOWN and LR4 NOT SHOWN, so the "LR3+LR4−" reading applies; "A_conv4 RELIABLE" does not apply |
+| p_scaling | VALID, 4 readings | ceiling_conv8 8/8, VALID. P1 SHOWN and P2 NOT SHOWN, so "P1+P2−" applies; P3 NOT SHOWN, so "P3+" does not |
+| load_curriculum | VALID | CUR_ceiling 5/5 with the pairing CHECK stored true: VALID |
+| curriculum_confirm | VALID | CUR_ceiling_lo 5/5: VALID |
+| scale_axes | VALID A, VALID B | ceiling8 3/3, VALID. ceiling4k4 5/5 with k=4 fit argmax 1.000, VALID |
+| stream_channels | VALID | ceiling4k8 3/3, pairing CHECK stored true, k=8 and k=16 fit argmax 1.0: VALID |
+
+**What changes in `claims_registry.md`.**
+- **The 32 L rows** read as above, sourced from `results/L`. None is "not recorded" any longer.
+- **Counts.** L now has a recorded outcome for every Phase III–IV row except the CHECK-based parts of four validity gates. Those parts are the conv-inert-at-init CHECK 54 and the pairing CHECKs 59, 64, 72 and 85. Each is stored only as a boolean in the file (`valid`, `pairing`), and the CHECK's own comparison is not in any record.
+- **One addition, channel_binding P=8 on L.** It passes Gate 0 and fails Gate 1. Revision 9's account of P=8 should say that it was excluded on X by Gate 0 and on L by Gate 1.
+
+**Caveats.**
+- **channel_binding's L file is a rerun.** It was run on L on 10 October (`meta.started` 10:28, `meta.git` `886a668`; added at `9c53e16`, whose message says the test code is unchanged since `93b227c`). It is not the September run that L's NOT SUPPORTED verdict was first reported from. The two agree where both can be compared: in both, learned A_ro binds only on seed 4, at 3600 (VAL cos 0.0009).
+- **The readings branch on verdicts, not on run counts.** Which reading applies is derived from the stored K/LR/P verdicts, which agree with every L verdict row (above). Their p-values were not recomputed from the per-run records here.

@@ -1,0 +1,100 @@
+== recount of L's NOT RECORDED rows (Phases III-IV) from results/L
+  channel_binding    GATE0                  recount: P=4: S=1 binds 3/3 PASS; P=8: S=1 binds 3/3 PASS | stored: gate0 {'4': True, '8': True} [AGREE]
+                                            registry: 'not printed per gate (P=4 passed, stated in test_router_discovery BACKGROUND)'; registry counts: "not printed; P=4 passed ('the only config that passed Gates 0 and 1 on both'); P=8 outcome"
+                                            basis: S1P4|B, S1P8|B transitions (3 seeds each); P=16 dropped (meta.dropped)
+  channel_binding    GATE1                  recount: P=4: ceiling 5/5, fit argmax 1.00 -> VALID; P=8: ceiling 3/5 -> EXCLUDED | stored: P4 valid=True; P8 valid=False (ceiling does not bind every seed) [AGREE]
+                                            registry: 'not printed per gate (P=4 passed, stated in test_router_discovery BACKGROUND)'; registry counts: 'P=4 passed; perfect gate 5/5 derived (pooled 10/10 minus X 5/5)'
+                                            basis: P8 ceiling seeds 1, 4 end at 0.943, 0.940; seeds 0 and 3 bind at the last evaluation (38400)
+  router_discovery   INVALID                recount: A_ro_nudge discovers 0/10 (< 8) -> INVALID | stored: INVALID [AGREE]
+                                            registry: 'NOT PRINTED (no L verdict recorded anywhere; derived count implies INVALID)'; registry counts: "A_ro_nudge 0/10 derived ('2/20 on A_ro (X and L combined)' minus X's 2/10)"
+                                            basis: DISCOVERED per run (docstring :68); positive-control rule :71
+  router_discovery   VERDICT                recount: INVALID, no candidate interpreted (A_ro_lr10 0/10, A_ro_ln 0/10, A_ro_noise 1/10; baseline A_ro 1/10) | stored: counts {"A_ro": 1, "A_ro_ln": 0, "A_ro_lr10": 0, "A_ro_noise": 1, "A_ro_nudge": 0, "B": null} [AGREE]
+                                            registry: 'NOT PRINTED'; registry counts: 'baseline A_ro 1/10; candidate counts not recorded'
+                                            basis: per-arm DISCOVERED counts against the stored counts
+  router_curriculum  INVALID                recount: A_nudge discovers 10/10 (>= 8) -> VALID | stored: counts A_nudge 10; verdict PARTIAL [AGREE]
+                                            registry: "not printed separately (only 'PARTIAL, as on X (... nudge 10/10)')"; registry counts: 'nudge 10/10'
+                                            basis: positive-control rule
+  router_layout      BAND-A_grouped         recount: discovered 28/40 -> MAJORITY (bound 28/40 -> MAJORITY) | stored: MAJORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'A_grouped 28/40 (docs/revision6.md)'
+                                            basis: band on discovered (code :630); the docstring (:75) does not name the outcome
+  router_layout      BAND-A_blocked         recount: discovered 21/40 -> MAJORITY (bound 21/40 -> MAJORITY) | stored: MAJORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'A_blocked 21/40 (docs/revision6.md)'
+                                            basis: band on discovered (code :630); the docstring (:75) does not name the outcome
+  router_layout      BAND-A_shuffled        recount: discovered 29/40 -> MAJORITY (bound 29/40 -> MAJORITY) | stored: MAJORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'A_shuffled 29/40 (docs/revision6.md)'
+                                            basis: band on discovered (code :630); the docstring (:75) does not name the outcome
+  short_conv         VALID                  recount: ceiling_conv binds 5/5 -> VALID (CHECK 54 not a record) | stored: valid=True [AGREE]
+                                            registry: 'NOT RECORDED (implied: ceiling 5/5 and K1-K3 carry verdicts, not UNTESTED)'; registry counts: 'ceiling_conv 5/5 (docs/revision6.md)'
+                                            basis: ceiling_conv transitions; CHECK 54 (conv inert at init) is stored only as the valid flag
+  short_conv         BAND-B_conv            recount: bound 5/40 -> MINORITY | stored: MINORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'B_conv 5/40 (docs/revision6.md)'
+                                            basis: band on BOUND (code :611-612)
+  short_conv         BAND-A_conv            recount: bound 28/40 -> MAJORITY | stored: MAJORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'A_conv 28/40 (docs/revision6.md)'
+                                            basis: band on BOUND (code :611-612)
+  short_conv         BAND-A                 recount: bound 14/40 -> MINORITY | stored: MINORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'A 14/40 (docs/revision6.md)'
+                                            basis: band on BOUND (code :611-612)
+  short_conv         READING[K1+K3-]        recount: does not apply (K1 NOT SHOWN, K3 SHOWN) | stored: reading=K1- [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored K1/K3 verdicts
+  short_conv         READING[K1+K3+]        recount: does not apply (K1 NOT SHOWN, K3 SHOWN) | stored: reading=K1- [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored K1/K3 verdicts
+  short_conv         READING[K1-]           recount: APPLIES (K1 NOT SHOWN, K3 SHOWN) | stored: reading=K1- [AGREE]
+                                            registry: 'NOT RECORDED (K1 NOT SHOWN on L, so this branch would apply)'; registry counts: '-'
+                                            basis: branch from the stored K1/K3 verdicts
+  conv_lr            VALID                  recount: ceiling_conv4 binds 5/5; pairing CHECK 59 stored True -> VALID | stored: valid=True [AGREE]
+                                            registry: 'NOT RECORDED (implied: ceiling 5/5 and LR1-M1 carry verdicts)'; registry counts: 'ceiling_conv4 5/5 (docs/revision6.md)'
+                                            basis: test_conv_lr.py:65
+  conv_lr            BAND-B_conv4           recount: bound 16/40 -> MINORITY | stored: MINORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'B_conv4 16/40 (test_p_scaling.py BACKGROUND)'
+                                            basis: band on BOUND (:648)
+  conv_lr            BAND-A_conv4           recount: bound 28/40 -> MAJORITY | stored: MAJORITY [AGREE]
+                                            registry: 'NOT RECORDED'; registry counts: 'A_conv4 28/40 (test_p_scaling.py BACKGROUND)'
+                                            basis: band on BOUND (:648)
+  conv_lr            READING[LR3-]          recount: does not apply (LR3 SHOWN, LR4 NOT SHOWN, A_conv4 MAJORITY) | stored: readings=['LR3 SHOWN and LR4 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored verdicts and the recounted band
+  conv_lr            READING[LR3+LR4+]      recount: does not apply (LR3 SHOWN, LR4 NOT SHOWN, A_conv4 MAJORITY) | stored: readings=['LR3 SHOWN and LR4 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored verdicts and the recounted band
+  conv_lr            READING[LR3+LR4-]      recount: APPLIES (LR3 SHOWN, LR4 NOT SHOWN, A_conv4 MAJORITY) | stored: readings=['LR3 SHOWN and LR4 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (LR3 SHOWN, LR4 NOT SHOWN on L, so this branch would apply)'; registry counts: '-'
+                                            basis: branch from the stored verdicts and the recounted band
+  conv_lr            READING[A_conv4 RELIABLE] recount: does not apply (LR3 SHOWN, LR4 NOT SHOWN, A_conv4 MAJORITY) | stored: readings=['LR3 SHOWN and LR4 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored verdicts and the recounted band
+  p_scaling          VALID                  recount: ceiling_conv8 binds 8/8 (>= 7); pairing CHECK 64 stored True -> VALID | stored: valid=True [AGREE]
+                                            registry: 'NOT RECORDED (implied: ceiling 8/8 and P1-M1-P8 carry verdicts)'; registry counts: 'ceiling_conv8 8/8 (test_load_curriculum.py BACKGROUND)'
+                                            basis: registry statement
+  p_scaling          READING[P1+P2+]        recount: does not apply (P1 SHOWN, P2 NOT SHOWN, P3 NOT SHOWN) | stored: readings=['P1 SHOWN and P2 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored verdicts
+  p_scaling          READING[P1+P2-]        recount: APPLIES (P1 SHOWN, P2 NOT SHOWN, P3 NOT SHOWN) | stored: readings=['P1 SHOWN and P2 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (P1 SHOWN, P2 NOT SHOWN on L, so this branch would apply)'; registry counts: '-'
+                                            basis: branch from the stored verdicts
+  p_scaling          READING[P1-]           recount: does not apply (P1 SHOWN, P2 NOT SHOWN, P3 NOT SHOWN) | stored: readings=['P1 SHOWN and P2 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored verdicts
+  p_scaling          READING[P3+]           recount: does not apply (P1 SHOWN, P2 NOT SHOWN, P3 NOT SHOWN) | stored: readings=['P1 SHOWN and P2 NOT SHOWN'] [AGREE]
+                                            registry: 'NOT RECORDED (condition not met on L)'; registry counts: '-'
+                                            basis: branch from the stored verdicts
+  load_curriculum    VALID                  recount: CUR_ceiling binds 5/5 (>= 4); pairing CHECK 72 stored True -> VALID | stored: valid=True [AGREE]
+                                            registry: 'not recorded as printed (ceiling 5/5; claims reported as tested)'; registry counts: 'CUR_ceiling 5/5 (CHECK 72 outcome on L not recorded)'
+                                            basis: registry statement
+  curriculum_confirm VALID                  recount: CUR_ceiling_lo binds 5/5 (>= 4) -> VALID | stored: valid=True [AGREE]
+                                            registry: 'not recorded as printed (ceiling 5/5)'; registry counts: 'CUR_ceiling_lo 5/5'
+                                            basis: registry statement
+  scale_axes         VALID A                recount: ceiling8 binds 3/3 (>= 2) -> VALID | stored: validA=True [AGREE]
+                                            registry: 'not printed in repo (json validA = true; ceiling 3/3)'; registry counts: 'ceiling8 3/3'
+                                            basis: test_scale_axes.py:66
+  scale_axes         VALID B                recount: ceiling4k4 binds 5/5 (>= 4), k=4 fit argmax 1.000 (>= 0.99) -> VALID | stored: validB=True [AGREE]
+                                            registry: 'not printed in repo (json validB = true)'; registry counts: 'ceiling4k4 5/5; fit argmax 1.0 (json)'
+                                            basis: test_scale_axes.py:67-68, :630
+  stream_channels    VALID                  recount: ceiling4k8 binds 3/3 (>= 2), pairing CHECK 85 stored True, fit argmax {'A4k16': 1.0, 'A4k8': 1.0} -> VALID | stored: valid=True [AGREE]
+                                            registry: 'not recorded as printed'; registry counts: "ceiling4k8 3/3 (pooled 6/6 minus X's 3/3, derived); CHECK 85 and fits on L not recorded"
+                                            basis: registry statement
+
+rows recounted: 32; stored field agrees: 32; differs: 0; nothing stored: 0
+records whose stored transition differs from the curve's (first eval >= 0.95 holding to the end): 0
