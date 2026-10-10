@@ -31,9 +31,17 @@ If the ORACLE validity arm fails (either seed unbound) the reading is reported a
 "INVALID (oracle did not bind)" next to the mechanical reading.
 Every count is reported with its Wilson 95% interval.
 
-RESULT (filled in after the run; see records/phase2.jsonl and analyze.py)
+RESULT (filled in after the run; see records/phase2.jsonl, records/phase2_table.md, analyze.py)
 ------------------------------------------------------------------------------
-(not yet run)
+Run 2026-10-10, one container, 4 workers x 1 thread, PyTorch 2.14.1 (CPU), 37.4 h of training.
+  ORACLE         bound 2/2 (transitions 10,800 and 6000)            -> validity PASS
+  WIN3_SPLIT_D8  bound routed 17/20, Wilson 95% [0.640, 0.948]; median transition 20,400
+  WIN3_SLOW_D8   bound routed  7/20, Wilson 95% [0.181, 0.567]; median transition 22,800
+  McNemar SPLIT vs SLOW: 10 vs 0, exact one-sided p = 0.00098
+  45 splits in 20 runs (1-3 per run); 44 had >= 2 streams on c* and none on c0 (labels, diagnostic).
+  Every one of the 16 failures (3 SPLIT, 13 SLOW) is a merge of 2 or 3 streams on one channel.
+READING (mechanical): "partially replicated" (17 < 18; McNemar p < 0.05).
+Independent replication, EXPLORATORY, not a result.
 """
 
 import dataclasses
