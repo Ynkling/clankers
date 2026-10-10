@@ -338,8 +338,8 @@ def check_task(task, n=4096, seed=4242):
         ok["composition list = compositions(); each drawn with frequency within 4 sd of uniform"] = (
             len(comps) == w[NB][M] and all(abs(v / len(lens_seen) - p0) <= 4 * math.sqrt(p0 * (1 - p0) / len(lens_seen))
                                            for v in freq.values()))
-    ok["block order: >1 order occurs; first block's source uniform within 0.03"] = (
-        len(orders) > 1 and all(abs(first_src.count(s) / n - 1 / S) <= 0.03 for s in range(S)))
+    ok["block order: >1 order occurs; first block's source uniform within 0.03 (vacuous at S = 1)"] = (
+        (S == 1 or len(orders) > 1) and all(abs(first_src.count(s) / n - 1 / S) <= 0.03 for s in range(S)))
     # mask
     is_src_t = tokens[:, 1:] < S
     n_mask = m.sum(1)
