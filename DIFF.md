@@ -80,7 +80,9 @@ Chosen as the two systematic differences in the split itself (D-1, D-2). The oth
 - D-4 and D-5 are inert in the Phase 2 records.
 - D-6 to D-10 only re-draw random numbers, so a rerun would measure seed noise, not the discrepancy.
 
-| Rerun | Change | Bound routed on 900–909 | vs Phase 2 (9/10) |
+| Rerun | Change | Bound routed on 900–909 | Change vs Phase 2's 9/10 |
 |---|---|---|---|
-| R1 | D-1: their probe (`Generator(12345)`, token-identical port) | see `replicate_report.md` | |
-| R2 | D-2: key mass over body keys only | see `replicate_report.md` | |
+| R1 | D-1: their probe (`Generator(12345)`, token-identical port) | 9/10 [0.596, 0.982] | 0 (splits moved on every seed; 907 failed again, 0.878) |
+| R2 | D-2: key mass over body keys only | 9/10 [0.596, 0.982] | 0 (7 of 10 runs bit-identical; 907 failed again, 0.752) |
+
+Neither discrepancy moves the count. Two of the four allowed reruns were used; no third was run, because every remaining difference is inert or a re-draw (see above).
