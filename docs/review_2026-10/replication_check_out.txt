@@ -1,0 +1,44 @@
+== 1. Session R's Phase 2 and Phase 3 records (claude/replicate-R at 100dced)
+  ORACLE: bound routed 2/2, Wilson [0.342, 1.000]; stored flags disagreeing with the recount: []
+  WIN3_SPLIT_D8: bound routed 17/20, Wilson [0.640, 0.948]; stored flags disagreeing with the recount: []
+  WIN3_SLOW_D8: bound routed 7/20, Wilson [0.181, 0.567]; stored flags disagreeing with the recount: []
+  paired SPLIT vs SLOW: 10 vs 0, exact one-sided p = 0.00098
+  SPLIT failures: [907, 914, 915]; maps: 907: [15, 12, 3, 1, 6, 3, 10, 6] acc 0.756; 914: [5, 15, 3, 5, 13, 6, 0, 8] acc 0.875; 915: [6, 3, 4, 1, 8, 1, 12, 1] acc 0.738
+  splits fired: 45 (per run 1-3); labelled on target: 44
+  checks where R's probe read >= 0.95 while the evaluation was < 0.95: 13, seeds [906, 914]
+  median transition over bound-routed WIN3_SPLIT_D8: 20400
+  median transition over bound-routed WIN3_SLOW_D8: 22800
+  Phase 3 SPLIT_R1_PROBE: bound routed 9/10
+  Phase 3 SPLIT_R2_BODYKEYS: bound routed 9/10
+
+== 2. The reading's arithmetic
+  true rate 0.95: P(>= 18 of 20) = 0.925; P(<= 17 of 20) = 0.075; P(>= 12 of 20) = 1.0000
+  true rate 0.9: P(>= 18 of 20) = 0.677; P(<= 17 of 20) = 0.323; P(>= 12 of 20) = 0.9999
+  true rate 0.85: P(>= 18 of 20) = 0.405; P(<= 17 of 20) = 0.595; P(>= 12 of 20) = 0.9987
+  17/20 (R) against 38/40 (main line): Fisher two-sided p = 0.322; pooled X + L + R: 55/60, Wilson [0.819, 0.964]
+  n = 20: P(>= 18, i.e. >= 90%) at true 0.95: 0.925
+  n = 20: P(>= 18, i.e. >= 90%) at true 0.85: 0.405
+  n = 40: P(>= 36, i.e. >= 90%) at true 0.95: 0.952
+  n = 40: P(>= 36, i.e. >= 90%) at true 0.85: 0.263
+  n = 60: P(>= 54, i.e. >= 90%) at true 0.95: 0.970
+  n = 60: P(>= 54, i.e. >= 90%) at true 0.85: 0.185
+
+== 3. The main line's split checks: probe >= 0.95 while the 2048-query evaluation is below 0.95
+  X WIN3_SPLIT_D8: 1 of 216 checks; (seed, step, probe, eval, transition): [(552, 24000, 0.953, 0.88, 27600)]
+  X WIN3_RESET_D8: 0 of 85 checks; (seed, step, probe, eval, transition): []
+  L WIN3_SPLIT_D8: 5 of 177 checks; (seed, step, probe, eval, transition): [(1550, 14400, 0.953, 0.877, 18000), (1553, 16800, 0.969, 0.865, 22800), (1553, 19200, 0.953, 0.867, 22800), (1554, 19200, 0.969, 0.875, 25200), (1554, 21600, 0.969, 0.869, 25200)]
+  L WIN3_RESET_D8: 0 of 60 checks; (seed, step, probe, eval, transition): []
+
+== 5. R's Phase 4 reading (pre-registered at 464be8d, phase4.py:25-29) and calibrated alternatives
+  'consistent' needs the Wilson upper bound >= 0.835: x >= 29/40; with 17/20 of Phase 2 pooled, >= 12 of the 20 new seeds
+  true rate 0.95: P('a lower rate' | 17/20 kept) = 0.000; on 40 fresh seeds = 0.000
+  true rate 0.85: P('a lower rate' | 17/20 kept) = 0.001; on 40 fresh seeds = 0.012
+  true rate 0.75: P('a lower rate' | 17/20 kept) = 0.041; on 40 fresh seeds = 0.285
+  true rate 0.7: P('a lower rate' | 17/20 kept) = 0.113; on 40 fresh seeds = 0.559
+  true rate 0.65: P('a lower rate' | 17/20 kept) = 0.238; on 40 fresh seeds = 0.795
+  exact one-sided test against 0.835 at n = 40: 'lower' if x <= 28 (size 0.024); power at 0.75 0.285, 0.70 0.559, 0.65 0.795
+  exact one-sided test against 0.835 at n = 60: 'lower' if x <= 44 (size 0.031); power at 0.75 0.431, 0.70 0.756, 0.65 0.934
+  smallest n telling 0.85 from 0.95 (one-sided alpha 0.05, power >= 0.8): n = 52, 'below 0.95' if x <= 46 (size 0.045, power 0.812)
+  smallest n telling 0.8 from 0.95 (one-sided alpha 0.05, power >= 0.8): n = 27, 'below 0.95' if x <= 23 (size 0.044, power 0.818)
+
+== 4. The main line's fixed probe (Generator 12345, S=8, P=4): queries per stream {0: 5, 1: 5, 2: 6, 3: 8, 4: 10, 5: 12, 6: 5, 7: 13}
