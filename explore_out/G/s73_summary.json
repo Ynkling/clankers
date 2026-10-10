@@ -1,0 +1,19 @@
+{
+ "readings": {
+  "validity": "S71 ORACLE_ALL_D 10/10 -> VALID",
+  "the register carries the cue (REG3_NUDGE_D >= 9/10)": "APPLIES (10/10)",
+  "discovered (register): REG3_D beats BASELINE_D": "does not apply (b 4, c 0, p 0.0625, n 20)",
+  "discovered (residual gate): RESGATE_ONLY_D beats BASELINE_D": "does not apply (b 0, c 0, p 1, n 10)",
+  "discovered (latch): LATCH3_D beats BASELINE_D": "does not apply (b 0, c 0, p 1, n 10)",
+  "the latch holds on delta memory (LATCH3_NUDGE_D z, >= 8/10 runs)": "APPLIES (9/10)",
+  "the delta stack carries the cue (BASELINE_D probe L3 >= 0.9 at K and V on >= 10/20)": "does not apply (7/20; descriptive)",
+  "probe x route, BASELINE_D": "probe L3 >= 0.9 on 7/20; [[probe & routed-bound, probe & not], [no probe & routed-bound, no probe & not]] = [[0, 7], [0, 13]]",
+  "probe x route, REG3_D": "probe L3 >= 0.9 on 0/20; [[probe & routed-bound, probe & not], [no probe & routed-bound, no probe & not]] = [[0, 0], [4, 16]]",
+  "probe x route, REG3_NUDGE_D": "probe L3 >= 0.9 on 0/10; [[probe & routed-bound, probe & not], [no probe & routed-bound, no probe & not]] = [[0, 0], [10, 0]]",
+  "probe x route, RESGATE_ONLY_D": "probe L3 >= 0.9 on 1/10; [[probe & routed-bound, probe & not], [no probe & routed-bound, no probe & not]] = [[0, 1], [0, 9]]",
+  "probe x route, LATCH3_D": "probe L3 >= 0.9 on 0/10; [[probe & routed-bound, probe & not], [no probe & routed-bound, no probe & not]] = [[0, 0], [0, 10]]",
+  "probe x route, LATCH3_NUDGE_D": "probe L3 >= 0.9 on 0/10; [[probe & routed-bound, probe & not], [no probe & routed-bound, no probe & not]] = [[0, 0], [9, 1]]",
+  "the gate is not needed on this task (SINGLE_D BOUND >= 8/10)": "does not apply (7/10; descriptive)"
+ },
+ "valid": true
+}
