@@ -311,3 +311,192 @@ Order: S71 → S73 → S72. Push after each. One report after S71 (one page), on
 (counts table first, under three pages), and a "Session G follow-up" section in
 explore_out/README.md.
 ```
+
+---
+
+# Prompts for three further sessions (R, V, I), 2026-10-10
+
+R replicates the headline result from the report alone; V referees the report against the records; I asks whether the
+partition emerges under a dense next-token loss. R and V have their own rules (R must not see the code; V changes
+nothing). I is an exploratory session like F/G/H: paste the common preamble above, then I's block.
+
+## Session R — clean-room replication (own repository; pushes an orphan branch claude/replicate-R; seeds 900-939)
+
+```
+You are replicating a result from a technical report without access to the authors' code. Attached:
+multichannel_hebbian_report_v8.pdf (Revision 8, draft). The report describes a research fork of
+Pathway's BDH (github.com/pathwaycom/bdh, public) with k memory channels and a learned gate, and a
+pre-registered result: a recipe called window gate + SLOW + SPLIT binds eight streams with one
+channel per stream in 38/40 runs (Section 5, Table 1) against 15/40 for the same recipe without the
+split. Your job is to find out whether the report is enough to reproduce that, and what it leaves
+out.
+
+Isolation rules; they are the experiment:
+- Work in a fresh directory. Clone ONLY github.com/pathwaycom/bdh. Do NOT clone, fetch, browse,
+  web-search or otherwise look at github.com/Ynkling/clankers or any of its branches, and do not
+  search the web for the project, until Phase 3 says so. If at any point you realise you have seen
+  any of its code, say so in the report: the replication is then void and you stop.
+- Your only sources are the PDF and Pathway's repository. Wherever the report does not determine a
+  detail (a batch size, an initialisation, an evaluation interval, what "conv" is, how the probe is
+  drawn, ...), choose something reasonable and LOG IT in UNSTATED.md (what, the choice, why) before
+  running. That file is a deliverable in its own right.
+- Push as an orphan branch: git init; git remote add origin <the clankers URL the user gives you>;
+  commit; git push origin HEAD:refs/heads/claude/replicate-R. Never fetch from that remote before
+  Phase 3. Python 3.11+, torch; 1 thread per run (torch.set_num_threads(1)), 4 workers.
+
+Phase 1, implement from the report alone: the task (the grouped layout, S=8 streams, P=4 keys, 16
+value tokens, one query; Section 3), the model (BDH with k=16 channels and the gate; N, D, layers,
+decay and "conv" as the report states them; Sections 1, 3, 4), the outcomes (bound, the transition,
+bound routed with the stream-to-channel map at value positions; Section 3), the recipes WIN3_SLOW_D8
+(window gate + SLOW, no split) and WIN3_SPLIT_D8 (with SPLIT; Sections 3-5), and the perfect gate
+(one-hot on the stream) as the validity oracle. Unit-test what the report makes checkable: the gate
+cannot see token t−3; the split's mechanics (fires on a plateau, copies the busiest row onto the
+idlest with the stated noise, zeroes the Adam state, at most three, at least 4800 apart); the
+outcome definitions on hand-made gates.
+Phase 2, run: ORACLE on seeds 900-901 (validity: both must bind), WIN3_SLOW_D8 and WIN3_SPLIT_D8 on
+seeds 900-919, at the budget the report gives for eight streams. Record per run: bound, transition,
+bound routed, the map, every split (update, c*, c0), final accuracy per stream, wall time. Fix the
+readings in the code's docstring and commit BEFORE running: "replicated" if WIN3_SPLIT_D8 bound
+routed ≥ 18/20 and beats WIN3_SLOW_D8 by exact one-sided McNemar p < 0.05 on the paired seeds;
+"partially replicated" if ≥ 12/20; "not replicated" otherwise. Wilson 95% intervals on every count.
+Push the records before Phase 3.
+Phase 3, only after Phase 2's records are pushed: fetch the main line
+(claude/bdh-growth-hebbian-inference-w90069), read README.md, test_window_gate.py and what it imports,
+and write DIFF.md: every discrepancy between your implementation and theirs, each labelled "stated
+in the report (I misread it)", "unstated" or "contradicts the report". If Phase 2 read "partially"
+or "not replicated", rerun WIN3_SPLIT_D8 on seeds 900-909 with ONE discrepancy fixed at a time, the
+ones you judge likeliest to matter, at most four reruns, and report which one moves the count.
+Report: replicate_report.md, under four pages, counts table first, then UNSTATED.md and DIFF.md
+summarised, then what the report should add for the next reader. Label everything "independent
+replication, EXPLORATORY, not a result". The user relays nothing by hand: push, and say when it is
+up.
+```
+
+## Session V — referee (branch claude/review-V off the main line; writes only under docs/review_2026-10/)
+
+```
+You are the referee. Clone Ynkling/clankers, branch claude/bdh-growth-hebbian-inference-w90069 (the
+main line), and create claude/review-V from it. Read multichannel_hebbian_report_v8.pdf and its
+.tex, README.md, docs/audit_2026-10.md, docs/revision7.md, specs/, the docstrings of every test_*.py
+the report's provenance tables cite, results/README.md and the JSON records under results/X and
+results/L, explore_out/README.md, and docs/reading/. Then write an adversarial review.
+Rules: you change nothing outside docs/review_2026-10/ (the review, your scripts, their outputs).
+You run nothing but your own checking scripts and, at most, one recorded run's bit-for-bit
+reproduction per main-line test if you want to verify the reproduction chain (1 thread; record the
+CPU; the records name theirs). You do not fix what you find; you report it, with file, line and
+number for every point. You are not asked to be kind or harsh; you are asked to be right, and to
+say what you could not check and why. Commit and push after each deliverable.
+
+Deliverables, in docs/review_2026-10/:
+1. recompute.py, recompute.md: every count, discordant pair, p-value, Wilson interval and band in the
+   report's Table 1, the copy/reset table and the Phase VI provenance tables, recomputed from the JSON
+   records (never from docstrings), with a column "matches the report". Then every number in
+   Sections 5-11 that a record can support. Disagreements first.
+2. preregistration.md: for each main-line test the report cites, the git history: commit and
+   timestamp of its spec in specs/ (or of its docstring's readings), of the test's first commit, of
+   its first run (meta.started in the results), and of the results commit; any change to a
+   docstring's claims or readings after the first run (git log -p), quoted verbatim. The same, as
+   far as the branches allow, for the exploratory "readings committed before any run" claims on
+   claude/outside-ideas and claude/explore-F/G/H: at least three screens per branch.
+3. claims.md: every sentence of the abstract, Sections 5, 6 and 11-13 and the conclusion that states
+   a result, with a verdict: SUPPORTED (by which record), OVERSTATED (how), UNSUPPORTED, or
+   UNVERIFIABLE (what would be needed). Include the report's corrections to Revision 7 and whether
+   each correction is itself supported.
+4. statistics.md: the choices (one-sided McNemar on discordant pairs, pooling two machines' disjoint
+   seeds, "bound" claims without p-values, the "~60 claims per machine" framing, the bands), what a
+   statistician referee would object to, what analysis would answer each objection; recompute any
+   p-value you dispute.
+5. literature.md: for each of the report's references, whether the citation resolves (arXiv id,
+   title, authors) and whether the report's one-line use of it is faithful: check against the notes
+   in docs/reading/ and, where arxiv.org is reachable from your container, the abstract. Flag any
+   characterisation that goes beyond what the note supports, the BDH-CQ reconstruction above all.
+6. review.md, under five pages: the contribution as you understand it; its three strongest points;
+   every substantive weakness, each with the evidence that would resolve it; the five fixes that
+   matter most, ranked; the questions you could not answer from the repository; and a
+   recommendation as a venue would want it (accept / minor / major / reject) with the reason.
+```
+
+## Session I — a dense loss (branch claude/explore-I off outside-ideas; seeds 800-859; output explore_out/I/)
+
+Paste the common preamble first, then:
+
+```
+Your subject: does the channel partition emerge under a dense next-token loss on interleaved
+sources? The project's binding task puts its loss at one query per sequence. Revision 8, Section 15,
+says language supplies a denser loss, and Section 10 and Session G's reports (explore_out/G/) show
+the distant-cue failures under the sparse loss: the stack does not carry the block's context token,
+and the loss gives no pressure to. Background: README.md Sections 3-5, 10 and 15;
+docs/reading/distant_cues_2026-10.md §3; explore_out/G/report_2.md; for the task family, Bietti et
+al. 2023, "Birth of a Transformer: a memory viewpoint" (in-context bigrams), and Edelman et al.
+2024, "The evolution of statistical induction heads: in-context learning Markov chains" (read the
+abstracts if arxiv.org is reachable; the task is defined fully here).
+
+Task ICMC (in-context Markov chains with sources), explore_i_task.py; a new task class, not a
+subclass of BindTask, keeping the harness conventions (fixed L; make_batch(B, gen); stream_labels
+giving every position its source; a loss mask):
+- Vocabulary: S source tokens SRC_s, then V = 16 word tokens.
+- Per sequence, each source s draws its own table T_s: for every word w, a set of 3 successors drawn
+  uniformly without replacement from the 16 words; the next word is uniform over the 3. Different
+  sources' sets are drawn independently; the tables are fresh per sequence, so there is nothing to
+  memorise in the weights: the sets must be learned in context.
+- Layout: NB blocks per source, each [SRC_s, w_1, ..., w_n] with n uniform in {LMIN..LMAX}; the S·NB
+  blocks in uniformly random order; a block continues its source's chain from the last word of that
+  source's previous block (the first word of a source's first block is uniform). Fixed L: draw the
+  lengths as compositions, as explore_f_tasks.RandHeaderTask does (copy that file unchanged if useful).
+- Loss: cross-entropy at every position whose target is a word with a known same-source predecessor,
+  i.e. masked at SRC tokens, at the first word of each source's first block and at the prediction OF
+  each SRC token (switches are unpredictable).
+- What the memory must do: at word w of source s the right successor set is T_s[w], held in context
+  only; a memory that mixes sources holds the union over sources, up to 3S words. The cue is the
+  block's SRC token, 1 to LMAX tokens back: the header layout's distant cue, now with a loss at every
+  position.
+- Metrics per run (held-out 1024 sequences, at every evaluation): the masked loss; SET accuracy (the
+  fraction of masked positions whose predicted top-3 set equals T_s[w]: the clean readout of "knows
+  the right set"); both by position within block (1, 2, 3-4, 5+); routing: η² by source of the gate
+  at word positions, the source-to-channel map at word positions (as the bound-routed map), the
+  margin; and the S55 probe (logistic regression from the residual entering each layer to the
+  source, at word positions, held-out 20%).
+Model: the project's BDH (N=256, D=32, 3 layers, decay 0.95, conv as in the eight-stream tests)
+with k channels; gates: the LOCAL3 window gate, a WIDE window gate (width LMAX+2, same construction,
+so it can see the SRC token at every word of a block), the perfect gate, and, copied unchanged from
+claude/explore-G if present, Session G's register gate at all three layers (REG3; copy
+explore_g_regmodel.py and what it needs). Recipes: SLOW; the KEYMASS split with "key positions" =
+all word positions (there are no keys; say so in the docstring).
+
+S74 explore_i_pilot (seeds 800-803; constants only, no readings): make the task usable. Arms at
+S=2 and at S=4, 12000 updates: ORACLE (perfect gate, k=S), SINGLE (k=1), NOMIX (S=1 source per
+sequence at the same L: the floor without interference). Start at L=192, NB=3, LMIN..LMAX = 6..14,
+B=32. Usable at a configuration if ORACLE's SET accuracy at the end ≥ 0.9 and SINGLE's ≤ ORACLE − 0.2
+on ≥ 3/4 seeds; adjust V, LMIN..LMAX, NB, L, B (never the model) until it is, logging every change
+in the pilot's log; measure the wall time per run. Then commit the constants and S75's readings
+before any S75 run. If nothing is usable within a day of compute, report and stop.
+
+S75 explore_i_dense (S=2 on seeds 810-829; the 10-seed arms on 810-819; 24000 updates, or what the
+pilot needed): ORACLE (810-811, validity), SINGLE (20), WIN3_SPLIT (k=S; 20), WIDE_SPLIT (k=S; 20),
+REG3 (no nudge; 20), WIDE_SLOW (no split; 10), REG3_NUDGE (5% labelled nudge; 10). If the pilot's
+runs took over 30 minutes each, every arm runs on 10 seeds and the thresholds below become 8/10,
+≤ 2/10 and 5 vs 0. Outcomes: ROUTED := η² by source at word positions ≥ 0.9 and a one-to-one
+source-to-channel map at the end; GAP := (SET(arm) − SET(SINGLE)) / (SET(ORACLE) − SET(SINGLE)) on
+the paired seed, the fraction of the interference gap closed. Exact one-sided McNemar on ROUTED.
+Readings fixed now:
+  "the dense loss supplies the cue" if WIDE_SPLIT is ROUTED on ≥ 15/20 with median GAP ≥ 0.8 (a
+    gate that can see the cue finds it label-free under this loss);
+  "the partition emerges with the three-token window" if WIN3_SPLIT is ROUTED on ≥ 15/20;
+  "the dense loss does not supply the cue" if every learned-gate arm is ROUTED on ≤ 5/20 (then
+    report η² by source at block positions 1-2 against 5+, and the probe: does the stack carry the
+    source here where the sparse-loss stacks did not?);
+  "the register is discovered under a dense loss" if REG3 beats WIN3_SPLIT on ROUTED (p < 0.05);
+  "the split matters here" if WIDE_SPLIT beats WIDE_SLOW on ROUTED on the shared seeds.
+  Descriptive: GAP by position within block for every arm (the first words after a switch are where
+  a three-token window sees the cue and a mixed memory cannot).
+S75 at S=4 (seeds 830-839): ORACLE (2), SINGLE, and the two learned arms with the highest ROUTED
+counts at S=2 (decided by that count; say which). Reading: "carries to four sources" if the best
+arm is ROUTED on ≥ 8/10.
+CHECKs: the task (every target is its source's chain; the mask; the compositions and the block
+order; stream_labels; SET accuracy of the true sets is 1.0); the model with k=1 on the grouped task
+equals a recorded run bit for bit with the new task and gates disabled; the WIDE gate sees token
+t−(LMAX+1) and not t−(LMAX+2); the split's mechanics on this task; the probe's synthetic check.
+Order: S74 → S75 (S=2) → S75 (S=4). Push after each. One report after S74 (one page: the constants
+and the pilot counts), one after S75 (counts table first, under three pages), and a "Session I"
+section in explore_out/README.md.
+```
