@@ -582,3 +582,16 @@ Descriptive summary. The single delta channel's tricks are limited:
   binds nothing.
 On the lighter randomised header task the window gate key-splits on both memories, because its 3-token window does not
 see the block's CTX beyond the first pair.
+
+### Session F, S77 and S76 (`explore_out/F/report_4.md`, `report_5.md`)
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| S77 probe (G's S55 probe) on reruns of S53's delta channel (300-309), S59's GDN delta channel and S69's GDN Hebbian channel (350-359); all 30 reruns bit for bit | stream decodable from the residual entering layer 3 | bound delta runs: 1 of 16 at ≥ 0.9 (median 0.62); unbound 0.52; layer 1 0.50 everywhere | descriptive (neither reading): no linearly readable stream tag behind the single delta channel's binding |
+| S76 Phase 1, perfect gate at S=8, k=16 (1300-1303; seeds shifted from 1000 to 1300, the block being in use) | BOUND, transition | Hebbian 2400-6000; delta β1-L2 1200 ×4; β0.25-L2 2400 ×4; β1-raw 1 diverged, 16800, 4800, 2400; β0.25-raw 7200, 1200, 2400, 1200 | "neither"; DELTA* = β 1, L2 keys |
+| S76 Phase 2, LOCAL3+SLOW+exact-copy split (1310-1319, paired) | BOUND ROUTED | HEBB_SPLIT 10/10 (median 23400); DELTA_SPLIT 9/10 (median 14400; 1 MERGED) | "the delta recipe keeps eight streams" |
+
+With β fixed at 1 the delta memory is not slow at eight streams: its perfect gate binds at the first evaluation, and the
+window-gate recipe with H's exact-copy split binds 9/10 on delta channels, sooner than on Hebbian ones on 8 of the 9 seeds
+both bind. S54(c)'s 3/10 and its slow delta oracle are attributable, post hoc, to learned β (not separated here from S54's
+noisy split).
