@@ -326,7 +326,12 @@ ARMS = {
     # Phase 3 reruns: WIN3_SPLIT_D8 with ONE discrepancy (DIFF.md) set to the main line's choice
     "SPLIT_R1_PROBE": ("window", True),     # D-1: the probe is the main line's, generator 12345, same for every seed
     "SPLIT_R2_BODYKEYS": ("window", True),  # D-2: key mass over the 32 body key positions only (query key excluded)
+    # Phase 4 (phase4.py): the split as the main line specifies it, and its validity arm
+    "WIN3_SPLIT_D8_ML": ("window", True),   # D-1 and D-2 together: probe Generator(12345), body keys only
+    "ORACLE_ADAM": ("perfect", False),      # D-3: perfect gate under single-rate Adam at 1e-3
 }
+ML_PROBE = ("SPLIT_R1_PROBE", "WIN3_SPLIT_D8_ML")
+BODY_KEYS = ("SPLIT_R2_BODYKEYS", "WIN3_SPLIT_D8_ML")
 
 EVAL_SEED = 123_457
 PROBE_SEED_OFFSET = 1_000_003
@@ -359,6 +364,8 @@ def run(arm, seed, S=8, P=4, budget=43_200, batch=32, eval_every=1200, n_eval=20
         slow_until=2400, lr=1e-3, slow_lr=1e-4, split_kw=None, log=None, stop_after=None, ckpt=None):
     torch.set_num_threads(1)
     gate, use_split = ARMS[arm]
+    if arm == "ORACLE_ADAM":
+        slow_lr = lr  # one rate throughout
     task = Task(S=S, P=P)
     torch.manual_seed(seed)
     model = MCBDH(task.vocab, k=k, gate=gate)
@@ -370,10 +377,10 @@ def run(arm, seed, S=8, P=4, budget=43_200, batch=32, eval_every=1200, n_eval=20
     opt = torch.optim.Adam(groups)
     data_gen = torch.Generator().manual_seed(seed)
     probe = task.sample(64, torch.Generator().manual_seed(seed + PROBE_SEED_OFFSET))
-    if arm == "SPLIT_R1_PROBE":
+    if arm in ML_PROBE:
         probe = task.sample_theirs(64, torch.Generator().manual_seed(12345))
     key_role = (probe["role"] == ROLE_KEY)
-    if arm == "SPLIT_R2_BODYKEYS":
+    if arm in BODY_KEYS:
         key_role = key_role.clone()
         key_role[:, -3:] = False
     noise_gen = torch.Generator().manual_seed(seed + NOISE_SEED_OFFSET)
@@ -474,8 +481,12 @@ def main():
         jobs = [("ORACLE", 900), ("ORACLE", 901)]
         for s in range(900, 920):
             jobs += [("WIN3_SPLIT_D8", s), ("WIN3_SLOW_D8", s)]
-    else:  # Phase 3: seeds 900-909, one discrepancy fixed at a time
+    elif a.phase == 3:  # seeds 900-909, one discrepancy fixed at a time
         jobs = [(arm, s) for arm in ("SPLIT_R1_PROBE", "SPLIT_R2_BODYKEYS") for s in range(900, 910)]
+    else:  # Phase 4 (phase4.py): seeds 920-939, the main line's split; validity on 920-921
+        jobs = [("ORACLE_ADAM", 920), ("ORACLE_ADAM", 921)]
+        for s in range(920, 940):
+            jobs += [("WIN3_SPLIT_D8_ML", s), ("WIN3_SLOW_D8", s)]
     done = set()
     if os.path.exists(a.out):
         for line in open(a.out):
