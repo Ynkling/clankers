@@ -1,0 +1,27 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — session H: H/two
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 3997ae2 | python 3.13.16 | torch threads 1
+====================================================================================================
+  code SHA H/two: 5af849d1455f over 27 modules (0 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b18_gates explore_common explore_common2 explore_h_ops explore_h_stability_child explore_h_two_child explore_keysplits_child explore_local_gate explore_window_recipe_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_instrument_v2 test_interference test_multilayer_binding test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_short_conv
+  CPU Intel(R) Xeon(R) Processor @ 2.10GHz; git 3997ae2; torch 2.14.0+cu130
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (40s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  CHECK H/two: copied modules: explore_h_fail_class_v2.py aef47a6fc6a9 = ba8901a:fail_class_v2.py aef47a6fc6a9; explore_keysplits_child.py f05e8f9d3bff = claude/outside-ideas' f05e8f9d3bff: ok
+  CHECK H/two: SPLIT2: fires at [4800, 9600, 14400] (cap 3, gap 4800), gap-blocked at [7200, 12000], capped at [16800, 19200, 21600]; first target c* 0 -> c0 1 with key masses [0.50218, 0.49782] (c0 is a busy row: True): ok
+  CHECK H/two: SPLIT2: after a firing the two rows are equal bit for bit (exact copy) and W_g's Adam state is untouched (True): ok
+  CHECK H/two: SPLIT2_NOISE: fires at [4800, 9600, 14400] (cap 3, gap 4800), gap-blocked at [7200, 12000], capped at [16800, 19200, 21600]; first target c* 0 -> c0 1 with key masses [0.50218, 0.49782] (c0 is a busy row: True): ok
+  CHECK H/two: SPLIT2_NOISE: the rows differ by the noise and W_g's Adam state is zero after the firings (True): ok
+  CHECK H/two: split_noise_reset vs S36's split_op: W_g and W_g's Adam state bit for bit equal: ok
+  CHECK H/two: copy_exact vs S61's copy_nonoise_op: W_g and W_g's Adam state bit for bit equal: ok
+  CHECK H/two: the copied fail_class_v2 reads v1's thresholds (ETA_SPLIT 0.5, MARGIN_PARTIAL 0.25): ok
+  CHECK H/two: REF|160 equals S43's recorded LOCAL3_SLOW|160 (Intel(R) Xeon(R) Processor @ 2.10GHz) bit for bit through 2400 (curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]): ok
+  CHECK H/two: K4|160 (the copied W2_K4 code) equals S52's recorded W2_K4|160 (claude/outside-ideas, Intel(R) Xeon(R) Processor @ 2.10GHz) bit for bit through 2400 (curve [[1200, 0.47607421875, 2.155621290206909], [2400, 1.0, 0.41494864225387573]]; statistics): ok
+  CHECK H/two: SPLIT2|1300 with the threshold at 0 equals REF|1300 bit for bit through 6000 (curve [[1200, 0.43408203125, 2.1930623054504395], [2400, 0.80126953125, 0.9641898274421692], [3600, 1.0, 0.013688521459698677], [4800, 1.0, 0.004648861940950155], [6000, 1.0, 0.0020724977366626263]]; statistics; decoder; trigger checks at [2400, 4800], fired 0): ok
+  CHECK H/two: fail_class_v2 vs v1 on 29 recorded unbound two-stream runs of this branch (S43, S60, S52): they differ on 6 runs, exactly those with eta^2 by key >= 0.5 and margin >= 0.25 (6): H/stability:TEMP_FLOOR|470 STREAM-PARTIAL -> KEY (key 0.5000, margin 0.508); H/stability:TEMP_FLOOR|477 STREAM-PARTIAL -> KEY (key 0.5000, margin 0.496); S43:LOCAL3_SLOW|163 STREAM-PARTIAL -> KEY (key 0.5000, margin 0.507); S52:W2_K4|169 MERGED (2 share) -> non-stream KEY (key 0.6925, margin 0.297); S52:W2_K4|196 MERGED (2 share) -> non-stream KEY (key 0.6271, margin 0.470); S52:W2_KEYHINGE|163 STREAM-PARTIAL -> KEY (key 0.5000, margin 0.500): ok
+  all CHECKs of H/two passed (1.6 min)
+  82 runs queued on 4 workers (1 torch thread each)
+  start    0.0 min  H/two            REF                      seed 1300  (projected worst case 400 min)
+  start    0.0 min  H/two            REF                      seed 1301  (projected worst case 400 min)
+  start    0.0 min  H/two            REF                      seed 1302  (projected worst case 400 min)
+  start    0.0 min  H/two            REF                      seed 1303  (projected worst case 400 min)
