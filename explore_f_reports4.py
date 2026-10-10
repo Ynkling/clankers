@@ -158,3 +158,99 @@ def report_s80():
           f"code SHA {c16.STATE['shas'][s.NAME][:12]}")
     out["md"] = _write("configs", L)
     return out
+
+
+# ── S81 ──────────────────────────────────────────────────────────────────────
+def report_s81():
+    import explore_f_trigger as s
+    R = _runs(s)
+    L = []
+    P = L.append
+    out = {}
+    arms = ("BASE", "GUARD", "EVAL", "GUARD_EVAL")
+    P("### S81 the split's trigger on delta memory (S = 8, P = 4, k = 16, conv, 43200; DELTA*; seeds 2020-2029; BOUND ROUTED; "
+      "Wilson 95%)\n")
+    P("Validity (the delta perfect gate binds on both seeds):\n")
+    _validity(P, R, ("O_DELTA_C",))
+    valid = sum(bound(r) for r in R["O_DELTA_C"].values()) == 2
+    P("\n| arm | n | BOUND ROUTED | BOUND | outcomes (v1) | firings (total; runs; labelled ok) | firings at a disagreement | "
+      "transitions of BOUND ROUTED |")
+    P("|---|---|---|---|---|---|---|---|")
+    st = {}
+    for arm in arms:
+        rs = R[arm]
+        oc = {}
+        for r in rs.values():
+            oc[r.get("outcome")] = oc.get(r.get("outcome"), 0) + 1
+        fires = [c for r in rs.values() for c in r.get("checks", []) if c.get("fired")]
+        chk = [c for r in rs.values() for c in r.get("checks", [])]
+        nok = sum(bool(c.get("key_ok")) for c in fires)
+        nd = sum(bool(c.get("disagree")) for c in fires)
+        st[arm] = dict(fires=len(fires), ok=nok, dis=nd, chk=chk)
+        P(f"| {arm} | {len(rs)}/10 | {fc.count_str(sum(r.get('outcome') == 'BOUND ROUTED' for r in rs.values()), len(rs))} | "
+          f"{fc.count_str(sum(bound(r) for r in rs.values()), len(rs))} | {oc} | {len(fires)}; "
+          f"{sum(1 for r in rs.values() if r.get('splits'))}; {nok}/{len(fires)}"
+          f"{f' ({100 * nok / len(fires):.0f}%)' if fires else ''} | {nd} | "
+          f"{_trs(rs, lambda r: r.get('outcome') == 'BOUND ROUTED')} |")
+    P("\nChecks (all arms; printed, not readings): disagreement = the rule's eligibility read on the probe differs from it read "
+      "on the evaluation (with the arm's guard).\n")
+    P("| arm | checks | guarded (eligible but < 0.5) | disagreements: probe yes / eval no | probe no / eval yes | probe >= 0.95 "
+      "while eval < 0.95 | eval >= 0.95 while probe < 0.95 |")
+    P("|---|---|---|---|---|---|---|")
+    for arm in arms:
+        chk = st[arm]["chk"]
+        P(f"| {arm} | {len(chk)} | {sum(bool(c.get('guarded')) for c in chk)} | "
+          f"{sum(1 for c in chk if c.get('elig_probe') and not c.get('elig_eval'))} | "
+          f"{sum(1 for c in chk if c.get('elig_eval') and not c.get('elig_probe'))} | "
+          f"{sum(1 for c in chk if c.get('acc_probe', 0) >= 0.95 and c.get('acc_eval', 1) < 0.95)} | "
+          f"{sum(1 for c in chk if c.get('acc_eval', 0) >= 0.95 and c.get('acc_probe', 1) < 0.95)} |")
+    base = {sd: r.get("outcome") == "BOUND ROUTED" for sd, r in R["BASE"].items()}
+    pr = {}
+    for arm in arms[1:]:
+        x = {sd: r.get("outcome") == "BOUND ROUTED" for sd, r in R[arm].items()}
+        pr[arm] = fc.paired(x, base, s.SEEDS)
+    P("\nPaired against BASE (BOUND ROUTED; b = the arm alone, c = BASE alone; exact one-sided McNemar):\n")
+    for arm, d in pr.items():
+        P(f"- {arm} {d['new']}/{d['n']} vs BASE {d['old']}/{d['n']}: b {d['b']}, c {d['c']}; p(arm > BASE) = "
+          f"{d['p_new_gt_old']:.3g}, p(BASE > arm) = {d['p_old_gt_new']:.3g}")
+    complete = all(len(R[a]) == 10 for a in arms) and len(R["O_DELTA_C"]) == 2
+    rd = []
+    if not complete:
+        rd = ["INCOMPLETE, no reading"]
+    elif not valid:
+        rd = ["UNTESTED (the delta perfect gate did not bind on both seeds)"]
+    else:
+        g, e, ge = pr["GUARD"], pr["EVAL"], pr["GUARD_EVAL"]
+        sg, se = st["GUARD"], st["EVAL"]
+        if sg["fires"] >= 1 and sg["ok"] >= 0.9 * sg["fires"] and g["c"] - g["b"] <= 1:
+            rd.append("the guard aims the split")
+        if e["c"] - e["b"] <= 1 and se["dis"] == 0:
+            rd.append("the evaluation is the better probe")
+        if g["c"] >= 4 and g["b"] == 0:
+            rd.append("the guard costs binding")
+        if e["c"] >= 4 and e["b"] == 0:
+            rd.append("the evaluation costs binding")
+        if ge["c"] >= 4 and ge["b"] == 0:
+            rd.append("(printed) both devices together cost binding")
+        if not any(x.startswith("the guard") for x in rd):
+            rd.append("guard: no reading applies")
+        if not any(x.startswith("the evaluation") for x in rd):
+            rd.append("evaluation: no reading applies")
+    sb = st["BASE"]
+    P(f"\nREADINGS S81: **{'; '.join(rd)}** (GUARD firings labelled ok {st['GUARD']['ok']}/{st['GUARD']['fires']}, rule >= 90%; "
+      f"EVAL firings at a disagreement {st['EVAL']['dis']}, rule 0; BASE labelled ok {sb['ok']}/{sb['fires']} (S76: 6/12); "
+      f"GUARD_EVAL labelled ok {st['GUARD_EVAL']['ok']}/{st['GUARD_EVAL']['fires']}, at a disagreement {st['GUARD_EVAL']['dis']})")
+    out["rd"] = rd
+    P("\nFirings per run (update c*->c0, labelled ok?, probe / evaluation reading, D = at a disagreement):\n")
+    for arm in arms:
+        P(f"- {arm}: " + "; ".join(
+            f"{sd} {r.get('outcome')}" + (f"@{r['transition']}" if r.get('transition') else f" {r['acc']:.2f}") + " ["
+            + ", ".join(f"{c['step']} {c['key_cs']}->{c['key_c0']} {'ok' if c.get('key_ok') else 'NOT ok'} "
+                        f"{c['acc_probe']:.2f}/{c['acc_eval']:.2f}{' D' if c.get('disagree') else ''}"
+                        for c in r.get("checks", []) if c.get("fired")) + "]"
+            for sd, r in sorted(R[arm].items()) if r.get("ok")))
+    meta = store_meta(s)
+    P(f"\n{s.NAME}: {meta['n']} runs ok (failed or diverged records {meta['failed']}), {meta['hours']:.2f} h of run time; CPU "
+      f"{meta['cpus']}; code SHA {c16.STATE['shas'][s.NAME][:12]}")
+    out["md"] = _write("trigger", L)
+    return out
