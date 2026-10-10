@@ -6857,3 +6857,374 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   [  1]   29.7 min  capacity     P8_N256        seed 277  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git e280ac7, code 17e56410a1db, attempt 1, resumed at [24000]: acc 0.984  trans 37200  stop 39600  outcome BOUND ROUTED
   start   29.7 min  capacity     P16_D128       seed 273  (projected worst case 433 min)
+  segment budget reached: 4 run(s) stopped, each to resume from its last checkpoint: capacity:P16_D128|270 at step 16800, capacity:P16_D128|271 at step 16800, capacity:P16_D128|272 at step 15600, capacity:P16_D128|273 at step 10800
+  1 runs saved in this segment; batch wall clock 114.6 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_width
+  idea    does the window recipe survive width? N = 256, 512, 1024 at D = 32; D = 64, 128 at N = 256
+  source  batch 16's S44(a) LOCAL3_SLOW16_A (20/20 at S=4, k=16, N=256, D=32); the user's batch 19
+  change  only the model's size (mult = N/D, the embedding width D); every recipe and initial scale rule as is
+  arm ORC_N256     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 8), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N256         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 8), D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N512     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=512 (mult 16), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N512         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=512 (mult 16), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_N1024    lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=1024 (mult 32), D=32, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm N1024        lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=1024 (mult 32), D=32, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D64      lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 4), D=64, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D64          lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 4), D=64, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_D128     lr 0.001  iters 28800  seeds 270-271 (2)  — oracle at N=256 (mult 2), D=128, 3 layers (S=4, P=4, k=16, conv)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm D128         lr 0.001  iters 28800  seeds 270-279 (10)  — LOCAL3 + SLOW at N=256 (mult 2), D=128, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 270-279 with N256 (the same batches); oracles on 270-271
+----------------------------------------------------------------------------------------------------
+  ORACLES (the perfect gate; BOUND = held-out accuracy >= 0.95 held to the end):
+    ORC_N256     N=256 (mult 8), D=32, 3 layers     bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_N512     N=512 (mult 16), D=32, 3 layers    bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_N1024    N=1024 (mult 32), D=32, 3 layers   bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_D64      N=256 (mult 4), D=64, 3 layers     bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_D128     N=256 (mult 2), D=128, 3 layers    bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+  ARM N256 (LOCAL3 + SLOW at N=256 (mult 8), D=32, 3 layers (the reference)), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 32) std 0.0201, encoder (1, 32, 256) std 0.0200, encoder_v (1, 32, 256) std 0.0201, decoder (256, 32) std 0.0199, lm_head (32, 24) std 0.0199, W_in (32, 32) std 0.0986, W_g (16, 32) std 0.0994, gate_conv.conv_w (32, 3) std 0.3278
+    seed | outcome                  trans  stop   acc          end map | 
+     270 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     272 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | 
+     273 | MERGED (2 share)          None 28800  0.80            2+1+1 |   [resumed at [24000]]
+     274 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     275 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     276 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     277 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     278 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     279 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | 
+    BOUND ROUTED 9/10; bound 9/10; transition median (BOUND ROUTED) 3600 [3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 4800]; stop median 8400.0; classes {'BOUND ROUTED': 9, 'MERGED (2 share)': 1}; trainable parameters 27872
+  ARM N512 (LOCAL3 + SLOW at N=512 (mult 16), D=32, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 32) std 0.0200, encoder (1, 32, 512) std 0.0199, encoder_v (1, 32, 512) std 0.0201, decoder (512, 32) std 0.0199, lm_head (32, 24) std 0.0202, W_in (32, 32) std 0.0957, W_g (16, 32) std 0.1024, gate_conv.conv_w (32, 3) std 0.3278
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     272 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+     273 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | MERGED (2 share) (trans None)
+     274 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     275 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     276 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     277 | BOUND ROUTED             12000 14400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     278 | BOUND ROUTED              6000  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     279 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 6000, 12000]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 52448
+    vs N256: N512 10/10, N256 9/10; N512 only 1, N256 only 0; d = +1; McNemar two-sided p = 1
+  ARM N1024 (LOCAL3 + SLOW at N=1024 (mult 32), D=32, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 32) std 0.0202, encoder (1, 32, 1024) std 0.0200, encoder_v (1, 32, 1024) std 0.0199, decoder (1024, 32) std 0.0199, lm_head (32, 24) std 0.0194, W_in (32, 32) std 0.1020, W_g (16, 32) std 0.1003, gate_conv.conv_w (32, 3) std 0.3278
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     272 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+     273 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | MERGED (2 share) (trans None)
+     274 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     275 | BOUND ROUTED              6000  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     276 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     277 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     278 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     279 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [2400, 2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 6000]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 101600
+    vs N256: N1024 10/10, N256 9/10; N1024 only 1, N256 only 0; d = +1; McNemar two-sided p = 1
+  ARM D64 (LOCAL3 + SLOW at N=256 (mult 4), D=64, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 64) std 0.0192, encoder (1, 64, 256) std 0.0199, encoder_v (1, 64, 256) std 0.0201, decoder (256, 64) std 0.0199, lm_head (64, 24) std 0.0199, W_in (32, 64) std 0.0994, W_g (16, 32) std 0.1030, gate_conv.conv_w (64, 3) std 0.3274
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     272 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+     273 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | MERGED (2 share) (trans None)
+     274 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     275 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     276 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     277 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     278 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     279 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 3600, 4800]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 55232
+    vs N256: D64 10/10, N256 9/10; D64 only 1, N256 only 0; d = +1; McNemar two-sided p = 1
+  ARM D128 (LOCAL3 + SLOW at N=256 (mult 2), D=128, 3 layers), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 270): embed.weight (24, 128) std 0.0196, encoder (1, 128, 256) std 0.0200, encoder_v (1, 128, 256) std 0.0199, decoder (256, 128) std 0.0199, lm_head (128, 24) std 0.0201, W_in (32, 128) std 0.0995, W_g (16, 32) std 0.1049, gate_conv.conv_w (128, 3) std 0.3288
+    seed | outcome                  trans  stop   acc          end map | N256
+     270 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     271 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     272 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+     273 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | MERGED (2 share) (trans None)  [resumed at [7200]]
+     274 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)  [resumed at [6000]]
+     275 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)  [resumed at [4800]]
+     276 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)  [resumed at [1200]]
+     277 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     278 | BOUND ROUTED              6000  8400  0.98          1+1+1+1 | BOUND ROUTED (trans 3600)
+     279 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 4800)
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 3600, 6000]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 109952
+    vs N256: D128 10/10, N256 9/10; D128 only 1, N256 only 0; d = +1; McNemar two-sided p = 1
+  transition medians per size (BOUND ROUTED runs): N256 3600, N512 3600.0, N1024 3600.0, D64 3600.0, D128 3600.0
+  READING scale_width: scale-free (d = arm - N256 BOUND ROUTED: N512 +1, N1024 +1, D64 +1, D128 +1; scale-free: every d >= -1; width-sensitive: any d <= -4)
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_depth
+  idea    does the window recipe survive depth? 2, 4 and 6 layers against 3 (one gate shared across layers)
+  source  batch 16's S44(a) (3 layers); the user's batch 19; RES6: Session G's design (docs/reading/distant_cues_2026-10.md 4.3)
+  change  only ARCH's n_layer (the shared BDH layer applied n times); RES6 adds a per-layer gate over the residual stream
+  arm ORC_L2       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 2 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L2           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 2 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L3       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 3 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L3           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L4       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 4 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L4           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 4 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm ORC_L6       lr 0.001  iters 28800  seeds 280-281 (2)  — oracle at N=256, D=32, 6 layers
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm L6           lr 0.001  iters 28800  seeds 280-289 (10)  — LOCAL3 + SLOW at N=256, D=32, 6 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 280-289 with L3 (the same batches and initial parameters); oracles on 280-281
+----------------------------------------------------------------------------------------------------
+  ORACLES (the perfect gate; BOUND = held-out accuracy >= 0.95 held to the end):
+    ORC_L2       N=256, D=32, 2 layers              bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_L3       N=256, D=32, 3 layers              bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_L4       N=256, D=32, 4 layers              bound 2/2 of 2  transitions [1200, 1200]  stop [8400, 8400]  -> VALID
+    ORC_L6       N=256, D=32, 6 layers              bound 2/2 of 2  transitions [2400, 2400]  stop [8400, 8400]  -> VALID
+  ARM L2 (LOCAL3 + SLOW at N=256, D=32, 2 layers), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 280): embed.weight (24, 32) std 0.0197, encoder (1, 32, 256) std 0.0200, encoder_v (1, 32, 256) std 0.0202, decoder (256, 32) std 0.0201, lm_head (32, 24) std 0.0198, W_in (32, 32) std 0.1016, W_g (16, 32) std 0.0980, gate_conv.conv_w (32, 3) std 0.3450
+    seed | outcome                  trans  stop   acc          end map | L3
+     280 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     281 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     282 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     283 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     284 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     285 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     286 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     287 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     288 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 6000)
+     289 | BOUND ROUTED              2400  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [2400, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 27872
+    vs L3: L2 10/10, L3 10/10; L2 only 0, L3 only 0; d = +0; McNemar two-sided p = 1
+  ARM L3 (LOCAL3 + SLOW at N=256, D=32, 3 layers (the reference)), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 280): embed.weight (24, 32) std 0.0197, encoder (1, 32, 256) std 0.0200, encoder_v (1, 32, 256) std 0.0202, decoder (256, 32) std 0.0201, lm_head (32, 24) std 0.0198, W_in (32, 32) std 0.1016, W_g (16, 32) std 0.0980, gate_conv.conv_w (32, 3) std 0.3450
+    seed | outcome                  trans  stop   acc          end map | 
+     280 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     281 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     282 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     283 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     284 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     285 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     286 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     287 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+     288 | BOUND ROUTED              6000  8400  1.00          1+1+1+1 | 
+     289 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | 
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 6000]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 27872
+  ARM L4 (LOCAL3 + SLOW at N=256, D=32, 4 layers), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 280): embed.weight (24, 32) std 0.0197, encoder (1, 32, 256) std 0.0200, encoder_v (1, 32, 256) std 0.0202, decoder (256, 32) std 0.0201, lm_head (32, 24) std 0.0198, W_in (32, 32) std 0.1016, W_g (16, 32) std 0.0980, gate_conv.conv_w (32, 3) std 0.3450
+    seed | outcome                  trans  stop   acc          end map | L3
+     280 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     281 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     282 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     283 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     284 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     285 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)  [resumed at [7200]]
+     286 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)  [resumed at [6000]]
+     287 | BOUND ROUTED              6000  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     288 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 6000)
+     289 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+    BOUND ROUTED 10/10; bound 10/10; transition median (BOUND ROUTED) 3600.0 [3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 6000]; stop median 8400.0; classes {'BOUND ROUTED': 10}; trainable parameters 27872
+    vs L3: L4 10/10, L3 10/10; L4 only 0, L3 only 0; d = +0; McNemar two-sided p = 1
+  ARM L6 (LOCAL3 + SLOW at N=256, D=32, 6 layers), seeds 280-289 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+    initial scales (seed 280): embed.weight (24, 32) std 0.0197, encoder (1, 32, 256) std 0.0200, encoder_v (1, 32, 256) std 0.0202, decoder (256, 32) std 0.0201, lm_head (32, 24) std 0.0198, W_in (32, 32) std 0.1016, W_g (16, 32) std 0.0980, gate_conv.conv_w (32, 3) std 0.3450
+    seed | outcome                  trans  stop   acc          end map | L3
+     280 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     281 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     282 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     283 | BOUND NOT routed          6000  8400  1.00            2+1+1 | BOUND ROUTED (trans 3600)
+     284 | BOUND ROUTED              7200  9600  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     285 | BOUND ROUTED              4800  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     286 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+     287 | BOUND ROUTED             25200 27600  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)  [resumed at [24000]]
+     288 | BOUND ROUTED              4800  8400  0.99          1+1+1+1 | BOUND ROUTED (trans 6000)
+     289 | BOUND ROUTED              3600  8400  1.00          1+1+1+1 | BOUND ROUTED (trans 3600)
+    BOUND ROUTED 9/10; bound 10/10; transition median (BOUND ROUTED) 4800 [3600, 3600, 4800, 4800, 4800, 4800, 4800, 7200, 25200]; stop median 8400.0; classes {'BOUND ROUTED': 9, 'BOUND NOT routed': 1}; trainable parameters 27872
+    vs L3: L6 9/10, L3 10/10; L6 only 0, L3 only 1; d = -1; McNemar two-sided p = 1
+  transition medians per size (BOUND ROUTED runs): L2 3600.0, L3 3600.0, L4 3600.0, L6 4800
+  READING scale_depth: scale-free (d = arm - L3 BOUND ROUTED: L2 +0, L4 +0, L6 -1; scale-free: every d >= -1; depth-sensitive: any d <= -4)
+
+  DIAGNOSTIC RES6 (Session G's per-layer residual gate at 6 layers (diagnostic; only if L6 fails)): 6 layers did not fail (L6 - L3 = -1 > -2): RES6 not run
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN scale_eight
+  idea    the window recipe with the split at eight streams, at the best width and the best depth of S64 / S65
+  source  batch 17's S48 W_SPLIT (9/10 at N=256, 3 layers); S64 / S65; the user's batch 19
+  change  the model's size (S64's best width; S65's best depth); recipe and trigger unchanged; 43200 updates
+  arm N256_L3      lr 0.001  iters 43200  seeds 290-299 (10)  — N=256, D=32, 3 layers (the reference)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed
+  arm D128_L3      lr 0.001  iters 43200  seeds 290-299 (10)  — S64's best width D128: N=256, D=128, 3 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed
+  arm N256_L2      lr 0.001  iters 43200  seeds 290-299 (10)  — S65's best depth: N=256, D=32, 2 layers
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; + S37's KEYMASS trigger (every 2400 from 4800 through 40800: probe acc < 0.95 and rise < 0.02; <= 3 splits, >= 4800 apart) -> S24's SPLIT of W_g's row c* onto c0, W_g's Adam state zeroed
+  pairing seeds 290-299 with N256_L3 (the same batches)
+----------------------------------------------------------------------------------------------------
+  phase-1 decision: {'best_depth': 2, 'best_width': 'D128', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.80GHz', 'depth_summary': {'L2': {'br': 10, 'n': 10, 'tested': True, 'trans_med': 3600.0}, 'L3': {'br': 10, 'n': 10, 'tested': True, 'trans_med': 3600.0}, 'L4': {'br': 10, 'n': 10, 'tested': True, 'trans_med': 3600.0}, 'L6': {'br': 9, 'n': 10, 'tested': True, 'trans_med': 4800}}, 'reading_s64': 'scale-free (d = arm - N256 BOUND ROUTED: N512 +1, N1024 +1, D64 +1, D128 +1; scale-free: every d >= -1; width-sensitive: any d <= -4)', 'reading_s65': 'scale-free (d = arm - L3 BOUND ROUTED: L2 +0, L4 +0, L6 -1; scale-free: every d >= -1; depth-sensitive: any d <= -4)', 'rule': 'the rule', 'time': '2026-10-09 16:40:29 UTC', 'width_summary': {'D128': {'br': 10, 'n': 10, 'params': 109952, 'tested': True, 'trans_med': 3600.0}, 'D64': {'br': 10, 'n': 10, 'params': 55232, 'tested': True, 'trans_med': 3600.0}, 'N1024': {'br': 10, 'n': 10, 'params': 101600, 'tested': True, 'trans_med': 3600.0}, 'N256': {'br': 9, 'n': 10, 'params': 27872, 'tested': True, 'trans_med': 3600}, 'N512': {'br': 10, 'n': 10, 'params': 52448, 'tested': True, 'trans_med': 3600.0}}}
+  ARM N256_L3 (N=256, D=32, 3 layers (the reference)), seeds 290-299 (10)
+    initial scales: embed.weight (28, 32) std 0.0189, encoder (1, 32, 256) std 0.0199, encoder_v (1, 32, 256) std 0.0199, decoder (256, 32) std 0.0201, lm_head (32, 28) std 0.0196, W_in (32, 32) std 0.0980, W_g (16, 32) std 0.0938, gate_conv.conv_w (32, 3) std 0.3463
+    seed | outcome                  trans  stop   acc          end map | 
+     290 | MERGED (2 share)          None 43200  0.63      2+2+1+1+1+1 |   [resumed at [37200]]
+     291 | BOUND ROUTED             30000 32400  1.00  1+1+1+1+1+1+1+1 | 
+     292 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 | 
+     293 | BOUND ROUTED             22800 25200  1.00  1+1+1+1+1+1+1+1 | 
+     294 | BOUND ROUTED             13200 15600  1.00  1+1+1+1+1+1+1+1 | 
+     295 | BOUND ROUTED             25200 27600  1.00  1+1+1+1+1+1+1+1 |   [resumed at [10800]]
+     296 | MERGED (3 share)          None 43200  0.49          3+2+2+1 |   [resumed at [24000]]
+     297 | BOUND ROUTED             20400 22800  1.00  1+1+1+1+1+1+1+1 |   [resumed at [2400]]
+     298 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 |   [resumed at [16800]]
+     299 | BOUND ROUTED             22800 25200  1.00  1+1+1+1+1+1+1+1 |   [resumed at [6000]]
+    BOUND ROUTED 8/10; bound 8/10; classes {'MERGED (2 share)': 1, 'BOUND ROUTED': 8, 'MERGED (3 share)': 1}
+    splits fired: 21 in 10 runs (per run [3, 2, 1, 2, 2, 2, 3, 2, 1, 3]); transitions (bound runs) [13200, 15600, 15600, 20400, 22800, 22800, 25200, 30000], median 21600.0; at or before the 2400 switch: 0; at or before the 4800 first check: 0
+    the trigger's checks per run (step:probe acc; F fired, B blocked):
+      290: 3 split(s) at [7200, 16800, 24000] (labelled ok [True, True, True]); checks 2400:0.05 4800:0.11 7200:0.11F 9600:0.12B 12000:0.25 14400:0.34 16800:0.30F 19200:0.48 21600:0.58 24000:0.52F 26400:0.56 28800:0.55B 31200:0.58 33600:0.55B 36000:0.59 38400:0.59B 40800:0.55B
+      291: 2 split(s) at [14400, 28800] (labelled ok [True, True]); checks 2400:0.06 4800:0.09 7200:0.39 9600:0.55 12000:0.69 14400:0.64F 16800:0.80 19200:0.84 21600:0.89 24000:0.94 26400:0.95 28800:0.91F 31200:1.00
+      292: 1 split(s) at [14400] (labelled ok [True]); checks 2400:0.06 4800:0.09 7200:0.45 9600:0.77 12000:0.86 14400:0.86F 16800:1.00
+      293: 2 split(s) at [12000, 19200] (labelled ok [True, True]); checks 2400:0.14 4800:0.23 7200:0.62 9600:0.67 12000:0.62F 14400:0.81 16800:0.86 19200:0.84F 21600:0.88 24000:1.00
+      294: 2 split(s) at [4800, 12000] (labelled ok [True, True]); checks 2400:0.11 4800:0.09F 7200:0.69 9600:0.89 12000:0.84F 14400:1.00
+      295: 2 split(s) at [19200, 24000] (labelled ok [True, True]); checks 2400:0.08 4800:0.14 7200:0.36 9600:0.64 12000:0.70 14400:0.73 16800:0.80 19200:0.80F 21600:0.91 24000:0.91F 26400:1.00
+      296: 3 split(s) at [7200, 12000, 16800] (labelled ok [True, True, True]); checks 2400:0.11 4800:0.14 7200:0.12F 9600:0.36 12000:0.33F 14400:0.38 16800:0.34F 19200:0.41 21600:0.52 24000:0.42B 26400:0.45 28800:0.48 31200:0.45B 33600:0.55 36000:0.45B 38400:0.42B 40800:0.50
+      297: 2 split(s) at [4800, 19200] (labelled ok [True, True]); checks 2400:0.09 4800:0.08F 7200:0.06B 9600:0.14 12000:0.23 14400:0.83 16800:0.89 19200:0.86F 21600:1.00
+      298: 1 split(s) at [14400] (labelled ok [True]); checks 2400:0.00 4800:0.06 7200:0.41 9600:0.45 12000:0.72 14400:0.67F 16800:1.00
+      299: 3 split(s) at [4800, 14400, 21600] (labelled ok [True, True, True]); checks 2400:0.14 4800:0.08F 7200:0.44 9600:0.72 12000:0.78 14400:0.78F 16800:0.84 19200:0.88 21600:0.81F 24000:1.00
+
+  ARM D128_L3 (S64's best width D128: N=256, D=128, 3 layers), seeds 290-299 (10)
+    initial scales: embed.weight (28, 128) std 0.0198, encoder (1, 128, 256) std 0.0200, encoder_v (1, 128, 256) std 0.0199, decoder (256, 128) std 0.0199, lm_head (128, 28) std 0.0200, W_in (32, 128) std 0.0975, W_g (16, 32) std 0.1016, gate_conv.conv_w (128, 3) std 0.3348
+    seed | outcome                  trans  stop   acc          end map | N256_L3
+     290 | BOUND ROUTED             14400 16800  1.00  1+1+1+1+1+1+1+1 | MERGED (2 share) (trans None)  [resumed at [1200]]
+     291 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 30000)
+     292 | BOUND ROUTED             27600 30000  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 15600)  [resumed at [15600]]
+     293 | MERGED (3 share)          None 43200  0.49          3+2+2+1 | BOUND ROUTED (trans 22800)  [resumed at [15600]]
+     294 | BOUND ROUTED             10800 13200  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 13200)
+     295 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 25200)  [resumed at [9600]]
+     296 | BOUND ROUTED             21600 24000  1.00  1+1+1+1+1+1+1+1 | MERGED (3 share) (trans None)
+     297 | BOUND ROUTED             19200 21600  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 20400)  [resumed at [19200]]
+     298 | BOUND ROUTED             12000 14400  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 15600)  [resumed at [13200]]
+     299 | MERGED (2 share)          None 43200  0.88    2+1+1+1+1+1+1 | BOUND ROUTED (trans 22800)  [resumed at [18000]]
+    BOUND ROUTED 8/10; bound 8/10; classes {'BOUND ROUTED': 8, 'MERGED (3 share)': 1, 'MERGED (2 share)': 1}
+    splits fired: 21 in 10 runs (per run [1, 2, 3, 3, 0, 2, 3, 3, 1, 3]); transitions (bound runs) [10800, 12000, 14400, 15600, 15600, 19200, 21600, 27600], median 15600.0; at or before the 2400 switch: 0; at or before the 4800 first check: 0
+    the trigger's checks per run (step:probe acc; F fired, B blocked):
+      290: 1 split(s) at [12000] (labelled ok [True]); checks 2400:0.17 4800:0.22 7200:0.47 9600:0.88 12000:0.80F 14400:1.00 16800:1.00
+      291: 2 split(s) at [9600, 14400] (labelled ok [True, True]); checks 2400:0.14 4800:0.27 7200:0.73 9600:0.72F 12000:0.89 14400:0.86F 16800:1.00
+      292: 3 split(s) at [9600, 16800, 21600] (labelled ok [True, True, True]); checks 2400:0.27 4800:0.42 7200:0.61 9600:0.55F 12000:0.59 14400:0.69 16800:0.66F 19200:0.91 21600:0.84F 24000:0.94 26400:0.88B 28800:1.00
+      293: 3 split(s) at [7200, 14400, 26400] (labelled ok [True, True, True]); checks 2400:0.06 4800:0.11 7200:0.08F 9600:0.17 12000:0.27 14400:0.25F 16800:0.31 19200:0.42 21600:0.48 24000:0.53 26400:0.48F 28800:0.45B 31200:0.53 33600:0.50B 36000:0.48B 38400:0.53 40800:0.48B
+      294: 0 split(s) at [] (labelled ok []); checks 2400:0.12 4800:0.47 7200:0.66 9600:0.88 12000:1.00
+      295: 2 split(s) at [4800, 14400] (labelled ok [True, True]); checks 2400:0.14 4800:0.12F 7200:0.31 9600:0.70 12000:0.91 14400:0.92F 16800:1.00
+      296: 3 split(s) at [4800, 12000, 19200] (labelled ok [True, True, True]); checks 2400:0.14 4800:0.16F 7200:0.53 9600:0.78 12000:0.64F 14400:0.88 16800:0.92 19200:0.86F 21600:1.00 24000:1.00
+      297: 3 split(s) at [4800, 12000, 16800] (labelled ok [True, True, True]); checks 2400:0.19 4800:0.14F 7200:0.48 9600:0.78 12000:0.75F 14400:0.89 16800:0.88F 19200:1.00 21600:1.00
+      298: 1 split(s) at [9600] (labelled ok [True]); checks 2400:0.27 4800:0.61 7200:0.67 9600:0.69F 12000:1.00 14400:1.00
+      299: 3 split(s) at [4800, 12000, 16800] (labelled ok [True, True, True]); checks 2400:0.12 4800:0.14F 7200:0.44 9600:0.56 12000:0.55F 14400:0.78 16800:0.78F 19200:0.80B 21600:0.86 24000:0.84B 26400:0.88 28800:0.88B 31200:0.88B 33600:0.86B 36000:0.83B 38400:0.84B 40800:0.88
+  READING S66 D128_L3: carries (BOUND ROUTED 8/10 vs N256_L3 8/10; d = +0; carries: d >= -1; D128_L3 only 2, N256_L3 only 2, p = 1; splits 21 vs 21)
+
+  ARM N256_L2 (S65's best depth: N=256, D=32, 2 layers), seeds 290-299 (10)
+    initial scales: embed.weight (28, 32) std 0.0189, encoder (1, 32, 256) std 0.0199, encoder_v (1, 32, 256) std 0.0199, decoder (256, 32) std 0.0201, lm_head (32, 28) std 0.0196, W_in (32, 32) std 0.0980, W_g (16, 32) std 0.0938, gate_conv.conv_w (32, 3) std 0.3463
+    seed | outcome                  trans  stop   acc          end map | N256_L3
+     290 | BOUND ROUTED             14400 16800  1.00  1+1+1+1+1+1+1+1 | MERGED (2 share) (trans None)  [resumed at [3600]]
+     291 | BOUND ROUTED             13200 15600  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 30000)  [resumed at [10800]]
+     292 | BOUND ROUTED             20400 22800  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 15600)  [resumed at [7200]]
+     293 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 22800)
+     294 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 13200)  [resumed at [16800]]
+     295 | BOUND ROUTED             25200 27600  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 25200)  [resumed at [4800]]
+     296 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 | MERGED (3 share) (trans None)  [resumed at [4800]]
+     297 | BOUND ROUTED             24000 26400  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 20400)
+     298 | BOUND ROUTED             15600 18000  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 15600)
+     299 | BOUND ROUTED             20400 22800  1.00  1+1+1+1+1+1+1+1 | BOUND ROUTED (trans 22800)
+    BOUND ROUTED 10/10; bound 10/10; classes {'BOUND ROUTED': 10}
+    splits fired: 19 in 10 runs (per run [1, 1, 2, 3, 1, 3, 2, 3, 1, 2]); transitions (bound runs) [13200, 14400, 15600, 15600, 15600, 15600, 20400, 20400, 24000, 25200], median 15600.0; at or before the 2400 switch: 0; at or before the 4800 first check: 0
+    the trigger's checks per run (step:probe acc; F fired, B blocked):
+      290: 1 split(s) at [12000] (labelled ok [True]); checks 2400:0.06 4800:0.23 7200:0.50 9600:0.81 12000:0.81F 14400:1.00 16800:1.00
+      291: 1 split(s) at [12000] (labelled ok [True]); checks 2400:0.06 4800:0.66 7200:0.80 9600:0.95 12000:0.94F 14400:1.00
+      292: 2 split(s) at [12000, 19200] (labelled ok [True, True]); checks 2400:0.12 4800:0.22 7200:0.59 9600:0.77 12000:0.75F 14400:0.86 16800:0.94 19200:0.84F 21600:1.00
+      293: 3 split(s) at [4800, 9600, 14400] (labelled ok [True, True, True]); checks 2400:0.14 4800:0.12F 7200:0.66 9600:0.67F 12000:0.92 14400:0.94F 16800:1.00
+      294: 1 split(s) at [14400] (labelled ok [True]); checks 2400:0.12 4800:0.28 7200:0.62 9600:0.66 12000:0.84 14400:0.83F 16800:1.00
+      295: 3 split(s) at [12000, 16800, 24000] (labelled ok [True, True, True]); checks 2400:0.08 4800:0.53 7200:0.61 9600:0.66 12000:0.62F 14400:0.80 16800:0.69F 19200:0.84 21600:0.94 24000:0.91F 26400:1.00
+      296: 2 split(s) at [9600, 14400] (labelled ok [True, True]); checks 2400:0.20 4800:0.34 7200:0.80 9600:0.77F 12000:0.94 14400:0.89F 16800:1.00
+      297: 3 split(s) at [9600, 16800, 21600] (labelled ok [True, True, True]); checks 2400:0.08 4800:0.17 7200:0.67 9600:0.64F 12000:0.78 14400:0.83 16800:0.84F 19200:0.89 21600:0.91F 24000:1.00 26400:1.00
+      298: 1 split(s) at [14400] (labelled ok [True]); checks 2400:0.05 4800:0.67 7200:0.72 9600:0.78 12000:0.91 14400:0.89F 16800:1.00
+      299: 2 split(s) at [12000, 19200] (labelled ok [True, True]); checks 2400:0.17 4800:0.77 7200:0.81 9600:0.84 12000:0.84F 14400:0.91 16800:0.94 19200:0.89F 21600:1.00
+  READING S66 N256_L2: carries (BOUND ROUTED 10/10 vs N256_L3 8/10; d = +2; carries: d >= -1; N256_L2 only 2, N256_L3 only 0, p = 0.5; splits 19 vs 21)
+
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN capacity
+  idea    is four-stream binding capacity-bound at N=256? P = 8 and 16 at N=256 and at S64's best width, oracle first
+  source  the user's batch 19 (budget 43200; the oracle-first rule)
+  change  the task's P (8, 16) and the model's size; recipes unchanged
+  arm ORC_P8_N256  lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=8, N256 (N=256, D=32)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_P8_D128  lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=8, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_P16_N256 lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=16, N256 (N=256, D=32)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_P16_D128 lr 0.001  iters 43200  seeds 270-271 (2)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm P8_N256      lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=8, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm P8_D128      lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=8, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm P16_N256     lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  arm P16_D128     lr 0.001  iters 43200  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge
+  pairing seeds 270-279: <W> with N256 at each P (the same batches); oracles on 270-271
+----------------------------------------------------------------------------------------------------
+  phase-1 decision: {'best_depth': 2, 'best_width': 'D128', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.80GHz', 'depth_summary': {'L2': {'br': 10, 'n': 10, 'tested': True, 'trans_med': 3600.0}, 'L3': {'br': 10, 'n': 10, 'tested': True, 'trans_med': 3600.0}, 'L4': {'br': 10, 'n': 10, 'tested': True, 'trans_med': 3600.0}, 'L6': {'br': 9, 'n': 10, 'tested': True, 'trans_med': 4800}}, 'reading_s64': 'scale-free (d = arm - N256 BOUND ROUTED: N512 +1, N1024 +1, D64 +1, D128 +1; scale-free: every d >= -1; width-sensitive: any d <= -4)', 'reading_s65': 'scale-free (d = arm - L3 BOUND ROUTED: L2 +0, L4 +0, L6 -1; scale-free: every d >= -1; depth-sensitive: any d <= -4)', 'rule': 'the rule', 'time': '2026-10-09 16:40:29 UTC', 'width_summary': {'D128': {'br': 10, 'n': 10, 'params': 109952, 'tested': True, 'trans_med': 3600.0}, 'D64': {'br': 10, 'n': 10, 'params': 55232, 'tested': True, 'trans_med': 3600.0}, 'N1024': {'br': 10, 'n': 10, 'params': 101600, 'tested': True, 'trans_med': 3600.0}, 'N256': {'br': 9, 'n': 10, 'params': 27872, 'tested': True, 'trans_med': 3600}, 'N512': {'br': 10, 'n': 10, 'params': 52448, 'tested': True, 'trans_med': 3600.0}}}
+  ORACLES (BOUND = held-out accuracy >= 0.95 held to the end, within 43200 updates):
+    ORC_P8_N256      bound 2/2 of 2; transitions [2400, 2400]; final accuracy [1.0, 0.999]; stop [8400, 8400] -> VALID
+    ORC_P8_D128      bound 2/2 of 2; transitions [2400, 2400]; final accuracy [1.0, 1.0]; stop [8400, 8400] -> VALID
+    ORC_P16_N256     bound 2/2 of 2; transitions [27600, 24000]; final accuracy [0.977, 0.99]; stop [30000, 26400] -> VALID
+    ORC_P16_D128     bound 1/2 of 2; transitions [None, 12000]; final accuracy [0.317, 0.966]; stop [43200, 14400] -> VALID
+  ARM P8_N256 (LOCAL3 + SLOW, P=8, N256 (N=256, D=32)), seeds 270-279 (10)
+    seed | outcome                  trans  stop   acc          end map | 
+     270 | BOUND ROUTED              6000  8400  0.99          1+1+1+1 |   [resumed at [7200]]
+     271 | BOUND ROUTED              8400 10800  0.99          1+1+1+1 | 
+     272 | MERGED (2 share)          None 43200  0.74            2+1+1 | 
+     273 | BOUND ROUTED             10800 13200  0.98          1+1+1+1 |   [resumed at [6000]]
+     274 | BOUND ROUTED              8400 10800  1.00          1+1+1+1 |   [resumed at [4800]]
+     275 | BOUND ROUTED              6000  8400  0.99          1+1+1+1 | 
+     276 | BOUND ROUTED              7200  9600  0.98          1+1+1+1 | 
+     277 | BOUND ROUTED             37200 39600  0.98          1+1+1+1 |   [resumed at [24000]]
+     278 | BOUND ROUTED              7200  9600  0.99          1+1+1+1 | 
+     279 | BOUND ROUTED              7200  9600  1.00          1+1+1+1 | 
+    BOUND ROUTED 9/10; transitions (BOUND ROUTED) [6000, 6000, 7200, 7200, 7200, 8400, 8400, 10800, 37200]; classes {'BOUND ROUTED': 9, 'MERGED (2 share)': 1}
+  ARM P8_D128 (LOCAL3 + SLOW, P=8, D128 (N=256, D=128)), seeds 270-279 (10)
+  ARM P16_N256 (LOCAL3 + SLOW, P=16, N256 (N=256, D=32)), seeds 270-279 (10)
+    seed | outcome                  trans  stop   acc          end map | 
+     270 | STREAM-PARTIAL one-to-one  None 43200  0.15          1+1+1+1 |   [resumed at [38400]]
+     271 | MERGED (2 share)          None 43200  0.11              2+2 |   [resumed at [37200]]
+     272 | STREAM-PARTIAL one-to-one  None 43200  0.14          1+1+1+1 |   [resumed at [36000]]
+     273 | STREAM-PARTIAL one-to-one  None 43200  0.59          1+1+1+1 |   [resumed at [34800]]
+     274 | STREAM-PARTIAL one-to-one  None 43200  0.72          1+1+1+1 |   [resumed at [21600]]
+     275 | STREAM-PARTIAL one-to-one  None 43200  0.67          1+1+1+1 |   [resumed at [20400]]
+     276 | STREAM-PARTIAL one-to-one  None 43200  0.29          1+1+1+1 |   [resumed at [19200]]
+     277 | MERGED (2 share)          None 43200  0.16            2+1+1 |   [resumed at [18000]]
+     278 | MERGED (3 share)          None 43200  0.18              3+1 |   [resumed at [32400]]
+     279 | MERGED (2 share)          None 43200  0.12            2+1+1 |   [resumed at [31200]]
+    BOUND ROUTED 0/10; transitions (BOUND ROUTED) []; classes {'STREAM-PARTIAL one-to-one': 6, 'MERGED (2 share)': 3, 'MERGED (3 share)': 1}
+  ARM P16_D128 (LOCAL3 + SLOW, P=16, D128 (N=256, D=128)), seeds 270-279 (10)
+  READING S67: not capacity-bound at N=256 (the oracle binds P=16 at N256 2/2; at D128 1/2)
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S64 scale_width: scale-free (d = arm - N256 BOUND ROUTED: N512 +1, N1024 +1, D64 +1, D128 +1; scale-free: every d >= -1; width-sensitive: any d <= -4)
+  S65 scale_depth: scale-free (d = arm - L3 BOUND ROUTED: L2 +0, L4 +0, L6 -1; scale-free: every d >= -1; depth-sensitive: any d <= -4); RES6: 6 layers did not fail (L6 - L3 = -1 > -2): RES6 not run
+  S66 scale_eight D128_L3: carries (BOUND ROUTED 8/10 vs N256_L3 8/10; d = +0; carries: d >= -1; D128_L3 only 2, N256_L3 only 2, p = 1; splits 21 vs 21)
+  S66 scale_eight N256_L2: carries (BOUND ROUTED 10/10 vs N256_L3 8/10; d = +2; carries: d >= -1; N256_L2 only 2, N256_L3 only 0, p = 0.5; splits 19 vs 21)
+  S67 capacity: not capacity-bound at N=256 (the oracle binds P=16 at N256 2/2; at D128 1/2)
+####################################################################################################
