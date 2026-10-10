@@ -54,3 +54,9 @@ EXPLORATORY, NOT A RESULT — Session F s80 (F/configs_a, F/configs_b)
   CHECK F/configs_b: explore_f_fail_class_v2.py minus its note equals fail_class_v2.py at ba8901a byte for byte: ok
   CHECK F/configs_b: v2 equals v1 on 319 stored Session F records (212 two-stream, 107 multichannel) except where eta2 by key >= 0.5 and margin >= 0.25, all STREAM-PARTIAL -> KEY: 1 differ: window_delta_scale:B_HEBB|323 (bound) STREAM-PARTIAL -> KEY (eta2 by key 0.6762, margin 0.362); violations []: ok
   CHECK F/configs_b: the perfect gate on DELTA* (k 16): read gate one-hot (True) and equal to the Hebbian model's (True); memory FastDeltaMemory beta 1.0 L2 True: ok
+  timings measured (46 s): F/configs_a:HEBB_A 13.4 ms/step, F/configs_a:DELTA_A 20.4 ms/step, F/configs_a:O_DELTA_A 19.0 ms/step, F/configs_a:O_HEBB_A 13.5 ms/step, F/configs_b:HEBB_B 30.0 ms/step, F/configs_b:DELTA_B 84.9 ms/step, F/configs_b:O_DELTA_B 83.4 ms/step, F/configs_b:O_HEBB_B 27.8 ms/step
+  48 runs queued; projected worst case 14.96 h of runs, makespan 3.74 h on 4 workers
+  start    0.0 min  F/configs_b      DELTA_B                  seed 2010  (projected worst case 44 min)
+  start    0.0 min  F/configs_b      DELTA_B                  seed 2011  (projected worst case 44 min)
+  start    0.0 min  F/configs_b      DELTA_B                  seed 2012  (projected worst case 44 min)
+  start    0.0 min  F/configs_b      DELTA_B                  seed 2013  (projected worst case 44 min)
