@@ -569,3 +569,17 @@ stable-max.
 
 Handed back for a pre-registered test: the KEYMASS split reduced to an exact row copy onto the idle channel (no noise, no
 Adam reset). Report: `explore_out/H/report_3.md`.
+
+### Session H follow-up 2 (S78-S79; seeds 1300-1329, shifted from 1100-1129 because 1100-1149 and 1200-1259 appear in results/)
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S78 two (S=2, k=2, 24000; 20 paired seeds) | DISCOVERED: REF (WIN3_SLOW) 15, SPLIT2 (exact copy) 16, SPLIT2_NOISE (noise + reset) 17; K4 (S52's W2_K4) BOUND ROUTED 15; oracle 2/2 | neither device (best p = 0.25); the copy does not carry to two streams; noise not needed by the rule (1 vs 0); spare channels not better (2 vs 3) |
+| S79 constants (S=8, k=16, 43200; 10 paired seeds; base = exact copy) | BOUND ROUTED: BASE 9, INT1200 7, CAP1 5, CAP6 9, PROBE16 10, THR05 10; oracle 2/2 | CAP1 sensitive (4 vs 0); INT1200 inconclusive (2 vs 0); CAP6, PROBE16, THR05 robust; "extra splits harmless" does not apply (1 of 7 extra firings not labelled ok) |
+
+At k = 2 the exact copy makes the gate uniform, and the same key split re-forms by the next check (8 of 8 firings on the
+key-split seeds). The copy needs an empty channel. At eight streams the cap matters: a split spent during the flat start,
+at chance accuracy, is wasted. So the cap, the first eligible check and the interval have to be stated; probe size and
+the rise threshold do not matter here. fail_class_v2 (ba8901a, copied unchanged) differs from v1 exactly on the runs
+with eta^2 by key >= 0.5 and margin >= 0.25: 6 of this branch's recorded unbound runs and 4 of S78's; none in S79.
+Reports: `explore_out/H/report_4.md`, `report_5.md`.
