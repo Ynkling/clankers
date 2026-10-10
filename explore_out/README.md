@@ -655,3 +655,22 @@ Handed back as worth a pre-registered look: the register gate shared by all thre
 5% nudge it routes and binds 20/20 (Hebbian) and 10/10 (delta). Unnudged it routes 4/20 on each memory against 0/20 for
 either baseline, one pair short of the screens' threshold each time. The open problem is the register's write at CTX
 tokens, which loses the race to an early key split in 16 of 20 seeds. Not: the residual gate alone and the unnudged latch.
+
+## Session G — S82 (devices against the key split)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. RandHeaderTask-lite, Hebbian, 24000, SLOW, seeds 2100-2119; the best
+device also on delta (2100-2109). Report `G/report_5.md`. Outcome: ROUTED-BOUND, paired with exact one-sided McNemar.
+
+| arm | ROUTED-BOUND | vs BASELINE (0/20) | vs REG3 (2/20) | reading |
+|---|---|---|---|---|
+| REG3_KEYHINGE (S52's key-term hinge on the shared gate, updates 1-2400) | 20/20 | 20 / 0, p 1e-6 | 18 / 0 | "discovered"; "the device helps"; "a working write without the device's cost" |
+| REG3_SLOWGATE (gate at 1e-4 for updates 1-1200) | 0/20 | 0 / 0 | 0 / 2 | none (KEY 18) |
+| REG3_NOWIN (gate reads [LN(r); R] only) | 5/20 | 5 / 0, p 0.031 | 3 / 0 | "discovered" (at the threshold) |
+| REG3_KEYHINGE_D (delta, 10 seeds, descriptive) | 10/10 | BASELINE_D 0/10: 10 / 0 | REG3_D 2/10: 8 / 0 | – |
+
+Validity: S71's ORACLE_ALL 10/10; its rerun 2/2 and REG3_NUDGE 2/2 on 2100-2101. The hinge reads key positions and key
+identities (token types), no stream label. It holds the shared gate's η² by key (0.89 at initialisation) near 0.05 until
+the register's write at CTX separates (β^R 0.32 vs 0.19-0.21 by update 2400). 18/20 then bind routed at 3600.
+
+Handed back as promising for a pre-registered main-line test (report 5 gives a proposed design): REG3_KEYHINGE, with a
+LOCAL3 + hinge control that this screen did not run. Not: the slow gate.
