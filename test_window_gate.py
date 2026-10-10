@@ -798,7 +798,7 @@ def check_144(f, cached):
     return ok
 
 
-def verify(pool, files, machine, early, also, cached=None):
+def verify(pool, files, machine, early, also, cached=None, early_assert=True):
     f = {}
     f["141"] = pool.submit(check_job, "WIN3_SPLIT_D8", SPLIT_SEED, SPLIT_THROUGH)
     for k in ("WIN3_SPLIT_D8", "WIN3_RESET_D8", "WIN3_SLOW_D8"):
@@ -823,7 +823,7 @@ def verify(pool, files, machine, early, also, cached=None):
     print("test_muon_recipe.py's verification (which runs test_early_recipe's, and so on down to")
     print("test_multilayer_binding's):")
     tmr.SEEDS = tmr.seeds_for(machine)
-    tmr.verify(pool, files, machine, early, None)
+    tmr.verify(pool, files, machine, early, None, early_assert=early_assert)
     print("=" * 100)
     print("VERIFICATION — this test's own CHECKs")
     print("=" * 100)

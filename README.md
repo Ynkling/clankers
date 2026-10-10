@@ -321,7 +321,7 @@ Next:
 - **`test_*.py`:** one file per experiment.
   - Each test's docstring holds its pre-registered design (background, arms, seeds, claims and thresholds), and after the run, its recorded result on each machine and pooled.
   - Every Phase III–VI test first runs its inherited verification chain and its own numbered CHECKs, then prints a runtime projection, then trains.
-  - Phase VI's tests are `test_muon_recipe.py` and `test_window_gate.py`; Phase V's are `test_stream_recipe.py`, `test_stream_curriculum.py`, `test_slow_start.py`, `test_recipe_scope.py` and `test_early_recipe.py`.
+  - Phase VI's tests are `test_muon_recipe.py`, `test_window_gate.py` and `test_split_copy.py`; Phase V's are `test_stream_recipe.py`, `test_stream_curriculum.py`, `test_slow_start.py`, `test_recipe_scope.py` and `test_early_recipe.py`.
   - Tests from Phases I–II (for example `test_interference*.py`, `test_asymmetric_routing.py`, `test_instrument_v2.py`) and earlier modules (`bdh_multichannel.py`, `bdh_mc.py`, `bdh_recurrent.py`) are kept for the record.
 - **`longrun.py`:** the detached run, its watcher and the resume and projection helpers (below). **`fail_class_v2.py`:** the failure classes with the key rule ahead of the margin rule, used by new tests; `docs/fail_class_v2.md` reclassifies the recorded two-stream runs (no recorded verdict changes).
 - **`specs/`:** each Phase VI test's specification, committed before the test was written (and amended, with the amendment dated, before any affected run).
