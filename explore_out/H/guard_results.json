@@ -1,0 +1,125 @@
+{
+ "meta": {
+  "arms": {
+   "BASE": {
+    "iters": 43200,
+    "label": "BASE",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger BASE",
+    "seeds": [
+     2300,
+     2301,
+     2302,
+     2303,
+     2304,
+     2305,
+     2306,
+     2307,
+     2308,
+     2309
+    ]
+   },
+   "EVAL": {
+    "iters": 43200,
+    "label": "EVAL",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger EVAL",
+    "seeds": [
+     2300,
+     2301,
+     2302,
+     2303,
+     2304,
+     2305,
+     2306,
+     2307,
+     2308,
+     2309
+    ]
+   },
+   "EVAL_GUARD_INT1200": {
+    "iters": 43200,
+    "label": "EVAL_GUARD_INT1200",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger EVAL_GUARD_INT1200",
+    "seeds": [
+     2300,
+     2301,
+     2302,
+     2303,
+     2304,
+     2305,
+     2306,
+     2307,
+     2308,
+     2309
+    ]
+   },
+   "GUARD": {
+    "iters": 43200,
+    "label": "GUARD",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger GUARD",
+    "seeds": [
+     2300,
+     2301,
+     2302,
+     2303,
+     2304,
+     2305,
+     2306,
+     2307,
+     2308,
+     2309
+    ]
+   },
+   "GUARD_INT1200": {
+    "iters": 43200,
+    "label": "GUARD_INT1200",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger GUARD_INT1200",
+    "seeds": [
+     2300,
+     2301,
+     2302,
+     2303,
+     2304,
+     2305,
+     2306,
+     2307,
+     2308,
+     2309
+    ]
+   },
+   "ORACLE": {
+    "iters": 43200,
+    "label": "perfect gate ceil8_D8",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3",
+    "seeds": [
+     2300,
+     2301
+    ]
+   }
+  },
+  "code_shas": [
+   "708d5adde60710f2e464d9ef972436b200b7918a"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "834581a",
+   "python": "3.13.16",
+   "started": "2026-10-10 19:05:34",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

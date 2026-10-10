@@ -285,6 +285,79 @@ def s79_section(L):
     return m
 
 
+def s84_section(L):
+    import explore_h_guard as m
+    setup([m])
+    res, got = m.report()
+    A = res["arms"]
+    L.append("## S84 explore_h_guard — S=8, P=4, k=16, conv, 43200, LOCAL3 + SLOW + exact-copy split, Hebbian, seeds 2300-2309\n")
+    L.append("| arm | BOUND ROUTED | band | Wilson 95% | failures v1 | failures v2 | transition median (all) | splits | labelled ok | "
+             "accuracy read at the splits | guard-blocked checks |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+    for a in ("BASE",) + m.VARIANTS:
+        x = A[a]
+        L.append(f"| {a} | {x['br']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | {cls_str(x['v1'])} | {cls_str(x['v2'])} | "
+                 f"{fmt_t(x['trans_med'])} ({', '.join(str(t) for t in x['trans'])}) | {x['ops']} | {x['ops_ok']}/{x['ops']} | "
+                 f"{', '.join(str(v) for v in x['fire_acc'])} | {x['guard_blocked']} |")
+    o = res["oracle"]
+    L.append(f"\nORACLE (ceil8_D8, seeds 2300-2301): bound {o['bound']}/{o['n']}, transitions {o['transitions']} → "
+             f"{'VALID' if o['valid'] else 'UNTESTED'}.\n")
+    for v, c in res["cmp"].items():
+        L.append(f"- {v} vs BASE: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {v} only {c['b']}, BASE only {c['c']}; p({v}>BASE) "
+                 f"{c['p']:.3g}, p(BASE>{v}) {c['p_rev']:.3g}")
+    L.append("\n**Readings (fixed in explore_h_guard's docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    L.append("\nFirst split per seed (update or none): " + "; ".join(
+        f"{a} " + " ".join(f"{s}:{A[a]['first'][s]}" for s in m.SEEDS) for a in ("BASE",) + m.VARIANTS))
+    L.append("v1/v2 outcome differences: " + ("; ".join(f"{a} {A[a]['v1v2_differ']}" for a in A if A[a]['v1v2_differ']) or "none") + ".")
+    return m
+
+
+def s85_section(L):
+    import explore_h_two_b as m
+    setup([m])
+    res, got = m.report()
+    A = res["arms"]
+    L.append("## S85 explore_h_two_b — S=2, P=4, k=2, no conv, 24000, WIN3_SLOW path, seeds 2310-2329\n")
+    L.append("| arm | DISCOVERED | band | Wilson 95% | bound, not discovered | unbound: classes v1 | unbound: classes v2 | "
+             "transition median (all) | key split formed (eta^2 by key > 0.5 at KEY), median update [runs] | > 0.5 at the end |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|")
+    for a in ("REF",) + m.DEVICES:
+        x = A[a]
+        on = [v[0] for v in x["onset"].values() if v[0] is not None]
+        L.append(f"| {a} | {x['k']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | {x['bound_not']} | {cls_str(x['v1'])} | {cls_str(x['v2'])} | "
+                 f"{fmt_t(x['trans_med'])} ({', '.join(str(t) for t in x['trans'])}) | {fmt_t(c16.med(on))} [{len(on)}/{x['n']}] | "
+                 f"{sum(1 for v in x['onset'].values() if v[1])} |")
+    o = res["oracle"]
+    L.append(f"\nORACLE (ceiling_conv, seeds 2310-2311): bound {o['bound']}/{o['n']}, transitions {o['transitions']} → "
+             f"{'VALID' if o['valid'] else 'UNTESTED'}.\n")
+    for a, c in res["cmp"].items():
+        L.append(f"- {a} vs REF: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {a} only {c['b']}, REF only {c['c']}; p({a}>REF) {c['p']:.3g}, "
+                 f"p(REF>{a}) {c['p_rev']:.3g}")
+    L.append("\n**Readings (fixed in explore_h_two_b's docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    L.append("\n**When the key split forms** (first measured update with eta^2 by key at KEY positions > 0.5; '-' never; "
+             "* = still > 0.5 at the end), per seed:\n")
+    L.append("| seed | " + " | ".join(("REF",) + m.DEVICES) + " |")
+    L.append("|---|" + "---|" * (1 + len(m.DEVICES)))
+    for sd in m.SEEDS:
+        cells = []
+        for a in ("REF",) + m.DEVICES:
+            v = A[a]["onset"].get(sd)
+            r = got[a].get(sd)
+            tag = "" if r is None else (" D" if ec.discovered(r) else "")
+            cells.append("--" if v is None else (f"{v[0] if v[0] is not None else '-'}{'*' if v[1] else ''}{tag}"))
+        L.append(f"| {sd} | " + " | ".join(cells) + " |")
+    L.append("(D = DISCOVERED.)")
+    ok, dis, pred = res["v2_property"]
+    L.append(f"\n**v1 / v2** on S85's unbound runs: differ on {len(dis)}; exactly the runs with eta^2 by key >= 0.5 and margin >= 0.25: "
+             f"{ok}. " + "; ".join(f"{k} {res['classes'][k]['v1']} -> {res['classes'][k]['v2']} (key {res['classes'][k]['eta_key']:.4f}, "
+                                  f"margin {res['classes'][k]['margin']:.3f})" for k in dis))
+    return m
+
+
 def write(n, body, notes):
     p = os.path.join(OUT, f"report_{n}.md")
     with open(p, "w") as f:
@@ -296,7 +369,7 @@ def write(n, body, notes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5))
+    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7))
     ap.add_argument("--notes", default=None)
     args = ap.parse_args()
     notes = open(args.notes).read() if args.notes else ""
@@ -308,8 +381,8 @@ def main():
         c = checks_line(s58.NAME)
         L.append(f"\n**Runtime:** {nr} runs, {h:.1f} CPU-hours (1 thread each, 4 workers) on {', '.join(cpus)}; code SHA {', '.join(shas)}.")
         L.append(f"**CHECKs:** all passed ({c['time']}, git {c['git']}, {c['minutes']:.1f} min); see explore_out/H/s58.log.")
-    elif args.batch in (4, 5):
-        m = s78_section(L) if args.batch == 4 else s79_section(L)
+    elif args.batch in (4, 5, 6, 7):
+        m = {4: s78_section, 5: s79_section, 6: s84_section, 7: s85_section}[args.batch](L)
         nr, h, cpus, shas = runtime(m)
         c = checks_line(m.NAME)
         L.append(f"\n**Runtime:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}. **CHECKs:** "
