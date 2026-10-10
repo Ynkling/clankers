@@ -5,3 +5,45 @@ EXPLORATORY, NOT A RESULT — Session G S73
   repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (47s)
     here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
     X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+/home/user/clankers/explore_g_rhl_child.py:523: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  f"update counter {ml.n_upd}", float(u.abs().max()) < 1 and float(ml.b_R) == 0.0 and ml.gated == (1, 2, 3)
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): every (stream, key) appears exactly once in the body: ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): S distinct values per key: ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): exactly one CTX per block, at its start; 4 blocks per sequence: ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3: ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): block-length frequencies {1: 0.338, 2: 0.324, 3: 0.338} each within 0.03 of 0.33: ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): the stream order of the blocks varies (6 distinct orders over 4096 sequences): ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): stream_labels = the latest CTX token's stream at every position: ok
+  CHECK S73: RandHeaderTask-lite (F's check_rand_header): L = 23 = S(NB + 2P) + 3 n_q, qpos = [21]; select reads the query's KEY position and targets its value: ok
+  CHECK S73: RHL as F's S70: P 4, nb 2, lengths 1..3, compositions [(1, 3), (2, 2), (3, 1)], L 23, qpos [21], vocab 22: ok
+  CHECK S73: in-run probe: hook-captured residuals (L1-L3, final) and logits equal S55's extraction bit for bit on LOCAL3: ok
+  CHECK S73: in-run probe on per-layer gates: logits from the hooked forward equal model(x)'s; layer 1's input is LN(embedding): ok
+  CHECK S73: acc_by_cell covers 12 (stream, block, index) cells, 2048 queries; blocks 0/1, index 0-2: ok
+  CHECK S73: S56: recorded run, new path disabled: S43 LOCAL3_SLOW|160 (batch 16) through 2400 with RegBDH(gated=()) reproduces its curve bit for bit ([[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]) and its decoder at 1200/2400: ok
+  CHECK S73: S56: RegBDH(gated=()) equals LOCAL3's logits bit for bit on H8: ok
+  CHECK S73: S56: REG init: existing parameters unchanged; A_v = W_in, W_g2 = W_g; beta^R in [0.0998, 0.1002] (about 0.1); with A_r = A_R = 0 every gated layer's gate = softmax(W_g tanh(W_in v)) (max |diff| 0.0e+00): ok
+  CHECK S73: S56: register causality: changing token 20's register write leaves every gated layer's gate at positions <= 20 bit-identical and changes it at 21: ok
+  CHECK S73: S56: strict causality: changing token 20 leaves logits and every layer's gate at positions < 20 unchanged: ok
+  CHECK S73: S56: SG and NOSG: the same forward; the gated layers' gates send no gradient into the stack (encoder) under SG and a non-zero one under NOSG: ok
+  CHECK S73: S56: RESGATE_ONLY: no register parameters; reg = False: ok
+  CHECK S73: S56: SLOW groups: gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A_v', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R'] at 1e-3, rest ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight'] at 1e-4; every trainable tensor once; W_h frozen: ok
+  CHECK S73: S56: nudge moves only ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'w_R'] (a subset of GATE_NEW); stream lean |p0(s0) - p0(s1)| after it at the gated layers [0.044, 0.043] (> 0.02): ok
+  CHECK S73: S56: delta path with beta 0, write 1, raw keys equals the Hebbian RegBDH (max |diff| 1.5e-07 <= 1e-5): ok
+  CHECK S73: S56: ORACLE_H and ORACLE_D: the query's logits are bit-identical when every VAL token of the other stream changes: ok
+  CHECK S73: S56: SINGLE_GDN: k = 1, DeltaMemory(beta 0, write 1, raw keys, decay gdn): ok
+  CHECK S73: REG3 with the layer-1 path disabled (gated (2, 3), input v) reproduces S56's REG|370 through 2400 bit for bit ([[1200, 0.15576171875, 2.7409420013427734], [2400, 0.20751953125, 2.5322160720825195]] vs [[1200, 0.15576171875, 2.7409420013427734], [2400, 0.20751953125, 2.5322160720825195]]): ok
+  CHECK S73: REG3_D with every new path disabled: the gate at every layer equals LOCAL3's and the logits equal BASELINE_D's bit for bit: ok
+  CHECK S73: REG3_D init: existing parameters unchanged; A_v = W_in, W_g2 = W_g; beta^R in [0.0997, 0.1005]: ok
+  CHECK S73: REG3_D: token 12's register/latch write changes no gate at <= 12 at layers 1-3 and changes layer 1's at 13 (register; the latch's binary z need not change); changing token 12 changes no logit at < 12: ok
+  CHECK S73: LATCH3_D: token 12's register/latch write changes no gate at <= 12 at layers 1-3 and changes layer 1's at 13 (register; the latch's binary z need not change); changing token 12 changes no logit at < 12: ok
+  CHECK S73: REG3, delta with beta 0, write 1, raw keys equals the Hebbian REG3 (max |diff| 1.2e-07 <= 1e-5): ok
+  CHECK S73: REG3_D SLOW groups: gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A_v', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R'] at 1e-3, rest ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight'] at 1e-4; every trainable tensor once: ok
+  CHECK S73: nudge moves only ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'w_R']; stream lean at layers 1-3 [0.047, 0.049, 0.046] (> 0.02): ok
+  CHECK S73: LATCH3_D: dead-STE guard max |u| 1.49e-03 < 1 at step 0, b_z 0; gated layers (1, 2, 3); update counter 0: ok
+  CHECK S73: RESGATE_ONLY_D: no register, the residual gate at all three layers: ok
+  CHECK S73: SINGLE_D equals F's S53 single-channel path (logits bit for bit); k = 1, beta 1, L2 keys, fixed decay: ok
+  CHECK S73: BASELINE_D: LOCAL3 + delta (beta 1, L2 keys, tied write, decay 0.95): ok
+  s73_register3_delta: code SHA 5366c9b9a792 (30 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  90 runs queued on 4 workers
