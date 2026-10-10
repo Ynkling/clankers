@@ -200,3 +200,114 @@ S60 explore_h_stability (seeds 470-479; S=2, P=4, k=2, no conv, 24000; LOCAL3 + 
 
 Order: S58 → S58b → S60. Push after each. One report after S58, one after S58b+S60.
 ```
+
+---
+
+## Session G — follow-up (S71-S73; seeds 700-759; branch claude/explore-G, output explore_out/G/)
+
+Written 2026-10-10 after G's report 2 (S55-S57) and F's report 3 (S68-S70). The common rules above still apply.
+
+```
+Follow-up to your S55-S57. Three screens on RandHeaderTask-lite, which Session F has now published
+with its baseline. Pull claude/explore-F (git fetch origin claude/explore-F; copy files, do not merge
+the branch): copy explore_f_tasks.py unchanged, and re-copy explore_delta_mem.py if its SHA differs
+from the one you have (then rerun your "β = 0 equals Hebbian" CHECK). Read explore_out/F/report_3.md
+and rh_lite_tables.md.
+
+Context since your round.
+- RandHeaderTask-lite = explore_f_tasks.RandHeaderTask(P=4, nb=2, lmin=1, lmax=3), S=2, n_vals=16,
+  n_q=1, L=23, k=2, no conv. Both perfect gates bind it by update 1200 on 5 of 6 seeds (3/3 each at
+  24000). LOCAL3+SLOW does not: Hebbian DISCOVERED 0/20, BOUND 1/20, ROUTED*@end 0/20, KEY 19 (seeds
+  330-349); delta β=1: 0/20, 6/20, 0/20, KEY 14. F's outcomes: DISCOVERED = bound and final VAL cos
+  < 0.5; ROUTED*@end = margin ≥ 0.9 and η² by stream at KEY > 0.9 at the end, both from
+  explore_f_tasks.rand_header_routing_stats.
+- F's S68: one delta channel binds the grouped layout 2/10 at S=4 and 0/10 at S=8 (the gated Hebbian
+  recipe 19/20, 9/10). S69: a single Hebbian channel does not learn the reset at CTX (0/10 under
+  every decay). So the partition is what binds at four and eight streams; the forget gate needs
+  the delta rule.
+
+My reading of your round, which the screens below test.
+(1) REG_NUDGE on Hebbian memory had a clean latch (β^R 0.96 at CTX) and perfect routing at layers
+    2-3, and sat at 0.32 on BOTH streams in every run, so the far block's decay is not the cause.
+    ORACLE23 0/3 against ORACLE_H's bound seed 371 is one paired seed. My spec kept layer 1 on
+    LOCAL3; that choice is what S71 and S72 test.
+(2) REG_D's "discovered" was by the letter of the rule (KEY splits counted on unbound runs), not
+    its intent. The readings below use routed binding, so a key-split binding cannot count.
+(3) S57's latch ran on the memory where routing did not pay; it gets its run on delta memory.
+(4) The fixed P=8 layout let gates split by pair index (η² by index 0.6-0.74 in your baselines);
+    the lite task removes most of that, and its Hebbian oracle is not at the edge.
+(5) Your S55 probe becomes an in-run readout on every arm, so "does the stack carry the cue" is
+    answered for the delta memory too (F's one-seed observation of stream-tagged keys at layer 3).
+
+Common to S71-S73.
+- Task: RandHeaderTask-lite exactly as F's S70; run F's check_rand_header as a CHECK. Budget 24000,
+  Adam, k=2, no conv. Seeds 700-759 (if any appears in explore_out/ or results/, say so and shift the
+  block by 100).
+- Outcomes per run: BOUND (your rule); ROUTED*@end and DISCOVERED (F's, computed with
+  rand_header_routing_stats so they pair with F's baseline); ROUTED-BOUND := BOUND ∧ ROUTED*@end.
+  The readings use ROUTED-BOUND only; print your BOUND ROUTED beside it. Failure classes as before.
+- In-run probe: at the final evaluation of every arm and seed, fit the S55 probe (logistic
+  regression, held-out 20%, 2000 sequences) from the residual entering layers 2 and 3 and from the
+  final layer, at K and at V positions, to the stream; save the accuracies in the record.
+- Also save held-out accuracy by (query stream, block index of the target pair, pair index within
+  its block) at the final evaluation; report it for every arm that sits on a plateau.
+- Report as before: β^R (or the latch's z) at CTX/KEY/VAL by step, the routing margin at VAL per
+  layer, the CTX/KEY/VAL × stream contingency of g_t at every gated layer.
+- Statistics: paired by seed, exact one-sided McNemar on ROUTED-BOUND; "A beats B" means p < 0.05
+  (at 20 seeds: 5 vs 0, 7 vs 1, 9 vs 2 or better). Wilson 95% and bands with every count. Validity:
+  a family is VALID if its perfect gate binds ≥ 8/10 on seeds 700-709 (F's bound by 1200).
+- Specs and readings committed before any run; everything EXPLORATORY, not a result. Detached runs
+  with a watcher and the 10-minute commit loop; cached runs reused after a restart. About six hours
+  on four workers in all.
+
+S71 explore_g_layers (seeds 700-709): which layers must be routed. Perfect gates on Hebbian memory:
+ ORACLE_ALL (all three layers; your ORACLE_H), ORACLE_23 (perfect at layers 2-3, LOCAL3 at layer 1;
+ your ORACLE23), ORACLE_1 (perfect at layer 1, LOCAL3 at layers 2-3). On delta memory (β=1, L2 keys,
+ decay 0.95): ORACLE_ALL_D, ORACLE_23_D. 50 runs. CHECKs: each oracle is one-hot on the stream at its
+ perfect layers and LOCAL3 at the others; ORACLE_ALL equals your ORACLE_H code path. Readings (BOUND,
+ paired): "layer 1 is the block" if ORACLE_ALL beats ORACLE_23; "layer 1 is not needed" if
+ ORACLE_23 ≥ ORACLE_ALL − 1 pair; "layer 1 alone suffices" if ORACLE_1 ≥ ORACLE_ALL − 1 pair;
+ "delta tolerates an unrouted layer 1" if ORACLE_23_D ≥ ORACLE_ALL_D − 1 pair. ORACLE_ALL and
+ ORACLE_ALL_D on 700-709 are also the validity oracles of S72 and S73.
+
+S73 explore_g_register3_delta (delta memory, β=1 fixed, L2 keys, decay 0.95; seeds 700-719, the
+ 10-seed arms on 700-709): the discovery devices, on the memory where routing pays. REG3 = your S56
+ RegBDH with ONE gate shared by layers 1-3, g^(ℓ)_t = softmax(W_g tanh(A [LN(r^(ℓ)_t); window_t;
+ R_{t−1}])), A initialised so u ≈ W_in window_t at step 0 at every layer (at layer 1 r^(1) =
+ LN(embedding), kept for a uniform code path); register, SG and the SLOW groups as S56's REG.
+ Arms: BASELINE_D (LOCAL3+SLOW; F's S70_DELTA is the reference), REG3_D (no nudge), REG3_NUDGE_D
+ (the 5% labelled nudge, validity; 10 seeds), RESGATE_ONLY_D (the per-layer residual gate without
+ the register, at all three layers; 10 seeds: can the gate read the stream tag the delta memory
+ writes into its own keys?), LATCH3_D (S57's HM-RNN latch, slope annealing 1→5, no prior, feeding
+ the gate at all three layers; 10 seeds), LATCH3_NUDGE_D (10 seeds), SINGLE_D (k=1 delta channel,
+ fixed decay, no gate, F's single-channel path as in S53/S68; 10 seeds: is the gate needed on this
+ task). 90 runs. No forget gate anywhere: with two blocks per stream, clearing at a CTX token
+ erases that stream's earlier block. CHECKs: S56's 12 and S57's latch checks at layer 1 (causality,
+ dead-STE guard); REG3 with the layer-1 path disabled equals your S56 code path bit for bit on a
+ recorded run through 2400; with every new path disabled equals LOCAL3; delta β=0 equals Hebbian;
+ SINGLE_D equals F's single-channel path.
+ Readings (ROUTED-BOUND, paired on the shared seeds):
+   "the register carries the cue" if REG3_NUDGE_D ≥ 9/10;
+   "discovered (register)" if REG3_D beats BASELINE_D;
+   "discovered (residual gate)" if RESGATE_ONLY_D beats BASELINE_D;
+   "discovered (latch)" if LATCH3_D beats BASELINE_D;
+   "the latch holds on delta memory" if LATCH3_NUDGE_D's z at the end is ≥ 0.9 at CTX and ≤ 0.1 at
+     KEY and at VAL on ≥ 8/10 runs;
+   "the delta stack carries the cue" if BASELINE_D's probe at the residual entering layer 3 is
+     ≥ 0.9 at K and at V on ≥ 10/20 runs (descriptive: the same for every arm, and whether the
+     runs whose probe reads the stream are the ones that route);
+   "the gate is not needed on this task" if SINGLE_D BOUND ≥ 8/10 (descriptive; print
+     write_order_acc).
+
+S72 explore_g_register3 (Hebbian memory; seeds 700-719): the register gate at all three layers,
+ on the main line's memory. Arms: BASELINE (LOCAL3+SLOW; F's S70_HEBB is the reference), REG3 (no
+ nudge, SG), REG3_NUDGE (validity). 60 runs. CHECKs as S73's, on the Hebbian path. Readings
+ (ROUTED-BOUND): "the register carries the cue at all three layers" if REG3_NUDGE ≥ 17/20;
+ "architecture insufficient" if REG3_NUDGE < 12/20 (then: does the per-(stream, block, pair)
+ accuracy pattern match S56's 0.32 plateau?); "discovered" if REG3 beats BASELINE; "not
+ discovered" otherwise.
+
+Order: S71 → S73 → S72. Push after each. One report after S71 (one page), one after S73+S72
+(counts table first, under three pages), and a "Session G follow-up" section in
+explore_out/README.md.
+```
