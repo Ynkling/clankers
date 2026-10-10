@@ -129,8 +129,9 @@ GPU with a stated efficiency bracket. K9 measures the real numbers.
 | memory per run incl. 15% slack; runs that fit | 0.6–1.5 GB; 3 (REG3) to 8 | 0.6–1.5 GB; 4 (REG3) to 11 |
 
 Shared as in (b), S75 at S = 4 takes about 6.4–9.5 h of wall time; on one CPU thread a single run takes about 15 h. The
-evaluation statistics take about 90 s of one CPU core per evaluation of a run. They run in 3 worker processes beside the
-training and keep up, since a run is evaluated every 1200 updates (≥ 38 s of GPU time).
+evaluation statistics, mostly the probe, take 40–90 s of one CPU core per evaluation of a run (here, depending on load).
+They run in 3 worker processes beside the training and keep up, since a run is evaluated every 1200 updates (≥ 38 s of
+GPU time).
 
 **Files:**
 - `device.py`, `batched.py`, `run.py`: the runner.

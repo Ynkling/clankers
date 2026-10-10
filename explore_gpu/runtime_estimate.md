@@ -6,10 +6,10 @@ Configuration: ICMC S=4 V=4 NB=16 block words 6..14 M=176 words/source L=768; B 
 
 | arm | GFLOP | GB moved | kernel launches | peak memory GB (update) | eval chunk GB | saved activations GB | CPU s/update |
 |---|---|---|---|---|---|---|---|
-| ORACLE | 108.8 | 8.60 | 374 | 0.60 | 0.35 | 0.56 | 2.25 |
-| SINGLE | 108.7 | 7.24 | 341 | 0.53 | 0.28 | 0.49 | 2.12 |
-| WIDE_SPLIT | 109.4 | 10.77 | 558 | 0.89 | 0.34 | 0.79 | 2.71 |
-| REG3 | 112.8 | 12.47 | 698 | 1.28 | 0.42 | 1.18 | 3.42 |
+| ORACLE | 108.8 | 8.60 | 374 | 0.60 | 0.35 | 0.56 | 2.22 |
+| SINGLE | 108.7 | 7.24 | 341 | 0.53 | 0.28 | 0.49 | 2.00 |
+| WIDE_SPLIT | 109.4 | 10.77 | 558 | 0.89 | 0.34 | 0.79 | 2.58 |
+| REG3 | 112.8 | 12.47 | 698 | 1.28 | 0.42 | 1.18 | 3.58 |
 
 ## Estimated GPU time per update and memory
 
@@ -28,11 +28,15 @@ Memory per run: the update's peak (parameters, gradients, Adam state and the upd
 
 ## Evaluation
 
-The CPU part of one evaluation (explore_gpu.run.eval_cpu_part: routing on 256 sequences with the float64 margin, the probe's four logistic regressions, SET accuracy) took 88 s (WIDE_SPLIT) and 90 s (REG3) here, 1 thread. On the GPU path it runs in --stats-workers CPU processes (default 3) while training continues: one evaluation per run every 1200 updates, i.e. every 38 s or more per run, so three workers keep up (the probe needs 90 s / 3 workers). The evaluation forwards (1024 + 256 + 256 sequences, forward only, ~1/3 of an update per 32 sequences) cost ~16 updates' worth of GPU time per evaluation: 20 evaluations add ~1.3% to a run.
+The CPU part of one evaluation (explore_gpu.run.eval_cpu_part: routing on 256 sequences with the float64 margin, the probe's four logistic regressions, SET accuracy) took 37 s (WIDE_SPLIT) and 47 s (REG3) of one CPU core here (this container's Xeon at 2.1 GHz, shared with other jobs). On the GPU path it runs in --stats-workers CPU processes (default 3) while training continues. A run is evaluated every 1200 updates, i.e. every 38 s or more of GPU time per run (R stacked runs: R evaluations every R times as long), so the workers keep up while 47 s / workers < 38 s: three workers do; on a slower CPU, add one. The evaluation forwards (1024 + 256 + 256 sequences, forward only, ~1/3 of an update per 32 sequences) cost ~16 updates' worth of GPU time per evaluation: 20 evaluations add ~1.3% to a run.
 
 ## S75 at S = 4, all 32 runs
 
-- **GTX 1660 SUPER (6 GB)**: 14 - 20 GPU hours of training (+1.3% for the evaluation forwards; the evaluation statistics run on the CPU alongside). Stacking R runs costs about the same GPU time per run (L = 768 already fills the GPU); it hides Python and launch overhead.
-- **RTX 3070 Laptop (8 GB)**: 9 - 13 GPU hours of training (+1.3% for the evaluation forwards; the evaluation statistics run on the CPU alongside). Stacking R runs costs about the same GPU time per run (L = 768 already fills the GPU); it hides Python and launch overhead.
+- **GTX 1660 SUPER (6 GB)** alone: 14 - 21 GPU hours (training, plus 1.3% for the evaluation forwards; the evaluation statistics run on the CPU alongside).
+- **RTX 3070 Laptop (8 GB)** alone: 9 - 13 GPU hours (training, plus 1.3% for the evaluation forwards; the evaluation statistics run on the CPU alongside).
+- Both, by arms (README (b)): the 8 GB laptop `--arms WIDE_SPLIT,REG3`, the 6 GB server `--arms ORACLE,SINGLE`: 6.4 - 9.5 h on the RTX 3070 Laptop (8 GB)
+  and 4.3 - 6.4 h on the GTX 1660 SUPER (6 GB), at the same time.
+
+Stacking R runs costs about the same GPU time per run (L = 768 already fills the GPU); it hides Python and launch overhead (~341-698 launches per update, a few ms of 32+ ms). explore_gpu/s75_s4.py's default --runs-per-batch is half the smallest R that fits above, rounded down, for margin (a display on the GPU, fragmentation beyond 15%, cuBLAS workspaces): 1 on the GTX 1660 SUPER (6 GB) (R fits 3), 2 on the RTX 3070 Laptop (8 GB) (R fits 4).
 
 Caveats: the bracket is wide because consumer-GPU SGEMM efficiency on these shapes (batched 767 x 767 x 256 GEMMs) and the eager-mode launch overhead are not known here; the peak-memory column counts live tensor bytes (the CUDA caching allocator adds block rounding and fragmentation, taken as 15%); K9 on the GPU replaces all of this with measurements in a minute.
