@@ -100,3 +100,9 @@ EXPLORATORY, NOT A RESULT — session H: H/guard
   [ 26]  200.7 min  H/guard          GUARD_INT1200            seed 2305  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger GUARD_INT1200)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9d390f5, code 708d5adde607, attempt 1: acc 0.997  trans 15600  outcome BOUND ROUTED; map [6, 0, 15, 9, 2, 13, 1, 10]; None fired at [13200]
   start  200.7 min  H/guard          GUARD_INT1200            seed 2309  (projected worst case 720 min)
+  [ 27]  223.9 min  H/guard          GUARD_INT1200            seed 2309  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger GUARD_INT1200)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 2dd264c, code 708d5adde607, attempt 1: acc 1.000  trans 16800  outcome BOUND ROUTED; map [5, 1, 13, 9, 15, 8, 14, 12]; None fired at [9600, 12000, 15600]
+  start  223.9 min  H/guard          EVAL                     seed 2300  (projected worst case 720 min)
+  [ 28]  226.0 min  H/guard          GUARD_INT1200            seed 2307  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger GUARD_INT1200)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 2dd264c+dirty, code 708d5adde607, attempt 1: acc 1.000  trans 27600  outcome BOUND ROUTED; map [4, 13, 3, 15, 14, 6, 5, 9]; None fired at [19200, 22800, 25200]
+  start  226.0 min  H/guard          EVAL                     seed 2301  (projected worst case 720 min)
