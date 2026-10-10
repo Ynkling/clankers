@@ -165,3 +165,8 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   S82 best device (phase 2): {'device': 'REG3_KEYHINGE', 'routed_bound': 20, 'key_failures': 0, 'table': {'REG3_KEYHINGE': [20, 0], 'REG3_SLOWGATE': [0, 18], 'REG3_NOWIN': [5, 12]}, 'time': '2026-10-10 22:00:26 UTC'}
   s82_devices: code SHA 1ec70589520b (32 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
   32 runs queued on 4 workers
+  [  1/32]    1.4 min  ORACLE_ALL_D seed 2101  acc 1.000 trans  1200 ROUTED-BOUND
+  [  2/32]    1.5 min  ORACLE_ALL_D seed 2100  acc 1.000 trans  1200 ROUTED-BOUND
+  [  3/32]    2.4 min  BASELINE_D   seed 2100  acc 0.995 trans  3600 BOUND unrouted
+  [  4/32]    3.0 min  REG3_D       seed 2100  acc 1.000 trans  3600 BOUND unrouted
+  [  5/32]    3.8 min  REG3_KEYHINGE_D seed 2100  acc 1.000 trans  2400 ROUTED-BOUND
