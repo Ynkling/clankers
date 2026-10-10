@@ -238,3 +238,34 @@ EXPLORATORY, NOT A RESULT — session H: H/two
   [ 71]   39.7 min  H/two            K4                       seed 1312  lr 0.001  (LOCAL3 + SLOW, k=4)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 82385fa+dirty, code 5af849d1455f, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [3, 2]
   start   39.7 min  H/two            K4                       seed 1314  (projected worst case 400 min)
+  [ 72]   41.3 min  H/two            K4                       seed 1314  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185, code 5af849d1455f, attempt 1: acc 1.000  trans  3600  outcome BOUND ROUTED; map [3, 2]
+  start   41.3 min  H/two            K4                       seed 1315  (projected worst case 400 min)
+  [ 73]   41.4 min  H/two            K4                       seed 1306  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 0.870  trans  None  outcome STREAM-PARTIAL one-to-one; map [0, 3]
+  start   41.4 min  H/two            K4                       seed 1316  (projected worst case 400 min)
+  [ 74]   42.6 min  H/two            K4                       seed 1315  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 1.000  trans  2400  outcome BOUND ROUTED; map [0, 2]
+  start   42.6 min  H/two            K4                       seed 1317  (projected worst case 400 min)
+  [ 75]   42.7 min  H/two            K4                       seed 1316  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 1.000  trans  2400  outcome BOUND ROUTED; map [0, 1]
+  start   42.7 min  H/two            K4                       seed 1318  (projected worst case 400 min)
+  [ 76]   44.2 min  H/two            K4                       seed 1310  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 0.884  trans  None  outcome STREAM-PARTIAL one-to-one; map [0, 1]
+  start   44.2 min  H/two            K4                       seed 1319  (projected worst case 400 min)
+  [ 77]   45.5 min  H/two            K4                       seed 1319  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 1.000  trans  2400  outcome BOUND ROUTED; map [2, 0]
+  start   45.5 min  H/two            ORACLE                   seed 1300  (projected worst case 400 min)
+  [ 78]   45.5 min  H/two            K4                       seed 1313  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 0.512  trans  None  outcome non-stream KEY; map [0, 0]
+  start   45.5 min  H/two            ORACLE                   seed 1301  (projected worst case 400 min)
+  [ 79]   46.4 min  H/two            ORACLE                   seed 1300  lr 0.001  (one Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 1.000  trans  1200  outcome None
+  [ 80]   46.4 min  H/two            ORACLE                   seed 1301  lr 0.001  (one Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 1.000  trans  1200  outcome None
+  [ 81]   48.9 min  H/two            K4                       seed 1317  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 0.513  trans  None  outcome non-stream KEY; map [2, 2]
+  [ 82]   48.9 min  H/two            K4                       seed 1318  lr 0.001  (LOCAL3 + SLOW, k=4)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5602185+dirty, code 5af849d1455f, attempt 1: acc 0.877  trans  None  outcome STREAM-PARTIAL one-to-one; map [3, 1]
+  wall clock 48.9 min
+  H/two: readings {'R1': 'does not apply (SPLIT2 vs REF 1 vs 0, one-sided p = 0.5)', 'R2': 'does not apply (SPLIT2_NOISE vs SPLIT2 1 vs 0)', 'R3': 'does not apply (K4 vs SPLIT2 2 vs 3)', 'R4': 'neither device (SPLIT2 vs REF 1 vs 0, p = 0.5; SPLIT2_NOISE vs REF 2 vs 0, p = 0.25; K4 vs REF 3 vs 3, p = 0.656)'}; complete True; valid True
