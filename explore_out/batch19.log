@@ -6854,3 +6854,6 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   start    0.0 min  capacity     P16_D128       seed 270  (resuming from its checkpoint at step 2400)  (projected worst case 433 min)
   start    0.0 min  capacity     P16_D128       seed 271  (resuming from its checkpoint at step 2400)  (projected worst case 433 min)
   start    0.0 min  capacity     P16_D128       seed 272  (resuming from its checkpoint at step 1200)  (projected worst case 433 min)
+  [  1]   29.7 min  capacity     P8_N256        seed 277  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git e280ac7, code 17e56410a1db, attempt 1, resumed at [24000]: acc 0.984  trans 37200  stop 39600  outcome BOUND ROUTED
+  start   29.7 min  capacity     P16_D128       seed 273  (projected worst case 433 min)
