@@ -229,3 +229,82 @@ Perfect gates first, then longest first. Runs go through `longrun.py` and are ca
    dominated by streams 7, 5 and 4, and a 64-query probe can read >= 0.95 while the held-out accuracy is lower
    (Session R). The trigger is kept as specified; the counts are printed.
 5. **Power.** 40 pairs pooled. D1's margin of 2 discordant pairs is a bound on the difference, not a test.
+
+## Amendment 1 (2026-10-10, after Referee V's review, before any run of an arm)
+
+Source: docs/review_2026-10/spec_review_test_delta_recipe.md (claude/review-V at fad1489; copied to the main line
+byte for byte with this amendment). The user chose two of the resolutions below: add HEBB_SLOW with a no-room rule,
+and rename D1's readings with a printed interval rather than add seeds. Every other item takes the review's own fix.
+Where this amendment and the draft above differ, this amendment holds.
+
+**Arms.** Add **HEBB_SLOW**: HEBB + the recipe, no trigger (test_window_gate's WIN3_SLOW_D8 on these seeds), 20 seeds
+per machine, part HEBB. The split's effect is then measured on both writes on the same seeds. Arms: HEBB_SPLIT,
+HEBB_SLOW, DELTA_SPLIT, DELTA_SLOW, CEIL_HEBB, CEIL_DELTA.
+
+**Claims.**
+- **D1** (computed as before: d = HEBB_SPLIT only − DELTA_SPLIT only, pooled) is reported with one of three labels,
+  none of them "interchangeable":
+  - d <= −3: "delta binds more often";
+  - −2 <= d <= 2: "delta not shown worse by more than 2 pairs";
+  - d >= 3: "delta not shown non-inferior".
+  - Printed beside d: the paired difference of BOUND ROUTED rates (DELTA_SPLIT − HEBB_SPLIT) with a 95% interval
+    (Newcombe's hybrid score interval for paired proportions, 1998 method 10).
+  - Also printed, quoted from the review: P(d <= 2) at 40 pairs with HEBB_SPLIT at 0.95 is 0.29 / 0.22
+    (independent / nested outcomes) when DELTA_SPLIT is 0.85, and 0.11 / 0.05 when it is 0.80. The label is a bound,
+    not a non-inferiority test.
+  - Per machine: the rate difference and its interval only, no label.
+- **D2** DELTA_SPLIT beats DELTA_SLOW (exact one-sided McNemar, SHOWN if p < 0.05).
+- **D4** (new) HEBB_SPLIT beats HEBB_SLOW (exact one-sided McNemar, SHOWN if p < 0.05).
+- **No-room rule.** If a write's no-trigger arm binds routed on >= 36 of the pooled 40 seeds, that write's split claim
+  (D2 for delta, D4 for Hebbian) is "NO ROOM": printed, not read.
+- **D3** unchanged (secondary; population: both split arms BOUND ROUTED).
+- Validity: D1, D3 use HEBB and DELTA; D2 uses DELTA; D4 uses HEBB.
+
+**Readings** (pooled only; each is printed as two parts):
+- The memory rule: D1's label (above).
+- The split, per write W (delta: D2, DELTA_SLOW; Hebbian: D4, HEBB_SLOW):
+  - "helps" if its claim is SHOWN;
+  - "no room" if W_SLOW binds routed on >= 36/40;
+  - "not shown" otherwise.
+- Named combinations of the two split labels:
+
+  | delta | Hebbian | reading |
+  |---|---|---|
+  | helps | helps | "the split helps on both writes" |
+  | not shown | helps | "the split is Hebbian-specific" |
+  | helps | not shown | "the split helps on delta" |
+  | not shown | not shown | "the split's effect is not shown on either write" |
+  | no room on either write | | that write's label only |
+
+- A claim that is UNTESTED (a part not VALID) gives no label.
+
+**Outcome definitions.**
+- The stream -> channel map (`test_scale_axes.routing_k`) takes, for each stream, the argmax of its mean read-gate mass
+  at the body's value positions, on unrounded values (torch.argmax: ties go to the lowest channel index).
+- The trigger's label uses the same function on the same probe (`probe_batch(task, seed)`) as the end outcome, at the
+  check.
+- The stored `stream_gate` is rounded to 4 decimals; the overlap is computed from it, as the referee's was.
+- The overlap function is copied into the test. CHECK 172 shows it gives the referee's values: it compares with
+  `overlap` in docs/review_2026-10/recompute.py at 0fdb363 (extracted from that commit and run) on every
+  WIN3_SPLIT_D8 record of this machine's test_window_gate file.
+
+**CHECKs** (changes and additions):
+- **161** tolerance: 1e-7 on the perfect-gate model, 1e-6 on the LOCAL3 model (7x the measured 1.49e-7); impl "hebb"
+  bit-identical on both.
+- **173** (new, CPU-independent) the arms' own memory: at β = 1 with L2 keys, the fused form (impl "fast", which the arms
+  run) against the parallel form, on the LOCAL3 and the perfect-gate models (seed 580, 16 training sequences). Logits to
+  1e-5 relative and every parameter gradient to 1e-4 relative (F's tolerances). Asserted on every machine.
+- **158** is asserted only where this machine's CPU equals the CPU that wrote the record. X's test_window_gate file was
+  written on a Xeon @ 2.80GHz and this container is a Xeon @ 2.10GHz, so on X it is printed, not asserted. On L it is
+  asserted if L runs this test on the i7 that wrote L's file.
+- **164** also runs HEBB_SLOW: HEBB_SPLIT at threshold 0 = HEBB_SLOW = test_window_gate's WIN3_SLOW_D8 (seed 1, 6000).
+- **174** (new, in the report) for every seed, each split arm's curve equals its no-trigger arm's curve on the same seed
+  through the split arm's first firing (the whole run if it never fired). Pairs: DELTA_SPLIT with DELTA_SLOW,
+  HEBB_SPLIT with HEBB_SLOW. Printed PASS or FAIL with the failing seeds; McNemar's pairing rests on it.
+- **Probe-blind checks** (printed, in the report):
+  - For every trigger check of every split arm: the probe accuracy beside the held-out accuracy at the same update.
+  - The count of checks where the probe read >= 0.95 (so the rule could not fire) while the held-out accuracy was < 0.95.
+- 172, 173 and 174 are numbered after 171.
+
+**Runtime.** Unchanged rule. The review computes DELTA_SPLIT at 2.2x HEBB_SPLIT per step from F's recorded secs/iters;
+the projection measures it before the first run and prints the ratio.
