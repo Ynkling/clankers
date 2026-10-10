@@ -325,6 +325,7 @@ Next:
   - Every Phase III–VI test first runs its inherited verification chain and its own numbered CHECKs, then prints a runtime projection, then trains.
   - Phase VI's tests are `test_muon_recipe.py` and `test_window_gate.py`; Phase V's are `test_stream_recipe.py`, `test_stream_curriculum.py`, `test_slow_start.py`, `test_recipe_scope.py` and `test_early_recipe.py`.
   - Tests from Phases I–II (for example `test_interference*.py`, `test_asymmetric_routing.py`, `test_instrument_v2.py`) and earlier modules (`bdh_multichannel.py`, `bdh_mc.py`, `bdh_recurrent.py`) are kept for the record.
+- **`longrun.py`:** the detached run, its watcher and the resume and projection helpers (below). **`fail_class_v2.py`:** the failure classes with the key rule ahead of the margin rule, used by new tests; `docs/fail_class_v2.md` reclassifies the recorded two-stream runs (no recorded verdict changes).
 - **`specs/`:** each Phase VI test's specification, committed before the test was written (and amended, with the amendment dated, before any affected run).
 - **`results/X/`, `results/L/`:** copies of each machine's result JSON files, with `results/README.md` recording each file's machine, commit and start time. Results files are gitignored where they are written. Both machines' files for every Phase V and VI test are recorded.
 - **`multichannel_hebbian_report_v8.pdf`** and **`multichannel_hebbian_report_v8.tex`:** Revision 8 of the technical report, which this README follows. `multichannel_hebbian_report_v7.pdf`, `multichannel_hebbian_report.pdf` and `multichannel_hebbian_report_v2.pdf` are earlier revisions.
@@ -348,13 +349,17 @@ python3 -u test_window_gate.py --machine L --report --also results/X/window_gate
 
 **Tests that pair with earlier recorded runs** read *this machine's* own earlier results files: by default from the working directory, or from flags such as `--early`, `--slow`, `--recipe` or `--short`. Before pairing, they reproduce a recorded run from each file bit for bit. If a file does not reproduce, the test stops before training, or reports the paired claims as UNTESTED.
 
-Training is deterministic for a given processor, kernel path and thread count; workers run one thread each. To detach a long run from the terminal:
+Training is deterministic for a given processor, kernel path and thread count; workers run one thread each.
+
+**Long runs** (`longrun.py`). Long runs in cloud containers have been lost to container restarts. `longrun.py start` launches the test detached (its own session, stdin closed, output appended to `longrun/<name>.log`, gitignored) and records each start's process, boot id and commit. `longrun.py watch --resume` prints the new log lines and the results file's record count for up to a few minutes. It relaunches the same command when the run has stopped without an exit code (a container restart or a kill), and the test then resumes from its cached records. A run that exits with an error is reported, not relaunched. Tests resume the way `test_window_gate`'s Part D did: runs already in the results file are skipped, and the meta keeps the first start's commit and time with every later start listed under `starts` (`longrun.resume_meta`). Each test prints its runtime projection, of all runs and of the runs still to do, before the first run (`longrun.projection`).
 
 ```bash
-setsid nohup python3 -u test_window_gate.py --machine L --workers 6 > window_gate.log 2>&1 &
+python3 longrun.py start window_gate_L --results window_gate_results.json --total 231 -- \
+    python3 -u test_window_gate.py --machine L --workers 6
+python3 longrun.py watch window_gate_L --minutes 9 --resume    # repeat until FINISHED
 ```
 
-Long runs in cloud containers have been lost to container restarts; keep a watcher that commits and pushes progress at short intervals, and resume from the cached results file.
+Without `longrun.py`, `setsid nohup python3 -u test_window_gate.py --machine L --workers 6 > window_gate.log 2>&1 &` detaches a run, and rerunning the same command resumes it.
 
 ## Provenance
 
