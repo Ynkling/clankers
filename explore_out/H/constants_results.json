@@ -1,0 +1,144 @@
+{
+ "meta": {
+  "arms": {
+   "BASE": {
+    "iters": 43200,
+    "label": "BASE",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + copy trigger BASE",
+    "seeds": [
+     1320,
+     1321,
+     1322,
+     1323,
+     1324,
+     1325,
+     1326,
+     1327,
+     1328,
+     1329
+    ]
+   },
+   "CAP1": {
+    "iters": 43200,
+    "label": "CAP1",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + copy trigger CAP1",
+    "seeds": [
+     1320,
+     1321,
+     1322,
+     1323,
+     1324,
+     1325,
+     1326,
+     1327,
+     1328,
+     1329
+    ]
+   },
+   "CAP6": {
+    "iters": 43200,
+    "label": "CAP6",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + copy trigger CAP6",
+    "seeds": [
+     1320,
+     1321,
+     1322,
+     1323,
+     1324,
+     1325,
+     1326,
+     1327,
+     1328,
+     1329
+    ]
+   },
+   "INT1200": {
+    "iters": 43200,
+    "label": "INT1200",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + copy trigger INT1200",
+    "seeds": [
+     1320,
+     1321,
+     1322,
+     1323,
+     1324,
+     1325,
+     1326,
+     1327,
+     1328,
+     1329
+    ]
+   },
+   "ORACLE": {
+    "iters": 43200,
+    "label": "perfect gate ceil8_D8",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3",
+    "seeds": [
+     1320,
+     1321
+    ]
+   },
+   "PROBE16": {
+    "iters": 43200,
+    "label": "PROBE16",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + copy trigger PROBE16",
+    "seeds": [
+     1320,
+     1321,
+     1322,
+     1323,
+     1324,
+     1325,
+     1326,
+     1327,
+     1328,
+     1329
+    ]
+   },
+   "THR05": {
+    "iters": 43200,
+    "label": "THR05",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + copy trigger THR05",
+    "seeds": [
+     1320,
+     1321,
+     1322,
+     1323,
+     1324,
+     1325,
+     1326,
+     1327,
+     1328,
+     1329
+    ]
+   }
+  },
+  "code_shas": [
+   "39143d0c9c2e9744d85b835429fd07e02eb974bd"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "72f0bbc",
+   "python": "3.13.16",
+   "started": "2026-10-10 05:01:28",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
