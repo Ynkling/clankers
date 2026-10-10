@@ -5210,3 +5210,6 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   [  2]   24.8 min  capacity     P16_N256       seed 271  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 95be8cd, code 17e56410a1db, attempt 1, resumed at [37200]: acc 0.114  trans  None  stop 43200  outcome MERGED (2 share)
   start   24.8 min  capacity     P16_N256       seed 275  (projected worst case 251 min)
+  [  3]   29.8 min  capacity     P16_N256       seed 272  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git c74d939, code 17e56410a1db, attempt 1, resumed at [36000]: acc 0.140  trans  None  stop 43200  outcome STREAM-PARTIAL one-to-one
+  start   29.8 min  capacity     P16_N256       seed 276  (projected worst case 251 min)
