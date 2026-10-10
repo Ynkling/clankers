@@ -27,6 +27,7 @@ Commit = the git head each run was started from (its `meta.git`); date = its `me
 | X/early_recipe_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 9f25dc8 | 2026-10-04 06:26 |
 | X/muon_recipe_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 74f5907 | 2026-10-06 06:19 |
 | X/window_gate_results.json | X: Intel(R) Xeon(R) Processor @ 2.80GHz | 886a668 (first start 2f98f06: its six perfect-gate runs kept) | 2026-10-07 23:30 |
+| L/channel_binding_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 93b227c (rerun at 886a668 on 2026-10-10; the test's code is unchanged between the two, only its docstring) | 2026-10-10 10:28 |
 | L/router_discovery_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 4422dc4 (run at a9b3112) | 2026-09-25 12:42 |
 | L/router_confirm_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 2271b55 (run at 5ba7c1d) | 2026-09-25 22:31 |
 | L/router_curriculum_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 1604209 (run at 5ba7c1d) | 2026-09-26 07:27 |
@@ -48,4 +49,4 @@ Commit = the git head each run was started from (its `meta.git`); date = its `me
 | L/muon_recipe_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 74f5907 | 2026-10-05 23:08 |
 | L/window_gate_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 886a668 | 2026-10-08 11:33 |
 
-X's `meta.started` times are UTC; L's are the laptop's local time (UTC−6). L's Phase III–IV files were committed on 10 October from the laptop's working copies (the test scripts write them next to themselves, gitignored); `L/channel_binding_results.json` is being rerun and will follow. A 5 October commit on the side branch `claude/bdh-repo-curl-obgdqk` (`664729f`) had placed copies of X's files under `results/L/`; those were not L's and were replaced.
+X's `meta.started` times are UTC; L's are the laptop's local time (UTC−6). L's Phase III–IV files were committed on 10 October from the laptop's working copies (the test scripts write them next to themselves, gitignored); L's original `channel_binding` file could not be found, so the test was rerun on L on 10 October (torch 2.14.1; the earlier L files are torch 2.14.0) and that record is the one committed. A 5 October commit on the side branch `claude/bdh-repo-curl-obgdqk` (`664729f`) had placed copies of X's files under `results/L/`; those were not L's and were replaced.
