@@ -162,7 +162,6 @@ def check():
     eq, c = upto(res["REF160"], rec160, 2400)
     rows.append((f"REF|160 equals S43's recorded LOCAL3_SLOW|160 ({rec160.get('cpu')}) bit for bit through 2400 (curve {c})", eq))
     eq, c = upto(res["K4_160"], k4rec, 2400, decode=False)
-    gn = res["K4_160"].get("grad") == [g for g in (k4rec.get("grad") or []) if g[0] <= 2400] if k4rec.get("grad") else True
     rows.append((f"K4|160 (the copied W2_K4 code) equals S52's recorded W2_K4|160 (claude/outside-ideas, {k4rec.get('cpu')}) bit for "
                  f"bit through 2400 (curve {c}; statistics)", eq))
     r2, r0 = res["SPLIT2_1300"], res["REF1300"]
