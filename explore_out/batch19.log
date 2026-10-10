@@ -6710,3 +6710,6 @@ EXPLORATORY, NOT A RESULT — batch 19: scale_width (S64), scale_depth (S65), sc
   [  2]   13.4 min  capacity     P8_N256        seed 273  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git dc6ac75, code 17e56410a1db, attempt 1, resumed at [6000]: acc 0.985  trans 10800  stop 13200  outcome BOUND ROUTED
   start   13.4 min  capacity     P8_N256        seed 276  (projected worst case 90 min)
+  [  3]   27.1 min  capacity     P8_N256        seed 275  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 70b4487, code 17e56410a1db, attempt 1: acc 0.994  trans  6000  stop 8400  outcome BOUND ROUTED
+  start   27.1 min  capacity     P8_N256        seed 277  (projected worst case 90 min)
