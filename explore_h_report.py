@@ -358,6 +358,42 @@ def s85_section(L):
     return m
 
 
+def s86_section(L):
+    import explore_h_allmass as m
+    setup([m])
+    res, got = m.report()
+    A = res["arms"]
+    L.append("## S86 explore_h_allmass — S=8, P=4, k=16, conv, 43200, LOCAL3 + SLOW + exact-copy split, Hebbian, seeds 2330-2339\n")
+    with open(os.path.join(OUT, "allmass_counts.txt")) as f:
+        L.append("**First, the main line's 50 split runs** (explore_h_allmass_counts.py, committed before the screen):\n")
+        L.append("```\n" + f.read().rstrip() + "\n```\n")
+    L.append("| arm | BOUND ROUTED | band | Wilson 95% | failures v1 | failures v2 | transition median (all) | splits | key-label ok | "
+             "all-label ok | own pair ok | pairs equal | accuracy read at the splits |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for a in ("BASE", "ALLMASS", "EVAL"):
+        x = A[a]
+        L.append(f"| {a} | {x['br']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | {cls_str(x['v1'])} | {cls_str(x['v2'])} | "
+                 f"{fmt_t(x['trans_med'])} ({', '.join(str(t) for t in x['trans'])}) | {x['ops']} | {x['key_ok']}/{x['ops']} | "
+                 f"{x['all_ok']}/{x['ops']} | {x['op_ok']}/{x['ops']} | {x['same']}/{x['ops']} | {', '.join(str(v) for v in x['fire_acc'])} |")
+    o = res["oracle"]
+    L.append(f"\nORACLE (ceil8_D8, seeds 2330-2331): bound {o['bound']}/{o['n']}, transitions {o['transitions']} → "
+             f"{'VALID' if o['valid'] else 'UNTESTED'}.\n")
+    for v, c in res["cmp"].items():
+        L.append(f"- {v} vs BASE: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {v} only {c['b']}, BASE only {c['c']}; p({v}>BASE) "
+                 f"{c['p']:.3g}, p(BASE>{v}) {c['p_rev']:.3g}")
+    pe = res["pooled_eval"]
+    L.append(f"- (descriptive) EVAL vs BASE pooled over S84 and S86: {pe['x']}/{pe['n']} vs {pe['y']}/{pe['n']}; EVAL only {pe['b']}, BASE "
+             f"only {pe['c']}; p(EVAL>BASE) {pe['p']:.3g}, p(BASE>EVAL) {pe['p_rev']:.3g}")
+    L.append("\n**Readings (fixed in explore_h_allmass' docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    bad = A["ALLMASS"]["bad_fires"]
+    L.append(f"\nALLMASS firings whose own (all-position) pair was not a labelled target (seed, update, key c*->c0, all c*->c0, "
+             f"key_ok, all_ok): {bad or 'none'}.")
+    L.append("v1/v2 outcome differences: " + ("; ".join(f"{a} {A[a]['v1v2_differ']}" for a in A if A[a]['v1v2_differ']) or "none") + ".")
+    return m
+
+
 def write(n, body, notes):
     p = os.path.join(OUT, f"report_{n}.md")
     with open(p, "w") as f:
@@ -369,7 +405,7 @@ def write(n, body, notes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7))
+    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8))
     ap.add_argument("--notes", default=None)
     args = ap.parse_args()
     notes = open(args.notes).read() if args.notes else ""
@@ -381,8 +417,8 @@ def main():
         c = checks_line(s58.NAME)
         L.append(f"\n**Runtime:** {nr} runs, {h:.1f} CPU-hours (1 thread each, 4 workers) on {', '.join(cpus)}; code SHA {', '.join(shas)}.")
         L.append(f"**CHECKs:** all passed ({c['time']}, git {c['git']}, {c['minutes']:.1f} min); see explore_out/H/s58.log.")
-    elif args.batch in (4, 5, 6, 7):
-        m = {4: s78_section, 5: s79_section, 6: s84_section, 7: s85_section}[args.batch](L)
+    elif args.batch in (4, 5, 6, 7, 8):
+        m = {4: s78_section, 5: s79_section, 6: s84_section, 7: s85_section, 8: s86_section}[args.batch](L)
         nr, h, cpus, shas = runtime(m)
         c = checks_line(m.NAME)
         L.append(f"\n**Runtime:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}. **CHECKs:** "
