@@ -674,3 +674,21 @@ the register's write at CTX separates (β^R 0.32 vs 0.19-0.21 by update 2400). 1
 
 Handed back as promising for a pre-registered main-line test (report 5 gives a proposed design): REG3_KEYHINGE, with a
 LOCAL3 + hinge control that this screen did not run. Not: the slow gate.
+
+## Session G — S83 (what the hinge must read; the register; the window)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. RandHeaderTask-lite, Hebbian, 24000, SLOW, seeds 2100-2119, paired
+with S82's records (all six reference arms reproduced bit for bit through 2400). Report `G/report_6.md`; main-line spec
+draft `G/spec_draft_register.md` (seeds X 600-619, L 1600-1619, checked free on every branch).
+
+| arm (what its term reads) | ROUTED-BOUND | vs BASELINE (0/20) | vs REG3_KEYHINGE (20/20) | reading |
+|---|---|---|---|---|
+| LOCAL3_KEYHINGE (key positions + identities, no register) | 0/20 | 0 / 0 | 0 / 20 | "the register is needed" |
+| REG3_KEYHINGE_POS (KL from uniform at key positions) | 1/20 | 1 / 0 | 0 / 19 | "the identity term is needed" |
+| REG3_FLAT (KL at every body position) | 0/20 | 0 / 0 | 0 / 20 | "no structure need be read" does not apply |
+| REG3_KEYHINGE_1200 (key term, updates 1-1200) | 18/20 | 18 / 0, discovered | 0 / 2 | "the short window suffices" does not apply (one pair short) |
+
+The KL terms hold the gate at exactly uniform for their window (value 0.0000 from update 300; β^R stuck at 0.10), so the
+register learns no write. The key term removes only key-structured variation, and the write at CTX separates while it is
+on. No arm of (1)-(2) was discovered, so the delta phase did not run. Handed back: the main-line spec draft for
+REG3_KEYHINGE with LOCAL3_KEYHINGE and REG3 as controls.
