@@ -6,7 +6,7 @@
 - `55dac50`, 15:36:08 UTC: `specs/test_delta_recipe.md`, "Amendment 2 (during X's run; report rules only)".
 - `2225f00`, 15:37:52 UTC: `test_delta_recipe.py`, plus two vendored records in `results/refs/`.
 
-Both were committed while X's full run was in progress. The run's code is `a581027` (committed 02:12 UTC); X's start time is not yet on any branch.
+Both were committed while X's full run was in progress. The run's code is `a581027` (committed 02:12:29 UTC). The amendment states the run started at 02:12 UTC (`55dac50`, spec lines added at "Source:"); no log yet confirms it.
 
 **Two questions:**
 1. Is every change a report rule, with none touching a run's code?
@@ -55,6 +55,7 @@ The run path is byte-identical: `outcome2`, `success`, `overlap`, `copy_op`, `ex
 - **Which runs had finished.** Confirm that no HEBB_SPLIT or HEBB_SLOW run, and no DELTA_SLOW run but 580, had finished by then.
 - **No report before the amendment.** Confirm that no report block appears in the log before the amendment's time.
 - **The two reports.** Confirm that the end-of-run report printed by the running process is the pre-Amendment-2 one, and that the recorded RESULT is the `--report` regeneration under `2225f00`, both kept in the log, as the amendment says.
+- **The start.** Confirm the run's start at 02:12 UTC, as the amendment states.
 - **Any resume.** If the run was resumed after 15:37:52, confirm that the verification block it printed used the vendored references.
 
 **Why it matters.** The amendment was written with 19 of 20 DELTA_SPLIT outcomes in view. Those feed D1 (against HEBB_SPLIT, unseen) and D2 (against DELTA_SLOW, of which only seed 580 had been seen).
@@ -63,4 +64,4 @@ The run path is byte-identical: `outcome2`, `success`, `overlap`, `copy_op`, `ex
 - Both were fixed to the referee's first-named fix. Those fixes were committed on 11 October: `16b04f9` (02:59:08 UTC, `spec_review_test_delta_recipe_2.md` §2(a)–(e) and §3: items (a)–(e), (g)), `6f2788d` (03:01:36, `test_check_delta_recipe.md` §2 and §4: items (e), (h)) and `0d1fa60` (03:34:03, its addendum: item (f)), all before any of X's records was on a branch. They are not chosen among options, and the arms they compare against were unseen.
 - The risk is therefore limited to the amendment's account of what was seen being true. That account is what the log check will test.
 
-**Correction (11 October, before X's push).** The first version of this note (`ca88faf`) dated `16b04f9` to 10 October and called the fixes written "before any run". `16b04f9` is 11 October, 02:59:08 UTC, after `a581027` (02:12:29). Whether X's run had started by then is not on any branch. What holds is that the referee had seen no record of it, so the fixes were written blind to its outcomes.
+**Correction (11 October, before X's push).** The first version of this note (`ca88faf`) dated `16b04f9` to 10 October and called the fixes written "before any run". `16b04f9` is 11 October, 02:59:08 UTC, after `a581027` (02:12:29). The amendment itself states that X's run started at 02:12 UTC, so all three fixes were written during the run, 47 to 82 minutes after its start (the earlier sentence "Whether X's run had started by then is not on any branch" in this correction was wrong: the start is on the main line, in `55dac50`, though unconfirmed by a log). What holds is that the referee had seen no record of it, so the fixes were written blind to its outcomes.

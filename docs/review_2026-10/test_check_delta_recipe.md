@@ -105,3 +105,7 @@ Yes. The test's `overlap` (`:198-204`) and `referee_overlap()` (`:453-462`, whic
 The referee's own count made the same 393-for-353 slip (corrected in `replication_review.md` and `revision_9_check.md`).
 
 **Fix.** Restrict the count to rows with `step >= tgw.FIRST`. Print "probe ≥ 0.95 while held-out < 0.95" as what it is, and separately "blocked by the probe alone": eligible apart from the probe, and not fired.
+
+## Correction (11 October, fourth pass)
+
+"The test has not run" (lines 5 and 94) was wrong when written. Amendment 2 (`55dac50`, main line) states that X's full run started at 02:12 UTC on 11 October with `a581027`, 49 minutes before this check (`6f2788d`, 03:01:36). What held, and what this check had verified, is that no result file or log was on any branch. No finding above depends on it: every check here reads the code and stored records, not X's output. The start time rests on the amendment's text alone until X's log is pushed.
