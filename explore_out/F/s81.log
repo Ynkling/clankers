@@ -165,3 +165,5 @@ EXPLORATORY, NOT A RESULT — Session F s81 (F/trigger)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git e060076, code bdd8269d38af, attempt 1: acc 1.000  trans  1200  BOUND ROUTED  splits []  map 1+1+1+1+1+1+1+1
   [ 40]  970.6 min  F/trigger        O_DELTA_C                seed 2020  lr 0.001  (Adam 1e-3)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git e060076+dirty, code bdd8269d38af, attempt 1: acc 1.000  trans  6000  BOUND ROUTED  splits []  map 1+1+1+1+1+1+1+1
+  [ 41] 1019.0 min  F/trigger        BASE                     seed 2029  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git ea931aa, code bdd8269d38af, attempt 1: acc 0.875  trans  None  MERGED (2 share)  splits [(14400, 'ok', ''), (24000, 'ok', ''), (28800, 'ok', '')]  map 2+1+1+1+1+1+1
