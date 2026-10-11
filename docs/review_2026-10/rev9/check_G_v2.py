@@ -1,0 +1,1597 @@
+#!/usr/bin/env python3
+"""check_G_v2.py — the referee's SECOND-PASS check of Revision 9's statements about Session G (S55-S57, S71-S73, S82)
+against the records, run on the draft's second version. A copy of check_G.py (first pass, draft 9bfa85a), changed so that:
+  * every fragment the first pass quoted (asserted on its OLD line, tex:NNN) is located in the NEW tex by text search
+    (all of a row's fragments on one line); the row is reported at its new line (tex2:NNN) or listed as REMOVED;
+  * the record recomputations are kept unchanged;
+  * rows are added for every new or changed sentence about Session G, among them everything that uses S82 (report 5).
+A carried row whose sentence was amended around the quoted fragment can carry a v2 status / note (the 'v2=' argument),
+stated with the reason.
+
+Run from anywhere inside the repository:  python3 docs/review_2026-10/rev9/check_G_v2.py
+It writes docs/review_2026-10/rev9/check_G_v2.md and nothing else. Python 3 stdlib + docs/review_2026-10/rlib.py; no
+torch; no screen module is imported. Every record and every source file is read with `git show <ref>:<path>`.
+
+Pinned refs
+  DRAFT  9bfa85a (first version, tex:NNN) and f67bc07 (second version, tex2:NNN), multichannel_hebbian_report_v9.tex
+  G      claude/explore-G at 93422cf (report 4) for S55-S57 and S71-S73 (asserted byte-identical at 8973d48)
+  G5     8973d48 (report 5, S82; the commit the second draft pins): s82_devices_results.json, s82_best.json, report_5.md
+  F      claude/explore-F at 2247298: F's S70 store rh_lite_results.json
+  S82    83699a2 (S82 spec: explore_g_devices.py, explore_g_devices_child.py)
+  MAIN   the main line, for the S56 specification's origin (docs/reading/*)
+Outcome definitions are re-implemented from explore_g_rhl_parent.py's docstring (S71-S73, S82) and explore_g_register.py's
+(S56, S57); see the 'definitions' block in the output. The draft's values are typed in below; None is used as an input.
+"""
+import json
+import os
+import re
+import statistics
+import subprocess
+import sys
+from collections import Counter
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(HERE))           # docs/review_2026-10
+from rlib import load, runs, git, transition, wilson, mcnemar1, fail_class  # noqa: E402
+
+DRAFT, DRAFT2, TEXP = "9bfa85a", "f67bc07", "multichannel_hebbian_report_v9.tex"
+G, F = "93422cf", "2247298"
+G5 = "8973d48"
+S82SPEC = "83699a2"
+GBR = "origin/claude/explore-G"
+MAIN = "origin/claude/bdh-growth-hebbian-inference-w90069"
+OUT = os.path.join(HERE, "check_G_v2.md")
+GD = "explore_out/G/"
+
+TEX = git("show", f"{DRAFT}:{TEXP}").split("\n")
+TEX2 = git("show", f"{DRAFT2}:{TEXP}").split("\n")
+ROWS = []        # (tex2 line, old tex line or None, item, draft, recomputed, status, note, kind)
+REMOVED = []     # (old tex line, needles, item, first-pass status)
+STATUSES = ("DISAGREE", "PARTIAL", "NOT RECORD-CHECKABLE", "MATCH")
+
+
+def tex(n):
+    return TEX[n - 1]
+
+
+def _nl(needles):
+    return [needles] if isinstance(needles, str) else list(needles)
+
+
+def locate(needles):
+    """First line of the second draft that contains every fragment, or None."""
+    for i, l in enumerate(TEX2, 1):
+        if all(nd in l for nd in _nl(needles)):
+            return i
+    return None
+
+
+def row(n, needles, item, draft, recomputed, status, note="", v2=None):
+    """A first-pass row: fragments asserted on the OLD line n, then located in the new tex by text search."""
+    for nd in _nl(needles):
+        assert nd in tex(n), f"tex:{n} does not contain {nd!r}"
+    assert status in STATUSES, status
+    n2 = locate(needles)
+    if n2 is None:
+        REMOVED.append((n, _nl(needles), item, status))
+        return
+    if v2:
+        status, note = v2
+        assert status in STATUSES, status
+    ROWS.append((n2, n, item, draft, recomputed, status, note, "carried"))
+
+
+def row2(needles, item, draft, recomputed, status, note=""):
+    """A row for a new or changed sentence of the second draft (located by text search; must be found)."""
+    n2 = locate(needles)
+    assert n2 is not None, f"second draft does not contain {needles!r}"
+    assert status in STATUSES, status
+    ROWS.append((n2, None, item, draft, recomputed, status, note, "new"))
+
+
+def src(ref, path):
+    return git("show", f"{ref}:{path}")
+
+
+def lineno(ref, path, needle):
+    for i, l in enumerate(src(ref, path).split("\n"), 1):
+        if needle in l:
+            return i
+    raise AssertionError(f"{needle!r} not in {ref}:{path}")
+
+
+def f2(x):
+    return f"{x:.2f}"
+
+
+def rng(xs, d=2):
+    return f"{min(xs):.{d}f}-{max(xs):.{d}f}" if xs else "-"
+
+
+def med(xs):
+    return statistics.median(xs)
+
+
+def ctime(ref):
+    return git("log", "-1", "--format=%cI", ref).strip()
+
+
+def short(ref):
+    return git("rev-parse", "--short=7", ref).strip()
+
+
+# ── outcomes ─────────────────────────────────────────────────────────────────
+def bound(r):
+    return r["transition"] is not None
+
+
+def routed_star(r):                                  # explore_g_rhl_parent.py:8-9 (code :35, :43-45)
+    e = r["end"]
+    return bool(e.get("margin", 0.0) >= 0.9 and e.get("eta_key_by_stream", 0.0) > 0.9)
+
+
+def rb(r):                                           # ROUTED-BOUND
+    return bound(r) and routed_star(r)
+
+
+def disc(r):                                         # F's DISCOVERED
+    return bound(r) and r["val_cos"] < 0.5
+
+
+def mine3(r):                                        # G's BOUND ROUTED, S71-S73
+    lay = r["end"]["layers"]
+    return bound(r) and all(lay[f"L{l}"]["one_to_one_val"] for l in (1, 2, 3)) and min(r["stream_acc"]) >= 0.9
+
+
+def br56(r, gated=(2, 3)):                           # G's BOUND ROUTED, S56/S57 (every gated layer)
+    lay = r["end"]["layers"]
+    return bound(r) and all(lay[f"L{l}"]["one_to_one_val"] for l in gated) and min(r["stream_acc"]) >= 0.9
+
+
+def cls(r):
+    """v1 failure class of the end gate (test_router_layout rule, rlib.fail_class); MERGED as rhl_parent.outcome."""
+    c = fail_class(r)
+    if c == "STREAM-PARTIAL" and not r["end"]["layers"]["L3"]["one_to_one_val"]:
+        return "MERGED"
+    return c
+
+
+def paired(ra, rb_, f):
+    ss = sorted(set(ra) & set(rb_))
+    b = sum(1 for s in ss if f(ra[s]) and not f(rb_[s]))
+    c = sum(1 for s in ss if f(rb_[s]) and not f(ra[s]))
+    return b, c, mcnemar1(b, c), len(ss)
+
+
+def cnt(rr, f):
+    return sum(1 for r in rr.values() if f(r))
+
+
+def trs(rr, f=bound):
+    return sorted(r["transition"] for r in rr.values() if f(r))
+
+
+def at_step(r, step):
+    for s in r["stats"]:
+        if s["step"] == step:
+            return s
+    return None
+
+
+# ── stores ───────────────────────────────────────────────────────────────────
+S55 = load(G, GD + "s55_probe_results.json")
+S56 = load(G, GD + "s56_register_results.json")
+S57 = load(G, GD + "s57_latch_results.json")
+S71 = load(G, GD + "s71_layers_results.json")
+S72 = load(G, GD + "s72_register3_results.json")
+S73 = load(G, GD + "s73_register3_delta_results.json")
+F70 = load(F, "explore_out/F/rh_lite_results.json")
+for _f in ("s55_probe_results", "s56_register_results", "s57_latch_results", "s71_layers_results",
+           "s72_register3_results", "s73_register3_delta_results"):
+    assert git("rev-parse", f"{G}:{GD}{_f}.json") == git("rev-parse", f"{G5}:{GD}{_f}.json"), _f   # unchanged at report 5
+A, A7 = {}, {}                                       # S55-S57 arms; S71-S73 arms (BASELINE / BASELINE_D occur in both)
+for st, D in ((S55, A), (S56, A), (S57, A), (S71, A7), (S72, A7), (S73, A7)):
+    for arm in sorted({k.split("|")[0] for k in st["runs"]}):
+        assert arm not in D, arm
+        D[arm] = runs(st, arm)
+FA = {a: runs(F70, a) for a in ("S70_HEBB", "S70_DELTA")}
+
+integrity = []
+for name, st in (("S55", S55), ("S56", S56), ("S57", S57), ("S71", S71), ("S72", S72), ("S73", S73)):
+    rr = list(st["runs"].values())
+    integ = sum(1 for r in rr if r.get("ok")), sum(1 for r in rr if r.get("attempt", 1) != 1), \
+        sum(1 for r in rr if r["transition"] == transition(r["curve"]))
+    integrity.append(f"{name}: {len(rr)} records, {integ[0]} ok, {integ[1]} retried, recorded transition = "
+                     f"rlib.transition(curve) in {integ[2]}")
+    assert integ[0] == len(rr) and integ[2] == len(rr)
+
+# ═════════════════════════════════════════════════════════════════════════════
+# S55 (tex:259, :59, :355)
+# ═════════════════════════════════════════════════════════════════════════════
+LAY = ("L2", "L3", "final")
+
+
+def pmed(arm, key="probe"):
+    return {f"{l}|{k}": med([r[key][f"{l}|{k}"]["acc"] for r in A[arm].values()]) for l in LAY for k in "KV"}
+
+
+m55 = pmed("L3S_P8")
+m55i = pmed("L3S_P8", "probe_init")
+m55o = pmed("ORACLE_P8")
+absent = all(v <= 0.6 for v in m55.values())
+present_any = any(m55[f"{l}|K"] >= 0.9 and m55[f"{l}|V"] >= 0.9 for l in LAY)
+row(259, "$0.55$--$0.58$ at layers 2 and 3 and at the output", "S55 L3S_P8 (trained window-gate stack, P = 8) probe medians, "
+    "L2 / L3 / final, K and V", "0.55-0.58", f"{rng(m55.values())} ({', '.join(f'{k} {f2(v)}' for k, v in m55.items())})",
+    "MATCH" if f"{min(m55.values()):.2f}" == "0.55" and f"{max(m55.values()):.2f}" == "0.58" else "DISAGREE",
+    "median over the 10 runs (seeds 360-369) of the held-out accuracy, as the S55 docstring reads it")
+row(259, "from about $0.70$ at initialisation", "S55 L3S_P8 probe medians at initialisation (same seeds), L2 / L3 / final",
+    "about 0.70", f"K {rng([m55i[f'{l}|K'] for l in LAY])}, V {rng([m55i[f'{l}|V'] for l in LAY])}",
+    "MATCH", "'about 0.70' holds for K; V starts at 0.66")
+drop = sum(1 for r in A["L3S_P8"].values() for l in LAY for k in "KV" if r["probe"][f"{l}|{k}"]["acc"] < r["probe_init"][f"{l}|{k}"]["acc"])
+row(259, "Training removes the cue", "trained vs initial probe, L3S_P8, per run and site (10 runs x 3 layers x K/V)",
+    "training removes the cue", f"trained < init in {drop}/60 run-sites", "MATCH" if drop >= 54 else "PARTIAL",
+    "descriptive (report_1.md 'Anything unexpected'); the causal clause that follows ('the gate reads only the window, nothing "
+    "asks the stack to keep it') is an interpretation, unmarked (see the last section)")
+row(259, "the perfect gate's stack carries nothing either ($0.54$)", "S55 ORACLE_P8 (perfect gate, 2 runs) probe medians "
+    "L2 / L3 / final, K and V", "0.54", f"{rng(m55o.values())} ({', '.join(f'{k} {f2(v)}' for k, v in m55o.items())})",
+    "PARTIAL", "0.54 is the layer-2 value; over the three sites the medians span 0.53-0.56. Two runs, one of which bound "
+    "(360, at 24000)")
+row(259, "The pre-fixed reading ``absent'' applied", "S55 reading for L3S_P8 (explore_g_probe.py docstring: median <= 0.6 at K "
+    "and V at every l in {L2, L3, final})", "'absent' applied", f"max median {max(m55.values()):.2f} <= 0.6: "
+    f"{'absent' if absent else 'not absent'}", "MATCH" if absent else "DISAGREE")
+row(59, "the cue is absent", "index row: S55 reading", "the cue is absent", "'absent' (L3S_P8)", "MATCH" if absent else "DISAGREE")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# S56 / S57 (tex:261)
+# ═════════════════════════════════════════════════════════════════════════════
+heb56 = ("BASELINE", "RESGATE_ONLY", "REG", "REG_NOSG", "REG_NUDGE", "SINGLE_GDN")
+heb57 = ("BASELINE_L", "LATCH", "LATCH_NUDGE", "LATCH_PRIOR")
+bc = {a: cnt(A[a], bound) for a in heb56 + heb57}
+row(261, "every Hebbian arm bound $0/10$", "S56 Hebbian arms (370-379) and S57 latch arms (410-419), BOUND",
+    "0/10 (baseline, residual gate alone, register with / without SG, nudged register)",
+    "; ".join(f"{a} {bc[a]}/{len(A[a])}" for a in heb56 + heb57), "MATCH" if not any(bc.values()) else "DISAGREE",
+    "also true of the arms the draft does not list (SINGLE_GDN, S57's four)")
+rp = json.loads(src(G, GD + "s56_read_path.json"))
+resl = {tuple(r["res_layers"]) for a in ("REG", "REG_NUDGE", "RESGATE_ONLY") for r in A[a].values()}
+row(261, "With the register gate at layers 2 and 3 and the window gate at layer 1", "S56 gated layers / read path",
+    "layers 2-3, window gate at layer 1", f"explore_g_regmodel.py GATED = (2, 3) (line {lineno(G, 'explore_g_regmodel.py', 'GATED = (2, 3)')}); "
+    f"s56_read_path.json res_layers {rp['res_layers']}; records' res_layers {sorted(resl)}", "MATCH")
+nb = [r["end"]["beta"] for r in A["REG_NUDGE"].values()]
+row(261, "$0.96$ at the context token against $\\leq 0.05$ at keys and values", "S56 REG_NUDGE end beta^R CTX / KEY / VAL",
+    "0.96 vs <= 0.05", f"median {f2(med([b['CTX'] for b in nb]))} / {f2(med([b['KEY'] for b in nb]))} / "
+    f"{f2(med([b['VAL'] for b in nb]))}; per run CTX {rng([b['CTX'] for b in nb])}, KEY {rng([b['KEY'] for b in nb])}, "
+    f"VAL {rng([b['VAL'] for b in nb])}",
+    "MATCH" if all(b['CTX'] >= 0.895 and b['KEY'] <= 0.1 and b['VAL'] <= 0.1 for b in nb) else "PARTIAL",
+    "the numbers are the medians over runs (report 2's diagnostics); a clean latch (CTX >= 0.9, KEY and VAL <= 0.1) in "
+    f"{sum(1 for b in nb if b['CTX'] >= 0.895 and b['KEY'] <= 0.1 and b['VAL'] <= 0.1)}/10 runs; not: "
+    + ", ".join(f"{s} (CTX {r['end']['beta']['CTX']:.2f})" for s, r in sorted(A['REG_NUDGE'].items())
+                if not (r['end']['beta']['CTX'] >= 0.895 and r['end']['beta']['KEY'] <= 0.1 and r['end']['beta']['VAL'] <= 0.1)))
+mg = [(r["end"]["layers"][f"L{l}"]["margin"], r["end"]["layers"][f"L{l}"]["one_to_one_val"]) for r in A["REG_NUDGE"].values() for l in (2, 3)]
+mgr = {s: (r["end"]["layers"]["L2"]["margin"], r["end"]["layers"]["L3"]["margin"], r["end"]["beta"]["CTX"])
+       for s, r in sorted(A["REG_NUDGE"].items())}
+mgbad = {s: v for s, v in mgr.items() if min(v[:2]) < 0.99}
+row(261, "its gates route one-to-one with margin $1.00$ at layers 2 and 3, and its accuracy", "S56 REG_NUDGE end margin and VAL map at L2, L3 "
+    "(every run)", "one-to-one, margin 1.00", f"margin {rng([m for m, _ in mg])}; one-to-one {sum(o for _, o in mg)}/{len(mg)} "
+    f"(run x layer); median L2 / L3 {f2(med([v[0] for v in mgr.values()]))} / {f2(med([v[1] for v in mgr.values()]))}; runs below 0.99: "
+    + ", ".join(f"{s} (L2 {v[0]:.2f}, L3 {v[1]:.2f}; beta^R CTX {v[2]:.2f})" for s, v in mgbad.items()),
+    "MATCH" if min(m for m, _ in mg) >= 0.995 and all(o for _, o in mg) else "PARTIAL",
+    f"true of the median run (report_2.md diagnostics give medians) and of {10 - len(mgbad)}/10 runs")
+sa = {s: r["stream_acc"] for s, r in sorted(A["REG_NUDGE"].items())}
+flat32 = [s for s, v in sa.items() if all(abs(x - 0.32) <= 0.03 + 1e-9 for x in v)]
+row(261, "its accuracy plateaus at $0.32$ on \\emph{both} streams in every run", "S56 REG_NUDGE end stream accuracies "
+    "(10 runs)", "0.32 on both streams, every run", f"stream acc {rng([x for v in sa.values() for x in v])}; both streams within "
+    f"0.32 +- 0.03 in {len(flat32)}/10 runs (not: {sorted(set(sa) - set(flat32))}); run acc {rng([r['acc'] for r in A['REG_NUDGE'].values()])}; per run "
+    + ", ".join(f"{s} {v[0]:.2f}/{v[1]:.2f}" for s, v in sa.items()),
+    "MATCH" if len(flat32) == 10 else "DISAGREE",
+    "report_2.md:86 itself says 'plateaus at acc 0.32-0.44'; 0.32 is the typical value, not every run's")
+bacc = [r["acc"] for r in A["BASELINE"].values()]
+bmarg = [r["end"]["margin"] for r in A["BASELINE"].values()]
+row(261, "no better than the unrouted baseline ($0.28$--$0.42$)", "S56 BASELINE end accuracy (10 runs); routing margin",
+    "0.28-0.42, unrouted", f"acc {rng(bacc)}; end margin {rng(bmarg)}; REG_NUDGE acc {rng([r['acc'] for r in A['REG_NUDGE'].values()])}",
+    "MATCH" if f"{min(bacc):.2f}" == "0.28" and f"{max(bacc):.2f}" == "0.42" else "PARTIAL")
+o23 = A["ORACLE23"]
+oh = A["ORACLE_H"]
+b, c, p, n = paired(oh, o23, bound)
+row(261, ["perfect gate at layers 2--3 alone bound $0/3$", "one of two seeds, one paired seed"],
+    "S57 post-hoc ORACLE23 (370-372) vs S56 ORACLE_H (370-371), BOUND", "0/3 vs 1 of 2; one paired seed",
+    f"ORACLE23 {cnt(o23, bound)}/{len(o23)}; ORACLE_H {cnt(oh, bound)}/{len(oh)} (bound seed {[s for s, r in oh.items() if bound(r)]}); "
+    f"paired on {n} seeds: {b} vs {c}", "MATCH" if (cnt(o23, bound), cnt(oh, bound), b, c) == (0, 1, 1, 0) else "DISAGREE",
+    "ORACLE23 is post hoc (s57 meta arms: post_hoc true)")
+nd = A["REG_NUDGE_D"]
+row(261, "the nudged register $8/10$, routed $7/10$, transitions 3600--6000", "S56 REG_NUDGE_D BOUND, BOUND ROUTED (G's: one-to-one "
+    "VAL map at layers 2 and 3, every stream >= 0.9), transitions", "8/10, 7/10, 3600-6000",
+    f"BOUND {cnt(nd, bound)}/10, BOUND ROUTED {cnt(nd, br56)}/10, transitions (bound) {trs(nd)[0]}-{trs(nd)[-1]}",
+    "MATCH" if (cnt(nd, bound), cnt(nd, br56), trs(nd)[0], trs(nd)[-1]) == (8, 7, 3600, 6000) else "DISAGREE")
+rd, bd = A["REG_D"], A["BASELINE_D"]
+b, c, p, n = paired(rd, bd, bound)
+row(261, "the unnudged register $6/10$ bound against the baseline's $2/10$ (4 vs 0, $p = 0.0625$)",
+    "S56 REG_D vs BASELINE_D (390-399), BOUND; paired one-sided McNemar", "6/10 vs 2/10, 4 vs 0, p = 0.0625",
+    f"{cnt(rd, bound)}/10 vs {cnt(bd, bound)}/10; {b} vs {c}, p = {p:.4f}",
+    "MATCH" if (cnt(rd, bound), cnt(bd, bound), b, c) == (6, 2, 4, 0) else "DISAGREE")
+bnr = {s: r for s, r in rd.items() if bound(r) and not br56(r)}
+ks2 = sorted(s for s, r in bnr.items() if r["end"]["layers"]["L2"]["eta_key_by_key"] >= 0.5)
+ks3 = sorted(s for s, r in bnr.items() if r["end"]["layers"]["L3"]["eta_key_by_key"] >= 0.5)
+row(261, "only two of its six routed, three binding through key splits", "S56 REG_D bound runs: BOUND ROUTED; bound unrouted runs "
+    "with eta^2 by key at KEY >= 0.5", "2 of 6 routed; 3 key-split bindings",
+    f"BOUND ROUTED {cnt(rd, br56)} ({sorted(s for s, r in rd.items() if br56(r))}); key split at L2 {len(ks2)} {ks2}, at L3 {len(ks3)} {ks3} "
+    f"(of the {len(bnr)} bound unrouted {sorted(bnr)})", "MATCH" if cnt(rd, br56) == 2 and len(ks2) == 3 else "PARTIAL",
+    "as report_2.md (layer 2); the S56 R2 reading that applied to REG_D is not stated by the draft (see 'Readings vs docstring')",
+    v2=("MATCH", "as report_2.md (layer 2); the second draft now states that REG_D met R2's rule for 'discovered'"))
+orc = {"ORACLE_P8 (S55)": A["ORACLE_P8"], "ORACLE_H (S56)": A["ORACLE_H"], "ORACLE_L (S57)": A["ORACLE_L"]}
+tot = sum(cnt(v, bound) for v in orc.values())
+row(261, "3 of 6 seeds over the three screens", "Hebbian perfect gate on P = 8, 24000 updates: S55 / S56 / S57 oracles, BOUND",
+    "3 of 6", "; ".join(f"{k} {cnt(v, bound)}/{len(v)} ({trs(v)})" for k, v in orc.items()) + f"; total {tot}/6",
+    "MATCH" if tot == 3 else "DISAGREE")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# S71 (tex:261, table)
+# ═════════════════════════════════════════════════════════════════════════════
+OA, O23, O1, OAD, O23D = (A7[a] for a in ("ORACLE_ALL", "ORACLE_23", "ORACLE_1", "ORACLE_ALL_D", "ORACLE_23_D"))
+row(261, "whose perfect gates bind at 1200 (S71)", "S71 ORACLE_ALL / ORACLE_ALL_D transitions", "bind at 1200",
+    f"ORACLE_ALL median {med(trs(OA)):.0f} ({trs(OA)[0]}-{trs(OA)[-1]}; {sum(t == 1200 for t in trs(OA))}/10 at 1200); "
+    f"ORACLE_ALL_D {trs(OAD)[0]}-{trs(OAD)[-1]}", "PARTIAL" if trs(OA)[-1] > 1200 else "MATCH",
+    "the Hebbian perfect gate binds at 1200 in the median run, not in every run",
+    v2=("MATCH", "the second draft qualifies it in the same sentence: 'binds 10/10 (median 1200, range 1200--4800)'; "
+        "'whose perfect gates bind at 1200' now reads as the layout's typical oracle transition"))
+row(261, ["perfect gate at all three layers binds $10/10$", "at layers 2--3 alone $0/10$"], "S71 ORACLE_ALL, ORACLE_23 BOUND",
+    "10/10, 0/10", f"{cnt(OA, bound)}/10, {cnt(O23, bound)}/10", "MATCH" if (cnt(OA, bound), cnt(O23, bound)) == (10, 0) else "DISAGREE")
+cells23 = {s: [c_["acc"] for c_ in r["acc_by_cell"].values()] for s, r in sorted(O23.items())}
+keys = sorted(next(iter(O23.values()))["acc_by_cell"])
+cellmed = [med([O23[s]["acc_by_cell"][k]["acc"] for s in O23]) for k in keys]
+acc23 = {s: r["acc"] for s, r in sorted(O23.items())}
+row(261, ["every run at exactly chance between the two streams", "$0.46$--$0.51$ in every (stream, block, pair) cell"],
+    "S71 ORACLE_23: per-run accuracy and per-cell accuracy (12 cells, 2048 queries)", "every run at chance; 0.46-0.51 in every cell",
+    f"per-cell medians over runs {rng(cellmed)}; per-run final acc {rng(acc23.values())} "
+    f"({', '.join(f'{s} {a:.2f}' for s, a in acc23.items())}); per-run cells {rng([x for v in cells23.values() for x in v])}; "
+    f"runs with every cell in 0.46-0.51: {sum(all(0.455 <= x < 0.515 for x in v) for v in cells23.values())}/10",
+    "DISAGREE",
+    "0.46-0.51 is the range of the per-cell MEDIANS over the 10 runs (report_3.md:38); no single run is in 0.46-0.51 in "
+    "every cell; run accuracies are bimodal (~0.32 and ~0.53), so 'every run at exactly chance' does not hold")
+mg23 = [r["end"]["layers"][f"L{l}"]["margin"] for r in O23.values() for l in (2, 3)]
+row(261, "with layers 2--3 routed perfectly", "S71 ORACLE_23 end margin at L2, L3", "routed perfectly", f"margin {rng(mg23)}",
+    "MATCH" if min(mg23) >= 0.995 else "PARTIAL", "perfect gates by construction (CHECK in checks_s71)")
+row(261, "at layer~1 alone $9/10$, slowly (median 16{,}800)", "S71 ORACLE_1 BOUND, median transition", "9/10, median 16800",
+    f"{cnt(O1, bound)}/10, median {med(trs(O1)):.0f} ({trs(O1)[0]}-{trs(O1)[-1]})",
+    "MATCH" if cnt(O1, bound) == 9 and med(trs(O1)) == 16800 else "DISAGREE")
+row(261, "on delta memory the perfect gate at layers 2--3 alone binds $10/10$", "S71 ORACLE_23_D BOUND", "10/10",
+    f"{cnt(O23D, bound)}/10", "MATCH" if cnt(O23D, bound) == 10 else "DISAGREE")
+b1, c1, p1, _ = paired(OA, O23, bound)
+b2, c2_, _, _ = paired(O1, OA, bound)          # A = ORACLE_1, B = ORACLE_ALL: (B only) - (A only) <= 1
+b3, c3, _, _ = paired(O23D, OAD, bound)
+r_block = p1 < 0.05
+r_alone = c2_ - b2 <= 1
+r_tol = c3 - b3 <= 1
+row(261, ["``layer~1 is the block'' (10 vs 0, $p = 0.00098$)", "``layer~1 alone suffices''", "``delta tolerates an unrouted layer~1''",
+          "all apply"], "S71 readings (BOUND, paired on 700-709; explore_g_layers.py:21-26)",
+    "block 10 vs 0 p = 0.00098; alone suffices; delta tolerates: all apply",
+    f"block: {b1} vs {c1}, p = {p1:.5f} -> {'applies' if r_block else 'no'}; alone suffices: ALL only {c2_}, ORACLE_1 only {b2} -> "
+    f"{'applies' if r_alone else 'no'}; delta tolerates: ALL_D only {c3}, 23_D only {b3} -> {'applies' if r_tol else 'no'}",
+    "MATCH" if (b1, c1, round(p1, 5), r_alone, r_tol) == (10, 0, 0.00098, True, True) else "DISAGREE",
+    "validity: ORACLE_ALL and ORACLE_ALL_D 10/10 >= 8/10, both families VALID")
+row(59, "layer~1 is the block on Hebbian memory", "index row: S71 reading", "layer 1 is the block", "applies (10 vs 0)",
+    "MATCH" if r_block else "DISAGREE")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# S72 / S73 (tex:263)
+# ═════════════════════════════════════════════════════════════════════════════
+BH, R3, R3N = A7["BASELINE"], A7["REG3"], A7["REG3_NUDGE"]
+BD, R3D, R3ND = A7["BASELINE_D"], A7["REG3_D"], A7["REG3_NUDGE_D"]
+RES, L3D, L3ND, SGL = A7["RESGATE_ONLY_D"], A7["LATCH3_D"], A7["LATCH3_NUDGE_D"], A7["SINGLE_D"]
+assert len(BH) == 20 and len(BD) == 20 and len(A["BASELINE"]) == 10 and len(A["BASELINE_D"]) == 10
+row(263, "20 seeds, readings on ROUTED-BOUND", "S72/S73 seeds and the readings' outcome", "20 seeds; ROUTED-BOUND",
+    f"BASELINE, REG3, REG3_NUDGE, BASELINE_D, REG3_D on 700-719 ({len(BH)}, {len(R3)}, {len(R3N)}, {len(BD)}, {len(R3D)} runs); "
+    f"REG3_NUDGE_D, RESGATE_ONLY_D, LATCH3_D, LATCH3_NUDGE_D, SINGLE_D on 700-709; readings on ROUTED-BOUND "
+    f"(register3.py:{lineno(G, 'explore_g_register3.py', 'ROUTED-BOUND')}, register3_delta.py:{lineno(G, 'explore_g_register3_delta.py', 'ROUTED-BOUND')})",
+    "MATCH", "the 10-seed arms are on 700-709; the draft gives their n with each count")
+row(263, "$\\mathbf{20/20}$ on Hebbian memory (transitions 2400--8400)", "S72 REG3_NUDGE ROUTED-BOUND; transitions",
+    "20/20; 2400-8400", f"{cnt(R3N, rb)}/20; {trs(R3N)[0]}-{trs(R3N)[-1]}",
+    "MATCH" if (cnt(R3N, rb), trs(R3N)[0], trs(R3N)[-1]) == (20, 2400, 8400) else "DISAGREE")
+row(263, "$\\mathbf{10/10}$ on delta (all at 1200)", "S73 REG3_NUDGE_D ROUTED-BOUND; transitions", "10/10, all at 1200",
+    f"{cnt(R3ND, rb)}/10; {sorted(set(trs(R3ND)))}", "MATCH" if cnt(R3ND, rb) == 10 and set(trs(R3ND)) == {1200} else "DISAGREE")
+nm = [r["end"]["layers"][f"L{l}"]["margin"] for rr in (R3N, R3ND) for r in rr.values() for l in (1, 2, 3)]
+n11 = sum(all(r["end"]["layers"][f"L{l}"]["one_to_one_val"] for l in (1, 2, 3)) for rr in (R3N, R3ND) for r in rr.values())
+row(263, "one-to-one with margin $1.00$ at every layer", "nudged REG3 / REG3_NUDGE_D: VAL map and margin at L1-L3, every run",
+    "one-to-one, margin 1.00, every layer", f"one-to-one at every layer {n11}/30 runs; margin {rng(nm, 3)}",
+    "MATCH" if n11 == 30 and min(nm) >= 0.985 else "PARTIAL", "lowest margin rounds to 0.99 (rounding only)" if min(nm) < 0.995 else "")
+row(263, ["on $4/20$ seeds on each memory, against $0/20$ for either baseline", "4 vs 0, $p = 0.0625$"],
+    "REG3 vs BASELINE (S72), REG3_D vs BASELINE_D (S73), ROUTED-BOUND", "4/20 each vs 0/20; 4 vs 0, p = 0.0625 each",
+    f"S72 {cnt(R3, rb)}/20 vs {cnt(BH, rb)}/20, {paired(R3, BH, rb)[:2]}, p = {paired(R3, BH, rb)[2]:.4f}; S73 {cnt(R3D, rb)}/20 vs "
+    f"{cnt(BD, rb)}/20, {paired(R3D, BD, rb)[:2]}, p = {paired(R3D, BD, rb)[2]:.4f}",
+    "MATCH" if paired(R3, BH, rb)[:2] == (4, 0) and paired(R3D, BD, rb)[:2] == (4, 0) else "DISAGREE")
+row(59, "$4/20$ label-free", "index row: label-free register", "4/20 label-free", f"REG3 {cnt(R3, rb)}/20, REG3_D {cnt(R3D, rb)}/20 ROUTED-BOUND; "
+    "pre-fixed readings 'not discovered' (S72) / 'discovered (register)' does not apply (S73)", "MATCH",
+    "the count is right; the index row's findings column does not say that its reading did not apply")
+row(59, "the register carries the cue $20/20$ nudged", "index row: S72 R1", "the register carries the cue, 20/20 nudged",
+    f"S72 R1 'the register carries the cue at all three layers' applies ({cnt(R3N, rb)}/20 >= 17/20)", "MATCH")
+dm = {(a, s): [r["end"]["layers"][f"L{l}"]["margin"] for l in (1, 2, 3)] for a, rr in (("REG3", R3), ("REG3_D", R3D))
+      for s, r in rr.items() if rb(r)}
+row(263, "each discovering run routed perfectly", "ROUTED-BOUND REG3 / REG3_D runs: VAL map and margin at L1-L3",
+    "routed perfectly", f"{len(dm)} runs {sorted(dm)}; margin {rng([x for v in dm.values() for x in v], 3)}; one-to-one at every layer "
+    f"{sum(mine3(r) for rr in (R3, R3D) for r in rr.values() if rb(r))}/{len(dm)}",
+    "MATCH" if min(x for v in dm.values() for x in v) >= 0.985 else "PARTIAL", "lowest margin rounds to 0.99 (rounding only)")
+pb = paired(R3, BH, rb)[0] + paired(R3D, BD, rb)[0]
+pc = paired(R3, BH, rb)[1] + paired(R3D, BD, rb)[1]
+row(263, "8 vs 0 over the 40 pairs is a description, not a test", "pooled discordant pairs, both screens", "8 vs 0 over 40",
+    f"{pb} vs {pc} over {len(R3) + len(R3D)} pairs (one-sided McNemar would give {mcnemar1(pb, pc):.4f})",
+    "MATCH" if (pb, pc) == (8, 0) else "DISAGREE", "labelled a description; not a pre-fixed reading")
+bdD = paired(R3D, BD, disc)
+extra = sorted(s for s, r in R3D.items() if disc(r) and not rb(r))
+row(263, ["5 vs 0 ($p = 0.031$)", "margin of $0.66$"], "S73 REG3_D vs BASELINE_D on F's DISCOVERED; the run counted by DISCOVERED "
+    "and not by ROUTED-BOUND", "5 vs 0, p = 0.031; margin 0.66", f"{bdD[0]} vs {bdD[1]}, p = {bdD[2]:.4f}; extra run(s) {extra} margin "
+    f"{', '.join(f2(R3D[s]['end']['margin']) for s in extra)}, bound {[bound(R3D[s]) for s in extra]}",
+    "MATCH" if bdD[:2] == (5, 0) and len(extra) == 1 and f2(R3D[extra[0]]["end"]["margin"]) == "0.66" else "DISAGREE")
+
+
+def beta_rng(rr):
+    bs = [r["end"]["beta"] for r in rr.values() if rb(r)]
+    return [b_["CTX"] for b_ in bs], [b_[k] for b_ in bs for k in ("KEY", "VAL")], all(b_["CTX"] > max(b_["KEY"], b_["VAL"]) for b_ in bs)
+
+
+hc, hkv, hall = beta_rng(R3)
+dc, dkv, dall = beta_rng(R3D)
+row(263, ["Hebbian $0.32$--$0.64$ against $0.16$--$0.24$", "delta $0.36$--$0.58$ against about $0.2$"],
+    "end beta^R at CTX vs KEY/VAL in the ROUTED-BOUND unnudged runs", "CTX above K/V in every routed run; H 0.32-0.64 vs "
+    "0.16-0.24; D 0.36-0.58 vs ~0.2", f"every run: {hall and dall}; H CTX {rng(hc)} vs {rng(hkv)}; D CTX {rng(dc)} vs {rng(dkv)}",
+    "MATCH" if hall and dall and rng(hc) == "0.32-0.64" and rng(hkv) == "0.16-0.24" and rng(dc) == "0.36-0.58" else "DISAGREE",
+    "marked 'Descriptively'")
+# key splits
+kc = {}
+for nm_, rr in (("Hebbian REG3", R3), ("delta REG3_D", R3D)):
+    unb = sum(1 for r in rr.values() if not bound(r) and cls(r) == "KEY")
+    allk = sum(1 for r in rr.values() if cls(r) == "KEY")
+    fail = [r for r in rr.values() if not rb(r)]
+    kf = sum(1 for r in fail if cls(r) == "KEY")
+    kb = sorted(s for s, r in rr.items() if bound(r) and cls(r) == "KEY")
+    kc[nm_] = (unb, allk, len(fail), kf, kb, Counter(cls(r) for r in fail))
+row(263, "KEY 14 of 20 on each memory by class", "REG3 / REG3_D key splits (v1 class of the end gate): printed (unbound only), "
+    "all 20 runs, and among the runs that are not ROUTED-BOUND", "KEY 14 of 20 on each memory",
+    "; ".join(f"{k}: unbound-only {v[0]}, all runs {v[1]}/20, among the {v[2]} not ROUTED-BOUND {v[3]} ({dict(v[5])}); "
+              f"bound key-split runs {v[4]}" for k, v in kc.items()),
+    "PARTIAL",
+    "the draft's 14 and 14 are the counts over ALL 20 runs (= among the 16 failures), i.e. the referee's earlier recount, not "
+    "the class table the screens print (unbound runs only: 14 Hebbian, 12 delta, explore_g_rhl_parent.py count_table). Read as "
+    "'14 of the 20 runs on each memory are key splits' it is right; but the sentence's subject is 'the runs that failed' "
+    "(16 per memory), and on delta 2 of the 14 (700, 709) bound by a key split rather than failed to bind. The class table "
+    "the screens print gives 12 for delta, so a reader checking the store against '14' will not find it without the population")
+ksr = [(s, r["end"]["beta"]) for rr in (R3, R3D) for s, r in rr.items() if cls(r) == "KEY"]
+flatA = sum(1 for _, b_ in ksr if max(b_[k] for k in ("CTX", "KEY", "VAL")) - min(b_[k] for k in ("CTX", "KEY", "VAL")) <= 0.10)
+flatB = sum(1 for _, b_ in ksr if all(0.15 <= b_[k] <= 0.35 for k in ("CTX", "KEY", "VAL")))
+khigh = sum(1 for _, b_ in ksr if b_["KEY"] >= max(b_["CTX"], b_["VAL"]))
+ctxlow = sum(1 for _, b_ in ksr if b_["CTX"] <= max(b_["KEY"], b_["VAL"]) + 0.05)
+row(263, "with $\\beta^R$ flat across roles", "end beta^R in the key-split runs (REG3 + REG3_D, v1 KEY, all runs)",
+    "flat across roles", f"{len(ksr)} runs: spread (max - min over CTX/KEY/VAL) <= 0.10 in {flatA}; every role in 0.15-0.35 in "
+    f"{flatB}; KEY the highest role in {khigh}; CTX not above K/V by > 0.05 in {ctxlow}; CTX {rng([b_['CTX'] for _, b_ in ksr])}, "
+    f"KEY {rng([b_['KEY'] for _, b_ in ksr])}, VAL {rng([b_['VAL'] for _, b_ in ksr])}",
+    "MATCH" if flatA == len(ksr) else "PARTIAL",
+    "report_4.md:57 said 'flat ... or highest at KEY'; the draft drops the second case. What holds in every key-split run is "
+    "that CTX is not separated above K/V")
+plate = {}
+for nm_, rr in (("BASELINE", BH), ("REG3", R3)):
+    ub = [r for r in rr.values() if not bound(r)]
+    accs = [r["acc"] for r in ub]
+    cel = [[c_["acc"] for c_ in r["acc_by_cell"].values()] for r in ub]
+    flat = sum(1 for r, cc in zip(ub, cel) if all(abs(x - r["acc"]) <= 0.1 for x in cc))
+    cm = [med([r["acc_by_cell"][k]["acc"] for r in ub]) for k in keys]
+    plate[nm_] = (len(ub), accs, flat, cm, sum(1 for a_ in accs if 0.45 <= a_ <= 0.55), Counter(cls(r) for r in ub))
+row(263, "The unbound Hebbian runs sit at chance between the streams in every cell, as the layers-2--3 oracle did",
+    "S72 BASELINE / REG3 unbound runs: per-run accuracy, per-cell flatness (explore_g_register3.py's rule: every cell within 0.1 "
+    "of the run's mean), per-cell medians", "at chance in every cell (every unbound run)",
+    "; ".join(f"{k}: {v[0]} unbound ({dict(v[5])}), acc {rng(v[1])}, acc in 0.45-0.55 in {v[4]}/{v[0]}, flat runs {v[2]}/{v[0]}, "
+              f"cell medians {rng(v[3])}" for k, v in plate.items()),
+    "PARTIAL",
+    "true of the per-cell medians and of most runs; not of every run (flat by the docstring's 0.1 rule in "
+    f"{plate['BASELINE'][2]}/{plate['BASELINE'][0]} and {plate['REG3'][2]}/{plate['REG3'][0]}); 'as the layers-2-3 oracle did' "
+    "inherits the S71 DISAGREE above (the oracle's runs are bimodal, 0.31-0.54). Not a pre-fixed reading: S72's plateau "
+    "follow-up was conditional on 'architecture insufficient', which did not apply")
+resb = sorted(s for s, r in RES.items() if bound(r))
+resk = sorted(s for s in resb if cls(RES[s]) == "KEY")
+row(263, "the residual gate alone routes $0/10$ on delta ($5/10$ bound, three by key splits)", "S73 RESGATE_ONLY_D ROUTED-BOUND, "
+    "BOUND, key-split bound runs (v1 KEY on the end gate)", "0/10 routed; 5/10 bound, 3 by key splits",
+    f"ROUTED-BOUND {cnt(RES, rb)}/10; BOUND {len(resb)}/10 {resb}; key-split bound {len(resk)} {resk}",
+    "MATCH" if (cnt(RES, rb), len(resb), len(resk)) == (0, 5, 3) else "DISAGREE")
+zend = {s: r["end"]["beta"] for s, r in L3ND.items()}
+exact = sum(1 for z in zend.values() if round(z["CTX"], 2) == 1 and round(z["KEY"], 2) == 0 and round(z["VAL"], 2) == 0)
+row(263, ["holds an exact latch when nudged ($9/10$ routed, $z = 1$ at the context token and $0$ elsewhere)"],
+    "S73 LATCH3_NUDGE_D ROUTED-BOUND; end z CTX = 1, KEY = VAL = 0 (2 dp)", "9/10 routed; z = 1 / 0 / 0",
+    f"ROUTED-BOUND {cnt(L3ND, rb)}/10; exact latch {exact}/10; reading 'the latch holds on delta memory' (z >= 0.9 / <= 0.1 on "
+    f">= 8/10): {sum(1 for z in zend.values() if z['CTX'] >= 0.9 and z['KEY'] <= 0.1 and z['VAL'] <= 0.1)}/10",
+    "MATCH" if cnt(L3ND, rb) == 9 and exact == 9 else "DISAGREE")
+z1200 = {s: at_step(r, 1200)["beta"] if at_step(r, 1200) else None for s, r in sorted(L3D.items())}
+all1 = sorted(s for s, z in z1200.items() if z and all(z[k] >= 0.99 for k in ("CTX", "KEY", "VAL")))
+zendD = {s: r["end"]["beta"] for s, r in sorted(L3D.items())}
+row(263, "goes to $z = 1$ everywhere by update 1200", "S73 LATCH3_D z at CTX/KEY/VAL at update 1200 and at the end, per run",
+    "z = 1 everywhere by 1200", f"z >= 0.99 at every role at 1200 in {len(all1)}/10 runs; not: "
+    + ", ".join(f"{s} ({z1200[s]['CTX']:.2f}/{z1200[s]['KEY']:.2f}/{z1200[s]['VAL']:.2f} at 1200; end {zendD[s]['CTX']:.2f}/"
+                f"{zendD[s]['KEY']:.2f}/{zendD[s]['VAL']:.2f})" for s in z1200 if s not in all1),
+    "MATCH" if len(all1) == 10 else "PARTIAL", "true of the median run (report_4.md:86), not of every run")
+lk_unb = sum(1 for r in L3D.values() if not bound(r) and cls(r) == "KEY")
+lk_all = sum(1 for r in L3D.values() if cls(r) == "KEY")
+row(263, "and key-splits $9/10$", "S73 LATCH3_D key splits (v1)", "9/10",
+    f"unbound KEY {lk_unb}/10 (the printed class count); all runs {lk_all}/10 (the bound run "
+    f"{[s for s, r in L3D.items() if bound(r)]} is a key-split binding)", "PARTIAL" if lk_all != lk_unb else "MATCH",
+    "the draft counts key splits over all runs for REG3_D (14) but over unbound runs here (9); on the same population as "
+    "the 14 this would be 10/10")
+s57z = {s: (at_step(r, 1200) or {}).get("beta") for s, r in sorted(A["LATCH"].items())}
+s57all1 = sum(1 for z in s57z.values() if z and all(z[k] >= 0.99 for k in ("CTX", "KEY", "VAL")))
+s57cls = Counter(cls(r) if not bound(r) else "BOUND" for r in A["LATCH"].values())
+row(263, "as it had on the fixed layout", "S57 LATCH (fixed P = 8 layout, 410-419): z at 1200; failure classes",
+    "the same behaviour on the fixed layout", f"z >= 0.99 at every role at 1200 in {s57all1}/10; classes {dict(s57cls)}",
+    "PARTIAL" if s57cls.get("KEY", 0) < 9 else "MATCH",
+    "holds for 'z = 1 everywhere by 1200'; if the clause also covers 'key-splits 9/10', the fixed layout's LATCH key-split "
+    f"{s57cls.get('KEY', 0)}/10 (report_2.md: POSITION 4, OTHER 3, KEY 3)")
+row(263, "one delta channel binds the layout $7/10$ with no gate", "S73 SINGLE_D BOUND", "7/10", f"{cnt(SGL, bound)}/10",
+    "MATCH" if cnt(SGL, bound) == 7 else "DISAGREE", "S73's 'the gate is not needed on this task' (>= 8/10) did not apply; the "
+    "draft does not name it", v2=("MATCH", "the second draft now names 'the gate is not needed' as not applying (7/10)"))
+
+
+def pk(r, site="L3"):
+    return r["probe"][f"{site}|K"]["acc"], r["probe"][f"{site}|V"]["acc"]
+
+
+routed = [(a, s, r) for a, rr in (("REG3", R3), ("REG3_NUDGE", R3N), ("REG3_D", R3D), ("REG3_NUDGE_D", R3ND),
+                                   ("LATCH3_NUDGE_D", L3ND)) for s, r in rr.items() if rb(r)]
+rk = [pk(r) for _, _, r in routed]
+row(263, "finds the stream in the residual of no routed run", "in-run probe at the residual entering layer 3 in every ROUTED-BOUND "
+    "run (S72 + S73)", "no routed run", f"{len(routed)} runs; K >= 0.9 and V >= 0.9 in {sum(k >= 0.9 and v >= 0.9 for k, v in rk)}; "
+    f"K >= 0.9 in {sum(k >= 0.9 for k, _ in rk)}; K {rng([k for k, _ in rk])}, V {rng([v for _, v in rk])}",
+    "MATCH" if not any(k >= 0.9 and v >= 0.9 for k, v in rk) else "DISAGREE",
+    "'finds the stream' read as the docstring's >= 0.9 at K and at V (register3_delta.py:30-32)")
+nonr = [(a, s, r) for a, rr in (("BASELINE_D", BD), ("REG3_D", R3D), ("RESGATE_ONLY_D", RES), ("LATCH3_D", L3D),
+                                 ("SINGLE_D", SGL)) for s, r in rr.items() if bound(r) and (a == "SINGLE_D" or not rb(r))]
+nk = [(a, pk(r)) for a, _, r in nonr]
+both = sum(1 for _, (k, v) in nk if k >= 0.9 and v >= 0.9)
+konly = sum(1 for _, (k, v) in nk if k >= 0.9)
+row(263, "and of most non-routing solutions", "in-run probe L3 in the bound runs that do not route (S73: BASELINE_D, REG3_D, "
+    "RESGATE_ONLY_D, LATCH3_D bound and not ROUTED-BOUND; SINGLE_D bound)", "most",
+    f"{len(nk)} runs; K >= 0.9 and V >= 0.9 in {both}; K >= 0.9 in {konly}; by arm: "
+    + ", ".join(f"{a} {sum(1 for b_, (k, v) in nk if b_ == a and k >= 0.9 and v >= 0.9)}/{sum(1 for b_, _ in nk if b_ == a)}"
+                for a in ("BASELINE_D", "REG3_D", "RESGATE_ONLY_D", "LATCH3_D", "SINGLE_D")),
+    "MATCH" if both > len(nk) / 2 else "PARTIAL",
+    "with the docstring's criterion (>= 0.9 at K and at V) the stream is found in fewer than half of the non-routing "
+    "solutions; 'most' holds at K alone" if both <= len(nk) / 2 else "")
+sk = [pk(r) for r in SGL.values() if bound(r)]
+row(263, "the single channel's bound runs at $0.93$--$1.00$;", "SINGLE_D bound runs, probe L3 K / V", "0.93-1.00",
+    f"K {rng([k for k, _ in sk])}, V {rng([v for _, v in sk])}", "PARTIAL" if min(v for _, v in sk) < 0.9 else "MATCH",
+    "the range is K's only; at V the stream is not found in every bound run")
+half = {s: r for s, r in BD.items() if bound(r) and 0.4 <= r["end"]["margin"] <= 0.6}
+hk = [pk(r) for r in half.values()]
+row(263, "the half-routed baseline's at $0.86$--$1.00$", "BASELINE_D bound runs with end margin in 0.4-0.6 (half-routed), probe L3 "
+    "K / V", "0.86-1.00", f"{len(half)} runs (margin {rng([r['end']['margin'] for r in half.values()])}); K {rng([k for k, _ in hk])}, "
+    f"V {rng([v for _, v in hk])}; all 14 bound: K {rng([pk(r)[0] for r in BD.values() if bound(r)])}, V "
+    f"{rng([pk(r)[1] for r in BD.values() if bound(r)])}", "PARTIAL" if min(v for _, v in hk) < 0.86 else "MATCH",
+    "K's range only; V goes down to 0.79",
+    v2=("PARTIAL", "the second draft labels the single channel's range 'at keys' and lists this one after it in the same "
+        "parenthesis without the label; it is K's range only (V 0.79-0.99), so the parallel reading is right only if "
+        "'at keys' is read as covering both"))
+row(263, "which is a description of a $2\\times2$ the screen fixed as descriptive", "BASELINE_D 2x2 probe (>= 0.9 at K and V) x "
+    "ROUTED-BOUND; S73 reading 'the delta stack carries the cue' (>= 10/20)", "descriptive",
+    f"[[probe & routed, probe & not], [no probe & routed, no probe & not]] = "
+    f"[[{sum(1 for r in BD.values() if min(pk(r)) >= 0.9 and rb(r))}, {sum(1 for r in BD.values() if min(pk(r)) >= 0.9 and not rb(r))}], "
+    f"[{sum(1 for r in BD.values() if min(pk(r)) < 0.9 and rb(r))}, {sum(1 for r in BD.values() if min(pk(r)) < 0.9 and not rb(r))}]]; "
+    f"reading: {sum(1 for r in BD.values() if min(pk(r)) >= 0.9)}/20 -> does not apply", "MATCH",
+    "the draft does not state that the pre-fixed 'the delta stack carries the cue' did not apply",
+    v2=("MATCH", "the second draft now states that 'the delta stack carries the cue' did not apply (the baseline 7/20)"))
+
+# ═════════════════════════════════════════════════════════════════════════════
+# tex:265, 449, 36, 312: key split 'forms first' (descriptive timing check)
+# ═════════════════════════════════════════════════════════════════════════════
+timing = []
+for nm_, rr in (("REG3", R3), ("REG3_D", R3D)):
+    for s, r in sorted(rr.items()):
+        ks = next((st["step"] for st in r["stats"] if "eta_key_by_key" in st and st["eta_key_by_key"] >= 0.5), None)
+        wr = next((st["step"] for st in r["stats"] if st.get("beta") and st["beta"]["CTX"] > max(st["beta"]["KEY"], st["beta"]["VAL"]) + 0.05), None)
+        timing.append((nm_, s, rb(r), cls(r), ks, wr))
+failK = [t for t in timing if not t[2] and t[3] == "KEY"]
+first = sum(1 for t in failK if t[4] is not None and (t[5] is None or t[5] > t[4]))
+at1200 = sum(1 for t in failK if t[4] == 1200)
+neverw = sum(1 for t in failK if t[5] is None)
+rout = [t for t in timing if t[2]]
+row(265, "by a key split that forms first", "REG3 + REG3_D key-split failures: first evaluation with eta^2 by key at KEY >= 0.5 "
+    "(returned gate; recorded at 1200/2400/3600/end) vs first evaluation with beta^R CTX > max(KEY, VAL) + 0.05",
+    "a key split forms first", f"{len(failK)} key-split failures: split before any CTX write in {first}; split already at 1200 in "
+    f"{at1200}; CTX write never appears in {neverw}. Routed runs: CTX write appears at "
+    f"{sorted(t[5] for t in rout if t[5] is not None)}",
+    "MATCH" if first == len(failK) else "PARTIAL",
+    "descriptive, unmarked here; the grid is coarse (eta^2 by key recorded at 1200, 2400, 3600 and the end only), so 'first' "
+    "means 'by the first recorded evaluation'",
+    v2=("PARTIAL", "the fragment now opens the S82 paragraph ('The discovering runs fail by a key split that forms first'): "
+        "the order agrees with the records, but it is 14 of the 16 failures on each memory in S72/S73 (16 of S82's 18 unbound "
+        "REG3 runs), not every failure; unmarked as a description; and its subject should be the label-free runs that fail, "
+        "not 'the discovering runs'"))
+row(449, "the write at the cue is found on a fifth of seeds, and a key split forms first on the rest",
+    "label-free REG3 / REG3_D: ROUTED-BOUND; the rest", "a fifth; key split first on the rest",
+    f"{cnt(R3, rb)}/20 and {cnt(R3D, rb)}/20; of the other 16 per memory, key splits {kc['Hebbian REG3'][3]} and {kc['delta REG3_D'][3]} "
+    f"(Hebbian also {dict(kc['Hebbian REG3'][5])}; delta {dict(kc['delta REG3_D'][5])})", "PARTIAL",
+    "14 of the 16 'rest' on each memory are key splits (Hebbian: 2 OTHER; delta: 2 bound STREAM-PARTIAL); unmarked description")
+row(36, "the failures being key splits that form first", "abstract: label-free failures", "the failures are key splits that form first",
+    f"key splits {kc['Hebbian REG3'][3]}/16 and {kc['delta REG3_D'][3]}/16 of the non-ROUTED-BOUND runs", "PARTIAL",
+    "14 of 16 per memory; unmarked description in the abstract")
+row(36, "perfect gates at the later layers alone bind $0/10$", "abstract: S71 ORACLE_23", "0/10", f"{cnt(O23, bound)}/10",
+    "MATCH" if cnt(O23, bound) == 0 else "DISAGREE")
+rhl = src(G, "explore_g_rhl_child.py")
+assert "RHL = ft.RandHeaderTask(P=4, nb=2, lmin=1, lmax=3)" in rhl
+row(36, ["carries a cue up to six tokens away $20/20$ when nudged by labels", "found label-free on $4/20$ seeds"],
+    "abstract: cue distance on RandHeaderTask-lite; nudged and label-free counts", "up to six tokens; 20/20 nudged; 4/20 label-free",
+    f"RandHeaderTask(P=4, nb=2, lmin=1, lmax=3) (explore_g_rhl_child.py:{lineno(G, 'explore_g_rhl_child.py', 'RHL = ft.RandHeaderTask')}): "
+    f"a block is CTX + 1-3 (key, value) pairs, so the last value is 6 tokens after its CTX; REG3_NUDGE {cnt(R3N, rb)}/20; "
+    f"REG3 {cnt(R3, rb)}/20", "MATCH", "'20/20' is the Hebbian count (delta nudged 10/10)")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# tex:265 other statements
+# ═════════════════════════════════════════════════════════════════════════════
+row(265, "told where to split, it binds 20 of 20", "S72 REG3_NUDGE ROUTED-BOUND", "20 of 20", f"{cnt(R3N, rb)}/20",
+    "MATCH" if cnt(R3N, rb) == 20 else "DISAGREE")
+row(265, "The architecture that carries a distant cue label-free exists on the main line's own memory",
+    "label-free carrying on Hebbian memory", "exists (stated as a finding)", f"REG3 (label-free) {cnt(R3, rb)}/20 ROUTED-BOUND vs "
+    f"BASELINE {cnt(BH, rb)}/20, 4 vs 0, p = 0.0625: S72 reading 'not discovered'; the reading that applied, 'the register carries "
+    "the cue at all three layers', is on the NUDGED arm", "PARTIAL",
+    "four label-free seeds show the architecture can carry the cue without labels, which is a description; the paragraph "
+    "presents it as the change, while the pre-fixed reading on label-free discovery is 'not discovered'")
+p8 = mcnemar1(8, 0)
+row(265, "at the observed rate, 40 pairs would put the pooled comparison near 8 vs 0 ($p = 0.004$)",
+    "projection: 4/20 vs 0/20 per 20 pairs, scaled to 40", "8 vs 0, p = 0.004", f"one-sided McNemar 8 vs 0 = {p8:.4f}",
+    "MATCH" if round(p8, 3) == 0.004 else "DISAGREE", "arithmetic only; see the S82 section for REG3 vs BASELINE on new seeds "
+    "(2100-2119), recorded before the draft's commit")
+r56 = A["RESGATE_ONLY"]
+resp = [pk(r) for r in RES.values()]
+resk_all = sum(1 for r in RES.values() if cls(r) == "KEY")
+row(265, ["The audit's per-layer gate over the residual stream is closed", "it key-splits ($0/10$ twice)"],
+    "S56 RESGATE_ONLY (Hebbian, P = 8, layers 2-3) and S73 RESGATE_ONLY_D (delta, RHL, all three layers)",
+    "0/10 twice; key-splits; nothing in the stack to read",
+    f"S56: BOUND {cnt(r56, bound)}/10, KEY {sum(1 for r in r56.values() if cls(r) == 'KEY')}/10; S73: ROUTED-BOUND {cnt(RES, rb)}/10 but "
+    f"BOUND {cnt(RES, bound)}/10, key splits (all runs) {resk_all}/10; S73 RESGATE_ONLY_D probe L3 >= 0.9 at K and V in "
+    f"{sum(1 for k, v in resp if k >= 0.9 and v >= 0.9)}/10 (K {rng([k for k, _ in resp])})", "PARTIAL",
+    "the two zeros are different outcomes (BOUND on S56's Hebbian P = 8 layout; ROUTED-BOUND on S73's delta RHL, where it binds "
+    "5/10); it key-splits in 10/10 and 8/10. 'Closed' is not a pre-fixed reading (S73's is only 'discovered (residual gate)', "
+    "which did not apply), and 'nothing in the stack to read' is S55's Hebbian result, while tex:263 says the delta stack can "
+    "learn stream-tagged keys")
+row(265, "the hinge's key term on the shared gate, a slow gate for the first 1200 updates, a gate without the raw window input",
+    "S82's three devices (explore_g_devices.py at 83699a2)", "key-term hinge; slow gate 1-1200; no window input",
+    "REG3_KEYHINGE (S52's key-term hinge, updates 1-2400, on the three layers' gates); REG3_SLOWGATE (gate group 1e-4 for "
+    "updates 1-1200); REG3_NOWIN (gate reads [LN(r); R_{t-1}] only)", "MATCH", "explore_g_devices.py:15-21 at 83699a2")
+specs = [p_ for b_ in (DRAFT, MAIN) for p_ in git("ls-tree", "--name-only", "-r", b_).split("\n") if p_.startswith("specs/")]
+row(265, "a pre-registered main-line test of the register against the baseline on the randomised header layout",
+    "a specification for the main-line register test", "pre-registered, queued",
+    f"specs/ at {DRAFT} and on the main line: {sorted(set(specs))}; no register test specification", "NOT RECORD-CHECKABLE",
+    "no committed specification exists to check 'pre-registered' against; the phrase describes a plan")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# far table (tex:293-307)
+# ═════════════════════════════════════════════════════════════════════════════
+row(293, "session G, seeds 700--719", "table header: seeds", "700-719", "S71 arms and S73's 10-seed arms on 700-709; S72 / S73 "
+    "20-seed arms on 700-719; RandHeaderTask-lite S = 2, P = 4, k = 2, 24000 updates", "MATCH", "the 10-run rows are on 700-709")
+tab = [
+    (295, "perfect gate, all three layers & $10/10$ & $10/10$", "ORACLE_ALL / ORACLE_ALL_D BOUND", (cnt(OA, bound), cnt(OAD, bound)), (10, 10)),
+    (296, "perfect gate, layers 2--3 only (window gate at layer 1) & $0/10$ & $10/10$", "ORACLE_23 / ORACLE_23_D BOUND",
+     (cnt(O23, bound), cnt(O23D, bound)), (0, 10)),
+    (297, "perfect gate, layer 1 only & $9/10$ & ---", "ORACLE_1 BOUND (no delta arm)", (cnt(O1, bound),), (9,)),
+    (298, "window gate + SLOW (ROUTED-BOUND; bound) & $0/20$ ($1/20$) & $0/20$ ($14/20$)", "BASELINE / BASELINE_D ROUTED-BOUND (BOUND)",
+     (cnt(BH, rb), cnt(BH, bound), cnt(BD, rb), cnt(BD, bound)), (0, 1, 0, 14)),
+    (299, "labelled nudge & $\\mathbf{20/20}$ & $\\mathbf{10/10}$", "REG3_NUDGE / REG3_NUDGE_D ROUTED-BOUND", (cnt(R3N, rb), cnt(R3ND, rb)), (20, 10)),
+    (300, "label-free & $4/20$ & $4/20$", "REG3 / REG3_D ROUTED-BOUND", (cnt(R3, rb), cnt(R3D, rb)), (4, 4)),
+    (301, "no register & --- & $0/10$", "RESGATE_ONLY_D ROUTED-BOUND", (cnt(RES, rb),), (0,)),
+    (302, "label-free / nudged & --- & $0/10$ / $9/10$", "LATCH3_D / LATCH3_NUDGE_D ROUTED-BOUND", (cnt(L3D, rb), cnt(L3ND, rb)), (0, 9)),
+    (303, "one channel, no gate (bound) & --- & $7/10$", "SINGLE_D BOUND", (cnt(SGL, bound),), (7,)),
+]
+for n_, nd_, it, got, want in tab:
+    row(n_, nd_, "table: " + it, " / ".join(map(str, want)), " / ".join(map(str, got)), "MATCH" if got == want else "DISAGREE")
+f70 = {a: (cnt(rr, rb), cnt(rr, routed_star), cnt(rr, bound), sorted(rr)) for a, rr in FA.items()}
+row(306, ["perfect-gate rows are BOUND, the others ROUTED-BOUND", "(S70, 330--349) is $0/20$ routed on either memory with $1/20$ and $6/20$ bound"],
+    "caption: outcomes per row; F's S70 window baseline", "S70: 0/20 routed, 1/20 and 6/20 bound",
+    "; ".join(f"{a}: ROUTED*@end {v[1]}/20, BOUND {v[2]}/20, seeds {v[3][0]}-{v[3][-1]}" for a, v in f70.items())
+    + "; rows 295-297 BOUND, 298 both, 299-302 ROUTED-BOUND, 303 BOUND (labelled)",
+    "MATCH" if (f70["S70_HEBB"][1], f70["S70_HEBB"][2], f70["S70_DELTA"][1], f70["S70_DELTA"][2]) == (0, 1, 0, 6) else "DISAGREE",
+    f"F's store explore_out/F/rh_lite_results.json at {F}; the one-channel row is BOUND, as its label says")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# tex:114 (ROUTED*@end), tex:415
+# ═════════════════════════════════════════════════════════════════════════════
+c2g = src(G, "explore_common2.py")
+c2f = src("origin/claude/explore-F", "explore_common2.py")
+okdef = all("ROUTE_MARGIN, ROUTE_ETA = 0.9, 0.9" in t and 'd["margin"] >= ROUTE_MARGIN and d["eta_key_by_stream"] > ROUTE_ETA' in t for t in (c2g, c2f))
+row(114, "routing margin $\\geq 0.9$ and $\\eta^2$ by stream at key positions $> 0.9$ at the end", "ROUTED*@end definition",
+    "margin >= 0.9 and eta^2 by stream at KEY > 0.9", f"explore_g_rhl_parent.py:{lineno(G, 'explore_g_rhl_parent.py', 'ROUTE_MARGIN, ROUTE_ETA = 0.9, 0.9')} "
+    f"and :{lineno(G, 'explore_g_rhl_parent.py', 'def routed_star')}-45 (G, {G}); explore_common2.py:"
+    f"{lineno(G, 'explore_common2.py', 'ROUTE_MARGIN, ROUTE_ETA = 0.9, 0.9')}, :{lineno(G, 'explore_common2.py', 'def routed_star')}-64 "
+    f"(G and F head identical: {okdef})", "MATCH" if okdef else "DISAGREE")
+row(114, "the readings of Sections~\\ref{sec:far} and \\ref{sec:replication} are on \\textbf{ROUTED-BOUND}",
+    "outcome of the Section 'far' readings", "ROUTED-BOUND", "S72 / S73: ROUTED-BOUND; S71: BOUND (explore_g_layers.py:"
+    f"{lineno(G, 'explore_g_layers.py', 'READINGS (BOUND')}); S56 / S57: BOUND and BOUND ROUTED (G's own, explore_g_register.py READINGS); "
+    "S55: probe medians", "PARTIAL",
+    "true of S72 / S73 only; the section's S71 readings are on BOUND (the table caption says so for the perfect-gate rows) "
+    "and S56 / S57's on BOUND / G's BOUND ROUTED")
+row(114, "one screen's reading named ``discovered'' was fixed on ROUTED-BOUND and would have come out differently on DISCOVERED",
+    "S73 'discovered (register)' on ROUTED-BOUND vs DISCOVERED", "differs", f"ROUTED-BOUND {paired(R3D, BD, rb)[:2]} p = "
+    f"{paired(R3D, BD, rb)[2]:.4f}; DISCOVERED {bdD[:2]} p = {bdD[2]:.4f}", "MATCH")
+row(415, "(4 vs 0 against 5 vs 0)", "S73 reading vs the outcome named DISCOVERED", "4 vs 0 against 5 vs 0",
+    f"{paired(R3D, BD, rb)[:2]} vs {bdD[:2]}; S72's DISCOVERED gives {paired(R3, BH, disc)[:2]} (the same as its ROUTED-BOUND)", "MATCH",
+    "only S73 is affected")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# tex:125 register gate vs code
+# ═════════════════════════════════════════════════════════════════════════════
+regm = src(G, "explore_g_regmodel.py")
+reg_rows = []
+
+
+def creg(item, draft, code, status, note=""):
+    reg_rows.append((item, draft, code, status, note))
+
+
+ln = lambda p_, nd_: f"{p_}:{lineno(G, p_, nd_)}"  # noqa: E731
+creg("register dimension", "16-dimensional", f"R_DIM = 16 ({ln('explore_g_regmodel.py', 'R_DIM = 16')})",
+     "MATCH" if "R_DIM = 16" in regm else "DISAGREE")
+creg("register update", "R_t = R_{t-1}(1 - beta_t) + beta_t W_R v_t",
+     f"R = R * (1 - b) + b * w[:, t], w = v @ W_R.T, v = raw embedding ({ln('explore_g_regmodel.py', 'R = R * (1 - b) + b * w[:, t]')}, "
+     f"{ln('explore_g_regmodel.py', 'w = v @ self.W_R.T')})", "MATCH")
+creg("write strength", "beta^R_t = sigmoid(w_R . v_t + b_R), b_R init logit 0.1",
+     f"beta = sigmoid(v @ w_R + b_R) ({ln('explore_g_regmodel.py', 'beta = torch.sigmoid(v @ self.w_R + self.b_R)')}); "
+     f"B_R0 = log(0.1 / 0.9) ({ln('explore_g_regmodel.py', 'B_R0 = math.log(0.1 / 0.9)')})", "MATCH")
+creg("written by every token", "every token writes", "beta in (0, 1) at every t (sigmoid); no gating of the write", "MATCH",
+     "not true of S57's / S73's latch, which is not the register gate")
+creg("causal read", "the gate at t reads R_{t-1}", f"prev.append(R) before the update ({ln('explore_g_regmodel.py', 'prev.append(R)')}); "
+     "CHECK (d) in checks_reg3 (token t's write changes no gate at <= t)", "MATCH")
+creg("one gate for all three layers", "one gate shared by all three layers",
+     f"make_reg3(..., gated=(1, 2, 3)) ({ln('explore_g_rhl_child.py', 'def make_reg3')}); A_v, A_r, A_R, W_g2 single tensors shared "
+     "by the gated layers (regmodel docstring); each layer's gate differs only through LN(r^(l))", "MATCH")
+creg("gate form", "g = softmax(W_g tanh(A [LN(r^(l)); u_t; R_{t-1}]))",
+     f"u = A_v x_in + A_r LN(r) + A_R Rprev; g = softmax(tanh(u) @ W_g2.T) ({ln('explore_g_regmodel.py', 'def layer_gate')}-"
+     f"{lineno(G, 'explore_g_regmodel.py', 'return F.softmax(torch.tanh(u) @ self.W_g2.T, dim=-1)')}); LN without affine; "
+     "r^(1) = LN(embedding)", "MATCH", "W_g in the draft is W_g2, a copy of the window gate's W_g (the original stays unused)")
+creg("u_t = the window gate's input", "u_t, the window gate's input",
+     f"Reg3BDH.layer_gate: x_in = gate_conv(v) if inp == 'window' ({ln('explore_g_rhl_child.py', 'x_in = self.gate_conv(v) if self.inp')}); "
+     f"make_reg3 default inp='window'", "MATCH", "LOCAL3's width-3 causal convolution of the raw embeddings")
+creg("initialisation", "A initialised so that the gate equals the window gate at step 0",
+     f"A_v = W_in (copy), W_g2 = W_g (copy), A_r, A_R ~ N(0, 0.01^2) ({ln('explore_g_regmodel.py', 'm.A_r = nn.Parameter(torch.randn(hg, D, generator=g) * 0.01)')}); "
+     "rhl_child docstring: 'u = W_in window_t + a perturbation at every layer at step 0'; CHECK (b) equals LOCAL3 only with "
+     "A_r = A_R = 0 set by hand", "PARTIAL",
+     "the gate equals the window gate up to a small random perturbation, not exactly (the spec said u ~ W_in v_t)")
+creg("stop-gradient", "a stop-gradient from the gate into the stack",
+     f"make_reg3 passes sg=True; r = h.detach() if self.sg ({ln('explore_g_regmodel.py', 'r = h.detach() if self.sg else h')})", "MATCH")
+creg("REG3 = all three layers", "REG3 is this gate at all three layers", "ARMS 'REG3': ('reg3', ...) -> make_reg3 gated=(1, 2, 3); "
+     "CHECK (c) asserts m.gated == (1, 2, 3)", "MATCH")
+s56doc = src(G, "explore_g_register.py")
+creg("the earlier design", "Revision 8's design had it at layers 2-3 only, with the window gate at layer 1",
+     f"S56: GATED = (2, 3), layer 1 LOCAL3 ({ln('explore_g_regmodel.py', 'GATED = (2, 3)')}); but S56's gate read the raw embedding v_t, "
+     f"not the window (regmodel layer_gate u = v @ A_v.T; rhl_child: inp = 'v' is 'S56's code path'; explore_g_register.py:"
+     f"{lineno(G, 'explore_g_register.py', 'A_v v_t + A_R R_{t-1}')}). The layers 2-3 design is the main line's S56 prompt "
+     f"(docs/reading/parallel_sessions_prompts.md:{lineno(MAIN, 'docs/reading/parallel_sessions_prompts.md', 'Gate: layer 1 keeps LOCAL3')}, "
+     f"added ad8a92e 2026-10-08) and docs/reading/distant_cues_2026-10.md:{lineno(MAIN, 'docs/reading/distant_cues_2026-10.md', 'layer 1 keeps the window gate')}; "
+     "Revision 8's text names only 'a per-layer gate over the residual stream'", "PARTIAL",
+     "the layers are right; 'had it' is not the same gate: S56's register gate read v_t, REG3's reads the window, so REG3 changes "
+     "two things (layer 1, and the gate's input) relative to S56, and S71's perfect-gate result speaks only to the first")
+creg("the nudge", "the 5% labelled nudge (tex:261, :263)", f"300 Adam steps at lr 0.01 on the new gate / register parameters toward "
+     f"0.475 + 0.05 x onehot(stream) ({ln('explore_g_register_child.py', 'NUDGE_STEPS, NUDGE_LR, NUDGE_B, NUDGE_BASE, NUDGE_AMP')}); "
+     "REG3_NUDGE applies it to all three layers", "MATCH", "'5%' is the 0.05 amplitude of the target, before training")
+NEEDLE125 = {"register dimension": "16-dimensional register",
+             "initialisation": "with $A$ initialised so that the gate equals the window gate at step 0, and a stop-gradient",
+             "the earlier design": "Revision~8's design had it at layers 2--3 only"}
+for it, d_, c_, s_, nt in reg_rows:
+    row(125, NEEDLE125.get(it, "register gate (session~G)"), "register gate: " + it, d_, c_, s_, nt)
+reg_rows2 = [
+    ("initialisation", "A initialised so that the gate equals the window gate at step 0 up to a N(0, 0.01^2) perturbation of "
+     "its register and residual blocks", "A_v = W_in, W_g2 = W_g (copies); A_r (residual block) and A_R (register block) ~ "
+     f"N(0, 0.01^2) ({ln('explore_g_regmodel.py', 'm.A_r = nn.Parameter(torch.randn(hg, D, generator=g) * 0.01)')})", "MATCH", ""),
+    ("the earlier design", "session G's first design (S56) had a register gate at layers 2-3 only, reading the raw embedding "
+     "rather than the window, with the window gate at layer 1", f"S56 GATED = (2, 3) ({ln('explore_g_regmodel.py', 'GATED = (2, 3)')}); "
+     f"gate input v_t (explore_g_register.py:{lineno(G, 'explore_g_register.py', 'A_v v_t + A_R R_{t-1}')}); layer 1 LOCAL3", "MATCH",
+     "attributed to session G's S56 rather than to 'Revision 8's design'"),
+]
+row2(["up to a $\\mathcal{N}(0, 0.01^2)$ perturbation of its register and residual blocks"], "register gate: " + reg_rows2[0][0],
+     *reg_rows2[0][1:])
+row2(["session~G's first design (S56) had a register gate at layers 2--3 only, reading the raw embedding rather than the window"],
+     "register gate: " + reg_rows2[1][0], *reg_rows2[1][1:])
+
+# ═════════════════════════════════════════════════════════════════════════════
+# provenance (tex:502), S82
+# ═════════════════════════════════════════════════════════════════════════════
+first_add = {n_: git("log", "--diff-filter=A", "--format=%h", GBR, "--", f"{GD}report_{n_}.md").strip() for n_ in (1, 2, 3, 4)}
+nrun = (len(S55["runs"]), len(S56["runs"]) + len(S57["runs"]), len(S71["runs"]), len(S72["runs"]) + len(S73["runs"]))
+row(502, ["report 1, \\texttt{6cd36ff}", "report 2, \\texttt{427db36}", "report 3, \\texttt{35de6db}", "report 4, \\texttt{93422cf}", "22; 139; 50; 150"],
+    "provenance: report commits and run counts", "6cd36ff, 427db36, 35de6db, 93422cf; 22; 139; 50; 150",
+    f"report_n.md first added at {', '.join(first_add[n_] for n_ in (1, 2, 3, 4))}; records {nrun[0]}; {nrun[1]} "
+    f"(S56 {len(S56['runs'])} + S57 {len(S57['runs'])}); {nrun[2]}; {nrun[3]} (S72 {len(S72['runs'])} + S73 {len(S73['runs'])})",
+    "MATCH" if [first_add[n_] for n_ in (1, 2, 3, 4)] == ["6cd36ff", "427db36", "35de6db", "93422cf"] and nrun == (22, 139, 50, 150) else "DISAGREE")
+
+draft_t = ctime(DRAFT)
+ghead = short(GBR)
+gdraft = git("rev-list", "-1", f"--before={draft_t}", GBR).strip()[:7]
+spec_files = git("show", "--name-only", "--format=", S82SPEC).split()
+spec_hist = git("log", "--format=%h", GBR, "--", "explore_g_devices.py", "explore_g_devices_child.py").split()
+s82p = GD + "s82_devices_results.json"
+at_spec = [p_ for p_ in git("ls-tree", "--name-only", S82SPEC, GD).split("\n") if "s82" in p_]
+commits = git("log", "--reverse", "--format=%h %cI", f"{S82SPEC}..{GBR}", "--", s82p).strip().split("\n")
+first_rec = None
+for ln_ in commits:
+    h, t = ln_.split()
+    st = json.loads(git("show", f"{h}:{s82p}"))
+    if st.get("runs"):
+        first_rec = (h, t, len(st["runs"]))
+        break
+best_add = git("log", "--diff-filter=A", "--format=%h %cI", GBR, "--", GD + "s82_best.json").strip()
+best = json.loads(git("show", f"{GBR}:{GD}s82_best.json"))
+rep82 = [p_ for p_ in git("ls-tree", "--name-only", GBR, GD).split("\n") if re.search(r"report_[5-9]", p_)]
+
+
+def s82_state(ref):
+    st = json.loads(git("show", f"{ref}:{s82p}"))
+    rr = {a: runs(st, a) for a in sorted({k.split("|")[0] for k in st["runs"]})}
+    return st, rr
+
+
+st_d, rr_d = s82_state(gdraft)
+st_h, rr_h = s82_state(GBR)
+
+
+def s82_table(rr):
+    L = ["| arm | n | BOUND | ROUTED-BOUND | unbound classes (v1) |", "|---|---|---|---|---|"]
+    for a, x in rr.items():
+        cl = Counter(cls(r) for r in x.values() if not bound(r))
+        L.append(f"| {a} | {len(x)} | {cnt(x, bound)} | {cnt(x, rb)} | {', '.join(f'{k} {v}' for k, v in sorted(cl.items())) or '-'} |")
+    return "\n".join(L)
+
+
+ph1 = all(len(rr_d.get(a, {})) == n_ for a, n_ in (("BASELINE", 20), ("REG3", 20), ("REG3_KEYHINGE", 20), ("REG3_SLOWGATE", 20),
+                                                    ("REG3_NOWIN", 20), ("REG3_NUDGE", 2), ("ORACLE_ALL", 2)))
+reg82 = paired(rr_d["REG3"], rr_d["BASELINE"], rb)
+kh82 = paired(rr_d["REG3_KEYHINGE"], rr_d["BASELINE"], rb)
+kr82 = paired(rr_d["REG3_KEYHINGE"], rr_d["REG3"], rb)
+row(265, "Session~G's S82 is screening three devices against that", "S82 state at the draft's commit",
+    "screening three devices", f"phase 1 (the three devices, 104 runs) complete at {best_add.split()[0]} ({best_add.split()[1]}), "
+    f"best device written to s82_best.json ({best['device']}, ROUTED-BOUND {best['routed_bound']}/20); phase 2 (the best device "
+    f"on delta, 32 runs) running: {sum(len(v) for a, v in rr_d.items() if a.endswith('_D'))}/32 records at {gdraft} (the last G "
+    f"commit before the draft's {draft_t}); no S82 report", "PARTIAL",
+    "15 minutes before the draft's commit the three-device screen had finished and selected one device; the draft describes "
+    "it as still screening three, and gives no S82 numbers (none are reported by G either)")
+row(41, ["G's S82", "are running"], "S82 running", "running", f"phase 2 {sum(len(v) for a, v in rr_h.items() if a.endswith('_D'))}/32 at the "
+    f"fetched head {ghead}", "MATCH")
+row(502, "S82 running & \\texttt{93422cf}", "provenance: S82 and the pinned commit", "S82 running; commit 93422cf; no run count",
+    f"93422cf precedes S82's spec ({S82SPEC}, {ctime(S82SPEC)}); at {gdraft} the S82 store held {len(st_d['runs'])} records "
+    f"({sum(len(v) for a, v in rr_d.items() if not a.endswith('_D'))} phase 1 + {sum(len(v) for a, v in rr_d.items() if a.endswith('_D'))} phase 2)",
+    "PARTIAL", "the row pins a commit without S82; the table gives a running batch's partial count elsewhere ('118 at 5dfc2b5' for "
+    "batch 19) but none for S82")
+row(449, "The devices under screen attack the key split", "S82 state", "devices under screen",
+    f"phase 1 complete, {best['device']} chosen ({best_add.split()[1]})", "PARTIAL", "as tex:265")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# retrospective lines (tex:314, 338, 355, 378, 380, 459, 464)
+# ═════════════════════════════════════════════════════════════════════════════
+row(314, "where a Hebbian stack needs its first layer routed and a delta stack does not", "S71 readings behind it",
+    "Hebbian needs layer 1 routed; delta does not", f"'layer 1 is the block' ({b1} vs {c1}); 'delta tolerates an unrouted layer 1' "
+    f"(ORACLE_23_D {cnt(O23D, bound)}/10)", "MATCH" if r_block and r_tol else "DISAGREE", "perfect gates, RandHeaderTask-lite")
+row(338, "Each is marked where it appears", "the sessions' descriptive statements are marked where they appear",
+    "each is marked", "marked at tex:263 ('Descriptively', 'a description of a 2x2'); the same statements recur unmarked at tex:36 "
+    "('key splits that form first'), tex:265 ('the register's write at the context token ... a key split that forms first'), "
+    "tex:312, tex:449, and the tex:261 interpretation recurs unmarked at tex:355", "PARTIAL",
+    "see 'Descriptive statements: marked or not'",
+    v2=("PARTIAL", "the second draft adds 'those are now marked'. Marked now: tex2:261 (the whole interpretation, with its "
+        "two crossings), tex2:361, tex2:265's firing description ('as a description'). Still unmarked: tex2:384 '(it needed "
+        "layer~1)'; 'key split(s) that form(s) first' at tex2:36, :265, :316, :455; tex2:265's 'worse than nothing, because it "
+        "delays the register's write along with the split' and tex2:384's 'because it slows the write too'"))
+row(355, ["The probe found the cue absent", "the residual gate had nothing to read",
+          "that design choice is what sank its Hebbian register"],
+    "'Done.' item: probe, residual gate, register", "absent; nothing to read; carries the cue once it gates layer 1; the design "
+    "choice sank the Hebbian register", f"S55 'absent' (applies); S72 R1 'carries the cue at all three layers' ({cnt(R3N, rb)}/20, "
+    f"nudged); residual gate: S56 RESGATE_ONLY 0/10 BOUND (Hebbian, P = 8), S73 RESGATE_ONLY_D {cnt(RES, bound)}/10 BOUND, 0/10 "
+    "ROUTED-BOUND (delta; the delta stack carries the stream in 7/20 baselines); the design-choice clause is the tex:261 "
+    "interpretation, here unmarked", "PARTIAL",
+    "the readings are right; 'nothing to read' holds for the Hebbian stack (S55) only, and 'that design choice is what sank its "
+    "Hebbian register' is an interpretation across tasks (S56 fixed P = 8 vs S71/S72 RandHeaderTask-lite) and across gate "
+    "inputs (S56 v_t vs REG3 window), marked as ours at tex:261 but not here")
+row(378, "that the register at layers 2--3 would carry the cue on Hebbian memory (it needed layer~1)",
+    "overturned prediction", "the register at layers 2-3 did not carry the cue; it needed layer 1",
+    f"S56 R1 'architecture insufficient' (REG_NUDGE BOUND ROUTED {cnt(A['REG_NUDGE'], br56)}/10); 'needed layer 1': S71 perfect gates "
+    "(RandHeaderTask-lite) and S72's REG3 (all three layers, window input, other task); no register run at layers 2-3 exists on "
+    "RandHeaderTask-lite and no all-layer register run on P = 8", "PARTIAL",
+    "the overturned prediction is a reading; the parenthesis is the tex:261 interpretation, unmarked",
+    v2=("PARTIAL", "unchanged in the second draft: '(it needed layer~1)' is still the tex2:261 interpretation, unmarked here "
+        "although tex2:261 and tex2:361 now mark it as ours and as crossing two tasks and two gate inputs"))
+dc_ = src(MAIN, "docs/reading/distant_cues_2026-10.md")
+row(380, ["One screen (S71) settled it", "on the reasoning that its residual input is the embedding and carries no cue"],
+    "S71 settled the layer question; the recorded reason for keeping layer 1 on the window gate", "S71 settled it; reasoning: "
+    "layer 1's residual input is the embedding",
+    f"S71 'layer 1 is the block' applies; main line docs/reading/distant_cues_2026-10.md:"
+    f"{lineno(MAIN, 'docs/reading/distant_cues_2026-10.md', 'layer 1 keeps the window gate')}: 'layer 1 keeps the window gate (no "
+    "residual yet)'; the register is written from raw embeddings (W_R v_t)", "MATCH" if "layer 1 keeps the window gate (no residual yet)" in dc_ else "PARTIAL",
+    "the S71 reading is on perfect gates; 'settled' for the register gate rests on S72 as well")
+row(459, ["is found label-free on a fifth of seeds", "on Hebbian memory the first layer is the one that must be routed"],
+    "conclusion: label-free fifth; layer 1", "a fifth; layer 1 must be routed", f"REG3 {cnt(R3, rb)}/20, REG3_D {cnt(R3D, rb)}/20 "
+    f"(readings 'not discovered' / does not apply); S71 'layer 1 is the block'", "MATCH",
+    "the count is a description; its pre-fixed reading did not apply, which the conclusion does not say",
+    v2=("MATCH", "the count is a description (S72 'not discovered', S73 'discovered (register)' does not apply); on S82's fresh "
+        "seeds the same arm is 2/20 (Hebbian) and 2/10 (delta), which 'a fifth' does not cover; see the tex2:465 row"))
+row(464, "Session~G's key-split devices for the register (S82)", "'Next' list: S82", "next", f"phase 1 complete before the draft "
+    f"({best_add.split()[1]}); phase 2 running", "MATCH", "phase 2 (the chosen device on delta memory) is what remains")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# SECOND DRAFT: S82 (report 5, 8973d48) recomputed from the records
+# ═════════════════════════════════════════════════════════════════════════════
+S82 = load(G5, GD + "s82_devices_results.json")
+X = {a: runs(S82, a) for a in sorted({k.split("|")[0] for k in S82["runs"]})}
+_r82 = list(S82["runs"].values())
+integ82 = (len(_r82), sum(1 for r in _r82 if r.get("ok")), sum(1 for r in _r82 if r.get("attempt", 1) != 1),
+           sum(1 for r in _r82 if r["transition"] == transition(r["curve"])))
+assert integ82[1] == integ82[0] and integ82[3] == integ82[0]
+DEV = ("REG3_KEYHINGE", "REG3_SLOWGATE", "REG3_NOWIN")
+P4 = mcnemar1(4, 0)                                   # explore_g_devices.py:35 "p(4 vs 0) = 0.0625"
+assert abs(P4 - 0.0625) < 1e-12
+
+
+def keyf(rr):                                         # explore_g_devices.decide / report: unbound runs whose outcome is KEY
+    return sum(1 for r in rr.values() if not bound(r) and cls(r) == "KEY")
+
+
+def write_ok(r):                                      # explore_g_devices.write_ok
+    b_ = r["end"].get("beta")
+    return bool(b_ and b_["CTX"] > max(b_["KEY"], b_["VAL"]))
+
+
+def nwrite(rr):
+    return sum(write_ok(r) for r in rr.values())
+
+
+B82, R82 = X["BASELINE"], X["REG3"]
+RD82 = {}
+for d in ("REG3",) + DEV:
+    dsc = paired(X[d], B82, rb)
+    o_ = {"discovered": (dsc[2] < 0.05, dsc)}
+    if d != "REG3":
+        hl, ht = paired(X[d], R82, rb), paired(R82, X[d], rb)
+        o_["helps"] = (hl[2] <= P4, hl)
+        o_["hurts"] = (ht[2] <= P4, ht)
+        o_["working write"] = (keyf(X[d]) == 0 and nwrite(X[d]) >= 15, (keyf(X[d]), nwrite(X[d]), len(X[d])))
+    RD82[d] = o_
+_score = sorted((-cnt(X[d], rb), keyf(X[d]), i, d) for i, d in enumerate(DEV))
+best_re = dict(device=_score[0][3], routed_bound=-_score[0][0], key_failures=_score[0][1],
+               table={d: [-a_, k_] for a_, k_, _, d in _score})
+best5 = json.loads(git("show", f"{G5}:{GD}s82_best.json"))
+best_ok = all(best5[k] == best_re[k] for k in ("device", "routed_bound", "key_failures", "table"))
+KD, BD82, RDD82 = X["REG3_KEYHINGE_D"], X["BASELINE_D"], X["REG3_D"]
+ph2 = {ref: paired(KD, X[ref], rb) for ref in ("BASELINE_D", "REG3_D")}
+val82 = dict(oracle=(cnt(X["ORACLE_ALL"], bound), len(X["ORACLE_ALL"])), nudge=(cnt(X["REG3_NUDGE"], rb), len(X["REG3_NUDGE"])),
+             oracle_d=(cnt(X["ORACLE_ALL_D"], bound), len(X["ORACLE_ALL_D"])))
+
+# timing: readings before the first record; s82_best.json before phase 2
+spec82_t = ctime(S82SPEC)
+_hist = git("log", "--reverse", "--format=%h %cI", f"{S82SPEC}..{G5}", "--", GD + "s82_devices_results.json").strip().split("\n")
+first_rec82 = first_d82 = None
+for _ln in _hist:
+    _h, _t = _ln.split()
+    _ks = json.loads(git("show", f"{_h}:{GD}s82_devices_results.json")).get("runs", {})
+    if _ks and first_rec82 is None:
+        first_rec82 = (_h, _t, len(_ks))
+    if any(k.split("|")[0].endswith("_D") for k in _ks):
+        first_d82 = (_h, _t, len(_ks), sum(1 for k in _ks if k.split("|")[0].endswith("_D")))
+        break
+best_commits = git("log", "--format=%h %cI", G5, "--", GD + "s82_best.json").strip().split("\n")
+best_c = best_commits[-1].split()
+_st_b = json.loads(git("show", f"{best_c[0]}:{GD}s82_devices_results.json"))["runs"]
+n_at_best, d_at_best = len(_st_b), sum(1 for k in _st_b if k.split("|")[0].endswith("_D"))
+best_unchanged = json.loads(git("show", f"{best_c[0]}:{GD}s82_best.json")) == best5
+log82 = git("show", f"{G5}:{GD}s82.log")
+i_best, i_q32 = log82.find("S82 best device (phase 2)"), log82.find("32 runs queued")
+code82_hist = git("log", "--format=%h", G5, "--", "explore_g_devices.py", "explore_g_devices_child.py").split()
+parent82_hist = git("log", "-1", "--format=%h %cI", G5, "--", "explore_g_rhl_parent.py").strip()
+rep5_t = ctime(G5)
+specs_now = [p_ for p_ in git("ls-tree", "--name-only", "-r", DRAFT2).split("\n") if p_.startswith("specs/")]
+
+# descriptive quantities (report 5 'What happened'; the draft's 'as a description')
+KH = X["REG3_KEYHINGE"]
+eta_u = {u: med([statistics.fmean(r["hinge"]["eta_at"][u]) for r in KH.values()]) for u in ("1", "300", "600", "1200", "2400")}
+fired = [r["hinge"]["fired"] for r in KH.values()]
+
+
+def beta_med(rr, step=None):
+    if step is None:
+        v = [r["end"]["beta"] for r in rr.values()]
+    else:
+        v = [at_step(r, step)["beta"] for r in rr.values() if at_step(r, step)]
+    return {k: med([b_[k] for b_ in v]) for k in ("CTX", "KEY", "VAL")}
+
+
+kb1200, kb2400, kbend = beta_med(KH, 1200), beta_med(KH, 2400), beta_med(KH)
+ctx_end_rng = [r["end"]["beta"]["CTX"] for r in KH.values()]
+k1200_all = [at_step(r, 1200)["beta"] for r in KH.values()]
+k1200_rng = [b_[k] for b_ in k1200_all for k in ("CTX", "KEY", "VAL")]
+trc = Counter(r["transition"] for r in KH.values())
+eta_after = []
+for s, r in sorted(KH.items()):
+    v = [st_["eta_key_by_key"] for st_ in r["stats"] if "eta_key_by_key" in st_ and isinstance(st_["step"], int)
+         and st_["step"] >= r["transition"]] + [r["end"]["eta_key_by_key"]]
+    eta_after.append(max(v))
+stop82 = Counter(r.get("stopped_at") for r in KH.values())
+gap82 = Counter(r.get("stopped_at") - r["transition"] for r in KH.values())
+SG, NW = X["REG3_SLOWGATE"], X["REG3_NOWIN"]
+sgb, nwb, r3b = beta_med(SG), beta_med(NW), beta_med(R82)
+
+
+def first_split(r):
+    for st_ in r["stats"]:
+        if isinstance(st_["step"], int) and st_.get("eta_key_by_key", -1) >= 0.5:
+            return st_["step"]
+    return "end" if r["end"]["eta_key_by_key"] >= 0.5 else None
+
+
+fs = {a: {s: first_split(r) for s, r in X[a].items()} for a in ("REG3", "REG3_SLOWGATE", "BASELINE")}
+e1200 = {a: [at_step(r, 1200).get("eta_key_by_key") for r in X[a].values()] for a in ("REG3", "REG3_SLOWGATE")}
+sg_later = sum(1 for s in X["REG3_SLOWGATE"] if fs["REG3"][s] == 1200 and fs["REG3_SLOWGATE"][s] not in (1200,))
+sg_split1200 = sum(1 for v in e1200["REG3_SLOWGATE"] if v is not None and v >= 0.5)
+r3_split1200 = sum(1 for v in e1200["REG3"] if v is not None and v >= 0.5)
+sg_ctx1200 = beta_med(SG, 1200)
+r3_ctx1200 = beta_med(R82, 1200)
+nw_rb = sorted(s for s, r in NW.items() if rb(r))
+r3_rb = sorted(s for s, r in R82.items() if rb(r))
+s52_batch = "S52 two_stream_keysplits" in git("show", "origin/claude/outside-ideas:explore_out/README.md") and \
+    "batch 18" in git("show", "origin/claude/outside-ideas:explore_out/README.md")
+dev_doc = src(S82SPEC, "explore_g_devices.py")
+rep5 = src(G5, GD + "report_5.md")
+other_use = []                                        # seeds 2100-2119 in any other keyed store on the fetched branches
+for b_ in ("origin/claude/explore-F", "origin/claude/explore-H", "origin/claude/explore-I", "origin/claude/outside-ideas",
+           MAIN, "origin/claude/replicate-R"):
+    try:
+        hit = git("grep", "-l", "-E", r'"[A-Za-z0-9_]+\|21(0[0-9]|1[0-9])\|', b_, "--", "*.json")
+    except subprocess.CalledProcessError:
+        hit = ""
+    other_use += [h for h in hit.split("\n") if h]
+g_other = []
+for p_ in git("ls-tree", "--name-only", G5, GD).split("\n"):
+    if p_.endswith("_results.json") and "s82" not in p_:
+        if any(re.search(r"\|21(0\d|1\d)(\||$)", k) for k in json.loads(git("show", f"{G5}:{p_}")).get("runs", {})):
+            g_other.append(p_)
+
+# ═════════════════════════════════════════════════════════════════════════════
+# SECOND DRAFT: rows for new or changed sentences about Session G
+# ═════════════════════════════════════════════════════════════════════════════
+ks16 = (kc["Hebbian REG3"][2], kc["Hebbian REG3"][3], kc["delta REG3_D"][2], kc["delta REG3_D"][3])
+# --- abstract (tex2:36)
+row2(r"fourteen of the sixteen failures on each memory being key splits that form first", "abstract: label-free failures",
+     "14 of 16 per memory; key splits form first", f"Hebbian {ks16[1]} of {ks16[0]}, delta {ks16[3]} of {ks16[2]} (v1 KEY among "
+     f"the non-ROUTED-BOUND REG3 / REG3_D runs); split before any CTX write in {first}/{len(failK)} key-split failures",
+     "MATCH" if ks16 == (16, 14, 16, 14) else "DISAGREE",
+     "inside the abstract's 'Exploratory screens, which are not claims'; 'form first' is a description (eta^2 grid 1200/2400/3600/end)")
+row2(r"is found $20/20$ when a hinge on the gate's key-dependence holds the key split off for the first 2400 updates",
+     "abstract: S82 REG3_KEYHINGE", "20/20; hinge on updates 1-2400", f"REG3_KEYHINGE ROUTED-BOUND {cnt(KH, rb)}/{len(KH)} on 2100-2119; "
+     "hinge weight 1.0 for updates 1-2400 (LAM 1.0, TAU 0.2; explore_g_devices.py:16-18 at 83699a2)",
+     "MATCH" if cnt(KH, rb) == 20 else "DISAGREE", "Hebbian count; 'discovered' and 'helps' apply (see S82 readings)")
+row2(r"a training-time prior that reads the task's key positions and identities as the split does",
+     "abstract: what the hinge reads", "key positions and identities, as the split does",
+     "explore_g_devices.py:17-18: 'It reads key positions and key identities (token types), as the key split reads key positions; "
+     "it reads no stream label'; the channel split (KEYMASS) reads key positions only", "PARTIAL",
+     "'as the split does' attaches 'identities' to the split as well; tex2:265 says it right ('as the split reads key positions'). "
+     "The abstract does not say that the hinge reads no stream label (tex2:267 does: 'a solution without stream labels')")
+row2(r"as the register's are", "abstract: the register's key splits are prevented by the key term", "prevented",
+     f"REG3_KEYHINGE KEY failures {keyf(KH)}, ROUTED-BOUND {cnt(KH, rb)}/20; reading 'a working write without the device's cost' "
+     f"{'applies' if RD82['REG3_KEYHINGE']['working write'][0] else 'does not apply'}", "MATCH", "the S85 half of the sentence is session H's")
+# --- tex2:41, 59, 114, 228
+row2([r"G's S55--S82", r"E's batch~19 (S66--S67) and F's S81 are running"], "S82 status", "complete (not in the running list)",
+     f"report 5 at {G5} ({rep5_t}); {integ82[0]} records, {integ82[1]} ok, {integ82[2]} retried; phase 1 "
+     f"{sum(len(v) for a, v in X.items() if not a.endswith('_D'))}/104, phase 2 {sum(len(v) for a, v in X.items() if a.endswith('_D'))}/32; "
+     f"{G5} is the head of origin/claude/explore-G: {short(GBR) == G5}", "MATCH" if short(GBR) == G5 and integ82[0] == 136 else "PARTIAL")
+row2(r"$20/20$ with the key hinge", "index row: S82", "20/20 with the key hinge", f"REG3_KEYHINGE ROUTED-BOUND {cnt(KH, rb)}/20",
+     "MATCH" if cnt(KH, rb) == 20 else "DISAGREE")
+row2([r"the readings of session~G's S72, S73 and S82 (Section~\ref{sec:far}) are on \textbf{ROUTED-BOUND}",
+      r"while S71's and S56's are on bound and on G's own bound routed"], "outcome of G's readings", "S72/S73/S82 ROUTED-BOUND; "
+     "S71 BOUND; S56 BOUND and BOUND ROUTED",
+     f"S82: 'READINGS (ROUTED-BOUND, paired on 2100-2119' (explore_g_devices.py:{lineno(S82SPEC, 'explore_g_devices.py', 'READINGS (ROUTED-BOUND')}); "
+     f"S72/S73 ROUTED-BOUND; S71 BOUND (explore_g_layers.py:{lineno(G, 'explore_g_layers.py', 'READINGS (BOUND')}); S56 R1 on BOUND ROUTED, "
+     "R2-R5 on BOUND (explore_g_register.py READINGS)", "MATCH",
+     "S57 (same outcomes as S56) and S55 (probe medians) are not named; nothing in the sentence is wrong")
+row2(r"This is the result of session~G's S82 at the other place the key split forms", "S82 cited from session H's S85 paragraph",
+     "the key term, reading key positions and identities during the slow phase, prevents the split",
+     f"REG3_KEYHINGE: KEY failures {keyf(KH)}, ROUTED-BOUND 20/20, hinge on updates 1-2400 (the SLOW phase is 1-2400)", "MATCH")
+# --- tex2:259, 261
+row2(r"($0.53$--$0.56$ over the three sites)", "S55 ORACLE_P8 probe medians, L2 / L3 / final, K and V", "0.53-0.56",
+     f"{rng(m55o.values())}", "MATCH" if rng(m55o.values()) == "0.53-0.56" else "DISAGREE")
+latch_ok = sorted(s for s, r in A["REG_NUDGE"].items() if r["end"]["beta"]["CTX"] >= 0.895 and r["end"]["beta"]["KEY"] <= 0.1
+                  and r["end"]["beta"]["VAL"] <= 0.1)
+nb_m = (f2(med([b_["CTX"] for b_ in nb])), f2(med([b_["KEY"] for b_ in nb])), f2(med([b_["VAL"] for b_ in nb])))
+row2(r"its register writes a clean latch in eight of the ten runs (medians: $\beta^R$ $0.96$ at the context token against $0.02$ and $0.05$ at keys and values)",
+     "S56 REG_NUDGE clean latch; median end beta^R", "8/10; medians 0.96 / 0.02 / 0.05",
+     f"clean latch (CTX >= 0.9, KEY and VAL <= 0.1) {len(latch_ok)}/10 {latch_ok}; medians {' / '.join(nb_m)}",
+     "MATCH" if len(latch_ok) == 8 and nb_m == ("0.96", "0.02", "0.05") else "DISAGREE")
+rt_ok = sorted(s for s, v in mgr.items() if min(v[:2]) >= 0.995 and all(A["REG_NUDGE"][s]["end"]["layers"][f"L{l}"]["one_to_one_val"] for l in (2, 3)))
+row2(r"its gates route one-to-one with margin $1.00$ at layers 2 and 3 in the same eight", "S56 REG_NUDGE routing at L2, L3",
+     "one-to-one, margin 1.00, in the same eight runs", f"one-to-one and margin >= 0.995 at L2 and L3 in {len(rt_ok)}/10 {rt_ok}; "
+     f"the same set as the clean latch: {rt_ok == latch_ok}", "MATCH" if rt_ok == latch_ok else "DISAGREE")
+racc = {s: r["acc"] for s, r in sorted(A["REG_NUDGE"].items())}
+out_rng = {s: a_ for s, a_ in racc.items() if not (0.315 <= a_ < 0.445)}
+row2(r"its accuracy plateaus at $0.32$--$0.44$", "S56 REG_NUDGE end accuracy (10 runs)", "0.32-0.44",
+     f"run acc {rng(racc.values())} ({', '.join(f'{s} {a_:.2f}' for s, a_ in racc.items())}); stream acc "
+     f"{rng([x for v in sa.values() for x in v])}; outside 0.32-0.44 (2 dp): {', '.join(f'{s} {a_:.2f}' for s, a_ in out_rng.items())}",
+     "MATCH" if not out_rng else "DISAGREE",
+     "0.32-0.44 is report_2.md:86's wording; the records give 0.20-0.44: seed 378 (the weakest latch, beta^R CTX 0.77) plateaus "
+     "at 0.20 (streams 0.19 / 0.21) and 379 at 0.31. The first draft's 'every run at 0.32' (B7) is gone, but the range that "
+     "replaced it is still not the records'")
+d2 = {s: abs(round(v[0], 2) - round(v[1], 2)) for s, v in sa.items()}
+d_ex = {s: abs(v[0] - v[1]) for s, v in sa.items()}
+row2(r"with the two streams within $0.03$ of each other in seven of ten", "S56 REG_NUDGE |stream 0 - stream 1|", "7/10 within 0.03",
+     f"on 2-dp stream accuracies {sum(1 for v in d2.values() if v <= 0.03 + 1e-9)}/10; on unrounded {sum(1 for v in d_ex.values() if v <= 0.03)}/10 "
+     f"(370 differs by {d_ex[370]:.3f})", "MATCH" if sum(1 for v in d2.values() if v <= 0.03 + 1e-9) == 7 else "DISAGREE",
+     "7/10 holds on the 2-dp values; 6/10 on the unrounded ones")
+row2(r"the reading ``architecture insufficient'' applied", "S56 R1 (Hebbian)", "'architecture insufficient' applied",
+     f"REG_NUDGE BOUND ROUTED {cnt(A['REG_NUDGE'], br56)}/10 < 6/10: 'architecture insufficient'",
+     "MATCH" if cnt(A["REG_NUDGE"], br56) < 6 else "DISAGREE", "the delta R1 outcome ('neither', REG_NUDGE_D 7/10) is still not named")
+_r2key = sum(1 for r in rd.values() if not bound(r) and cls(r) == "KEY")
+row2(r"which met the screen's own rule for ``discovered'' on delta (6 against 2 with no unbound key failure; 4 vs 0 by McNemar, which was not its rule)",
+     "S56 R2 on delta (REG_D vs BASELINE_D)", "'discovered' by R2's rule: 6 vs 2, no unbound KEY failure",
+     f"REG_D BOUND {cnt(rd, bound)} >= BASELINE_D {cnt(bd, bound)} + 3; REG_D unbound KEY failures {_r2key} (rule: <= 2) -> "
+     f"{'discovered' if cnt(rd, bound) >= cnt(bd, bound) + 3 and _r2key <= 2 else 'not discovered'}",
+     "MATCH" if cnt(rd, bound) >= cnt(bd, bound) + 3 and _r2key == 0 else "DISAGREE")
+row2(r"binds $10/10$ (median 1200, range 1200--4800)", "S71 ORACLE_ALL BOUND, transitions", "10/10, median 1200, 1200-4800",
+     f"{cnt(OA, bound)}/10, median {med(trs(OA)):.0f}, {trs(OA)[0]}-{trs(OA)[-1]}",
+     "MATCH" if (cnt(OA, bound), med(trs(OA)), trs(OA)[0], trs(OA)[-1]) == (10, 1200, 1200, 4800) else "DISAGREE")
+lo = [a_ for a_ in acc23.values() if a_ < 0.43]
+hi = [a_ for a_ in acc23.values() if a_ >= 0.43]
+row2([r"the runs' accuracies $0.31$--$0.54$ in two clusters near $0.32$ and $0.53$",
+      r"the per-cell medians over runs $0.46$--$0.51$ in every (stream, block, pair) cell"],
+     "S71 ORACLE_23 per-run accuracy; per-cell medians", "0.31-0.54, clusters ~0.32 and ~0.53; cell medians 0.46-0.51",
+     f"run acc {rng(acc23.values())}: {len(lo)} runs {rng(lo)} (median {med(lo):.2f}), {len(hi)} runs {rng(hi)} (median {med(hi):.2f}); "
+     f"per-cell medians {rng(cellmed)}", "MATCH" if rng(acc23.values()) == "0.31-0.54" and rng(cellmed) == "0.46-0.51" else "DISAGREE")
+row2(r"the interpretation crosses two tasks (S56's fixed eight-key layout; S71's randomised one) and two gate inputs",
+     "the layer-1 interpretation: marking and scope", "ours; crosses two tasks and two gate inputs",
+     "S56: HeaderTask(8) fixed layout, gate input v_t; S71/S72: RandHeaderTask-lite, REG3 input window (rows above)", "MATCH",
+     "the whole interpretation, including 'that choice is what sank its Hebbian register', is now inside the marking")
+# --- tex2:263
+row2(r"so the pre-fixed reading ``discovered (register)'' applies on neither", "S72 / S73 label-free readings", "'discovered (register)' on neither",
+     f"S72: 'discovered' / 'not discovered' (explore_g_register3.py:{lineno(G, 'explore_g_register3.py', 'REG3 beats BASELINE')}) -> "
+     f"'not discovered' {paired(R3, BH, rb)[:2]}; S73: 'discovered (register)' -> does not apply {paired(R3D, BD, rb)[:2]}", "PARTIAL",
+     "substance right on both; the label is now S73's for both screens, where S72's reading is named 'discovered' (outcome "
+     "'not discovered'). The first draft's error was the reverse")
+row2(r"Two other readings of S73 did not apply either, ``the delta stack carries the cue'' (the baseline $7/20$) and ``the gate is not needed'' (one channel $7/10$)",
+     "S73 descriptive readings", "both did not apply; 7/20, 7/10",
+     f"'the delta stack carries the cue': {sum(1 for r in BD.values() if min(pk(r)) >= 0.9)}/20 (< 10/20); 'the gate is not needed': "
+     f"SINGLE_D {cnt(SGL, bound)}/10 (< 8/10)", "MATCH")
+row2(r"(14 of the 16 runs that did not route on each memory; on delta two of the 14 bound)", "REG3 / REG3_D key splits among the "
+     "non-ROUTED-BOUND runs", "14 of 16 each; 2 of delta's 14 bound", f"Hebbian {ks16[1]}/{ks16[0]}, delta {ks16[3]}/{ks16[2]}; delta "
+     f"bound key-split runs {kc['delta REG3_D'][4]}", "MATCH" if ks16 == (16, 14, 16, 14) and len(kc['delta REG3_D'][4]) == 2 else "DISAGREE")
+sep = sorted(((b_["CTX"] - max(b_["KEY"], b_["VAL"])), s) for s, b_ in ksr)
+row2(r"with $\beta^R$ at the context token not separated above keys and values", "end beta^R in the 28 key-split runs",
+     "CTX not separated above K/V", f"CTX <= max(KEY, VAL) + 0.05 in {ctxlow}/{len(ksr)}; the exception: REG3|712 CTX "
+     f"{R3[712]['end']['beta']['CTX']:.2f} vs KEY {R3[712]['end']['beta']['KEY']:.2f}, VAL {R3[712]['end']['beta']['VAL']:.2f} "
+     f"(+{sep[-1][0]:.2f})", "PARTIAL" if ctxlow < len(ksr) else "MATCH",
+     "replaces the first draft's 'flat across roles' (resolved); holds in 27 of 28; in REG3|712 (unbound, KEY) CTX sits 0.10 "
+     "above K/V, about the routed runs' lower edge (0.32 vs 0.16-0.24)")
+row2(r"The unbound Hebbian runs sit near chance between the streams (per-cell medians $0.46$--$0.55$; flat across cells by the screen's rule in about half of them)",
+     "S72 BASELINE / REG3 unbound runs", "per-cell medians 0.46-0.55; flat in about half",
+     "; ".join(f"{k}: {v[0]} unbound, flat {v[2]}/{v[0]}, cell medians {rng(v[3])}" for k, v in plate.items()),
+     "MATCH" if rng(plate['BASELINE'][3] + plate['REG3'][3]) == "0.46-0.55" else "PARTIAL",
+     "within the paragraph's 'Descriptively' passage; the S71 comparison is gone")
+row2(r"goes to $z = 1$ at every role by update 1200 in eight of ten runs", "S73 LATCH3_D z at 1200", "8/10",
+     f"z >= 0.99 at CTX, KEY, VAL at 1200 in {len(all1)}/10", "MATCH" if len(all1) == 8 else "DISAGREE")
+row2(r"key-splits in nine of its nine unbound runs", "S73 LATCH3_D key splits", "9 of 9 unbound",
+     f"unbound {sum(1 for r in L3D.values() if not bound(r))}, KEY among them {lk_unb}; all runs {lk_all}/10",
+     "MATCH" if lk_unb == 9 and sum(1 for r in L3D.values() if not bound(r)) == 9 else "DISAGREE")
+row2(r"(on the fixed layout, S57, it had gone to $z = 1$ in every run and key-split $3/10$)", "S57 LATCH (410-419)",
+     "z = 1 in every run by 1200; key-split 3/10", f"z >= 0.99 at every role at 1200 in {s57all1}/10; classes {dict(s57cls)}",
+     "MATCH" if s57all1 == 10 and s57cls.get("KEY", 0) == 3 else "DISAGREE")
+row2(r"among the 31 non-routing delta solutions it finds it at key positions in 18 and at both key and value positions in 13",
+     "S73 in-run probe L3 in the non-routing bound delta runs", "31; K 18; K and V 13", f"{len(nk)}; K >= 0.9 {konly}; both {both}",
+     "MATCH" if (len(nk), konly, both) == (31, 18, 13) else "DISAGREE")
+row2(r"the single channel's bound runs at $0.93$--$1.00$ at keys", "SINGLE_D bound runs, probe L3 at K", "0.93-1.00 at keys",
+     f"K {rng([k for k, _ in sk])} (V {rng([v for _, v in sk])})", "MATCH" if rng([k for k, _ in sk]) == "0.93-1.00" else "DISAGREE")
+# --- tex2:265, S82
+row2(r"session~G screened three devices against the key split on 20 fresh seeds (2100--2119), Hebbian memory",
+     "S82 phase 1: devices, seeds, memory", "three devices; 20 fresh seeds 2100-2119; Hebbian",
+     f"{', '.join(f'{d} {len(X[d])}' for d in DEV)} on {min(KH)}-{max(KH)}; seeds 2100-2119 in no other keyed store on G "
+     f"({g_other or 'none'}) or on F, H, I, E, R, the main line ({other_use or 'none'})", "MATCH")
+row2(r"with the baseline, REG3 and a nudged pair for validity ($2/2$, with the perfect gate $2/2$)", "S82 references and validity arms",
+     "BASELINE, REG3; REG3_NUDGE 2/2; ORACLE_ALL 2/2", f"BASELINE {len(B82)}, REG3 {len(R82)}; REG3_NUDGE ROUTED-BOUND "
+     f"{val82['nudge'][0]}/{val82['nudge'][1]}; ORACLE_ALL BOUND {val82['oracle'][0]}/{val82['oracle'][1]} (transitions "
+     f"{trs(X['ORACLE_ALL'])}); ORACLE_ALL_D {val82['oracle_d'][0]}/{val82['oracle_d'][1]}; VALIDITY rule (oracle rerun >= 1/2): VALID",
+     "MATCH" if val82["nudge"] == (2, 2) and val82["oracle"] == (2, 2) else "DISAGREE")
+row2(r"The hinge's key term of batch~18, a penalty on the shared gate's dependence on key identity at key positions during updates 1--2400 (REG3\_KEYHINGE)",
+     "S82 REG3_KEYHINGE: what the device is", "batch 18's key term; key identity at key positions; updates 1-2400",
+     "explore_g_devices.py:16-18 (S52's key-term hinge, LAM 1.0, TAU 0.2, updates 1-2400, mean over the three layers' gates); "
+     f"S52 is batch 18's two_stream_keysplits (outside-ideas README): {s52_batch}; the child's term: LAM x mean_l relu(eta2_key(g^(l)) - TAU)",
+     "MATCH" if s52_batch else "PARTIAL", "the penalty is a hinge (only eta^2 above 0.2 is penalised), averaged over the three layers' gates")
+kk = RD82["REG3_KEYHINGE"]
+row2(r"binds routed $\mathbf{20/20}$ against the baseline's $0/20$ and REG3's $2/20$ on these seeds (20 vs 0 and 18 vs 0; the readings ``discovered'' and ``helps'' both apply",
+     "S82 REG3_KEYHINGE vs BASELINE and REG3 (ROUTED-BOUND)", "20/20 vs 0/20 and 2/20; 20 vs 0, 18 vs 0; discovered and helps apply",
+     f"ROUTED-BOUND {cnt(KH, rb)}/20, BASELINE {cnt(B82, rb)}/20, REG3 {cnt(R82, rb)}/20; discovered {kk['discovered'][1][:2]} p = "
+     f"{kk['discovered'][1][2]:.2g} -> {'applies' if kk['discovered'][0] else 'no'}; helps {kk['helps'][1][:2]} p = {kk['helps'][1][2]:.2g} "
+     f"(<= {P4}) -> {'applies' if kk['helps'][0] else 'no'}",
+     "MATCH" if (cnt(KH, rb), cnt(B82, rb), cnt(R82, rb), kk['discovered'][1][:2], kk['helps'][1][:2]) == (20, 0, 2, (20, 0), (18, 0))
+     and kk['discovered'][0] and kk['helps'][0] else "DISAGREE")
+row2(r"the arm has no key failures and $\beta^R$ at the cue above keys and values in every run", "S82 REG3_KEYHINGE: the fourth reading's content",
+     "no key failures; CTX > K, V in 20/20", f"KEY failures {kk['working write'][1][0]}; beta^R CTX > KEY, VAL in {kk['working write'][1][1]}/20 -> "
+     f"'a working write without the device's cost' {'applies' if kk['working write'][0] else 'does not apply'}",
+     "MATCH" if kk["working write"][1][:2] == (0, 20) else "DISAGREE", "the reading's content is stated; its name is not")
+row2(r"on delta memory the same arm binds $10/10$ against $0/10$ and $2/10$", "S82 phase 2 (delta, 2100-2109)", "10/10 vs 0/10 and 2/10",
+     f"ROUTED-BOUND: REG3_KEYHINGE_D {cnt(KD, rb)}/10, BASELINE_D {cnt(BD82, rb)}/10, REG3_D {cnt(RDD82, rb)}/10 (pairs "
+     f"{ph2['BASELINE_D'][:2]} p = {ph2['BASELINE_D'][2]:.2g}; {ph2['REG3_D'][:2]} p = {ph2['REG3_D'][2]:.2g}); BOUND: {cnt(KD, bound)}, "
+     f"{cnt(BD82, bound)}, {cnt(RDD82, bound)}", "PARTIAL",
+     "the counts are ROUTED-BOUND (as the table caption says), but the sentence says 'binds' and on BOUND the references are 2/10 and "
+     "4/10. The docstring fixes phase 2 as descriptive (explore_g_devices.py:40; report_5.md:68-69); the sentence does not say so")
+sgr = RD82["REG3_SLOWGATE"]
+row2(r"A gate held slow for the first 1200 updates binds $0/20$, worse than nothing", "S82 REG3_SLOWGATE", "0/20; worse than nothing",
+     f"ROUTED-BOUND {cnt(SG, rb)}/20 (BOUND {cnt(SG, bound)}); vs BASELINE {sgr['discovered'][1][:2]}; vs REG3 (no device) "
+     f"{paired(SG, R82, rb)[:2]}; 'the device hurts' (REG3 > D, p <= 0.0625): {sgr['hurts'][1][:2]} p = {sgr['hurts'][1][2]:.2f} -> "
+     f"{'applies' if sgr['hurts'][0] else 'does not apply'}", "PARTIAL",
+     "0/20 is right. 'Worse than nothing' is not: against the baseline it is 0 vs 0, and against the register without a device "
+     "(2/20) it is 0 vs 2, where the pre-fixed 'the device hurts' does not apply (p = 0.25). An unmarked description that "
+     "contradicts the screen's own reading (the S61 pattern)")
+row2(r"because it delays the register's write along with the split", "S82 REG3_SLOWGATE: the stated cause", "the slow gate delays the write and the split",
+     f"eta^2 by key >= 0.5 at 1200: SLOWGATE {sg_split1200}/20 vs REG3 {r3_split1200}/20 (median {med([v for v in e1200['REG3_SLOWGATE'] if v is not None]):.2f} vs "
+     f"{med([v for v in e1200['REG3'] if v is not None]):.2f}); unbound KEY at the end {keyf(SG)}/20; beta^R CTX > K, V at the end "
+     f"{nwrite(SG)}/20; median end beta^R CTX/KEY/VAL {sgb['CTX']:.2f}/{sgb['KEY']:.2f}/{sgb['VAL']:.2f} (REG3 {r3b['CTX']:.2f}/{r3b['KEY']:.2f}/{r3b['VAL']:.2f})",
+     "PARTIAL", "the records agree that the split is delayed (fewer splits at 1200) and still forms (18 KEY), and that the write "
+     "never separates; that one causes the failure is an interpretation (report_5.md 'What happened (exploratory)'), stated here "
+     "without a marking")
+nwr = RD82["REG3_NOWIN"]
+row2(r"a gate without the raw window input binds $5/20$, ``discovered'' exactly at its threshold (5 vs 0)", "S82 REG3_NOWIN",
+     "5/20; discovered at 5 vs 0", f"ROUTED-BOUND {cnt(NW, rb)}/20 {nw_rb} (REG3's {r3_rb} a subset: {set(r3_rb) <= set(nw_rb)}); "
+     f"discovered {nwr['discovered'][1][:2]} p = {nwr['discovered'][1][2]:.4f} -> {'applies' if nwr['discovered'][0] else 'no'}; "
+     f"helps {nwr['helps'][1][:2]} p = {nwr['helps'][1][2]:.3f} -> {'applies' if nwr['helps'][0] else 'does not apply'}",
+     "MATCH" if cnt(NW, rb) == 5 and nwr['discovered'][1][:2] == (5, 0) and nwr['discovered'][0] else "DISAGREE",
+     "5 vs 0 is the smallest discordance that clears p < 0.05 (0.031); 'helps' did not apply (3 vs 0), which the draft does not say")
+row2(r"with a register that writes at nearly every token", "S82 REG3_NOWIN end beta^R", "writes at nearly every token",
+     f"median end beta^R CTX/KEY/VAL {nwb['CTX']:.2f}/{nwb['KEY']:.2f}/{nwb['VAL']:.2f}; beta^R CTX > K, V in {nwrite(NW)}/20",
+     "MATCH" if min(nwb.values()) >= 0.8 else "PARTIAL", "a description (report_5.md:54-56), before the sentence that marks the next ones")
+row2(r"($\eta^2$ by key $0.89$ at update 1)", "S82 REG3_KEYHINGE eta^2 by key at update 1", "0.89",
+     f"median over runs of the mean over layers: {eta_u['1']:.3f}", "MATCH" if f"{eta_u['1']:.2f}" == "0.89" else "DISAGREE",
+     "marked 'as a description'")
+row2(r"the hinge holds that at $0.05$ from update 300", "S82 REG3_KEYHINGE eta^2 by key during the hinge", "0.05 from update 300",
+     ", ".join(f"{u} {v:.3f}" for u, v in eta_u.items() if u != "1") + f"; firings median {med(fired):.0f} ({min(fired)}-{max(fired)})",
+     "MATCH" if max(eta_u[u] for u in ("300", "600", "1200", "2400")) < 0.06 else "PARTIAL",
+     "at or below 0.05 (0.051, 0.056, 0.035, 0.000): 'at about 0.05 and falling to 0 by 2400'")
+row2(r"($0.12$ at every role at 1200; $0.48$ against $0.20$ at the end)", "S82 REG3_KEYHINGE beta^R by role", "0.12 at 1200; 0.48 vs 0.20 at the end",
+     f"median at 1200 CTX/KEY/VAL {kb1200['CTX']:.2f}/{kb1200['KEY']:.2f}/{kb1200['VAL']:.2f} (per run {rng(k1200_rng)}); at 2400 "
+     f"{kb2400['CTX']:.2f}/{kb2400['KEY']:.2f}/{kb2400['VAL']:.2f}; at the end {kbend['CTX']:.2f}/{kbend['KEY']:.2f}/{kbend['VAL']:.2f} "
+     f"(CTX per run {rng(ctx_end_rng)})", "MATCH" if (f2(kb1200['CTX']), f2(kbend['CTX'])) == ("0.12", "0.48") and
+     max(f2(kbend['KEY']), f2(kbend['VAL'])) in ("0.20", "0.21") else "PARTIAL",
+     "medians over runs; 'the end' is each run's early stop (see the next rows), not update 24000")
+row2(r"18 of the 20 bind at 3600, the first evaluation after the hinge stops", "S82 REG3_KEYHINGE transitions", "18 at 3600",
+     f"{dict(sorted(trc.items()))}; evaluations every 1200, hinge weight 1 to update 2400, 0 from 2401", "MATCH" if trc.get(3600) == 18 else "DISAGREE")
+row2(r"and the key split does not return once the gate routes", "S82 REG3_KEYHINGE eta^2 by key from the transition to the end",
+     "does not return", f"max eta^2 by key at the evaluations >= the transition and at the end: {rng(eta_after, 3)}; the runs stop "
+     f"early (3 evaluations >= 0.95): stopped_at {dict(sorted(stop82.items()))}, i.e. transition + {sorted(gap82)}",
+     "PARTIAL" if max(eta_after) < 0.5 else "DISAGREE",
+     "true over what was recorded; each run stops 2400 updates after its transition (explore_g_devices_child.py:9), so 'does not "
+     "return' is observed over 2400 updates, not to 24000")
+row2(r"The hinge reads the task's key positions and key identities, as the split reads key positions", "what the hinge reads",
+     "key positions and key identities; not an architecture", "explore_g_devices.py:17-18 ('reads key positions and key identities "
+     "(token types) ... it reads no stream label'); report_5.md:64-66 (training-time prior, not an architecture)", "MATCH",
+     "the docstring's 'reads no stream label' is said at tex2:267 ('without stream labels')")
+# --- tex2:267
+row2(r"On a screen of twenty seeds, the distant-cue task has a solution without stream labels", "label-free solution", "on a screen of 20 seeds",
+     f"REG3_KEYHINGE {cnt(KH, rb)}/20, 'discovered' applies; the device reads key identities, no stream label", "MATCH",
+     "replaces the first draft's unmarked 'exists'; marked as a screen")
+row2(r"Its capacity was never the limit (the nudged register, $20/20$)", "capacity", "the nudged register 20/20",
+     f"S72 R1 'the register carries the cue at all three layers' applies ({cnt(R3N, rb)}/20)", "MATCH",
+     "a paraphrase of S72 R1's reading")
+row2(r"its discovery is $20/20$ with the hinge and $2$--$4/20$ without", "discovery with and without the hinge", "20/20; 2-4/20",
+     f"REG3_KEYHINGE {cnt(KH, rb)}/20; REG3 {cnt(R82, rb)}/20 (S82), {cnt(R3, rb)}/20 (S72), REG3_D {cnt(R3D, rb)}/20 (S73)", "MATCH")
+row2(r"Session~G proposed the pre-registered test, and it is the register test queued behind \texttt{test\_delta\_recipe}",
+     "the register test", "G's proposal; queued", f"report_5.md:{lineno(G5, GD + 'report_5.md', 'A pre-registered main-line test of REG3_KEYHINGE')}-103: "
+     "BASELINE, REG3, REG3_KEYHINGE, LOCAL3_KEYHINGE (not run in S82), 20 seeds per machine, rate claim >= 18/20 on each: as the "
+     f"draft says; specs/ at {DRAFT2}: {sorted(specs_now)}", "NOT RECORD-CHECKABLE",
+     "the proposal's content matches report 5; 'queued' has no committed specification to check")
+row2(r"bound $0/10$ on the fixed Hebbian layout (S56, every run a key split, with nothing in the stack to read)", "S56 RESGATE_ONLY",
+     "0/10 BOUND; every run a key split", f"BOUND {cnt(r56, bound)}/10; KEY {sum(1 for r in r56.values() if cls(r) == 'KEY')}/10; S55 'absent' "
+     "(Hebbian, P = 8)", "MATCH" if cnt(r56, bound) == 0 and sum(1 for r in r56.values() if cls(r) == 'KEY') == 10 else "DISAGREE")
+row2(r"routed $0/10$ on delta (S73; $5/10$ bound, eight key splits)", "S73 RESGATE_ONLY_D", "0/10 routed; 5/10 bound; 8 key splits",
+     f"ROUTED-BOUND {cnt(RES, rb)}/10; BOUND {cnt(RES, bound)}/10; key splits (all runs) {resk_all}/10",
+     "MATCH" if (cnt(RES, rb), cnt(RES, bound), resk_all) == (0, 5, 8) else "DISAGREE")
+row2(r"no reading of either screen applied to it, and it is not pursued", "readings on the residual gate", "none applied",
+     "S73 'discovered (residual gate)' (0, 0): does not apply; S56 has no reading of RESGATE_ONLY's own outcome (R4 'the register "
+     "adds to the residual gate' compares REG with it: 'it does not', 0 <= 0)", "MATCH",
+     "replaces the first draft's 'closed'")
+# --- table 5
+row2(r"the same with the key hinge for updates 1--2400 (S82, seeds 2100--2119; baseline there $0/20$, register $2/20$) & $\mathbf{20/20}$ & $\mathbf{10/10}$",
+     "table: S82 REG3_KEYHINGE / _D (ROUTED-BOUND); references", "20/20, 10/10; baseline 0/20, register 2/20",
+     f"{cnt(KH, rb)}/20, {cnt(KD, rb)}/10; BASELINE {cnt(B82, rb)}/20, REG3 {cnt(R82, rb)}/20",
+     "MATCH" if (cnt(KH, rb), cnt(KD, rb), cnt(B82, rb), cnt(R82, rb)) == (20, 10, 0, 2) else "DISAGREE",
+     "the delta column is on 2100-2109, and its references (0/10, 2/10) are not in the row")
+row2(r"the same with a slow gate for 1200 updates / without the window input (S82) & $0/20$ / $5/20$ & ---",
+     "table: S82 REG3_SLOWGATE / REG3_NOWIN (ROUTED-BOUND)", "0/20 / 5/20", f"{cnt(SG, rb)}/20 / {cnt(NW, rb)}/20",
+     "MATCH" if (cnt(SG, rb), cnt(NW, rb)) == (0, 5) else "DISAGREE")
+row2(r"Exploratory (session G, S71--S73 and S82)", "table caption: S82 rows' outcome", "ROUTED-BOUND (non-oracle rows)",
+     "S82 counts above are ROUTED-BOUND", "MATCH")
+# --- retrospective, referee, limits, conclusion, next, provenance
+row2(r"which a hinge on the gate's key-dependence during the slow phase prevents ($20/20$ on a screen)", "discovery race: the distant key split",
+     "prevented, 20/20 on a screen", f"REG3_KEYHINGE {cnt(KH, rb)}/20, KEY failures {keyf(KH)}", "MATCH",
+     "'a key split that forms before the register's write at the cue has appeared' is still an unmarked description (records agree)")
+_dt = (__import__("datetime").datetime.fromisoformat(ctime(DRAFT)) - __import__("datetime").datetime.fromisoformat(best_c[1])).total_seconds() / 60
+row2(r"that session~G was still screening three devices whose result, $20/20$, had been recorded fifteen minutes before the commit",
+     "the first draft's S82 error, as listed", "20/20 recorded 15 min before the first draft", f"s82_best.json added at {best_c[0]} "
+     f"({best_c[1]}), REG3_KEYHINGE 20/20; first draft {DRAFT} at {ctime(DRAFT)}: {_dt:.1f} min", "MATCH" if 14 <= _dt <= 16 else "PARTIAL")
+row2([r"the residual gate alone bound nothing on Hebbian memory and routed nothing on delta",
+      r"that this design choice is what sank the Hebbian register is our interpretation, across two tasks and two gate inputs"],
+     "'Done.' item", "0 bound (Hebbian), 0 routed (delta); interpretation marked", f"S56 RESGATE_ONLY BOUND {cnt(r56, bound)}/10; S73 "
+     f"RESGATE_ONLY_D ROUTED-BOUND {cnt(RES, rb)}/10", "MATCH", "'nothing to read' removed; the interpretation is now marked")
+row2(r"that a gate held slow at the start would let the register's write win the race against the key split (it binds $0/20$, worse than nothing, because it slows the write too)",
+     "overturned prediction: the slow gate", "0/20; worse than nothing; because it slows the write",
+     f"REG3_SLOWGATE {cnt(SG, rb)}/20; vs REG3 {paired(SG, R82, rb)[:2]}, 'the device hurts' does not apply (p = {sgr['hurts'][1][2]:.2f}); "
+     f"vs BASELINE (0, 0); the S82 docstring's purpose: 'devices that delay or prevent the key split so the register's CTX write can emerge'",
+     "PARTIAL", "the prediction is the spec's (explore_g_devices.py:3-4) and 0/20 is right; 'worse than nothing' and the cause are "
+     "unmarked, as at tex2:265")
+row2(r"the distant-cue task has a solution without stream labels on screens ($20/20$ with a hinge that reads key identities during the first 2400 updates) and no pre-registered test of it yet",
+     "scope: distant cue", "20/20 on screens; no pre-registered test", f"REG3_KEYHINGE {cnt(KH, rb)}/20; specs/ at {DRAFT2}: {sorted(specs_now)}",
+     "MATCH")
+row2(r"the hinge's key term, which prevents the key split at two streams and for the register at a distance, reads key positions and key identities",
+     "limits: what the key term reads (register part)", "prevents the register's key split; reads key positions and identities",
+     f"REG3_KEYHINGE KEY failures {keyf(KH)}; 'a working write without the device's cost' applies; explore_g_devices.py:17-18",
+     "MATCH", "the two-stream half is session H's S85")
+row2(r"The architecture exists and, with the key hinge, is found $20/20$", "limits: distant cue", "20/20 with the hinge",
+     f"REG3_KEYHINGE {cnt(KH, rb)}/20", "MATCH", "'exists' is now backed by S82's 'discovered' on a screen")
+row2(r"without it the write at the cue is found on a fifth of seeds and a key split forms first on fourteen of the sixteen others on each memory",
+     "limits: without the hinge", "a fifth; 14 of 16 key splits first", f"S72/S73: REG3 {cnt(R3, rb)}/20, REG3_D {cnt(R3D, rb)}/20, key "
+     f"splits {ks16[1]}/16 and {ks16[3]}/16; S82 (fresh seeds): REG3 {cnt(R82, rb)}/20 (KEY {keyf(R82)} of {sum(1 for r in R82.values() if not bound(r))} "
+     f"unbound), REG3_D {cnt(RDD82, rb)}/10", "PARTIAL",
+     "right for S72/S73 (the first draft's 'the rest' now 14 of 16); on S82's fresh seeds the same arm is a tenth (2/20), which "
+     "tex2:267's '2--4/20' states and this item does not; the order 'forms first' is an unmarked description")
+row2(r"and is found on every seed when a hinge keeps the gate off key identity during the slow phase", "conclusion: the hinged register",
+     "every seed", f"REG3_KEYHINGE {cnt(KH, rb)}/20 (Hebbian, 2100-2119), REG3_KEYHINGE_D {cnt(KD, rb)}/10 (delta, 2100-2109): one screen",
+     "PARTIAL", "the counts are right; the conclusion drops 'on a screen' (the abstract, tex2:267 and tex2:434 keep it), and "
+     "'every seed' is 30 seeds of one exploratory screen whose phase 2 is descriptive")
+row2(r"then the hinged-register test on the randomised header layout (session~G's proposal: the hinged register against the baseline, the plain register and the hinge without the register; 20 seeds per machine; a rate claim of $\geq 18/20$)",
+     "next steps: the register test", "G's proposal as listed", "report_5.md:85-103 (C1 vs BASELINE, C2 vs REG3, C3 vs LOCAL3_KEYHINGE, "
+     "rate >= 18/20 per machine, 20 per machine; validity REG3_NUDGE and the perfect gate)", "MATCH")
+nrun5 = nrun + (integ82[0],)
+row2(r"S82 devices against the key split (report 5, \texttt{8973d48}; spec \texttt{83699a2}) & \texttt{8973d48} & 22; 139; 50; 150; 136",
+     "provenance: S82", "report 5 at 8973d48; spec 83699a2; 136 records", f"report_5.md first added at "
+     f"{git('log', '--diff-filter=A', '--format=%h', GBR, '--', GD + 'report_5.md').strip()}; spec {S82SPEC} adds {', '.join(spec_files)}; "
+     f"S82 records {integ82[0]}; the earlier counts {nrun}", "MATCH" if integ82[0] == 136 and git('log', '--diff-filter=A', '--format=%h', GBR, '--', GD + 'report_5.md').strip() == G5 else "DISAGREE")
+
+# ═════════════════════════════════════════════════════════════════════════════
+# output
+# ═════════════════════════════════════════════════════════════════════════════
+ORDER = {"DISAGREE": 0, "PARTIAL": 1, "NOT RECORD-CHECKABLE": 2, "MATCH": 3}
+ROWS.sort(key=lambda r: (ORDER[r[5]], r[0]))
+C = Counter(r[5] for r in ROWS)
+Cc = Counter(r[5] for r in ROWS if r[7] == "carried")
+Cn = Counter(r[5] for r in ROWS if r[7] == "new")
+
+
+def esc(s):
+    return str(s).replace("|", "\\|").replace("\n", " ")
+
+
+def cnts(c):
+    return ", ".join(f"{k} {c.get(k, 0)}" for k in STATUSES)
+
+
+# report 5's count table against the records
+def mine_br(r):
+    return mine3(r)
+
+
+rep_rows = {}
+for l_ in rep5.split("\n"):
+    m_ = re.match(r"\| \**([A-Z0-9_]+)\**( \(|\s*\|)", l_)
+    if m_ and m_.group(1) in X:
+        cols = [c_.strip() for c_ in l_.strip().strip("|").split("|")]
+        fr = lambda t: re.search(r"(\d+)/(\d+)", t).group(0) if re.search(r"(\d+)/(\d+)", t) else t  # noqa: E731
+        if len(cols) >= 7 and m_.group(1) not in rep_rows:
+            rep_rows[m_.group(1)] = (fr(cols[1]), fr(cols[2]), fr(cols[3]), fr(cols[4]), cols[5])
+cmp82 = []
+for a in ("BASELINE", "REG3", "REG3_KEYHINGE", "REG3_SLOWGATE", "REG3_NOWIN", "REG3_NUDGE", "ORACLE_ALL", "ORACLE_ALL_D",
+          "BASELINE_D", "REG3_D", "REG3_KEYHINGE_D"):
+    rr = X[a]
+    n = len(rr)
+    cl = Counter(cls(r) for r in rr.values() if not bound(r))
+    got = (f"{cnt(rr, bound)}/{n}", f"{cnt(rr, rb)}/{n}", f"{cnt(rr, disc)}/{n}", f"{cnt(rr, mine_br)}/{n}",
+           ", ".join(f"{k} {v}" for k, v in sorted(cl.items(), key=lambda kv: -kv[1])) or "–")
+    rp = rep_rows.get(a)
+    same = rp is not None and rp[:4] == got[:4] and all(f"{k} {v}" in rp[4].replace("S-PARTIAL", "STREAM-PARTIAL") for k, v in cl.items())
+    cmp82.append((a, n, got, rp, same, sorted(r["transition"] for r in rr.values() if bound(r))))
+
+L = []
+L.append("# Revision 9 draft, second version, vs Session G's records (referee, second pass)")
+L.append("")
+L.append(f"Draft: `{TEXP}` at `{DRAFT2}` (second version, committed {ctime(DRAFT2)}), cited as tex2:NNN; the first version "
+         f"`{DRAFT}` ({ctime(DRAFT)}) as tex:NNN. Records: Session G at `{G}` for S55-S57 and S71-S73 (byte-identical at `{G5}`); "
+         f"S82 at `{G5}` (report 5, the head of origin/claude/explore-G, {ctime(G5)}; the commit the second draft pins), spec "
+         f"`{S82SPEC}`; F's S70 store at `{F}`. Generated by `docs/review_2026-10/rev9/check_G_v2.py` (a copy of check_G.py; stdlib "
+         "+ rlib.py; records and code read with `git show`; no torch).")
+L.append("")
+L.append("Method. Each fragment the first pass quoted is asserted on its old line and searched for in the second draft (all of a row's "
+         "fragments on one line). Found: the row is kept with its recomputation and reported at its new line. Not found: the row "
+         "is listed under 'Removed or rewritten'. Rows are added for every new or changed sentence about Session G. Where a carried "
+         "fragment survives inside a sentence that was amended around it, the row's status and note are revised, and the note says "
+         "why.")
+L.append("")
+L.append(f"**Rows: {len(ROWS)} — {cnts(C)}.** Carried from the first pass ({sum(Cc.values())}): {cnts(Cc)}. New or changed "
+         f"sentences ({sum(Cn.values())}): {cnts(Cn)}. First-pass rows whose fragment is gone: {len(REMOVED)} (of which first-pass "
+         f"DISAGREE {sum(1 for r in REMOVED if r[3] == 'DISAGREE')}, PARTIAL {sum(1 for r in REMOVED if r[3] == 'PARTIAL')}, NOT "
+         f"RECORD-CHECKABLE {sum(1 for r in REMOVED if r[3] == 'NOT RECORD-CHECKABLE')}, MATCH {sum(1 for r in REMOVED if r[3] == 'MATCH')}).")
+L.append("")
+L.append("Record integrity: " + "; ".join(integrity) + f"; S82 (at {G5}): {integ82[0]} records, {integ82[1]} ok, {integ82[2]} retried, "
+         f"recorded transition = rlib.transition(curve) in {integ82[3]}.")
+L.append("")
+L.append("Definitions (re-implemented): BOUND = transition not None; ROUTED*@end = end margin >= 0.9 and end eta^2 by stream at KEY "
+         "> 0.9; ROUTED-BOUND = BOUND and ROUTED*@end; DISCOVERED (F's) = BOUND and end VAL cos < 0.5 (explore_g_rhl_parent.py:6-17, "
+         f"unchanged since {parent82_hist}); G's BOUND ROUTED = BOUND, VAL map one-to-one at every gated layer, every stream >= 0.9; "
+         "failure class = test_router_layout v1 on the end gate (rlib.fail_class), MERGED if STREAM-PARTIAL and the L3 VAL map is "
+         "not one-to-one; 'beats' = one-sided exact McNemar p < 0.05 (rlib.mcnemar1). S82's readings as explore_g_devices.py:32-40 "
+         f"fixes them at {S82SPEC}: 'discovered' D beats BASELINE; 'the device helps' p(D > REG3) <= p(4 vs 0) = {P4}; 'the device "
+         "hurts' p(REG3 > D) <= 0.0625; 'a working write without the device's cost' no unbound KEY failure and end beta^R CTX > "
+         "KEY and VAL in >= 15/20 runs.")
+L.append("")
+L.append("## Rows (DISAGREE, then PARTIAL, NOT RECORD-CHECKABLE, MATCH)")
+L.append("")
+L.append("| tex2 line | first pass | item | draft says | recomputed | status | note |")
+L.append("|---|---|---|---|---|---|---|")
+for n2, n1, it, d_, rc, s_, nt, kd in ROWS:
+    L.append(f"| tex2:{n2} | {('tex:' + str(n1)) if n1 else 'new'} | {esc(it)} | {esc(d_)} | {esc(rc)} | **{s_}** | {esc(nt)} |")
+L.append("")
+L.append("## Removed or rewritten: first-pass rows whose quoted fragment is not in the second draft")
+L.append("")
+L.append("Each was re-checked by its replacement row above (see resolution_G.md for the item-by-item verdict).")
+L.append("")
+L.append("| tex line | fragment(s) | item | first-pass status |")
+L.append("|---|---|---|---|")
+for n1, nds, it, s_ in sorted(REMOVED):
+    L.append(f"| tex:{n1} | {esc(' / '.join(nds))} | {esc(it)} | {s_} |")
+L.append("")
+
+# ── S82
+L.append("## S82 (report 5) against the records and the docstring")
+L.append("")
+L.append(f"- Spec, readings and best-device rule: `{S82SPEC}` ({spec82_t}), adds {', '.join(spec_files)}; both files have one commit "
+         f"on the branch ({', '.join(code82_hist)}), so they are unchanged since. explore_g_rhl_parent.py (the outcomes) last "
+         f"changed at {parent82_hist}, before the spec.")
+L.append(f"- First S82 record: `{first_rec82[0]}` ({first_rec82[1]}, {first_rec82[2]} records), {'after' if first_rec82[1] > spec82_t else 'BEFORE'} the spec.")
+L.append(f"- Best device: `s82_best.json` added at `{best_c[0]}` ({best_c[1]}; file time '{best5['time']}'), unchanged since "
+         f"({len(best_commits)} commit; content at add = content at {G5}: {best_unchanged}). The store at that commit holds {n_at_best} "
+         f"records, {d_at_best} of them phase 2. First phase-2 record: `{first_d82[0]}` ({first_d82[1]}, {first_d82[3]} phase-2 records). "
+         f"In s82.log the best-device line comes {'before' if 0 <= i_best < i_q32 else 'AFTER'} '32 runs queued'.")
+L.append(f"- The rule recomputed from phase 1 (most ROUTED-BOUND, then fewer unbound KEY failures, then the order KEYHINGE, "
+         f"SLOWGATE, NOWIN): {best_re['device']}, table {best_re['table']}; equals s82_best.json: {best_ok}.")
+L.append(f"- Validity: ORACLE_ALL rerun BOUND {val82['oracle'][0]}/{val82['oracle'][1]} (VALID needs >= 1/2), REG3_NUDGE ROUTED-BOUND "
+         f"{val82['nudge'][0]}/{val82['nudge'][1]}, ORACLE_ALL_D {val82['oracle_d'][0]}/{val82['oracle_d'][1]}.")
+L.append(f"- Seeds 2100-2119: no other keyed store on the fetched G, F, H, I, E, R branches or the main line uses them "
+         f"({(g_other + other_use) or 'none found'}).")
+L.append("")
+L.append("Counts per arm (recomputed) against report_5.md's table:")
+L.append("")
+L.append("| arm | n | BOUND | ROUTED-BOUND | DISCOVERED | G's BOUND ROUTED | unbound classes (v1) | transitions | report 5 | same |")
+L.append("|---|---|---|---|---|---|---|---|---|---|")
+for a, n, got, rp, same, tr in cmp82:
+    L.append(f"| {a} | {n} | {got[0]} | {got[1]} | {got[2]} | {got[3]} | {got[4]} | {', '.join(map(str, tr)) if tr else '–'} | "
+             f"{esc(' / '.join(rp[:4]) + '; ' + rp[4]) if rp else 'not in table'} | {'yes' if same else '**no**'} |")
+L.append("")
+L.append("Readings (ROUTED-BOUND, paired on 2100-2119; b = seeds where the first arm alone succeeds):")
+L.append("")
+L.append("| arm | discovered (vs BASELINE) | helps (vs REG3) | hurts (REG3 vs it) | a working write without the device's cost | report 5 |")
+L.append("|---|---|---|---|---|---|")
+_rep_read = {"REG3": "does not apply (2 / 0, p 0.25)", "REG3_KEYHINGE": "APPLIES / APPLIES / no / APPLIES",
+             "REG3_SLOWGATE": "does not apply / no / does not apply / does not apply",
+             "REG3_NOWIN": "APPLIES (threshold) / no / no / does not apply"}
+for d in ("REG3",) + DEV:
+    o_ = RD82[d]
+    f_ = lambda t: f"{'APPLIES' if t[0] else 'does not apply'} ({t[1][0]} vs {t[1][1]}, p {t[1][2]:.2g})"  # noqa: E731
+    if d == "REG3":
+        L.append(f"| {d} | {f_(o_['discovered'])} | – | – | (CTX > K, V in {nwrite(R82)}/20) | {_rep_read[d]} |")
+    else:
+        w_ = o_["working write"]
+        L.append(f"| {d} | {f_(o_['discovered'])} | {f_(o_['helps'])} | {f_(o_['hurts'])} | {'APPLIES' if w_[0] else 'does not apply'} "
+                 f"(KEY {w_[1][0]}; CTX > K, V {w_[1][1]}/{w_[1][2]}) | {_rep_read[d]} |")
+L.append("")
+L.append(f"Phase 2 (delta, 2100-2109; descriptive by the docstring, explore_g_devices.py:40): REG3_KEYHINGE_D ROUTED-BOUND {cnt(KD, rb)}/10 "
+         f"(transitions {dict(sorted(Counter(r['transition'] for r in KD.values()).items()))}); vs BASELINE_D {ph2['BASELINE_D'][:2]} "
+         f"p = {ph2['BASELINE_D'][2]:.3g}; vs REG3_D {ph2['REG3_D'][:2]} p = {ph2['REG3_D'][2]:.3g}; beta^R CTX > K, V {nwrite(KD)}/10. "
+         "The draft's 'delta 10/10' holds; the references are ROUTED-BOUND 0/10 and 2/10 (BOUND 2/10 and 4/10).")
+L.append("")
+L.append(f"Descriptive quantities (REG3_KEYHINGE, median over runs): eta^2 by key (mean over layers) {', '.join(f'{u} {v:.3f}' for u, v in eta_u.items())}; "
+         f"hinge firings {med(fired):.0f} ({min(fired)}-{max(fired)}); beta^R CTX/KEY/VAL at 1200 {kb1200['CTX']:.2f}/{kb1200['KEY']:.2f}/"
+         f"{kb1200['VAL']:.2f}, 2400 {kb2400['CTX']:.2f}/{kb2400['KEY']:.2f}/{kb2400['VAL']:.2f}, end {kbend['CTX']:.2f}/{kbend['KEY']:.2f}/"
+         f"{kbend['VAL']:.2f}; transitions {dict(sorted(trc.items()))}; runs stop at transition + {sorted(gap82)}. REG3_SLOWGATE: "
+         f"eta^2 by key >= 0.5 at 1200 in {sg_split1200}/20 (REG3 {r3_split1200}/20); end beta^R {sgb['CTX']:.2f}/{sgb['KEY']:.2f}/{sgb['VAL']:.2f}. "
+         f"REG3_NOWIN: end beta^R {nwb['CTX']:.2f}/{nwb['KEY']:.2f}/{nwb['VAL']:.2f}; routed seeds {nw_rb} (REG3's {r3_rb}).")
+L.append("")
+L.append("What the hinge reads (explore_g_devices.py:17-18 at 83699a2): 'It reads key positions and key identities (token types), as "
+         "the key split reads key positions; it reads no stream label.' The second draft says so at tex2:265 ('reads the task's key "
+         "positions and key identities, as the split reads key positions ... a training-time prior ... not an architecture'), "
+         "tex2:434 and tex2:436 ('reads key positions and key identities'), and tex2:267 ('a solution without stream labels'). The "
+         "abstract (tex2:36) says 'reads the task's key positions and identities as the split does', which reads as if the split "
+         "also read key identities.")
+L.append("")
+L.append("Marked as descriptive where it is not a pre-fixed reading? At tex2:265: 'What the firing records show, as a description' "
+         "marks the hinge's eta^2 and beta^R trajectory, the 3600 transitions and 'does not return' (yes). Not marked: 'The "
+         "discovering runs fail by a key split that forms first'; 'worse than nothing' (contradicts 'hurts' not applying) and "
+         "'because it delays the register's write along with the split'; 'with a register that writes at nearly every token'; the "
+         "delta comparison (descriptive by the docstring) given as a result. tex2:384 repeats 'worse than nothing, because it "
+         "slows the write too' unmarked; tex2:465 drops 'on a screen'.")
+L.append("")
+
+# ── readings vs docstring (second draft)
+L.append("## Readings vs docstring (second draft)")
+L.append("")
+L.append("| screen | reading (docstring) | applies (recomputed) | second draft | wording |")
+L.append("|---|---|---|---|---|")
+r1h = cnt(A["REG_NUDGE"], br56)
+r1d = cnt(nd, br56)
+lab = lambda k: "the register carries the cue" if k >= 9 else "architecture insufficient" if k < 6 else "neither"  # noqa: E731
+_rd = [
+    ("S55", "'absent'", "absent", "tex2:259 ''absent'' applied", "same"),
+    ("S56 R1", "'the register carries the cue' / 'architecture insufficient' / 'neither'", f"Hebbian {r1h}/10 '{lab(r1h)}'; delta {r1d}/10 '{lab(r1d)}'",
+     "tex2:261 'the reading ``architecture insufficient'' applied'", "Hebbian: same (resolved); delta 'neither' not named"),
+    ("S56 R2", "'discovered' (BOUND >= BASELINE + 3, KEY failures <= 2)", f"Hebbian 'not discovered'; delta REG_D {cnt(rd, bound)} vs {cnt(bd, bound)}, "
+     f"KEY {_r2key}: 'discovered'", "tex2:261 'met the screen's own rule for ``discovered'' on delta ... 4 vs 0 by McNemar, which was not its rule'",
+     "same (resolved)"),
+    ("S71", "'layer 1 is the block' / 'alone suffices' / 'delta tolerates'", "all three apply", "tex2:261 verbatim", "same"),
+    ("S72 R1", "'the register carries the cue at all three layers'", f"{cnt(R3N, rb)}/20 applies", "tex2:263 heading; tex2:59", "paraphrase"),
+    ("S72 R2", "'discovered' / 'not discovered'", f"{paired(R3, BH, rb)[:2]}: 'not discovered'", "tex2:263 '``discovered (register)'' applies on neither'",
+     "substance same; S73's label used for S72"),
+    ("S73", "'discovered (register)'", f"{paired(R3D, BD, rb)[:2]}: does not apply", "tex2:263 'applies on neither'", "same (resolved)"),
+    ("S73", "'the delta stack carries the cue' (>= 10/20)", f"{sum(1 for r in BD.values() if min(pk(r)) >= 0.9)}/20: does not apply",
+     "tex2:263 'did not apply either ... (the baseline 7/20)'", "same (resolved)"),
+    ("S73", "'the gate is not needed on this task' (>= 8/10)", f"{cnt(SGL, bound)}/10: does not apply", "tex2:263 'did not apply ... (one channel 7/10)'",
+     "same (resolved)"),
+    ("S73", "'the latch holds on delta memory'", "9/10 applies", "tex2:263 'holds an exact latch when nudged (9/10 routed ...)'", "not named"),
+    ("S82", "'discovered'", f"KEYHINGE {RD82['REG3_KEYHINGE']['discovered'][1][:2]} applies; NOWIN {RD82['REG3_NOWIN']['discovered'][1][:2]} applies; "
+     f"SLOWGATE {RD82['REG3_SLOWGATE']['discovered'][1][:2]} no; REG3 {RD82['REG3']['discovered'][1][:2]} no",
+     "tex2:265 'discovered' for KEYHINGE and for NOWIN 'exactly at its threshold (5 vs 0)'", "same"),
+    ("S82", "'the device helps'", f"KEYHINGE {RD82['REG3_KEYHINGE']['helps'][1][:2]} applies; NOWIN {RD82['REG3_NOWIN']['helps'][1][:2]} no; "
+     f"SLOWGATE {RD82['REG3_SLOWGATE']['helps'][1][:2]} no", "tex2:265 '``helps'' ... applies' (KEYHINGE)", "same; NOWIN's 'no' not stated"),
+    ("S82", "'the device hurts'", f"none applies (SLOWGATE {RD82['REG3_SLOWGATE']['hurts'][1][:2]}, p {RD82['REG3_SLOWGATE']['hurts'][1][2]:.2f})",
+     "tex2:265, :384 'worse than nothing'", "**differs**: the draft calls the slow gate worse than nothing where 'hurts' did not apply"),
+    ("S82", "'a working write without the device's cost'", f"KEYHINGE applies {RD82['REG3_KEYHINGE']['working write'][1][:2]}; others no",
+     "tex2:265 'no key failures and beta^R at the cue above keys and values in every run'", "content stated, name not"),
+    ("S82", "best-device rule", f"{best_re['device']} {best_re['table']}", "tex2:265 (implicit: the hinge is the device run on delta)", "same"),
+]
+for r_ in _rd:
+    L.append("| " + " | ".join(esc(x) for x in r_) + " |")
+L.append("")
+
+# ── register gate
+L.append("## Register gate description (tex:125 -> tex2:125) vs code")
+L.append("")
+L.append("| item | draft | code | status | note |")
+L.append("|---|---|---|---|---|")
+for it, d_, c_, s_, nt in reg_rows:
+    if it in ("initialisation", "the earlier design"):
+        it = it + " (first draft)"
+    L.append(f"| {esc(it)} | {esc(d_)} | {esc(c_)} | **{s_}** | {esc(nt)} |")
+for it, d_, c_, s_, nt in reg_rows2:
+    L.append(f"| {esc(it)} (second draft) | {esc(d_)} | {esc(c_)} | **{s_}** | {esc(nt)} |")
+L.append("")
+
+# ── S82 at the first draft's commit (for A2)
+L.append("## S82 at the first draft's commit (for the resolution of A2)")
+L.append("")
+L.append(f"At {DRAFT} ({draft_t}) the last G commit was `{gdraft}`: {len(st_d['runs'])} S82 records, phase 1 "
+         f"{'complete (104/104)' if ph1 else 'incomplete'}, s82_best.json {best5['device']} 20/20 at {best_c[0]} ({best_c[1]}). "
+         f"Paired on 2100-2119 at that commit: REG3 vs BASELINE {reg82[0]} vs {reg82[1]}; REG3_KEYHINGE vs BASELINE {kh82[0]} vs {kh82[1]}; "
+         f"vs REG3 {kr82[0]} vs {kr82[1]}. The second draft reports S82 from report 5 at {G5} ({ctime(G5)}), after the first draft.")
+L.append("")
+
+# ── descriptive statements, second draft
+L.append("## Descriptive statements in the second draft: marked or not")
+L.append("")
+DESC2 = [
+    (36, "fourteen of the sixteen failures on each memory being key splits that form first", "inside 'Exploratory screens, which are not claims'",
+     "counts right (14/16); order agrees with the records"),
+    (36, "a training-time prior that reads the task's key positions and identities as the split does", "—", "wording: the split reads key positions only"),
+    (259, "Training removes the cue: the gate reads only the window, nothing asks the stack to keep it", "no", "unchanged; interpretation"),
+    (261, "The interpretation, which is ours ... that choice is what sank its Hebbian register; the interpretation crosses two tasks ... and two gate inputs", "yes (whole)", "resolved"),
+    (263, "Descriptively: ... (14 of the 16 runs that did not route ...) ... not separated above keys and values. The unbound Hebbian runs sit near chance ...", "yes", "27 of 28 key-split runs not separated (REG3|712 is)"),
+    (263, "on delta memory the stack can learn stream-tagged keys ... a description of a 2x2", "yes", ""),
+    (265, "The discovering runs fail by a key split that forms first", "no", "S72/S73 14/16; order agrees; 'discovering' should be 'label-free'"),
+    (265, "binds 0/20, worse than nothing, because it delays the register's write along with the split", "no", "'hurts' did not apply (2 vs 0, p 0.25); cause is an interpretation"),
+    (265, "with a register that writes at nearly every token", "no (precedes the marked sentence)", "records agree (median end beta^R >= 0.86 at every role)"),
+    (265, "on delta memory the same arm binds 10/10 against 0/10 and 2/10", "no", "phase 2 is descriptive by the docstring; counts are ROUTED-BOUND"),
+    (265, "What the firing records show, as a description: ...", "yes", "values agree; 'does not return' observed for 2400 updates after the transition"),
+    (267, "On a screen of twenty seeds, the distant-cue task has a solution without stream labels", "yes (a screen)", "backed by S82 'discovered'"),
+    (267, "Its capacity was never the limit (the nudged register, 20/20)", "no", "paraphrase of S72 R1, which applied"),
+    (316, "at a distance, a key split that forms before the register's write at the cue has appeared, which a hinge ... prevents (20/20 on a screen)", "partly ('on a screen')", "order agrees with the records"),
+    (342, "Each is marked where it appears; ... those are now marked", "—", "not all: see tex2:265, :316, :384, :455, :465"),
+    (361, "that this design choice is what sank the Hebbian register is our interpretation, across two tasks and two gate inputs", "yes", "resolved"),
+    (384, "that the register at layers 2--3 would carry the cue on Hebbian memory (it needed layer~1)", "no", "unchanged; the tex2:261 interpretation"),
+    (384, "(it binds 0/20, worse than nothing, because it slows the write too)", "no", "as tex2:265"),
+    (455, "without it the write at the cue is found on a fifth of seeds and a key split forms first on fourteen of the sixteen others", "no", "S82's REG3 2/20 not covered"),
+    (465, "is found on every seed when a hinge keeps the gate off key identity during the slow phase", "no ('on a screen' dropped)", "30 seeds of one screen"),
+]
+L.append("| tex2 line | statement | marked? | note |")
+L.append("|---|---|---|---|")
+for n_, s_, m_, nt in DESC2:
+    L.append(f"| tex2:{n_} | {esc(s_)} | {esc(m_)} | {esc(nt)} |")
+L.append("")
+L.append("Not checkable from the records: 'queued' for the register test (no specification is committed; specs/ at "
+         f"{DRAFT2}: {', '.join(sorted(specs_now))}); the reasoning attributed to Revision 8's specification at tex2:386 (as in the "
+         "first pass); S82's CHECKs and wall-clock (log and checks file, taken as stated); the code SHA 1ec70589520b (not recomputed).")
+L.append("")
+with open(OUT, "w") as fh:
+    fh.write("\n".join(L))
+print(f"wrote {OUT}: {len(ROWS)} rows, {dict(C)}; carried {dict(Cc)}; new {dict(Cn)}; removed {len(REMOVED)}")
