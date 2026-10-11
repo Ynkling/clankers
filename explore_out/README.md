@@ -595,3 +595,22 @@ With β fixed at 1 the delta memory is not slow at eight streams: its perfect ga
 window-gate recipe with H's exact-copy split binds 9/10 on delta channels, sooner than on Hebbian ones on 8 of the 9 seeds
 both bind. S54(c)'s 3/10 and its slow delta oracle are attributable, post hoc, to learned β (not separated here from S54's
 noisy split).
+
+### Session F, S80 and S81 (`explore_out/F/report_6.md`, `report_7.md`)
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| S80 (a) two streams, S=2, k=2, WIN3_SLOW (Part A path), DELTA* vs Hebbian (2000-2009, paired) | DISCOVERED | DELTA 10/10 (all at 1200) vs HEBB 10/10 (median 2400); delta perfect gate 2/2 | "the delta recipe keeps it" (0 vs 0; at the ceiling) |
+| S80 (b) four streams, S=4, k=16, WIN3_SLOW16 + exact-copy split (Part B path; 2010-2019, paired) | BOUND ROUTED | DELTA 10/10 vs HEBB 10/10 (all at 3600; no split fired); delta perfect gate 2/2 | "the delta recipe keeps it" (0 vs 0; at the ceiling) |
+| S80 probe at two streams (S77's, end of every run) | stream decodable from the residual | DELTA: KEY 0.98-1.00 from layer 2, VAL 0.54-0.65; HEBB: 0.52-0.60 at KEY | descriptive: on delta the stream is readable at KEY only |
+| S81 trigger on delta, S=8, k=16 (2020-2029, paired vs BASE) | BOUND ROUTED | BASE 9/10 (firings ok 10/19); GUARD 7/10 (6/6 ok; BASE alone 2); EVAL 10/10 (EVAL alone 1; 5 firings at a probe-vs-evaluation disagreement); GUARD_EVAL 8/10 (9/9 ok) | no reading applies to either device |
+
+Descriptive summary:
+- The delta recipe (β 1, L2 keys) loses nothing at the main line's two- and four-stream configurations. Both
+  configurations were at the ceiling on both memories, so these screens could detect only a large loss.
+- At eight streams the guard does aim the split (every firing labelled ok), but it costs binding on 2 seeds. On delta
+  channels the flat-start splits it removes were mostly useful.
+- The evaluation as the trigger's reading bound 10/10 and fixed the one seed BASE lost. It misses its reading only on the
+  disagreement clause (my definition, fixed before the runs). Under Session H's S84 rule (EVAL ≥ BASE − 1 pair) it would
+  read "the evaluation is the better probe".
+- R's probe failure (the probe ≥ 0.95 at a true 0.87-0.92) occurred once with consequence (GUARD 2025).
