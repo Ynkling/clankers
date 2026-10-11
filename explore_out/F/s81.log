@@ -71,3 +71,9 @@ EXPLORATORY, NOT A RESULT — Session F s81 (F/trigger)
   [  8]  190.5 min  F/trigger        GUARD                    seed 2028  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 16e1816, code bdd8269d38af, attempt 1: acc 1.000  trans 13200  BOUND ROUTED  splits []  map 1+1+1+1+1+1+1+1
   start  190.5 min  F/trigger        GUARD_EVAL               seed 2021  (projected worst case 165 min)
+  [  9]  239.7 min  F/trigger        GUARD                    seed 2025  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9c32012, code bdd8269d38af, attempt 1: acc 0.927  trans  None  MERGED (2 share)  splits [(31200, 'ok', '')]  map 2+1+1+1+1+1+1
+  start  239.7 min  F/trigger        GUARD_EVAL               seed 2022  (projected worst case 165 min)
+  [ 10]  242.7 min  F/trigger        GUARD_EVAL               seed 2021  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 9c32012+dirty, code bdd8269d38af, attempt 1: acc 1.000  trans 10800  BOUND ROUTED  splits []  map 1+1+1+1+1+1+1+1
+  start  242.7 min  F/trigger        GUARD_EVAL               seed 2023  (projected worst case 165 min)
