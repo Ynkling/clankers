@@ -760,3 +760,97 @@ Three more, same rules.
     findings), missing CHECKs, outcomes that can be read two ways, power at the planned seeds. One
     page per spec, spec_review_<name>.md. Say what you could not check and why.
 ```
+
+## Session G — round 4 (S83 and a spec draft; seeds 2100-2119 paired with S82, 2120-2159 spare)
+
+```
+Follow-up to S82. REG3_KEYHINGE discovers 20/20 against BASELINE 0/20 and REG3 2/20, and the hinge
+reads key positions and key identities. S83 asks three things on S82's seeds (2100-2119; Hebbian,
+RandHeaderTask-lite, 24000, SLOW), reusing S82's BASELINE, REG3 and REG3_KEYHINGE records as the
+paired references: first reproduce one S82 run of each arm bit for bit through 2400 under the current
+code, and rerun any arm that differs.
+ (1) The control the main-line test needs. LOCAL3_KEYHINGE: the key term on the window gate, no
+ register. If it is discovered, the hinge is the ingredient and the register is not.
+ (2) What the hinge must read. REG3_KEYHINGE_POS: a term that reads key positions but not key
+ identities — a penalty on the gate's commitment at key positions during updates 1-2400 (your choice
+ of form, e.g. the KL of g_t from uniform at key positions, or the variance of g_t across a sequence's
+ key positions; fix it in the docstring and say what it reads). REG3_FLAT: the same term at every body
+ position (reads no task structure).
+ (3) The window. REG3_KEYHINGE_1200: the key term for updates 1-1200 only.
+ REG3_NUDGE on 2100-2101 for validity.
+Readings fixed now (ROUTED-BOUND; exact one-sided McNemar against BASELINE's S82 record; "discovered"
+ if p < 0.05): "the register is not needed" if LOCAL3_KEYHINGE is discovered and within 1 pair of
+ REG3_KEYHINGE; "the register is needed" if REG3_KEYHINGE beats it by >= 4 vs 0. "Key identity need not
+ be read" if POS is discovered and within 1 pair of REG3_KEYHINGE; "no structure need be read" if FLAT
+ likewise; "the identity term is needed" if REG3_KEYHINGE beats POS by >= 4 vs 0. "The short window
+ suffices" if the 1200 arm is within 1 pair. Delta (beta 1, L2; 2100-2109, against S82's delta
+ references): the arm of (1)-(2) that reads least and is discovered on Hebbian memory.
+Then write explore_out/G/spec_draft_register.md: a main-line specification in the form of
+ specs/test_split_copy.md, for the user and X to adopt. Arms BASELINE, REG3, REG3_KEYHINGE,
+ LOCAL3_KEYHINGE (and the POS arm if it was discovered), REG3_NUDGE and the perfect gate as validity;
+ 20 seeds per machine (propose X 600-619, L 1600-1619, and check every branch and the main line's seed
+ list for collisions); outcome ROUTED-BOUND fixed by function; claims per machine secondary and pooled
+ primary: C1 REG3_KEYHINGE beats BASELINE, C2 REG3_KEYHINGE beats LOCAL3_KEYHINGE, C3 REG3_KEYHINGE
+ beats REG3 (exact one-sided McNemar); a rate claim >= 18/20 per machine (Wilson printed); readings
+ named so that each outcome has exactly one name; the task-structure caveat in the spec's own words;
+ CHECKs including the hinge's gradient, each device with its switch off equal to its base bit for bit
+ through 2400, and the S82 reproduction.
+CHECKs for S83: each new term with its switch off equals REG3 bit for bit through 2400;
+ LOCAL3_KEYHINGE with the term off equals BASELINE; the POS and FLAT terms' gradients reach W_g (and A)
+ only. report_6.md, README section.
+```
+
+## Session H — round 4 (S86 and a spec draft; seeds 2330-2339)
+
+```
+Follow-up to S84-S85. Two things.
+S86 explore_h_allmass (S=8, P=4, k=16, conv, 43200, Hebbian, exact copy; seeds 2330-2339; paired):
+ what the trigger reads. The main line's 50 split runs store, at every check, the pair an all-position
+ mass would have chosen (checks[].all_cs, all_c0, all_ok) beside the key-position pair; at their 107
+ firings the all-position pair was a labelled target at 97 (window_gate X 46/47, L 30/38; split_copy X
+ 21/22), the key-position pair at all 107, and the two pairs coincide at 46. Recompute that first with
+ a short script over results/X and results/L, commit the script, and print the counts. Arms: BASE
+ (S79's BASE, KEYMASS); ALLMASS (c*, c0 by the mean read-gate mass over all body positions —
+ test_window_gate.select() already computes it; it reads no task structure); EVAL (S84's
+ evaluation-read trigger, a second look at its 1 vs 0). Outcome BOUND ROUTED with transitions; every
+ firing with its key-label and its all-label. Readings fixed now: "all-position targeting keeps it" if
+ ALLMASS >= BASE - 1 pair; "aims" if >= 90% of ALLMASS's firings are labelled ok; "costs binding" if
+ BASE beats it by >= 4 vs 0; "the evaluation is the better probe" if EVAL >= BASE - 1 pair, and S84 and
+ S86 pooled descriptively (20 pairs).
+Then write explore_out/H/spec_draft_two_keyterm.md: the main-line specification of your S85 proposal,
+ in the form of specs/test_split_copy.md. S=2, P=4, k=2, no conv, 24000; WIN3_SLOW with and without the
+ key term on updates 1-2400 (S52's W2_KEYHINGE); the perfect gate as validity; outcome DISCOVERED under
+ fail_class_v2; 20 seeds per machine (propose blocks; check every branch and the main line's seed
+ list); claims per machine secondary and pooled primary: K1 WIN3_SLOW_KEYHINGE beats WIN3_SLOW (exact
+ one-sided McNemar); K2 its KEY failures, a printed count; a rate claim >= 18/20 per machine; readings
+ named so that each outcome has exactly one name; the task-structure caveat (the term reads key
+ positions and key identities) in the spec's words; CHECKs: the term with its switch off equals
+ WIN3_SLOW bit for bit through 2400, the S52 and S85 reproductions, the v2 classifier on the recorded
+ two-stream runs.
+CHECKs for S86: ALLMASS at threshold 0 equals BASE bit for bit through 6000; the two selections
+ recomputed on one stored check equal the record's. report_8.md, README section.
+```
+
+## Session V — round 4 (branch claude/review-V; docs/review_2026-10/)
+
+```
+Three tasks, in order; nothing outside docs/review_2026-10/.
+1. The Revision 9 draft, second version (claude/rev9-draft at f67bc07; the tex and the PDF). For every
+ row of your revision_9_check.md state whether this version resolves it (RESOLVED, PARTLY, NOT, or NEW
+ ERROR) with the new tex line; re-run rev9/check_*.py against the new tex and report the counts as
+ before. The draft also folds in three reports that landed after your check — G's report 5 (S82), H's
+ reports 6 and 7 (S84, S85) — check their paragraphs (the far section, the S84 sentences of the split
+ section, the two-stream section, Table 5, the abstract, the limits, the provenance rows) against the
+ reports and the records as you did the others. One count in the limits section is ours and not a
+ session's: "97 of 107 firings" for the all-position target pair; recompute it from results/X and
+ results/L (checks[].all_cs, all_c0, all_ok; key_ok). Write rev9/second_pass.md with a verdict: "ready
+ to merge", or the list of what remains.
+2. specs/test_delta_recipe.md, Amendment 1 (32c121b on the main line): review it as you reviewed the
+ draft — whether it takes each of your fixes as you meant them, the no-room rule's 36/40, the Newcombe
+ interval's implementation, the new CHECKs 172-174, and anything it leaves open.
+ spec_review_test_delta_recipe_2.md.
+3. When X commits test_delta_recipe.py: check that its docstring equals the amended spec in meaning,
+ that every reading is printed from the code's own counts, and that CHECK 172 reproduces your overlap
+ values on a stored record; test_check_delta_recipe.md. If X has not committed it when 1 and 2 are
+ done, stop and say so.
+```
