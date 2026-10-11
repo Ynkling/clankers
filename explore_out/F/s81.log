@@ -152,3 +152,12 @@ EXPLORATORY, NOT A RESULT — Session F s81 (F/trigger)
   [ 35]  869.5 min  F/trigger        EVAL                     seed 2024  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 31d24d6+dirty, code bdd8269d38af, attempt 1: acc 0.999  trans 16800  BOUND ROUTED  splits [(4800, 'NOT', '')]  map 1+1+1+1+1+1+1+1
   start  869.5 min  F/trigger        EVAL                     seed 2028  (projected worst case 162 min)
+  [ 36]  933.0 min  F/trigger        EVAL                     seed 2027  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8c3a5b9, code bdd8269d38af, attempt 1: acc 1.000  trans 13200  BOUND ROUTED  splits [(4800, 'ok', 'D')]  map 1+1+1+1+1+1+1+1
+  start  933.0 min  F/trigger        EVAL                     seed 2029  (projected worst case 162 min)
+  [ 37]  939.5 min  F/trigger        EVAL                     seed 2026  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8c3a5b9+dirty, code bdd8269d38af, attempt 1: acc 0.995  trans 22800  BOUND ROUTED  splits [(4800, 'NOT', ''), (19200, 'NOT', 'D')]  map 1+1+1+1+1+1+1+1
+  start  939.5 min  F/trigger        O_DELTA_C                seed 2020  (projected worst case 149 min)
+  [ 38]  947.3 min  F/trigger        EVAL                     seed 2028  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8c3a5b9+dirty, code bdd8269d38af, attempt 1: acc 0.995  trans 15600  BOUND ROUTED  splits [(4800, 'NOT', 'D')]  map 1+1+1+1+1+1+1+1
+  start  947.3 min  F/trigger        O_DELTA_C                seed 2021  (projected worst case 149 min)
