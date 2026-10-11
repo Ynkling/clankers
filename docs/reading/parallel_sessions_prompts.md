@@ -854,3 +854,28 @@ Three tasks, in order; nothing outside docs/review_2026-10/.
  values on a stored record; test_check_delta_recipe.md. If X has not committed it when 1 and 2 are
  done, stop and say so.
 ```
+
+## Session R — Phase 4, amended (replaces the Phase 4 prompt above; given to the user in chat on 10 October after the referee's replication review, committed here on 11 October; R's branch at 464be8d still carries the first rule)
+
+```
+Phase 4, amended after the referee's review (docs/review_2026-10/replication_review.md on
+claude/review-V; read it first). Three parts, all with the split as the main line specifies it
+(the fixed probe from Generator(12345), body keys only for the mass, the oracle under
+single-rate Adam). Readings fixed now; replace phase4.py's rule with these before any run, and
+leave Phase 2's record untouched.
+ (a) The failing seeds: rerun WIN3_SPLIT_D8 on 914 and 915 with the main line's protocol.
+     Reading: "D-1 cost seed 914" if 914 binds routed under it. 2 runs.
+ (b) Fresh seeds, the rate: WIN3_SPLIT_D8 on 920-951 (32 seeds, none pooled with Phase 2).
+     Primary reading on the fresh count x: "below the report's 0.95" if x <= 27/32 (exact one-sided
+     size 0.020; power 0.54 at a true rate of 0.85 and 0.80 at 0.80 — stated, and all the budget
+     allows); "consistent" otherwise. Secondary: Fisher against 38/40. Count the checks where the
+     probe and the evaluation disagree about >= 0.95.
+ (c) The mechanism on 920-929: COPY_ONLY (exact copy, no noise, no Adam reset), RESET_ONLY (the
+     trigger with the Adam reset and W_g untouched) and WIN3_SLOW_D8 (no trigger), paired with (b)'s
+     runs on the same seeds. Readings: "the copy is the ingredient" if SPLIT and COPY_ONLY each beat
+     RESET_ONLY by >= 4 vs 0 and RESET_ONLY >= WIN3_SLOW_D8 - 1 pair; descriptive otherwise.
+ Records in a format the main line's outcome code can score: per run the curve, the per-stream
+ gate mass at value positions, per-stream accuracy, each check's probe and evaluation accuracy,
+ each split's (update, c*, c0, map before). Append to replicate_report.md; Phase 2's record stays
+ as it is.
+```
