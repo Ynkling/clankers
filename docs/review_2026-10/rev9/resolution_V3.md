@@ -1,0 +1,26 @@
+# Third pass, the referee's own rows
+
+*Referee V, 11 October 2026.*
+
+**What was checked.** The third version, `a5f67a2` (claude/rev9-draft, 03:15:04 UTC), cited as `tex3:NNN`. The rows are the non-RESOLVED rows of `resolution_V.md`, and second_pass.md §1 items 1, 2, 3, 4 and 9 and §3's Session V items, where they are the referee's.
+
+**The new commit `db22857`.** It is on the main line, at 03:01:26 UTC: "session R's amended Phase 4 prompt, committed (it had been given only in chat ...)". It adds `docs/reading/parallel_sessions_prompts.md:858-884`.
+
+| item (second pass) | third version | status |
+|---|---|---|
+| tex2:327, R's labels: "ambiguous or silent on nine" | tex3:327: "the text stated seven outright or in part (the gate's input among them) and left 37 to be guessed, 20 on which it was silent, 12 on which it was ambiguous and 2 carried over" | **PARTLY: arithmetic.** 20 + 12 + 2 = 34, not 37. R's labels (UNSTATED.md): 4 [stated]; 3 stated in part (2 [stated + A], 1 [A in code, stated in report]); 34 guessed (20 [A], 12 [B], 2 [C]); 3 unlabelled (process). "Seven outright or in part" is right and already includes the three partials, so the three are counted twice. Write "left 34 to be guessed (20 silent, 12 ambiguous, 2 carried over), 3 more stated only in part". The referee's second pass wrote "37 of 44 ... silent, ambiguous or carried over", lumping the partials in, and that is where the 37 came from |
+| tex2:325, 344, 388, 470: the amended Phase 4 reading "issued as a prompt" with no record | tex3:325: "an amended reading (32 fresh seeds, 'below 0.95' at x ≤ 27, size 0.020, power 0.54 at 0.85) was written after the referee's review but existed in no commit **until this version put it in** docs/reading/parallel_sessions_prompts.md". tex3:344 says the same ("until this version committed it"). tex3:388: "existed in no commit until this version". tex3:470: "now committed" | **PARTLY.** The reading now exists: `db22857:docs/reading/parallel_sessions_prompts.md:858-884`, (a) 914/915 reruns, (b) 32 fresh seeds, (c) the mechanism arms. Its numbers are right: P(X ≤ 27 \| 32, 0.95) = 0.020; power 0.536 at 0.85 and 0.796 at 0.80. But it was committed by `db22857` on the main line, not by "this version": `a5f67a2` changes only the tex and the PDF. Write "until `db22857` committed it". That it had been "given in chat on 10 October" is the commit's own statement; no record shows it |
+| tex2:427: "a probe whose readings the records do not keep" | tex3:427: "Read what the trigger saw. The records keep every check's probe reading beside the evaluation's, and nobody read the two against each other ... A test should print them side by side, with the count of checks the probe blocked, as test_delta_recipe now does" | RESOLVED. `test_delta_recipe.py`'s `probe_blind` and its report line `:1176-1180` do this |
+| tex2:488: split_copy L "running" | tex3:488: "not run" | RESOLVED |
+| tex2:489: delta_recipe "not written" | tex3:489: "spec 05256c5, Amendment 1 32c121b / test a581027 / not run" | RESOLVED |
+| tex2:510: R "Phase 4 running" | tex3:510: "Phase 4 rule (464be8d), not started", with branch commit 464be8d | RESOLVED |
+| tex2:511: the V row stops at 0e6c189 | tex3:511: adds "delta spec reviews (fad1489, 16b04f9); this revision's checks (e8fbb25, 16b04f9)" | **PARTLY.** The second pass's verdict, `rev9/second_pass.md`, is `66334b8`, and the test check is `6f2788d`. `16b04f9` holds only the Amendment 1 review and part of the second pass's own rows. Write "this revision's checks (e8fbb25, 66334b8); the test check (6f2788d)" |
+| tex2:344: "five ranges" | tex3:344: "three ranges stated for every run that held for the median run"; "five of the six copied the wrong channel" | RESOLVED |
+| tex2:344: "Every item is corrected" | tex3:344: "Every item is addressed in this version, which the referee's second pass checked again (... corrected in turn)" | PARTLY, pending this pass (third_pass.md) |
+| tex2:330: "reports 3–6" | tex3:334: "two later passes over F's reports 3–5, G's 3–4, H's 4–5 and I's 1, 808 rows" | RESOLVED |
+| tex2:458: "every size" | tex3:458: "at two, four and eight streams" | RESOLVED |
+| tex2:465: the conclusion's screen markers and "recomputed ... found them to reproduce" | tex3:465: "found on every seed of a screen ... which on a screen also prevents the two-stream key split that the copy did not repair"; the referee sentence unchanged | RESOLVED for the markers. The referee sentence is acceptable: "the numbers ... reproduce" is true of the tables, and the statements are listed |
+| tex2:327: "eleven guesses", two of them not on DIFF.md's list | tex3:327: the 0.02 initialisation "matched as well (R's report)", and the map "is filed by R as a difference (D-10) that matched in statistic only" | RESOLVED |
+| §1 item 9: 914 range; 6 of 393 | tex3:205: "0.953–1.000"; tex3:390: "6 of 353 checks" | RESOLVED (the 205 count is in `resolution_split_copy_appB3.md`) |
+| tex2:41, 53: delta_recipe's state | tex3:41: "specified, reviewed by the referee, amended once and written, its test file checked against the amended spec before any run"; tex3:53: "the test written and checked against the amended spec; not run" | MATCH (`a581027`; `test_check_delta_recipe.md`) |
+| tex2:36: the held-out seed | tex3:525 gives 424242 | RESOLVED |
