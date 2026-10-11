@@ -107,3 +107,58 @@ I logged 44 choices before running.
   - this report: the branch head
 - **What I saw of the clankers repository before Phase 3.** The attached PDF was inside the session's checkout of it (`/home/user/clankers`). A filename search to locate the PDF printed six filenames from that checkout: `bdh_multichannel.py`, the `.tex` sources of v7 and v8, and older report PDFs. I opened none of them and saw none of their contents. Apart from the v8 PDF, nothing from that checkout was read. I judge the replication not void, but the reader should know.
 - **Environment:** 4 workers × 1 thread, PyTorch 2.14.1 (CPU).
+
+---
+
+## Phase 4: the 40-seed count (added after the report above; Phases 1–3 unchanged)
+
+**Independent replication, EXPLORATORY, not a result.** The design and readings were fixed in `phase4.py` and pushed (`464be8d`) before any Phase 4 run.
+
+**Design.**
+- **Split arm:** WIN3_SPLIT_D8 on seeds 900–919 (Phase 2, my probe and key positions), together with WIN3_SPLIT_D8_ML on 920–939. WIN3_SPLIT_D8_ML is the split as the main line specifies it: one probe from `Generator(12345)` for every seed, and c*/c0 from the 32 body key positions.
+- **No-split arm:** WIN3_SLOW_D8 on 900–939. It has no split, so pooling it across phases is exact.
+- **Validity:** the perfect gate under single-rate Adam (ORACLE_ADAM) on seeds 920–921.
+
+| | count | Wilson 95% |
+|---|---|---|
+| split arm, 40 seeds | **35/40** | [0.739, 0.945] |
+| WIN3_SLOW_D8, 40 seeds | 12/40 | [0.181, 0.454] |
+| paired split vs no split | **23 vs 0**, exact one-sided McNemar p = 1.2×10⁻⁷ | |
+| secondary: WIN3_SPLIT_D8_ML, 920–939 only | 18/20 | [0.699, 0.972] |
+| secondary: WIN3_SLOW_D8, 920–939 only | 5/20 | [0.112, 0.469] |
+| ORACLE_ADAM (validity) | 2/2, both at 2400 | |
+| report, pooled | 38/40 vs 15/40, 23 vs 0 | [0.835, 0.986] |
+
+**READING (mechanical): "consistent with the report".** The interval [0.739, 0.945] overlaps [0.835, 0.986], and the split arm beats the no-split arm at p = 1.2×10⁻⁷.
+
+Under the main line's specification alone, 920–939 gave 18/20. That is the count Phase 2's threshold asked for.
+
+**What the 40 seeds can and cannot say:**
+- The point estimate, 0.875, sits below the report's 0.95.
+- The interval excludes rates below 0.74 and includes 0.95.
+- 40 seeds can still not tell 0.85 from 0.95. Separating them at this precision needs on the order of 150 seeds per arm.
+- The no-split arm (12/40, 0.30) matches the report's 15/40 (0.375). So does the paired effect: no seed in either replication or in the report bound without the split and failed with it.
+
+**Failures.**
+- WIN3_SPLIT_D8_ML failed on seeds 920 and 933. Both ended with two streams sharing a channel after three splits, the same failure the report gives for X's seeds 555 and 556.
+- All 44 Phase 4 splits were on target by the labels (c* held ≥ 2 streams, c0 none).
+- All 15 WIN3_SLOW_D8 failures were merges of two or three streams.
+- Median transition over bound-routed runs: 19,800 with the split, 19,200 without.
+
+**Probe-versus-evaluation blocks (seed 914's failure mode).** A blocked check is one at update ≥ 4800 where the probe reads ≥ 0.95 while the held-out evaluation at the same update is < 0.95.
+
+| split runs | checks | blocked | of them otherwise eligible (cap and gap allowing) | runs affected | of those, not bound routed |
+|---|---|---|---|---|---|
+| Phase 2, per-seed probes (900–919) | 192 | 13 | 12 | 906, 914 | 914 |
+| R1, the report's probe (900–909) | 91 | 1 | 1 | 905 | none |
+| R2, per-seed probes, body keys (900–909) | 90 | 0 | 0 | — | — |
+| **Phase 4, the report's probe (920–939)** | **172** | **2** | **0** | **none** | **none** |
+
+The opposite disagreement (probe < 0.95 while the evaluation is ≥ 0.95) never occurred.
+
+With the report's probe, the failure mode appeared at 3 of 263 checks, and never decided a run. With per-seed probes it decided one run in twenty: one probe drawn per seed is sometimes easy enough to read ≥ 0.95 while two streams are still merged. The fixed probe from `Generator(12345)` happened not to be easy in that way on these seeds. That is a property of one particular 64-sequence draw, not a guarantee.
+
+**For the report (adding to Section 4):**
+- Specify the probe as one fixed draw, as the main line does.
+- Say that its 64 queries can over-read a merged model.
+- Better still, gate the trigger on more queries per probe sequence.

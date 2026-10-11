@@ -39,9 +39,18 @@ PROBE-VERSUS-EVALUATION BLOCKS (counted on every split run: Phase 2, R1, R2 and 
   and how many of them ended not bound routed. The converse (probe < 0.95 while evaluation
   >= 0.95) is counted too.
 
-RESULT (filled in after the run)
+RESULT (filled in after the run; records/phase4.jsonl, records/phase4_table.md)
 -------------------------------------------------------------------------------
-(not yet run)
+  ORACLE_ADAM 2/2 (both at 2400) -> validity PASS.
+  Split arm, 40 seeds: 35/40, Wilson [0.739, 0.945] (overlaps [0.835, 0.986]);
+  WIN3_SLOW_D8 12/40 [0.181, 0.454]; McNemar 23 vs 0, p = 1.19e-7.
+  Secondary, 920-939 only (all under the main line's split): WIN3_SPLIT_D8_ML 18/20 [0.699, 0.972];
+  WIN3_SLOW_D8 5/20 [0.112, 0.469].
+  Probe-versus-evaluation blocks: Phase 4 2 of 172 checks, 0 otherwise eligible, no run affected;
+  Phase 2 (per-seed probes) 13 of 192 checks, 12 eligible, in seeds 906 and 914 (914 not bound routed);
+  R1 (the fixed probe) 1 of 91, in 905 (bound routed); R2 0 of 90.
+READING (mechanical): "consistent with the report".
+Independent replication, EXPLORATORY, not a result.
 """
 
 import json
