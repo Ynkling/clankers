@@ -20,3 +20,39 @@ EXPLORATORY, NOT A RESULT — batch 20: continue (S68)
   lr for s67_continue C_ORC_P16_D128: 0.001; iters 86400; seeds 270-270 (1); size [2, 128, 3]; task P16S4; gate perfect; marks 43200..86400
   lr for s67_continue C_P16_N256: 0.001; iters 86400; seeds 270-279 (10); size [8, 32, 3]; task P16S4; gate local; marks 43200..86400
   lr for s67_continue C_P16_D128: 0.001; iters 86400; seeds [271, 272, 273, 275, 276, 279] (6); size [2, 128, 3]; task P16S4; gate local; marks 43200..86400
+  CHECK batch 20: the checkpoint guard writes nothing after ckpt_until and writes at it: ok
+  CHECK batch 20: the batch-20 measurements do not change a run: P8_N256 272 with marks and weight hashes at 1200 / 2400 equals batch 19's run path without them through 2400 (fields differing [] of 10: curve, stats, early, end, w_sha, transition, stopped_at, outcome, acc_check, passed): ok
+  CHECK batch 20: P8_N256 seed 272 reproduces its S67 record through 2400 (curve, statistics, early curve) [curve [[1200, 0.06103515625, 2.8067595958709717], [2400, 0.11572265625, 2.7502667903900146]]]: ok
+  CHECK batch 20: P16_N256 seed 270 reproduces its S67 record through 2400 (curve, statistics, early curve) [curve [[1200, 0.0693359375, 2.8224425315856934], [2400, 0.06787109375, 2.789310932159424]]]: ok
+  CHECK batch 20: P16_D128 seed 271 reproduces its S67 record through 2400 (curve, statistics, early curve) [curve [[1200, 0.06787109375, 2.784893751144409], [2400, 0.10009765625, 2.755230188369751]]]: ok
+  CHECK batch 20: ORC_P16_D128 seed 270 reproduces its S67 record through 2400 (curve, statistics, early curve) [curve [[1200, 0.109375, 2.7381460666656494], [2400, 0.13037109375, 2.703066110610962]]]: ok
+  CHECK batch 20: the halt-and-new-process path: P8_N256 272 halted after its checkpoint at 1200, its process replaced (os.execv), resumed from [1200], marker 1200, to 2400: fields differing from the uninterrupted run [] (of 10 + marks + weight hashes): ok
+  CHECK batch 20: S68 width reading: 6/6, 4/6 -> slow, not stuck; 3/6, 1/6 -> unresolved; 0/6 -> stuck; incomplete -> INCOMPLETE: ok
+  CHECK batch 20: S68 joint reading: (D128, N256) = (4, 4) budget; (6, 1), (4, 0) width; (4, 2), (3, 0), (0, 6) neither; incomplete: ok
+  CHECK batch 20: budget rule: latest transition + 2400, rounded up to a multiple of 2400 (S67 alone: [19200, 26400, 37200, 38400] -> 40800; 40000 -> 43200; none -> None): ok
+  CHECK batch 20: S67 records: every S68 seed has a saved S67 run (code 17e56410a1db) stopped at 43,200, unbound, with the class the specification names (one-to-one N256 (270, 272, 273, 274, 275, 276), D128 (271, 272, 273, 275, 276, 279); MERGED N256 (271, 277, 278, 279)); P16_D128 has no other unbound seed: ok
+  CHECK batch 20: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (15.9 min)
+  recorded the full CHECK pass (code SHA, the batch's CPU Intel(R) Xeon(R) Processor @ 2.10GHz) in /home/user/clankers/explore_out/batch20_checks.json
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN s67_continue
+  idea    are batch 19's unbound P = 16 runs slow or stuck? every unbound S67 learned run on to 86,400, same recipe
+  source  batch 19's S67 (P16_D128 4/10 vs P16_N256 0/10; 12 of 16 failures one-to-one and unbound); the user's batch 20
+  change  only the budget (43,200 -> 86,400); every run regenerated from update 0 and checked against its S67 record
+  arm RCHK_P8_N256 lr 0.001  iters 44400  seeds 272-272 (1)  — the reproduction's run computed through (no checkpoint after 42000), P=8, N256, to 44400
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P8_N256    lr 0.001  iters 86400  seeds 272-272 (1)  — P=8, N256 (N=256, D=32): halts at 43200, a new process resumes it
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_ORC_P16_D128 lr 0.001  iters 86400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm C_P16_N256   lr 0.001  iters 86400  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P16_D128   lr 0.001  iters 86400  seeds [271, 272, 273, 275, 276, 279] (6)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  pairing each run is its own S67 run (same arm, seed, recipe), continued
+----------------------------------------------------------------------------------------------------
+  pool: 4 workers (1 torch thread each); segment budget 99 min left
+  start    0.0 min  s67_continue RCHK_P8_N256   seed 272  (projected worst case 92 min)
+  start    0.0 min  s67_continue C_ORC_P16_D128 seed 270  (projected worst case 763 min)
+  start    0.0 min  s67_continue C_P16_D128     seed 271  (projected worst case 865 min)
+  start    0.0 min  s67_continue C_P16_D128     seed 272  (projected worst case 865 min)

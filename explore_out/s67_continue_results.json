@@ -1,0 +1,221 @@
+{
+ "meta": {
+  "arms": {
+   "C_ORC_P16_D128": {
+    "iters": 86400,
+    "key": "C_ORC_P16_D128",
+    "label": "oracle, P=16, D128 (N=256, D=128)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "s67": "ORC_P16_D128",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "marks": [
+      43200,
+      48000,
+      52800,
+      57600,
+      62400,
+      67200,
+      72000,
+      76800,
+      81600,
+      86400
+     ],
+     "sha_at": [
+      43200
+     ],
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "C_P16_D128": {
+    "iters": 86400,
+    "key": "C_P16_D128",
+    "label": "LOCAL3 + SLOW, P=16, D128 (N=256, D=128)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "arm",
+    "s67": "P16_D128",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)",
+    "seeds": [
+     271,
+     272,
+     273,
+     275,
+     276,
+     279
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "marks": [
+      43200,
+      48000,
+      52800,
+      57600,
+      62400,
+      67200,
+      72000,
+      76800,
+      81600,
+      86400
+     ],
+     "sha_at": [
+      43200
+     ],
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "C_P16_N256": {
+    "iters": 86400,
+    "key": "C_P16_N256",
+    "label": "LOCAL3 + SLOW, P=16, N256 (N=256, D=32)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "arm",
+    "s67": "P16_N256",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "marks": [
+      43200,
+      48000,
+      52800,
+      57600,
+      62400,
+      67200,
+      72000,
+      76800,
+      81600,
+      86400
+     ],
+     "sha_at": [
+      43200
+     ],
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "C_P8_N256": {
+    "iters": 86400,
+    "key": "C_P8_N256",
+    "label": "P=8, N256 (N=256, D=32): halts at 43200, a new process resumes it",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "arm",
+    "s67": "P8_N256",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)",
+    "seeds": [
+     272
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "local",
+     "halt_once_at": 43200,
+     "marks": [
+      43200,
+      44400,
+      48000,
+      52800,
+      57600,
+      62400,
+      67200,
+      72000,
+      76800,
+      81600,
+      86400
+     ],
+     "sha_at": [
+      43200,
+      44400
+     ],
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P8S4"
+    }
+   },
+   "RCHK_P8_N256": {
+    "iters": 44400,
+    "key": "RCHK_P8_N256",
+    "label": "the reproduction's run computed through (no checkpoint after 42000), P=8, N256, to 44400",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "check",
+    "s67": "P8_N256",
+    "sched": "gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)",
+    "seeds": [
+     272
+    ],
+    "spec": {
+     "cfg": "k16",
+     "ckpt_until": 42000,
+     "gate": "local",
+     "marks": [
+      43200,
+      44400
+     ],
+     "sha_at": [
+      43200,
+      44400
+     ],
+     "size": [
+      8,
+      32,
+      3
+     ],
+     "task": "P8S4"
+    }
+   }
+  },
+  "code_shas": [
+   "78c8b0a643d9dcd7af39640f35dc124debf01a1a"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "83ac671+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-11 22:00:03",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
