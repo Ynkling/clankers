@@ -31,16 +31,23 @@ they are bit-identical for every Hebbian model (the next paragraph). On CUDA the
 differently.
 
 The CUDA CHECK is therefore **lock-step**: before every update, the model under test is set to the reference's parameters,
-and both compute logits and gradients on the same batch. Each update must pass one of two tests:
-- **Tolerance.** max |Δlogits| ≤ tol_logits, and for each parameter ‖Δg‖ ≤ tol_grad · ‖g_ref‖, using that parameter's
-  own Frobenius norm.
-- **Float64 arbitration.** Where the tolerance fails, a float64 copy of the reference computes the same update. The
-  tested path passes if it is no farther from float64 than 4× the reference's own float32 error, plus the tolerance.
+and both compute logits and gradients on the same batch.
+- **Tolerance.** An update passes if max |Δlogits| ≤ tol_logits and, for each parameter, ‖Δg‖ ≤ tol_grad · ‖g_ref‖, using
+  that parameter's own Frobenius norm.
+- **Arbitration.** Otherwise a float64 copy of the reference computes the same update. The update counts as *test-worse*
+  (A) if the tested path is farther from float64 than 4× the reference's own float32 error plus the tolerance. It counts
+  as *reference-worse* (B) in the mirror case.
+- **Pass.** A case passes if no value is non-finite and a one-sided sign test does not reject "equally accurate":
+  P(Binomial(A + B, ½) ≥ A) ≥ 1e-4.
 
-Arbitration is needed because the reference's float32 rounding can exceed the tolerance by itself. In the delta memory's
-ill-conditioned solve, at a relu at its threshold, or in a cancelling sum, it is the reference that is off, so a fixed
-bound would fail a correct path. A case passes if at most 0.5% of its run-updates fail both tests (at least 1 is allowed).
-K3c checks this criterion: it passes a correct path that rounds differently and fails wrong gradients within 20 updates.
+A fixed bound alone would fail correct code. Two float32 paths that round differently sometimes disagree by more than any
+tolerance, and the reference is as often the inaccurate one:
+- a relu pre-activation within rounding of zero, active in one path only (about 6 million relu units per update at
+  L = 768);
+- the delta memory's ill-conditioned solve;
+- a cancelling sum.
+
+A wrong gradient makes nearly every update A and none B.
 
 | CHECK | Comparison on CUDA | tol_logits, tol_grad |
 |---|---|---|
@@ -57,14 +64,13 @@ On CPU (`checks_cpu_output.txt`, this container) these are asserted bit for bit:
   include a split that fires.
 - K5: the ICMC trainer equals `explore_i_common.run_one`, and the register's scan equals its loop.
 
-K3c (the criterion's controls) also runs on CPU.
-- **Positive control.** A neuron-permuted twin of arm A (same function, another summation order) fails both tests at
-  5 of 2400 updates (0.2%). Each failure is an isolated rounding flip in the twin's own float32 path, with arbitration
-  scores 1.4–18 (1 is the limit). The twin passes within the 0.5% budget.
-- **Negative controls.** A zeroed W_in, W_h or W_g gradient, or W_g's gradient scaled by 1.01, fails at every update
-  from the first, with scores 70–9000. This includes W_in at L = 768, where its gradient is ~1e-7 of the largest.
-
-On CPU the delta memory's GDN case also passes: 6 of 900 updates needed arbitration and none failed.
+K3c (the criterion's controls) also runs on CPU, and `calibrate_judge.py` runs the CUDA lengths on CPU
+(`calibrate_judge_output.txt`):
+- a neuron-permuted twin of arm A passes (same function, another summation order);
+- REG3's register scan against its loop at L = 768 passes;
+- the delta memory passes;
+- a zeroed W_in, W_h or W_g gradient, or W_g's gradient scaled by 1.01, fails at every update. This includes W_in at
+  L = 768, where its gradient is ~1e-7 of the largest. __CALIB__
 
 K7 checks the data path. K8 runs every forward on fake CUDA tensors to show that no CPU tensor is mixed in.
 
@@ -137,5 +143,6 @@ GPU time).
 - `device.py`, `batched.py`, `run.py`: the runner.
 - `s75_s4.py`, `mainline.py`: (b) and (c).
 - `checks.py` and `checks_cpu_output.*`: the CHECKs and this container's outputs.
+- `calibrate_judge.py` and its output: the lock-step criterion at the CUDA lengths.
 - `profile_s75.py`, `runtime_estimate.md`, `profile_s75.json`: the estimate.
 - `../explore_out/I/gpu/audit.json`: the audit of the project's CUDA hazards behind `device.py`.

@@ -17,14 +17,18 @@ O(1) within ~200 updates: two free-running paths agree to 1e-5 for 2400 updates 
     path's own parameters on the same batch (the reference trains; the tested model is re-synchronised to it before each
     update), so the comparison follows the real training trajectory without the chaos. The criterion (class Judge):
     FAST: max |dlogits| <= tol_logits and, per parameter, ||dg|| <= tol_grad ||g_ref|| (Frobenius norm, the parameter's
-    own); where FAST fails, ARBITRATED by a float64 copy of the reference on the same update: the tested path passes if
-    it is no farther from float64 than 4x the reference's own float32 error plus the tolerance (logits, and every
-    parameter). Tolerances, stated: same device (batched vs sequential): tol_logits 1e-5, tol_grad 1e-4; CUDA vs CPU:
-    1e-4, 1e-3 (cuBLAS and MKL sum in different orders; float32, TF32 off). A case passes if at most `budget` of its
-    run-updates fail both (budget stated per case in the output; K3c calibrates it). Why arbitration: float32 rounding of
-    the reference itself exceeds the bare tolerance at some updates (an ill-conditioned solve in the delta memory, a relu
-    at its threshold, cancelling sums: measured, the one-delta-channel GDN case's sequential float32 gradient is 1.3e-2
-    from float64 at one update where the batched one is 4e-7 from it); a fixed bound then fails a correct path.
+    own); where FAST fails, a float64 copy of the reference computes the same update, and the update counts as
+    TEST-WORSE (A) if the tested path is farther from float64 than 4x the reference's own float32 error plus the
+    tolerance, REF-WORSE (B) in the mirror case. A case passes if no value is non-finite and a one-sided sign test does
+    not reject "both paths are equally accurate": P(Binomial(A + B, 1/2) >= A) >= 1e-4. Tolerances, stated: same device
+    (batched vs sequential): tol_logits 1e-5, tol_grad 1e-4; CUDA vs CPU: 1e-4, 1e-3 (cuBLAS and MKL sum in different
+    orders; float32, TF32 off). Why not a fixed bound alone: two float32 paths that round differently disagree, now and
+    then, by more than any fixed tolerance (a relu pre-activation within rounding of zero, active in one path only: at
+    L = 768 there are ~6e6 relu units per update; an ill-conditioned solve in the delta memory; a cancelling sum), and
+    such an update is as likely to be the reference's error as the tested path's (measured: the one-delta-channel GDN
+    case's sequential float32 gradient is 1.3e-2 from float64 at one update where the batched one is 4e-7 from it; the
+    REG3 register's scan against its loop at L = 768: see K3c and the output). A wrong gradient makes nearly every
+    update A and none B (K3c's negative controls).
 
 CHECKS
   K0  (printed) the chaos calibration above, recomputed (arm A 160, two perturbation sizes, every 100 updates).          cpu
@@ -361,26 +365,41 @@ def to64(m):
     return m
 
 
+ALPHA = 1e-4           # the sign test's level (per case)
+
+
+def _sign_p(a, b):
+    """P(X >= a) for X ~ Binomial(a + b, 1/2): the one-sided sign test of "the tested path is the worse one more often
+    than the reference" when both are equally accurate (a, b exchangeable)."""
+    n = a + b
+    return sum(math.comb(n, k) for k in range(a, n + 1)) / 2 ** n if n else 1.0
+
+
 class Judge:
     """The lock-step criterion, per run and update, on the same parameters and batch: TEST (the batched or the device path)
     against REF (the sequential / CPU path, the one that trains).
       FAST: max |logits_test - logits_ref| <= tol["logits"] and, for every parameter, ||g_test - g_ref|| <=
             tol["grad"] * ||g_ref|| (Frobenius norms; the parameter's OWN norm, so a gate or register parameter whose
             gradient is 1e-9 of the model's largest is checked at its own scale; floor 1e-12 of the model's gradient
-            norm for gradients that are exactly zero).
-      ARBITRATED (only where FAST fails): a float64 copy of REF computes the same update (ref64). TEST passes if it is no
-            farther from ref64 than C_ARB times REF's own float32 error plus the tolerance: max |l_test - l64| <=
-            C_ARB max |l_ref - l64| + tol["logits"], and for every parameter ||g_test - g64|| <= C_ARB ||g_ref - g64|| +
-            tol["grad"] ||g64||. This is for updates where float32 rounding of the reference itself exceeds the tolerance
-            (an ill-conditioned solve in the delta memory, a relu or clamp at its threshold in one path and not in the
-            other, cancelling sums): there the reference is the inaccurate one and TEST is not blamed for it.
-      An update FAILS if it fails both; non-finite values fail. The CHECK allows at most `budget` failed updates in a
-      case (a threshold flip in TEST's own float32 path at one update: calibrated by K3c's positive control); a wrong
-      gradient fails at (nearly) every update (K3c's negative controls)."""
+            norm for gradients that are exactly zero). An update that passes is consistent.
+      ARBITRATED (where FAST fails): a float64 copy of REF computes the same update (ref64). The update is TEST-WORSE (A)
+            if TEST is farther from ref64 than C_ARB times REF's own float32 error plus the tolerance, for the logits or
+            any parameter: e_test > C_ARB e_ref + tol * scale (e = max |l - l64| for the logits, ||g - g64|| per
+            parameter; scale 1 for the logits, ||g64|| for a parameter). It is REF-WORSE (B) in the mirror case,
+            e_ref > C_ARB e_test + tol * scale. Otherwise both are within the tolerance of float64's answer or of each
+            other's error, and the update is consistent.
+      WHY: two float32 paths that round differently disagree, now and then, by more than any fixed tolerance: a relu
+            pre-activation within rounding of zero is active in one path and not in the other (at L = 768 there are
+            ~6e6 relu units per update), an ill-conditioned solve (the delta memory), a cancelling sum (a scalar bias's
+            gradient). Such an update is A or B with equal probability when the two paths are equally accurate; a
+            wrong gradient or forward makes (nearly) every update A and none B.
+      CASE PASSES: no non-finite value, and the one-sided sign test does not reject equal accuracy: P(Binomial(A + B,
+            1/2) >= A) >= ALPHA (1e-4). K3c CHECKs the criterion: a correct path that rounds differently passes, and
+            wrong gradients fail within 20 updates."""
 
-    def __init__(self, tol, budget=0):
-        self.tol, self.budget = tol, budget
-        self.updates, self.arbitrated, self.failed = 0, 0, []
+    def __init__(self, tol):
+        self.tol = tol
+        self.updates, self.arbitrated, self.A, self.B, self.nonfinite = 0, 0, [], 0, 0
         self.raw_logits, self.raw_grad, self.raw_grad_name, self.worst_score = 0.0, 0.0, None, 0.0
 
     def check(self, step, run, lt, ls, gt, gs, ref64):
@@ -394,6 +413,8 @@ class Judge:
             eg[n] = float("inf") if t is None else _nrm(t.detach().cpu().double() - g.detach().cpu().double()) / max(
                 _nrm(g), 1e-12 * gn, 1e-30)
         n_worst = max(eg, key=lambda k: eg[k]) if eg else None
+        if not math.isfinite(el) or (n_worst is not None and not math.isfinite(eg[n_worst])):
+            self.nonfinite += 1
         self.raw_logits = max(self.raw_logits, el)
         if n_worst is not None and eg[n_worst] > self.raw_grad:
             self.raw_grad, self.raw_grad_name = eg[n_worst], n_worst
@@ -401,26 +422,33 @@ class Judge:
             return
         self.arbitrated += 1
         l64, g64 = ref64()
-        sc = {"logits": _maxabs(lt, l64) / (C_ARB * _maxabs(ls, l64) + self.tol["logits"])}
+        e_t, e_r = _maxabs(lt, l64), _maxabs(ls, l64)
+        st = {"logits": e_t / (C_ARB * e_r + self.tol["logits"])}
+        sr = {"logits": e_r / (C_ARB * e_t + self.tol["logits"])}
         gn64 = math.sqrt(sum(_nrm(g) ** 2 for g in g64.values()))
         for n, g in g64.items():
             t = gt.get(n)
-            if t is None:
-                sc[n] = float("inf")
-                continue
-            e_t = _nrm(t.detach().cpu().double() - g.cpu())
+            scale = self.tol["grad"] * max(_nrm(g), 1e-12 * gn64, 1e-30)
             e_r = _nrm(gs[n].detach().cpu().double() - g.cpu())
-            sc[n] = e_t / (C_ARB * e_r + self.tol["grad"] * max(_nrm(g), 1e-12 * gn64, 1e-30))
-        k = max(sc, key=lambda x: sc[x] if math.isfinite(sc[x]) else float("inf"))
-        s = sc[k] if math.isfinite(sc[k]) else float("inf")
-        self.worst_score = max(self.worst_score, s)
-        if s > 1.0:
-            self.failed.append(dict(step=step, run=run, score=s, where=k, raw_logits=el, raw_grad=eg.get(k)))
+            e_t = float("inf") if t is None else _nrm(t.detach().cpu().double() - g.cpu())
+            st[n] = e_t / (C_ARB * e_r + scale)
+            sr[n] = e_r / (C_ARB * e_t + scale) if math.isfinite(e_t) else 0.0
+        fin = lambda d: {k: (v if math.isfinite(v) else float("inf")) for k, v in d.items()}
+        st, sr = fin(st), fin(sr)
+        k = max(st, key=st.get)
+        self.worst_score = max(self.worst_score, st[k])
+        if st[k] > 1.0:
+            self.A.append(dict(step=step, run=run, score=st[k], where=k, raw_logits=el, raw_grad=eg.get(k)))
+        elif max(sr.values()) > 1.0:
+            self.B += 1
 
     def result(self):
-        return dict(ok=len(self.failed) <= self.budget, updates=self.updates, logits=self.raw_logits, grad=self.raw_grad,
-                    grad_param=self.raw_grad_name, arbitrated=self.arbitrated, failed=len(self.failed),
-                    budget=self.budget, worst_arbitration=self.worst_score, first_failures=self.failed[:5])
+        a = len(self.A)
+        p = _sign_p(a, self.B)
+        return dict(ok=self.nonfinite == 0 and p >= ALPHA, updates=self.updates, logits=self.raw_logits,
+                    grad=self.raw_grad, grad_param=self.raw_grad_name, arbitrated=self.arbitrated, test_worse=a,
+                    ref_worse=self.B, sign_p=p, nonfinite=self.nonfinite, worst_arbitration=self.worst_score,
+                    first_failures=self.A[:5])
 
 
 def _loss_fn(task, loss):
@@ -450,7 +478,7 @@ def _optimizer(m, slow_gate):
                              dict(params=[p for n, p in named if n not in slow_gate], lr=1e-4)], lr=1e-3)
 
 
-def lockstep(task, make, seeds, iters, dev_seq, dev_b, tol, loss="select", register="auto", slow_gate=None, budget=None):
+def lockstep(task, make, seeds, iters, dev_seq, dev_b, tol, loss="select", register="auto", slow_gate=None):
     """BATCHED (on dev_b) against SEQUENTIAL (on dev_seq). The sequential models train (Adam 1e-3, or SLOW's two groups
     when slow_gate names the gate parameters); before every update the batched model is set to their parameters and
     computes logits and gradients on the same batch; Judge decides each run's update. Returns Judge.result()."""
@@ -463,7 +491,7 @@ def lockstep(task, make, seeds, iters, dev_seq, dev_b, tol, loss="select", regis
     opts = [_optimizer(m, slow_gate) for m in models]
     rngs = [torch.Generator().manual_seed(s + 10_000) for s in seeds]
     lossf = _loss_fn(task, loss)
-    judge = Judge(tol, budget if budget is not None else max(1, iters * len(seeds) // 200))
+    judge = Judge(tol)
     for step in range(1, iters + 1):
         toks = [task.make_batch(gr.BATCH, g)[0] for g in rngs]
         with torch.no_grad():
@@ -499,7 +527,7 @@ def lockstep(task, make, seeds, iters, dev_seq, dev_b, tol, loss="select", regis
     return judge.result()
 
 
-def lockstep_pair(task, make, seed, iters, tol, loss="select", dev_test=None, to_test=None, grads_back=None, budget=None):
+def lockstep_pair(task, make, seed, iters, tol, loss="select", dev_test=None, to_test=None, grads_back=None):
     """TEST = a second sequential model against REF (CPU, trains): before every update to_test(ref, test) sets TEST's
     parameters from REF's; both compute logits and gradients on the same batch (TEST's forward through cpu_io when it is a
     device model); grads_back(test) gives TEST's gradients in REF's coordinates. Used by K4b (the device's sequential
@@ -514,7 +542,7 @@ def lockstep_pair(task, make, seed, iters, tol, loss="select", dev_test=None, to
     opt = torch.optim.Adam(ref.parameters(), lr=1e-3)
     rng = torch.Generator().manual_seed(seed + 10_000)
     lossf = _loss_fn(task, loss)
-    judge = Judge(tol, budget if budget is not None else max(1, iters // 200))
+    judge = Judge(tol)
     for step in range(1, iters + 1):
         tok = task.make_batch(gr.BATCH, rng)[0]
         with torch.no_grad():
@@ -621,12 +649,11 @@ def k3c_controls(device, iters=2400):
     neg = {"negative: W_in gradient zeroed": (("W_in",), 0.0), "negative: W_g gradient x 1.01": (("W_g",), 1.01),
            "negative: W_h gradient zeroed": (("W_h",), 0.0)}
     for name, (names, scale) in neg.items():
-        r = lockstep_pair(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), 160, 20, TOL_SAME, grads_back=wrong(names, scale),
-                          budget=0)
+        r = lockstep_pair(tsc.TASK, lambda s: trr.make_fn(ARM_A, s)(), 160, 20, TOL_SAME, grads_back=wrong(names, scale))
         out[name] = dict(r, ok=not r["ok"], detected_at=(r["first_failures"] or [{}])[0].get("step"))
     task = it.ICMCTask(**S75_CFG)
-    r = lockstep_pair(task, lambda s: gr.make_model(gr.arm_spec("WIDE_SPLIT", task.S), task, s), 830, 3, TOL_SAME,
-                      loss="icmc", grads_back=wrong(("W_in",), 0.0), budget=0)
+    r = lockstep_pair(task, lambda s: gr.make_model(gr.arm_spec("WIDE_SPLIT", task.S), task, s), 830, 20, TOL_SAME,
+                      loss="icmc", grads_back=wrong(("W_in",), 0.0))
     out["negative: S75 WIDE_SPLIT, W_in gradient zeroed"] = dict(r, ok=not r["ok"],
                                                                 detected_at=(r["first_failures"] or [{}])[0].get("step"))
     return dict(ok=_cases_ok(out), cases=out)
