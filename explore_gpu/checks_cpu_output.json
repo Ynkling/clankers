@@ -152,6 +152,682 @@
     "2400": 0.0
    },
    "secs": 590.1
+  },
+  "K2b": {
+   "ok": true,
+   "asserted": true,
+   "cases": {
+    "B_conv": {
+     "max": 0.0,
+     "by_step": {
+      "100": 0.0,
+      "200": 0.0,
+      "300": 0.0,
+      "400": 0.0,
+      "500": 0.0,
+      "600": 0.0
+     }
+    },
+    "LOCAL3 RandHeaderTask-lite": {
+     "max": 0.0,
+     "by_step": {
+      "100": 0.0,
+      "200": 0.0,
+      "300": 0.0,
+      "400": 0.0,
+      "500": 0.0,
+      "600": 0.0
+     }
+    },
+    "ICMC LOCAL3+SLOW+split": {
+     "max": 0.0,
+     "by_step": {
+      "100": 0.0,
+      "200": 0.0,
+      "300": 0.0,
+      "400": 0.0,
+      "500": 0.0,
+      "600": 0.0
+     }
+    },
+    "ICMC REG3 (loop)": {
+     "max": 0.0,
+     "by_step": {
+      "100": 0.0,
+      "200": 0.0,
+      "300": 0.0,
+      "400": 0.0,
+      "500": 0.0,
+      "600": 0.0
+     }
+    },
+    "ICMC perfect": {
+     "max": 0.0,
+     "by_step": {
+      "100": 0.0,
+      "200": 0.0,
+      "300": 0.0,
+      "400": 0.0,
+      "500": 0.0,
+      "600": 0.0
+     }
+    },
+    "ICMC single": {
+     "max": 0.0,
+     "by_step": {
+      "100": 0.0,
+      "200": 0.0,
+      "300": 0.0,
+      "400": 0.0,
+      "500": 0.0,
+      "600": 0.0
+     }
+    },
+    "ICMC REG3_NUDGE (loop)": {
+     "max": 0.0,
+     "by_step": {
+      "100": 0.0,
+      "200": 0.0,
+      "300": 0.0,
+      "400": 0.0,
+      "500": 0.0,
+      "600": 0.0
+     }
+    }
+   },
+   "secs": 1192.7
+  },
+  "K2c": {
+   "ok": true,
+   "asserted": true,
+   "max": 0.0,
+   "fired": {
+    "7": [
+     4800
+    ],
+    "8": [
+     4800
+    ]
+   },
+   "rows_same": true,
+   "state_zeroed": [
+    [
+     "step",
+     "exp_avg",
+     "exp_avg_sq"
+    ],
+    [
+     "step",
+     "exp_avg",
+     "exp_avg_sq"
+    ]
+   ],
+   "by_step": {
+    "600": 0.0,
+    "1200": 0.0,
+    "1800": 0.0,
+    "2400": 0.0,
+    "3000": 0.0,
+    "3600": 0.0,
+    "4200": 0.0,
+    "4800": 0.0,
+    "5400": 0.0,
+    "6000": 0.0,
+    "6600": 0.0,
+    "7200": 0.0
+   },
+   "secs": 1318.4
+  },
+  "K3": {
+   "ok": true,
+   "updates": 9600,
+   "logits": 0.0,
+   "grad": 0.0,
+   "grad_param": null,
+   "arbitrated": 0,
+   "test_worse": 0,
+   "ref_worse": 0,
+   "sign_p": 1.0,
+   "nonfinite": 0,
+   "worst_arbitration": 0.0,
+   "first_failures": [],
+   "tol": {
+    "logits": 1e-05,
+    "grad": 0.0001
+   },
+   "secs": 367.3
+  },
+  "K3b": {
+   "ok": true,
+   "tol": {
+    "logits": 1e-05,
+    "grad": 0.0001
+   },
+   "cases": {
+    "ORACLE": {
+     "ok": true,
+     "updates": 40,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "SINGLE": {
+     "ok": true,
+     "updates": 40,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "WIDE_SPLIT": {
+     "ok": true,
+     "updates": 40,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "REG3": {
+     "ok": true,
+     "updates": 40,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "WIN3_SPLIT": {
+     "ok": true,
+     "updates": 40,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "WIDE_SLOW": {
+     "ok": true,
+     "updates": 40,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "REG3, register scan (batched) vs loop (sequential)": {
+     "ok": true,
+     "updates": 40,
+     "logits": 2.384185791015625e-07,
+     "grad": 6.647249820724818e-05,
+     "grad_param": "b_R",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "LOCAL3 + delta (beta 1)": {
+     "ok": true,
+     "updates": 900,
+     "logits": 0.0,
+     "grad": 7.614895062021361e-05,
+     "grad_param": "gate_conv.conv_w",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "one delta channel, learned beta, GDN decay": {
+     "ok": true,
+     "updates": 900,
+     "logits": 9.462237358093262e-06,
+     "grad": 0.004518914685988675,
+     "grad_param": "attn.b_b",
+     "arbitrated": 6,
+     "test_worse": 0,
+     "ref_worse": 2,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.41704501268004684,
+     "first_failures": []
+    }
+   },
+   "secs": 1448.3
+  },
+  "K3c": {
+   "ok": true,
+   "cases": {
+    "positive: arm A vs its permuted twin": {
+     "ok": true,
+     "updates": 2400,
+     "logits": 4.1961669921875e-05,
+     "grad": 0.009085169351550288,
+     "grad_param": "embed.weight",
+     "arbitrated": 103,
+     "test_worse": 5,
+     "ref_worse": 3,
+     "sign_p": 0.36328125,
+     "nonfinite": 0,
+     "worst_arbitration": 18.424396827958454,
+     "first_failures": [
+      {
+       "step": 936,
+       "run": 0,
+       "score": 5.708254468398801,
+       "where": "encoder_v",
+       "raw_logits": 1.9073486328125e-06,
+       "raw_grad": 0.000579108844446099
+      },
+      {
+       "step": 958,
+       "run": 0,
+       "score": 1.4019757068360807,
+       "where": "encoder_v",
+       "raw_logits": 2.384185791015625e-06,
+       "raw_grad": 0.00014211570630313545
+      },
+      {
+       "step": 1366,
+       "run": 0,
+       "score": 8.617342284042733,
+       "where": "W_in",
+       "raw_logits": 2.384185791015625e-06,
+       "raw_grad": 0.0009451423848785516
+      },
+      {
+       "step": 1768,
+       "run": 0,
+       "score": 18.424396827958454,
+       "where": "W_g",
+       "raw_logits": 3.814697265625e-06,
+       "raw_grad": 0.0024586898805486553
+      },
+      {
+       "step": 1910,
+       "run": 0,
+       "score": 9.083310940991938,
+       "where": "encoder",
+       "raw_logits": 7.3909759521484375e-06,
+       "raw_grad": 0.0009293135158535604
+      }
+     ]
+    },
+    "negative: W_in gradient zeroed": {
+     "ok": true,
+     "updates": 20,
+     "logits": 0.0,
+     "grad": 1.0,
+     "grad_param": "W_in",
+     "arbitrated": 20,
+     "test_worse": 20,
+     "ref_worse": 0,
+     "sign_p": 9.5367431640625e-07,
+     "nonfinite": 0,
+     "worst_arbitration": 8925.533385584304,
+     "first_failures": [
+      {
+       "step": 1,
+       "run": 0,
+       "score": 7137.274600116814,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 2,
+       "run": 0,
+       "score": 7701.595680342954,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 3,
+       "run": 0,
+       "score": 6065.4496937751155,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 4,
+       "run": 0,
+       "score": 7679.8903213155145,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 5,
+       "run": 0,
+       "score": 7111.203758363003,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      }
+     ],
+     "detected_at": 1
+    },
+    "negative: W_g gradient x 1.01": {
+     "ok": true,
+     "updates": 20,
+     "logits": 0.0,
+     "grad": 0.010000001445482985,
+     "grad_param": "W_g",
+     "arbitrated": 20,
+     "test_worse": 20,
+     "ref_worse": 0,
+     "sign_p": 9.5367431640625e-07,
+     "nonfinite": 0,
+     "worst_arbitration": 90.03508319998849,
+     "first_failures": [
+      {
+       "step": 1,
+       "run": 0,
+       "score": 70.13838785429182,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 0.009999993246881323
+      },
+      {
+       "step": 2,
+       "run": 0,
+       "score": 83.44685141505947,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 0.009999997322000307
+      },
+      {
+       "step": 3,
+       "run": 0,
+       "score": 57.03230027762835,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 0.010000001445482985
+      },
+      {
+       "step": 4,
+       "run": 0,
+       "score": 77.68755504407191,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 0.009999993778551397
+      },
+      {
+       "step": 5,
+       "run": 0,
+       "score": 73.58000787771762,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 0.009999988395960968
+      }
+     ],
+     "detected_at": 1
+    },
+    "negative: W_h gradient zeroed": {
+     "ok": true,
+     "updates": 20,
+     "logits": 0.0,
+     "grad": 1.0,
+     "grad_param": "W_h",
+     "arbitrated": 20,
+     "test_worse": 20,
+     "ref_worse": 0,
+     "sign_p": 9.5367431640625e-07,
+     "nonfinite": 0,
+     "worst_arbitration": 8499.62080635211,
+     "first_failures": [
+      {
+       "step": 1,
+       "run": 0,
+       "score": 6946.77011791336,
+       "where": "W_h",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 2,
+       "run": 0,
+       "score": 8093.869118585774,
+       "where": "W_h",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 3,
+       "run": 0,
+       "score": 7019.818177034322,
+       "where": "W_h",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 4,
+       "run": 0,
+       "score": 7480.657749000322,
+       "where": "W_h",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 5,
+       "run": 0,
+       "score": 7427.204481271979,
+       "where": "W_h",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      }
+     ],
+     "detected_at": 1
+    },
+    "negative: S75 WIDE_SPLIT, W_in gradient zeroed": {
+     "ok": true,
+     "updates": 20,
+     "logits": 0.0,
+     "grad": 1.0,
+     "grad_param": "W_in",
+     "arbitrated": 20,
+     "test_worse": 20,
+     "ref_worse": 0,
+     "sign_p": 9.5367431640625e-07,
+     "nonfinite": 0,
+     "worst_arbitration": 7241.619138382344,
+     "first_failures": [
+      {
+       "step": 1,
+       "run": 0,
+       "score": 7241.619138382344,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 2,
+       "run": 0,
+       "score": 7172.083630409058,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 3,
+       "run": 0,
+       "score": 6834.3111425290335,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 4,
+       "run": 0,
+       "score": 6971.887166233715,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 5,
+       "run": 0,
+       "score": 6622.807132028087,
+       "where": "W_in",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      }
+     ],
+     "detected_at": 1
+    }
+   },
+   "secs": 291.1
+  },
+  "K4": {
+   "ok": true,
+   "skipped": "cuda only",
+   "secs": 0.0
+  },
+  "K4b": {
+   "ok": true,
+   "skipped": "cuda only",
+   "secs": 0.0
+  },
+  "K5": {
+   "ok": true,
+   "LOCAL3+SLOW+split": true,
+   "REG3": true,
+   "register scan = loop": true,
+   "scan_vs_loop": {
+    "logits": 1.4901161193847656e-07,
+    "grad_rel": 3.536895746947266e-06
+   },
+   "register scan = loop with beta saturated (finite)": true,
+   "saturated": {
+    "finite": true,
+    "logits": 0.0
+   },
+   "evaluation split = explore_i_common.evaluate": true,
+   "statistics in workers = in line": true,
+   "secs": 763.0
+  },
+  "K6": {
+   "ok": true,
+   "worst": 0.0,
+   "exact": true,
+   "split_reset_through_runopt": 0.0,
+   "secs": 0.1
+  },
+  "K7": {
+   "ok": true,
+   "mask S=1 (4096 sequences, L = 192)": true,
+   "mask S=2 (4096 sequences, L = 192)": true,
+   "mask S=4 (512 sequences, L = 768)": true,
+   "prefetch = direct (20 steps, R = 2)": true,
+   "secs": 7.2
+  },
+  "K8": {
+   "ok": true,
+   "cases": {
+    "MultiBDH recurrent (arm A)": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "MultiBDH perfect + conv (ORACLE)": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "MultiBDH none + conv (SINGLE)": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "LocalBDH LOCAL3 (WIN3_SPLIT)": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "LocalBDH WIDE (WIDE_SPLIT)": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "Reg3Conv (REG3)": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "LocalBDH + delta": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "delta learned beta + GDN": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "delta routed decay + perfect gate": {
+     "ok": true,
+     "sequential": "cuda:0",
+     "batched": "cuda:0"
+    },
+    "negative control (a CPU tensor in a forward must raise)": {
+     "ok": true
+    },
+    "split noise on a cuda W_g (explore_i_common.noise_for)": {
+     "ok": true
+    },
+    "split noise on a cuda W_g (test_window_gate.noise_for)": {
+     "ok": true
+    },
+    "negative control (split noise unwrapped must raise)": {
+     "ok": true
+    }
+   },
+   "secs": 2.2
+  },
+  "K9": {
+   "ok": true,
+   "skipped": "cuda only",
+   "secs": 0.0
   }
  }
 }
