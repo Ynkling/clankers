@@ -1,0 +1,67 @@
+== 1. One-sided vs two-sided, and paired vs unpaired, for the claims of test_window_gate and test_muon_recipe
+G1: 38/40 vs 27/40; McNemar 13 vs 2: one-sided 0.00369, two-sided 0.00739; unpaired Fisher one-sided 0.00156
+    table: both 25, WIN3_SLOW16 only 13, WIN16_A only 2, neither 0
+G2: 38/40 vs 0/40; McNemar 38 vs 0: one-sided 3.64e-12, two-sided 7.28e-12; unpaired Fisher one-sided 8.01e-21
+    table: both 0, WIN3_SPLIT_D8 only 38, HINGE_D8 only 0, neither 2
+G4: 38/40 vs 15/40; McNemar 23 vs 0: one-sided 1.19e-07, two-sided 2.38e-07; unpaired Fisher one-sided 2.1e-08
+    table: both 15, WIN3_SPLIT_D8 only 23, WIN3_SLOW_D8 only 0, neither 2
+
+== 2. Heterogeneity between machines (does the discordant split differ between X and L?)
+G1: X 5 vs 1, L 8 vs 1; Fisher two-sided on the discordant splits p = 1.000
+G4: X 12 vs 0, L 11 vs 0; Fisher two-sided on the discordant splits p = 1.000
+G3: X 6 vs 6, L 3 vs 5; Fisher two-sided on the discordant splits p = 0.670
+M2: X 7 vs 1, L 5 vs 7; Fisher two-sided on the discordant splits p = 0.070
+  arm WIN3_SLOW_D8: X 6/20 vs L 9/20, Fisher two-sided p = 0.514
+  arm WIN16_A: X 15/20 vs L 12/20, Fisher two-sided p = 0.501
+  arm WIN3: X 33/40 vs L 32/40, Fisher two-sided p = 1.000
+  arm WIN3_SLOW: X 33/40 vs L 36/40, Fisher two-sided p = 0.518
+  arm HINGE0: X 33/40 vs L 34/40, Fisher two-sided p = 1.000
+  arm WIN16_M bound by 4800: X 15/20 vs L 9/20, Fisher two-sided p = 0.105
+
+== 3. Muon's four-stream speed across all four looks (E2 on X and L shared seeds 340-359; M2 on disjoint seeds)
+E2 X 5 vs 1 (n=12), E2 L 7 vs 0 (n=20); M2 X 7 vs 1, M2 L 5 vs 7
+  L's own two looks (E2 seeds 340-359, M2 seeds 1440-1459): 12 vs 7, one-sided p = 0.180
+  X's own two looks: 12 vs 2, one-sided p = 0.0065
+  M2 pooled plus E2 on L only (disjoint seeds): 19 vs 8, one-sided p = 0.0261  (descriptive; not pre-registered)
+  power of M2's pooled test with 20 discordant pairs (reject if b >= 15) when P(Muon-only | discordant) = 0.7: 0.42
+  power of M2's pooled test with 20 discordant pairs (reject if b >= 15) when P(Muon-only | discordant) = 0.75: 0.62
+  power of M2's pooled test with 20 discordant pairs (reject if b >= 15) when P(Muon-only | discordant) = 0.8: 0.80
+  power of M2's pooled test with 20 discordant pairs (reject if b >= 15) when P(Muon-only | discordant) = 0.9: 0.99
+
+== 4. G3's non-inferiority rule 'd = (HINGE0 only) - (WIN3_SLOW only) <= 2': operating characteristics
+observed: HINGE0 only 9, WIN3_SLOW only 11, discordant 20 of 80 pairs
+  paired difference in success rate (WIN3_SLOW - HINGE0) = +0.025; conditional 95% interval from the Wilson interval of the discordant split [0.342, 0.742]: [-0.079, +0.121]
+  with 20 discordant pairs, P(rule HOLDS) if P(WIN3_SLOW only | discordant) = 0.5 (true difference +0.000): 0.75
+  with 20 discordant pairs, P(rule HOLDS) if P(WIN3_SLOW only | discordant) = 0.4 (true difference -0.050): 0.40
+  with 20 discordant pairs, P(rule HOLDS) if P(WIN3_SLOW only | discordant) = 0.3 (true difference -0.100): 0.11
+  with 20 discordant pairs, P(rule HOLDS) if P(WIN3_SLOW only | discordant) = 0.25 (true difference -0.125): 0.04
+  at exact equality with 10 discordant pairs, P(rule FAILS) = 0.17
+  at exact equality with 20 discordant pairs, P(rule FAILS) = 0.25
+  at exact equality with 40 discordant pairs, P(rule FAILS) = 0.32
+
+== 5. Bands and Wilson lower bounds
+  38/40: Wilson 95% [0.835, 0.986]; one-sided exact (Clopper-Pearson) 95% lower bound 0.851
+  18/20: Wilson 95% [0.699, 0.972]; one-sided exact (Clopper-Pearson) 95% lower bound 0.717
+  20/20: Wilson 95% [0.839, 1.000]; one-sided exact (Clopper-Pearson) 95% lower bound 0.861
+  19/20: Wilson 95% [0.764, 0.991]; one-sided exact (Clopper-Pearson) 95% lower bound 0.784
+  36/40: Wilson 95% [0.769, 0.960]; one-sided exact (Clopper-Pearson) 95% lower bound 0.786
+  9/10: Wilson 95% [0.596, 0.982]; one-sided exact (Clopper-Pearson) 95% lower bound 0.606
+  10/10: Wilson 95% [0.722, 1.000]; one-sided exact (Clopper-Pearson) 95% lower bound 0.741
+  (test_muon_recipe's reading required a Wilson lower bound >= 0.80; test_window_gate's reading only the band)
+
+== 6. Multiplicity
+  Bonferroni over 60 claims: G1 pooled p 0.0037 -> 0.22; G4 1.2e-7 -> 7.2e-06; G2 3.6e-12 -> 2.2e-10; M1 0.00098 -> 0.059
+  Bonferroni over 120 claims: G1 pooled p 0.0037 -> 0.44; G4 1.2e-7 -> 1.4e-05; G2 3.6e-12 -> 4.3e-10; M1 0.00098 -> 0.118
+  expected false positives among 60 one-sided claims at alpha 0.05 if all nulls true: 3.0; probability that a given null passes on both machines independently: 0.0025; expected among 60: 0.15
+  Holm over the three pooled window-gate claims (G1, G2, G4): G2 1.1e-11, G4 2.4e-07, G1 0.0037
+
+== 7. The 'scale-free' rule (batch 19: d = arm - reference >= -1 over 10 paired seeds)
+  reference rate 0.9, arm rate 0.9: P(d >= -1, 'scale-free') = 0.88
+  reference rate 0.9, arm rate 0.7: P(d >= -1, 'scale-free') = 0.39
+  reference rate 0.9, arm rate 0.6: P(d >= -1, 'scale-free') = 0.20
+  reference rate 0.95, arm rate 0.75: P(d >= -1, 'scale-free') = 0.38
+
+== 8. Copy vs reset, pooled over the two ten-seed eight-stream screens (not pre-registered)
+  S50 split-only 8 / reset-only 1, S58b 8 / 0 -> 16 vs 1: one-sided p = 0.00014, two-sided 0.00027
+  the window_gate control seeds (same test, same trigger): split vs reset 7 vs 0, one-sided p = 0.0078
+  S61 (uncited): COPY 9/10 vs SPLIT 9/10; the 'reset adds nothing' comparison has at most a handful of discordant pairs
