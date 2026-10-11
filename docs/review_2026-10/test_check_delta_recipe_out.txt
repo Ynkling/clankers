@@ -1,0 +1,25 @@
+== 1. CHECK 172: the test's overlap (test_delta_recipe.py at a581027) against recompute.py's at 0fdb363
+  X: 20/20 records equal (bitwise); largest overlap over all 1.0000, over the 18 bound-routed runs 0.0324
+     per seed (overlap): 540 0.019, 541 0.031, 542 0.006, 543 0.014, 544 0.023, 545 0.032, 546 0.008, 547 0.023, 548 0.013, 549 0.030, 550 0.024, 551 0.019, 552 0.032, 553 0.011, 554 0.008, 555 1.000, 556 1.000, 557 0.031, 558 0.018, 559 0.017
+  L: 20/20 records equal (bitwise); largest overlap over all 0.0469, over the 20 bound-routed runs 0.0469
+     per seed (overlap): 1540 0.026, 1541 0.005, 1542 0.037, 1543 0.028, 1544 0.015, 1545 0.028, 1546 0.047, 1547 0.014, 1548 0.024, 1549 0.016, 1550 0.022, 1551 0.010, 1552 0.017, 1553 0.004, 1554 0.027, 1555 0.037, 1556 0.028, 1557 0.002, 1558 0.013, 1559 0.030
+  recompute.md:189: 'The window-gate partitions are clean (overlap at most 0.047)' over the bound-routed runs
+
+== 2. The reading functions on constructed stores (extracted from the test's source)
+  D1 table a=34 DELTA only=0 HEBB only=3 neither=3: code counts a=34 b=0 c=3 dd=3; d = c - b = 3 -> label 'delta not shown non-inferior'; DELTA - HEBB -0.075 [-0.196, +0.029]
+  D1 table a=34 DELTA only=3 HEBB only=0 neither=3: code counts a=34 b=3 c=0 dd=3; d = c - b = -3 -> label 'delta binds more often'; DELTA - HEBB +0.075 [-0.029, +0.196]
+  D1 table a=34 DELTA only=2 HEBB only=2 neither=2: code counts a=34 b=2 c=2 dd=2; d = c - b = 0 -> label 'delta not shown worse by more than 2 pairs'; DELTA - HEBB +0.000 [-0.126, +0.126]
+  D1 table a=33 DELTA only=0 HEBB only=2 neither=5: code counts a=33 b=0 c=2 dd=5; d = c - b = 2 -> label 'delta not shown worse by more than 2 pairs'; DELTA - HEBB -0.050 [-0.156, +0.045]
+  D1 table a=33 DELTA only=3 HEBB only=0 neither=4: code counts a=33 b=3 c=0 dd=4; d = c - b = -3 -> label 'delta binds more often'; DELTA - HEBB +0.075 [-0.028, +0.193]
+  D2/D4 no-trigger 36/40, split 40/40, 4 vs 0, p = 0.0625: verdict NOT SHOWN, label 'no room'
+  D2/D4 no-trigger 35/40, split 40/40, 5 vs 0, p = 0.0312: verdict SHOWN, label 'helps'
+  D2/D4 no-trigger 30/40, split 35/40, 5 vs 0, p = 0.0312: verdict SHOWN, label 'helps'
+  D2/D4 no-trigger 30/40, split 34/40, 4 vs 0, p = 0.0625: verdict NOT SHOWN, label 'not shown'
+  D2/D4 no-trigger 20/40, split 30/40, 12 vs 2, p = 0.0065: verdict SHOWN, label 'helps'
+  split reading delta='helps', Hebbian='helps': 'the split helps on both writes'
+  split reading delta='not shown', Hebbian='helps': 'the split is Hebbian-specific'
+  split reading delta='helps', Hebbian='not shown': 'the split helps on delta'
+  split reading delta='not shown', Hebbian='not shown': "the split's effect is not shown on either write"
+  split reading delta='no room', Hebbian='helps': 'delta: no room; Hebbian: helps'
+  split reading delta='no room', Hebbian='no room': 'delta: no room; Hebbian: no room'
+  D3 on 7 constructed rows (5 delta earlier, 1 tie, 1 later): pos 5, neg 1, ties 1, p = 0.1094 (exact: 0.1094), medians H 24000 D 14400
