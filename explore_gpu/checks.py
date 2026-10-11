@@ -45,7 +45,7 @@ CHECKS
       a path that fails or stops early fails the case: cpu asserted (bit for bit), cuda printed.
   K3  LOCK-STEP batched vs sequential, arm A, seeds 160-163, 2400 updates, every update; Judge, tolerances same device.
       Asserted on every device.
-  K2c a split that FIRES (threshold 1.01: at 4800) and SLOW's lr switch, ICMC LOCAL3 + SLOW + split, 7200 updates,
+  K2c a split that FIRES (threshold 1.01, rise 1.0: at 4800) and SLOW's lr switch, ICMC LOCAL3 + SLOW + split, 7200 updates,
       free-running batched vs sequential: logits every 600 updates, the trigger's rows (state_zeroed = step, exp_avg,
       exp_avg_sq) equal (cpu: asserted, bit for bit; cuda: printed).
   K3b LOCK-STEP batched vs sequential on ICMC (S = 4, L = 768, the S75 configuration) for each S75 arm (ORACLE, SINGLE,
@@ -284,10 +284,23 @@ def k2b_free(device, iters=600):
 
 
 def k2c_split(device, iters=7200):
-    """A split that FIRES (threshold 1.01: every eligible check fires; the first at 4800) and SLOW's lr switch at 2400,
-    batched vs sequential, free-running, on ICMC LOCAL3 + SLOW + split: every run's logits at every 600 updates, the
-    trigger's rows (step, c*, c0, noise seed, state_zeroed, row distances, maps) equal. CPU: asserted (bit for bit);
-    CUDA: printed (free-running)."""
+    """A split that FIRES (threshold 1.01 and rise 1.0, as explore_i_checks C6: the check at 4800 fires) and SLOW's lr
+    switch at 2400, batched vs sequential, free-running, on ICMC LOCAL3 + SLOW + split: every run's logits at every 600
+    updates (2400 of them after the split), the trigger's rows (step, c*, c0, noise seed, state_zeroed, row distances,
+    maps) equal. CPU: asserted (bit for bit); CUDA: printed (free-running)."""
+    orig = ic.make_split
+
+    def firing(task_, seed_, last_, thr_, **kw):                # rise 1.0 as explore_i_checks C6: the check at 4800
+        kw["rise"] = 1.0                                       # fires whatever the accuracy did since 2400
+        return orig(task_, seed_, last_, thr_, **kw)
+    ic.make_split = firing                                     # both trainers call ic.make_split
+    try:
+        return _k2c(device, iters)
+    finally:
+        ic.make_split = orig
+
+
+def _k2c(device, iters):
     task = SMALL
     spec = dict(gate="win3", k=2, recipe="slow", split="split")
     seeds = (7, 8)
