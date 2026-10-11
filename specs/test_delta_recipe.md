@@ -308,3 +308,46 @@ HEBB_SLOW, DELTA_SPLIT, DELTA_SLOW, CEIL_HEBB, CEIL_DELTA.
 
 **Runtime.** Unchanged rule. The review computes DELTA_SPLIT at 2.2x HEBB_SPLIT per step from F's recorded secs/iters;
 the projection measures it before the first run and prints the ratio.
+
+## Amendment 2 (2026-10-11, about 15:40 UTC, during X's full run; report rules only)
+
+Source: Referee V's second review (docs/review_2026-10/spec_review_test_delta_recipe_2.md, §2) and its check of the
+committed test (test_check_delta_recipe.md, §2, §4 and the addendum), on claude/review-V at 0d1fa60. Both reached
+this session after X's full run had started (02:12 UTC, 11 October, test commit a581027).
+
+**What had been seen when this was committed.** This is not a before-the-run amendment.
+- The test prints one line per finished run (arm, seed, transition, outcome, the firings). At commit time 24 such lines
+  had been printed and read in the log:
+  - the four perfect-gate runs (CEIL_HEBB 580, 581; CEIL_DELTA 580, 581);
+  - 19 of the 20 DELTA_SPLIT runs (580-598);
+  - DELTA_SLOW|580.
+- None of HEBB_SPLIT or HEBB_SLOW had finished. No claim (D1-D4), no reading, no CHECK 174 comparison and no
+  probe-blind count had been computed or printed: the report runs only after the last run.
+- Every item below takes the referee's first-named fix as written, so no choice among options was made in view of the
+  lines above. The run's code is unchanged; only the report changes.
+- The report the running process prints at its end is the pre-Amendment-2 one. The recorded RESULT is the report
+  regenerated with --report from the same results file under this amendment's code; both are kept in the log.
+
+**Changes.**
+- (a) **D1's label at d <= −3** becomes "delta not shown worse; ahead by >= 3 pairs (untested)". It is the mirror of "not
+  shown non-inferior", and the printed interval carries the uncertainty.
+- (b) **Split labels.** Every split label (helps / no room / not shown) is printed with the no-trigger arm's pooled
+  count and McNemar's b and c. "Not shown" at a no-trigger rate of 0.85-0.90 means low power, not no effect.
+- (c) **Rename.** "The split is Hebbian-specific" becomes "the split is shown on Hebbian, not on delta": a difference
+  between two verdicts, not an interaction test.
+- (d) **CHECK 174's consequence.** A seed whose split arm's curve differs from its no-trigger arm's before the split
+  arm's first firing (the whole run if it never fired) has broken pairing. Its pair is dropped from that claim (D2 for
+  DELTA, D4 for HEBB), and the claim is printed with "k pairs dropped by CHECK 174". The no-room count uses the
+  remaining pairs.
+- (e) **The no-room row.** If either write is "no room", both writes' labels are printed and no combination is named.
+  This replaces "that write's label only".
+- (f) **Probe-blind checks.**
+  - Counted only on checks at update >= 4800 (2400 is the reference reading, at which nothing can fire).
+  - Two counts are printed: "probe >= 0.95 while held-out < 0.95", and "blocked by the probe alone" (eligible
+    apart from the probe: a previous reading, rise < 0.02, under the cap and the gap; and not fired).
+- (g) **Newcombe's interval** is labelled "the hybrid score interval with continuity-corrected φ (method 10 as
+  Fagerland, Lydersen and Laake 2014 give it)". The method number is not checked against the 1998 paper.
+- (h) **CHECKs 159 and 162** read their reference records from vendored copies in results/refs/ (each with its source
+  commit, path and key). Where the source commit is present in the clone, they also print whether the copy equals the
+  commit's record. The records and the CHECKs' assertions are unchanged; this only removes the need for session
+  branches in the clone.
