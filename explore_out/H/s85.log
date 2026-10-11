@@ -1,0 +1,9 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — session H: H/two_b
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 37c1fbf | python 3.13.16 | torch threads 1
+====================================================================================================
+  code SHA H/two_b: 957abe999f8d over 26 modules (0 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b18_gates explore_common explore_common2 explore_h_stability_child explore_h_two_b_child explore_keysplits_child explore_local_gate explore_window_recipe_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_instrument_v2 test_interference test_multilayer_binding test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_short_conv
+  CPU Intel(R) Xeon(R) Processor @ 2.10GHz; git 37c1fbf; torch 2.14.0+cu130
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (42s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
