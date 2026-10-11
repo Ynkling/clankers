@@ -152,3 +152,219 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 78/82]   94.2 min  REG3_FLAT    seed 2118  acc 0.488 trans  None KEY
   [ 79/82]   95.6 min  LOCAL3_KEYHINGE seed 2119  acc 0.505 trans  None KEY
   [ 80/82]   95.8 min  REG3_KEYHINGE_1200 seed 2119  acc 1.000 trans  3600 ROUTED-BOUND
+  [ 81/82]   98.2 min  REG3_KEYHINGE_POS seed 2119  acc 0.508 trans  None KEY
+  [ 82/82]   99.6 min  REG3_FLAT    seed 2119  acc 0.507 trans  None KEY
+  S83 phase 2 arm (rule): None
+  s83: code SHA 24268c2446f8 (33 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  0 runs queued on 4 workers
+  S83 runs done in 114.1 min
+| arm | n | BOUND | ROUTED-BOUND | ROUTED*@end | DISCOVERED | BOUND ROUTED (mine) | unbound classes | transitions | median acc |
+|---|---|---|---|---|---|---|---|---|---|
+| BASELINE | 20 | 3/20 [0.05, 0.36] MINORITY | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 3/20 | KEY 17 | median 13200 (10800-16800) | 0.503 |
+| REG3 | 20 | 2/20 [0.03, 0.30] MINORITY | 2/20 [0.03, 0.30] MINORITY | 2/20 | 2/20 | 2/20 | KEY 16, OTHER 1, STREAM-PARTIAL 1 | median 3600 (3600-3600) | 0.499 |
+| REG3_KEYHINGE | 20 | 20/20 [0.84, 1.00] RELIABLE | 20/20 [0.84, 1.00] RELIABLE | 20/20 | 20/20 | 20/20 | - | median 3600 (3600-6000) | 1.000 |
+| LOCAL3_KEYHINGE | 20 | 5/20 [0.11, 0.47] MINORITY | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 5/20 | KEY 14, STREAM-PARTIAL 1 | median 19200 (8400-24000) | 0.508 |
+| REG3_KEYHINGE_POS | 20 | 1/20 [0.01, 0.24] MINORITY | 1/20 [0.01, 0.24] MINORITY | 1/20 | 1/20 | 1/20 | KEY 18, OTHER 1 | median 6000 (6000-6000) | 0.498 |
+| REG3_FLAT | 20 | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 0/20 | KEY 18, OTHER 1, STREAM-PARTIAL 1 | - | 0.494 |
+| REG3_KEYHINGE_1200 | 20 | 18/20 [0.70, 0.97] RELIABLE | 18/20 [0.70, 0.97] RELIABLE | 18/20 | 18/20 | 18/20 | KEY 2 | median 3600 (3600-6000) | 1.000 |
+| REG3_NUDGE | 2 | 2/2 [0.34, 1.00] RELIABLE | 2/2 [0.34, 1.00] RELIABLE | 2/2 | 2/2 | 2/2 | - | median 2400 (2400-2400) | 1.000 |
+| BASELINE_D | 10 | 2/10 [0.06, 0.51] MINORITY | 0/10 [0.00, 0.28] NEVER | 0/10 | 0/10 | 2/10 | KEY 8 | median 3600 (3600-3600) | 0.800 |
+| REG3_D | 10 | 4/10 [0.17, 0.69] MINORITY | 2/10 [0.06, 0.51] MINORITY | 2/10 | 3/10 | 4/10 | KEY 6 | median 3000 (1200-9600) | 0.874 |
+| REG3_KEYHINGE_D | 10 | 10/10 [0.72, 1.00] RELIABLE | 10/10 [0.72, 1.00] RELIABLE | 10/10 | 10/10 | 10/10 | - | median 2400 (2400-3600) | 1.000 |
+
+READINGS:
+  reproduction: {'BASELINE': True, 'REG3': True, 'REG3_KEYHINGE': True, 'BASELINE_D': True, 'REG3_D': True, 'REG3_KEYHINGE_D': True}
+  validity: S71 ORACLE_ALL 10/10 and S82's rerun 2/2 stand; REG3_NUDGE ROUTED-BOUND 2/2
+  LOCAL3_KEYHINGE: discovered (beats BASELINE): no (b 0, c 0, p 1, n 20); vs REG3_KEYHINGE: KH only 20, LOCAL3_KEYHINGE only 0
+  REG3_KEYHINGE_POS: discovered (beats BASELINE): no (b 1, c 0, p 0.5, n 20); vs REG3_KEYHINGE: KH only 19, REG3_KEYHINGE_POS only 0
+  REG3_FLAT: discovered (beats BASELINE): no (b 0, c 0, p 1, n 20); vs REG3_KEYHINGE: KH only 20, REG3_FLAT only 0
+  REG3_KEYHINGE_1200: discovered (beats BASELINE): yes (b 18, c 0, p 3.81e-06, n 20); vs REG3_KEYHINGE: KH only 2, REG3_KEYHINGE_1200 only 0
+  the register: the register is needed (p(KH > LOCAL3_KH) 9.54e-07)
+  key identity: the identity term is needed (p(KH > POS) 1.91e-06)
+  structure: does not apply
+  the window: does not apply
+  delta arm (rule): {'arm': None, 'order': ['REG3_FLAT', 'REG3_KEYHINGE_POS', 'LOCAL3_KEYHINGE'], 'time': '2026-10-11 05:04:45 UTC'}
+  LOCAL3_KEYHINGE: term firings median 4.0 (1-15); term value (mean over layers, median) 1 0.1760, 300 0.0000, 600 0.0000, 1200 0.0000, 2400 0.0000
+  REG3_KEYHINGE_POS: term firings median 2400.0 (2400-2400); term value (mean over layers, median) 1 0.0002, 300 0.0000, 600 0.0000, 1200 0.0000, 2400 0.0119
+  REG3_FLAT: term firings median 2400.0 (2400-2400); term value (mean over layers, median) 1 0.0002, 300 0.0000, 600 0.0000, 1200 0.0000, 2400 0.0000
+  REG3_KEYHINGE_1200: term firings median 73.0 (55-142); term value (mean over layers, median) 1 0.6909, 300 0.0000, 600 0.0000, 1200 0.0000
+
+DIAGNOSTICS:
+- BASELINE:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.58, 0.42], [0.62, 0.38]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.58, 0.42], [0.62, 0.38]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.58, 0.42], [0.62, 0.38]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  in-run probe (median held-out acc) L2|K 0.61, L2|V 0.50, L3|K 0.60, L3|V 0.51, final|K 0.61, final|V 0.52
+  plateau (17 unbound runs; acc 0.50): acc by (stream|block|index) 0|0|0 0.45, 0|0|1 0.48, 0|0|2 0.51, 0|1|0 0.51, 0|1|1 0.53, 0|1|2 0.52, 1|0|0 0.46, 1|0|1 0.49, 1|0|2 0.50, 1|1|0 0.51, 1|1|1 0.51, 1|1|2 0.52
+  write order: acc last-written 0.52, not-last 0.50
+- REG3:
+  margin at VAL by layer (median) L1 -0.00, L2 -0.00, L3 -0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.49, 0.51], [0.55, 0.45]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.5, 0.5], [0.55, 0.45]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.52, 0.48], [0.55, 0.45]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.23/0.25/0.23; 2400 0.24/0.25/0.24; 4800 0.25/0.27/0.24; 9600 0.23/0.29/0.25; 14400 0.24/0.30/0.25; 19200 0.23/0.31/0.24; 24000 0.24/0.31/0.23; end 0.24/0.30/0.23
+  in-run probe (median held-out acc) L2|K 0.61, L2|V 0.50, L3|K 0.60, L3|V 0.52, final|K 0.60, final|V 0.53
+  plateau (18 unbound runs; acc 0.50): acc by (stream|block|index) 0|0|0 0.47, 0|0|1 0.49, 0|0|2 0.49, 0|1|0 0.49, 0|1|1 0.53, 0|1|2 0.52, 1|0|0 0.46, 1|0|1 0.46, 1|0|2 0.50, 1|1|0 0.52, 1|1|1 0.52, 1|1|2 0.53
+  write order: acc last-written 0.51, not-last 0.49
+- REG3_KEYHINGE:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.36, 0.64], [0.64, 0.36]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.37, 0.63], [0.64, 0.36]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.37, 0.63], [0.64, 0.36]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.12/0.12/0.12; 2400 0.32/0.19/0.21; 4800 0.48/0.20/0.21; end 0.48/0.20/0.21
+  in-run probe (median held-out acc) L2|K 0.50, L2|V 0.50, L3|K 0.51, L3|V 0.50, final|K 0.52, final|V 0.52
+  write order: acc last-written 1.00, not-last 1.00
+- LOCAL3_KEYHINGE:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.53, 0.47], [0.28, 0.72]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.53, 0.47], [0.28, 0.72]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.53, 0.47], [0.28, 0.72]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  in-run probe (median held-out acc) L2|K 0.63, L2|V 0.51, L3|K 0.61, L3|V 0.53, final|K 0.62, final|V 0.55
+  plateau (15 unbound runs; acc 0.50): acc by (stream|block|index) 0|0|0 0.50, 0|0|1 0.52, 0|0|2 0.49, 0|1|0 0.52, 0|1|1 0.54, 0|1|2 0.57, 1|0|0 0.50, 1|0|1 0.49, 1|0|2 0.53, 1|1|0 0.53, 1|1|1 0.51, 1|1|2 0.51
+  write order: acc last-written 0.55, not-last 0.50
+- REG3_KEYHINGE_POS:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 -0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.42, 0.58], [0.25, 0.75]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.58, 0.42], [0.34, 0.66]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.54, 0.46], [0.4, 0.6]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.10/0.10/0.10; 2400 0.19/0.20/0.19; 4800 0.26/0.29/0.25; 9600 0.26/0.30/0.25; 14400 0.28/0.31/0.25; 19200 0.28/0.30/0.25; 24000 0.29/0.28/0.25; end 0.29/0.28/0.25
+  in-run probe (median held-out acc) L2|K 0.61, L2|V 0.50, L3|K 0.60, L3|V 0.52, final|K 0.60, final|V 0.52
+  plateau (19 unbound runs; acc 0.50): acc by (stream|block|index) 0|0|0 0.47, 0|0|1 0.48, 0|0|2 0.49, 0|1|0 0.50, 0|1|1 0.54, 0|1|2 0.54, 1|0|0 0.48, 1|0|1 0.46, 1|0|2 0.53, 1|1|0 0.52, 1|1|1 0.51, 1|1|2 0.55
+  write order: acc last-written 0.52, not-last 0.47
+- REG3_FLAT:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.27, 0.73], [0.54, 0.46]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.51, 0.49], [0.74, 0.26]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.58, 0.42], [0.74, 0.26]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.10/0.10/0.10; 2400 0.10/0.10/0.10; 4800 0.21/0.23/0.20; 9600 0.21/0.24/0.20; 14400 0.21/0.24/0.20; 19200 0.21/0.24/0.19; 24000 0.21/0.23/0.19; end 0.21/0.23/0.19
+  in-run probe (median held-out acc) L2|K 0.63, L2|V 0.51, L3|K 0.61, L3|V 0.52, final|K 0.59, final|V 0.53
+  plateau (20 unbound runs; acc 0.49): acc by (stream|block|index) 0|0|0 0.48, 0|0|1 0.50, 0|0|2 0.48, 0|1|0 0.50, 0|1|1 0.51, 0|1|2 0.53, 1|0|0 0.47, 1|0|1 0.48, 1|0|2 0.50, 1|1|0 0.53, 1|1|1 0.51, 1|1|2 0.52
+  write order: acc last-written 0.52, not-last 0.47
+- REG3_KEYHINGE_1200:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.37, 0.63], [0.66, 0.34]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.37, 0.63], [0.65, 0.35]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.37, 0.63], [0.65, 0.35]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.12/0.12/0.12; 2400 0.32/0.18/0.21; 4800 0.48/0.20/0.21; end 0.48/0.20/0.21
+  in-run probe (median held-out acc) L2|K 0.51, L2|V 0.50, L3|K 0.51, L3|V 0.50, final|K 0.52, final|V 0.52
+  plateau (2 unbound runs; acc 0.51): acc by (stream|block|index) 0|0|0 0.52, 0|0|1 0.50, 0|0|2 0.53, 0|1|0 0.49, 0|1|1 0.56, 0|1|2 0.57, 1|0|0 0.48, 1|0|1 0.45, 1|0|2 0.55, 1|1|0 0.51, 1|1|1 0.53, 1|1|2 0.51
+  write order: acc last-written 1.00, not-last 1.00
+- REG3_NUDGE:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.36, 0.64], [0.65, 0.35]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.36, 0.64], [0.65, 0.35]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.36, 0.64], [0.65, 0.35]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.34/0.20/0.22; 1200 0.45/0.19/0.23; 2400 0.48/0.19/0.23; 4800 0.65/0.20/0.21; end 0.65/0.20/0.21
+  in-run probe (median held-out acc) L2|K 0.50, L2|V 0.50, L3|K 0.51, L3|V 0.51, final|K 0.51, final|V 0.52
+  write order: acc last-written 1.00, not-last 1.00
+- BASELINE_D:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.94, 0.06]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.94, 0.06]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.94, 0.06]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.5, 0.5], [0.5, 0.5]]
+  in-run probe (median held-out acc) L2|K 0.74, L2|V 0.55, L3|K 0.79, L3|V 0.61, final|K 0.78, final|V 0.67
+  plateau (8 unbound runs; acc 0.75): acc by (stream|block|index) 0|0|0 0.76, 0|0|1 0.76, 0|0|2 0.80, 0|1|0 0.75, 0|1|1 0.77, 0|1|2 0.78, 1|0|0 0.80, 1|0|1 0.71, 1|0|2 0.80, 1|1|0 0.75, 1|1|1 0.76, 1|1|2 0.79
+  write order: acc last-written 0.79, not-last 0.84
+- REG3_D:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.62, 0.38], [0.73, 0.27]]; KEY [[0.5, 0.5], [0.75, 0.25]]; VAL [[0.5, 0.5], [0.75, 0.25]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.64, 0.36], [0.74, 0.26]]; KEY [[0.5, 0.5], [0.75, 0.25]]; VAL [[0.5, 0.5], [0.75, 0.25]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.65, 0.35], [0.73, 0.27]]; KEY [[0.5, 0.5], [0.75, 0.25]]; VAL [[0.5, 0.5], [0.75, 0.25]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.27/0.24/0.23; 2400 0.29/0.24/0.24; 4800 0.32/0.22/0.23; end 0.37/0.22/0.23
+  in-run probe (median held-out acc) L2|K 0.74, L2|V 0.56, L3|K 0.77, L3|V 0.58, final|K 0.76, final|V 0.65
+  plateau (6 unbound runs; acc 0.81): acc by (stream|block|index) 0|0|0 0.81, 0|0|1 0.82, 0|0|2 0.81, 0|1|0 0.79, 0|1|1 0.82, 0|1|2 0.74, 1|0|0 0.86, 1|0|1 0.79, 1|0|2 0.83, 1|1|0 0.82, 1|1|1 0.81, 1|1|2 0.82
+  write order: acc last-written 0.86, not-last 0.90
+- REG3_KEYHINGE_D:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.38, 0.62], [0.6, 0.4]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.38, 0.62], [0.6, 0.4]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.38, 0.62], [0.59, 0.41]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.13/0.12/0.12; 2400 0.38/0.21/0.21; 4800 0.42/0.21/0.21; end 0.42/0.21/0.21
+  in-run probe (median held-out acc) L2|K 0.50, L2|V 0.51, L3|K 0.52, L3|V 0.51, final|K 0.52, final|V 0.51
+  write order: acc last-written 1.00, not-last 1.00
+
+per run:
+  LOCAL3_KEYHINGE 2100: BOUND unrouted  acc 0.951 trans 15600 margin 0.49 etaS/K@KEY 0.50/0.00 | L1 map [1, 0] m 0.49 | L2 map [1, 0] m 0.49 | L3 map [1, 0] m 0.49 | probe L3 0.65/0.67
+  LOCAL3_KEYHINGE 2101: KEY             acc 0.505 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.61/0.53
+  LOCAL3_KEYHINGE 2102: KEY             acc 0.502 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.61/0.51
+  LOCAL3_KEYHINGE 2103: BOUND unrouted  acc 0.960 trans 19200 margin 0.50 etaS/K@KEY 0.50/0.00 | L1 map [1, 0] m 0.50 | L2 map [1, 0] m 0.50 | L3 map [1, 0] m 0.50 | probe L3 0.56/0.53
+  LOCAL3_KEYHINGE 2104: BOUND unrouted  acc 0.958 trans 24000 margin 0.49 etaS/K@KEY 0.50/0.00 | L1 map [0, 1] m 0.49 | L2 map [0, 1] m 0.49 | L3 map [0, 1] m 0.49 | probe L3 0.59/0.62
+  LOCAL3_KEYHINGE 2105: KEY             acc 0.688 trans None margin 0.25 etaS/K@KEY 0.09/0.65 | L1 map [1, 0] m 0.25 | L2 map [1, 0] m 0.25 | L3 map [1, 0] m 0.25 | probe L3 0.72/0.57
+  LOCAL3_KEYHINGE 2106: BOUND unrouted  acc 0.986 trans 8400 margin 0.45 etaS/K@KEY 0.29/0.21 | L1 map [1, 0] m 0.45 | L2 map [1, 0] m 0.45 | L3 map [1, 0] m 0.45 | probe L3 0.69/0.69
+  LOCAL3_KEYHINGE 2107: KEY             acc 0.498 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.61/0.52
+  LOCAL3_KEYHINGE 2108: KEY             acc 0.582 trans None margin 0.13 etaS/K@KEY 0.02/0.85 | L1 map [0, 0] m 0.13 | L2 map [0, 0] m 0.13 | L3 map [0, 0] m 0.13 | probe L3 0.67/0.56
+  LOCAL3_KEYHINGE 2109: KEY             acc 0.917 trans None margin 0.10 etaS/K@KEY 0.01/0.87 | L1 map [1, 1] m 0.10 | L2 map [1, 1] m 0.10 | L3 map [1, 1] m 0.10 | probe L3 0.81/0.80
+  LOCAL3_KEYHINGE 2110: KEY             acc 0.500 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.62/0.54
+  LOCAL3_KEYHINGE 2111: STREAM-PARTIAL  acc 0.947 trans None margin 0.45 etaS/K@KEY 0.50/0.00 | L1 map [1, 0] m 0.45 | L2 map [1, 0] m 0.45 | L3 map [1, 0] m 0.45 | probe L3 0.59/0.53
+  LOCAL3_KEYHINGE 2112: KEY             acc 0.510 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 1] m -0.00 | L2 map [0, 1] m -0.00 | L3 map [0, 1] m -0.00 | probe L3 0.60/0.53
+  LOCAL3_KEYHINGE 2113: KEY             acc 0.500 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.61/0.52
+  LOCAL3_KEYHINGE 2114: KEY             acc 0.480 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 1] m -0.00 | L2 map [0, 1] m -0.00 | L3 map [0, 1] m -0.00 | probe L3 0.63/0.51
+  LOCAL3_KEYHINGE 2115: KEY             acc 0.491 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.62/0.51
+  LOCAL3_KEYHINGE 2116: BOUND unrouted  acc 0.954 trans 22800 margin 0.46 etaS/K@KEY 0.50/0.00 | L1 map [1, 0] m 0.46 | L2 map [1, 0] m 0.46 | L3 map [1, 0] m 0.46 | probe L3 0.57/0.53
+  LOCAL3_KEYHINGE 2117: KEY             acc 0.505 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.60/0.51
+  LOCAL3_KEYHINGE 2118: KEY             acc 0.487 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.63/0.54
+  LOCAL3_KEYHINGE 2119: KEY             acc 0.505 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.59/0.51
+  REG3_KEYHINGE_POS 2100: KEY             acc 0.484 trans None margin 0.00 etaS/K@KEY 0.00/0.94 | L1 map [1, 1] m 0.00 | L2 map [0, 0] m 0.05 | L3 map [0, 0] m 0.00 | probe L3 0.58/0.52 | w C/K/V 0.23/0.18/0.18
+  REG3_KEYHINGE_POS 2101: KEY             acc 0.499 trans None margin 0.00 etaS/K@KEY 0.00/0.53 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.53/0.50 | w C/K/V 0.38/0.39/0.32
+  REG3_KEYHINGE_POS 2102: KEY             acc 0.497 trans None margin 0.00 etaS/K@KEY 0.00/0.96 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.56/0.51 | w C/K/V 0.28/0.41/0.27
+  REG3_KEYHINGE_POS 2103: KEY             acc 0.519 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.55/0.50 | w C/K/V 0.36/0.41/0.30
+  REG3_KEYHINGE_POS 2104: KEY             acc 0.513 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [1, 1] m -0.00 | probe L3 0.59/0.51 | w C/K/V 0.34/0.26/0.25
+  REG3_KEYHINGE_POS 2105: KEY             acc 0.483 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m 0.00 | L3 map [1, 1] m -0.00 | probe L3 0.61/0.52 | w C/K/V 0.29/0.35/0.30
+  REG3_KEYHINGE_POS 2106: KEY             acc 0.496 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.59/0.53 | w C/K/V 0.29/0.25/0.25
+  REG3_KEYHINGE_POS 2107: KEY             acc 0.497 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.59/0.52 | w C/K/V 0.31/0.35/0.26
+  REG3_KEYHINGE_POS 2108: ROUTED-BOUND    acc 1.000 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.55/0.55 | w C/K/V 0.48/0.21/0.19
+  REG3_KEYHINGE_POS 2109: KEY             acc 0.490 trans None margin 0.00 etaS/K@KEY 0.00/0.73 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.56/0.53 | w C/K/V 0.30/0.28/0.29
+  REG3_KEYHINGE_POS 2110: KEY             acc 0.493 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.62/0.51 | w C/K/V 0.33/0.46/0.37
+  REG3_KEYHINGE_POS 2111: KEY             acc 0.491 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.53/0.51 | w C/K/V 0.23/0.21/0.20
+  REG3_KEYHINGE_POS 2112: KEY             acc 0.504 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m -0.00 | probe L3 0.63/0.52 | w C/K/V 0.24/0.30/0.23
+  REG3_KEYHINGE_POS 2113: KEY             acc 0.504 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [0, 1] m -0.00 | probe L3 0.63/0.52 | w C/K/V 0.20/0.22/0.18
+  REG3_KEYHINGE_POS 2114: OTHER           acc 0.606 trans None margin -0.00 etaS/K@KEY 0.00/0.46 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.70/0.62 | w C/K/V 0.15/0.22/0.17
+  REG3_KEYHINGE_POS 2115: KEY             acc 0.372 trans None margin 0.00 etaS/K@KEY 0.00/0.86 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m 0.00 | probe L3 0.61/0.50 | w C/K/V 0.48/0.64/0.47
+  REG3_KEYHINGE_POS 2116: KEY             acc 0.490 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.63/0.51 | w C/K/V 0.19/0.17/0.15
+  REG3_KEYHINGE_POS 2117: KEY             acc 0.507 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.62/0.51 | w C/K/V 0.25/0.28/0.21
+  REG3_KEYHINGE_POS 2118: KEY             acc 0.507 trans None margin -0.01 etaS/K@KEY 0.00/0.92 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.01 | L3 map [1, 1] m -0.01 | probe L3 0.64/0.53 | w C/K/V 0.25/0.28/0.23
+  REG3_KEYHINGE_POS 2119: KEY             acc 0.508 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m -0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.62/0.52 | w C/K/V 0.37/0.39/0.35
+  REG3_FLAT 2100: KEY             acc 0.490 trans None margin -0.00 etaS/K@KEY 0.00/0.93 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m -0.00 | probe L3 0.60/0.54 | w C/K/V 0.20/0.21/0.18
+  REG3_FLAT 2101: OTHER           acc 0.494 trans None margin 0.00 etaS/K@KEY 0.00/0.47 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.60/0.51 | w C/K/V 0.05/0.13/0.08
+  REG3_FLAT 2102: KEY             acc 0.502 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.61/0.52 | w C/K/V 0.22/0.30/0.20
+  REG3_FLAT 2103: KEY             acc 0.527 trans None margin -0.00 etaS/K@KEY 0.00/0.56 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.61/0.52 | w C/K/V 0.21/0.24/0.20
+  REG3_FLAT 2104: KEY             acc 0.512 trans None margin -0.00 etaS/K@KEY 0.00/0.96 | L1 map [0, 0] m -0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m -0.00 | probe L3 0.57/0.54 | w C/K/V 0.11/0.19/0.12
+  REG3_FLAT 2105: KEY             acc 0.487 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m -0.00 | probe L3 0.61/0.52 | w C/K/V 0.26/0.27/0.23
+  REG3_FLAT 2106: KEY             acc 0.503 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m 0.00 | probe L3 0.59/0.53 | w C/K/V 0.18/0.21/0.19
+  REG3_FLAT 2107: KEY             acc 0.393 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.59/0.51 | w C/K/V 0.20/0.23/0.16
+  REG3_FLAT 2108: KEY             acc 0.491 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.62/0.51 | w C/K/V 0.20/0.23/0.18
+  REG3_FLAT 2109: KEY             acc 0.482 trans None margin -0.00 etaS/K@KEY 0.00/0.90 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.64/0.52 | w C/K/V 0.16/0.20/0.17
+  REG3_FLAT 2110: KEY             acc 0.489 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.58/0.52 | w C/K/V 0.18/0.22/0.17
+  REG3_FLAT 2111: KEY             acc 0.494 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.62/0.52 | w C/K/V 0.19/0.22/0.19
+  REG3_FLAT 2112: KEY             acc 0.516 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m -0.00 | probe L3 0.62/0.51 | w C/K/V 0.21/0.20/0.17
+  REG3_FLAT 2113: STREAM-PARTIAL  acc 0.756 trans None margin 0.45 etaS/K@KEY 0.25/0.50 | L1 map [0, 1] m 0.45 | L2 map [0, 1] m 0.45 | L3 map [0, 1] m 0.45 | probe L3 0.65/0.62 | w C/K/V 0.89/0.15/0.10
+  REG3_FLAT 2114: KEY             acc 0.484 trans None margin 0.00 etaS/K@KEY 0.00/0.99 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m 0.00 | probe L3 0.59/0.54 | w C/K/V 0.21/0.35/0.26
+  REG3_FLAT 2115: KEY             acc 0.378 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.59/0.53 | w C/K/V 0.25/0.35/0.22
+  REG3_FLAT 2116: KEY             acc 0.504 trans None margin 0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.62/0.51 | w C/K/V 0.24/0.34/0.24
+  REG3_FLAT 2117: KEY             acc 0.507 trans None margin -0.00 etaS/K@KEY 0.00/0.83 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.62/0.53 | w C/K/V 0.20/0.27/0.21
+  REG3_FLAT 2118: KEY             acc 0.488 trans None margin 0.00 etaS/K@KEY 0.00/0.88 | L1 map [1, 1] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.57/0.51 | w C/K/V 0.24/0.22/0.21
+  REG3_FLAT 2119: KEY             acc 0.507 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [0, 1] m -0.00 | probe L3 0.63/0.51 | w C/K/V 0.24/0.26/0.24
+  REG3_KEYHINGE_1200 2100: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.54/0.51 | w C/K/V 0.59/0.19/0.22
+  REG3_KEYHINGE_1200 2101: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.50/0.50 | w C/K/V 0.40/0.21/0.21
+  REG3_KEYHINGE_1200 2102: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.49/0.50 | w C/K/V 0.49/0.21/0.23
+  REG3_KEYHINGE_1200 2103: KEY             acc 0.511 trans None margin -0.00 etaS/K@KEY 0.00/0.99 | L1 map [0, 0] m 0.01 | L2 map [0, 0] m 0.00 | L3 map [1, 1] m -0.00 | probe L3 0.56/0.51 | w C/K/V 0.16/0.27/0.16
+  REG3_KEYHINGE_1200 2104: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.48/0.50 | w C/K/V 0.44/0.20/0.21
+  REG3_KEYHINGE_1200 2105: ROUTED-BOUND    acc 1.000 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.48/0.50 | w C/K/V 0.52/0.17/0.16
+  REG3_KEYHINGE_1200 2106: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.53/0.50 | w C/K/V 0.54/0.20/0.19
+  REG3_KEYHINGE_1200 2107: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.51/0.49 | w C/K/V 0.50/0.19/0.22
+  REG3_KEYHINGE_1200 2108: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.51/0.52 | w C/K/V 0.46/0.20/0.21
+  REG3_KEYHINGE_1200 2109: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.50/0.50 | w C/K/V 0.45/0.19/0.19
+  REG3_KEYHINGE_1200 2110: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.50/0.50 | w C/K/V 0.48/0.20/0.21
+  REG3_KEYHINGE_1200 2111: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.51/0.50 | w C/K/V 0.42/0.19/0.19
+  REG3_KEYHINGE_1200 2112: KEY             acc 0.508 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m 0.00 | L3 map [0, 0] m -0.00 | probe L3 0.61/0.51 | w C/K/V 0.19/0.31/0.21
+  REG3_KEYHINGE_1200 2113: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.51/0.50 | w C/K/V 0.43/0.21/0.21
+  REG3_KEYHINGE_1200 2114: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.50/0.50 | w C/K/V 0.60/0.17/0.21
+  REG3_KEYHINGE_1200 2115: ROUTED-BOUND    acc 1.000 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.58/0.55 | w C/K/V 0.57/0.17/0.16
+  REG3_KEYHINGE_1200 2116: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.52/0.51 | w C/K/V 0.62/0.18/0.20
+  REG3_KEYHINGE_1200 2117: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.49/0.49 | w C/K/V 0.50/0.20/0.20
+  REG3_KEYHINGE_1200 2118: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.50/0.51 | w C/K/V 0.49/0.20/0.23
+  REG3_KEYHINGE_1200 2119: ROUTED-BOUND    acc 1.000 trans 3600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.52/0.52 | w C/K/V 0.47/0.20/0.21
+  REG3_NUDGE 2100: ROUTED-BOUND    acc 1.000 trans 2400 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.51/0.50 | w C/K/V 0.60/0.21/0.22
+  REG3_NUDGE 2101: ROUTED-BOUND    acc 1.000 trans 2400 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.50/0.53 | w C/K/V 0.70/0.19/0.19
+SCREEN_DONE
