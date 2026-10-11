@@ -58,3 +58,5 @@ EXPLORATORY, NOT A RESULT — batch 20: continue (S68) — DRY RUN (shortened: 1
   [  1]    3.1 min  dry_s67_continue RCHK_P8_N256   seed 272  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1b18ac4, code 78c8b0a643d9, attempt 1: acc 0.116  trans  None  stop 2400  outcome non-stream OTHER
   start    3.1 min  dry_s67_continue C_P8_N256      seed 272  (projected worst case 5 min)
+  [  2]    6.4 min  dry_s67_continue C_P8_N256      seed 272  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git fac3fa8, code 78c8b0a643d9, attempt 1, resumed at [1200]: acc 0.116  trans  None  stop 2400  outcome non-stream OTHER; halted once at 1200
