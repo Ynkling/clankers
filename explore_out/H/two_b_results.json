@@ -1,0 +1,146 @@
+{
+ "meta": {
+  "arms": {
+   "KEYHINGE": {
+    "iters": 24000,
+    "label": "KEYHINGE",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW KEYHINGE",
+    "seeds": [
+     2310,
+     2311,
+     2312,
+     2313,
+     2314,
+     2315,
+     2316,
+     2317,
+     2318,
+     2319,
+     2320,
+     2321,
+     2322,
+     2323,
+     2324,
+     2325,
+     2326,
+     2327,
+     2328,
+     2329
+    ]
+   },
+   "ORACLE": {
+    "iters": 24000,
+    "label": "ceiling_conv",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3",
+    "seeds": [
+     2310,
+     2311
+    ]
+   },
+   "REF": {
+    "iters": 24000,
+    "label": "REF",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW REF",
+    "seeds": [
+     2310,
+     2311,
+     2312,
+     2313,
+     2314,
+     2315,
+     2316,
+     2317,
+     2318,
+     2319,
+     2320,
+     2321,
+     2322,
+     2323,
+     2324,
+     2325,
+     2326,
+     2327,
+     2328,
+     2329
+    ]
+   },
+   "SLOWGATE": {
+    "iters": 24000,
+    "label": "SLOWGATE",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW SLOWGATE",
+    "seeds": [
+     2310,
+     2311,
+     2312,
+     2313,
+     2314,
+     2315,
+     2316,
+     2317,
+     2318,
+     2319,
+     2320,
+     2321,
+     2322,
+     2323,
+     2324,
+     2325,
+     2326,
+     2327,
+     2328,
+     2329
+    ]
+   },
+   "SLOWGATE_KEYHINGE": {
+    "iters": 24000,
+    "label": "SLOWGATE_KEYHINGE",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW SLOWGATE_KEYHINGE",
+    "seeds": [
+     2310,
+     2311,
+     2312,
+     2313,
+     2314,
+     2315,
+     2316,
+     2317,
+     2318,
+     2319,
+     2320,
+     2321,
+     2322,
+     2323,
+     2324,
+     2325,
+     2326,
+     2327,
+     2328,
+     2329
+    ]
+   }
+  },
+  "code_shas": [
+   "957abe999f8d826908628068011bc654409e2ad5"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "37c1fbf",
+   "python": "3.13.16",
+   "started": "2026-10-11 01:34:50",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
