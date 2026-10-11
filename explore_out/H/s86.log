@@ -108,3 +108,17 @@ EXPLORATORY, NOT A RESULT — session H: H/allmass
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 78ef2a3+dirty, code 898867f69ad4, attempt 1: acc 0.977  trans  3600  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
   [ 31]  255.3 min  H/allmass        EVAL                     seed 2339  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger EVAL)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 78ef2a3+dirty, code 898867f69ad4, attempt 1: acc 1.000  trans 16800  outcome BOUND ROUTED; map [0, 14, 6, 3, 2, 9, 11, 10]
+  [ 32]  282.1 min  H/allmass        EVAL                     seed 2338  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger EVAL)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git c462fd7, code 898867f69ad4, attempt 1: acc 1.000  trans 34800  outcome BOUND ROUTED; map [1, 5, 6, 12, 14, 9, 0, 3]; None fired at [4800, 12000, 16800]
+  wall clock 282.1 min
+Traceback (most recent call last):
+  File "/home/user/clankers/explore_h_run.py", line 130, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/clankers/explore_h_run.py", line 123, in main
+    res, got = m.report()
+               ~~~~~~~~^^
+  File "/home/user/clankers/explore_h_allmass.py", line 171, in report
+    res["pooled_eval"] = hc.paired(dict(e84, **B["EVAL"]), dict(b84, **B["BASE"]), s84.SEEDS + SEEDS)
+                                   ~~~~^^^^^^^^^^^^^^^^^^
+TypeError: keywords must be strings

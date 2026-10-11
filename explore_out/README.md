@@ -597,3 +597,16 @@ flat-start splits. S85: the hinge's key term prevents the two-stream key split d
 discover (20/20). A slow gate does not stop the split forming, and with the hinge it pushes the split past the hinge's
 window (seed 2317). Handed back for a pre-registered test: WIN3_SLOW + the key term vs WIN3_SLOW, under fail_class_v2.
 Reports: `explore_out/H/report_6.md`, `report_7.md`.
+
+### Session H round 4 (S86 + a specification draft; seeds 2330-2339)
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S86 allmass (S=8, k=16, 43200, Hebbian, exact copy; 10 paired seeds) | BOUND ROUTED: BASE (KEYMASS) 9, ALLMASS (all-position target) 8, EVAL 9; oracle 2/2 | all-position targeting keeps it (1 vs 0); aims (20/21 labelled ok); no cost; the evaluation is the better probe (0 vs 0; pooled with S84 descriptively 1 vs 0 over 20 pairs) |
+
+Before the screen, explore_h_allmass_counts.py recomputed the main line's 50 split runs. At their 107 firings, the
+key-position pair was a labelled target at 107 and the all-position pair at 97; the two pairs coincide at 46. In S86 the
+one discordant pair (seed 2334) is ALLMASS's one mistargeted firing. Also written: explore_out/H/spec_draft_two_keyterm.md,
+the main-line specification of S85's proposal (WIN3_SLOW +/- S52's key term at S=2, k=2; proposed seeds X 620-639,
+L 1620-1639; claims K1-K3; readings with one name per outcome; the task-structure caveat). Report:
+explore_out/H/report_8.md.

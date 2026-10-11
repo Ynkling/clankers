@@ -168,7 +168,7 @@ def report():
     c16.STATE["shas"].setdefault(s84.NAME, g84["meta"]["code_shas"][-1])
     e84 = {s: hc.br(r) for s, r in c16.runs_of(s84, "EVAL", store=g84).items()}
     b84 = {s: hc.br(r) for s, r in c16.runs_of(s84, "BASE", store=g84).items()}
-    res["pooled_eval"] = hc.paired(dict(e84, **B["EVAL"]), dict(b84, **B["BASE"]), s84.SEEDS + SEEDS)
+    res["pooled_eval"] = hc.paired({**e84, **B["EVAL"]}, {**b84, **B["BASE"]}, s84.SEEDS + SEEDS)
     complete = all(res["arms"][a]["complete"] for a in learned) and len(orc) == len(ORACLE_SEEDS)
     A, C = res["arms"], res["cmp"]
     if not complete:
