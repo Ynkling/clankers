@@ -27,8 +27,9 @@ O(1) within ~200 updates: two free-running paths agree to 1e-5 for 2400 updates 
     L = 768 there are ~6e6 relu units per update; an ill-conditioned solve in the delta memory; a cancelling sum), and
     such an update is as likely to be the reference's error as the tested path's (measured: the one-delta-channel GDN
     case's sequential float32 gradient is 1.3e-2 from float64 at one update where the batched one is 4e-7 from it; the
-    REG3 register's scan against its loop at L = 768: see K3c and the output). A wrong gradient makes nearly every
-    update A and none B (K3c's negative controls).
+    REG3 register's scan against its loop at L = 768, 300 updates x 2 seeds: A 21, B 24, p 0.72 — explore_gpu/
+    calibrate_judge.py, whose output is committed). A wrong gradient makes nearly every update A and none B (K3c's
+    negative controls: A 20, B 0, p 1e-6).
 
 CHECKS
   K0  (printed) the chaos calibration above, recomputed (arm A 160, two perturbation sizes, every 100 updates).          cpu

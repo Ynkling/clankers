@@ -65,12 +65,16 @@ On CPU (`checks_cpu_output.txt`, this container) these are asserted bit for bit:
 - K5: the ICMC trainer equals `explore_i_common.run_one`, and the register's scan equals its loop.
 
 K3c (the criterion's controls) also runs on CPU, and `calibrate_judge.py` runs the CUDA lengths on CPU
-(`calibrate_judge_output.txt`):
-- a neuron-permuted twin of arm A passes (same function, another summation order);
-- REG3's register scan against its loop at L = 768 passes;
-- the delta memory passes;
-- a zeroed W_in, W_h or W_g gradient, or W_g's gradient scaled by 1.01, fails at every update. This includes W_in at
-  L = 768, where its gradient is ~1e-7 of the largest. __CALIB__
+(`calibrate_judge_output.txt`). Two correct paths that round differently pass, with A ≈ B:
+
+| Case | Run-updates | A | B | p |
+|---|---|---|---|---|
+| REG3's register scan vs its loop, L = 768 | 600 | 21 | 24 | 0.72 |
+| arm A vs its neuron-permuted twin | 2400 | 5 | 3 | 0.36 |
+| the delta memory (GDN) | 900 | 0 | 2 | 1 |
+
+Wrong gradients fail at every update (A = 20, B = 0, p = 1e-6): a zeroed W_in, W_h or W_g gradient, or W_g's gradient
+scaled by 1.01. This includes W_in at L = 768, where its gradient is ~1e-7 of the largest.
 
 K7 checks the data path. K8 runs every forward on fake CUDA tensors to show that no CPU tensor is mixed in.
 
