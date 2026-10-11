@@ -1,0 +1,794 @@
+{
+ "meta": {
+  "device": "cuda:0",
+  "torch": "2.14.0+cu130",
+  "cpu": "AMD Ryzen 5 3600 6-Core Processor",
+  "threads": 4,
+  "gpu": "NVIDIA GeForce GTX 1660 SUPER",
+  "capability": "7.5",
+  "gpu_mem_gb": 5.61,
+  "cuda": "13.0",
+  "cudnn": 92400,
+  "tf32_matmul": false,
+  "tf32_cudnn": false,
+  "started": "2026-10-11 17:18:10",
+  "quick": false,
+  "tolerances": {
+   "free": 1e-05,
+   "same_device": {
+    "logits": 1e-05,
+    "grad": 0.0001
+   },
+   "cuda_vs_cpu": {
+    "logits": 0.0001,
+    "grad": 0.001
+   },
+   "arbitration_factor": 4.0
+  }
+ },
+ "checks": {
+  "K0": {
+   "ok": true,
+   "skipped": "cpu only",
+   "secs": 0.0
+  },
+  "K1": {
+   "ok": true,
+   "asserted": false,
+   "identical": false,
+   "curve": [
+    [
+     1200,
+     0.2236328125,
+     2.172762870788574
+    ],
+    [
+     2400,
+     0.4755859375,
+     1.190804362297058
+    ]
+   ],
+   "recorded": [
+    [
+     1200,
+     0.25732421875,
+     2.1073341369628906
+    ],
+    [
+     2400,
+     0.50244140625,
+     1.1376346349716187
+    ]
+   ],
+   "grad_same": false,
+   "stats_same": false,
+   "record_cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "here": "AMD Ryzen 5 3600 6-Core Processor",
+   "device": {
+    "device": "cuda:0",
+    "torch": "2.14.0+cu130",
+    "cpu": "AMD Ryzen 5 3600 6-Core Processor",
+    "threads": 4,
+    "gpu": "NVIDIA GeForce GTX 1660 SUPER",
+    "capability": "7.5",
+    "gpu_mem_gb": 5.61,
+    "cuda": "13.0",
+    "cudnn": 92400,
+    "tf32_matmul": false,
+    "tf32_cudnn": false
+   },
+   "secs": 48.6
+  },
+  "K2": {
+   "ok": true,
+   "asserted": false,
+   "max": 12.38917064666748,
+   "by_step": {
+    "100": 0.37117648124694824,
+    "200": 3.926950454711914,
+    "300": 4.868704795837402,
+    "400": 5.538688659667969,
+    "500": 6.502588272094727,
+    "600": 5.788000106811523,
+    "700": 6.166178226470947,
+    "800": 6.893770217895508,
+    "900": 7.473081111907959,
+    "1000": 8.251997947692871,
+    "1100": 8.936647415161133,
+    "1200": 8.96709156036377,
+    "1300": 9.891128540039062,
+    "1400": 11.035045623779297,
+    "1500": 10.507275581359863,
+    "1600": 10.596384048461914,
+    "1700": 10.076871871948242,
+    "1800": 10.364230155944824,
+    "1900": 10.389730453491211,
+    "2000": 10.001825332641602,
+    "2100": 11.02091121673584,
+    "2200": 12.09249496459961,
+    "2300": 11.773337364196777,
+    "2400": 12.38917064666748
+   },
+   "secs": 190.2
+  },
+  "K2b": {
+   "ok": true,
+   "asserted": false,
+   "cases": {
+    "B_conv": {
+     "max": 6.192654609680176,
+     "by_step": {
+      "100": 0.6348937749862671,
+      "200": 3.172247886657715,
+      "300": 4.659031391143799,
+      "400": 5.3348236083984375,
+      "500": 6.192654609680176,
+      "600": 5.585451602935791
+     }
+    },
+    "LOCAL3 RandHeaderTask-lite": {
+     "max": 5.195152759552002,
+     "by_step": {
+      "100": 0.3496328294277191,
+      "200": 3.4305167198181152,
+      "300": 4.087797164916992,
+      "400": 4.479386806488037,
+      "500": 5.195152759552002,
+      "600": 4.056359767913818
+     }
+    },
+    "ICMC LOCAL3+SLOW+split": {
+     "max": 0.01055610179901123,
+     "by_step": {
+      "100": 0.0006136000156402588,
+      "200": 0.0020789504051208496,
+      "300": 0.004250824451446533,
+      "400": 0.004109799861907959,
+      "500": 0.005381286144256592,
+      "600": 0.01055610179901123
+     }
+    },
+    "ICMC REG3 (loop)": {
+     "max": 0.008468329906463623,
+     "by_step": {
+      "100": 0.0003104209899902344,
+      "200": 0.0011638402938842773,
+      "300": 0.0030094385147094727,
+      "400": 0.0032411813735961914,
+      "500": 0.008468329906463623,
+      "600": 0.007558107376098633
+     }
+    },
+    "ICMC perfect": {
+     "max": 0.8299973011016846,
+     "by_step": {
+      "100": 0.03931736946105957,
+      "200": 0.17077666521072388,
+      "300": 0.3113906979560852,
+      "400": 0.3088972568511963,
+      "500": 0.5149268507957458,
+      "600": 0.8299973011016846
+     }
+    },
+    "ICMC single": {
+     "max": 0.8054202795028687,
+     "by_step": {
+      "100": 0.010320544242858887,
+      "200": 0.05327785015106201,
+      "300": 0.1220313310623169,
+      "400": 0.5666735172271729,
+      "500": 0.8054202795028687,
+      "600": 0.40554773807525635
+     }
+    },
+    "ICMC REG3_NUDGE (loop)": {
+     "max": 0.02952134609222412,
+     "by_step": {
+      "100": 0.00032639503479003906,
+      "200": 0.001493692398071289,
+      "300": 0.0018378496170043945,
+      "400": 0.0029392242431640625,
+      "500": 0.008787274360656738,
+      "600": 0.02952134609222412
+     }
+    }
+   },
+   "secs": 370.0
+  },
+  "K2c": {
+   "ok": true,
+   "asserted": false,
+   "max": 3.297323226928711,
+   "fired": {
+    "7": [
+     4800
+    ],
+    "8": [
+     4800
+    ]
+   },
+   "rows_same": false,
+   "state_zeroed": [
+    [
+     "step",
+     "exp_avg",
+     "exp_avg_sq"
+    ],
+    [
+     "step",
+     "exp_avg",
+     "exp_avg_sq"
+    ]
+   ],
+   "by_step": {
+    "600": 0.012035250663757324,
+    "1200": 0.045546650886535645,
+    "1800": 0.10589289665222168,
+    "2400": 0.09322595596313477,
+    "3000": 0.4609718322753906,
+    "3600": 0.7927291393280029,
+    "4200": 1.1364877223968506,
+    "4800": 1.4123854637145996,
+    "5400": 3.297323226928711,
+    "6000": 2.6388919353485107,
+    "6600": 2.214390277862549,
+    "7200": 2.663050889968872
+   },
+   "secs": 311.1
+  },
+  "K3": {
+   "ok": true,
+   "updates": 9600,
+   "logits": 0.00032591819763183594,
+   "grad": 0.007753518253510505,
+   "grad_param": "encoder_v",
+   "arbitrated": 67,
+   "test_worse": 13,
+   "ref_worse": 12,
+   "sign_p": 0.5,
+   "nonfinite": 0,
+   "worst_arbitration": 15.717903705561909,
+   "first_failures": [
+    {
+     "step": 56,
+     "run": 1,
+     "score": 15.717903705561909,
+     "where": "encoder_v",
+     "raw_logits": 5.960464477539062e-07,
+     "raw_grad": 0.0015854204364091325
+    },
+    {
+     "step": 202,
+     "run": 3,
+     "score": 5.4632926500386025,
+     "where": "encoder",
+     "raw_logits": 9.5367431640625e-07,
+     "raw_grad": 0.0005555933847227811
+    },
+    {
+     "step": 239,
+     "run": 1,
+     "score": 1.0254144559879685,
+     "where": "encoder_v",
+     "raw_logits": 9.5367431640625e-07,
+     "raw_grad": 0.00010390218425921922
+    },
+    {
+     "step": 305,
+     "run": 2,
+     "score": 2.8743372262143874,
+     "where": "encoder",
+     "raw_logits": 1.1920928955078125e-06,
+     "raw_grad": 0.0002910220041061747
+    },
+    {
+     "step": 645,
+     "run": 0,
+     "score": 1.154954142568309,
+     "where": "encoder",
+     "raw_logits": 1.430511474609375e-06,
+     "raw_grad": 0.00011692665025232543
+    }
+   ],
+   "tol": {
+    "logits": 1e-05,
+    "grad": 0.0001
+   },
+   "secs": 171.8
+  },
+  "K3b": {
+   "ok": true,
+   "tol": {
+    "logits": 1e-05,
+    "grad": 0.0001
+   },
+   "cases": {
+    "ORACLE": {
+     "ok": true,
+     "updates": 600,
+     "logits": 0.0,
+     "grad": 3.6115756129128804e-06,
+     "grad_param": "lm_head",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "SINGLE": {
+     "ok": true,
+     "updates": 600,
+     "logits": 0.0,
+     "grad": 4.179959632305028e-06,
+     "grad_param": "lm_head",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "WIDE_SPLIT": {
+     "ok": true,
+     "updates": 600,
+     "logits": 0.0,
+     "grad": 6.905312037260185e-06,
+     "grad_param": "W_g",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "REG3": {
+     "ok": true,
+     "updates": 600,
+     "logits": 5.960464477539062e-07,
+     "grad": 0.0013161720475361916,
+     "grad_param": "b_R",
+     "arbitrated": 66,
+     "test_worse": 23,
+     "ref_worse": 21,
+     "sign_p": 0.440197910640336,
+     "nonfinite": 0,
+     "worst_arbitration": 12.471127721292357,
+     "first_failures": [
+      {
+       "step": 15,
+       "run": 0,
+       "score": 2.782236459378032,
+       "where": "b_R",
+       "raw_logits": 1.341104507446289e-07,
+       "raw_grad": 0.00035685669903678176
+      },
+      {
+       "step": 38,
+       "run": 0,
+       "score": 12.471127721292357,
+       "where": "b_R",
+       "raw_logits": 1.7881393432617188e-07,
+       "raw_grad": 0.0013099207224335043
+      },
+      {
+       "step": 41,
+       "run": 1,
+       "score": 2.151623156237571,
+       "where": "encoder",
+       "raw_logits": 2.980232238769531e-07,
+       "raw_grad": 0.000217410249346584
+      },
+      {
+       "step": 63,
+       "run": 0,
+       "score": 1.4702916810897697,
+       "where": "b_R",
+       "raw_logits": 2.086162567138672e-07,
+       "raw_grad": 0.0002164500228524714
+      },
+      {
+       "step": 89,
+       "run": 0,
+       "score": 1.0963448725900937,
+       "where": "b_R",
+       "raw_logits": 2.384185791015625e-07,
+       "raw_grad": 0.00015256120175251994
+      }
+     ]
+    },
+    "WIN3_SPLIT": {
+     "ok": true,
+     "updates": 600,
+     "logits": 0.0,
+     "grad": 1.3951229280637315e-05,
+     "grad_param": "W_g",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "WIDE_SLOW": {
+     "ok": true,
+     "updates": 600,
+     "logits": 0.0,
+     "grad": 7.431602496565798e-06,
+     "grad_param": "W_g",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "LOCAL3 + delta (beta 1)": {
+     "ok": true,
+     "updates": 900,
+     "logits": 2.8014183044433594e-06,
+     "grad": 0.0001325758169126788,
+     "grad_param": "encoder",
+     "arbitrated": 13,
+     "test_worse": 1,
+     "ref_worse": 1,
+     "sign_p": 0.75,
+     "nonfinite": 0,
+     "worst_arbitration": 1.1340891177968786,
+     "first_failures": [
+      {
+       "step": 270,
+       "run": 1,
+       "score": 1.1340891177968786,
+       "where": "encoder",
+       "raw_logits": 1.1920928955078125e-06,
+       "raw_grad": 0.00011522193724225656
+      }
+     ]
+    },
+    "one delta channel, learned beta, GDN decay": {
+     "ok": true,
+     "updates": 900,
+     "logits": 4.291534423828125e-06,
+     "grad": 0.005525181291468617,
+     "grad_param": "attn.b_b",
+     "arbitrated": 10,
+     "test_worse": 2,
+     "ref_worse": 1,
+     "sign_p": 0.5,
+     "nonfinite": 0,
+     "worst_arbitration": 26.095985365943882,
+     "first_failures": [
+      {
+       "step": 116,
+       "run": 1,
+       "score": 5.047871527378765,
+       "where": "attn.decay_mod.A_log",
+       "raw_logits": 7.152557373046875e-07,
+       "raw_grad": 0.0006042612082005729
+      },
+      {
+       "step": 222,
+       "run": 1,
+       "score": 26.095985365943882,
+       "where": "attn.b_b",
+       "raw_logits": 9.5367431640625e-07,
+       "raw_grad": 0.005525181291468617
+      }
+     ]
+    }
+   },
+   "secs": 774.5
+  },
+  "K3c": {
+   "ok": true,
+   "skipped": "cpu only",
+   "secs": 0.0
+  },
+  "K4": {
+   "ok": true,
+   "tol": {
+    "logits": 0.0001,
+    "grad": 0.001
+   },
+   "cases": {
+    "arm A 160 (2400 updates)": {
+     "ok": true,
+     "updates": 2400,
+     "logits": 0.00013113021850585938,
+     "grad": 0.008113526490685067,
+     "grad_param": "encoder",
+     "arbitrated": 4,
+     "test_worse": 2,
+     "ref_worse": 1,
+     "sign_p": 0.5,
+     "nonfinite": 0,
+     "worst_arbitration": 8.09724575217175,
+     "first_failures": [
+      {
+       "step": 962,
+       "run": 0,
+       "score": 1.0571830508019662,
+       "where": "encoder",
+       "raw_logits": 1.9073486328125e-06,
+       "raw_grad": 0.0010585384498727375
+      },
+      {
+       "step": 2326,
+       "run": 0,
+       "score": 8.09724575217175,
+       "where": "encoder",
+       "raw_logits": 1.1444091796875e-05,
+       "raw_grad": 0.008113526490685067
+      }
+     ]
+    },
+    "S75 ORACLE (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 3.5762786865234375e-07,
+     "grad": 2.4423430570804376e-05,
+     "grad_param": "encoder",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "S75 SINGLE (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 4.172325134277344e-07,
+     "grad": 0.00010699864630018598,
+     "grad_param": "encoder",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "S75 WIDE_SPLIT (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 2.2351741790771484e-07,
+     "grad": 7.76939215870971e-05,
+     "grad_param": "W_in",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "S75 REG3 (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 2.086162567138672e-07,
+     "grad": 0.0015771537474636864,
+     "grad_param": "b_R",
+     "arbitrated": 3,
+     "test_worse": 1,
+     "ref_worse": 1,
+     "sign_p": 0.75,
+     "nonfinite": 0,
+     "worst_arbitration": 1.3310148856586488,
+     "first_failures": [
+      {
+       "step": 6,
+       "run": 0,
+       "score": 1.3310148856586488,
+       "where": "b_R",
+       "raw_logits": 1.5273690223693848e-07,
+       "raw_grad": 0.0015771537474636864
+      }
+     ]
+    }
+   },
+   "secs": 308.9
+  },
+  "K4b": {
+   "ok": true,
+   "tol": {
+    "logits": 0.0001,
+    "grad": 0.001
+   },
+   "cases": {
+    "arm A 160 (2400 updates)": {
+     "ok": true,
+     "updates": 2400,
+     "logits": 0.00013113021850585938,
+     "grad": 0.008113531043588425,
+     "grad_param": "encoder",
+     "arbitrated": 4,
+     "test_worse": 2,
+     "ref_worse": 1,
+     "sign_p": 0.5,
+     "nonfinite": 0,
+     "worst_arbitration": 8.097250295448575,
+     "first_failures": [
+      {
+       "step": 962,
+       "run": 0,
+       "score": 1.057179973177083,
+       "where": "encoder",
+       "raw_logits": 1.9073486328125e-06,
+       "raw_grad": 0.0010585353687245908
+      },
+      {
+       "step": 2326,
+       "run": 0,
+       "score": 8.097250295448575,
+       "where": "encoder",
+       "raw_logits": 1.1444091796875e-05,
+       "raw_grad": 0.008113531043588425
+      }
+     ]
+    },
+    "S75 ORACLE (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 3.5762786865234375e-07,
+     "grad": 2.4427058860881306e-05,
+     "grad_param": "encoder",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "S75 SINGLE (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 4.172325134277344e-07,
+     "grad": 0.00010700896153691658,
+     "grad_param": "encoder",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "S75 WIDE_SPLIT (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 4.172325134277344e-07,
+     "grad": 6.718426444883747e-05,
+     "grad_param": "W_in",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "S75 REG3 (20 updates)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 3.5762786865234375e-07,
+     "grad": 0.0004284171596676851,
+     "grad_param": "W_g2",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    }
+   },
+   "secs": 194.9
+  },
+  "K5": {
+   "ok": true,
+   "skipped": "cpu only",
+   "secs": 0.0
+  },
+  "K6": {
+   "ok": true,
+   "worst": 5.960464477539063e-08,
+   "exact": false,
+   "split_reset_through_runopt": 2.9802322387695312e-08,
+   "secs": 0.2
+  },
+  "K7": {
+   "ok": true,
+   "skipped": "cpu only",
+   "secs": 0.0
+  },
+  "K8": {
+   "ok": true,
+   "skipped": "cpu only (on CUDA the real checks above run)",
+   "secs": 0.0
+  },
+  "K9": {
+   "ok": true,
+   "printed": true,
+   "bench": {
+    "ORACLE R=1": {
+     "secs_per_update": 0.06558164358139038,
+     "secs_per_run_update": 0.06558164358139038,
+     "peak_gb": 0.6235580444335938,
+     "peak_reserved_gb": 0.703125,
+     "device_used_gb": 0.8084716796875,
+     "total_gb": 5.61419677734375
+    },
+    "ORACLE R=2": {
+     "secs_per_update": 0.13669428825378419,
+     "secs_per_run_update": 0.06834714412689209,
+     "peak_gb": 1.2380805015563965,
+     "peak_reserved_gb": 1.4453125,
+     "device_used_gb": 1.5506591796875,
+     "total_gb": 5.61419677734375
+    },
+    "SINGLE R=1": {
+     "secs_per_update": 0.06081255674362183,
+     "secs_per_run_update": 0.06081255674362183,
+     "peak_gb": 0.552879810333252,
+     "peak_reserved_gb": 0.6328125,
+     "device_used_gb": 0.7381591796875,
+     "total_gb": 5.61419677734375
+    },
+    "SINGLE R=2": {
+     "secs_per_update": 0.12690097093582153,
+     "secs_per_run_update": 0.06345048546791077,
+     "peak_gb": 1.096724033355713,
+     "peak_reserved_gb": 1.3046875,
+     "device_used_gb": 1.4100341796875,
+     "total_gb": 5.61419677734375
+    },
+    "WIDE_SPLIT R=1": {
+     "secs_per_update": 0.07400083541870117,
+     "secs_per_run_update": 0.07400083541870117,
+     "peak_gb": 0.9128513336181641,
+     "peak_reserved_gb": 1.00390625,
+     "device_used_gb": 1.1092529296875,
+     "total_gb": 5.61419677734375
+    },
+    "WIDE_SPLIT R=2": {
+     "secs_per_update": 0.15586220026016234,
+     "secs_per_run_update": 0.07793110013008117,
+     "peak_gb": 1.8159451484680176,
+     "peak_reserved_gb": 2.02734375,
+     "device_used_gb": 2.1326904296875,
+     "total_gb": 5.61419677734375
+    },
+    "REG3 R=1": {
+     "secs_per_update": 0.09390225410461425,
+     "secs_per_run_update": 0.09390225410461425,
+     "peak_gb": 1.29768705368042,
+     "peak_reserved_gb": 1.52734375,
+     "device_used_gb": 1.6326904296875,
+     "total_gb": 5.61419677734375
+    },
+    "REG3 R=2": {
+     "secs_per_update": 0.20837681293487548,
+     "secs_per_run_update": 0.10418840646743774,
+     "peak_gb": 2.5845704078674316,
+     "peak_reserved_gb": 3.07421875,
+     "device_used_gb": 3.1795654296875,
+     "total_gb": 5.61419677734375
+    }
+   },
+   "s75_train_hours": {
+    "R=1": 16.122131665547688,
+    "R=2": 17.282628059387207
+   },
+   "secs": 71.1
+  }
+ }
+}
