@@ -583,3 +583,17 @@ at chance accuracy, is wasted. So the cap, the first eligible check and the inte
 the rise threshold do not matter here. fail_class_v2 (ba8901a, copied unchanged) differs from v1 exactly on the runs
 with eta^2 by key >= 0.5 and margin >= 0.25: 6 of this branch's recorded unbound runs and 4 of S78's; none in S79.
 Reports: `explore_out/H/report_4.md`, `report_5.md`.
+
+### Session H round 3 (S84-S85; seeds 2300-2329, shifted from 2200-2229 because 2200-2229 appear in results/)
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S84 guard (S=8, k=16, 43200, Hebbian, exact-copy split; 10 paired seeds) | BOUND ROUTED: BASE 9, GUARD 9, GUARD_INT1200 9, EVAL 10, EVAL_GUARD_INT1200 9; oracle 2/2 | the guard aims the split (17/17 labelled ok, 0 vs 0); faster without the cost: does not apply (median 15600 vs 16800); the evaluation is the better probe (0 vs 1); no arm costs binding |
+| S85 two_b (S=2, k=2, 24000; 20 paired seeds) | DISCOVERED: REF 15, SLOWGATE 14, KEYHINGE 20, SLOWGATE_KEYHINGE 19; ceiling_conv 2/2 | KEYHINGE: prevention works (5 vs 0, p = 0.031), no KEY failures; SLOWGATE: the key split only moves (KEY 4 vs 4); SLOWGATE_KEYHINGE: not shown (5 vs 1, p = 0.109) |
+
+S84's seeds hardly tested the flat start: BASE kept enough splits for the real merge. The guard moved the splits to
+accuracy >= 0.5, and locked out one slow run (2306), which the held-out-evaluation arm bound. "Labelled ok" cannot detect
+flat-start splits. S85: the hinge's key term prevents the two-stream key split during updates 1-2400, and the runs then
+discover (20/20). A slow gate does not stop the split forming, and with the hinge it pushes the split past the hinge's
+window (seed 2317). Handed back for a pre-registered test: WIN3_SLOW + the key term vs WIN3_SLOW, under fail_class_v2.
+Reports: `explore_out/H/report_6.md`, `report_7.md`.
