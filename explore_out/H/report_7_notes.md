@@ -15,8 +15,10 @@
 - **SLOWGATE does not stop the split forming; it only delays it a little.** With the gate at 1e-4, REF's real splits on 2310
   and 2323 still formed: at 275 and 575 (REF: 125 and 125). A third formed on 2321 at 275, a seed REF discovered. The
   gate's learning rate is not what lets the split form early.
-- **The hinge stops the split during its window, and its runs stay clean.** In every KEYHINGE run eta^2 by key fell to
-  0.00-0.12 by update 25 and stayed below 0.07 to update 2400. The term fired on 1-37 batches per run.
+- **The hinge stops the split during its window, and its runs stay clean.** In every KEYHINGE run eta^2 by key was below
+  the term's threshold 0.2 at every measurement from update 25 to update 2400 (maximum 0.195 over the 20 runs).
+  (Corrected after report 7 was first pushed. It had said "0.00-0.12 by update 25 and below 0.07 to update 2400", which
+  holds on the three seeds I first looked at, not on all 20.) The term fired on 1-11 training batches per KEYHINGE run.
 - **After the window, a split can try to form.** It reached 0.21-0.64 at 3600 on some seeds (2317: 0.64; 2321 > 0.5). In
   KEYHINGE every such run recovered and discovered by 4800-8400: the stream routing had already formed.
 - **SLOWGATE + KEYHINGE fails exactly where the two collide.** On seed 2317 the slow gate held the gate back while the
