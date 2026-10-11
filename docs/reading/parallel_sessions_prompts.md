@@ -879,3 +879,38 @@ leave Phase 2's record untouched.
  each split's (update, c*, c0, map before). Append to replicate_report.md; Phase 2's record stays
  as it is.
 ```
+
+## Session E — batch 20 (the key-load lead's budget; seeds 270-279 continued; branch claude/outside-ideas)
+
+```
+Batch 20, from batch 19's S67. Its clearest lead, P = 16 at D = 128 against D = 32 (4/10 against 0/10,
+4 vs 0, p = 0.125), has a confound your own observations name: 12 of the 16 failures ended one-to-one
+and unbound (STREAM-PARTIAL one-to-one), the N = 256 oracle itself needed 24,000-27,600 with the routing
+given, and the screen could not tell slow from stuck. Batch 20 asks that one question, cheaply, so the
+main-line test can fix its budget beforehand.
+S68 continue (EXPLORATORY): resume every unbound S67 learned run from its 43,200 checkpoint and run it to
+ 86,400 under the same recipe and the same trigger schedule (checks every 2400 continue; a run's spent
+ splits stay spent; the evaluation every 1200; early stop as before). Arms as recorded: P16_N256 (6
+ one-to-one, 4 MERGED) and P16_D128 (6 one-to-one); P8_N256 272 (MERGED). Also the D128 P = 16 oracle on
+ seed 270 (unbound at 0.32), to 86,400. First reproduce one resumed run's next 1200 updates bit for bit
+ against a fresh run of the same seed through 44,400 (the checkpoint's exactness is the premise). Outcome
+ BOUND ROUTED with the transition; the per-stream accuracy at 43,200 and every 4800 after.
+Readings fixed now, on the one-to-one runs: "slow, not stuck" for a width if >= 4 of its 6 one-to-one
+ runs bind by 86,400; "stuck" if 0 of 6; "unresolved" otherwise. "The budget is the lead" if D128's
+ one-to-one runs bind >= 4 and N256's >= 4 (then the 4/10 against 0/10 was a budget effect); "the width
+ is the lead" if D128's bind >= 4 and N256's <= 1. Descriptive: the MERGED runs (no splits left) and the
+ oracle. Say which 86,400-update budget the main-line test should fix (the latest transition seen, plus
+ one check interval, rounded up to a multiple of 2400), or that 86,400 is not enough.
+Then write explore_out/spec_draft_keyload.md: a main-line specification in the form of
+ specs/test_split_copy.md for the key-load test the user and X may adopt: S = 4, k = 16, conv, P = 16 at
+ D = 128 against D = 32 (N = 256), the window recipe with the exact-copy split, the budget from S68, 20
+ seeds per machine (propose blocks; check every branch and the main line's seed list), the oracle at
+ both widths on the first two seeds as validity; claims pooled primary and per machine secondary: K1
+ D128 beats D32 on BOUND ROUTED (exact one-sided McNemar); a rate claim on D128; how a run that ends
+ one-to-one and unbound at the budget counts (pre-registered: it is unbound); readings named so each
+ outcome has exactly one name; CHECKs: the batch-19 reproduction, each arm against the recorded S67 run
+ of the same seed through 2400.
+Rules as always: readings committed before any resumed run; a batch-20 section in explore_out/README.md;
+ every output labelled EXPLORATORY, not a result; new files only; the segment and checkpoint discipline
+ of batch 19.
+```
