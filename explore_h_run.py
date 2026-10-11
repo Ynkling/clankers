@@ -10,7 +10,7 @@ failed CHECK stops the invocation before any screen run. Only Adam runs are used
 container's CPU is bit for bit; records from other CPUs are compared by counts only.
 
 Run:  python explore_h_run.py SCREEN [SCREEN ...] [--workers 4] [--report-only]
-      SCREEN: collapse (S58) | eight (S58b) | stability (S60) | copy2x2 (S61) | query (S62) | hardness (S63) | two (S78) | constants (S79) | guard (S84) | two_b (S85)
+      SCREEN: collapse (S58) | eight (S58b) | stability (S60) | copy2x2 (S61) | query (S62) | hardness (S63) | two (S78) | constants (S79) | guard (S84) | two_b (S85) | allmass (S86)
 """
 
 import argparse
@@ -30,7 +30,8 @@ import explore_main9c as mt
 MODS = {"collapse": "explore_h_collapse", "eight": "explore_h_eight", "stability": "explore_h_stability",
         "copy2x2": "explore_h_copy2x2", "query": "explore_h_query_gate", "hardness": "explore_h_hardness",
         "two": "explore_h_two", "constants": "explore_h_constants",
-        "guard": "explore_h_guard", "two_b": "explore_h_two_b"}
+        "guard": "explore_h_guard", "two_b": "explore_h_two_b",
+        "allmass": "explore_h_allmass"}
 OUT = os.path.join(ec.OUT_DIR, "H")
 CHECKS = os.path.join(OUT, "checks.json")
 
