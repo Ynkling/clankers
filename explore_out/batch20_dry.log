@@ -64,3 +64,125 @@ EXPLORATORY, NOT A RESULT — batch 20: continue (S68) — DRY RUN (shortened: 1
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 0cb9e72, code 78c8b0a643d9, attempt 1: acc 0.068  trans  None  stop 2400  outcome non-stream OTHER
   [  4]   13.1 min  dry_s67_continue C_ORC_P16_D128 seed 270  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git a99f86b, code 78c8b0a643d9, attempt 1: acc 0.130  trans  None  stop 2400  outcome not bound
+  [  5]   14.0 min  dry_s67_continue C_P16_D128     seed 271  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 1f2ef7a, code 78c8b0a643d9, attempt 1: acc 0.100  trans  None  stop 2400  outcome MERGED (2 share)
+  5 runs saved in this segment; batch wall clock 14.0 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_s67_continue
+  idea    are batch 19's unbound P = 16 runs slow or stuck? every unbound S67 learned run on to 86,400, same recipe
+  source  batch 19's S67 (P16_D128 4/10 vs P16_N256 0/10; 12 of 16 failures one-to-one and unbound); the user's batch 20
+  change  only the budget (43,200 -> 86,400); every run regenerated from update 0 and checked against its S67 record
+  arm RCHK_P8_N256 lr 0.001  iters 2400  seeds 272-272 (1)  — the reproduction's run computed through (no checkpoint after 0), P=8, N256, to 2400
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P8_N256    lr 0.001  iters 2400  seeds 272-272 (1)  — P=8, N256 (N=256, D=32): halts at 1200, a new process resumes it
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_ORC_P16_D128 lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm C_P16_N256   lr 0.001  iters 2400  seeds 270-270 (1)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P16_D128   lr 0.001  iters 2400  seeds 271-271 (1)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  pairing each run is its own S67 run (same arm, seed, recipe), continued
+----------------------------------------------------------------------------------------------------
+  REPRODUCTION OF A RESUMED RUN (C_P8_N256 272 resumed from its 43,200 checkpoint in a new process vs RCHK_P8_N256 272 computed through, at 2400): BIT-IDENTICAL (evaluation [[2400, 0.11572265625, 2.7502667903900146]], weights' SHA-1 ec7d770af2e8)
+  ARM RCHK_P8_N256 (the reproduction's run computed through (no checkpoint after 0), P=8, N256, to 2400), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | yes        | non-stream OTHER             None   2400  0.12       3+1 | 1200:0.07/0.06/0.06/0.05  2400:0.12/0.14/0.10/0.10
+
+  ARM C_P8_N256 (P=8, N256 (N=256, D=32): halts at 1200, a new process resumes it), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | yes        | non-stream OTHER             None   2400  0.12       3+1 | 1200:0.07/0.06/0.06/0.05  2400:0.12/0.14/0.10/0.10  [resumed at [1200]]  [halted once at 1200]
+
+  ARM C_ORC_P16_D128 (oracle, P=16, D128 (N=256, D=128)), seeds 270-270 (1); the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | not bound 0.32             | yes        | not bound                    None   2400  0.13   1+1+1+1 | 1200:0.11/0.10/0.12/0.11  2400:0.12/0.12/0.13/0.15
+
+  ARM C_P16_N256 (LOCAL3 + SLOW, P=16, N256 (N=256, D=32)), seeds 270-270 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | STREAM-PARTIAL one-to-one 0.15 | yes        | non-stream OTHER             None   2400  0.07       3+1 | 1200:0.07/0.07/0.07/0.08  2400:0.07/0.07/0.07/0.06
+
+  ARM C_P16_D128 (LOCAL3 + SLOW, P=16, D128 (N=256, D=128)), seeds 271-271 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     271 | STREAM-PARTIAL one-to-one 0.29 | yes        | MERGED (2 share)             None   2400  0.10       2+2 | 1200:0.06/0.07/0.06/0.08  2400:0.10/0.09/0.11/0.10
+
+Traceback (most recent call last):
+  File "/home/user/clankers/explore_batch20.py", line 301, in <module>
+    main()
+  File "/home/user/clankers/explore_batch20.py", line 297, in main
+    report_all("DRY RUN " if args.dry else "")
+  File "/home/user/clankers/explore_batch20.py", line 218, in report_all
+    r = s68.report()
+        ^^^^^^^^^^^^
+  File "/home/user/clankers/explore_continue.py", line 323, in report
+    bound_s = [s for s in ONE2ONE[w] if ev["valid"][(arm, s)] and br(ev["rows"][(arm, s)])]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/clankers/explore_continue.py", line 323, in <listcomp>
+    bound_s = [s for s in ONE2ONE[w] if ev["valid"][(arm, s)] and br(ev["rows"][(arm, s)])]
+                                        ~~~~~~~~~~~^^^^^^^^^^
+KeyError: ('C_P16_N256', 272)
+driver exit 1
+
+=== ADDENDUM (EXPLORATORY, not a result): the report above stopped with KeyError ('C_P16_N256', 272): the report looked up seeds the dry run does not run (one seed per arm). Fixed in explore_continue.report (parent only; the run code SHA 78c8b0a643d9 is unchanged). The report from the saved dry runs, regenerated with --report-only: ===
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 20: continue (S68) — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 1f2ef7a+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  code SHA (the child): 78c8b0a643d9 over 44 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b19_model explore_common explore_common2 explore_continue_child explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  this segment's CPU: Intel(R) Xeon(R) Processor @ 2.10GHz; the batch's CPU (the full CHECK pass): Intel(R) Xeon(R) Processor @ 2.10GHz; checkpoints in /tmp/b20_ckpt
+  REPORT ONLY: from the saved runs (no repro check, CHECKs or runs in this call)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_s67_continue
+  idea    are batch 19's unbound P = 16 runs slow or stuck? every unbound S67 learned run on to 86,400, same recipe
+  source  batch 19's S67 (P16_D128 4/10 vs P16_N256 0/10; 12 of 16 failures one-to-one and unbound); the user's batch 20
+  change  only the budget (43,200 -> 86,400); every run regenerated from update 0 and checked against its S67 record
+  arm RCHK_P8_N256 lr 0.001  iters 2400  seeds 272-272 (1)  — the reproduction's run computed through (no checkpoint after 0), P=8, N256, to 2400
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P8_N256    lr 0.001  iters 2400  seeds 272-272 (1)  — P=8, N256 (N=256, D=32): halts at 1200, a new process resumes it
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_ORC_P16_D128 lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm C_P16_N256   lr 0.001  iters 2400  seeds 270-270 (1)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P16_D128   lr 0.001  iters 2400  seeds 271-271 (1)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  pairing each run is its own S67 run (same arm, seed, recipe), continued
+----------------------------------------------------------------------------------------------------
+  REPRODUCTION OF A RESUMED RUN (C_P8_N256 272 resumed from its 43,200 checkpoint in a new process vs RCHK_P8_N256 272 computed through, at 2400): BIT-IDENTICAL (evaluation [[2400, 0.11572265625, 2.7502667903900146]], weights' SHA-1 ec7d770af2e8)
+  ARM RCHK_P8_N256 (the reproduction's run computed through (no checkpoint after 0), P=8, N256, to 2400), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | yes        | non-stream OTHER             None   2400  0.12       3+1 | 1200:0.07/0.06/0.06/0.05  2400:0.12/0.14/0.10/0.10
+
+  ARM C_P8_N256 (P=8, N256 (N=256, D=32): halts at 1200, a new process resumes it), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | yes        | non-stream OTHER             None   2400  0.12       3+1 | 1200:0.07/0.06/0.06/0.05  2400:0.12/0.14/0.10/0.10  [resumed at [1200]]  [halted once at 1200]
+
+  ARM C_ORC_P16_D128 (oracle, P=16, D128 (N=256, D=128)), seeds 270-270 (1); the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | not bound 0.32             | yes        | not bound                    None   2400  0.13   1+1+1+1 | 1200:0.11/0.10/0.12/0.11  2400:0.12/0.12/0.13/0.15
+
+  ARM C_P16_N256 (LOCAL3 + SLOW, P=16, N256 (N=256, D=32)), seeds 270-270 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | STREAM-PARTIAL one-to-one 0.15 | yes        | non-stream OTHER             None   2400  0.07       3+1 | 1200:0.07/0.07/0.07/0.08  2400:0.07/0.07/0.07/0.06
+
+  ARM C_P16_D128 (LOCAL3 + SLOW, P=16, D128 (N=256, D=128)), seeds 271-271 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     271 | STREAM-PARTIAL one-to-one 0.29 | yes        | MERGED (2 share)             None   2400  0.10       2+2 | 1200:0.06/0.07/0.06/0.08  2400:0.10/0.09/0.11/0.10
+
+  READING S68 N256 (its 6 one-to-one runs, seeds [270, 272, 273, 274, 275, 276] (6)): stuck (bind by 2400: 0/1 []; slow, not stuck: >= 4; stuck: 0; unresolved otherwise)
+  READING S68 D128 (its 6 one-to-one runs, seeds [271, 272, 273, 275, 276, 279] (6)): stuck (bind by 2400: 0/1 []; slow, not stuck: >= 4; stuck: 0; unresolved otherwise)
+  READING S68 joint: neither (D128 0/6, N256 0/6; the budget is the lead: both >= 4; the width is the lead: D128 >= 4 and N256 <= 1; neither otherwise)
+  BUDGET for the main-line test: 40800 (the latest transition 38400 of the BOUND ROUTED P = 16 learned runs in S67 and S68 [19200, 26400, 37200, 38400], + 2400, rounded up to a multiple of 2400); 86,400 IS NOT ENOUGH: still rising at 2400 (>= 0.02 since 1200): ['C_P16_D128|271']
+  DESCRIPTIVE (no reading): the MERGED P16_N256 runs 271 not run, 277 not run, 278 not run, 279 not run; P8_N256 272 non-stream OTHER; the D128 oracle on 270 not bound
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  S68 reproduction of a resumed run at 2400: BIT-IDENTICAL
+  S68 N256: stuck (0/6); D128: stuck (0/6); joint: neither
+  S68 budget for the main-line test: 40800; 86,400 IS NOT ENOUGH (['C_P16_D128|271'])
+####################################################################################################

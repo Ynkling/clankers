@@ -298,7 +298,7 @@ def report():
     st = ec.load_store(NAME)
     ev = evaluate_all(st)
     s67 = s67_store()
-    print("  REPRODUCTION OF A RESUMED RUN (C_P8_N256 272 resumed from its 43,200 checkpoint in a new process vs RCHK_P8_N256 272 "
+    print(f"  REPRODUCTION OF A RESUMED RUN (C_P8_N256 272 resumed from its {HALT_AT} checkpoint in a new process vs RCHK_P8_N256 272 "
           f"computed through, at {REPRO_AT}): "
           + ("not run yet" if ev["repro44"]["ok"] is None else ("BIT-IDENTICAL" if ev["repro44"]["ok"] else f"DIFFERS: {ev['repro44']['why']}"))
           + (f" (evaluation {ev['repro44'].get('acc')}, weights' SHA-1 {str(ev['repro44'].get('sha'))[:12]})" if ev["repro44"]["ok"] else ""))
@@ -320,20 +320,20 @@ def report():
                   + (f"  [halted once at {r['halted_once_at']}]" if r.get("halted_once_at") else ""))
         print()
     for w, arm in (("N256", "C_P16_N256"), ("D128", "C_P16_D128")):
-        bound_s = [s for s in ONE2ONE[w] if ev["valid"][(arm, s)] and br(ev["rows"][(arm, s)])]
+        bound_s = [s for s in ONE2ONE[w] if ev["valid"].get((arm, s)) and br(ev["rows"].get((arm, s)))]
         print(f"  READING S68 {w} (its 6 one-to-one runs, seeds {ec.fmt_seeds(ONE2ONE[w])}): {ev['width'][w]} (bind by {ITERS}: "
-              f"{ev['k'][w]}/6 {bound_s}; slow, not stuck: >= {SLOW_K}; stuck: {STUCK_K}; unresolved otherwise)")
+              f"{ev['k'][w]}/{len([x for x in ONE2ONE[w] if x in ARMS['C_P16_' + w]['seeds']])} {bound_s}; slow, not stuck: >= {SLOW_K}; stuck: {STUCK_K}; unresolved otherwise)")
     print(f"  READING S68 joint: {ev['joint']} (D128 {ev['k']['D128']}/6, N256 {ev['k']['N256']}/6; the budget is the lead: both >= "
           f"{SLOW_K}; the width is the lead: D128 >= {SLOW_K} and N256 <= {WIDTH_N256_MAX}; neither otherwise)")
     b = ev["budget"]
+    w6 = {w: len([x for x in ONE2ONE[w] if x in ARMS["C_P16_" + w]["seeds"]]) for w in ONE2ONE}
     print(f"  BUDGET for the main-line test: {b} (the latest transition {max(ev['transitions']) if ev['transitions'] else None} of the "
           f"BOUND ROUTED P = 16 learned runs in S67 and S68 {ev['transitions']}, + {STEP_B}, rounded up to a multiple of {STEP_B})"
           + (f"; 86,400 IS NOT ENOUGH: still rising at {ITERS} (>= {RISE} since {RISE_FROM}): {ev['rising']}" if ev["rising"] else
              f"; no one-to-one run still rising at {ITERS}"))
     print("  DESCRIPTIVE (no reading): the MERGED P16_N256 runs "
-          + ", ".join(f"{s} {ev['rows'][('C_P16_N256', s)].get('outcome') if ev['rows'][('C_P16_N256', s)] else 'not run'}"
-                      for s in MERGED_N256)
-          + "; P8_N256 272 " + str((ev["rows"][("C_P8_N256", 272)] or {}).get("outcome"))
-          + "; the D128 oracle on 270 " + str((ev["rows"][("C_ORC_P16_D128", 270)] or {}).get("outcome")))
+          + ", ".join(f"{s} {(ev['rows'].get(('C_P16_N256', s)) or {}).get('outcome', 'not run')}" for s in MERGED_N256)
+          + "; P8_N256 272 " + str((ev["rows"].get(("C_P8_N256", 272)) or {}).get("outcome"))
+          + "; the D128 oracle on 270 " + str((ev["rows"].get(("C_ORC_P16_D128", 270)) or {}).get("outcome")))
     print()
     return dict(width=ev["width"], joint=ev["joint"], k=ev["k"], budget=b, rising=ev["rising"], repro44=ev["repro44"])
