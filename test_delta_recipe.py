@@ -65,18 +65,22 @@ OUTCOME and VALIDITY
   D2 uses DELTA, D4 uses HEBB.
 
 CLAIMS (Amendment 1, after Referee V's review; seed pairs; pooled PRIMARY with b and c summed, per machine SECONDARY):
-- D1  d = HEBB_SPLIT only - DELTA_SPLIT only, pooled, labelled: d <= -3 "delta binds more often"; -2 <= d <= 2 "delta
-      not shown worse by more than 2 pairs"; d >= 3 "delta not shown non-inferior". Printed beside it: the paired
+- D1  d = HEBB_SPLIT only - DELTA_SPLIT only, pooled, labelled: d <= -3 "delta not shown worse; ahead by >= 3 pairs
+      (untested)" (Amendment 2); -2 <= d <= 2 "delta not shown worse by more than 2 pairs"; d >= 3 "delta not shown
+      non-inferior". Printed beside it: the paired
       difference of BOUND ROUTED rates with Newcombe's 95% interval, and the review's operating characteristics (a bound,
       not a non-inferiority test). Per machine: the rate difference and interval only.
 - D2  DELTA_SPLIT beats DELTA_SLOW; D4 HEBB_SPLIT beats HEBB_SLOW: exact one-sided McNemar, SHOWN if p < 0.05. If the
-      no-trigger arm binds routed on >= 36 of the pooled 40, that claim is NO ROOM (printed, not read).
+      no-trigger arm binds routed on >= 36 of the pooled 40, that claim is NO ROOM (printed, not read). Amendment 2: a
+      seed whose split arm's curve differs from its no-trigger arm's before the first firing (CHECK 174) is dropped from
+      that claim, with the count printed.
 - D3  (secondary, printed) on the seeds both split arms are BOUND ROUTED: the median transitions and an exact one-sided
       sign test of "DELTA earlier" (ties dropped).
 READINGS (pooled): the memory rule = D1's label. The split, per write: "helps" (SHOWN), "no room", or "not shown"; named
-combinations: helps/helps "the split helps on both writes"; delta not shown / Hebbian helps "the split is
-Hebbian-specific"; delta helps / Hebbian not shown "the split helps on delta"; not shown / not shown "the split's effect
-is not shown on either write". UNTESTED gives no reading.
+combinations: helps/helps "the split helps on both writes"; delta not shown / Hebbian helps "the split is shown on
+Hebbian, not on delta" (Amendment 2); delta helps / Hebbian not shown "the split helps on delta"; not shown / not shown
+"the split's effect is not shown on either write". If either write is "no room", both labels are printed and no
+combination is named. Each label is printed with its no-trigger count and McNemar's b and c. UNTESTED gives no reading.
 PRINTED, NOT CLAIMS: the largest pairwise overlap sum_c min(g_i[c], g_j[c]) of the streams' value-position gates (the
 referee's function, copied; CHECK 172) and "BOUND ROUTED with overlap <= 0.1" per arm; MERGED counts and failure
 classes (fail_class_v2.outcome_v2); every firing with its label; every check's probe accuracy beside the held-out
@@ -84,8 +88,8 @@ accuracy and the count of probe-blind checks; bands with Wilson 95% intervals fo
 unrounded values (lowest index); the label and the outcome use the same map function on the same probe.
 
 CHECKS (before any run of an arm): the inherited chain (test_split_copy's verification, with test_window_gate's and
-everything below), then 158-170, 172 and 173 as specs/test_delta_recipe.md and its Amendment 1 state them; 171 and 174
-in the report.
+everything below), then 158-170, 172 and 173 as specs/test_delta_recipe.md and its Amendments 1-2 state them; 171 and
+174 in the report. CHECKs 159 and 162 read their reference records from results/refs/ (Amendment 2 (h)).
 
 RUNTIME: projection with pool-load timing before the first run (longrun.projection). Nothing is cut. Perfect gates
 first, then longest first. Runs are cached in delta_recipe_results.json (gitignored, written atomically after each
@@ -166,9 +170,10 @@ ARMS_RUN = tuple(k for k in KEYS if not ARM[k]["ceil"])
 CEILS = (("HEBB", "CEIL_HEBB"), ("DELTA", "CEIL_DELTA"))
 PARTS = {"D1": ("HEBB", "DELTA"), "D2": ("DELTA",), "D3": ("HEBB", "DELTA"), "D4": ("HEBB",)}
 NO_ROOM = 36                               # a no-trigger arm at >= 36 of the pooled 40 makes its split claim NO ROOM
-D1_LABELS = ("delta binds more often", "delta not shown worse by more than 2 pairs", "delta not shown non-inferior")
+D1_LABELS = ("delta not shown worse; ahead by >= 3 pairs (untested)", "delta not shown worse by more than 2 pairs",
+             "delta not shown non-inferior")                                   # Amendment 2 (a)
 SPLIT_READINGS = {("helps", "helps"): "the split helps on both writes",
-                  ("not shown", "helps"): "the split is Hebbian-specific",
+                  ("not shown", "helps"): "the split is shown on Hebbian, not on delta",   # Amendment 2 (c)
                   ("helps", "not shown"): "the split helps on delta",
                   ("not shown", "not shown"): "the split's effect is not shown on either write"}
 D1_OC = ("at 40 pairs with HEBB_SPLIT at 0.95, P(d <= 2) is 0.29 (independent outcomes) / 0.22 (nested) when DELTA_SPLIT "
@@ -505,12 +510,22 @@ def git_show(sha, path):
     return subprocess.run(["git", "-C", HERE, "show", f"{sha}:{path}"], capture_output=True, text=True, check=True).stdout
 
 
+REFS = {H_KEY: "results/refs/H_copy2x2_COPY_NONOISE_487.json", F_KEY: "results/refs/F_eight_DELTA_SPLIT_1310.json"}
+
+
 def record_at(sha, path, prefix):
+    """Amendment 2 (h): the reference record from its vendored copy in results/refs/; where the source commit is in
+    this clone, whether the copy equals the commit's record (None if the commit is absent)."""
     import json
-    runs = json.loads(git_show(sha, path))["runs"]
-    ks = [k for k in runs if k == prefix or k.startswith(prefix + "|")]
-    assert len(ks) == 1, (path, prefix, ks)
-    return ks[0], runs[ks[0]]
+    ref = json.load(open(os.path.join(HERE, REFS[prefix])))
+    src = ref["source"]
+    assert src["commit"].startswith(sha) and src["path"] == path and src["key"].split("|")[0] + "|" + src["key"].split("|")[1] == prefix
+    try:
+        runs = json.loads(git_show(sha, path))["runs"]
+        same = runs.get(src["key"]) == ref["record"]
+    except subprocess.CalledProcessError:
+        same = None
+    return src["key"], ref["record"], same
 
 
 def d_seed(window, machine):
@@ -624,7 +639,7 @@ def verify(pool, files, machine, early, also, window, cached):
         print("     (the record's CPU differs from this machine's: printed, not asserted)")
     print()
 
-    k_h, rec_h = record_at(H_SHA, H_FILE, H_KEY)
+    k_h, rec_h, same_h = record_at(H_SHA, H_FILE, H_KEY)
     match = rec_h.get("cpu") == cpu_model()
     r = f["159"].result()["rec"]
     c, g_, s_, shared = tgw.same_through(r, rec_h, H_THROUGH)
@@ -632,10 +647,14 @@ def verify(pool, files, machine, early, also, window, cached):
                       H_ROW_KEYS)
     g = c and g_ and s_ and rows and r["ok"]
     print(f"CHECK 159 HEBB_SPLIT|{H_SEED} vs H's {k_h} ({H_FILE} at {H_SHA}, written on {rec_h.get('cpu')}) through {H_THROUGH} "
-          f"(asserted on a matching CPU; this machine {cpu_model()}):")
+          f"(asserted on a matching CPU; this machine {cpu_model()}); the record from {REFS[H_KEY]}, equal to the commit's "
+          f"{'(commit not in this clone)' if same_h is None else same_h}:")
     print(f"     curve {r['curve']} vs {[x for x in rec_h['curve'] if x[0] <= H_THROUGH]}; curve equal {c}; gradient norms equal "
           f"{g_}; statistics equal {s_} ({shared}); trigger rows equal {rows} (fired at "
           f"{[x['step'] for x in r['checks'] if x['fired']]})  -> {'IDENTICAL' if g else 'DIFFERS'}")
+    if same_h is False:
+        ok = False
+        print("     the vendored record differs from the commit's  -> WRONG")
     if match:
         ok &= g
     else:
@@ -663,15 +682,19 @@ def verify(pool, files, machine, early, also, window, cached):
     ok &= good
     print()
 
-    k_f, rec_f = record_at(F_SHA, F_FILE, F_KEY)
+    k_f, rec_f, same_f = record_at(F_SHA, F_FILE, F_KEY)
     match = rec_f.get("cpu") == cpu_model()
     r = f["162"].result()["rec"]
     c, g_, s_, shared = tgw.same_through(r, rec_f, F_THROUGH)
     g = c and g_ and s_ and r["ok"]
     print(f"CHECK 162 DELTA_SPLIT|{F_SEED} vs F's {k_f} ({F_FILE} at {F_SHA}, written on {rec_f.get('cpu')}) through {F_THROUGH} "
-          f"(asserted on a matching CPU; this machine {cpu_model()}):")
+          f"(asserted on a matching CPU; this machine {cpu_model()}); the record from {REFS[F_KEY]}, equal to the commit's "
+          f"{'(commit not in this clone)' if same_f is None else same_f}:")
     print(f"     curve {r['curve']} vs {[x for x in rec_f['curve'] if x[0] <= F_THROUGH]}; curve equal {c}; gradient norms "
           f"equal {g_}; statistics equal {s_} ({shared})  -> {'IDENTICAL' if g else 'DIFFERS'}")
+    if same_f is False:
+        ok = False
+        print("     the vendored record differs from the commit's  -> WRONG")
     if match:
         ok &= g
     else:
@@ -872,10 +895,14 @@ def tally(store, seeds):
     out = dict(rA=rA, valid=valid, seeds=seeds, bands={})
     out["D1"] = dict(paired_full(rA["DELTA_SPLIT"], rA["HEBB_SPLIT"], seeds["DELTA_SPLIT"], lambda r: success("DELTA_SPLIT", r),
                             lambda r: success("HEBB_SPLIT", r)), valid=sv(PARTS["D1"]))
-    out["D2"] = dict(paired(rA["DELTA_SPLIT"], rA["DELTA_SLOW"], seeds["DELTA_SPLIT"], lambda r: success("DELTA_SPLIT", r),
-                            lambda r: success("DELTA_SLOW", r)), valid=sv(PARTS["D2"]))
-    out["D4"] = dict(paired(rA["HEBB_SPLIT"], rA["HEBB_SLOW"], seeds["HEBB_SPLIT"], lambda r: success("HEBB_SPLIT", r),
-                            lambda r: success("HEBB_SLOW", r)), valid=sv(PARTS["D4"]))
+    drop2 = broken_pairs(rA, seeds, "DELTA_SPLIT", "DELTA_SLOW")          # Amendment 2 (d)
+    drop4 = broken_pairs(rA, seeds, "HEBB_SPLIT", "HEBB_SLOW")
+    out["D2"] = dict(paired(rA["DELTA_SPLIT"], rA["DELTA_SLOW"], [s for s in seeds["DELTA_SPLIT"] if s not in drop2],
+                            lambda r: success("DELTA_SPLIT", r), lambda r: success("DELTA_SLOW", r)),
+                     valid=sv(PARTS["D2"]), dropped=drop2)
+    out["D4"] = dict(paired(rA["HEBB_SPLIT"], rA["HEBB_SLOW"], [s for s in seeds["HEBB_SPLIT"] if s not in drop4],
+                            lambda r: success("HEBB_SPLIT", r), lambda r: success("HEBB_SLOW", r)),
+                     valid=sv(PARTS["D4"]), dropped=drop4)
     out["D3rows"] = d3_rows(rA, seeds["DELTA_SPLIT"])
     out["D3"] = dict(d3_of(out["D3rows"]), valid=sv(PARTS["D3"]))
     for k in ARMS_RUN:
@@ -936,6 +963,7 @@ def split_label(d, slow_count):
 
 
 def split_reading(ld, lh):
+    """Amendment 2 (e): if either write is "no room", both labels are printed and no combination is named."""
     if ld is None or lh is None:
         return None
     return SPLIT_READINGS.get((ld, lh)) or f"delta: {ld}; Hebbian: {lh}"
@@ -947,6 +975,8 @@ def pool2(ds):
                p=mcnemar_greater(b, c), valid=all(d["valid"] for d in ds))
     if all("a" in d for d in ds):
         out.update(a=sum(d["a"] for d in ds), dd=sum(d["dd"] for d in ds))
+    if all("dropped" in d for d in ds):
+        out["dropped"] = [s for d in ds for s in d["dropped"]]
     return out
 
 
@@ -959,7 +989,8 @@ def band_str(b):
 
 def diff_str(d):
     nc = newcombe_paired(d["a"], d["b"], d["c"], d["dd"])
-    return "--" if nc is None else f"{nc[0]:+.3f}, 95% [{nc[1]:+.3f}, {nc[2]:+.3f}] (Newcombe, paired)"
+    return "--" if nc is None else (f"{nc[0]:+.3f}, 95% [{nc[1]:+.3f}, {nc[2]:+.3f}] (the hybrid score interval with "
+                                    f"continuity-corrected phi; method 10 as Fagerland, Lydersen and Laake 2014 give it)")
 
 
 def print_claims(t, who, pooled):
@@ -976,8 +1007,10 @@ def print_claims(t, who, pooled):
     for name, slow in (("D2", "DELTA_SLOW"), ("D4", "HEBB_SLOW")):
         d = t[name]
         new = "DELTA_SPLIT" if name == "D2" else "HEBB_SPLIT"
+        drop = d.get("dropped") or []
         print(f"  {name}  {new} beats {slow} (BOUND ROUTED): {d['new']}/{d['n']} vs {d['old']}/{d['n']}; {new} only {d['b']}, "
-              f"{slow} only {d['c']}; p = {d['p']:.4g}" + nv(d))
+              f"{slow} only {d['c']}; p = {d['p']:.4g}" + nv(d)
+              + (f"   ({len(drop)} pairs dropped by CHECK 174: {' '.join('s' + str(x) for x in drop)})" if drop else ""))
         room = (f"; {slow} {d['old']}/{d['n']} >= {NO_ROOM}: NO ROOM (printed, not read)" if pooled and d["old"] >= NO_ROOM else "")
         print(f"     *** {name}{tag}: {split_verdict(d)}{room} ***")
     d = t["D3"]
@@ -986,40 +1019,55 @@ def print_claims(t, who, pooled):
           f"p = {d['p']:.4g} (DELTA earlier)" + nv(d))
 
 
+def broken_pairs(rA, seeds, sk, nk):
+    """CHECK 174 for one pair of arms: the seeds whose split arm's curve differs from its no-trigger arm's through the
+    split arm's first firing (the whole run if it never fired). Amendment 2 (d): these pairs are dropped."""
+    bad = []
+    for s in seeds[sk]:
+        a, b = rA[sk].get(s), rA[nk].get(s)
+        if not (ok_r(a) and ok_r(b)):
+            continue
+        fs = [c["step"] for c in a.get("checks", []) if c["fired"]]
+        if fs:
+            same = [x for x in a["curve"] if x[0] <= fs[0]] == [x for x in b["curve"] if x[0] <= fs[0]]
+        else:
+            same = a["curve"] == b["curve"]
+        if not same:
+            bad.append(s)
+    return bad
+
+
 def check_174(t):
-    """Each split arm's curve equals its no-trigger arm's on the same seed through the split arm's first firing."""
-    bad, n = [], 0
-    for sk, nk in (("DELTA_SPLIT", "DELTA_SLOW"), ("HEBB_SPLIT", "HEBB_SLOW")):
-        for s in t["seeds"][sk]:
-            a, b = t["rA"][sk].get(s), t["rA"][nk].get(s)
-            if not (ok_r(a) and ok_r(b)):
-                continue
-            n += 1
-            fs = [c["step"] for c in a.get("checks", []) if c["fired"]]
-            upto = fs[0] if fs else max(a["stopped_at"], b["stopped_at"])
-            ca = [x for x in a["curve"] if x[0] <= upto]
-            cb = [x for x in b["curve"] if x[0] <= upto]
-            if not fs:
-                ca, cb = a["curve"], b["curve"]
-            if ca != cb:
-                bad.append(f"{sk}|{s} (through {upto})")
+    n = sum(1 for sk, nk in (("DELTA_SPLIT", "DELTA_SLOW"), ("HEBB_SPLIT", "HEBB_SLOW")) for s in t["seeds"][sk]
+            if ok_r(t["rA"][sk].get(s)) and ok_r(t["rA"][nk].get(s)))
+    bad = [f"{sk}|{s}" for sk, nk in (("DELTA_SPLIT", "DELTA_SLOW"), ("HEBB_SPLIT", "HEBB_SLOW"))
+           for s in broken_pairs(t["rA"], t["seeds"], sk, nk)]
     return n, bad
 
 
 def probe_blind(t, k):
-    """Every trigger check: (seed, step, probe acc, held-out acc at that update); and the count of checks where the probe
-    read >= 0.95 while the held-out accuracy was < 0.95."""
-    rows, blind = [], 0
+    """Amendment 2 (f): the trigger checks at update >= 4800 (seed, step, probe acc, held-out acc at that update); the
+    count where the probe read >= 0.95 while the held-out accuracy was < 0.95; and the count blocked by the probe alone
+    (a previous reading, rise < 0.02, under the cap and the gap, probe >= 0.95, not fired)."""
+    rows, blind, alone = [], 0, 0
     for s, r in sorted(t["rA"][k].items()):
         if not ok_r(r):
             continue
         cur = {x[0]: x[1] for x in r["curve"]}
+        n, last = 0, None
         for c in r.get("checks", []):
-            h = cur.get(c["step"])
-            rows.append((s, c["step"], c["acc"], h))
-            if h is not None and c["acc"] >= tgw.ACC_THR and h < tgw.ACC_THR:
-                blind += 1
-    return rows, blind
+            if c["step"] >= tgw.FIRST:
+                h = cur.get(c["step"])
+                rows.append((s, c["step"], c["acc"], h))
+                if h is not None and c["acc"] >= tgw.ACC_THR and h < tgw.ACC_THR:
+                    blind += 1
+                room = n < tgw.MAX_SPLITS and (last is None or c["step"] - last >= tgw.GAP)
+                if (c["prev"] is not None and c["acc"] - c["prev"] < tgw.RISE and room and c["acc"] >= tgw.ACC_THR
+                        and not c["fired"]):
+                    alone += 1
+            if c["fired"]:
+                n, last = n + 1, c["step"]
+    return rows, blind, alone
 
 
 def print_bands(bands, label):
@@ -1110,7 +1158,7 @@ def report(store, seeds, machine, wall, path, also):
                   f"({len(missing)} runs missing or failed: {missing[:6]}{' ...' if len(missing) > 6 else ''}): NOT POOLED")
             other = None
     print("#" * 100)
-    print("PRE-REGISTERED CLAIMS (Amendment 1: D1 labelled by d with a paired interval; D2, D4 exact one-sided McNemar, SHOWN "
+    print("PRE-REGISTERED CLAIMS (Amendments 1-2: D1 labelled by d with a paired interval; D2, D4 exact one-sided McNemar, SHOWN "
           "if p < 0.05, NO ROOM if the no-trigger arm binds >= 36/40 pooled; D3 secondary, printed)")
     print("#" * 100)
     to = None
@@ -1133,9 +1181,11 @@ def report(store, seeds, machine, wall, path, also):
         ld = split_label(pc["D2"], pc["D2"]["old"])
         lh = split_label(pc["D4"], pc["D4"]["old"])
         sr = split_reading(ld, lh)
-        print("  READINGS (pooled; Amendment 1):")
+        print("  READINGS (pooled; Amendments 1-2):")
         print(f"     the memory rule: " + (f"\"{l1}\"" if l1 != "UNTESTED" else "UNTESTED, no reading"))
-        print(f"     the split: delta {ld or 'UNTESTED'}, Hebbian {lh or 'UNTESTED'}: " + (f"\"{sr}\"" if sr else "no reading"))
+        cnt = lambda d, slow: f"{slow} {d['old']}/{d['n']}, b {d['b']}, c {d['c']}"
+        print(f"     the split: delta {ld or 'UNTESTED'} ({cnt(pc['D2'], 'DELTA_SLOW')}), Hebbian {lh or 'UNTESTED'} "
+              f"({cnt(pc['D4'], 'HEBB_SLOW')}): " + (f"\"{sr}\"" if sr else "no reading"))
         print()
     else:
         print("POOLED (PRIMARY): not computed here — it needs --also with the other machine's complete file")
@@ -1174,9 +1224,9 @@ def report(store, seeds, machine, wall, path, also):
     print(f"  CHECK 174 each split arm's curve equals its no-trigger arm's on the same seed through the first firing: {n174} pairs, "
           f"{'PASS' if not bad else 'FAIL: ' + ', '.join(bad)}")
     for k in ("HEBB_SPLIT", "DELTA_SPLIT"):
-        rows_pb, blind = probe_blind(t, k)
-        print(f"  probe-blind checks, {k}: {blind} of {len(rows_pb)} checks read >= {tgw.ACC_THR} on the probe while the held-out "
-              f"accuracy was < {tgw.ACC_THR}")
+        rows_pb, blind, alone = probe_blind(t, k)
+        print(f"  probe-blind checks, {k} (checks at update >= {tgw.FIRST}): {blind} of {len(rows_pb)} read >= {tgw.ACC_THR} on the "
+              f"probe while the held-out accuracy was < {tgw.ACC_THR}; blocked by the probe alone {alone}")
         print("    (seed@update probe/held-out) " + " ".join(f"s{s_}@{st}:{pa:.2f}/{('%.2f' % h) if h is not None else '--'}"
                                                          for s_, st, pa, h in rows_pb))
     print()
