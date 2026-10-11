@@ -1,6 +1,6 @@
 # Third pass, the referee's own rows
 
-*Referee V, 11 October 2026.*
+*Referee V, 11 October 2026. (Corrected after the split_copy/Appendix B check: R's Phase 4 records, row tex2:510.)*
 
 **What was checked.** The third version, `a5f67a2` (claude/rev9-draft, 03:15:04 UTC), cited as `tex3:NNN`. The rows are the non-RESOLVED rows of `resolution_V.md`, and second_pass.md §1 items 1, 2, 3, 4 and 9 and §3's Session V items, where they are the referee's.
 
@@ -13,7 +13,7 @@
 | tex2:427: "a probe whose readings the records do not keep" | tex3:427: "Read what the trigger saw. The records keep every check's probe reading beside the evaluation's, and nobody read the two against each other ... A test should print them side by side, with the count of checks the probe blocked, as test_delta_recipe now does" | RESOLVED. `test_delta_recipe.py`'s `probe_blind` and its report line `:1176-1180` do this |
 | tex2:488: split_copy L "running" | tex3:488: "not run" | RESOLVED |
 | tex2:489: delta_recipe "not written" | tex3:489: "spec 05256c5, Amendment 1 32c121b / test a581027 / not run" | RESOLVED |
-| tex2:510: R "Phase 4 running" | tex3:510: "Phase 4 rule (464be8d), not started", with branch commit 464be8d | RESOLVED |
+| tex2:510: R "Phase 4 running" | tex3:510: "Phase 4 rule (464be8d), not started", with branch commit 464be8d | **NEW ERROR, and the referee's.** R's branch head is `0364e28` ("Phase 4 interim records", 00:02:24 UTC, 11 October). `records/phase4.jsonl` holds 21 records under the first rule: WIN3_SPLIT_D8_ML 9/10 bound routed (seeds 920–929), WIN3_SLOW_D8 4/9, ORACLE_ADAM 2/2. The second version's "Phase 4 running" was right. The referee's second pass called it a new error ("no records") from a stale memory of the branch: the commit was already in the local remote-tracking ref (reflog `origin/claude/replicate-R@{0}`). The same error is at tex3:41 ("has not started") and tex3:325 ("no Phase 4 record exists") |
 | tex2:511: the V row stops at 0e6c189 | tex3:511: adds "delta spec reviews (fad1489, 16b04f9); this revision's checks (e8fbb25, 16b04f9)" | **PARTLY.** The second pass's verdict, `rev9/second_pass.md`, is `66334b8`, and the test check is `6f2788d`. `16b04f9` holds only the Amendment 1 review and part of the second pass's own rows. Write "this revision's checks (e8fbb25, 66334b8); the test check (6f2788d)" |
 | tex2:344: "five ranges" | tex3:344: "three ranges stated for every run that held for the median run"; "five of the six copied the wrong channel" | RESOLVED |
 | tex2:344: "Every item is corrected" | tex3:344: "Every item is addressed in this version, which the referee's second pass checked again (... corrected in turn)" | PARTLY, pending this pass (third_pass.md) |

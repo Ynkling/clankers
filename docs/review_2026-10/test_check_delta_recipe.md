@@ -94,3 +94,14 @@ Yes. The test's `overlap` (`:198-204`) and `referee_overlap()` (`:453-462`, whic
 - **The test's printed output.** It has not run (no `results/X/delta_recipe_results.json`).
 - **Every CHECK except 172.** They were read, not run. Running them means building models and training, which this round's rules exclude.
 - **The fused against parallel tolerances of CHECK 173**, and CHECK 161's measured β = 0 differences. These need forward passes.
+
+## Addendum (11 October, third pass)
+
+**What the probe-blind printout counts.**
+- `probe_blind` (`test_delta_recipe.py:1009-1022`) iterates over every row of `checks`.
+- The trigger appends a row from update 2400 on, the reference reading, at which no split can fire (`test_window_gate.py:520-546`, `step < REF_AT` returns, `FIRST = 4800`).
+- So the printed "N of M checks" counts the 2400 reference rows in M. Its N counts probe readings ≥ 0.95 with the held-out accuracy below 0.95, which is not the same as "checks the probe blocked": a blocked check also needs the rise and gap conditions.
+
+The referee's own count made the same 393-for-353 slip (corrected in `replication_review.md` and `revision_9_check.md`).
+
+**Fix.** Restrict the count to rows with `step >= tgw.FIRST`. Print "probe ≥ 0.95 while held-out < 0.95" as what it is, and separately "blocked by the probe alone": eligible apart from the probe, and not fired.

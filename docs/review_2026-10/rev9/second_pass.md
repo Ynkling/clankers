@@ -83,6 +83,7 @@ The first pass's 22 disagreements are all RESOLVED, except B5. B5 is PARTLY: the
 - **tex2:488.** split_copy's L half is "running", but tex2:41, 53, 195 and 469 say it has not run. No L file exists on any branch.
 - **tex2:489.** delta_recipe is "not written", but `test_delta_recipe.py` was committed at `a581027`, 02:12:29, 31 minutes before this version.
 - **tex2:510.** R's "Phase 4 running", but tex2:41 says it has not started, and no record exists.
+  - **Correction, 11 October (third pass): this bullet was wrong.** R's branch held 21 Phase 4 interim records at `0364e28` (00:02 UTC, 11 October), so tex2:510's "running" was the true statement and tex2:41's "has not started" the false one. See `third_pass.md`.
 
 **5. tex2:246 (and 344): the six delta splits.** "at each [of the six] ... the split copied a channel that was not the merged one" / "they copied the wrong channel". True of five.
 - At S76 seed 1314, update 9600, the map was [6, 5, 4, 6, 10, 13, 2, 2]. The split copied channel 6, which held streams 0 and 3, a merged channel, onto channel 10, which held stream 4.
