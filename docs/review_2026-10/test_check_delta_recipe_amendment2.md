@@ -6,7 +6,7 @@
 - `55dac50`, 15:36:08 UTC: `specs/test_delta_recipe.md`, "Amendment 2 (during X's run; report rules only)".
 - `2225f00`, 15:37:52 UTC: `test_delta_recipe.py`, plus two vendored records in `results/refs/`.
 
-Both were committed while X's full run (started from `a581027`, 02:12 UTC) was in progress.
+Both were committed while X's full run was in progress. The run's code is `a581027` (committed 02:12 UTC); X's start time is not yet on any branch.
 
 **Two questions:**
 1. Is every change a report rule, with none touching a run's code?
@@ -60,5 +60,7 @@ The run path is byte-identical: `outcome2`, `success`, `overlap`, `copy_op`, `ex
 **Why it matters.** The amendment was written with 19 of 20 DELTA_SPLIT outcomes in view. Those feed D1 (against HEBB_SPLIT, unseen) and D2 (against DELTA_SLOW, of which only seed 580 had been seen).
 - Item (a) changes the label D1 would print if DELTA_SPLIT came out well ahead.
 - Item (d) changes which pairs D2 counts.
-- Both were fixed to the referee's first-named fix, which the referee wrote before any run (`16b04f9`, 10 October). They are not chosen among options, and the arms they compare against were unseen.
+- Both were fixed to the referee's first-named fix. Those fixes were committed on 11 October: `16b04f9` (02:59:08 UTC, `spec_review_test_delta_recipe_2.md` §2(a)–(e) and §3: items (a)–(e), (g)), `6f2788d` (03:01:36, `test_check_delta_recipe.md` §2 and §4: items (e), (h)) and `0d1fa60` (03:34:03, its addendum: item (f)), all before any of X's records was on a branch. They are not chosen among options, and the arms they compare against were unseen.
 - The risk is therefore limited to the amendment's account of what was seen being true. That account is what the log check will test.
+
+**Correction (11 October, before X's push).** The first version of this note (`ca88faf`) dated `16b04f9` to 10 October and called the fixes written "before any run". `16b04f9` is 11 October, 02:59:08 UTC, after `a581027` (02:12:29). Whether X's run had started by then is not on any branch. What holds is that the referee had seen no record of it, so the fixes were written blind to its outcomes.
