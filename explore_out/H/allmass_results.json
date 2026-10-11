@@ -1,0 +1,87 @@
+{
+ "meta": {
+  "arms": {
+   "ALLMASS": {
+    "iters": 43200,
+    "label": "ALLMASS",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger ALLMASS",
+    "seeds": [
+     2330,
+     2331,
+     2332,
+     2333,
+     2334,
+     2335,
+     2336,
+     2337,
+     2338,
+     2339
+    ]
+   },
+   "BASE": {
+    "iters": 43200,
+    "label": "BASE",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger BASE",
+    "seeds": [
+     2330,
+     2331,
+     2332,
+     2333,
+     2334,
+     2335,
+     2336,
+     2337,
+     2338,
+     2339
+    ]
+   },
+   "EVAL": {
+    "iters": 43200,
+    "label": "EVAL",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger EVAL",
+    "seeds": [
+     2330,
+     2331,
+     2332,
+     2333,
+     2334,
+     2335,
+     2336,
+     2337,
+     2338,
+     2339
+    ]
+   },
+   "ORACLE": {
+    "iters": 43200,
+    "label": "perfect gate ceil8_D8",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3",
+    "seeds": [
+     2330,
+     2331
+    ]
+   }
+  },
+  "code_shas": [
+   "898867f69ad40d487e57f5fda24fffff63282135"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "50da719",
+   "python": "3.13.16",
+   "started": "2026-10-11 02:56:36",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}

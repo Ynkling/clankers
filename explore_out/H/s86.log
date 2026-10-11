@@ -1,0 +1,20 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — session H: H/allmass
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 50da719 | python 3.13.16 | torch threads 1
+====================================================================================================
+  code SHA H/allmass: 898867f69ad4 over 49 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b18_gates explore_common explore_common2 explore_h_allmass_child explore_h_collapse_child explore_h_constants_child explore_h_eight_child explore_h_fail_class_v2 explore_h_guard_child explore_h_ops explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  CPU Intel(R) Xeon(R) Processor @ 2.10GHz; git 50da719; torch 2.14.0+cu130
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (45s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  (printed) the two selections recomputed at the main line's X WIN3_SPLIT_D8|540 checks 2400 and 4800 (a Xeon @ 2.80GHz; its first split at 4800: key 11->13, all 11->13) equal the record's: True
+  CHECK H/allmass: target key equals S84's make_trigger_guard (guard off, probe) row for row (fired at [4800, 9600, 14400]): ok
+  CHECK H/allmass: target all copies onto the all-position pair at every firing ([(4800, 15, 12, 2, 15), (9600, 12, 0, 2, 12), (14400, 0, 8, 2, 0)]: (update, all c*, all c0, key c*, key c0)): ok
+  CHECK H/allmass: ALLMASS|260 with the threshold at 0 equals batch 16's LOCAL3_SLOW_D8_A|260 (Intel(R) Xeon(R) Processor @ 2.80GHz) bit for bit through 6000 (curve [[1200, 0.060546875], [2400, 0.1005859375], [3600, 0.09716796875], [4800, 0.09423828125], [6000, 0.15966796875]]; statistics) and equals BASE|260 at threshold 0 (curve, statistics, trigger rows: True); fired 0: ok
+  CHECK H/allmass: the two selections recomputed at S84's BASE|2300 stored checks 2400 and 4800 (its first split at 4800) equal the record's (key_cs, key_c0, all_cs, all_c0, key_masses, all_masses, key_ok, all_ok): ok
+  all CHECKs of H/allmass passed (7.8 min)
+  32 runs queued on 4 workers (1 torch thread each)
+  start    0.0 min  H/allmass        BASE                     seed 2330  (projected worst case 720 min)
+  start    0.0 min  H/allmass        BASE                     seed 2331  (projected worst case 720 min)
+  start    0.0 min  H/allmass        BASE                     seed 2332  (projected worst case 720 min)
+  start    0.0 min  H/allmass        BASE                     seed 2333  (projected worst case 720 min)
