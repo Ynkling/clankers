@@ -160,3 +160,19 @@ EXPLORATORY, NOT A RESULT — session H: H/guard
   [ 46]  345.1 min  H/guard          EVAL_GUARD_INT1200       seed 2305  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger EVAL_GUARD_INT1200)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7509f4f, code 708d5adde607, attempt 1: acc 0.997  trans 15600  outcome BOUND ROUTED; map [6, 0, 15, 9, 2, 13, 1, 10]; None fired at [13200]
   start  345.1 min  H/guard          EVAL_GUARD_INT1200       seed 2309  (projected worst case 720 min)
+  [ 47]  369.0 min  H/guard          EVAL_GUARD_INT1200       seed 2308  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger EVAL_GUARD_INT1200)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 542b4d3, code 708d5adde607, attempt 1: acc 1.000  trans 24000  outcome BOUND ROUTED; map [8, 14, 3, 6, 0, 13, 7, 9]; None fired at [18000, 20400, 22800]
+  start  369.0 min  H/guard          ORACLE                   seed 2300  (projected worst case 720 min)
+  [ 48]  369.3 min  H/guard          EVAL_GUARD_INT1200       seed 2309  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger EVAL_GUARD_INT1200)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 542b4d3+dirty, code 708d5adde607, attempt 1: acc 1.000  trans 16800  outcome BOUND ROUTED; map [5, 1, 13, 9, 15, 8, 14, 12]; None fired at [9600, 12000, 15600]
+  start  369.3 min  H/guard          ORACLE                   seed 2301  (projected worst case 720 min)
+  [ 49]  371.5 min  H/guard          EVAL_GUARD_INT1200       seed 2307  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger EVAL_GUARD_INT1200)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 542b4d3+dirty, code 708d5adde607, attempt 1: acc 1.000  trans 25200  outcome BOUND ROUTED; map [14, 13, 3, 15, 4, 6, 9, 5]; None fired at [13200, 15600, 20400]
+  [ 50]  375.8 min  H/guard          ORACLE                   seed 2300  lr 0.001  (one Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 542b4d3+dirty, code 708d5adde607, attempt 1: acc 0.978  trans  3600  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
+  [ 51]  376.0 min  H/guard          ORACLE                   seed 2301  lr 0.001  (one Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 542b4d3+dirty, code 708d5adde607, attempt 1: acc 0.988  trans  3600  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
+  [ 52]  377.2 min  H/guard          EVAL_GUARD_INT1200       seed 2306  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger EVAL_GUARD_INT1200)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 542b4d3+dirty, code 708d5adde607, attempt 1: acc 0.381  trans  None  outcome MERGED (3 share); map [2, 2, 1, 1, 8, 8, 8, 2]
+  wall clock 377.2 min
+  H/guard: readings {'guard aims': 'the guard aims the split (labelled ok 17/17; BASE only 0, GUARD only 0)', 'faster': 'does not apply (BASE only 0, GUARD_INT1200 only 0; median transition 15600 vs BASE 16800)', 'eval': 'the evaluation is the better probe (BASE only 0, EVAL only 1)', 'cost GUARD': 'no cost by the rule (BASE only 0, GUARD only 0)', 'cost GUARD_INT1200': 'no cost by the rule (BASE only 0, GUARD_INT1200 only 0)', 'cost EVAL': 'no cost by the rule (BASE only 0, EVAL only 1)', 'cost EVAL_GUARD_INT1200': 'no cost by the rule (BASE only 0, EVAL_GUARD_INT1200 only 0)'}; complete True; valid True
