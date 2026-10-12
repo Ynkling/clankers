@@ -2,3 +2,10 @@
 EXPLORATORY, NOT A RESULT — Session G S87
   cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 3c89f87 | python 3.13.16 | torch threads 1
 ====================================================================================================
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (45s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  S87 phase 0 (S82 records through 2400 under the current code): {'BASELINE': True, 'REG3_KEYHINGE': True}
+/home/user/clankers/explore_g_rhl_child.py:523: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  f"update counter {ml.n_upd}", float(u.abs().max()) < 1 and float(ml.b_R) == 0.0 and ml.gated == (1, 2, 3)
