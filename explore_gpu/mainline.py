@@ -28,7 +28,11 @@ machine "GPU:<model>" so that no test's --also pooling can take these records fo
 CUDA run is a new run of that arm and seed (CUDA does not reproduce CPU records bit for bit: explore_gpu/checks.py, K0);
 compare outcomes, not curves.
 WORKERS: --workers N runs N processes (spawn), each with its own CUDA context, sharing the GPU (the main-line models at
-L <= 99 are small: several runs per GPU keep it busy).
+L <= 99 are small: several runs per GPU keep it busy). Every process, on every device, runs ONE thread: torch's
+intra-op pool and OpenMP / MKL / OpenBLAS (OMP_NUM_THREADS etc. set before any worker starts; torch.set_num_threads(1)
+in each worker's initializer and again in run_arm). torch's default on CUDA is the core count (10 on the RTX 3070
+laptop), which thrashed two workers there. The record's device meta carries the thread count (device_info "threads").
+CODE SHA: over the test's modules and this package's device.py and mainline.py (the code that ran the job).
 """
 
 import argparse
@@ -43,6 +47,17 @@ import traceback
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if HERE not in sys.path:
     sys.path.insert(0, HERE)
+
+THREAD_ENV = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS")
+
+
+def one_thread():
+    """One thread per process on every device (see WORKERS above): the BLAS pools through the environment (read when
+    numpy / torch load in a spawned worker, which inherits it), torch's intra-op pool directly."""
+    for k in THREAD_ENV:
+        os.environ[k] = "1"
+    import torch
+    torch.set_num_threads(1)
 
 OUT = os.path.join(HERE, "explore_out", "I", "gpu", "mainline")
 
@@ -97,10 +112,8 @@ def make_spec(mod, arm, seed, iters):
 
 def run_arm(test, arm, seed, device, iters=None):
     """One run of a main-line test's arm on `device`, through the test's own run_job. Returns the record."""
-    import torch
+    one_thread()                                           # every device (on CUDA torch's default is the core count)
     from explore_gpu import device as dv
-    if torch.device(device).type == "cpu":
-        torch.set_num_threads(1)
     mod = importlib.import_module(test)
     assert hasattr(mod, "run_job") and hasattr(mod, "spec"), (
         f"{test} has no run_job / spec: supported are the tests with both (this module's docstring lists them)")
@@ -148,6 +161,7 @@ def main():
         for k in getattr(mod, "ARM", {}):
             print(k, (seeds.get(k) if isinstance(seeds, dict) else ""))
         return
+    one_thread()                                           # this process, and (through the environment) every worker
     from explore_gpu import device as dv
     dev = dv.setup(a.device)
     path = a.results or store_path(a.test, dev)
@@ -158,7 +172,7 @@ def main():
     st["meta"].update(test=a.test, machine=f"GPU:{info.get('gpu') or info['cpu']}", device=info,
                       note="explore_gpu.mainline: the test's own run_job on this device; not machine X's or L's records")
     from explore_gpu import run as gr
-    sha = gr.code_sha(a.test)[0]
+    sha = gr.code_sha(f"{a.test}, explore_gpu.device, explore_gpu.mainline")[0]
     mod = importlib.import_module(a.test)
     seeds = []
     for s in parse_seeds(a.seeds):
@@ -181,7 +195,7 @@ def main():
         results = map(_job, jobs)
     else:
         import multiprocessing as mp
-        pool = mp.get_context("spawn").Pool(a.workers)
+        pool = mp.get_context("spawn").Pool(a.workers, initializer=one_thread)
         results = pool.imap_unordered(_job, jobs)
     for rec in results:
         rec["code_sha"] = sha
