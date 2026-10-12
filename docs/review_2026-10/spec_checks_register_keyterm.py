@@ -286,6 +286,10 @@ nud = runs(S72, "REG3_NUDGE")
 nn = (sum(g_rb(r) for r in nud.values()), len(nud))
 say(f"  REG3_NUDGE ROUTED-BOUND: S72 {nn[0]}/{nn[1]} (seeds {min(nud)}-{max(nud)}), S82 "
     f"{sum(g_rb(r) for r in A[('REG3_NUDGE', 'S82')].values())}/2, S83 {sum(g_rb(r) for r in A[('REG3_NUDGE', 'S83')].values())}/2")
+say(f"  S72 (700-719) ROUTED-BOUND: BASELINE {sum(g_rb(r) for r in runs(S72, 'BASELINE').values())}/20, REG3 "
+    f"{sum(g_rb(r) for r in runs(S72, 'REG3').values())}/20; S71 (700-709) BOUND: " + ", ".join(
+    f"{a} {sum(g_bound(r) for r in runs(load(G6, 'explore_out/G/s71_layers_results.json'), a).values())}/10"
+    for a in ("ORACLE_ALL", "ORACLE_23", "ORACLE_1")))
 src = git("show", f"{G6}:explore_g_devices.py").decode().splitlines()
 say(f"  S82's validity rule as coded (explore_g_devices.py:{[i + 1 for i, l in enumerate(src) if 'VALID' in l and 'no >=' in l]}): "
     f"{[l.strip() for l in src if 'VALID' in l and 'no >=' in l]}")
@@ -352,8 +356,13 @@ for lbl, s, f in (("G: S82 REG3_KEYHINGE 20/20", 20, 0), ("G: S82 20/20 + S83 KH
     for pr, (a0, b0) in (("uniform", (1, 1)), ("Jeffreys", (0.5, 0.5))):
         a, b = a0 + s, b0 + f
         one = betabin_ge(20, 18, a, b)
-        say(f"  predictive, {lbl}, {pr} prior: P(>= 18/20 on a machine) {one:.3f}; on both, if the machines share one "
-            f"rate drawn once (lower) ~ {betabin_ge(20, 18, a, b) ** 2:.3f} (independent draws)")
+        # E[P(>= 18 | p)^2] over p ~ Beta(a, b), with p = 1 - u^2 (removes the b < 1 singularity at p = 1)
+        lbeta = math.lgamma(a) + math.lgamma(b) - math.lgamma(a + b)
+        us = [(i + 0.5) / 20000 for i in range(20000)]
+        w = [2 * math.exp((a - 1) * math.log(1 - u * u) + (2 * b - 1) * math.log(u) - lbeta) / 20000 for u in us]
+        shared = sum(wi * p_ge(20, 18, 1 - u * u) ** 2 for wi, u in zip(w, us)) / sum(w)
+        say(f"  predictive, {lbl}, {pr} prior: P(>= 18/20 on a machine) {one:.3f}; on both: {one * one:.3f} if each "
+            f"machine has its own rate, {shared:.3f} if they share one")
 
 # ══ 5. power ═════════════════════════════════════════════════════════════════
 say("\n== 5. McNemar power (exact one-sided, SHOWN at p < 0.05; pooled 40 pairs, per machine 20)")
@@ -384,6 +393,12 @@ for lbl, f in (("indep 0.95 vs 0.8625", lambda n: power(n, 0.95, 0.8625, False))
                ("indep 0.95 vs 0.80", lambda n: power(n, 0.95, 0.80, False))):
     need = next((n for n in range(20, 201, 2) if f(n) >= 0.8), None)
     say(f"    pooled pairs for 80% power, {lbl}: {need}")
+say("  H: K1 at 80 pooled pairs (40 seeds per machine), indep / nested: " + "; ".join(
+    f"{p1} vs {p2}: {power(80, p1, p2, False):.3f}/{power(80, p1, p2, True):.3f}"
+    for p2 in (0.8125, 0.8625) for p1 in (0.933, 0.95)))
+say("  H: with 40 seeds per machine, the RELIABLE band per machine (>= 36/40): P(on both machines) " + ", ".join(
+    f"{p}: {p_ge(40, 36, p) ** 2:.3f}" for p in (0.90, 0.933, 0.95, 0.975)) + "; the 18/20 rule for comparison: "
+    + ", ".join(f"{p}: {p_ge(20, 18, p) ** 2:.3f}" for p in (0.90, 0.933, 0.95, 0.975)))
 say("  H's no-room region: K1 cannot be SHOWN when WIN3_SLOW binds >= 36/40 pooled (b <= 4, p >= 0.0625). P(WIN3_SLOW >= "
     "36/40): " + ", ".join(f"{p}: {p_ge(40, 36, p):.3f}" for p in (0.80, 0.8125, 0.8625, 0.90)))
 

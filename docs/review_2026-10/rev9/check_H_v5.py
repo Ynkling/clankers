@@ -2450,7 +2450,7 @@ rate_ml5 = 1 - MLT5["all"] / MLT5["fired"]
 p_le1_5 = sum(math.comb(L86["ALLMASS"]["ops"], i) * rate_ml5 ** i * (1 - rate_ml5) ** (L86["ALLMASS"]["ops"] - i) for i in (0, 1))
 scl_cited = bool(where5("ffb0771"))
 
-# ── F's S81 (report 7, d5851b1): the evaluation as the trigger's probe, for the three-screen count of tex5:207
+# ── F's S81 (report 7, d5851b1): the evaluation as the trigger's probe, for the three-screen count of tex5:205
 F81 = "d5851b1"
 ST81 = load(F81, "explore_out/F/trigger_results.json")
 S81 = {a: runs(ST81, a) for a in ("BASE", "EVAL")}
@@ -2512,7 +2512,7 @@ NEW5 += [
     ("every session's queue is empty", "the rounds: 'every session's queue is empty' (H's half)", "H's queue empty",
      f"H's last commit before the draft ({DRAFT5_TIME}): {h_pre5[0]} (report 8); after it: "
      f"{'; '.join(h_after5) or 'none'}; files changed since {R8}: {h_files_after}; stores touched: {h_stores_touched or 'none'}; "
-     f"'No runs.' in the new script's docstring: {'No runs.' in onetoone_doc}",
+     f"'No runs.' in the new script's docstring: {'No runs.' in ' '.join(onetoone_doc)}",
      "NOT RECORD-CHECKABLE",
      "a queue is not a record. At the draft's commit H had committed nothing for 35 h. 3 h 26 min after it H committed "
      "5b5deec, 'Session H round 5 (2)': a recount over the main line's records with no runs; its '(2)' implies a part (1) "
@@ -2534,7 +2534,7 @@ NEW5 += [
      + f"; total with L's split_copy {MLT5}; L's file committed at {SCL} ({SCL_TIME}), before the draft, and cited by it "
      f"({scl_cited})",
      "PARTIAL" if MLT5["runs"] > MLT["runs"] else "MATCH",
-     f"the count is right for the three files it names, but this version folds in test_split_copy's L half ({SCL}, tex5:195-205), "
+     f"the count is right for the three files it names, but this version folds in test_split_copy's L half ({SCL}, tex5:193-201), "
      f"so the recorded split runs at eight streams are now {MLT5['runs']}: {MLT5['fired']} firings, the all-position pair a "
      f"labelled target at {MLT5['all']} ({ML5['split_copy L']['all']} of {ML5['split_copy L']['fired']} on L), the key pair at "
      f"{MLT5['key']}, the pairs the same at {MLT5['same']}; mistargets {MLT5['fired'] - MLT5['all']} in {MLT5['fired']} "
@@ -2542,6 +2542,14 @@ NEW5 += [
      f"test_split_copy's L half' or the 60-run count. H's own recount after the draft (5b5deec, onetoone_counts.txt) gets the "
      f"same 60 / 126 / 126 / 115"),
 ]
+
+NEW5.append(("S86 all-position targeting (report 8, \\texttt{9b72bf6}) & \\texttt{9b72bf6} &",
+             "provenance: H's branch commit at the fifth draft (new check; line unchanged)", "9b72bf6",
+             f"H's last commit at or before the draft ({DRAFT5_TIME}): {h_pre5[0]}; after the draft: "
+             f"{'; '.join(x.split(' ', 2)[0] + ' ' + x.split(' ', 2)[1] for x in h_after5) or 'none'} (no store touched: {not h_stores_touched})",
+             ms(h_pre5[0].split()[0] == R8 and not h_stores_touched),
+             "the pin was the head when the draft was committed; the branch moved 3 h 26 min later (5b5deec, a count file and its "
+             "script, no store), which the draft could not cite"))
 
 # apply
 ROWS5 = []
@@ -2576,7 +2584,7 @@ READ5 = [(t[0], t[1], t45(t[2]), t[3], t45(t[4])) for t in READ4]
 DESC5 = [(t45(loc), sc, stmt, mk, note) for loc, sc, stmt, mk, note in DESC4]
 DESC5 = [(loc, sc, stmt, mk, note + ("; v5: the comma splice at 'would have gone differently, S86 then found'"
                                       if "small cost in aim" in stmt else "")) for loc, sc, stmt, mk, note in DESC5]
-DESC5.append(("tex5:207", "S84/S86/S81", "Over the three screens of the evaluation as the trigger's probe ... it has not cost a run",
+DESC5.append(("tex5:205", "S84/S86/S81", "Over the three screens of the evaluation as the trigger's probe ... it has not cost a run",
               "'descriptive' (yes)", "29/30 against 27/30, 2 vs 0, recomputed"))
 
 S86_SENT5 = [where5(x)[0] for x in ("Session~H then screened what the trigger reads", "a trigger reading all positions keeps binding",
@@ -2624,7 +2632,7 @@ def main5():
          f"all-position 97 ({'REPRODUCES S86' in onetoone and 'True' in onetoone}) and adds L's split_copy (60 runs, 126 "
          f"firings, all-position 115), as recomputed here from {SCL}: {MLT5}.",
          f"- F's S81 (d5851b1, report 7): EVAL {THREE['S81'][0]}/10, BASE {THREE['S81'][1]}/10, {e81_only} vs {b81_only} "
-         "(used only for tex5:207's three-screen sum).", "",
+         "(used only for tex5:205's three-screen sum).", "",
          "## Rows (DISAGREE, PARTIAL, NOT RECORD-CHECKABLE, MATCH)", "",
          "| tex5 line | tex4 line | first draft | item | draft says (fifth draft) | recomputed | status | fourth pass | note |",
          "|---|---|---|---|---|---|---|---|---|"]
@@ -2652,8 +2660,8 @@ def main5():
           "- Literature attributions in tex5:209 and S24's 'near-tie' (tex5:228) are not H records.",
           "- That seeds 2300-2339 are fresh: taken from the docstrings' scans (explore_h_guard.py l.9-12; explore_h_allmass.py "
           "l.5-6); not rescanned.",
-          "- Session F's S81 (except the two arms summed at tex5:207), session G's S82/S83, session R's probe counts at tex5:209 "
-          "('13 of 282', 'on R's inference') and the main line's test_split_copy L rows (tex5:193-205) are not H records.",
+          "- Session F's S81 (except the two arms summed at tex5:205), session G's S82/S83, session R's probe counts at tex5:207 "
+          "('13 of 282', 'on R's inference') and the main line's test_split_copy L rows (tex5:193-201) are not H records.",
           "- 'Every session's queue is empty' (tex5:41): no record holds a queue; H committed new work after the draft.",
           "- Whether H's S85 and S86 runs, many on dirty trees (s86.log: '+dirty' while the progress commits were made), used "
           "exactly the committed code: the run code SHA (898867f69ad4 for all 32 S86 runs) is the only evidence.",

@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
-"""check_F_v4.py — fourth pass. The referee's check of what Revision 9's draft says about Session F, run against the
-FOURTH version of the draft (c66cc76, multichannel_hebbian_report_v9.tex, 564 lines), with the first (9bfa85a), second
-(f67bc07) and third (a5f67a2) versions kept for locating the earlier passes' rows.
+"""check_F_v5.py — fifth pass. The referee's check of what Revision 9's draft says about Session F, run against the
+FIFTH version of the draft (c5e4508, multichannel_hebbian_report_v9.tex, 568 lines), with the first (9bfa85a), second
+(f67bc07), third (a5f67a2) and fourth (c66cc76) versions kept for locating the earlier passes' rows.
 
-A copy of check_F_v3.py with every record recomputation and every v3 row kept unchanged (they are still asserted at
-their tex, tex2 and tex3 lines). What is new in v4:
-  * every row live in v3 (first-pass and N rows that stood in the third draft, and the M rows) is searched for in the
-    fourth draft by text: found -> it stands at that tex4 line; not found -> REMOVED in v4, superseded by a P row;
-  * rows whose fragment survives but whose verdict must be re-read with a record that appeared after the third pass
-    (the main line's Amendment 2 of test_delta_recipe, 55dac50, which dates X's run start) or at the fourth draft's
-    time (S81) are SUPERSEDED in v4 by the P row that re-checks them;
-  * P rows: every changed sentence of the fourth draft about Session F, the delta write and its main-line test, and the
-    memory horizon, each with a fragment asserted at its tex4 line.
+A copy of check_F_v4.py with every record recomputation and every v4 row kept unchanged (they are still asserted at
+their tex, tex2, tex3 and tex4 lines). What is new in v5:
+  * every row live in v4 is searched for in the fifth draft by text: found -> it stands at that tex5 line; not found ->
+    REMOVED in v5, superseded by a Q row; P8 (the count test_delta_recipe prints) is SUPERSEDED by Q21, re-checked against
+    the test's code at the main line as of the fifth draft (8ae660d);
+  * report 7 (S81, d5851b1, after the fourth pass): every count, discordant pair, p-value, interval, firing and reading
+    recomputed from explore_out/F/trigger_results.json (R7 rows), and the readings' commit against the first S81 record;
+  * Q rows: every changed sentence of the fifth draft about Session F (S81, folded in by 3b06af2), test_delta_recipe's
+    status, and the memory horizon, each with a fragment asserted at its tex5 line;
+  * section 7 records the corrections to the referee's earlier files (X's runs began at 05:27, after the check).
 
 Inputs: JSON run records read with `git show <ref>:<path>` (rlib.load); the screens' docstrings; git history. The
 draft's numbers are typed in as DRAFT strings and never used as inputs.
 
-Writes docs/review_2026-10/rev9/check_F_v4.md. Read-only otherwise. Python stdlib + rlib.
+Writes docs/review_2026-10/rev9/check_F_v5.md. Read-only otherwise. Python stdlib + rlib.
 """
 import datetime
 import json
@@ -1483,14 +1484,503 @@ for k in list(SUP4) + list(RESUP4):
     assert any(r.get("id") == k for r in LIVE3), ("SUP4/RESUP4 key matches no live row", k)
 
 
+
+# ══ fifth pass: S81 (report 7), every live fourth-pass row in the fifth draft, Q rows for c5e4508's changes ══════════
+CUT5_ISO = git("show", "-s", "--format=%cI", FIFTH_REF).strip()
+CUT5 = ctime(FIFTH_REF)
+REMOTES = [x.strip() for x in git("branch", "-r").split("\n") if x.strip() and "->" not in x]
+TIP5 = {b_: git("rev-list", "-1", f"--before={CUT5_ISO}", b_).strip()[:7] for b_ in REMOTES}
+TIP5 = {b_: t_ for b_, t_ in TIP5.items() if t_}
+R7 = "d5851b1"                                              # report 7 (S81), the commit F's provenance row names
+F5 = TIP5[BR]
+assert F5 == R7, ("F's last commit before the fifth draft is not report 7", F5)
+assert HEAD == R7, ("F's head moved after report 7; pin the records", HEAD)
+TG = load(R7, f"{F}trigger_results.json")
+T = {a: runs(TG, a) for a in ("BASE", "GUARD", "EVAL", "GUARD_EVAL", "O_DELTA_C")}
+LA = ("BASE", "GUARD", "EVAL", "GUARD_EVAL")
+nrec_T = sum(1 for r in TG["runs"].values() if not r.get("dry"))
+okT = sum(1 for r in TG["runs"].values() if r.get("ok"))
+
+
+def brt(r):
+    return bool(r.get("ok")) and outcome_k(r) == "BOUND ROUTED"
+
+
+nT = {a: cnt(brt, T[a]) for a in LA}
+agreeT = all(brt(r) == (r["outcome"] == "BOUND ROUTED") for a in LA for r in T[a].values())
+orT = {s: transition(r["curve"]) for s, r in sorted(T["O_DELTA_C"].items())}
+validT = len(orT) == 2 and all(v is not None for v in orT.values())
+pT = {a: pairs(T[a], T["BASE"], brt) for a in ("GUARD", "EVAL", "GUARD_EVAL")}       # (arm only b, BASE only c, n)
+dsT = {a: sorted(s for s in T["BASE"] if brt(T[a][s]) != brt(T["BASE"][s])) for a in pT}
+GU = {"BASE": None, "GUARD": 0.5, "EVAL": None, "GUARD_EVAL": 0.5}
+
+
+def targ(c):
+    m = c["map_before"]
+    return m.count(c["key_cs"]) >= 2 and m.count(c["key_c0"]) == 0
+
+
+def elig(r_, p_, step, g):
+    return step >= 4800 and p_ is not None and r_ < 0.95 and r_ - p_ < 0.02 and (g is None or r_ >= g)
+
+
+def ep(c, a):
+    return elig(c["acc_probe"], c["prev_probe"], c["step"], GU[a])
+
+
+def ee(c, a):
+    return elig(c["acc_eval"], c["prev_eval"], c["step"], GU[a])
+
+
+FT = {a: [(s, c) for s, r in sorted(T[a].items()) for c in r["checks"] if c["fired"]] for a in LA}
+labT = {a: sum(targ(c) for _, c in FT[a]) for a in LA}
+labTr = {a: sum(bool(c["key_ok"]) for _, c in FT[a]) for a in LA}
+runsF = {a: len({s for s, _ in FT[a]}) for a in LA}
+srcT = {a: sorted({r.get("source") for r in T[a].values()}) for a in LA}
+read_ok = all(c["acc"] == (c["acc_probe"] if srcT[a] == ["probe"] else c["acc_eval"]) for a in LA for r in T[a].values() for c in r["checks"])
+elig_mism = sum((ep(c, a) != c["elig_probe"]) + (ee(c, a) != c["elig_eval"]) + ((ep(c, a) != ee(c, a)) != c["disagree"])
+                for a in LA for r in T[a].values() for c in r["checks"])
+disF = {a: sum(1 for _, c in FT[a] if ep(c, a) != ee(c, a)) for a in LA}
+disC = {a: sum(1 for r in T[a].values() for c in r["checks"] if ep(c, a) != ee(c, a)) for a in LA}
+disC_flat = {a: sum(1 for r in T[a].values() for c in r["checks"] if ep(c, a) != ee(c, a) and c["acc"] < 0.5) for a in LA}
+nchk = {a: sum(len(r["checks"]) for r in T[a].values()) for a in LA}
+held = {a: sum(1 for r in T[a].values() for c in r["checks"]
+               if c["step"] >= 4800 and c["prev"] is not None and c["acc"] < 0.5 and c["acc"] - c["prev"] < 0.02 and not c["blocked"])
+        for a in ("GUARD", "GUARD_EVAL")}
+flatB = [(s, c) for s, c in FT["BASE"] if c["acc"] < 0.5]
+flatB_runs = sorted({s for s, _ in flatB})
+flatB_bound = [brt(T["BASE"][s]) for s in flatB_runs]
+flatB_lab = sum(targ(c) for _, c in flatB)
+flatB_steps = (min(c["step"] for _, c in flatB), max(c["step"] for _, c in flatB)) if flatB else None
+lateB = [(s, c["step"]) for s, c in FT["BASE"] if c["acc"] >= 0.5]
+gu_f = [(s, c["step"]) for s, c in FT["GUARD"]]
+m914 = {a: [(s, c["step"], c["acc_probe"], c["acc_eval"]) for s, r in sorted(T[a].items()) for c in r["checks"]
+            if c["acc_probe"] >= 0.95 and c["acc_eval"] < 0.95] for a in LA}
+g25 = m914["GUARD"]
+g25_ok = (len(g25) == 5 and {s for s, *_ in g25} == {2025} and f"{min(x[2] for x in g25):.2f}" == "0.95"
+          and f"{max(x[2] for x in g25):.2f}" == "0.98" and f"{min(x[3] for x in g25):.2f}" == "0.87"
+          and f"{max(x[3] for x in g25):.2f}" == "0.92" and f"{T['GUARD'][2025]['acc']:.2f}" == "0.93"
+          and outcome_k(T["GUARD"][2025]).startswith("MERGED"))
+trT = {a: sorted(transition(r["curve"]) for r in T[a].values() if brt(r)) for a in LA}
+secsT = sum(r["secs_wall"] for r in TG["runs"].values()) / 3600
+secsT_cpu = sum(r["secs"] for r in TG["runs"].values()) / 3600
+unb = {a: sorted((s, outcome_k(r), r.get("outcome"), r.get("outcome_v2")) for s, r in T[a].items() if not brt(r)) for a in LA}
+b_g, c_g = pT["GUARD"][0], pT["GUARD"][1]
+b_e, c_e = pT["EVAL"][0], pT["EVAL"][1]
+b_ge, c_ge = pT["GUARD_EVAL"][0], pT["GUARD_EVAL"][1]
+aims = bool(FT["GUARD"]) and labT["GUARD"] >= 0.9 * len(FT["GUARD"]) and c_g - b_g <= 1
+better = c_e - b_e <= 1 and disF["EVAL"] == 0
+better_H = c_e - b_e <= 1                                             # H's S84 rule, no disagreement clause
+g_costs, e_costs, both_costs = (c_g >= 4 and b_g == 0), (c_e >= 4 and b_e == 0), (c_ge >= 4 and b_ge == 0)
+none_applies = not (aims or better or g_costs or e_costs)
+# the readings' commit against the first S81 record (git log order)
+rc81 = first_reading_commit("explore_f_trigger.py", '"the guard aims the split"')
+fr81, nrec81 = first_record_commit([f"{F}trigger_results.json"], list(T))
+unch81 = git("diff", rc81, R7, "--", "explore_f_trigger.py").strip() == ""
+child_after = git("log", "--format=%h", f"{rc81}..{R7}", "--", "explore_f_trigger_child.py").split()
+rg81 = sorted({r["git"].split("+")[0] for r in TG["runs"].values() if r.get("git")})
+desc81 = all(is_anc(rc81, g) for g in rg81)
+prec81 = ctime(rc81) < ctime(fr81) and is_anc(rc81, fr81)
+CK81 = [x for x in git("ls-tree", "-r", "--name-only", R7, F).split() if "checks_s81" in x]
+ck81 = json.loads(git("show", f"{R7}:{CK81[0]}")) if CK81 else {}
+ck81_ok = bool(ck81.get("ok")) and all(v for _, v in ck81.get("rows", []))
+ck81_start = ck81.get("provenance", {}).get("started")
+log81 = git("show", f"{R7}:{F}s81.log")
+log_start = [ln for ln in log81.split("\n") if ln.startswith("=== S81 start")]
+log_done = [ln for ln in log81.split("\n") if ln.startswith("=== S81 done")]
+# H's S84 and S86 (the draft's 29/30 against 27/30 over three screens), at H's report commits
+HS = {"S84": ("37c1fbf", "guard", (2300, 2309)), "S86": ("9b72bf6", "allmass", (2330, 2339))}
+HE = {}
+for k_, (ref_, nm_, _) in HS.items():
+    st_ = load(ref_, f"explore_out/H/{nm_}_results.json")
+    HE[k_] = (runs(st_, "EVAL"), runs(st_, "BASE"))
+tri = {k_: (sum(brt(r) for r in e_.values()), sum(brt(r) for r in b_.values()), pairs(e_, b_, brt))
+       for k_, (e_, b_) in HE.items()}
+tri["S81"] = (nT["EVAL"], nT["BASE"], pT["EVAL"])
+tri_e, tri_b = sum(v[0] for v in tri.values()), sum(v[1] for v in tri.values())
+tri_bc = (sum(v[2][0] for v in tri.values()), sum(v[2][1] for v in tri.values()))
+tri_n = sum(v[2][2] for v in tri.values())
+# S76's DELTA_SPLIT labelled rate (report 7 compares 10/19 with it)
+S76F = [c for r in runs(EI, "DELTA_SPLIT").values() for c in r.get("checks", []) if c.get("fired")]
+s76_lab = (sum(targ(c) for c in S76F), len(S76F))
+
+# ── report 7, every number ─────────────────────────────────────────────────
+R7F = "report_7.md"
+R7T = git("show", f"{R7}:{F}{R7F}").split("\n")
+R7ROWS = []
+
+
+def r7ln(text):
+    h = [i + 1 for i, ln in enumerate(R7T) if text in ln]
+    assert h, ("not in report 7", text)
+    return h[0]
+
+
+def r7row(text, item, says, rec, status, note=""):
+    R7ROWS.append(dict(tex=f"{R7F}:{r7ln(text)}", item=item, draft=str(says), rec=str(rec), status=status, note=note,
+                       kind="report7", q=None, loc5=R7F))
+
+
+codeT = sorted({r["code_sha"][:12] for r in TG["runs"].values()})
+mainT = sorted({r.get("main_sha", "")[:7] for r in TG["runs"].values()})
+cpuT, torchT = sorted({r["cpu"] for r in TG["runs"].values()}), sorted({r["torch"] for r in TG["runs"].values()})
+attT = sorted({r["attempts"] for r in TG["runs"].values()})
+r7row("Readings committed at 451cde9 before any stored run", "readings committed before any stored run", "451cde9, before any stored run",
+      f"first commit holding the READINGS text: {rc81} ({cdate(rc81)}); first commit with an S81 record: {fr81} ({cdate(fr81)}, "
+      f"{nrec81} records); the readings commit is an ancestor of it: {is_anc(rc81, fr81)}; explore_f_trigger.py unchanged "
+      f"{rc81}..{R7}: {unch81}; explore_f_trigger_child.py changed after it: {child_after or 'never'}; every record's code "
+      f"commit {rg81} descends from {rc81}: {desc81}; s81.log '{log_start[0] if log_start else '?'}'; CHECK file started {ck81_start}",
+      "MATCH" if rc81 == "451cde9" and prec81 and unch81 and desc81 and not child_after else "DISAGREE",
+      "git log order: the readings (19:28:32 UTC, 10 October) precede the segment's start (20:41:45) and the first record commit. "
+      "The report's own disclosure (one unstored 2400-update smoke test of GUARD_EVAL on seed 2029 before the readings' commit, "
+      "the readings already written) is not checkable from git.")
+r7row("Code SHA bdd8269d38af", "code SHA; main-line modules; CPU; torch", "bdd8269d38af; 9c5939e; Xeon 2.10GHz; 2.14.0+cu130",
+      f"{codeT}; {mainT}; {cpuT}; {torchT}",
+      "MATCH" if codeT == ["bdd8269d38af"] and mainT == ["9c5939e"] and len(cpuT) == 1 and "2.10GHz" in cpuT[0] and torchT == ["2.14.0+cu130"] else "DISAGREE")
+r7row("42/42 runs ok, none retried, none diverged", "42/42 ok, none retried", "42/42, attempts 1",
+      f"{okT}/{nrec_T} ok; attempts {attT}; diverged {[k for k, r in TG['runs'].items() if r.get('diverged')]}",
+      "MATCH" if okT == nrec_T == 42 and attT == [1] else "DISAGREE")
+r7row("seeds 2020-2029, paired", "seeds", "2020-2029, paired", f"{ {a: (min(T[a]), max(T[a]), len(T[a])) for a in LA} }",
+      "MATCH" if all(sorted(T[a]) == list(range(2020, 2030)) for a in LA) else "DISAGREE")
+for a, says, wil_s, band_s in (("BASE", "9/10", "[0.60, 0.98]", "RELIABLE"), ("GUARD", "7/10", "[0.40, 0.89]", "MAJORITY"),
+                               ("EVAL", "10/10", "[0.72, 1.00]", "RELIABLE"), ("GUARD_EVAL", "8/10", "[0.49, 0.94]", "MAJORITY")):
+    rec_ = f"{nT[a]}/10 {wil(nT[a], 10)} {band(nT[a], 10)}"
+    r7row(f"| {a} (" if a != "GUARD_EVAL" else "| GUARD_EVAL (both)", f"{a}: BOUND ROUTED, Wilson, band", f"{says} {wil_s} {band_s}", rec_,
+          eq(f"{says} {wil_s} {band_s}", rec_), f"rlib.outcome_k == the record's outcome on every S81 run: {agreeT}")
+r7row("| GUARD (probe, no split below 0.5)", "GUARD vs BASE: arm only / BASE only; p", "0 / 2 (2020, 2025); p = 0.25",
+      f"{b_g} / {c_g} {dsT['GUARD']}; p(BASE > GUARD) = {mcnemar1(c_g, b_g):.3g}",
+      "MATCH" if (b_g, c_g, dsT["GUARD"]) == (0, 2, [2020, 2025]) and abs(mcnemar1(c_g, b_g) - 0.25) < 1e-9 else "DISAGREE")
+r7row("| EVAL (2048-sequence evaluation)", "EVAL vs BASE: arm only / BASE only; p", "1 (2029) / 0; p = 0.5",
+      f"{b_e} / {c_e} {dsT['EVAL']}; p(EVAL > BASE) = {mcnemar1(b_e, c_e):.3g}",
+      "MATCH" if (b_e, c_e, dsT["EVAL"]) == (1, 0, [2029]) and abs(mcnemar1(b_e, c_e) - 0.5) < 1e-9 else "DISAGREE")
+r7row("| GUARD_EVAL (both)", "GUARD_EVAL vs BASE", "1 (2029) / 2 (2020, 2025)", f"{b_ge} / {c_ge} {dsT['GUARD_EVAL']}",
+      "MATCH" if (b_ge, c_ge) == (1, 2) and dsT["GUARD_EVAL"] == [2020, 2025, 2029] else "DISAGREE")
+for a, says in (("BASE", "19; 9 | 10/19 | 7"), ("GUARD", "6; 3 | 6/6 | 0"), ("EVAL", "13; 9 | 8/13 | 5"), ("GUARD_EVAL", "9; 3 | 9/9 | 4")):
+    rec_ = f"{len(FT[a])}; {runsF[a]} | {labT[a]}/{len(FT[a])} | {disF[a]}"
+    r7row(f"| {a} (" if a != "GUARD_EVAL" else "| GUARD_EVAL (both)", f"{a}: firings (total; runs) | labelled ok | at a disagreement", says, rec_,
+          eq(says, rec_), f"labelled ok recomputed with s37c.targeting on map_before (recorded key_ok {labTr[a]}); disagreement recomputed "
+          f"from both readings and their previous values with the arm's guard (recorded eligibility and 'disagree' fields: "
+          f"{elig_mism} mismatches over every check of every arm); each arm's rule reads its own source: {read_ok}")
+for a, says in (("BASE", "15600 (7200-32400)"), ("GUARD", "13200 (7200-15600)"), ("EVAL", "15600 (7200-31200)"), ("GUARD_EVAL", "13200 (7200-31200)")):
+    rec_ = f"{med(trT[a]):.0f} ({min(trT[a])}-{max(trT[a])})"
+    r7row(f"| {a} (" if a != "GUARD_EVAL" else "| GUARD_EVAL (both)", f"{a}: transitions (median; range)", says, rec_, eq(says, rec_))
+r7row("**Validity:**", "validity: the delta perfect gate bound on 2020 (6000) and 2021 (1200)", "6000, 1200; VALID", f"{orT}; VALID {validT}",
+      "MATCH" if orT == {2020: 6000, 2021: 1200} else "DISAGREE")
+r7row("**Failures:**", "every unbound run MERGED (2 share), v1 and v2; BASE 2029; GUARD 2020, 2025, 2029; GUARD_EVAL 2020, 2025",
+      "as listed", "(seed, rlib outcome, recorded v1 outcome, recorded v2 outcome) " + "; ".join(f"{a}: {unb[a]}" for a in LA),
+      "MATCH" if [s for s, *_ in unb["BASE"]] == [2029] and [s for s, *_ in unb["GUARD"]] == [2020, 2025, 2029]
+      and [s for s, *_ in unb["GUARD_EVAL"]] == [2020, 2025] and not unb["EVAL"]
+      and all(x[1] == "MERGED (2 share)" and x[2] == "MERGED (2 share)" and x[3] == "MERGED (2 share)" for a in LA for x in unb[a]) else "DISAGREE")
+r7row("**\"The guard aims the split\": does not apply.**", "'the guard aims the split' does not apply (6/6 ok, but c - b = 2 > 1)",
+      "does not apply", f"labelled {labT['GUARD']}/{len(FT['GUARD'])} (>= 90%: {labT['GUARD'] >= 0.9 * len(FT['GUARD'])}); c - b = {c_g - b_g}; applies: {aims}",
+      "MATCH" if not aims and c_g - b_g == 2 else "DISAGREE", "explore_f_trigger.py READINGS")
+r7row("**\"The guard costs binding\": does not apply**", "'the guard costs binding' does not apply (c = 2 < 4)", "does not apply",
+      f"c = {c_g}, b = {b_g}; applies: {g_costs}", "MATCH" if not g_costs else "DISAGREE")
+r7row("**\"The evaluation is the better probe\": does not apply.**", "'the evaluation is the better probe' does not apply (b = 1, c = 0; 5 of 13 at a disagreement)",
+      "does not apply", f"b = {b_e}, c = {c_e}, c - b <= 1: {c_e - b_e <= 1}; EVAL firings at a disagreement {disF['EVAL']} of {len(FT['EVAL'])}; applies: {better}",
+      "MATCH" if not better and disF["EVAL"] == 5 and len(FT["EVAL"]) == 13 else "DISAGREE")
+r7row("**\"The evaluation costs binding\": does not apply**", "'the evaluation costs binding' does not apply (c = 0)", "does not apply",
+      f"c = {c_e}; applies: {e_costs}", "MATCH" if not e_costs else "DISAGREE")
+r7row("**So: no reading applies to either device.**", "no reading applies to either device; GUARD_EVAL not 'both cost binding' (c = 2)",
+      "none", f"none applies: {none_applies}; GUARD_EVAL c = {c_ge}, 'both devices cost binding': {both_costs}",
+      "MATCH" if none_applies and not both_costs and c_ge == 2 else "DISAGREE")
+r7row("Under the simpler rule Session H's S84 uses", "under H's S84 rule (EVAL >= BASE - 1 pair) EVAL would read 'the evaluation is the better probe'",
+      "would apply", f"c - b = {c_e - b_e} <= 1: {better_H}", "MATCH" if better_H else "DISAGREE")
+ev5 = sorted((s, c["step"]) for s, c in FT["EVAL"] if ep(c, "EVAL") != ee(c, "EVAL"))
+r7row("Of EVAL's 5 such firings, 3 were in the flat start", "EVAL's 5 disagreement firings: 2022@9600, 2027@4800, 2028@4800 (flat start); 2026@19200, 2029@21600",
+      "as listed", f"{ev5}", "MATCH" if ev5 == [(2022, 9600), (2026, 19200), (2027, 4800), (2028, 4800), (2029, 21600)] else "DISAGREE")
+r7row("BASE made 13 of its 19 firings while accuracy was still below 0.5", "BASE: 13 of 19 firings below 0.5 (4800-12000), 6 labelled ok; all 8 runs that split there bound",
+      "13 of 19; 4800-12000; 6 ok; 8 runs, all bound", f"{len(flatB)} of {len(FT['BASE'])}; {flatB_steps}; {flatB_lab} ok; runs {flatB_runs} bound routed {flatB_bound}",
+      "MATCH" if len(flatB) == 13 and flatB_steps == (4800, 12000) and flatB_lab == 6 and len(flatB_runs) == 8 and all(flatB_bound) else "DISAGREE",
+      "'below 0.5' read on the reading the rule used (the probe, for BASE)")
+r7row("13 eligible checks were held back in GUARD and 18 in GUARD_EVAL", "checks held back by the guard: GUARD 13, GUARD_EVAL 18", "13; 18",
+      f"{held['GUARD']}; {held['GUARD_EVAL']}", eq("13; 18", f"{held['GUARD']}; {held['GUARD_EVAL']}"),
+      "a check is held back if, on the arm's own reading, update >= 4800, a previous reading, rise < 0.02, reading < 0.5, not gap/cap-blocked")
+gl = sorted((a, s, c["step"], targ(c)) for a in ("GUARD", "GUARD_EVAL") for s, c in FT[a] if s in (2020, 2025))
+r7row("Their late splits (31200-40800, all labelled ok)", "GUARD 2020, 2025: later splits 31200-40800, all labelled ok", "31200-40800, all ok",
+      f"{gl}", "MATCH" if gl and all(x[3] for x in gl) and min(x[2] for x in gl) >= 28800 and max(x[2] for x in gl) == 40800 else "DISAGREE",
+      "the range spans GUARD (31200-36000) and GUARD_EVAL (28800-40800) together; GUARD alone ends at 36000 and GUARD_EVAL 2025 fired first at 28800")
+r7row("At 5 checks between 28800 and 40800 the probe read 0.95-0.98", "GUARD 2025: 5 checks 28800-40800, probe 0.95-0.98, evaluation 0.87-0.92; one fire at 31200 at 0.94; MERGED 0.93",
+      "as stated", f"GUARD probe >= 0.95 with evaluation < 0.95: {[(s, u, round(p, 3), round(e, 3)) for s, u, p, e in g25]}; GUARD 2025 fired at "
+      f"{[(c['step'], round(c['acc_probe'], 3)) for s, c in FT['GUARD'] if s == 2025]}; end {outcome_k(T['GUARD'][2025])} {T['GUARD'][2025]['acc']:.3f}",
+      "MATCH" if g25_ok and [(c["step"], round(c["acc_probe"], 2)) for s, c in FT["GUARD"] if s == 2025] == [(31200, 0.94)] else "DISAGREE")
+r7row("In BASE it occurred at 2 checks (2025 at 14400, 2027 at 31200)", "BASE: the 914 mode at 2025@14400 and 2027@31200, both shortly before those runs bound",
+      "2 checks", f"{[(s, u) for s, u, *_ in m914['BASE']]}; BASE transitions 2025 {transition(T['BASE'][2025]['curve'])}, 2027 {transition(T['BASE'][2027]['curve'])}",
+      "MATCH" if [(s, u) for s, u, *_ in m914["BASE"]] == [(2025, 14400), (2027, 31200)] else "DISAGREE",
+      f"not in the report: GUARD_EVAL 2025 shows the same mode at {len(m914['GUARD_EVAL'])} checks (the rule there reads the evaluation)")
+ge25 = [(c["step"], targ(c)) for s, c in FT["GUARD_EVAL"] if s == 2025]
+r7row("With the evaluation as the reading (GUARD_EVAL 2025)", "GUARD_EVAL 2025: three splits, all labelled ok; merged (0.92)", "3, all ok; 0.92",
+      f"{ge25}; end {outcome_k(T['GUARD_EVAL'][2025])} {T['GUARD_EVAL'][2025]['acc']:.3f}",
+      "MATCH" if len(ge25) == 3 and all(x[1] for x in ge25) and f"{T['GUARD_EVAL'][2025]['acc']:.2f}" == "0.92" else "DISAGREE")
+e29 = [c for s, c in FT["EVAL"] if s == 2029 and c["step"] == 21600]
+b29 = [c["step"] for s, c in FT["BASE"] if s == 2029]
+g29 = [c["step"] for s, c in FT["GUARD"] if s == 2029]
+r7row("**EVAL's one win (2029).**", "EVAL 2029: BASE and GUARD fired at 14400, 24000, 28800; EVAL's second split at 21600, evaluation 0.868 -> 0.870, probe 0.75 -> 0.78; bound 31200, as GUARD_EVAL",
+      "as stated", f"BASE {b29}, GUARD {g29}; EVAL@21600 eval {e29[0]['prev_eval']:.3f} -> {e29[0]['acc_eval']:.3f}, probe {e29[0]['prev_probe']:.3f} -> "
+      f"{e29[0]['acc_probe']:.3f}; EVAL 2029 bound at {transition(T['EVAL'][2029]['curve'])}, GUARD_EVAL at {transition(T['GUARD_EVAL'][2029]['curve'])}" if e29 else "no firing",
+      "MATCH" if e29 and b29 == g29 == [14400, 24000, 28800] and f"{e29[0]['prev_eval']:.3f}" == "0.868" and f"{e29[0]['acc_eval']:.3f}" == "0.870"
+      and f"{e29[0]['prev_probe']:.2f}" == "0.75" and f"{e29[0]['acc_probe']:.2f}" == "0.78"
+      and transition(T["EVAL"][2029]["curve"]) == transition(T["GUARD_EVAL"][2029]["curve"]) == 31200 else "DISAGREE")
+r7row("**BASE's labelled-ok rate:** 10/19 (53%), as in S76 (6/12)", "BASE 10/19 labelled ok; S76 6/12", "10/19; 6/12",
+      f"{labT['BASE']}/{len(FT['BASE'])}; S76 DELTA_SPLIT {s76_lab[0]}/{s76_lab[1]} (eight_results.json)",
+      "MATCH" if (labT["BASE"], len(FT["BASE"])) == (10, 19) and s76_lab == (6, 12) else "DISAGREE")
+r7row("## CHECKs (all passed, asserted before any run)", "CHECKs all passed", "all passed",
+      f"{CK81[0].split('/')[-1] if CK81 else 'no CHECK file'}: ok {ck81.get('ok')}, {len(ck81.get('rows', []))} rows all true: {ck81_ok}; "
+      f"started {ck81_start}", "MATCH" if ck81_ok else "DISAGREE", "the file is the segment's CHECK record; the bit-for-bit claims are read from it, not re-run")
+r7row("69.2 h of run time", "69.2 h of run time; 20:41 UTC 10 October to 17:37 UTC 11 October", "69.2 h; 20:41 to 17:37",
+      f"sum of secs_wall {secsT:.2f} h (of secs, {secsT_cpu:.2f} h); s81.log '{log_start[0] if log_start else '?'}' / '{log_done[0] if log_done else '?'}'",
+      "MATCH" if f"{secsT:.1f}" == "69.2" and log_start and "20:41" in log_start[0] and log_done and "17:37" in log_done[0] else "DISAGREE",
+      "69.2 h is the sum of the records' secs_wall (explore_f_reports4.py's 'h of run time'); their secs sum to 68.9 h")
+r7row("BASE and EVAL had 20 and 17 disagreeing checks, 12 of each in the flat start", "disagreeing checks: BASE 20, EVAL 17, 12 of each below 0.5",
+      "20, 17; 12 each", f"{disC['BASE']}, {disC['EVAL']}; below 0.5 on the arm's reading {disC_flat['BASE']}, {disC_flat['EVAL']}",
+      "MATCH" if (disC["BASE"], disC["EVAL"], disC_flat["BASE"], disC_flat["EVAL"]) == (20, 17, 12, 12) else "DISAGREE")
+r7row("The guarded arms had 10 and 9, none in the flat start", "guarded arms 10 and 9, none in the flat start", "10, 9; none",
+      f"{disC['GUARD']}, {disC['GUARD_EVAL']}; below 0.5 {disC_flat['GUARD']}, {disC_flat['GUARD_EVAL']}",
+      "MATCH" if (disC["GUARD"], disC["GUARD_EVAL"], disC_flat["GUARD"], disC_flat["GUARD_EVAL"]) == (10, 9, 0, 0) else "DISAGREE")
+
+# ── fifth-draft rows ───────────────────────────────────────────────────────
+QROWS = []
+
+
+def qrow(qid, tex5, item, draft, rec, status, note, q5):
+    loc = find(TEX5, q5)
+    assert tex5 in loc, ("fragment not at the cited fifth-draft line", qid, tex5, q5, loc)
+    QROWS.append(dict(id=qid, tex=f"tex5:{tex5}", item=item, draft=str(draft), rec=str(rec), status=status, note=note,
+                      q=q5, loc5=loc, kind="fifth", old=find(TEX4, q5)))
+
+
+MAIN = "origin/claude/bdh-growth-hebbian-inference-w90069"
+ML5 = TIP5[MAIN]
+XREC = "results/X/delta_recipe_results.json"
+x_add = git("log", "--diff-filter=A", "--format=%h", ML5, "--", XREC).split()
+XS = load(ML5, XREC)
+xm = XS["meta"]
+x_arms = dict(Counter(k.split("|")[0] for k in XS["runs"]))
+x_seeds = sorted({int(k.split("|")[1]) for k in XS["runs"] if not k.startswith("CEIL")})
+x_doc = git("show", f"{ML5}:test_delta_recipe.py")
+x_doc_start = "The run started 2026-10-11 02:12 UTC" in x_doc and "runs began at 05:27 after the verification" in x_doc
+x_runs_began = datetime.datetime.strptime(xm["started"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=datetime.timezone.utc)
+t_rb = int(x_runs_began.timestamp())
+t_x = ctime(x_add[0]) if x_add else None
+L_DR = {b_: [f_ for f_ in git("ls-tree", "-r", "--name-only", t_).split("\n") if f_.startswith("results/L/") and "delta_recipe" in f_]
+        for b_, t_ in TIP5.items()}
+L_DR = {b_: v for b_, v in L_DR.items() if v}
+am1_before = ctime(DR["amend"]) < run_start
+dr5 = (f"X's result {x_add} ({cdate(x_add[0]) if x_add else '-'}) adds {XREC}: {sum(x_arms.values())} records {x_arms}, seeds {x_seeds[0]}-{x_seeds[-1]}, "
+       f"meta.git {xm['git']}, meta.started (the start of the runs, after the verification; X records UTC) {xm['started']}; the test's RESULT (X) "
+       f"docstring: 'The run started 2026-10-11 02:12 UTC ...; runs began at 05:27 after the verification': {x_doc_start}; Amendment 1 "
+       f"{DR['amend']} ({cdate(DR['amend'])}) before the 02:12 start: {am1_before}; Amendment 2 {AM2_REF} ({cdate(AM2_REF)}) between the runs' "
+       f"start and the result: {t_rb < ctime(AM2_REF) < (t_x or 0)}; L delta_recipe files on any branch at the fifth draft: {L_DR or 'none'}")
+dr5_ok = bool(x_add) and t_x < CUT5 and sum(x_arms.values()) == 84 and xm["git"] == DR["test"] and x_doc_start and am1_before and not L_DR
+qrow("Q1", 41, "test_delta_recipe: 'specified, reviewed by the referee, amended once before any run and written, its test file checked against "
+     "the amended spec, and complete on X (a second amendment, to the report's rules only, was committed during X's run ...); L's half is next'",
+     "amended once before any run; checked; complete on X; Amendment 2 during the run; L next", dr5, "MATCH" if dr5_ok else "DISAGREE",
+     "Supersedes P3. 'Before any run' now qualifies Amendment 1 only (20:47, 10 October). CORRECTION to P3 and fourth_pass.md §1 item 6: "
+     f"the arms' runs began at {xm['started']} UTC (meta.started; the RESULT docstring), after the referee's check "
+     f"{DR['tcheck']} ({cdate(DR['tcheck'])}); 02:12 was the start of the process, whose first 3 h 15 min were the verification. "
+     "tex4:41's 'checked against the amended spec before any run' was therefore true of the test's runs; P3's DISAGREE is withdrawn.",
+     ("amended once before any run and written, its test file checked against the amended spec, and complete on X",
+      "L's half is next"))
+s81_5 = s81_state(F5)
+qrow("Q2", 41, "'F's S81, G's S83, H's S86 and R's Phase 4 are complete' (F's part)", "S81 complete",
+     f"F at {F5} ({cdate(F5)}), the last F commit before the fifth draft ({cdate(FIFTH_REF)}): {s81_5['n']} S81 records, log 'S81 done' "
+     f"{s81_5['done']}, report 7 {s81_5['report']}", "MATCH" if s81_5["done"] and s81_5["report"] and s81_5["n"] == 42 else "DISAGREE",
+     "Supersedes P1. G, H and R are other checks'.", ("F's S81, G's S83, H's S86 and R's Phase~4 are complete",))
+E_BR, I_BR = "origin/claude/outside-ideas", "origin/claude/explore-I"
+e_after = git("log", "--format=%h %cI %s", f"e3f5809..{TIP5[E_BR]}").strip().split("\n")
+e_b20 = [x for x in e_after if "batch 20" in x]
+i_last = git("log", "-1", "--format=%h %cI %s", TIP5[I_BR]).strip()
+qrow("Q3", 41, "'every session's queue is empty'", "every queue empty",
+     f"E ({E_BR.split('/')[-1]}): {len(e_b20)} 'batch 20' commits after e3f5809 before the fifth draft, the last '{e_b20[0][:110] if e_b20 else '-'}'; "
+     f"I: last commit before the fifth draft '{i_last[:120]}'; the draft itself (tex5:458): 'on the nine seeds run so far (the tenth is queued)'",
+     "DISAGREE" if e_b20 or "pending" in i_last else "MATCH",
+     "New in c5e4508. Session E was running batch 20 (progress commits to 17:49 UTC on 12 October) and session I's tenth WIDE_SLOW "
+     "seed (839) was pending, as the draft's own S75 paragraph says. 'F's queue' is empty (no F commit after report 7).",
+     ("every session's queue is empty",))
+d54_ok = "D4 SHOWN 10 vs 1" in TEX5[53] and "pooled labels and readings wait for L" in TEX5[53]
+qrow("Q4", 54, "index row delta_recipe: '(specified) ... on X (secondary): D4 SHOWN 10 vs 1, D2 0 vs 0 ..., D1 d = -3; pooled labels and "
+     "readings wait for L'", "X secondary results; pooled waits for L; label '(specified)'", dr5,
+     "PARTIAL" if dr5_ok else "DISAGREE",
+     "Supersedes P4. The status is right (X complete at 8ae660d, L not run). The row's label '(specified)' is stale beside "
+     "split_copy's '(X, L, pooled)': '(X; L to run)' would match. The D numbers are the X-results check's, not this one's.",
+     ("\\texttt{delta\\_recipe} (specified)", "pooled labels and readings wait for L"))
+qrow("Q5", 256, "memory section: '(... with the test file checked against the amended spec; running on X, where a second amendment ... was "
+     "committed during the run ...)'", "running on X", dr5, "PARTIAL",
+     "Supersedes P5. 'Running on X' is not the state at c5e4508: X's run ended before 8ae660d (07:25:51 UTC, 12 October), and "
+     "the same paragraph later says 'X's half is complete'. Read as the time of the amendment it is true; as written it is stale.",
+     ("with the test file checked against the amended spec; running on X, where a second amendment confined to the report's rules",))
+am2t = git("show", f"{AM2_REF}:specs/test_delta_recipe.md")
+am2_lines = ("the four perfect-gate runs (CEIL_HEBB 580, 581; CEIL_DELTA 580, 581)" in am2t and "19 of the 20 DELTA_SPLIT runs (580-598)" in am2t
+             and "DELTA_SLOW|580" in am2t and "None of HEBB_SPLIT or HEBB_SLOW had finished" in am2t)
+qrow("Q6", 256, "'a statement of the 24 run lines that had been read, none of them a claim, a reading or a Hebbian run'",
+     "24 lines; none Hebbian", f"Amendment 2 ({AM2_REF}): 24 lines = CEIL_HEBB 580, 581; CEIL_DELTA 580, 581; DELTA_SPLIT 580-598; DELTA_SLOW|580; "
+     f"'None of HEBB_SPLIT or HEBB_SLOW had finished': {am2_lines}", "DISAGREE" if am2_lines else "NOT RECORD-CHECKABLE",
+     "New in c5e4508. Two of the 24 lines were Hebbian runs: the Hebbian perfect gate CEIL_HEBB 580 and 581. The amendment says none "
+     "of the Hebbian learned arms (HEBB_SPLIT, HEBB_SLOW) had finished; 'none of them ... a Hebbian learned-arm run' would be exact.",
+     ("the 24 run lines that had been read, none of them a claim, a reading or a Hebbian run",))
+qrow("Q7", 256, "'X's half is complete (seeds 580--599, 84 runs, 29.2 h; ...)' (status and run count only)", "complete; 580-599; 84 runs",
+     dr5 + f"; 02:12 + 29.2 h = {datetime.datetime.fromtimestamp(run_start + 29.2 * 3600, datetime.timezone.utc):%Y-%m-%d %H:%M} UTC",
+     "MATCH" if dr5_ok and x_seeds == list(range(580, 600)) else "DISAGREE",
+     "Status, seeds and run count. The 29.2 h is the RESULT docstring's wall clock from the process start (02:12, the 3 h 15 min of "
+     "verification included), not the runs' time. Every count, claim and reading of X's half is the X-results check's.",
+     ("X's half is complete (seeds 580--599, 84 runs, 29.2 h",))
+qrow("Q8", 256, "'(S68, whose reading of that name did not apply; the pre-registered support for the partition is C3 on X)'", "C3 on X",
+     "C3 pooled over X and L: SHOWN, 18/20 vs 0/20, 18 vs 0 (tex5:246; ffb0771); S68 reading 'neither' (recomputed: " + r68 + ")",
+     "PARTIAL", "Unchanged text made stale by ef6d690 (test_split_copy complete on L and pooled): tex5:246 and tex5:362 now cite C3 "
+     "pooled and on each machine; this parenthesis still says 'C3 on X'.", ("the pre-registered support for the partition is C3 on X",))
+qrow("Q9", 476, "next steps: 'test_delta_recipe's L half (X's is complete), then the hinged-register test ...'", "L half next; X complete",
+     dr5, "MATCH" if dr5_ok else "DISAGREE", "Supersedes P7 (the fourth pass's §2 bullet tex4:472 is resolved).",
+     ("\\texttt{test\\_delta\\_recipe}'s L half (X's is complete)",))
+qrow("Q10", 477, "next steps: 'session~F's trigger on delta channels (S81)'", "S81 a next step",
+     f"S81 complete: report 7 {R7} ({cdate(R7)}), folded in at tex5:205 by 3b06af2 ({cdate('3b06af2')}); no reading applies",
+     "PARTIAL", "Unchanged text (tex4:473) made stale by this version: S81 is done and in the draft. If a main-line test of the "
+     "trigger on delta is meant, the item should say so.", ("session~F's trigger on delta channels (S81)",))
+r55, r22, r8a = (git("show", "--name-only", "--format=", c_).split() for c_ in (AM2_REF, "2225f00", "8ae660d"))
+prov_ok = ("specs/test_delta_recipe.md" in r55 and "test_delta_recipe.py" in r22 and XREC in r8a
+           and t_rb < ctime(AM2_REF) < ctime("2225f00") < t_x and all(is_anc(c_, ML5) for c_ in (DR["spec"], DR["amend"], DR["test"], AM2_REF, "2225f00", "8ae660d")))
+qrow("Q11", 496, "provenance row delta_recipe: 'spec 05256c5, Amendment 1 32c121b / test a581027, Amendment 2 during the run 55dac50, 2225f00 / "
+     "8ae660d (X) & X complete; L to run & 84; ---'", "as listed",
+     f"{AM2_REF} changes {r55}; 2225f00 ({cdate('2225f00')}) changes {r22}; 8ae660d changes {r8a}; runs began {xm['started']} UTC, "
+     f"result {cdate('8ae660d')}: both amendment commits fall between: {t_rb < ctime(AM2_REF) < ctime('2225f00') < t_x}; X records' "
+     f"meta.git {xm['git']}; all on the main line: {prov_ok}; X records {sum(x_arms.values())}; L files {L_DR or 'none'}",
+     "MATCH" if prov_ok and dr5_ok else "DISAGREE",
+     "Supersedes P6 (resolved). The X records carry a581027: 2225f00 changed the report rules and the CHECKs' sources during the "
+     "run, and 8ae660d's report was regenerated with --report at 2225f00, as the test's RESULT docstring says.",
+     ("Amendment~2 during the run \\texttt{55dac50}, \\texttt{2225f00} / \\texttt{8ae660d} (X) & X complete; L to run & 84; ---",))
+f_after = git("log", "--format=%h", f"{R7}..{F5}").split()
+r7_files = git("show", "--name-only", "--format=", R7).split()
+qrow("Q12", 514, "F's provenance row: 'S81 the trigger on delta (report 7, d5851b1) & d5851b1 & 322; 102; 30; 40; 48; 42'", "report 7 d5851b1; 42 runs",
+     f"{R7} '{git('log', '-1', '--format=%s', R7).strip()[:80]}' ({cdate(R7)}) adds {r7_files}; F's last commit before the fifth draft "
+     f"{F5} (commits after {R7}: {f_after or 'none'}); S81 records {nrec_T} (BASE, GUARD, EVAL, GUARD_EVAL 10 each, O_DELTA_C 2)",
+     "MATCH" if F5 == R7 and nrec_T == 42 and f"{F}report_7.md" in r7_files else "DISAGREE",
+     "Supersedes P2 and the first-pass 'branch commit' row (ed76eea). The first five counts stand (first-pass row 'runs per report').",
+     ("S81 the trigger on delta (report 7, \\texttt{d5851b1}) & \\texttt{d5851b1} & 322; 102; 30; 40; 48; 42",))
+qrow("Q13", 58, "index row, session F: 'on delta the flat-start guard costs and the evaluation trigger keeps'", "guard costs; evaluation keeps",
+     f"GUARD {nT['GUARD']}/10 vs BASE {nT['BASE']}/10 ({b_g} vs {c_g}); EVAL {nT['EVAL']}/10 ({b_e} vs {c_e}); F's readings: 'the guard costs "
+     f"binding' {g_costs} (needs c >= 4), 'the guard aims the split' {aims}, 'the evaluation is the better probe' {better}, 'the evaluation "
+     f"costs binding' {e_costs}", "PARTIAL",
+     "New in 3b06af2. The index's results column states readings elsewhere; here 'costs' and 'keeps' are not S81 readings (none "
+     "applies by F's rules) but descriptions of 0 vs 2 and 1 vs 0 on ten seeds. 'Costs' is the name of F's reading that did not "
+     "apply (c = 2 < 4). Suggest: 'on delta the flat-start guard lost two seeds and the evaluation trigger none (no reading applies)'.",
+     ("on delta the flat-start guard costs and the evaluation trigger keeps",))
+qrow("Q14", 205, "S81 'is the same screen on delta channels (seeds 2020--2029; the delta perfect gate 2/2)'", "same screen; 2020-2029; 2/2",
+     f"seeds {sorted(T['BASE'])[0]}-{sorted(T['BASE'])[-1]}; O_DELTA_C {orT}; arms {LA} (S84's: BASE, GUARD, GUARD_INT1200, EVAL, EVAL_GUARD_INT1200)",
+     "MATCH" if validT and sorted(T["BASE"]) == list(range(2020, 2030)) else "DISAGREE",
+     "explore_f_trigger.py: 'The arm names and the guard's rule are Session H's S84 ones (BASE, GUARD, EVAL), so the two screens "
+     "pair by name.' S81's fourth arm (GUARD_EVAL) is not S84's EVAL_GUARD_INT1200 (no fast checks); the draft does not cite it.",
+     ("Session~F's S81 is the same screen on delta channels (seeds 2020--2029; the delta perfect gate $2/2$)",))
+qrow("Q15", 205, "'the guard reads the other way, 7/10 against the base's 9/10 (0 vs 2; neither \"aims\" nor \"costs binding\" applies by F's rules)'",
+     "7/10 vs 9/10; 0 vs 2; neither applies", f"GUARD {nT['GUARD']}/10, BASE {nT['BASE']}/10, {b_g} vs {c_g}; aims {aims}, costs {g_costs}",
+     "MATCH" if (nT["GUARD"], nT["BASE"], b_g, c_g) == (7, 9, 0, 2) and not aims and not g_costs else "DISAGREE", "",
+     ("there the guard reads the other way, $7/10$ against the base's $9/10$ (0 vs 2; neither ``aims'' nor ``costs binding'' applies by F's rules)",))
+qrow("Q16", 205, "'because on delta channels the base's flat-start splits precede runs that bind (all eight runs that split in the flat start "
+     "bound, though only 10 of the base's 19 firings were on labelled targets), and the guard removes exactly those'",
+     "8 flat-start runs all bound; 10 of 19 labelled; guard removes those",
+     f"BASE firings below 0.5: {len(flatB)} in runs {flatB_runs}, all bound routed {all(flatB_bound)}; labelled {labT['BASE']}/{len(FT['BASE'])}; "
+     f"GUARD fires none below 0.5 (its 6 at {gu_f}); BASE's firings at >= 0.5: {lateB}",
+     "PARTIAL" if len(flatB_runs) == 8 and all(flatB_bound) and (labT["BASE"], len(FT["BASE"])) == (10, 19) else "DISAGREE",
+     "Counts right. 'Because' states as a cause what report 7 gives under 'What happened (post hoc; one screen, ten seeds)'; the "
+     "draft does not mark it. 'Removes exactly those' is the guard's rule (no split below 0.5); the guarded runs then fire elsewhere "
+     "(2020 and 2025 at 31200-36000).",
+     ("because on delta channels the base's flat-start splits precede runs that bind (all eight runs that split in the flat start bound, "
+      "though only 10 of the base's 19 firings were on labelled targets), and the guard removes exactly those",))
+qrow("Q17", 205, "'the evaluation as the probe binds 10/10 against 9/10 (1 vs 0), \"the evaluation is the better probe\" not applying under "
+     "F's stricter rule because 5 of its 13 firings came where the probe would have decided otherwise, and applying under H's rule'",
+     "10/10 vs 9/10; 1 vs 0; 5 of 13; F no, H yes",
+     f"EVAL {nT['EVAL']}/10 vs {nT['BASE']}/10, {b_e} vs {c_e}; disagreement firings {disF['EVAL']} of {len(FT['EVAL'])}; F's rule {better}; "
+     f"H's rule (c - b <= 1) {better_H}",
+     "MATCH" if (nT["EVAL"], b_e, c_e, disF["EVAL"], len(FT["EVAL"])) == (10, 1, 0, 5, 13) and not better and better_H else "DISAGREE", "",
+     ("the evaluation as the probe binds $10/10$ against $9/10$ (1 vs 0), ``the evaluation is the better probe'' not applying under F's stricter rule",
+      "because 5 of its 13 firings came where the probe would have decided otherwise, and applying under H's rule"))
+qrow("Q18", 205, "'The seed-914 mode appeared in one guarded run (the probe at 0.95--0.98 against the evaluation's 0.87--0.92 at five checks; MERGED at 0.93)'",
+     "one guarded run; 0.95-0.98 vs 0.87-0.92; five checks; MERGED 0.93",
+     "; ".join(f"{a}: {[(s, u, round(p, 3), round(e, 3)) for s, u, p, e in m914[a]]}" for a in LA),
+     "PARTIAL" if g25_ok else "DISAGREE",
+     "GUARD 2025's numbers match. As F's tables print the mode (probe >= 0.95 while the evaluation < 0.95), it also occurred in the "
+     "other guarded run on that seed, GUARD_EVAL 2025, at 4 checks (there the rule read the evaluation and fired), and in BASE "
+     "at 2 checks (2025, 2027), as report 7 says. 'One guarded run' is true only of runs where the mode could block the rule.",
+     ("The seed-914 mode appeared in one guarded run (the probe at $0.95$--$0.98$ against the evaluation's $0.87$--$0.92$ at five checks; MERGED at $0.93$)",))
+qrow("Q19", 205, "'Over the three screens of the evaluation as the trigger's probe (S84, S86, S81) it is 29/30 against 27/30, 2 vs 0, descriptive; it has not cost a run'",
+     "29/30 vs 27/30; 2 vs 0",
+     "; ".join(f"{k_} EVAL {v[0]}/10 vs BASE {v[1]}/10, {v[2][0]} vs {v[2][1]}" for k_, v in tri.items())
+     + f"; total {tri_e}/{tri_n} vs {tri_b}/{tri_n}, {tri_bc[0]} vs {tri_bc[1]}",
+     "MATCH" if (tri_e, tri_b, tri_n, tri_bc) == (29, 27, 30, (2, 0)) else "DISAGREE",
+     "S84 from H's guard_results.json at 37c1fbf (report 6), S86 from allmass_results.json at 9b72bf6 (report 8); BOUND ROUTED "
+     "recomputed with rlib. 'Has not cost a run': BASE alone binds on no seed in any of the three.",
+     ("Over the three screens of the evaluation as the trigger's probe (S84, S86, S81) it is $29/30$ against $27/30$, 2 vs 0, descriptive",))
+qrow("Q20", 36, "abstract: 'so the memory rule is open again and is the next main-line test, specified and reviewed'",
+     "next main-line test, specified and reviewed", dr5, "PARTIAL",
+     "Unchanged text. At c5e4508 test_delta_recipe is no longer only specified and reviewed: X's half is complete (8ae660d) and its "
+     "secondary results are in the index (tex5:54) and the memory section (tex5:256). The fourth pass did not flag this sentence "
+     "while X's runs were under way (an omission of that pass).",
+     ("so the memory rule is open again and is the next main-line test, specified and reviewed",))
+pdt5 = x_doc.split("\n")
+pb5 = [i + 1 for i, ln in enumerate(pdt5) if ln.startswith("def probe_blind")]
+pb5_body = "\n".join(pdt5[pb5[0] - 1:pb5[0] + 25]) if pb5 else ""
+pb5_cond = 'c["acc"] >= tgw.ACC_THR and h < tgw.ACC_THR' in pb5_body and "c[\"step\"] >= tgw.FIRST" in pb5_body
+qrow("Q21", 432, "method: 'with the count of checks at which the probe read >= 0.95 while the held-out accuracy was below it, as test_delta_recipe prints'",
+     "the count test_delta_recipe prints", f"test_delta_recipe.py at {ML5}: probe_blind() at :{pb5}, condition probe >= ACC_THR and held-out < "
+     f"ACC_THR from update FIRST (4800): {pb5_cond}; the RESULT (X) docstring prints 'Probe-blind (checks from 4800): HEBB_SPLIT 1 of 181 ... "
+     f"DELTA_SPLIT 1 of 142': {'Probe-blind (checks from 4800)' in x_doc}",
+     "MATCH" if pb5 and pb5_cond else "DISAGREE",
+     "Supersedes P8: the code changed at 2225f00 (Amendment 2 counts from 4800 and adds 'blocked by the probe alone'); the sentence "
+     "is true of it, and the test has now printed the count on X.",
+     "with the count of checks at which the probe read $\\geq 0.95$ while the held-out accuracy was below it, as \\texttt{test\\_delta\\_recipe} prints")
+qrow("Q22", 286, "synthesis table S=8: one delta channel 'test_split_copy pooled 0/20^s, F 0/10^f'", "F's S68 0/10 at eight",
+     f"S68_SINGLE_S8 BOUND {k8}/10", "MATCH" if k8 == 0 else "DISAGREE",
+     "Supersedes the first-pass row 'S=8 one delta channel, F' (the cell's X part became the pooled 0/20, the main line's, checked "
+     "in check_split_copy_v5).", ("$0/20^{s}$, $0/10^{f}$",))
+
+# readings vs docstring, fifth draft (S81 now has readings)
+PREC81 = dict(scr="S81", path="explore_f_trigger.py", text='"the guard aims the split"', rc=rc81, rcd=cdate(rc81), fr=fr81, frd=cdate(fr81),
+              nrec=nrec81, unchanged=unch81, rg=rg81, desc=desc81, prec=prec81)
+
+# ── every live fourth-pass row located in the fifth draft ──────────────────
 LIVE4 = [r for r in LIVE3 if r["state4"] == "stands"] + PROWS
+SUP5 = {"P1": "Q2", "P2": "Q12", "P3": "Q1", "P4": "Q4", "P5": "Q5", "P6": "Q11", "P7": "Q9"}
+SUP5_FIRST = {("tex:280", "S=8 one delta channel, F"): "Q22", ("tex:501", "branch commit"): "Q12"}
+RESUP5 = {"P8": "Q21"}
+
+
+def key5(r):
+    if r["kind"] == "first":
+        for (t_, pre), v in SUP5_FIRST.items():
+            if r["tex"] == t_ and r["item"].startswith(pre):
+                return v
+        return None
+    return r.get("id")
+
+
 for r in LIVE4:
     q = r["q"]
     r["loc5"] = (find(TEX5, q) or "REMOVED") if q is not None else r.get("loc4")
-    if r["loc5"] == "REMOVED" or (isinstance(r["loc4"], list) and isinstance(r["loc5"], list) and len(r["loc5"]) != len(r["loc4"])):
-        print("PROBE", r.get("id"), r["tex"], r["loc4"], r["loc5"], r["status"], r["item"][:90])
-print("PROBE live4", len(LIVE4))
-import sys; sys.exit(0)
+    k5 = key5(r)
+    if r["loc5"] == "REMOVED":
+        sup = SUP5.get(k5, k5 if k5 and k5.startswith("Q") else None)
+        assert sup, ("row removed in tex5 without a superseding Q row", r.get("id"), r["tex"], r["item"][:60])
+        r["sup5"], r["state5"] = sup, "REMOVED in v5"
+    elif k5 in RESUP5:
+        r["sup5"], r["state5"] = RESUP5[k5], "SUPERSEDED in v5 (re-checked against the code at the main line as of the fifth draft)"
+    else:
+        r["sup5"], r["state5"] = None, "stands"
+for k in list(SUP5) + list(RESUP5):
+    assert any(r.get("id") == k for r in LIVE4), ("SUP5/RESUP5 key matches no live row", k)
+# statuses of the fourth-pass rows as recomputed now, against check_F_v4.md (rows whose inputs are read at branch heads)
+V4MD = open(os.path.join(HERE, "check_F_v4.md")).read().split("\n")
+v4stat = {}
+for ln in V4MD:
+    if ln.startswith("| ") and "**" in ln:
+        c_ = [x.strip() for x in ln.split(" | ")]
+        if len(c_) >= 9 and c_[0].lstrip("| ").isdigit():
+            v4stat.setdefault((c_[1], c_[4]), c_[7].strip("*"))
+flips = []
+for r in LIVE4:
+    k_ = (r.get("id", "") or "", str(r["item"]).replace("|", "\\|").replace("\n", " "))
+    old_ = v4stat.get(k_)
+    if old_ is not None and old_ != r["status"]:
+        flips.append((r.get("id") or r["tex"], r["item"][:80], old_, r["status"]))
+
+
 # ══ write ═══════════════════════════════════════════════════════════════════
 ORDER = {"DISAGREE": 0, "PARTIAL": 1, "NOT RECORD-CHECKABLE": 2, "MATCH": 3}
 
@@ -1499,7 +1989,7 @@ def esc(s):
     return str(s).replace("|", "\\|").replace("\n", " ")
 
 
-def lstr(loc, pre="tex4"):
+def lstr(loc, pre="tex5"):
     return loc if isinstance(loc, str) else ", ".join(f"{pre}:{x}" for x in loc)
 
 
@@ -1507,94 +1997,140 @@ def qstr(q):
     return " ... ".join(q) if isinstance(q, tuple) else q
 
 
-ALLP = {r["id"]: r for r in PROWS}
-live4 = [r for r in LIVE3 if r["state4"] == "stands"] + PROWS
-gone4 = [r for r in LIVE3 if r["state4"] != "stands"]
-cnt4 = Counter(r["status"] for r in live4)
-cntP = Counter(r["status"] for r in PROWS)
-cnt3 = Counter(r["status"] for r in LIVE3)
+ALLQ = {r["id"]: r for r in QROWS}
+live5 = [r for r in LIVE4 if r["state5"] == "stands"] + QROWS
+gone5 = [r for r in LIVE4 if r["state5"] != "stands"]
+cnt5 = Counter(r["status"] for r in live5)
+cntQ = Counter(r["status"] for r in QROWS)
+cnt4 = Counter(r["status"] for r in LIVE4)
+cntR7 = Counter(r["status"] for r in R7ROWS)
 L = []
 P = L.append
-P("# Revision 9 draft, fourth version, vs Session F's records (fourth pass)\n")
-P(f"Generated by `docs/review_2026-10/rev9/check_F_v4.py` (stdlib + `rlib`), built from `check_F_v3.py` with every record "
-  f"recomputation kept. Fourth draft: `{DRAFT_FILE}` at `{FOURTH_REF}` ({cdate(FOURTH_REF)}, {len(TEX4) - (TEX4[-1] == '')} lines), "
-  f"cited `tex4:NNN`; third draft `{THIRD_REF}` ({cdate(THIRD_REF)}, {len(TEX3) - (TEX3[-1] == '')} lines), cited `tex3:NNN` "
-  f"(lines move by +2 after tex3:233 and by +3 after tex3:304). Records: `{BR}` at **{HEAD}** ({cdate(HEAD)}); every store "
-  f"used is byte-identical to the one at the report commit the draft names: {all(v[1] for v in SAME.values())} "
-  f"({', '.join(f'{k}@{v[0]}' for k, v in SAME.items())}). F's commits after the third pass's 1218a24 are S81 progress only.\n")
-P("Method. Every row live in `check_F_v3.md` (first-pass and `N..` rows that stood in the third draft, and the `M..` rows) "
-  "keeps its record recomputation and is located in the fourth draft by text:\n"
-  "- found: it **stands** at that `tex4` line with its v3 status;\n"
-  "- not found: **REMOVED in v4**, superseded by the fourth-pass row (`P..`) that checks the new wording;\n"
-  "- found, but its verdict must be re-read with a record that appeared since (X's start of test_delta_recipe, in the "
-  "main line's Amendment 2, `55dac50`) or at the fourth draft's time (S81): **SUPERSEDED in v4**, and the `P..` row is live.\n"
-  "`P..` rows cover every changed sentence of the fourth draft about Session F, the delta write and its main-line test, "
-  "and the memory horizon; each has a fragment asserted at its `tex4` line.\n")
-P(f"**Fourth draft: {len(live4)} rows** ({sum(1 for r in live4 if r['kind'] == 'first')} first-pass, "
-  f"{sum(1 for r in live4 if r['kind'] == 'second')} second-pass, {sum(1 for r in live4 if r['kind'] == 'third')} third-pass, "
-  f"{len(PROWS)} fourth-pass rows): " + ", ".join(f"{k} {cnt4.get(k, 0)}" for k in ORDER) + ".\n")
-P(f"- Third draft (v3, recomputed here): {len(LIVE3)} rows, " + ", ".join(f"{k} {cnt3.get(k, 0)}" for k in ORDER) + ".")
-P(f"- Removed or superseded in v4: {len(gone4)} rows, of which " + ", ".join(f"{k} {Counter(r['status'] for r in gone4).get(k, 0)}" for k in ORDER) + ".")
-P("- Fourth-pass rows alone: " + ", ".join(f"{k} {cntP.get(k, 0)}" for k in ORDER) + ".\n")
-P("Definitions as in `check_F.md`: BOUND = `rlib.bound`; DISCOVERED = bound and final `val_cos` < 0.5; BOUND ROUTED = `rlib.outcome_k`. "
-  f"stream_gate ties deferred to ch_map: {sorted(set(TIES)) or 'none'}.\n")
-P("## Fourth-draft table (non-MATCH first)\n")
-P("| # | id | where (tex4) | origin | item | draft says | recomputed | status | note |")
+P("# Revision 9 draft, fifth version, vs Session F's records (fifth pass)\n")
+P(f"Generated by `docs/review_2026-10/rev9/check_F_v5.py` (stdlib + `rlib`), built from `check_F_v4.py` with every record "
+  f"recomputation kept. Fifth draft: `{DRAFT_FILE}` at `{FIFTH_REF}` ({cdate(FIFTH_REF)}, {len(TEX5) - (TEX5[-1] == '')} lines), "
+  f"cited `tex5:NNN`; fourth draft `{FOURTH_REF}` ({cdate(FOURTH_REF)}, {len(TEX4) - (TEX4[-1] == '')} lines), cited `tex4:NNN` "
+  f"(lines move by +2 after tex4:192, where the split_copy L and pooled rows were inserted, and by +4 after tex4:454, where the "
+  f"S75 paragraph was added). Records: `{BR}` at **{HEAD}** ({cdate(HEAD)}), which is report 7 and F's last commit before the "
+  f"fifth draft; every store used before report 7 is byte-identical to the one at the report commit the draft names: "
+  f"{all(v[1] for v in SAME.values())}. The main line as of the fifth draft is `{ML5}`.\n")
+P("Method. Every row live in `check_F_v4.md` (the first-, second- and third-pass rows that stood in the fourth draft, and the "
+  "`P..` rows) keeps its record recomputation and is located in the fifth draft by text:\n"
+  "- found: it **stands** at that `tex5` line with its status;\n"
+  "- not found: **REMOVED in v5**, superseded by the fifth-pass row (`Q..`) that checks the new wording;\n"
+  "- found, but its verdict must be re-read against what changed since (the test_delta_recipe code at the main line): "
+  "**SUPERSEDED in v5**, and the `Q..` row is live.\n"
+  "`Q..` rows cover every changed sentence of the fifth draft about Session F (S81 folded in by `3b06af2`), the delta write's "
+  "main-line test and its status, and the memory horizon; each has a fragment asserted at its `tex5` line. Report 7 (S81, "
+  f"`{R7}`, after the fourth pass) is checked number by number against `trigger_results.json` (`R7` rows, section 2).\n")
+P(f"**Fifth draft: {len(live5)} rows** ({sum(1 for r in live5 if r['kind'] == 'first')} first-pass, "
+  f"{sum(1 for r in live5 if r['kind'] == 'second')} second-pass, {sum(1 for r in live5 if r['kind'] == 'third')} third-pass, "
+  f"{sum(1 for r in live5 if r['kind'] == 'fourth')} fourth-pass, {len(QROWS)} fifth-pass rows): "
+  + ", ".join(f"{k} {cnt5.get(k, 0)}" for k in ORDER) + ".\n")
+P(f"- Fourth draft's live rows (recomputed here): {len(LIVE4)}, " + ", ".join(f"{k} {cnt4.get(k, 0)}" for k in ORDER) + ".")
+P(f"- Removed or superseded in v5: {len(gone5)} rows, of which " + ", ".join(f"{k} {Counter(r['status'] for r in gone5).get(k, 0)}" for k in ORDER) + ".")
+P("- Fifth-pass rows alone: " + ", ".join(f"{k} {cntQ.get(k, 0)}" for k in ORDER) + ".")
+P(f"- Report 7 (S81), not counted above: {len(R7ROWS)} rows, " + ", ".join(f"{k} {cntR7.get(k, 0)}" for k in ORDER) + ".\n")
+P("Definitions as in `check_F.md`: BOUND = `rlib.bound`; BOUND ROUTED = `rlib.outcome_k`; 'labelled ok' = c* holds >= 2 "
+  "streams and c0 none on the map just before the firing (s37c.targeting). stream_gate ties deferred to ch_map: "
+  f"{sorted(set(TIES)) or 'none'}.\n")
+P("## 1. Fifth-draft table (non-MATCH first)\n")
+P("| # | id | where (tex5) | origin | item | draft says | recomputed | status | note |")
 P("|---|---|---|---|---|---|---|---|---|")
-rows4 = sorted(live4, key=lambda r: (ORDER[r["status"]], (lambda x: x[0] if isinstance(x, list) and x else 9999)(r["loc4"])))
-for i, r in enumerate(rows4, 1):
-    if r["kind"] in ("first", "second", "third"):
-        org = {"first": r["tex"], "second": f"second pass ({r['tex']})", "third": f"third pass ({r['tex']})"}[r["kind"]]
+rows5 = sorted(live5, key=lambda r: (ORDER[r["status"]], (lambda x: x[0] if isinstance(x, list) and x else 9999)(r["loc5"])))
+for i, r in enumerate(rows5, 1):
+    if r["kind"] in ("first", "second", "third", "fourth"):
+        org = {"first": r["tex"], "second": f"second pass ({r['tex']})", "third": f"third pass ({r['tex']})",
+               "fourth": f"fourth pass ({r['tex']})"}[r["kind"]]
     else:
-        org = ("tex3:" + ", ".join(map(str, r["old"])) + " (unchanged)") if r["old"] else "new or reworded in tex4"
-    P(f"| {i} | {r.get('id', '')} | {esc(lstr(r['loc4']))} | {esc(org)} | {esc(r['item'])} | {esc(r['draft'])} | {esc(r['rec'])} | **{r['status']}** | {esc(r['note'])} |")
-P("\n## Rows removed or superseded in the fourth draft\n")
-P("| row | was at (tex3) | its v3 status | fragment | v4 state | superseded by | its status | its tex4 line |")
+        org = ("tex4:" + ", ".join(map(str, r["old"])) + " (unchanged)") if r["old"] else "new or reworded in tex5"
+    P(f"| {i} | {r.get('id', '')} | {esc(lstr(r['loc5']))} | {esc(org)} | {esc(r['item'])} | {esc(r['draft'])} | {esc(r['rec'])} | **{r['status']}** | {esc(r['note'])} |")
+P("\n## 2. Report 7 (S81), every number, against `trigger_results.json` at " + R7 + "\n")
+P("| # | where | item | report says | recomputed | status | note |")
+P("|---|---|---|---|---|---|---|")
+for i, r in enumerate(sorted(R7ROWS, key=lambda r: (ORDER[r["status"]], int(r["tex"].split(":")[1]))), 1):
+    P(f"| {i} | {r['tex']} | {esc(r['item'])} | {esc(r['draft'])} | {esc(r['rec'])} | **{r['status']}** | {esc(r['note'])} |")
+P(f"\nThe draft's S81 commit `3b06af2` ({cdate('3b06af2')}) follows report 7 (`{R7}`, {cdate(R7)}); its readings commit "
+  f"`{rc81}` ({cdate(rc81)}) precedes the first commit holding an S81 record, `{fr81}` ({cdate(fr81)}), and is its ancestor: {prec81}.\n")
+P("## 3. Rows removed or superseded in the fifth draft\n")
+P("| row | was at (tex4) | its v4-era status (recomputed) | fragment | v5 state | superseded by | its status | its tex5 line |")
 P("|---|---|---|---|---|---|---|---|")
-for r in sorted(gone4, key=lambda r: (ORDER[r["status"]], r.get("id", "") or r["tex"])):
-    s = ALLP[r["sup4"]]
-    P(f"| {r.get('id') or esc(r['item'][:60])} | {esc(lstr(r['loc3'], 'tex3'))} | {r['status']} | {esc(qstr(r['q']))} | {r['state4']} | "
-      f"{s['id']} | {s['status']} | {lstr(s['loc4'])} |")
-P("\n## Every third-draft non-MATCH row, in the fourth draft\n")
-P("| row | v3 place | v3 status | fourth draft |")
+for r in sorted(gone5, key=lambda r: (ORDER[r["status"]], r.get("id", "") or r["tex"])):
+    s = ALLQ[r["sup5"]]
+    P(f"| {r.get('id') or esc(r['item'][:60])} | {esc(lstr(r['loc4'], 'tex4'))} | {r['status']} | {esc(qstr(r['q']))} | {r['state5']} | "
+      f"{s['id']} | {s['status']} | {lstr(s['loc5'])} |")
+P("\n## 4. Every fourth-draft non-MATCH row, in the fifth draft\n")
+P("| row | v4 place | status | fifth draft |")
 P("|---|---|---|---|")
-for r in sorted([r for r in LIVE3 if r["status"] != "MATCH"], key=lambda r: (ORDER[r["status"]], r.get("id", "") or r["tex"])):
-    if r["state4"] == "stands":
-        w = (f"stands at {lstr(r['loc4'])}: still {r['status']}" if r["loc4"] != "report_6.md" else "report 6 (not the draft): unchanged")
+for r in sorted([r for r in LIVE4 if r["status"] != "MATCH" or r.get("id") in ("P3", "P4", "P5", "P6", "P7")],
+                key=lambda r: (ORDER[r["status"]], r.get("id", "") or r["tex"])):
+    if r["state5"] == "stands":
+        w = (f"stands at {lstr(r['loc5'])}: still {r['status']}" if r["loc5"] != "report_6.md" else "report 6 (not the draft): unchanged")
     else:
-        s = ALLP[r["sup4"]]
-        w = f"{r['state4']}; {s['id']} at {lstr(s['loc4'])}: {s['status']}"
-    P(f"| {r.get('id') or esc(r['item'][:70])} | {esc(lstr(r['loc3'], 'tex3') if isinstance(r['loc3'], list) else r['loc3'])} | {r['status']} | {esc(w)} |")
-P("\n## Readings vs docstring, fourth draft\n")
-P("| screen | reading (docstring, file:line) | fourth-draft wording (tex4) | recomputed | status |")
+        s = ALLQ[r["sup5"]]
+        w = f"{r['state5']}; {s['id']} at {lstr(s['loc5'])}: {s['status']}"
+    P(f"| {r.get('id') or esc(r['item'][:70])} | {esc(lstr(r['loc4'], 'tex4') if isinstance(r['loc4'], list) else r['loc4'])} | {r['status']} | {esc(w)} |")
+P("\n## 5. Fourth-pass rows whose status, recomputed now, differs from `check_F_v4.md`\n")
+P("Some rows read branch heads (results files, F's head). Recomputed at the fifth draft's time:\n")
+if flips:
+    P("| row | item | in check_F_v4.md | now |\n|---|---|---|---|")
+    for x in flips:
+        P("| " + " | ".join(esc(v) for v in x) + " |")
+else:
+    P("- none.")
+P("\n## 6. Readings vs docstring, fifth draft\n")
+P("| screen | reading (docstring) | fifth-draft wording (tex5) | recomputed | status |")
 P("|---|---|---|---|---|")
-RD4 = [
+RD5 = [
     ("S68", "\"the partition's advantage is in the number of streams\" / \"context-tagged keys scale\" (explore_f_premise.py:22-23)",
-     "'did not apply' (tex4:254, 360); the count only (tex4:339)", r68, "MATCH"),
-    ("S69", "\"the forget gate needs the delta rule\" (explore_f_hebb_decay.py:23)", "paragraph title (tex4:246)", r69, "MATCH"),
-    ("S59", "\"the horizon knob matters\" / \"it does not\" (explore_f_decay.py:30-34)",
-     "tex4:441 'its pre-fixed reading on the horizon read \"it does not\"'; tex4:460", r59, "MATCH"),
-    ("S76 P2", "\"the delta recipe keeps eight streams\" if c - b <= 1 (explore_f_eight.py:39)", "applies (tex4:248)", r76, "MATCH"),
-    ("S80 (a), (b)", "\"the delta recipe keeps it\" (explore_f_configs.py READINGS)", "'Both readings are \"keeps it\"' (tex4:250)", f"{ra80}; {rb80}", "MATCH"),
-    ("S81", "explore_f_trigger.py READINGS", "'running', no number (tex4:41, 254, 473, 510)", f"{S81_4['n']} progress records at {S81_4['ref']}; no report", "MATCH (no reading claimed)"),
+     "'both read \"neither\"' (tex5:246); 'did not apply' (tex5:256, 362)", r68, "MATCH"),
+    ("S69", "\"the forget gate needs the delta rule\" (explore_f_hebb_decay.py:23)", "paragraph title (tex5:248)", r69, "MATCH"),
+    ("S59", "\"the horizon knob matters\" / \"it does not\" (explore_f_decay.py:30-34)", "tex5:443 ('its pre-fixed reading on the horizon read \"it does not\"'), 464", r59, "MATCH"),
+    ("S76 P2", "\"the delta recipe keeps eight streams\" (explore_f_eight.py:39)", "applies (tex5:250)", r76, "MATCH"),
+    ("S80 (a), (b)", "\"the delta recipe keeps it\" (explore_f_configs.py READINGS)", "'Both readings are \"keeps it\"' (tex5:252)", f"{ra80}; {rb80}", "MATCH"),
+    ("S81", "\"the guard aims the split\", \"the evaluation is the better probe\", \"the guard costs binding\", \"the evaluation costs binding\" (explore_f_trigger.py READINGS)",
+     "'neither \"aims\" nor \"costs binding\" applies by F's rules'; 'the evaluation is the better probe' not applying (tex5:205); "
+     "the index's 'the flat-start guard costs and the evaluation trigger keeps' (tex5:58, Q13)",
+     f"aims {aims}; better {better} (H's rule {better_H}); guard costs {g_costs}; evaluation costs {e_costs}", "MATCH (tex5:205); PARTIAL (tex5:58)"),
 ]
-for x in RD4:
+for x in RD5:
     P("| " + " | ".join(esc(v) for v in x) + " |")
-P("\n## Not checked here\n")
-P("- Session G's numbers attached to F's statements (tex4:254's 14/20 against 1/20 and S71; the randomised-layout in-run probe). "
-  "Main-line counts used beside F's (C3 on X is in `check_split_copy_v4.md`).\n"
-  "- When X's test_delta_recipe run started: only the main line's own statement in Amendment 2 (55dac50, 15:36 UTC) gives "
-  "02:12 UTC; no log or result is committed. The draft's session (01D7...) is not the test's (01Qg...).\n"
-  "- S81's readings: S81 is still running (progress commits only); the draft quotes no S81 number.\n"
+P(f"\nS81's readings commit: `{PREC81['rc']}` ({PREC81['rcd']}); first S81 record commit `{PREC81['fr']}` ({PREC81['frd']}, "
+  f"{PREC81['nrec']} records); explore_f_trigger.py unchanged to report 7: {PREC81['unchanged']}; record code commits {PREC81['rg']} "
+  f"descend from the readings commit: {PREC81['desc']}; readings before the first record: {PREC81['prec']}.\n")
+P("## 7. Corrections to the referee's earlier files (recorded here, not edited)\n")
+P(f"- **`check_F_v4.md` P3 (DISAGREE), `check_split_copy_v4.md` §4 (the tex4:41 row), `fourth_pass.md` §1 item 6, "
+  f"`resolution_F_sc_appB4.md` §5.** They read Amendment 2's 'after X's full run had started (02:12 UTC)' as the start of the "
+  f"test's runs. The main line's RESULT (X) docstring at `8ae660d` says 'The run started 2026-10-11 02:12 UTC through longrun.py; "
+  f"runs began at 05:27 after the verification', and the results file's `meta.started` is '{xm['started']}' (set after "
+  f"`verify()` returns; X records UTC). The referee's code check `{DR['tcheck']}` ({cdate(DR['tcheck'])}) and second review "
+  f"`{DR['review2']}` ({cdate(DR['review2'])}) therefore came before any run of the test's arms. tex4:41's 'checked against the "
+  f"amended spec before any run' was true of the runs; it was false only if the 3 h 15 min of verification count as a run.")
+P("- **The same files on tex4:54 and tex4:254 ('not run').** Still false at 07:52 UTC on 11 October, but the runs had been "
+  "going for 2 h 25 min (from 05:27), not 5 h 40 min (from 02:12).")
+P("- **`fourth_pass.md` §1 and `check_F_v4.md`** did not flag tex4:36's 'the next main-line test, specified and reviewed' "
+  "while X's runs were under way; Q20 flags it now.")
+P("\n## 8. Not checked here\n")
+P("- test_delta_recipe's X counts, D1-D4, the firings and probe counts (tex5:54, 256): the X-results check's. Only the status, "
+  "the commits, the run count and the seeds are checked here.\n"
+  "- Session G's numbers attached to F's statements and session H's S84/S86 beyond the three EVAL-vs-BASE counts used in Q19.\n"
+  "- Report 7's smoke-test disclosure (an unstored run) and the bit-for-bit CHECKs (read from the CHECK file, not re-run).\n"
+  "- Whether 'every session's queue is empty' was meant of the main line's queue only; checked as written.\n"
   "- The PDF.")
 with open(OUT, "w") as fh:
     fh.write("\n".join(L) + "\n")
-print(f"wrote {OUT}: fourth draft {len(live4)} rows; " + ", ".join(f"{k} {cnt4.get(k, 0)}" for k in ORDER)
-      + f"; removed/superseded in v4 {len(gone4)}; fourth-pass rows {len(PROWS)} (" + ", ".join(f"{k} {cntP.get(k, 0)}" for k in ORDER) + ")")
-for r in rows4:
+print(f"wrote {OUT}: fifth draft {len(live5)} rows; " + ", ".join(f"{k} {cnt5.get(k, 0)}" for k in ORDER)
+      + f"; removed/superseded in v5 {len(gone5)}; fifth-pass rows {len(QROWS)} (" + ", ".join(f"{k} {cntQ.get(k, 0)}" for k in ORDER)
+      + f"); report 7 rows {len(R7ROWS)} (" + ", ".join(f"{k} {cntR7.get(k, 0)}" for k in ORDER) + ")")
+for r in rows5:
     if r["status"] != "MATCH":
-        print(f"  {r['status']:8} {r.get('id', ''):4} {lstr(r['loc4']):14} {r['tex']:10} {r['item'][:100]}")
-for r in gone4:
-    print(f"  {r['state4'][:13]} {r.get('id') or r['tex']:8} {r['status']:9} -> {r['sup4']}: {ALLP[r['sup4']]['status']}")
-for r in PROWS:
-    print(f"  {r['id']:4} {r['status']:8} {r['rec'][:200]}")
+        print(f"  {r['status']:8} {r.get('id', ''):4} {lstr(r['loc5']):14} {r['tex']:10} {r['item'][:100]}")
+for r in R7ROWS:
+    if r["status"] != "MATCH":
+        print(f"  R7 {r['status']:8} {r['tex']:16} {r['item'][:100]}")
+for r in gone5:
+    print(f"  {r['state5'][:13]} {r.get('id') or r['tex']:8} {r['status']:9} -> {r['sup5']}: {ALLQ[r['sup5']]['status']}")
+for x in flips:
+    print("  FLIP", x)
+for r in QROWS:
+    print(f"  {r['id']:4} {r['status']:8} {r['rec'][:220]}")

@@ -9,7 +9,7 @@
   scanned origin/claude/relaxed-edison-he00cc at 3c2fb70
   scanned origin/claude/replicate-R at 1f8be04
   scanned origin/claude/rev9-draft at c5e4508
-  scanned origin/claude/review-V at b25a4f6
+  scanned origin/claude/review-V at e938873
   scanned origin/feature/per-channel-plasticity at 4af9d50
   308 distinct JSON/JSONL blobs (966 branch-paths); 28791 seed values read (keys, 'seed' fields, 'seeds' lists); unparsed: none
   G (X 600-619, L 1600-1619): records using a seed of the block: 0
@@ -31,7 +31,11 @@
     docs/review_2026-10/registry_L_recount_out.txt (review-V)
     docs/review_2026-10/rev9/check_G_v4.md (review-V)
     docs/review_2026-10/rev9/check_G_v4.py (review-V)
+    docs/review_2026-10/rev9/check_G_v5.md (review-V)
+    docs/review_2026-10/rev9/check_G_v5.py (review-V)
     docs/review_2026-10/rev9/resolution_G4.md (review-V)
+    docs/review_2026-10/spec_checks_register_keyterm.py (review-V)
+    docs/review_2026-10/spec_checks_register_keyterm_out.txt (review-V)
     docs/review_2026-10/test_check_delta_recipe.md (review-V)
     explore_out/G/report_6.md (explore-G)
     explore_out/G/spec_draft_register.md (explore-G)
@@ -62,6 +66,7 @@
   recorded 'transition' against test_binding_onset.transition(curve) on all 186 S82/S83 records: 0 differ []
   bound records with per-layer statistics, (ROUTED* at every layer, ROUTED* on the returned gate): {(False, False): 8, (True, True): 52}
   REG3_NUDGE ROUTED-BOUND: S72 20/20 (seeds 700-719), S82 2/2, S83 2/2
+  S72 (700-719) ROUTED-BOUND: BASELINE 0/20, REG3 4/20; S71 (700-709) BOUND: ORACLE_ALL 10/10, ORACLE_23 0/10, ORACLE_1 9/10
   S82's validity rule as coded (explore_g_devices.py:[120]): ['f"ROUTED-BOUND {nn}/{len(R[\'REG3_NUDGE\'])} -> {\'VALID\' if no >= 1 else \'UNTESTED\'}"}']
   blob of explore_f_tasks.py: {'9a6c2bf': 'de4746371d', '076005d': 'de4746371d'}; on the main line: False
   blob of explore_b18_gates.py: {'9a6c2bf': 'a61a577388', '076005d': 'a61a577388', '9b72bf6': 'a61a577388', 'origin/claude/outside-ideas': 'a61a577388'}; on the main line: False
@@ -110,12 +115,12 @@
     p 0.975: >= 18/20 on one machine 0.987; on both 0.974; on exactly one 0.026; pooled >= 36/40 0.997; pooled >= 37/40 0.983; pooled >= 38/40 0.922
     p 0.990: >= 18/20 on one machine 0.999; on both 0.998; on exactly one 0.002; pooled >= 36/40 1.000; pooled >= 37/40 0.999; pooled >= 38/40 0.993
   the 'both machines' rule is not monotone in the pooled count: X 20/20 + L 17/20 = 37/40 fails it, X 18/20 + L 18/20 = 36/40 passes
-  predictive, G: S82 REG3_KEYHINGE 20/20, uniform prior: P(>= 18/20 on a machine) 0.893; on both, if the machines share one rate drawn once (lower) ~ 0.798 (independent draws)
-  predictive, G: S82 REG3_KEYHINGE 20/20, Jeffreys prior: P(>= 18/20 on a machine) 0.955; on both, if the machines share one rate drawn once (lower) ~ 0.913 (independent draws)
-  predictive, G: S82 20/20 + S83 KH_1200 18/20 (a different window), uniform prior: P(>= 18/20 on a machine) 0.807; on both, if the machines share one rate drawn once (lower) ~ 0.651 (independent draws)
-  predictive, G: S82 20/20 + S83 KH_1200 18/20 (a different window), Jeffreys prior: P(>= 18/20 on a machine) 0.850; on both, if the machines share one rate drawn once (lower) ~ 0.723 (independent draws)
-  predictive, H: S52 36/40 + S85 20/20, uniform prior: P(>= 18/20 on a machine) 0.770; on both, if the machines share one rate drawn once (lower) ~ 0.593 (independent draws)
-  predictive, H: S52 36/40 + S85 20/20, Jeffreys prior: P(>= 18/20 on a machine) 0.802; on both, if the machines share one rate drawn once (lower) ~ 0.643 (independent draws)
+  predictive, G: S82 REG3_KEYHINGE 20/20, uniform prior: P(>= 18/20 on a machine) 0.893; on both: 0.798 if each machine has its own rate, 0.827 if they share one
+  predictive, G: S82 REG3_KEYHINGE 20/20, Jeffreys prior: P(>= 18/20 on a machine) 0.955; on both: 0.913 if each machine has its own rate, 0.926 if they share one
+  predictive, G: S82 20/20 + S83 KH_1200 18/20 (a different window), uniform prior: P(>= 18/20 on a machine) 0.807; on both: 0.651 if each machine has its own rate, 0.684 if they share one
+  predictive, G: S82 20/20 + S83 KH_1200 18/20 (a different window), Jeffreys prior: P(>= 18/20 on a machine) 0.850; on both: 0.723 if each machine has its own rate, 0.750 if they share one
+  predictive, H: S52 36/40 + S85 20/20, uniform prior: P(>= 18/20 on a machine) 0.770; on both: 0.593 if each machine has its own rate, 0.621 if they share one
+  predictive, H: S52 36/40 + S85 20/20, Jeffreys prior: P(>= 18/20 on a machine) 0.802; on both: 0.643 if each machine has its own rate, 0.668 if they share one
 
 == 5. McNemar power (exact one-sided, SHOWN at p < 0.05; pooled 40 pairs, per machine 20)
   G: REG3_KEYHINGE at p1 against a comparator at p2 (S82/S83: BASELINE 0/20, LOCAL3_KEYHINGE 0/20, REG3 2/20; Wilson upper bounds 0.16, 0.16, 0.30)
@@ -138,6 +143,8 @@
     pooled pairs for 80% power, nested 0.95 vs 0.8625: 76
     pooled pairs for 80% power, empirical 12 vs 2 of 60: 56
     pooled pairs for 80% power, indep 0.95 vs 0.80: 68
+  H: K1 at 80 pooled pairs (40 seeds per machine), indep / nested: 0.933 vs 0.8125: 0.681/0.971; 0.95 vs 0.8125: 0.820/0.989; 0.933 vs 0.8625: 0.339/0.673; 0.95 vs 0.8625: 0.507/0.839
+  H: with 40 seeds per machine, the RELIABLE band per machine (>= 36/40): P(on both machines) 0.9: 0.396, 0.933: 0.762, 0.95: 0.906, 0.975: 0.994; the 18/20 rule for comparison: 0.9: 0.458, 0.933: 0.728, 0.95: 0.855, 0.975: 0.974
   H's no-room region: K1 cannot be SHOWN when WIN3_SLOW binds >= 36/40 pooled (b <= 4, p >= 0.0625). P(WIN3_SLOW >= 36/40): 0.8: 0.076, 0.8125: 0.107, 0.8625: 0.340, 0.9: 0.629
 
 == 6. Readings: every combination (both machines VALID unless stated)

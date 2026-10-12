@@ -2036,6 +2036,8 @@ kl_mn1 = min(min(kl_all[a]["1"].values()) for a in POSFLAT)
 kl_300_1200 = max(kl_mx[a][u] for a in POSFLAT for u in ("300", "600", "1200"))
 n_over_300_1200 = sum(len(kl_over[a][u]) for a in POSFLAT for u in ("300", "600", "1200"))
 n_over_1 = sum(len(kl_over[a]["1"]) for a in POSFLAT)
+kl_lmean = {a: {u: {s: statistics.fmean(r["term"]["value_at"][u]) for s, r in Y[a].items()} for u in KLU} for a in POSFLAT}
+kl_lmean_over1200 = {a: sorted((s, round(v, 7)) for s, v in kl_lmean[a]["1200"].items() if v > 1e-5) for a in POSFLAT}
 w_on = all(r["term"]["weights"]["2400"] == 1.0 and r["term"]["weights"]["2401"] == 0.0 for a in POSFLAT for r in Y[a].values())
 
 
@@ -2085,7 +2087,8 @@ row5(r"both hold the gate at uniform while they act (its KL from uniform at most
      f"KL(g || U), max over layers, per run: at update 1 {kl_mn1:.2g}-{max(kl_mx[a]['1'] for a in POSFLAT):.2g} (above 1e-5 in "
      f"{n_over_1}/40); at 300 / 600 / 1200 max POS {kl_mx['REG3_KEYHINGE_POS']['300']:.2g} / {kl_mx['REG3_KEYHINGE_POS']['600']:.2g} / "
      f"{kl_mx['REG3_KEYHINGE_POS']['1200']:.2g}, FLAT {kl_mx['REG3_FLAT']['300']:.2g} / {kl_mx['REG3_FLAT']['600']:.2g} / "
-     f"{kl_mx['REG3_FLAT']['1200']:.2g} (above 1e-5: POS seeds {kl_over['REG3_KEYHINGE_POS']['1200']} at 1200); at 2400 POS max "
+     f"{kl_mx['REG3_FLAT']['1200']:.2g} (above 1e-5: POS seeds {kl_over['REG3_KEYHINGE_POS']['1200']} at 1200; the layer mean, the term "
+     f"itself, above 1e-5 at 1200: {kl_lmean_over1200}); at 2400 POS max "
      f"{kl_mx['REG3_KEYHINGE_POS']['2400']:.3f} (above 1e-5 in {len(kl_over['REG3_KEYHINGE_POS']['2400'])}/20), FLAT "
      f"{kl_mx['REG3_FLAT']['2400']:.2g}; both terms act through update 2400 (weight 1 at 2400, 0 at 2401, every run: {w_on})",
      "DISAGREE" if (kl_300_1200 > 1e-5 or n_over_1) else "MATCH",
