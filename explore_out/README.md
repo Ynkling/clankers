@@ -34,3 +34,16 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
     expected to be biased low.
   - **Fixed run selection.** WIDE_SPLIT and REG3 on the 3070, and WIDE_SLOW as the no-split twin on the 1660.
   - **Follow-up rule.** Any later S = 4 screen derives its constants from ORACLE and SINGLE data only.
+- **S75 at S = 4, all registered arms (GTX 1660 SUPER; report_2.md).**
+  - **UNTESTED, as registered.** ORACLE ended at 0.892 and 0.880.
+  - **Descriptions only.** WIDE_SPLIT 0/10 and REG3 0/10 ROUTED. Every gate stayed source-blind (η² 0.00) at every
+    evaluation, and SET stayed at SINGLE's level, with GAP ≈ 0.
+  - **The split.** 30 fires, all on merged maps; the declared hazard did not arise.
+  - **Correction to the pre-run note.** Three WIDE_SPLIT runs had already finished on the 1660 when it was committed.
+    It was still blind: no learned-arm record was pushed until 13:53.
+  - **Pending.** WIDE_SLOW is running.
+- **S75b draft spec (s75b_spec_draft.md, for the user).** It was designed before S75's learned arms were read (1e31409).
+  - Configuration B: S = 4, NB = 32, M = 352, L = 1536, bound 0.963.
+  - A 2-seed ORACLE pilot with proceed and stop rules fixed in advance.
+  - SPLIT_THR set from the pilot, and the split guarded against one-to-one maps.
+  - Fresh seeds 850–859, and an estimated ~1.4 days on both cards.
