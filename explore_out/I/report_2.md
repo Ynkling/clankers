@@ -6,7 +6,7 @@
 | SINGLE | 830–839 | – (no gate) | 0.538 (0.534–0.595) | 0 | – | – |
 | WIDE_SPLIT | 830–839 | 0/10 [0.00, 0.28] NEVER | 0.534 (0.529–0.536) | −0.01 | 0.00 | 30 (3 per run) |
 | REG3 | 830–839 | 0/10 [0.00, 0.28] NEVER | 0.539 (0.535–0.588) | 0.00 | 0.00 / 0.00 / 0.00 | – |
-| WIDE_SLOW (no-split twin, printed) | 830–839 | pending: running on the GTX 1660 SUPER | | | | |
+| WIDE_SLOW (no-split twin, printed) | 830–838 (839 pending) | 0/9 [0.00, 0.30] NEVER | 0.534 (0.530–0.536) | – | 0.00 | – (no split) |
 
 **The registered result is UNTESTED.** VALID needs both ORACLE runs at SET ≥ 0.9; they ended at 0.892 and 0.880. As
 the pre-run note fixed (`gpu/s75_S4_prerun_note_2026-10-12.md`), nothing below is read as "carries" or "does not
@@ -65,9 +65,17 @@ three runs.
 
    The per-fire table, with every eligible check including those blocked by gap or cap, is section 2 of
    `gpu/s75_S4_descriptions.md`.
-6. **WIDE_SLOW is pending.** When its records land, the pairing with WIDE_SPLIT by seed (section 4 of the descriptions)
-   is regenerated with `python -m explore_gpu.s75_writeup` and this report is updated. With no WIDE_SPLIT run routed,
-   that pairing can only show whether the window gate routes when it is never split.
+6. **WIDE_SLOW, the no-split twin: seeds 830–838** (4c3984a; seed 839 is pending, and this item and the table row
+   are regenerated when it lands).
+   - *ROUTED.* 0/9 at the end, and never at any of the 20 evaluations of any run.
+   - *Gates.* η² is 0.00, and the gates are source-blind exactly as in WIDE_SPLIT: the rows of the source × channel
+     table differ by at most 0.02, the margin is 0.01–0.03, and the mass is spread or uneven over the channels the same
+     way for every source.
+   - *SET and probe.* SET is 0.530–0.536, SINGLE's level, and the source probe is at chance (0.24–0.26) at every layer.
+   - *Paired by seed with WIDE_SPLIT* (section 4 of the descriptions): neither arm is ROUTED on any of the 9 shared
+     seeds. Per seed, SET differs by at most 0.003 (median absolute difference 0.0006).
+   - *As a description of these runs:* the window gate stayed source-blind with the split and without it. The split's
+     30 fires neither helped nor harmed routing that never formed.
 
 ## What this does and does not say
 

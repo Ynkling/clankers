@@ -34,7 +34,19 @@ R = ROUTED (eta^2 >= 0.9 and a one-to-one map at every gate layer); o = one-to-o
     838   ....................     -    0.00/0.00/0.00
     839   ....................     -    0.00/0.00/0.00
 
-- WIDE_SLOW: no records yet
+**WIDE_SLOW** (0/9 ROUTED at the end)
+
+    seed  trajectory               end  eta^2 at the end (per gate layer)
+    830   ....................     -    0.00
+    831   ....................     -    0.00
+    832   ....................     -    0.00
+    833   ....................     -    0.00
+    834   ....................     -    0.00
+    835   ....................     -    0.00
+    836   ....................     -    0.00
+    837   ....................     -    0.00
+    838   ....................     -    0.00
+
 ## 2. WIDE_SPLIT: every eligible check of the split trigger
 
 Trigger: checks every 2400 updates from 4800; eligible when the 64-sequence probe's SET < 0.88 and the rise since the previous check < 0.02; at most 3 fires, at least 4800 apart (explore_i_common.make_split). 'routed@step' is the evaluation at the same step, which runs before the trigger; 'routed@next' the one 1200 updates later.
@@ -121,16 +133,16 @@ Trigger: checks every 2400 updates from 4800; eligible when the 64-sequence prob
 
 | seed | WIDE_SPLIT routed@end | fires | eta^2 | SET | WIDE_SLOW routed@end | eta^2 | SET |
 |---|---|---|---|---|---|---|---|
-| 830 | - | 3 | 0.00 | 0.535 | pending | - | - |
-| 831 | - | 3 | 0.00 | 0.533 | pending | - | - |
-| 832 | - | 3 | 0.00 | 0.535 | pending | - | - |
-| 833 | - | 3 | 0.00 | 0.534 | pending | - | - |
-| 834 | - | 3 | 0.00 | 0.533 | pending | - | - |
-| 835 | - | 3 | 0.00 | 0.533 | pending | - | - |
-| 836 | - | 3 | 0.00 | 0.536 | pending | - | - |
-| 837 | - | 3 | 0.00 | 0.529 | pending | - | - |
-| 838 | - | 3 | 0.00 | 0.536 | pending | - | - |
+| 830 | - | 3 | 0.00 | 0.535 | - | 0.00 | 0.534 |
+| 831 | - | 3 | 0.00 | 0.533 | - | 0.00 | 0.536 |
+| 832 | - | 3 | 0.00 | 0.535 | - | 0.00 | 0.535 |
+| 833 | - | 3 | 0.00 | 0.534 | - | 0.00 | 0.534 |
+| 834 | - | 3 | 0.00 | 0.533 | - | 0.00 | 0.534 |
+| 835 | - | 3 | 0.00 | 0.533 | - | 0.00 | 0.532 |
+| 836 | - | 3 | 0.00 | 0.536 | - | 0.00 | 0.535 |
+| 837 | - | 3 | 0.00 | 0.529 | - | 0.00 | 0.530 |
+| 838 | - | 3 | 0.00 | 0.536 | - | 0.00 | 0.536 |
 | 839 | - | 3 | 0.00 | 0.534 | pending | - | - |
 
-Paired seeds with both records: 0. ROUTED in both 0, WIDE_SPLIT only 0, WIDE_SLOW only 0, neither 0. WIDE_SLOW records are pending for 10 of 10 seeds; this section is regenerated when they land.
+Paired seeds with both records: 9. ROUTED in both 0, WIDE_SPLIT only 0, WIDE_SLOW only 0, neither 9. WIDE_SLOW records are pending for 1 of 10 seeds; this section is regenerated when they land.
 
