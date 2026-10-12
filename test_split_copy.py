@@ -119,13 +119,16 @@ verification), Intel(R) Xeon(R) Processor @ 2.10GHz, torch 2.14.0+cu130, 4 worke
 
 RESULT (L) — test commit 1f52cd5, run at 592c574 on 2026-10-11 (started 09:31 local = 15:31 UTC through longrun.py; runs
 from 11:12 local after the verification), 12th Gen Intel(R) Core(TM) i7-12650H, torch 2.14.1, 6 workers x 1 thread, one
-start, nothing cut, 54/54 runs, none failed; 536 min of runs after the verification (exit 0). An earlier start on
-2026-10-10 stopped at verification with 0 runs (CHECK 155: --also was given a directory, not X's file); its log is kept
-at the top of results/L/split_copy_L.log.
-- Verification: every inherited and own CHECK passed, asserted. test_muon_recipe's CHECK 130 asserted (L's
+start for the runs, nothing cut, 54/54 runs, none failed; 536 min of runs after the verification (exit 0 by the
+user's report; the second start's longrun json and .exit file are not committed, and the log ends with the report).
+An earlier start on 2026-10-10 stopped at verification with 0 runs (CHECK 155: --also was given a directory, not X's
+file); its log is kept at the top of results/L/split_copy_L.log, and longrun's counter was reset between the two, so
+both headers read "start 1".
+- Verification: every CHECK passed; every CHECK that compares with L's own records was asserted, and the three that
+  compare with 2.10GHz Xeon records were printed, not asserted, and DIFFER on this CPU (the inherited CHECKs 135 and
+  141, and the test's own CHECK 150, F's S68_SINGLE_S8|300). test_muon_recipe's CHECK 130 asserted (L's
   test_early_recipe file was written on this CPU). CHECK 146 reproduced L's test_window_gate records at seed 1541 bit
-  for bit through 7200 (asserted: same CPU). CHECK 150 (F's S68_SINGLE_S8|300, a 2.10GHz Xeon record) differs here and
-  was printed, not asserted. CHECK 151(a): 65 Part C/D records, v1 = v2; 151(b): 30 Part A records, no disagreement.
+  for bit through 7200 (asserted: same CPU). CHECK 151(a): 65 Part C/D records, v1 = v2; 151(b): 30 Part A records, no disagreement.
 - Validity: CEIL_C bound 2/2 (4800, 3600); CEIL_DELTA_D8 bound 2/2 (1200, 1200). Parts A and B VALID on L.
 - Counts: WIN3_SPLIT_D8 BOUND ROUTED 8/10 (transition median 19200, 8400-25200; s1566, s1569 MERGED 2 share);
   WIN3_RESET_D8 3/10 (s1560, s1565, s1568); WIN3_SLOW_D8 3/10 (s1560, s1565, s1568); SINGLE_DELTA_D8 BOUND 0/10 (final
