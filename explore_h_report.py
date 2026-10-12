@@ -394,6 +394,65 @@ def s86_section(L):
     return m
 
 
+def s87_section(L):
+    import explore_h_allmass2 as m1
+    import explore_h_dose as m2
+    setup([m1, m2])
+    res, got = m1.report()
+    A = res["arms"]
+    L.append("## (1) S87a explore_h_allmass2 — S=8, P=4, k=16, conv, 43200, Hebbian, exact copy, seeds 2600-2619 (as S86)\n")
+    L.append("| arm | BOUND ROUTED | band | Wilson 95% | failures v1 | failures v2 | transition median (all) | splits | key-label ok | "
+             "all-label ok | own pair ok | pairs equal | map 1:1 before a split |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for a in ("BASE", "ALLMASS"):
+        x = A[a]
+        L.append(f"| {a} | {x['br']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | {cls_str(x['v1'])} | {cls_str(x['v2'])} | "
+                 f"{fmt_t(x['trans_med'])} ({', '.join(str(t) for t in x['trans'])}) | {x['ops']} | {x['key_ok']}/{x['ops']} | "
+                 f"{x['all_ok']}/{x['ops']} | {x['op_ok']}/{x['ops']} | {x['same']}/{x['ops']} | {x['one_to_one_before']} |")
+    o = res["oracle"]
+    L.append(f"\nORACLE (ceil8_D8, seeds 2600-2601): bound {o['bound']}/{o['n']}, transitions {o['transitions']} → "
+             f"{'VALID' if o['valid'] else 'UNTESTED'}.\n")
+    c = res["cmp"]["ALLMASS"]
+    L.append(f"- ALLMASS vs BASE (20 new pairs): {c['x']}/{c['n']} vs {c['y']}/{c['n']}; ALLMASS only {c['b']}, BASE only {c['c']}; "
+             f"p(ALLMASS>BASE) {c['p']:.3g}, p(BASE>ALLMASS) {c['p_rev']:.3g}")
+    pp = res["pooled"]
+    L.append(f"- pooled with S86 (30 pairs, no reading): ALLMASS {pp['x']}/{pp['n']}, BASE {pp['y']}/{pp['n']}; ALLMASS only {pp['b']}, "
+             f"BASE only {pp['c']}; p(ALLMASS>BASE) {pp['p']:.3g}, p(BASE>ALLMASS) {pp['p_rev']:.3g}")
+    L.append("\n**Readings (fixed in explore_h_allmass2's docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    L.append(f"\nALLMASS firings whose own pair was not a labelled target (seed, update, key c*->c0, all c*->c0, key_ok, all_ok): "
+             f"{A['ALLMASS']['bad_fires'] or 'none'}; BASE's: {A['BASE']['bad_fires'] or 'none'}. v1/v2 differences: "
+             + ("; ".join(f"{a} {A[a]['v1v2_differ']}" for a in A if A[a]['v1v2_differ']) or "none") + ".\n")
+    L.append("## (2) The one-to-one guard on the main line's split (no runs)\n")
+    with open(os.path.join(OUT, "onetoone_counts.txt")) as f:
+        L.append("```\n" + f.read().rstrip() + "\n```\n")
+    res2, got2 = m2.report()
+    B = res2["arms"]
+    L.append("## (3) S87c explore_h_dose — S=2, P=4, k=2, no conv, 24000, WIN3_SLOW + the key term, seeds 2630-2639\n")
+    L.append("| arm | lam | window | DISCOVERED | band | Wilson 95% | unbound: v1 | unbound: v2 | transition median (all) | "
+             "max eta^2 by key (25..window) | key split > 0.5 at the end | firings (per run) |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
+    import explore_h_dose_child as dc
+    for a in ("KEYHINGE",) + m2.VARIANTS:
+        x = B[a]
+        L.append(f"| {a} | {dc.ARM[a]['lam']} | {dc.ARM[a]['window']} | {x['k']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | "
+                 f"{cls_str(x['v1'])} | {cls_str(x['v2'])} | {fmt_t(x['trans_med'])} ({', '.join(str(t) for t in x['trans'])}) | "
+                 f"{x['eta_max']:.3f} | {sum(1 for v in x['onset'].values() if v[1])} | {', '.join(str(f) for f in x['fired'])} |")
+    o = res2["oracle"]
+    L.append(f"\nORACLE (ceiling_conv, seeds 2630-2631): bound {o['bound']}/{o['n']}, transitions {o['transitions']} → "
+             f"{'VALID' if o['valid'] else 'UNTESTED'}.\n")
+    for v, c in res2["cmp"].items():
+        L.append(f"- {v} vs KEYHINGE: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {v} only {c['b']}, KEYHINGE only {c['c']}; "
+                 f"p({v}>KEYHINGE) {c['p']:.3g}, p(KEYHINGE>{v}) {c['p_rev']:.3g}")
+    L.append("\n**Readings (fixed in explore_h_dose's docstring before any run):**\n")
+    for k, v in res2["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    ok, dis, pred = res2["v2_property"]
+    L.append(f"\nv1 / v2 on S87c's unbound runs: differ on {len(dis)}, exactly the predicted ones: {ok}.")
+    return [m1, m2]
+
+
 def write(n, body, notes):
     p = os.path.join(OUT, f"report_{n}.md")
     with open(p, "w") as f:
@@ -405,7 +464,7 @@ def write(n, body, notes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8))
+    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9))
     ap.add_argument("--notes", default=None)
     args = ap.parse_args()
     notes = open(args.notes).read() if args.notes else ""
@@ -417,6 +476,12 @@ def main():
         c = checks_line(s58.NAME)
         L.append(f"\n**Runtime:** {nr} runs, {h:.1f} CPU-hours (1 thread each, 4 workers) on {', '.join(cpus)}; code SHA {', '.join(shas)}.")
         L.append(f"**CHECKs:** all passed ({c['time']}, git {c['git']}, {c['minutes']:.1f} min); see explore_out/H/s58.log.")
+    elif args.batch == 9:
+        for m in s87_section(L):
+            nr, h, cpus, shas = runtime(m)
+            c = checks_line(m.NAME)
+            L.append(f"\n**{m.NAME}:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}; CHECKs "
+                     + (f"all passed ({c['time']}, git {c['git']})" if c else "NOT RECORDED"))
     elif args.batch in (4, 5, 6, 7, 8):
         m = {4: s78_section, 5: s79_section, 6: s84_section, 7: s85_section, 8: s86_section}[args.batch](L)
         nr, h, cpus, shas = runtime(m)
