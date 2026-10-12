@@ -914,3 +914,180 @@ Rules as always: readings committed before any resumed run; a batch-20 section i
  every output labelled EXPLORATORY, not a result; new files only; the segment and checkpoint discipline
  of batch 19.
 ```
+
+## Round 5 (12 October, evening): V, G, H, F, R and I, while X adopts the register spec, L runs test_delta_recipe and the GPUs run S75's last arm and the window_gate replication
+
+Seed blocks for this round: F 2400-2459, H 2600-2659, G 2700-2759, R 940-959 (2540-2559 are taken by the GPU
+replication of test_window_gate on session I's branch; 840-859 by S75b). Each session checks every branch and the
+main line's seed list before its first run, as before.
+
+## Session V — round 5 (branch claude/review-V; docs/review_2026-10/)
+
+```
+Four tasks, in order; nothing outside docs/review_2026-10/; stop after whichever you finish last.
+1. The Revision 9 draft, fifth version (claude/rev9-draft at c5e4508 or later; the tex and the PDF).
+ For every row of rev9/fourth_pass.md state whether this version resolves it (RESOLVED, PARTLY, NOT,
+ NEW ERROR) with the new tex line; re-run rev9/check_*.py against the new tex and report the counts.
+ Then check the material added since c66cc76 against the records as you did the rest:
+ (a) test_split_copy on L and pooled (main line ffb0771: results/L/split_copy_results.json,
+ results/L/split_copy_L.log, the RESULT (L) and RESULT (POOLED, PRIMARY) docstring blocks; the draft's
+ split section table, Table 4, the abstract, the index row, the conclusion): every count and p-value,
+ and that the docstring's text equals the log's printed verdicts;
+ (b) test_delta_recipe on X (8ae660d: results/X/delta_recipe_results.json, the RESULT (X) block; the
+ draft's memory section): the counts, D1's Newcombe interval, the no-room rule, and Amendment 2's
+ timing — from the run's log and the records' times, which runs had finished when 55dac50 and 2225f00
+ were committed, against what the amendment says had been seen;
+ (c) S75 at four sources (claude/explore-I: explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json,
+ s75_S4_summary.md, s75_S4_descriptions.md, s75_S4_prerun_note_2026-10-12.md, report_2.md; the
+ draft's "A dense loss" and "Four sources (S75)" paragraphs, the abstract's sentence, the index row,
+ the conclusion, the limits list, the provenance row): every number in those paragraphs is from the
+ records or from session I's files, and some are ours — eta^2 below 0.003 at every evaluation of every
+ gate layer, no one-to-one map at any evaluation, the probe from the residual entering layer 2 at
+ 1200 updates 0.35-0.61 in the gated arms and chance in ORACLE and SINGLE, chance in every arm from
+ 3600, SINGLE's rise of at most 0.03 after 4800 on nine seeds, the fires' masses 0.05-0.38 and
+ margins, WIDE_SLOW's nine seeds within 0.003 of WIDE_SPLIT; recompute each from the results file and
+ say which you could not;
+ (d) if your fourth pass did not cover them: F's report 7 (S81) and H's report 8 (S86) paragraphs.
+ Write rev9/fifth_pass.md with the verdict: "ready to merge", or the list of what remains.
+2. explore_out/G/spec_draft_register.md (claude/explore-G at 076005d) and
+ explore_out/H/spec_draft_two_keyterm.md (claude/explore-H at 9b72bf6): review each as you reviewed
+ specs/test_delta_recipe.md — arms, seeds (X 600-619 / L 1600-1619 for the register; H's proposal),
+ validity, outcomes fixed by function, claims and their multiplicity, the rate claim's interval, the
+ readings' exhaustiveness, the CHECKs, the task-structure caveat, and what each leaves open — so that
+ X's adoption into specs/ can take your fixes in one step. spec_review_register_draft.md,
+ spec_review_two_keyterm_draft.md.
+3. explore_out/I/s75b_spec_draft.md (claude/explore-I at 114cd08): an exploratory follow-up the user
+ has approved; review its provenance claim (the design commit 1e31409's parent 5bc6c2e and what git
+ can show), the pilot's proceed and stop rules, the guard's precedence, and whether any constant could
+ have been chosen from S75's learned arms. spec_review_s75b_draft.md.
+4. Session I's report 2 and the pre-run note's correction (03bffdf): check the timeline it reconstructs
+ from the record durations against the results file, and the descriptions against the records as in
+ 1(c); add the outcome to fifth_pass.md or a short s75_check.md.
+```
+
+## Session G — round 5 (S87: hinges that read no task structure; seeds 2700-2759)
+
+```
+Follow-up to S83, which found that the key term's identity part is needed (the position-only KL 1/20,
+the flat KL 0/20, both by clamping the gate) and that a language model has no marked keys. S87 asks
+whether a hinge that reads no task labels can do the key term's work on the randomised header layout
+(Hebbian, RandHeaderTask-lite, 24000, SLOW, the register at all three layers as REG3; seeds 2700-2719;
+paired). Rerun BASELINE and REG3_KEYHINGE on these seeds as the controls (they are the S82/S83 arms;
+first reproduce one S82 run of each bit for bit through 2400 under the current code). New arms, each a
+term on updates 1-2400 only, each with a switch that makes it REG3 bit for bit when off:
+ (1) REG3_FREQHINGE: the key term applied at the positions of the K most frequent token types in a
+ sample of training sequences (a corpus statistic, no labels; fix K by the sample's frequency table,
+ e.g. the smallest K covering half the token mass, and print which types it selects — on this task
+ the keys and values are frequent and the context tokens rare, so say in the docstring how far it
+ coincides with the key positions, as a count over the sample);
+ (2) REG3_SELFKL: the KL of g_t from the sequence's own time-averaged gate, at every body position
+ (penalises within-sequence dependence on anything; reads nothing);
+ (3) REG3_TEMP: a softmax temperature on the gate, high for 1-2400 and 1 after (reads nothing; a
+ schedule, not a penalty — the form S83's FLAT did not try).
+Readings fixed now (ROUTED-BOUND; exact one-sided McNemar against BASELINE; "discovered" if p < 0.05):
+ "a frequency hinge replaces the key hinge" if FREQHINGE is discovered and within 1 pair of
+ REG3_KEYHINGE; "a hinge that reads nothing suffices" if SELFKL or TEMP likewise; "clamps" for any arm
+ at BASELINE + 1 pair or fewer with the gate's commitment at 2400 below BASELINE's (print it);
+ "the identity term is still needed" if REG3_KEYHINGE beats every new arm by >= 4 vs 0. Delta (beta 1,
+ L2; seeds 2720-2729): the new arm that reads least and is discovered on Hebbian memory, against
+ S82's delta references rerun on these seeds.
+CHECKs: each term with its switch off equals REG3 bit for bit through 2400; the frequency table is
+ computed from token ids only (assert the function receives no label tensor); each term's gradient
+ reaches W_g (and A) only; the S82 reproduction. report_7.md, README section.
+```
+
+## Session H — round 5 (S87: the all-position trigger at 20 more seeds; the one-to-one guard on the main-line split; the key term's dose; seeds 2600-2659)
+
+```
+Three things, in order.
+ (1) S86 found the all-position trigger within one pair of the key-position one on ten seeds (8/10 vs
+ 9/10). Run ALLMASS and BASE on twenty more paired seeds (2600-2619; S=8, P=4, k=16, conv, 43200,
+ Hebbian, exact copy, as S86), and pool with S86 descriptively (30 pairs). Readings fixed now: on the
+ 20 new pairs as S86's ("keeps it" if ALLMASS >= BASE - 1 pair; "costs binding" if BASE beats it by
+ >= 4 vs 0; "aims" if >= 90% of ALLMASS's firings are labelled ok); the pooled count printed with its
+ discordant pairs and no reading.
+ (2) Session I's S75b adds a guard to the split: no fire when the source -> channel map is already
+ one-to-one, because at k = S a fire overwrites a live channel. At the main line's k = 16 and S = 8
+ there are spare channels, so the question is empirical: over the 50 recorded split runs at eight
+ streams (results/X and results/L: window_gate's WIN3_SPLIT_D8 and split_copy's COPY arms), count the
+ firings whose map before the fire was already one-to-one (checks[].map_before or the stored routing
+ at that check — say which field), and for those, whether the run was BOUND ROUTED at the end. Commit
+ the script and print the counts. If the count is zero the guard is moot on the main line and you say
+ so; if not, screen the guarded trigger against BASE on seeds 2620-2629 (paired) with the reading
+ "the guard costs nothing" if within 1 pair.
+ (3) Your spec draft fixes the key term's weight and its 2400-update window from S52 and S85. Screen
+ the term's dose at two streams (S=2, P=4, k=2, no conv, 24000, WIN3_SLOW; seeds 2630-2639; paired):
+ the weight at 0.3x and 3x, and the window at 1200, each against the drafted constant. Readings:
+ "robust" if every variant is within 1 pair of the drafted one; otherwise print which fails and by
+ how much, and amend the draft's constant only if a variant beats it by >= 4 vs 0 (say so in the draft
+ with the date).
+CHECKs: ALLMASS at threshold 0 equals BASE bit for bit through 6000; the guarded trigger with the guard
+ off equals BASE bit for bit; the recount of (2) reproduces S86's 97 of 107 first. report_9.md, README
+ section.
+```
+
+## Session F — round 5 (S88: a learned write strength; the horizon on delta memory; seeds 2400-2459)
+
+```
+Two screens, in order.
+ S88a, the write strength. The delta recipe keeps 2, 4 and 8 streams with beta fixed; Gated DeltaNet
+ learns beta per token. At eight streams (S=8, P=4, k=16, conv, 43200, the delta recipe with the split,
+ exact copy; seeds 2400-2409; paired): DELTA_FIXED (your S76 recipe) against DELTA_LEARNED (beta_t =
+ sigmoid(w . x_t + b), w in the gate's learning-rate group, b initialised so that beta starts at the
+ fixed value) and DELTA_LEARNED_SLOW (the same with w in the slow group for 1-2400). Readings fixed
+ now (BOUND ROUTED): "a learned write strength keeps the partition" if the better learned arm is
+ within 1 pair of DELTA_FIXED; "costs it" if DELTA_FIXED beats both by >= 4 vs 0. Print beta's
+ trajectory (median over positions) per run and whether beta diverges by stream.
+ S88b, the horizon. Your forget-gate screen raised one delta channel's binding at one length and its
+ reading on the horizon read "it does not". Screen the horizon directly on the lite task: the
+ cue-to-key distance at 1x (your S70 configuration) and at 2x, one delta channel, decay fixed against
+ the learned forget gate (seeds 2420-2429 at each length; paired across arms within a length).
+ Readings fixed now: "the forget gate extends the horizon" if at 2x the learned-gate arm beats the
+ fixed-decay arm by >= 4 vs 0 while at 1x both bind on >= 8/10; "the horizon is the decay's" if the
+ fixed-decay arm drops by >= 4 pairs from 1x to 2x and the learned gate drops the same within 1 pair;
+ "untested" if at 1x either arm binds on fewer than 8/10.
+CHECKs: DELTA_LEARNED with w frozen at its initial value equals DELTA_FIXED bit for bit through 2400;
+ the forget gate with its parameters frozen equals the fixed decay bit for bit; one S76 and one S70
+ reproduction. report_8.md, README section.
+```
+
+## Session R — Phase 5 (the second pre-registered result, from the text; seeds 940-959)
+
+```
+Phase 5. The main line's test_split_copy (specs/test_split_copy.md and the docstring of
+test_split_copy.py on the main line at ffb0771; read those, not the code below the docstring) reports,
+pooled over two machines, the copy with its reset 18/20 against the reset alone 6/20 (12 vs 0), the
+reset alone 6/20 against no trigger 8/20 (0 vs 2), and one delta-rule channel 0/20. Replicate the
+first and the third from the spec's description in your implementation: keep your Phase 4 recipe as
+the copy arm (it is the main line's trigger and copy with the probe and key positions you took in
+Phase 4), add RESET (the trigger fires, the gate group's Adam state is zeroed, nothing is copied) and
+DELTA1 (one channel with the delta-rule write at the spec's fixed write strength, no gate), and run
+the three arms on seeds 940-959. Before any run, write the amended reading rule from the Phase 4
+amendment (docs/reading/parallel_sessions_prompts.md, "Phase 4, amended") into your protocol:
+"consistent" if your copy-arm count lies in the main line's pooled Wilson interval for that arm, and
+likewise per arm; the discordant counts printed; no "replicates" label. Log every detail you had to
+guess, as in Phase 2, in the same appendix format. Commit the protocol before the first run and the
+report when the runs end.
+```
+
+## Session I — round 3 (after S75; the user's message of 12 October)
+
+```
+Three things, in order.
+ (1) WIDE_SLOW's seeds 830-838 are in (4c3984a; 839 follows when the server returns from other work):
+ regenerate the descriptions (python -m explore_gpu.s75_writeup) and update report_2.md's pairing
+ section; S75's reading stays UNTESTED.
+ (2) The window_gate run through mainline.py moves from the RTX 3070 to the GTX 1660 SUPER (the laptop
+ ran out of host memory with it beside test_delta_recipe). Commit a short pre-run note for it before
+ it starts: test_window_gate arms CEIL_C on seeds 2540-2541 (validity), then WIN3_SPLIT_D8, HINGE_D8
+ and WIN3_SLOW_D8 on 2540-2559 (fresh seeds; no overlap with X, L or R); what will be described (each
+ arm's BOUND ROUTED count with its Wilson interval, the test's own validity rule, discordant pairs
+ against the controls, beside X's, L's and the pooled counts); no reading. Also: mainline.py leaves
+ torch at its default thread count on CUDA (10 on the laptop, which thrashed two workers); set one
+ thread per worker on every device.
+ (3) S75b, approved as the spec at 114cd08 (any later change is not blind and must say so): write
+ explore_gpu/s75b.py and its CHECKs. Host RAM for the stats workers: the laptop has 15.2 GB and runs
+ test_delta_recipe beside anything on the 3070; the server's RAM follows from the user. The pilot runs
+ on the 1660 after the window_gate run, or on the 3070 if that is free first; say in the stage-1
+ record which.
+```
