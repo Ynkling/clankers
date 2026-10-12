@@ -208,3 +208,15 @@ These do not block the draft; they are listed so the reports can be corrected.
 - **The re-runs.** S83's bit-for-bit reproduction and its 61 CHECKs, and S86's CHECKs, were read from their files, not re-run.
 - **The PDF.**
 - **The five draft commits after `c66cc76`.**
+
+## Corrections (12 October, fifth pass)
+
+1. **§2, the tex4:269 bullet on "never leaves its initial value".**
+   - **What this pass said.** It called the statement true "while the terms are on" and gave the KL bound "at 300–1200".
+   - **Why that is wrong for the position-only term.** Both KL terms act through update 2400: their weight is 1 at 2400 and 0 at 2401, in all 40 runs. At 2400 the position-only term's KL is above 1e-5 in 13 of 20 runs (maximum 0.068), and its write has moved more than 0.03 in 14 of 20.
+   - **What else was wrong.** The bound "≤ 1.4e-5" holds from update 300 through 1200 only. At update 1, every run is at 1.2e-4 to 7.9e-4. At 1200, seed 2109 reads 1.3e-5, 1.4e-5 and 9e-6 (`term.value_at`, re-read here).
+   - **The exact scope.** "from update 300 through 1200 (at most 1.4×10⁻⁵; the flat term's through 2400)".
+   - **Consequence.** The fifth version adopted this pass's wrong scope as "while they act" (tex5:271). See `resolution_G_H5.md`.
+   - The same wording is in `check_G_v4.md` (row tex4:269) and `resolution_G4.md` (row 269 and §3 item 2). Their numbers are right; their scope is not.
+
+2. **§2a missed a second interval error in R's `replicate_report.md`.** At line 27 it says 17/20's interval "contains the report's 38/40 (0.95)". Wilson for 17/20 is [0.6396, 0.9476], which does not contain 0.95. The draft does not repeat it. (Found by `check_R_v5`.)

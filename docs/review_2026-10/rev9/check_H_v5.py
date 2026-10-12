@@ -2514,10 +2514,10 @@ NEW5 += [
      f"{'; '.join(h_after5) or 'none'}; files changed since {R8}: {h_files_after}; stores touched: {h_stores_touched or 'none'}; "
      f"'No runs.' in the new script's docstring: {'No runs.' in ' '.join(onetoone_doc)}",
      "NOT RECORD-CHECKABLE",
-     "a queue is not a record. At the draft's commit H had committed nothing for 35 h. 3 h 26 min after it H committed "
-     "5b5deec, 'Session H round 5 (2)': a recount over the main line's records with no runs; its '(2)' implies a part (1) "
-     "that is on no branch. So the sentence is now out of date for H, and whether H's round 5 had begun at 19:14 cannot be "
-     "told from git"),
+     "a queue is not a record. At the draft's commit H had committed nothing for 35 h. After it H opened round 5: "
+     f"{len(h_after5)} commits, the first 3 h 26 min after the draft (5b5deec, a recount with no runs, titled 'round 5 (2)'; "
+     "f4fd535, S87a and S87c specified with their readings). So the sentence is now out of date for H; whether round 5 "
+     "had been set before 19:14 cannot be told from git"),
     ("Over the three screens of the evaluation as the trigger's probe (S84, S86, S81) it is $29/30$ against $27/30$, 2 vs 0, "
      "descriptive; it has not cost a run", "the evaluation as the probe over three screens (S84, S86 and F's S81)",
      "29/30 against 27/30, 2 vs 0; it has not cost a run",
@@ -2548,8 +2548,8 @@ NEW5.append(("S86 all-position targeting (report 8, \\texttt{9b72bf6}) & \\textt
              f"H's last commit at or before the draft ({DRAFT5_TIME}): {h_pre5[0]}; after the draft: "
              f"{'; '.join(x.split(' ', 2)[0] + ' ' + x.split(' ', 2)[1] for x in h_after5) or 'none'} (no store touched: {not h_stores_touched})",
              ms(h_pre5[0].split()[0] == R8 and not h_stores_touched),
-             "the pin was the head when the draft was committed; the branch moved 3 h 26 min later (5b5deec, a count file and its "
-             "script, no store), which the draft could not cite"))
+             "the pin was the head when the draft was committed; the branch moved from 3 h 26 min later (round 5: no store "
+             "touched), which the draft could not cite"))
 
 # apply
 ROWS5 = []
