@@ -119,8 +119,9 @@ verification), Intel(R) Xeon(R) Processor @ 2.10GHz, torch 2.14.0+cu130, 4 worke
 
 RESULT (L) — test commit 1f52cd5, run at 592c574 on 2026-10-11 (started 09:31 local = 15:31 UTC through longrun.py; runs
 from 11:12 local after the verification), 12th Gen Intel(R) Core(TM) i7-12650H, torch 2.14.1, 6 workers x 1 thread, one
-start for the runs, nothing cut, 54/54 runs, none failed; 536 min of runs after the verification (exit 0 by the
-user's report; the second start's longrun json and .exit file are not committed, and the log ends with the report).
+start for the runs, nothing cut, 54/54 runs, none failed; 536 min of runs after the verification (exit 0: the second
+start's longrun json and .exit file are at results/L/longrun/, as the user sent them; the json's epoch and local time
+give L's offset, UTC-6).
 An earlier start on 2026-10-10 stopped at verification with 0 runs (CHECK 155: --also was given a directory, not X's
 file); its log is kept at the top of results/L/split_copy_L.log, and longrun's counter was reset between the two, so
 both headers read "start 1".
