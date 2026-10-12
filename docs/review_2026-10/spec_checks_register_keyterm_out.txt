@@ -1,0 +1,178 @@
+== 1. Seeds: every JSON / JSONL blob on every remote branch head
+  scanned origin/claude/bdh-growth-hebbian-inference-w90069 at 0754d61
+  scanned origin/claude/bdh-repo-curl-obgdqk at a3e0a97
+  scanned origin/claude/explore-F at d5851b1
+  scanned origin/claude/explore-G at 076005d
+  scanned origin/claude/explore-H at 5b5deec
+  scanned origin/claude/explore-I at 559b942
+  scanned origin/claude/outside-ideas at 46cb8d0
+  scanned origin/claude/relaxed-edison-he00cc at 3c2fb70
+  scanned origin/claude/replicate-R at 1f8be04
+  scanned origin/claude/rev9-draft at c5e4508
+  scanned origin/claude/review-V at b25a4f6
+  scanned origin/feature/per-channel-plasticity at 4af9d50
+  308 distinct JSON/JSONL blobs (966 branch-paths); 28791 seed values read (keys, 'seed' fields, 'seeds' lists); unparsed: none
+  G (X 600-619, L 1600-1619): records using a seed of the block: 0
+    integer dict keys with these values (parents): {600: ['1.2e-07', '1e-06', 'by_step', 'dense', 'diag', 'early_evals', 'eta_at', 'exp_avg_sq', 'mem', 'spec', 'value_at'], 1600: ['1.2e-07', '1e-06', 'by_step', 'dense', 'mem', 'rho', 'spec']}
+  H (X 620-639, L 1620-1639): records using a seed of the block: 0
+    integer dict keys with these values (parents): {625: ['dense']}
+  seeds in use in 500-699: ['500-569', '580-599']
+  seeds in use in 1500-1699: ['1500-1569']
+    seed 599: [('bdh-growth-hebbian-inference-w90069', 'results/X/delta_recipe_results.json')]
+    seed 1599: unused
+    seed 640: unused
+    seed 1640: unused
+    seed 700: [('explore-G', 'explore_out/G/s71_layers_results.json'), ('explore-G', 'explore_out/G/s72_register3_results.json'), ('explore-G', 'explore_out/G/s73_register3_delta_results.json')]
+    seed 1700: unused
+  text mentions of a block (*.py, *.md, *.tex, *.txt on every head; path, branch):
+    docs/reading/parallel_sessions_prompts.md (bdh-growth-hebbian-inference-w90069)
+    docs/reading/parallel_sessions_prompts.md (bdh-repo-curl-obgdqk)
+    docs/review_2026-10/registry_L_recount.py (review-V)
+    docs/review_2026-10/registry_L_recount_out.txt (review-V)
+    docs/review_2026-10/rev9/check_G_v4.md (review-V)
+    docs/review_2026-10/rev9/check_G_v4.py (review-V)
+    docs/review_2026-10/rev9/resolution_G4.md (review-V)
+    docs/review_2026-10/test_check_delta_recipe.md (review-V)
+    explore_out/G/report_6.md (explore-G)
+    explore_out/G/spec_draft_register.md (explore-G)
+    explore_out/H/spec_draft_two_keyterm.md (explore-H)
+    explore_out/README.md (explore-G)
+    explore_out/README.md (explore-H)
+
+== 2. G's draft: the records it cites (claude/explore-G at 076005d)
+  S82 BASELINE             n 20: BOUND  3, ROUTED-BOUND  0, recorded discovered  0; minutes median 6.3 [3.5, 6.5]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S82 REG3                 n 20: BOUND  2, ROUTED-BOUND  2, recorded discovered  2; minutes median 8.5 [2.1, 8.7]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S82 REG3_KEYHINGE        n 20: BOUND 20, ROUTED-BOUND 20, recorded discovered 20; minutes median 2.2 [2.1, 3.0]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S82 REG3_SLOWGATE        n 20: BOUND  0, ROUTED-BOUND  0, recorded discovered  0; minutes median 8.5 [8.3, 9.8]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S82 REG3_NOWIN           n 20: BOUND  5, ROUTED-BOUND  5, recorded discovered  5; minutes median 7.6 [1.9, 7.8]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S82 REG3_NUDGE           n  2: BOUND  2, ROUTED-BOUND  2, recorded discovered  2; minutes median 1.9 [1.8, 1.9]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S82 ORACLE_ALL           n  2: BOUND  2, ROUTED-BOUND  2, recorded discovered  2; minutes median 1.0 [1.0, 1.0]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S83 LOCAL3_KEYHINGE      n 20: BOUND  5, ROUTED-BOUND  0, recorded discovered  0; minutes median 4.6 [2.1, 4.7]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S83 REG3_KEYHINGE_POS    n 20: BOUND  1, ROUTED-BOUND  1, recorded discovered  1; minutes median 6.3 [2.3, 6.4]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S83 REG3_FLAT            n 20: BOUND  0, ROUTED-BOUND  0, recorded discovered  0; minutes median 6.3 [6.2, 6.4]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S83 REG3_KEYHINGE_1200   n 20: BOUND 18, ROUTED-BOUND 18, recorded discovered 18; minutes median 1.6 [1.6, 6.4]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  S83 REG3_NUDGE           n  2: BOUND  2, ROUTED-BOUND  2, recorded discovered  2; minutes median 1.4 [1.3, 1.4]; cpu ['Intel(R) Xeon(R) Processor @ 2.10GHz']
+  C1 vs BASELINE: b 20, c 0, n 20, one-sided p 9.54e-07
+  C2 vs LOCAL3_KEYHINGE: b 20, c 0, n 20, one-sided p 9.54e-07
+  C3 vs REG3: b 18, c 0, n 20, one-sided p 3.81e-06
+  KH_1200 vs BASELINE: b 18, c 0, n 20, one-sided p 3.81e-06
+  bound records (60) with end margin or eta_key_by_stream in [0.75, 0.98): none
+  end margins of bound records: min 0.44, max 1.0; values: [(1.0, 52), (0.45, 2), (0.49, 2), (0.44, 1), (0.46, 1), (0.5, 1)]
+  bound but not ROUTED* (the key-split bindings ROUTED-BOUND excludes): 8: [('BASELINE', 2106, 0.44, 0.33), ('BASELINE', 2108, 0.51, 0.49), ('BASELINE', 2116, 0.45, 0.3), ('LOCAL3_KEYHINGE', 2100, 0.49, 0.5), ('LOCAL3_KEYHINGE', 2103, 0.5, 0.5), ('LOCAL3_KEYHINGE', 2104, 0.49, 0.5), ('LOCAL3_KEYHINGE', 2106, 0.45, 0.29), ('LOCAL3_KEYHINGE', 2116, 0.46, 0.5)]
+  recorded 'transition' against test_binding_onset.transition(curve) on all 186 S82/S83 records: 0 differ []
+  bound records with per-layer statistics, (ROUTED* at every layer, ROUTED* on the returned gate): {(False, False): 8, (True, True): 52}
+  REG3_NUDGE ROUTED-BOUND: S72 20/20 (seeds 700-719), S82 2/2, S83 2/2
+  S82's validity rule as coded (explore_g_devices.py:[120]): ['f"ROUTED-BOUND {nn}/{len(R[\'REG3_NUDGE\'])} -> {\'VALID\' if no >= 1 else \'UNTESTED\'}"}']
+  blob of explore_f_tasks.py: {'9a6c2bf': 'de4746371d', '076005d': 'de4746371d'}; on the main line: False
+  blob of explore_b18_gates.py: {'9a6c2bf': 'a61a577388', '076005d': 'a61a577388', '9b72bf6': 'a61a577388', 'origin/claude/outside-ideas': 'a61a577388'}; on the main line: False
+  blob of explore_aux_gate.py: {'9a6c2bf': 'ffae342178', '076005d': 'ffae342178', '9b72bf6': 'ffae342178', 'origin/claude/outside-ideas': 'ffae342178'}; on the main line: False
+  blob of explore_keysplits_child.py: {'9a6c2bf': 'f05e8f9d3b', '076005d': 'f05e8f9d3b', '9b72bf6': 'f05e8f9d3b', 'origin/claude/outside-ideas': 'f05e8f9d3b'}; on the main line: False
+  main line test_binding_onset.py: ['def transition(']
+  main line test_window_gate.py: ['def success(', 'def to_local(']
+  main line fail_class_v2.py: ['def fail_class_v2(', 'def outcome_v2(']
+  main line test_slow_start.py: ['def success(', 'class Inject(', 'def eta2_hinge(']
+  main line test_short_conv.py: []
+
+== 3. H's draft: the records it cites
+  S85 REF                n 20 discovered 15; minutes median 1.6 [1.3, 6.3]
+  S85 KEYHINGE           n 20 discovered 20; minutes median 2.0 [1.7, 2.9]
+  S85 SLOWGATE           n 20 discovered 14; minutes median 1.6 [1.3, 6.5]
+  S85 SLOWGATE_KEYHINGE  n 20 discovered 19; minutes median 2.3 [1.4, 6.2]
+  S85 ORACLE             n  2 discovered  2; minutes median 1.0 [1.0, 1.0]
+  S85 KEYHINGE vs REF: b 5, c 0, n 20, p 0.0312
+  S52 W2_KEYHINGE (seeds 160-199) discovered 36/40; batch 16 LOCAL3_SLOW 31/40; b 7, c 2, p 0.090
+  S52 W2_KEYHINGE|160 hinge record (for T3): fired 2, eta_at {'1': 0.45507, '1200': 0.00445, '2400': 0.00282, '300': 0.01155, '600': 0.00671}, cpu Intel(R) Xeon(R) Processor @ 2.10GHz; S85 KEYHINGE|2310 present: True, its hinge record True
+  S78 REF (WIN3_SLOW, 1300-1319): discovered 15/20
+  main line test_window_gate Part A WIN3_SLOW X (500-539): discovered 33/40
+  main line test_window_gate Part A WIN3_SLOW L (1500-1539): discovered 36/40
+  WIN3_SLOW (the same arm, CHECK 135) over every record above: 130/160 = 0.812; key term (S52 + S85): 56/60
+
+== 4. The rate claims (G's R and H's K3: >= 18/20 on each machine)
+  16/20: Wilson 95% [0.584, 0.919]; Clopper-Pearson 95% [0.563, 0.943]
+  17/20: Wilson 95% [0.640, 0.948]; Clopper-Pearson 95% [0.621, 0.968]
+  18/20: Wilson 95% [0.699, 0.972]; Clopper-Pearson 95% [0.683, 0.988]
+  19/20: Wilson 95% [0.764, 0.991]; Clopper-Pearson 95% [0.751, 0.999]
+  20/20: Wilson 95% [0.839, 1.000]; Clopper-Pearson 95% [0.832, 1.000]
+  34/40: Wilson 95% [0.709, 0.929]; Clopper-Pearson 95% [0.702, 0.943]
+  35/40: Wilson 95% [0.739, 0.945]; Clopper-Pearson 95% [0.732, 0.958]
+  36/40: Wilson 95% [0.769, 0.960]; Clopper-Pearson 95% [0.763, 0.972]
+  37/40: Wilson 95% [0.801, 0.974]; Clopper-Pearson 95% [0.796, 0.984]
+  38/40: Wilson 95% [0.835, 0.986]; Clopper-Pearson 95% [0.831, 0.994]
+  39/40: Wilson 95% [0.871, 0.996]; Clopper-Pearson 95% [0.868, 0.999]
+  40/40: Wilson 95% [0.912, 1.000]; Clopper-Pearson 95% [0.912, 1.000]
+  P(pass) by exact binomial at the true rate p (machines independent, equal rates):
+    p 0.700: >= 18/20 on one machine 0.035; on both 0.001; on exactly one 0.068; pooled >= 36/40 0.003; pooled >= 37/40 0.001; pooled >= 38/40 0.000
+    p 0.800: >= 18/20 on one machine 0.206; on both 0.042; on exactly one 0.327; pooled >= 36/40 0.076; pooled >= 37/40 0.028; pooled >= 38/40 0.008
+    p 0.850: >= 18/20 on one machine 0.405; on both 0.164; on exactly one 0.482; pooled >= 36/40 0.263; pooled >= 37/40 0.130; pooled >= 38/40 0.049
+    p 0.900: >= 18/20 on one machine 0.677; on both 0.458; on exactly one 0.437; pooled >= 36/40 0.629; pooled >= 37/40 0.423; pooled >= 38/40 0.223
+    p 0.930: >= 18/20 on one machine 0.839; on both 0.704; on exactly one 0.270; pooled >= 36/40 0.855; pooled >= 37/40 0.694; pooled >= 38/40 0.463
+    p 0.950: >= 18/20 on one machine 0.925; on both 0.855; on exactly one 0.140; pooled >= 36/40 0.952; pooled >= 37/40 0.862; pooled >= 38/40 0.677
+    p 0.975: >= 18/20 on one machine 0.987; on both 0.974; on exactly one 0.026; pooled >= 36/40 0.997; pooled >= 37/40 0.983; pooled >= 38/40 0.922
+    p 0.990: >= 18/20 on one machine 0.999; on both 0.998; on exactly one 0.002; pooled >= 36/40 1.000; pooled >= 37/40 0.999; pooled >= 38/40 0.993
+  the 'both machines' rule is not monotone in the pooled count: X 20/20 + L 17/20 = 37/40 fails it, X 18/20 + L 18/20 = 36/40 passes
+  predictive, G: S82 REG3_KEYHINGE 20/20, uniform prior: P(>= 18/20 on a machine) 0.893; on both, if the machines share one rate drawn once (lower) ~ 0.798 (independent draws)
+  predictive, G: S82 REG3_KEYHINGE 20/20, Jeffreys prior: P(>= 18/20 on a machine) 0.955; on both, if the machines share one rate drawn once (lower) ~ 0.913 (independent draws)
+  predictive, G: S82 20/20 + S83 KH_1200 18/20 (a different window), uniform prior: P(>= 18/20 on a machine) 0.807; on both, if the machines share one rate drawn once (lower) ~ 0.651 (independent draws)
+  predictive, G: S82 20/20 + S83 KH_1200 18/20 (a different window), Jeffreys prior: P(>= 18/20 on a machine) 0.850; on both, if the machines share one rate drawn once (lower) ~ 0.723 (independent draws)
+  predictive, H: S52 36/40 + S85 20/20, uniform prior: P(>= 18/20 on a machine) 0.770; on both, if the machines share one rate drawn once (lower) ~ 0.593 (independent draws)
+  predictive, H: S52 36/40 + S85 20/20, Jeffreys prior: P(>= 18/20 on a machine) 0.802; on both, if the machines share one rate drawn once (lower) ~ 0.643 (independent draws)
+
+== 5. McNemar power (exact one-sided, SHOWN at p < 0.05; pooled 40 pairs, per machine 20)
+  G: REG3_KEYHINGE at p1 against a comparator at p2 (S82/S83: BASELINE 0/20, LOCAL3_KEYHINGE 0/20, REG3 2/20; Wilson upper bounds 0.16, 0.16, 0.30)
+    p1 0.50 (indep/nested): p2 0.00: 40 1.000/1.000, 20 0.994/0.994; p2 0.10: 40 0.989/1.000, 20 0.794/0.949; p2 0.16: 40 0.929/1.000, 20 0.611/0.863; p2 0.30: 40 0.489/0.924, 20 0.233/0.370
+    p1 0.70 (indep/nested): p2 0.00: 40 1.000/1.000, 20 1.000/1.000; p2 0.10: 40 1.000/1.000, 20 0.987/1.000; p2 0.16: 40 1.000/1.000, 20 0.950/0.998; p2 0.30: 40 0.965/1.000, 20 0.718/0.949
+    p1 0.80 (indep/nested): p2 0.00: 40 1.000/1.000, 20 1.000/1.000; p2 0.10: 40 1.000/1.000, 20 0.999/1.000; p2 0.16: 40 1.000/1.000, 20 0.993/1.000; p2 0.30: 40 0.998/1.000, 20 0.906/0.994
+    p1 0.90 (indep/nested): p2 0.00: 40 1.000/1.000, 20 1.000/1.000; p2 0.10: 40 1.000/1.000, 20 1.000/1.000; p2 0.16: 40 1.000/1.000, 20 1.000/1.000; p2 0.30: 40 1.000/1.000, 20 0.987/1.000
+    at Holm's or Bonferroni's 0.05/3: p1 0.8, p2 0.3: 40 0.990; p1 0.7, p2 0.3: 40 0.897; p1 0.5, p2 0.16: 40 0.820
+  smallest b with c = 0 that shows: alpha 0.0500: b >= 5, alpha 0.0250: b >= 6, alpha 0.0167: b >= 6
+  H: K1, WIN3_SLOW_KEYHINGE at p1 against WIN3_SLOW at p2 (indep / nested)
+    WIN3_SLOW 0.7500: p1 0.933: 40 0.626/0.880, 20 0.267/0.297; p1 0.950: 40 0.731/0.924, 20 0.329/0.370; p1 1.000: 40 0.984/0.984, 20 0.585/0.585
+    WIN3_SLOW 0.8000: p1 0.933: 40 0.400/0.629, 20 0.144/0.117; p1 0.950: 40 0.516/0.737, 20 0.184/0.170; p1 1.000: 40 0.924/0.924, 20 0.370/0.370
+    WIN3_SLOW 0.8125: p1 0.933: 40 0.343/0.537, 20 0.118/0.084; p1 0.950: 40 0.455/0.660, 20 0.153/0.130; p1 1.000: 40 0.893/0.893, 20 0.316/0.316
+    WIN3_SLOW 0.8625: p1 0.933: 40 0.146/0.148, 20 0.042/0.011; p1 0.950: 40 0.220/0.270, 20 0.056/0.026; p1 1.000: 40 0.660/0.660, 20 0.130/0.130
+    WIN3_SLOW 0.9000: p1 0.933: 40 0.052/0.010, 20 0.013/0.000; p1 0.950: 40 0.088/0.048, 20 0.017/0.003; p1 1.000: 40 0.371/0.371, 20 0.043/0.043
+    empirical S52 + S85 discordance (12 vs 2 of 60): P(K1 SHOWN) at 40 pairs 0.616, at 20 0.232, at 80 0.933
+    empirical S52 alone (7 vs 2 of 40): P(K1 SHOWN) at 40 pairs 0.372, at 20 0.126, at 80 0.723
+    empirical S85 alone (5 vs 0 of 20): P(K1 SHOWN) at 40 pairs 0.984, at 20 0.585, at 80 1.000
+    pooled pairs for 80% power, indep 0.95 vs 0.8625: 152
+    pooled pairs for 80% power, nested 0.95 vs 0.8625: 76
+    pooled pairs for 80% power, empirical 12 vs 2 of 60: 56
+    pooled pairs for 80% power, indep 0.95 vs 0.80: 68
+  H's no-room region: K1 cannot be SHOWN when WIN3_SLOW binds >= 36/40 pooled (b <= 4, p >= 0.0625). P(WIN3_SLOW >= 36/40): 0.8: 0.076, 0.8125: 0.107, 0.8625: 0.340, 0.9: 0.629
+
+== 6. Readings: every combination (both machines VALID unless stated)
+  G: C1 S C2 S C3 S -> ['the register, released by the key term, discovers the stream'] 
+  G: C1 S C2 S C3 N -> ['the term and the register discover it; the register alone is not shown worse'] 
+  G: C1 S C2 N C3 S -> ['discovered, but the register is not shown to be needed'] 
+  G: C1 S C2 N C3 N -> ['discovered, but the register is not shown to be needed'] 
+  G: C1 N C2 S C3 S -> ['not replicated'] 
+  G: C1 N C2 S C3 N -> ['not replicated'] 
+  G: C1 N C2 N C3 S -> ['not replicated'] 
+  G: C1 N C2 N C3 N -> ['not replicated'] 
+  G rate: X True, L True -> reliable on both machines
+  G rate: X True, L False -> reliable on one machine
+  G rate: X True, L None -> not defined (a machine UNTESTED)
+  G rate: X False, L True -> reliable on one machine
+  G rate: X False, L False -> not reliable
+  G rate: X False, L None -> not defined (a machine UNTESTED)
+  G rate: X None, L True -> not defined (a machine UNTESTED)
+  G rate: X None, L False -> not defined (a machine UNTESTED)
+  G rate: X None, L None -> not defined (a machine UNTESTED)
+  G: KH 40/40 with BASELINE 36/40 gives C1 p = 0.0625 -> 'not replicated' printed beside 'reliable on both machines'
+  H: K1 S K3 X MET L MET -> ['the key term makes two streams reliable'] 
+  H: K1 S K3 X MET L NOT -> ['the key term helps, but not reliably'] 
+  H: K1 S K3 X NOT L MET -> ['the key term helps, but not reliably'] 
+  H: K1 S K3 X NOT L NOT -> ['the key term helps, but not reliably'] 
+  H: K1 N K3 X MET L MET -> ['reliable, but not shown better than WIN3_SLOW'] 
+  H: K1 N K3 X MET L NOT -> ['not shown'] 
+  H: K1 N K3 X NOT L MET -> ['not shown'] 
+  H: K1 N K3 X NOT L NOT -> ['not shown'] 
+  H: K1 SHOWN with WIN3_SLOW >= 18/20 on both machines is impossible (WIN3_SLOW >= 36/40 leaves b <= 4, p >= 0.0625), so 'makes two streams reliable' never fires while the baseline is itself >= 18/20 on both
+  H: P('the key term helps, but not reliably' | K1 SHOWN) is P(K3 fails somewhere) = 1 - P(both): 0.9: 0.542, 0.933: 0.272, 0.95: 0.145, 0.975: 0.026
+
+== 7. Validity: G's REG3_NUDGE must be ROUTED-BOUND on both validity seeds of a machine
+  nudge rate 0.99: P(machine VALID) 0.980; P(both machines VALID) 0.961; P(>= 1 of 2 on a machine) 0.9999
+  nudge rate 0.95: P(machine VALID) 0.902; P(both machines VALID) 0.815; P(>= 1 of 2 on a machine) 0.9975
+  nudge rate 0.9: P(machine VALID) 0.810; P(both machines VALID) 0.656; P(>= 1 of 2 on a machine) 0.9900
+  nudge rate 0.8575: P(machine VALID) 0.735; P(both machines VALID) 0.541; P(>= 1 of 2 on a machine) 0.9797
+  (24/24 nudge runs recorded routed (S72, S82, S83): Clopper-Pearson 95% lower bound 0.858)
