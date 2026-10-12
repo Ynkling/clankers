@@ -9,3 +9,81 @@ EXPLORATORY, NOT A RESULT — Session G S87
 /home/user/clankers/explore_g_rhl_child.py:523: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
 Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
   f"update counter {ml.n_upd}", float(u.abs().max()) < 1 and float(ml.b_R) == 0.0 and ml.gated == (1, 2, 3)
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): every (stream, key) appears exactly once in the body: ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): S distinct values per key: ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): exactly one CTX per block, at its start; 4 blocks per sequence: ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3: ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): block-length frequencies {1: 0.338, 2: 0.324, 3: 0.338} each within 0.03 of 0.33: ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): the stream order of the blocks varies (6 distinct orders over 4096 sequences): ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): stream_labels = the latest CTX token's stream at every position: ok
+  CHECK S87: S83 inherited: S82: S73: RandHeaderTask-lite (F's check_rand_header): L = 23 = S(NB + 2P) + 3 n_q, qpos = [21]; select reads the query's KEY position and targets its value: ok
+  CHECK S87: S83 inherited: S82: S73: RHL as F's S70: P 4, nb 2, lengths 1..3, compositions [(1, 3), (2, 2), (3, 1)], L 23, qpos [21], vocab 22: ok
+  CHECK S87: S83 inherited: S82: S73: in-run probe: hook-captured residuals (L1-L3, final) and logits equal S55's extraction bit for bit on LOCAL3: ok
+  CHECK S87: S83 inherited: S82: S73: in-run probe on per-layer gates: logits from the hooked forward equal model(x)'s; layer 1's input is LN(embedding): ok
+  CHECK S87: S83 inherited: S82: S73: acc_by_cell covers 12 (stream, block, index) cells, 2048 queries; blocks 0/1, index 0-2: ok
+  CHECK S87: S83 inherited: S82: S73: S56: recorded run, new path disabled: S43 LOCAL3_SLOW|160 (batch 16) through 2400 with RegBDH(gated=()) reproduces its curve bit for bit ([[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]) and its decoder at 1200/2400: ok
+  CHECK S87: S83 inherited: S82: S73: S56: RegBDH(gated=()) equals LOCAL3's logits bit for bit on H8: ok
+  CHECK S87: S83 inherited: S82: S73: S56: REG init: existing parameters unchanged; A_v = W_in, W_g2 = W_g; beta^R in [0.0998, 0.1002] (about 0.1); with A_r = A_R = 0 every gated layer's gate = softmax(W_g tanh(W_in v)) (max |diff| 0.0e+00): ok
+  CHECK S87: S83 inherited: S82: S73: S56: register causality: changing token 20's register write leaves every gated layer's gate at positions <= 20 bit-identical and changes it at 21: ok
+  CHECK S87: S83 inherited: S82: S73: S56: strict causality: changing token 20 leaves logits and every layer's gate at positions < 20 unchanged: ok
+  CHECK S87: S83 inherited: S82: S73: S56: SG and NOSG: the same forward; the gated layers' gates send no gradient into the stack (encoder) under SG and a non-zero one under NOSG: ok
+  CHECK S87: S83 inherited: S82: S73: S56: RESGATE_ONLY: no register parameters; reg = False: ok
+  CHECK S87: S83 inherited: S82: S73: S56: SLOW groups: gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A_v', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R'] at 1e-3, rest ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight'] at 1e-4; every trainable tensor once; W_h frozen: ok
+  CHECK S87: S83 inherited: S82: S73: S56: nudge moves only ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'w_R'] (a subset of GATE_NEW); stream lean |p0(s0) - p0(s1)| after it at the gated layers [0.044, 0.043] (> 0.02): ok
+  CHECK S87: S83 inherited: S82: S73: S56: delta path with beta 0, write 1, raw keys equals the Hebbian RegBDH (max |diff| 1.5e-07 <= 1e-5): ok
+  CHECK S87: S83 inherited: S82: S73: S56: ORACLE_H and ORACLE_D: the query's logits are bit-identical when every VAL token of the other stream changes: ok
+  CHECK S87: S83 inherited: S82: S73: S56: SINGLE_GDN: k = 1, DeltaMemory(beta 0, write 1, raw keys, decay gdn): ok
+  CHECK S87: S83 inherited: S82: S73: REG3 with the layer-1 path disabled (gated (2, 3), input v) reproduces S56's REG|370 through 2400 bit for bit ([[1200, 0.15576171875, 2.7409420013427734], [2400, 0.20751953125, 2.5322160720825195]] vs [[1200, 0.15576171875, 2.7409420013427734], [2400, 0.20751953125, 2.5322160720825195]]): ok
+  CHECK S87: S83 inherited: S82: S73: REG3_D with every new path disabled: the gate at every layer equals LOCAL3's and the logits equal BASELINE_D's bit for bit: ok
+  CHECK S87: S83 inherited: S82: S73: REG3_D init: existing parameters unchanged; A_v = W_in, W_g2 = W_g; beta^R in [0.0997, 0.1005]: ok
+  CHECK S87: S83 inherited: S82: S73: REG3_D: token 12's register/latch write changes no gate at <= 12 at layers 1-3 and changes layer 1's at 13 (register; the latch's binary z need not change); changing token 12 changes no logit at < 12: ok
+  CHECK S87: S83 inherited: S82: S73: LATCH3_D: token 12's register/latch write changes no gate at <= 12 at layers 1-3 and changes layer 1's at 13 (register; the latch's binary z need not change); changing token 12 changes no logit at < 12: ok
+  CHECK S87: S83 inherited: S82: S73: REG3, delta with beta 0, write 1, raw keys equals the Hebbian REG3 (max |diff| 1.2e-07 <= 1e-5): ok
+  CHECK S87: S83 inherited: S82: S73: REG3_D SLOW groups: gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A_v', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R'] at 1e-3, rest ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight'] at 1e-4; every trainable tensor once: ok
+  CHECK S87: S83 inherited: S82: S73: nudge moves only ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'w_R']; stream lean at layers 1-3 [0.047, 0.049, 0.046] (> 0.02): ok
+  CHECK S87: S83 inherited: S82: S73: LATCH3_D: dead-STE guard max |u| 1.49e-03 < 1 at step 0, b_z 0; gated layers (1, 2, 3); update counter 0: ok
+  CHECK S87: S83 inherited: S82: S73: RESGATE_ONLY_D: no register, the residual gate at all three layers: ok
+  CHECK S87: S83 inherited: S82: S73: SINGLE_D equals F's S53 single-channel path (logits bit for bit); k = 1, beta 1, L2 keys, fixed decay: ok
+  CHECK S87: S83 inherited: S82: S73: BASELINE_D: LOCAL3 + delta (beta 1, L2 keys, tied write, decay 0.95): ok
+  CHECK S87: S83 inherited: S82: REG3_KEYHINGE with its switch off (lam 0 / gate lr 1e-3 from update 1 / window on) equals REG3|2100 through 2400 bit for bit (curve [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]] vs [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]]; statistics; probe): ok
+  CHECK S87: S83 inherited: S82: REG3_SLOWGATE with its switch off (lam 0 / gate lr 1e-3 from update 1 / window on) equals REG3|2100 through 2400 bit for bit (curve [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]] vs [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]]; statistics; probe): ok
+  CHECK S87: S83 inherited: S82: REG3_NOWIN with its switch off (lam 0 / gate lr 1e-3 from update 1 / window on) equals REG3|2100 through 2400 bit for bit (curve [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]] vs [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]]; statistics; probe): ok
+  CHECK S87: S83 inherited: S82: hinge gradient through _Inject equals autograd of LAM mean_l relu(eta2_key - TAU) (max |diff| 0.0e+00 <= 1e-7; |grad| 5.53e-01 > 0): ok
+  CHECK S87: S83 inherited: S82: eta2_key at RandHeaderTask's KEY positions grouped by key id equals the hand computation (0.027029 vs 0.027029): ok
+  CHECK S87: S83 inherited: S82: hinge schedule: weight at updates {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0} (LAM 1.0 through 2400, 0 after); 55 firings in 2400 updates: ok
+  CHECK S87: S83 inherited: S82: slow-gate lrs [gate, rest] at updates 1 / 1200 / 1201 / 2400 / 2401: [[0.0001, 0.0001], [0.0001, 0.0001], [0.001, 0.0001], [0.001, 0.0001], [0.001, 0.001]]: ok
+  CHECK S87: S83 inherited: S82: slow-gate groups: gate ['W_in', 'W_g', 'gate_conv.conv_w', 'A_v', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R'], rest ['decoder', 'encoder', 'encoder_v', 'lm_head', 'embed.weight']: ok
+  CHECK S87: S83 inherited: S82: REG3_NOWIN has no window parameters (no gate_conv, A_v, W_in, W_g): ['decoder', 'encoder', 'encoder_v', 'lm_head', 'W_h', 'A_r', 'W_g2', 'A_R', 'W_R', 'w_R', 'b_R', 'embed.weight']: ok
+  CHECK S87: S83 inherited: S82: REG3_NOWIN: changing token 12 changes no gate at positions < 12 at any layer (causal; the register at 12 enters only from 13): ok
+  CHECK S87: S83 inherited: S82: REG3_NOWIN with the window on has REG3's parameters and logits bit for bit: ok
+  CHECK S87: S83 inherited: REG3_KEYHINGE_POS with its term off equals S82's REG3|2100 through 2400 bit for bit (curve [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]]): ok
+  CHECK S87: S83 inherited: REG3_FLAT with its term off equals S82's REG3|2100 through 2400 bit for bit (curve [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]]): ok
+  CHECK S87: S83 inherited: REG3_KEYHINGE_1200 with its term off equals S82's REG3|2100 through 2400 bit for bit (curve [[1200, 0.31982421875, 2.36141037940979], [2400, 0.4912109375, 1.6198692321777344]]): ok
+  CHECK S87: S83 inherited: LOCAL3_KEYHINGE with its term off equals S82's BASELINE|2100 through 2400 bit for bit (curve [[1200, 0.3642578125, 2.2896060943603516], [2400, 0.50341796875, 1.5809520483016968]]): ok
+  CHECK S87: S83 inherited: the key term in S83's class at W 2400 equals S82's REG3_KEYHINGE|2100 through 2400 bit for bit (curve [[1200, 0.21630859375, 2.5863893032073975], [2400, 0.23046875, 2.3827595710754395]]): ok
+  CHECK S87: S83 inherited: REG3_KEYHINGE_POS: the term's gradient reaches ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'embed.weight', 'gate_conv.conv_w', 'w_R']; the stack none (embedding |grad| 3.7e-04, through the gate's input): ok
+  CHECK S87: S83 inherited: REG3_FLAT: the term's gradient reaches ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'embed.weight', 'gate_conv.conv_w', 'w_R']; the stack none (embedding |grad| 1.4e-04, through the gate's input): ok
+  CHECK S87: S83 inherited: LOCAL3_KEYHINGE: the term's gradient reaches ['W_g', 'W_in', 'embed.weight', 'gate_conv.conv_w']; the stack none (embedding |grad| 3.1e+00, through the gate's input): ok
+  CHECK S87: S83 inherited: pos term = mean KL at the body's KEY positions (0.154166 vs 0.154166); flat = mean KL at positions < 20 (0.157875 vs 0.157875); KL of the uniform gate 0.0e+00: ok
+  CHECK S87: S83 inherited: REG3_KEYHINGE_1200 schedule: weights {'1': 1.0, '1199': 1.0, '1200': 1.0, '1201': 0.0, '1202': 0.0} (1.0 through 1200, 0 after): ok
+  CHECK S87: S83 inherited: REG3_FLAT schedule: weights {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0} (1.0 through 2400, 0 after): ok
+  CHECK S87: S83 inherited: LOCAL3_KEYHINGE: BASELINE's parameters and logits (no register, no new parameter): ok
+  CHECK S87: S83 inherited: delta variants: the term class over the delta memory (beta 1, L2 keys): ok
+  CHECK S87: REG3_FREQHINGE with its switch off equals REG3|2700 through 2400 bit for bit (curve [[1200, 0.29248046875, 2.4377338886260986], [2400, 0.48486328125, 1.7404098510742188]]): ok
+  CHECK S87: REG3_SELFKL with its switch off equals REG3|2700 through 2400 bit for bit (curve [[1200, 0.29248046875, 2.4377338886260986], [2400, 0.48486328125, 1.7404098510742188]]): ok
+  CHECK S87: REG3_TEMP with its switch off equals REG3|2700 through 2400 bit for bit (curve [[1200, 0.29248046875, 2.4377338886260986], [2400, 0.48486328125, 1.7404098510742188]]): ok
+  CHECK S87: the frequency table is computed from token ids only: freq_types('tokens',) asserts a LongTensor of ids (a float tensor is refused: True); frequent types [0, 1, 3, 4, 5, 2]; table head [(0, 0.11368), (1, 0.11359), (3, 0.10266), (4, 0.10255), (5, 0.10223), (2, 0.10165), (18, 0.02356)]: ok
+  CHECK S87: coincidence over 4096 sequences: frequent positions per sequence [14], key-term positions [8], both [8] (every key-term position is frequent; the other frequent positions are the 5 CTX and the query's KEY): ok
+  CHECK S87: grouping by token id at the key positions equals the key term's grouping by key id (0.013684 vs 0.013684): ok
+  CHECK S87: REG3_FREQHINGE: the term's gradient reaches ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'embed.weight', 'gate_conv.conv_w', 'w_R']; the stack none: ok
+  CHECK S87: REG3_SELFKL: the term's gradient reaches ['A_R', 'A_r', 'A_v', 'W_R', 'W_g2', 'b_R', 'embed.weight', 'gate_conv.conv_w', 'w_R']; the stack none: ok
+  CHECK S87: REG3_TEMP: after the window its gates equal REG3's bit for bit; inside it the gates are flatter (mean |g - 1/2| 3.51e-03 vs 1.40e-02); no parameter added: ok
+  CHECK S87: REG3_SELFKL schedule over training forwards {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}: ok
+  CHECK S87: REG3_TEMP schedule over training forwards {'1': 4.0, '2399': 4.0, '2400': 4.0, '2401': 1.0, '2402': 1.0}: ok
+  CHECK S87: REG3_TEMP: the first training forward ran at T 4.0 (log {'1': 4.0}): ok
+  s87: code SHA f205db31dfed (33 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  102 runs queued on 4 workers
+  [  1/102]    1.0 min  ORACLE_ALL   seed 2701  acc 1.000 trans  1200 ROUTED-BOUND
+  [  2/102]    1.0 min  ORACLE_ALL   seed 2700  acc 1.000 trans  1200 ROUTED-BOUND
+  [  3/102]    2.1 min  REG3_KEYHINGE seed 2700  acc 1.000 trans  3600 ROUTED-BOUND

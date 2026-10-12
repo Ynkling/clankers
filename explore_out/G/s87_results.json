@@ -1,0 +1,3242 @@
+{
+ "meta": {
+  "arms": {
+   "BASELINE": {
+    "iters": 24000,
+    "prio": 1,
+    "seeds": [
+     2700,
+     2701,
+     2702,
+     2703,
+     2704,
+     2705,
+     2706,
+     2707,
+     2708,
+     2709,
+     2710,
+     2711,
+     2712,
+     2713,
+     2714,
+     2715,
+     2716,
+     2717,
+     2718,
+     2719
+    ]
+   },
+   "ORACLE_ALL": {
+    "iters": 24000,
+    "prio": 2,
+    "seeds": [
+     2700,
+     2701
+    ]
+   },
+   "REG3_FREQHINGE": {
+    "iters": 24000,
+    "prio": 1,
+    "seeds": [
+     2700,
+     2701,
+     2702,
+     2703,
+     2704,
+     2705,
+     2706,
+     2707,
+     2708,
+     2709,
+     2710,
+     2711,
+     2712,
+     2713,
+     2714,
+     2715,
+     2716,
+     2717,
+     2718,
+     2719
+    ]
+   },
+   "REG3_KEYHINGE": {
+    "iters": 24000,
+    "prio": 1,
+    "seeds": [
+     2700,
+     2701,
+     2702,
+     2703,
+     2704,
+     2705,
+     2706,
+     2707,
+     2708,
+     2709,
+     2710,
+     2711,
+     2712,
+     2713,
+     2714,
+     2715,
+     2716,
+     2717,
+     2718,
+     2719
+    ]
+   },
+   "REG3_SELFKL": {
+    "iters": 24000,
+    "prio": 1,
+    "seeds": [
+     2700,
+     2701,
+     2702,
+     2703,
+     2704,
+     2705,
+     2706,
+     2707,
+     2708,
+     2709,
+     2710,
+     2711,
+     2712,
+     2713,
+     2714,
+     2715,
+     2716,
+     2717,
+     2718,
+     2719
+    ]
+   },
+   "REG3_TEMP": {
+    "iters": 24000,
+    "prio": 1,
+    "seeds": [
+     2700,
+     2701,
+     2702,
+     2703,
+     2704,
+     2705,
+     2706,
+     2707,
+     2708,
+     2709,
+     2710,
+     2711,
+     2712,
+     2713,
+     2714,
+     2715,
+     2716,
+     2717,
+     2718,
+     2719
+    ]
+   }
+  },
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "f632291+dirty",
+   "python": "3.13.16",
+   "started": "2026-10-12 23:05:49",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  },
+  "sha": "f205db31dfed30cb1877376246fe6c6f72e63171",
+  "sha_rows": [
+   [
+    "bdh",
+    "53419a6a324b173f5d45fb11855036014e557192",
+    "branch"
+   ],
+   [
+    "bdh_recurrent",
+    "fa0c6dda59a04af086d5136c2c01f292e909449f",
+    "branch"
+   ],
+   [
+    "explore_aux_gate",
+    "ad2d2a0d34eab43bbd98149eeef0b4ef18b62975",
+    "branch"
+   ],
+   [
+    "explore_b16_gates",
+    "78d793876f7f94e6470e7324ee685092477d4818",
+    "branch"
+   ],
+   [
+    "explore_b18_gates",
+    "7aaba9d4413c0de322f8219d1e16ea726b47c853",
+    "branch"
+   ],
+   [
+    "explore_common",
+    "be7b46f6a743b37b04f5f3a64a3f8f4ad5500cdb",
+    "branch"
+   ],
+   [
+    "explore_common2",
+    "1141737f36f63980c5840705408c1bf5cc0a920d",
+    "branch"
+   ],
+   [
+    "explore_delta_mem",
+    "499afb7d95b117890c44f7196f22275719bb3b03",
+    "branch"
+   ],
+   [
+    "explore_f_tasks",
+    "de5a0f2f537506b7a499724e9e46199649728131",
+    "branch"
+   ],
+   [
+    "explore_far_cue",
+    "e97ee2f71037de8631f450a7f79abdae76c892c1",
+    "branch"
+   ],
+   [
+    "explore_g_common",
+    "5b9b558f14cf6d73981811218bb2b6a334521f93",
+    "branch"
+   ],
+   [
+    "explore_g_devices_child",
+    "9af50ee2a267fde377a0e2d2e5e01f90335a73e9",
+    "branch"
+   ],
+   [
+    "explore_g_latch_child",
+    "b09fd70f77ebd9e800ba425dafa1c67f95323ea6",
+    "branch"
+   ],
+   [
+    "explore_g_register_child",
+    "1decfb31365e3a56143626e7a4fa825993ad9040",
+    "branch"
+   ],
+   [
+    "explore_g_regmodel",
+    "9155ffa8c4d6645f83d2ddfb3b5e22bd22fb5ad3",
+    "branch"
+   ],
+   [
+    "explore_g_rhl_child",
+    "f12d4f552b1afd9d3d1ae81319bf69dc153cee82",
+    "branch"
+   ],
+   [
+    "explore_g_s87_child",
+    "115e850596faf8d1f138e8ee2d0d9e5e3d48fe77",
+    "branch"
+   ],
+   [
+    "explore_local_gate",
+    "2fcad39c3cb1e466f336d074436d4c6130c36a02",
+    "branch"
+   ],
+   [
+    "explore_window_recipe_child",
+    "616dabddbde2a28c0fb9df1df84f04fdbbe6960a",
+    "branch"
+   ],
+   [
+    "test_binding_capacity",
+    "da7f41cf6b05242b513498ae393fbea5da2fd2f6",
+    "branch"
+   ],
+   [
+    "test_binding_onset",
+    "8ddecefcc6fadbfeb21b3f8c9e6ad9341aa88bc5",
+    "branch"
+   ],
+   [
+    "test_binding_recipe",
+    "15fb947fcd81775f9af9be50cc4201433ac39186",
+    "branch"
+   ],
+   [
+    "test_channel_binding",
+    "8b0d04e45b9f5ba53d49e07479a6f3ab484b34d8",
+    "branch"
+   ],
+   [
+    "test_instrument_v2",
+    "dcc5175d4e121040675b432d652cecb83027e27f",
+    "branch"
+   ],
+   [
+    "test_interference",
+    "9a6820ae475a28fc7e2333877832488abf208207",
+    "branch"
+   ],
+   [
+    "test_multilayer_binding",
+    "0d3bb2d33a7b8997d01c9ff80f7d2f06ed2ba865",
+    "branch"
+   ],
+   [
+    "test_readout_path",
+    "755775e4a1ee46a1bac83c8cab4f266744b49625",
+    "branch"
+   ],
+   [
+    "test_router_confirm",
+    "8964ea8a6778a8b04a31c40c1fd86878559d2d60",
+    "branch"
+   ],
+   [
+    "test_router_curriculum",
+    "373f5df333059267d2ea91bd04d928d23f109740",
+    "branch"
+   ],
+   [
+    "test_router_discovery",
+    "5892bc74efecf3d2f4a112b6408d1357ef259b27",
+    "branch"
+   ],
+   [
+    "test_router_layout",
+    "97a74528d7f7383d2b4a6638a27d1725acbd7853",
+    "branch"
+   ],
+   [
+    "test_router_reliability",
+    "9b7f734343fb1549b677fb67fced462d335b0735",
+    "branch"
+   ],
+   [
+    "test_short_conv",
+    "b4cd10557eb4acaa391bb9232150a68ca3d48d03",
+    "branch"
+   ]
+  ]
+ },
+ "runs": {
+  "ORACLE_ALL|2700|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "acc_by_cell": {
+    "0|0|0": {
+     "acc": 1.0,
+     "n": 274
+    },
+    "0|0|1": {
+     "acc": 1.0,
+     "n": 174
+    },
+    "0|0|2": {
+     "acc": 1.0,
+     "n": 63
+    },
+    "0|1|0": {
+     "acc": 1.0,
+     "n": 250
+    },
+    "0|1|1": {
+     "acc": 1.0,
+     "n": 165
+    },
+    "0|1|2": {
+     "acc": 1.0,
+     "n": 84
+    },
+    "1|0|0": {
+     "acc": 1.0,
+     "n": 259
+    },
+    "1|0|1": {
+     "acc": 1.0,
+     "n": 169
+    },
+    "1|0|2": {
+     "acc": 1.0,
+     "n": 102
+    },
+    "1|1|0": {
+     "acc": 1.0,
+     "n": 250
+    },
+    "1|1|1": {
+     "acc": 1.0,
+     "n": 176
+    },
+    "1|1|2": {
+     "acc": 1.0,
+     "n": 82
+    }
+   },
+   "arm": "ORACLE_ALL",
+   "attempt": 1,
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     1.0,
+     0.02514387108385563
+    ],
+    [
+     2400,
+     1.0,
+     0.005745969712734222
+    ],
+    [
+     3600,
+     1.0,
+     0.0027958140708506107
+    ]
+   ],
+   "discovered": true,
+   "end": {
+    "beta": null,
+    "ctx_cos": 0.0,
+    "eff_ch": 1.99996781756006,
+    "eta_key_by_half": 0.0003814697265625,
+    "eta_key_by_index": 0.0008087158203125,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0003814697265625,
+    "eta_val_by_index": 0.0008087158203125,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.012040838599205017,
+    "key_sep": 0.009701661765575409,
+    "layers": {
+     "L1": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.0003814697265625,
+      "eta_key_by_index": 0.0008087158203125,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.0003814697265625,
+      "eta_val_by_index": 0.0008087158203125,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L2": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.0003814697265625,
+      "eta_key_by_index": 0.0008087158203125,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.0003814697265625,
+      "eta_val_by_index": 0.0008087158203125,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L3": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.0003814697265625,
+      "eta_key_by_index": 0.0008087158203125,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.0003814697265625,
+      "eta_val_by_index": 0.0008087158203125,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     }
+    },
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "fail": null,
+   "grad": {
+    "1": [
+     0.0,
+     1.920043134304149,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.6521693694532456,
+     0.0
+    ],
+    "100": [
+     0.0,
+     4.662496856708848,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.0,
+   "ok": true,
+   "params": 25984,
+   "probe": {
+    "L2|K": {
+     "acc": 0.635,
+     "k": 2032,
+     "n": 3200,
+     "train_acc": 0.649296875,
+     "wilson": [
+      0.618166640489401,
+      0.6515096131680832
+     ]
+    },
+    "L2|V": {
+     "acc": 0.5034375,
+     "k": 1611,
+     "n": 3200,
+     "train_acc": 0.526328125,
+     "wilson": [
+      0.48612006022387233,
+      0.5207466962349988
+     ]
+    },
+    "L3|K": {
+     "acc": 0.6653125,
+     "k": 2129,
+     "n": 3200,
+     "train_acc": 0.671796875,
+     "wilson": [
+      0.6487730370880908,
+      0.6814555235248932
+     ]
+    },
+    "L3|V": {
+     "acc": 0.505625,
+     "k": 1618,
+     "n": 3200,
+     "train_acc": 0.535234375,
+     "wilson": [
+      0.4883056229478307,
+      0.5229308876212311
+     ]
+    },
+    "final|K": {
+     "acc": 0.6875,
+     "k": 2200,
+     "n": 3200,
+     "train_acc": 0.695859375,
+     "wilson": [
+      0.671223347406604,
+      0.7033270048954574
+     ]
+    },
+    "final|V": {
+     "acc": 0.5665625,
+     "k": 1813,
+     "n": 3200,
+     "train_acc": 0.57015625,
+     "wilson": [
+      0.5493228802883353,
+      0.5836424947788964
+     ]
+    }
+   },
+   "recipe": "adam",
+   "secs": 50.10014891624451,
+   "secs_wall": 58.47527766227722,
+   "seed": 2700,
+   "sha": "f205db31dfed",
+   "stats": [
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.99996781756006,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.012040838599205017,
+     "key_sep": 0.009701661765575409,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.99996781756006,
+     "eta_key_by_half": 0.0003814697265625,
+     "eta_key_by_index": 0.0008087158203125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0003814697265625,
+     "eta_val_by_index": 0.0008087158203125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.012040838599205017,
+     "key_sep": 0.009701661765575409,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.0003814697265625,
+       "eta_key_by_index": 0.0008087158203125,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.0003814697265625,
+       "eta_val_by_index": 0.0008087158203125,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.0003814697265625,
+       "eta_key_by_index": 0.0008087158203125,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.0003814697265625,
+       "eta_val_by_index": 0.0008087158203125,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.0003814697265625,
+       "eta_key_by_index": 0.0008087158203125,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.0003814697265625,
+       "eta_val_by_index": 0.0008087158203125,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.99996781756006,
+     "eta_key_by_half": 0.0003814697265625,
+     "eta_key_by_index": 0.0008087158203125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0003814697265625,
+     "eta_val_by_index": 0.0008087158203125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.012040838599205017,
+     "key_sep": 0.009701661765575409,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.0003814697265625,
+       "eta_key_by_index": 0.0008087158203125,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.0003814697265625,
+       "eta_val_by_index": 0.0008087158203125,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.0003814697265625,
+       "eta_key_by_index": 0.0008087158203125,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.0003814697265625,
+       "eta_val_by_index": 0.0008087158203125,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.0003814697265625,
+       "eta_key_by_index": 0.0008087158203125,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.0003814697265625,
+       "eta_val_by_index": 0.0008087158203125,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.99996781756006,
+     "eta_key_by_half": 0.0003814697265625,
+     "eta_key_by_index": 0.0008087158203125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0003814697265625,
+     "eta_val_by_index": 0.0008087158203125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.012040838599205017,
+     "key_sep": 0.009701661765575409,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "stream_acc": [
+    1.0,
+    1.0
+   ],
+   "transition": 1200,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "ORACLE_ALL|2701|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "acc_by_cell": {
+    "0|0|0": {
+     "acc": 1.0,
+     "n": 274
+    },
+    "0|0|1": {
+     "acc": 1.0,
+     "n": 174
+    },
+    "0|0|2": {
+     "acc": 1.0,
+     "n": 63
+    },
+    "0|1|0": {
+     "acc": 1.0,
+     "n": 250
+    },
+    "0|1|1": {
+     "acc": 1.0,
+     "n": 165
+    },
+    "0|1|2": {
+     "acc": 1.0,
+     "n": 84
+    },
+    "1|0|0": {
+     "acc": 1.0,
+     "n": 259
+    },
+    "1|0|1": {
+     "acc": 1.0,
+     "n": 169
+    },
+    "1|0|2": {
+     "acc": 1.0,
+     "n": 102
+    },
+    "1|1|0": {
+     "acc": 1.0,
+     "n": 250
+    },
+    "1|1|1": {
+     "acc": 1.0,
+     "n": 176
+    },
+    "1|1|2": {
+     "acc": 1.0,
+     "n": 82
+    }
+   },
+   "arm": "ORACLE_ALL",
+   "attempt": 1,
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     1.0,
+     0.028934888541698456
+    ],
+    [
+     2400,
+     1.0,
+     0.006466867867857218
+    ],
+    [
+     3600,
+     1.0,
+     0.0023763729259371758
+    ]
+   ],
+   "discovered": true,
+   "end": {
+    "beta": null,
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9998542161616781,
+    "eta_key_by_half": 0.00390625,
+    "eta_key_by_index": 0.0105438232421875,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.00390625,
+    "eta_val_by_index": 0.0105438232421875,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.014757126569747925,
+    "key_sep": 0.008697251478830973,
+    "layers": {
+     "L1": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.00390625,
+      "eta_key_by_index": 0.0105438232421875,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.00390625,
+      "eta_val_by_index": 0.0105438232421875,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L2": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.00390625,
+      "eta_key_by_index": 0.0105438232421875,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.00390625,
+      "eta_val_by_index": 0.0105438232421875,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L3": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.00390625,
+      "eta_key_by_index": 0.0105438232421875,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.00390625,
+      "eta_val_by_index": 0.0105438232421875,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     }
+    },
+    "margin": 1.0,
+    "sep": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0
+   },
+   "fail": null,
+   "grad": {
+    "1": [
+     0.0,
+     2.738865222779226,
+     0.0
+    ],
+    "10": [
+     0.0,
+     1.4763011802051056,
+     0.0
+    ],
+    "100": [
+     0.0,
+     2.7959339967012653,
+     0.0
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.0,
+   "ok": true,
+   "params": 25984,
+   "probe": {
+    "L2|K": {
+     "acc": 0.6703125,
+     "k": 2145,
+     "n": 3200,
+     "train_acc": 0.664609375,
+     "wilson": [
+      0.6538286514332707,
+      0.686387918574435
+     ]
+    },
+    "L2|V": {
+     "acc": 0.5053125,
+     "k": 1617,
+     "n": 3200,
+     "train_acc": 0.52953125,
+     "wilson": [
+      0.4879933794335389,
+      0.522618880548353
+     ]
+    },
+    "L3|K": {
+     "acc": 0.67375,
+     "k": 2156,
+     "n": 3200,
+     "train_acc": 0.683125,
+     "wilson": [
+      0.6573055915732066,
+      0.6897777348933704
+     ]
+    },
+    "L3|V": {
+     "acc": 0.5209375,
+     "k": 1667,
+     "n": 3200,
+     "train_acc": 0.53328125,
+     "wilson": [
+      0.5036138363662834,
+      0.5382109529741135
+     ]
+    },
+    "final|K": {
+     "acc": 0.7303125,
+     "k": 2337,
+     "n": 3200,
+     "train_acc": 0.73125,
+     "wilson": [
+      0.7146662856931155,
+      0.74540639705125
+     ]
+    },
+    "final|V": {
+     "acc": 0.6165625,
+     "k": 1973,
+     "n": 3200,
+     "train_acc": 0.614375,
+     "wilson": [
+      0.5995854766811896,
+      0.6332599923332586
+     ]
+    }
+   },
+   "recipe": "adam",
+   "secs": 49.65749740600586,
+   "secs_wall": 58.12721109390259,
+   "seed": 2701,
+   "sha": "f205db31dfed",
+   "stats": [
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9998542161616781,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.014757126569747925,
+     "key_sep": 0.008697251478830973,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9998542161616781,
+     "eta_key_by_half": 0.00390625,
+     "eta_key_by_index": 0.0105438232421875,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00390625,
+     "eta_val_by_index": 0.0105438232421875,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.014757126569747925,
+     "key_sep": 0.008697251478830973,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.00390625,
+       "eta_key_by_index": 0.0105438232421875,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.00390625,
+       "eta_val_by_index": 0.0105438232421875,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.00390625,
+       "eta_key_by_index": 0.0105438232421875,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.00390625,
+       "eta_val_by_index": 0.0105438232421875,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.00390625,
+       "eta_key_by_index": 0.0105438232421875,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.00390625,
+       "eta_val_by_index": 0.0105438232421875,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9998542161616781,
+     "eta_key_by_half": 0.00390625,
+     "eta_key_by_index": 0.0105438232421875,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00390625,
+     "eta_val_by_index": 0.0105438232421875,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.014757126569747925,
+     "key_sep": 0.008697251478830973,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.00390625,
+       "eta_key_by_index": 0.0105438232421875,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.00390625,
+       "eta_val_by_index": 0.0105438232421875,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.00390625,
+       "eta_key_by_index": 0.0105438232421875,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.00390625,
+       "eta_val_by_index": 0.0105438232421875,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.00390625,
+       "eta_key_by_index": 0.0105438232421875,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.00390625,
+       "eta_val_by_index": 0.0105438232421875,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9998542161616781,
+     "eta_key_by_half": 0.00390625,
+     "eta_key_by_index": 0.0105438232421875,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.00390625,
+     "eta_val_by_index": 0.0105438232421875,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.014757126569747925,
+     "key_sep": 0.008697251478830973,
+     "margin": 1.0,
+     "sep": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "stream_acc": [
+    1.0,
+    1.0
+   ],
+   "transition": 1200,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "REG3_KEYHINGE|2700|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "acc_by_cell": {
+    "0|0|0": {
+     "acc": 1.0,
+     "n": 274
+    },
+    "0|0|1": {
+     "acc": 1.0,
+     "n": 174
+    },
+    "0|0|2": {
+     "acc": 1.0,
+     "n": 63
+    },
+    "0|1|0": {
+     "acc": 1.0,
+     "n": 250
+    },
+    "0|1|1": {
+     "acc": 1.0,
+     "n": 165
+    },
+    "0|1|2": {
+     "acc": 1.0,
+     "n": 84
+    },
+    "1|0|0": {
+     "acc": 1.0,
+     "n": 259
+    },
+    "1|0|1": {
+     "acc": 1.0,
+     "n": 169
+    },
+    "1|0|2": {
+     "acc": 1.0,
+     "n": 102
+    },
+    "1|1|0": {
+     "acc": 1.0,
+     "n": 250
+    },
+    "1|1|1": {
+     "acc": 1.0,
+     "n": 176
+    },
+    "1|1|2": {
+     "acc": 1.0,
+     "n": 82
+    }
+   },
+   "arm": "REG3_KEYHINGE",
+   "attempt": 1,
+   "collapsed": false,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.8458313941955566,
+   "curve": [
+    [
+     1200,
+     0.21826171875,
+     2.5754892826080322
+    ],
+    [
+     2400,
+     0.22705078125,
+     2.3986170291900635
+    ],
+    [
+     3600,
+     0.9951171875,
+     0.05434280261397362
+    ],
+    [
+     4800,
+     1.0,
+     0.006943793501704931
+    ],
+    [
+     6000,
+     1.0,
+     0.0030432487837970257
+    ]
+   ],
+   "discovered": true,
+   "end": {
+    "beta": {
+     "CTX": 0.49210795760154724,
+     "KEY": 0.1982477903366089,
+     "QUERY": 0.3446033298969269,
+     "VAL": 0.18480448424816132
+    },
+    "ctx_cos": 0.8458313941955566,
+    "eff_ch": 1.9999620956144215,
+    "eta_key_by_half": 0.00038148842303964414,
+    "eta_key_by_index": 0.0008085524322068114,
+    "eta_key_by_key": 1.031143506530887e-09,
+    "eta_key_by_stream": 0.9999994010688599,
+    "eta_val_by_half": 0.00038138563154171284,
+    "eta_val_by_index": 0.0008074611775776104,
+    "eta_val_by_key": 2.6916833277222603e-08,
+    "eta_val_by_stream": 0.9999961968675348,
+    "k": 2,
+    "key_cos": 0.00031207851134240627,
+    "key_part": 0.012056350708007812,
+    "key_sep": 0.009709874788920084,
+    "layers": {
+     "L1": {
+      "ch_map_key": [
+       1,
+       0
+      ],
+      "ch_map_val": [
+       1,
+       0
+      ],
+      "eta_key_by_half": 0.0003810416030648651,
+      "eta_key_by_index": 0.0008076995037518785,
+      "eta_key_by_key": 3.4200016998761457e-09,
+      "eta_key_by_stream": 0.9999992680570439,
+      "eta_val_by_half": 0.0003809983036797514,
+      "eta_val_by_index": 0.00080718462838847,
+      "eta_val_by_key": 1.1872650049627296e-08,
+      "eta_val_by_stream": 0.9999965765184339,
+      "margin": 0.9991957545280457,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         0.6659,
+         0.3341
+        ],
+        [
+         0.3239,
+         0.6761
+        ]
+       ],
+       "KEY": [
+        [
+         0.0002,
+         0.9998
+        ],
+        [
+         0.9998,
+         0.0002
+        ]
+       ],
+       "QUERY": [
+        [
+         0.2612,
+         0.7388
+        ],
+        [
+         0.7207,
+         0.2793
+        ]
+       ],
+       "VAL": [
+        [
+         0.0004,
+         0.9996
+        ],
+        [
+         0.9997,
+         0.0003
+        ]
+       ]
+      }
+     },
+     "L2": {
+      "ch_map_key": [
+       1,
+       0
+      ],
+      "ch_map_val": [
+       1,
+       0
+      ],
+      "eta_key_by_half": 0.00038167683963635075,
+      "eta_key_by_index": 0.0008087966691526979,
+      "eta_key_by_key": 1.0498483573587624e-09,
+      "eta_key_by_stream": 0.9999994061018336,
+      "eta_val_by_half": 0.00038295334910932603,
+      "eta_val_by_index": 0.0008098834602250431,
+      "eta_val_by_key": 1.739284160753277e-08,
+      "eta_val_by_stream": 0.9999964443436442,
+      "margin": 0.9991672039031982,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         0.6657,
+         0.3343
+        ],
+        [
+         0.3238,
+         0.6762
+        ]
+       ],
+       "KEY": [
+        [
+         0.0002,
+         0.9998
+        ],
+        [
+         0.9998,
+         0.0002
+        ]
+       ],
+       "QUERY": [
+        [
+         0.2609,
+         0.7391
+        ],
+        [
+         0.7206,
+         0.2794
+        ]
+       ],
+       "VAL": [
+        [
+         0.0003,
+         0.9997
+        ],
+        [
+         0.9996,
+         0.0004
+        ]
+       ]
+      }
+     },
+     "L3": {
+      "ch_map_key": [
+       1,
+       0
+      ],
+      "ch_map_val": [
+       1,
+       0
+      ],
+      "eta_key_by_half": 0.00038148842303964414,
+      "eta_key_by_index": 0.0008085524322068114,
+      "eta_key_by_key": 1.031143506530887e-09,
+      "eta_key_by_stream": 0.9999994010688599,
+      "eta_val_by_half": 0.00038138563154171284,
+      "eta_val_by_index": 0.0008074611775776104,
+      "eta_val_by_key": 2.6916833277222603e-08,
+      "eta_val_by_stream": 0.9999961968675348,
+      "margin": 0.9991858005523682,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         0.6656,
+         0.3344
+        ],
+        [
+         0.324,
+         0.676
+        ]
+       ],
+       "KEY": [
+        [
+         0.0002,
+         0.9998
+        ],
+        [
+         0.9998,
+         0.0002
+        ]
+       ],
+       "QUERY": [
+        [
+         0.2608,
+         0.7392
+        ],
+        [
+         0.7207,
+         0.2793
+        ]
+       ],
+       "VAL": [
+        [
+         0.0004,
+         0.9996
+        ],
+        [
+         0.9997,
+         0.0003
+        ]
+       ]
+      }
+     }
+    },
+    "margin": 0.9991858005523682,
+    "sep": 0.7066746950149536,
+    "spread": 0.9661533832550049,
+    "step": "end",
+    "val_cos": 0.0007204751600511372
+   },
+   "fail": null,
+   "grad": {
+    "1": [
+     0.0,
+     5.01462074437384,
+     0.0
+    ],
+    "10": [
+     0.0,
+     56.11673843605742,
+     0.0
+    ],
+    "100": [
+     0.0,
+     24.918298364692546,
+     0.0
+    ]
+   },
+   "group_names": [
+    [
+     "W_in",
+     "W_g",
+     "gate_conv.conv_w",
+     "A_v",
+     "A_r",
+     "W_g2",
+     "A_R",
+     "W_R",
+     "w_R",
+     "b_R"
+    ],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "hinge": {
+    "eta_at": {
+     "1": [
+      0.99775,
+      0.96309,
+      0.88802
+     ],
+     "1200": [
+      0.01202,
+      0.01793,
+      0.01192
+     ],
+     "2400": [
+      0.00247,
+      0.0022,
+      0.01042
+     ],
+     "300": [
+      0.09443,
+      0.0497,
+      0.0338
+     ],
+     "600": [
+      0.07044,
+      0.01522,
+      0.07207
+     ]
+    },
+    "fired": 86,
+    "last": [
+     0.0024705221876502037,
+     0.002202192321419716,
+     0.010416007600724697
+    ],
+    "n": 6000,
+    "weights": {
+     "1": 1.0,
+     "2399": 1.0,
+     "2400": 1.0,
+     "2401": 0.0,
+     "2402": 0.0
+    },
+    "windows": [
+     74,
+     12
+    ]
+   },
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.00031207851134240627,
+   "ok": true,
+   "params": 30337,
+   "probe": {
+    "L2|K": {
+     "acc": 0.48875,
+     "k": 1564,
+     "n": 3200,
+     "train_acc": 0.521796875,
+     "wilson": [
+      0.47145414057473406,
+      0.5060728382871423
+     ]
+    },
+    "L2|V": {
+     "acc": 0.5034375,
+     "k": 1611,
+     "n": 3200,
+     "train_acc": 0.52671875,
+     "wilson": [
+      0.48612006022387233,
+      0.5207466962349988
+     ]
+    },
+    "L3|K": {
+     "acc": 0.5034375,
+     "k": 1611,
+     "n": 3200,
+     "train_acc": 0.5221875,
+     "wilson": [
+      0.48612006022387233,
+      0.5207466962349988
+     ]
+    },
+    "L3|V": {
+     "acc": 0.4978125,
+     "k": 1593,
+     "n": 3200,
+     "train_acc": 0.52390625,
+     "wilson": [
+      0.48050156175296777,
+      0.5151286841368417
+     ]
+    },
+    "final|K": {
+     "acc": 0.489375,
+     "k": 1566,
+     "n": 3200,
+     "train_acc": 0.5203125,
+     "wilson": [
+      0.47207791819422046,
+      0.5066975618419962
+     ]
+    },
+    "final|V": {
+     "acc": 0.5128125,
+     "k": 1641,
+     "n": 3200,
+     "train_acc": 0.539296875,
+     "wilson": [
+      0.4954890889085553,
+      0.5301051851654189
+     ]
+    }
+   },
+   "recipe": "slow",
+   "secs": 119.15062546730042,
+   "secs_wall": 127.39092206954956,
+   "seed": 2700,
+   "sha": "f205db31dfed",
+   "stats": [
+    {
+     "beta": {
+      "CTX": 0.10005541145801544,
+      "KEY": 0.09995411336421967,
+      "QUERY": 0.10000519454479218,
+      "VAL": 0.09997469186782837
+     },
+     "ctx_cos": 0.9998445510864258,
+     "eff_ch": 1.9994324097273883,
+     "k": 2,
+     "key_cos": 0.9999998807907104,
+     "key_part": 0.03994092345237732,
+     "key_sep": 0.016033940017223358,
+     "sep": 0.0018464624881744385,
+     "spread": 0.027734963223338127,
+     "step": 0,
+     "val_cos": 0.9999986886978149
+    },
+    {
+     "beta": {
+      "CTX": 0.11553680896759033,
+      "KEY": 0.1130807101726532,
+      "QUERY": 0.11420224606990814,
+      "VAL": 0.11230791360139847
+     },
+     "ctx_cos": 0.9994568824768066,
+     "eff_ch": 1.9990118837634947,
+     "eta_key_by_half": 0.004343765073571095,
+     "eta_key_by_index": 0.06280474788248765,
+     "eta_key_by_key": 0.023823188643533673,
+     "eta_key_by_stream": 0.09823225846367942,
+     "eta_val_by_half": 0.0007286211654764339,
+     "eta_val_by_index": 0.0024395631310851302,
+     "eta_val_by_key": 0.07344545094790407,
+     "eta_val_by_stream": 0.02289421982573258,
+     "k": 2,
+     "key_cos": 0.9995085000991821,
+     "key_part": 0.05072706937789917,
+     "key_sep": 0.004352552195390065,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        0
+       ],
+       "ch_map_val": [
+        0,
+        0
+       ],
+       "eta_key_by_half": 0.0017401144405286922,
+       "eta_key_by_index": 0.01119485233044345,
+       "eta_key_by_key": 0.0176090616636961,
+       "eta_key_by_stream": 0.2322911586466068,
+       "eta_val_by_half": 0.0007282543464892897,
+       "eta_val_by_index": 0.00431585303268152,
+       "eta_val_by_key": 0.035577468860679036,
+       "eta_val_by_stream": 0.011829294442307708,
+       "margin": 0.0001782967010512948,
+       "one_to_one_key": false,
+       "one_to_one_val": false,
+       "table": {
+        "CTX": [
+         [
+          0.4804,
+          0.5196
+         ],
+         [
+          0.4904,
+          0.5096
+         ]
+        ],
+        "KEY": [
+         [
+          0.5115,
+          0.4885
+         ],
+         [
+          0.5223,
+          0.4777
+         ]
+        ],
+        "QUERY": [
+         [
+          0.4969,
+          0.5031
+         ],
+         [
+          0.5129,
+          0.4871
+         ]
+        ],
+        "VAL": [
+         [
+          0.5017,
+          0.4983
+         ],
+         [
+          0.5066,
+          0.4934
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        0
+       ],
+       "ch_map_val": [
+        0,
+        0
+       ],
+       "eta_key_by_half": 0.004139209924289529,
+       "eta_key_by_index": 0.026691635322878684,
+       "eta_key_by_key": 0.034035547246028836,
+       "eta_key_by_stream": 0.14147513437652587,
+       "eta_val_by_half": 0.0009041185192242514,
+       "eta_val_by_index": 0.0027008019082161014,
+       "eta_val_by_key": 0.061755301062710856,
+       "eta_val_by_stream": 0.01457797246361673,
+       "margin": 0.0002588737988844514,
+       "one_to_one_key": false,
+       "one_to_one_val": false,
+       "table": {
+        "CTX": [
+         [
+          0.48,
+          0.52
+         ],
+         [
+          0.4931,
+          0.5069
+         ]
+        ],
+        "KEY": [
+         [
+          0.522,
+          0.478
+         ],
+         [
+          0.5358,
+          0.4642
+         ]
+        ],
+        "QUERY": [
+         [
+          0.5038,
+          0.4962
+         ],
+         [
+          0.5237,
+          0.4763
+         ]
+        ],
+        "VAL": [
+         [
+          0.5085,
+          0.4915
+         ],
+         [
+          0.5149,
+          0.4851
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        0
+       ],
+       "ch_map_val": [
+        0,
+        0
+       ],
+       "eta_key_by_half": 0.004343765073571095,
+       "eta_key_by_index": 0.06280474788248765,
+       "eta_key_by_key": 0.023823188643533673,
+       "eta_key_by_stream": 0.09823225846367942,
+       "eta_val_by_half": 0.0007286211654764339,
+       "eta_val_by_index": 0.0024395631310851302,
+       "eta_val_by_key": 0.07344545094790407,
+       "eta_val_by_stream": 0.02289421982573258,
+       "margin": 0.00030664727091789246,
+       "one_to_one_key": false,
+       "one_to_one_val": false,
+       "table": {
+        "CTX": [
+         [
+          0.4881,
+          0.5119
+         ],
+         [
+          0.5025,
+          0.4975
+         ]
+        ],
+        "KEY": [
+         [
+          0.5174,
+          0.4826
+         ],
+         [
+          0.5323,
+          0.4677
+         ]
+        ],
+        "QUERY": [
+         [
+          0.5058,
+          0.4942
+         ],
+         [
+          0.5301,
+          0.4699
+         ]
+        ],
+        "VAL": [
+         [
+          0.5125,
+          0.4875
+         ],
+         [
+          0.5204,
+          0.4796
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 0.00030664727091789246,
+     "sep": 0.01312778890132904,
+     "spread": 0.050008729100227356,
+     "step": 1200,
+     "val_cos": 0.9998729228973389
+    },
+    {
+     "beta": {
+      "CTX": 0.1487186998128891,
+      "KEY": 0.1313539296388626,
+      "QUERY": 0.13963989913463593,
+      "VAL": 0.13085967302322388
+     },
+     "ctx_cos": 0.9997197389602661,
+     "eff_ch": 1.9942853034707855,
+     "eta_key_by_half": 0.0016140859248727772,
+     "eta_key_by_index": 0.015984619488262873,
+     "eta_key_by_key": 0.007755459055797606,
+     "eta_key_by_stream": 0.32284208768075334,
+     "eta_val_by_half": 0.014821695345999778,
+     "eta_val_by_index": 0.019631776739881503,
+     "eta_val_by_key": 0.1580614920513707,
+     "eta_val_by_stream": 0.20751557324348321,
+     "k": 2,
+     "key_cos": 0.9904615879058838,
+     "key_part": 0.07791674137115479,
+     "key_sep": 0.005240040520826976,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        0
+       ],
+       "ch_map_val": [
+        0,
+        0
+       ],
+       "eta_key_by_half": 0.005326346479286123,
+       "eta_key_by_index": 0.011545997631280348,
+       "eta_key_by_key": 0.00816829323574722,
+       "eta_key_by_stream": 0.4040595316452479,
+       "eta_val_by_half": 0.005201441678141001,
+       "eta_val_by_index": 0.006935902651803884,
+       "eta_val_by_key": 0.17141902637822531,
+       "eta_val_by_stream": 0.22514471417103515,
+       "margin": 0.00427550682798028,
+       "one_to_one_key": false,
+       "one_to_one_val": false,
+       "table": {
+        "CTX": [
+         [
+          0.4955,
+          0.5045
+         ],
+         [
+          0.5169,
+          0.4831
+         ]
+        ],
+        "KEY": [
+         [
+          0.5021,
+          0.4979
+         ],
+         [
+          0.5626,
+          0.4374
+         ]
+        ],
+        "QUERY": [
+         [
+          0.4994,
+          0.5006
+         ],
+         [
+          0.5676,
+          0.4324
+         ]
+        ],
+        "VAL": [
+         [
+          0.5088,
+          0.4912
+         ],
+         [
+          0.5546,
+          0.4454
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        0
+       ],
+       "ch_map_val": [
+        0,
+        0
+       ],
+       "eta_key_by_half": 0.00279683650365639,
+       "eta_key_by_index": 0.012835253330943616,
+       "eta_key_by_key": 0.004304549984319151,
+       "eta_key_by_stream": 0.3669706346372654,
+       "eta_val_by_half": 0.005164201808495967,
+       "eta_val_by_index": 0.007180116877608134,
+       "eta_val_by_key": 0.17262922021004637,
+       "eta_val_by_stream": 0.2073166010920613,
+       "margin": 0.004720289725810289,
+       "one_to_one_key": false,
+       "one_to_one_val": false,
+       "table": {
+        "CTX": [
+         [
+          0.4968,
+          0.5032
+         ],
+         [
+          0.5124,
+          0.4876
+         ]
+        ],
+        "KEY": [
+         [
+          0.5015,
+          0.4985
+         ],
+         [
+          0.5662,
+          0.4338
+         ]
+        ],
+        "QUERY": [
+         [
+          0.5,
+          0.5
+         ],
+         [
+          0.5681,
+          0.4319
+         ]
+        ],
+        "VAL": [
+         [
+          0.5128,
+          0.4872
+         ],
+         [
+          0.5616,
+          0.4384
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        0
+       ],
+       "ch_map_val": [
+        0,
+        0
+       ],
+       "eta_key_by_half": 0.0016140859248727772,
+       "eta_key_by_index": 0.015984619488262873,
+       "eta_key_by_key": 0.007755459055797606,
+       "eta_key_by_stream": 0.32284208768075334,
+       "eta_val_by_half": 0.014821695345999778,
+       "eta_val_by_index": 0.019631776739881503,
+       "eta_val_by_key": 0.1580614920513707,
+       "eta_val_by_stream": 0.20751557324348321,
+       "margin": 0.0049640522338449955,
+       "one_to_one_key": false,
+       "one_to_one_val": false,
+       "table": {
+        "CTX": [
+         [
+          0.5108,
+          0.4892
+         ],
+         [
+          0.5179,
+          0.4821
+         ]
+        ],
+        "KEY": [
+         [
+          0.504,
+          0.496
+         ],
+         [
+          0.5702,
+          0.4298
+         ]
+        ],
+        "QUERY": [
+         [
+          0.5122,
+          0.4878
+         ],
+         [
+          0.5785,
+          0.4215
+         ]
+        ],
+        "VAL": [
+         [
+          0.5236,
+          0.4764
+         ],
+         [
+          0.5741,
+          0.4259
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 0.0049640522338449955,
+     "sep": 0.04964686930179596,
+     "spread": 0.10933995246887207,
+     "step": 2400,
+     "val_cos": 0.9950132369995117
+    },
+    {
+     "beta": {
+      "CTX": 0.467134952545166,
+      "KEY": 0.1963871270418167,
+      "QUERY": 0.33113542199134827,
+      "VAL": 0.18416127562522888
+     },
+     "ctx_cos": 0.8558716773986816,
+     "eff_ch": 1.9999330093105443,
+     "eta_key_by_half": 0.0003764269140064562,
+     "eta_key_by_index": 0.0008011587594425913,
+     "eta_key_by_key": 2.671653656508046e-08,
+     "eta_key_by_stream": 0.999991066896227,
+     "eta_val_by_half": 0.0003637849384896313,
+     "eta_val_by_index": 0.0007777577602554808,
+     "eta_val_by_key": 5.670408598816742e-07,
+     "eta_val_by_stream": 0.999913869369496,
+     "k": 2,
+     "key_cos": 0.0006286253337748349,
+     "key_part": 0.012129649519920349,
+     "key_sep": 0.00977352261543274,
+     "margin": 0.9983511567115784,
+     "sep": 0.7084668874740601,
+     "spread": 0.9624811410903931,
+     "step": 3600,
+     "val_cos": 0.001862287288531661
+    },
+    {
+     "beta": {
+      "CTX": 0.491851806640625,
+      "KEY": 0.1977594494819641,
+      "QUERY": 0.3441815972328186,
+      "VAL": 0.18407447636127472
+     },
+     "ctx_cos": 0.8452448844909668,
+     "eff_ch": 1.9999612611653839,
+     "k": 2,
+     "key_cos": 0.0003076423890888691,
+     "key_part": 0.012052550911903381,
+     "key_sep": 0.009708799421787262,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        1,
+        0
+       ],
+       "ch_map_val": [
+        1,
+        0
+       ],
+       "eta_key_by_half": 0.0003809282394457567,
+       "eta_key_by_index": 0.0008075391664994086,
+       "eta_key_by_key": 3.369518836979524e-09,
+       "eta_key_by_stream": 0.9999992949348132,
+       "eta_val_by_half": 0.00038057901451315747,
+       "eta_val_by_index": 0.000806548930720789,
+       "eta_val_by_key": 1.1981807454679748e-08,
+       "eta_val_by_stream": 0.9999966989531384,
+       "margin": 0.9992095232009888,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          0.666,
+          0.334
+         ],
+         [
+          0.3233,
+          0.6767
+         ]
+        ],
+        "KEY": [
+         [
+          0.0002,
+          0.9998
+         ],
+         [
+          0.9999,
+          0.0001
+         ]
+        ],
+        "QUERY": [
+         [
+          0.2613,
+          0.7387
+         ],
+         [
+          0.7207,
+          0.2793
+         ]
+        ],
+        "VAL": [
+         [
+          0.0004,
+          0.9996
+         ],
+         [
+          0.9997,
+          0.0003
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        1,
+        0
+       ],
+       "ch_map_val": [
+        1,
+        0
+       ],
+       "eta_key_by_half": 0.0003815373215467599,
+       "eta_key_by_index": 0.0008086026942875125,
+       "eta_key_by_key": 9.87252187290128e-10,
+       "eta_key_by_stream": 0.9999994468734548,
+       "eta_val_by_half": 0.0003825242104459597,
+       "eta_val_by_index": 0.0008091912458351486,
+       "eta_val_by_key": 1.7214514084704502e-08,
+       "eta_val_by_stream": 0.9999966153643033,
+       "margin": 0.9991838932037354,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          0.6658,
+          0.3342
+         ],
+         [
+          0.3232,
+          0.6768
+         ]
+        ],
+        "KEY": [
+         [
+          0.0002,
+          0.9998
+         ],
+         [
+          0.9998,
+          0.0002
+         ]
+        ],
+        "QUERY": [
+         [
+          0.2609,
+          0.7391
+         ],
+         [
+          0.7207,
+          0.2793
+         ]
+        ],
+        "VAL": [
+         [
+          0.0003,
+          0.9997
+         ],
+         [
+          0.9996,
+          0.0004
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        1,
+        0
+       ],
+       "ch_map_val": [
+        1,
+        0
+       ],
+       "eta_key_by_half": 0.0003813764285828912,
+       "eta_key_by_index": 0.0008084075897498079,
+       "eta_key_by_key": 8.691602517438799e-10,
+       "eta_key_by_stream": 0.9999994452778226,
+       "eta_val_by_half": 0.00038093977709461317,
+       "eta_val_by_index": 0.0008067334521174593,
+       "eta_val_by_key": 2.7800858017584255e-08,
+       "eta_val_by_stream": 0.9999962026100856,
+       "margin": 0.9992002844810486,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          0.6658,
+          0.3342
+         ],
+         [
+          0.3234,
+          0.6766
+         ]
+        ],
+        "KEY": [
+         [
+          0.0002,
+          0.9998
+         ],
+         [
+          0.9998,
+          0.0002
+         ]
+        ],
+        "QUERY": [
+         [
+          0.2608,
+          0.7392
+         ],
+         [
+          0.7207,
+          0.2793
+         ]
+        ],
+        "VAL": [
+         [
+          0.0004,
+          0.9996
+         ],
+         [
+          0.9997,
+          0.0003
+         ]
+        ]
+       }
+      }
+     },
+     "sep": 0.7065443992614746,
+     "spread": 0.9663218855857849,
+     "step": 4800,
+     "val_cos": 0.0007113307365216315
+    },
+    {
+     "beta": {
+      "CTX": 0.49210795760154724,
+      "KEY": 0.1982477903366089,
+      "QUERY": 0.3446033298969269,
+      "VAL": 0.18480448424816132
+     },
+     "ctx_cos": 0.8458313941955566,
+     "eff_ch": 1.9999620956144215,
+     "k": 2,
+     "key_cos": 0.00031207851134240627,
+     "key_part": 0.012056350708007812,
+     "key_sep": 0.009709874788920084,
+     "sep": 0.7066746950149536,
+     "spread": 0.9661533832550049,
+     "step": 6000,
+     "val_cos": 0.0007204751600511372
+    }
+   ],
+   "stopped_at": 6000,
+   "stream_acc": [
+    1.0,
+    1.0
+   ],
+   "transition": 3600,
+   "val_cos": 0.0007204751600511372,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  }
+ }
+}
