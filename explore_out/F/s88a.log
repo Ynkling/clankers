@@ -46,3 +46,9 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   CHECK F/write: explore_f_delta_fast: fast = parallel in float64 (beta 1 / 0.5 / per token, write tied / 1, k = 5): forward 0.0e+00 <= 1e-12, gradients 8.9e-16 <= 1e-10: ok
   CHECK F/write: explore_f_delta_fast: fast = parallel in float32 at B 32, T 99, k 16: forward relative 0.0e+00 <= 1e-5, gradients relative 4.9e-07 <= 1e-4: ok
   CHECK F/write: the perfect gate (k 16) on both memories: one-hot (True); logits equal at init (True): ok
+  timings measured (149 s): F/write:DELTA_FIXED 278.2 ms/step, F/write:DELTA_LEARNED 279.2 ms/step, F/write:DELTA_LEARNED_SLOW 278.0 ms/step, F/write:O_DELTA 268.0 ms/step, F/write:O_DELTA_LEARNED 252.1 ms/step
+  34 runs queued; projected worst case 121.42 h of runs, makespan 31.94 h on 4 workers
+  start    0.0 min  F/write          DELTA_LEARNED            seed 2400  (projected worst case 216 min)
+  start    0.0 min  F/write          DELTA_LEARNED            seed 2401  (projected worst case 216 min)
+  start    0.0 min  F/write          DELTA_LEARNED            seed 2402  (projected worst case 216 min)
+  start    0.0 min  F/write          DELTA_LEARNED            seed 2403  (projected worst case 216 min)
