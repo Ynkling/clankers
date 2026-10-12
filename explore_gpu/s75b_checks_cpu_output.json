@@ -5,35 +5,190 @@
   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
   "threads": 1,
   "gpu": null,
-  "started": "2026-10-12 22:52:16",
+  "started": "2026-10-12 22:52:39",
   "s75b_sha": "0201896a129f"
  },
  "checks": {
-  "B2": {
+  "B7": {
    "ok": true,
-   "w_g_untouched_at_4800": true,
-   "fired": [
-    7200,
-    14400,
-    19200
-   ],
-   "blocked": {
-    "4800": "one-to-one",
-    "9600": "gap",
-    "12000": "one-to-one",
-    "16800": "gap",
-    "21600": "cap",
-    "24000": "cap",
-    "26400": "cap"
+   "tol": {
+    "logits": 1e-05,
+    "grad": 0.0001
    },
-   "all_merged_rows_equal": true,
-   "all_merged_models_equal": true,
-   "all_merged_fired": [
-    4800,
-    9600,
-    14400
+   "updates": 2,
+   "seeds": [
+    850
    ],
-   "secs": 9.3
+   "cases": {
+    "ORACLE": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "SINGLE": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "WIDE (WIDE_SPLIT_G / WIDE_SLOW)": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "REG3 (loop)": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "REG3 (scan vs the sequential loop)": {
+     "ok": true,
+     "updates": 2,
+     "logits": 1.4901161193847656e-07,
+     "grad": 3.857344062977765e-05,
+     "grad_param": "b_R",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    }
+   },
+   "secs": 380.5
+  },
+  "B8": {
+   "ok": true,
+   "stage1": {
+    "proceed": true,
+    "split_thr": 0.45280072212219236,
+    "missing": [],
+    "record": true
+   },
+   "stage2": {
+    "missing": {},
+    "records": {
+     "ORACLE_PILOT": [
+      840,
+      841
+     ],
+     "ORACLE": [
+      850,
+      851
+     ],
+     "SINGLE": [
+      850,
+      851
+     ],
+     "WIDE_SPLIT_G": [
+      850,
+      851
+     ],
+     "REG3": [
+      850,
+      851
+     ],
+     "WIDE_SLOW": [
+      850,
+      851
+     ]
+    },
+    "split_checks": [
+     [
+      400,
+      false,
+      null,
+      false
+     ],
+     [
+      800,
+      false,
+      null,
+      false
+     ],
+     [
+      400,
+      false,
+      null,
+      false
+     ],
+     [
+      800,
+      false,
+      null,
+      false
+     ]
+    ],
+    "meta": {
+     "machine": "fallback",
+     "split_thr": 0.45280072212219236,
+     "stage1_commit": null,
+     "register_reg3": "loop",
+     "workers": 0,
+     "started": "2026-10-12 23:04:51"
+    },
+    "reg3_register": [
+     "loop"
+    ]
+   },
+   "report_lines": 21,
+   "bench": {
+    "arms": {
+     "ORACLE": true,
+     "SINGLE": true,
+     "WIDE_SLOW": true,
+     "WIDE_SPLIT_G": true,
+     "REG3 scan": true,
+     "REG3 loop": true
+    },
+    "stats_workers": 1,
+    "worker_rss_gb": 9.050174713134766,
+    "main_rss_gb": 9.050174713134766,
+    "split_checks": [
+     [
+      2,
+      null,
+      false
+     ]
+    ]
+   },
+   "secs": 2243.0
   }
  }
 }
