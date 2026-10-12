@@ -1,0 +1,106 @@
+{
+ "meta": {
+  "arms": {
+   "KEYHINGE": {
+    "iters": 24000,
+    "label": "KEYHINGE",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "WIN3_SLOW + key term KEYHINGE",
+    "seeds": [
+     2630,
+     2631,
+     2632,
+     2633,
+     2634,
+     2635,
+     2636,
+     2637,
+     2638,
+     2639
+    ]
+   },
+   "LAM03": {
+    "iters": 24000,
+    "label": "LAM03",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "WIN3_SLOW + key term LAM03",
+    "seeds": [
+     2630,
+     2631,
+     2632,
+     2633,
+     2634,
+     2635,
+     2636,
+     2637,
+     2638,
+     2639
+    ]
+   },
+   "LAM3": {
+    "iters": 24000,
+    "label": "LAM3",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "WIN3_SLOW + key term LAM3",
+    "seeds": [
+     2630,
+     2631,
+     2632,
+     2633,
+     2634,
+     2635,
+     2636,
+     2637,
+     2638,
+     2639
+    ]
+   },
+   "ORACLE": {
+    "iters": 24000,
+    "label": "ceiling_conv",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "one Adam 1e-3",
+    "seeds": [
+     2630,
+     2631
+    ]
+   },
+   "WIN1200": {
+    "iters": 24000,
+    "label": "WIN1200",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "WIN3_SLOW + key term WIN1200",
+    "seeds": [
+     2630,
+     2631,
+     2632,
+     2633,
+     2634,
+     2635,
+     2636,
+     2637,
+     2638,
+     2639
+    ]
+   }
+  },
+  "code_shas": [
+   "65d3498e451112d29d852907fda95be8fd708808"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "f4fd535",
+   "python": "3.13.16",
+   "started": "2026-10-12 22:45:51",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
