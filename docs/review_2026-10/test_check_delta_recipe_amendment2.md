@@ -88,3 +88,5 @@ The check of §2 was therefore done against the records' times, the code's sched
 **Verdict.**
 - **What the amendment says had been seen is consistent with the records.** One run, DELTA_SPLIT 599, is within seconds of the commit either way.
 - **The log is still needed for three things:** the start time, the absence of a manual report, and the two reports.
+
+**Correction (12 October, fifth pass).** "All three fixes were written during the run, 47 to 82 minutes after its start" holds only of the process: until 05:27:31 the process was running its verification (`meta.started` is stamped after `verify()`). The fixes (02:59–03:34) were committed before any arm's run began.

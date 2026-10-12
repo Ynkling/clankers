@@ -109,3 +109,7 @@ The referee's own count made the same 393-for-353 slip (corrected in `replicatio
 ## Correction (11 October, fourth pass)
 
 "The test has not run" (lines 5 and 94) was wrong when written. Amendment 2 (`55dac50`, main line) states that X's full run started at 02:12 UTC on 11 October with `a581027`, 49 minutes before this check (`6f2788d`, 03:01:36). What held, and what this check had verified, is that no result file or log was on any branch. No finding above depends on it: every check here reads the code and stored records, not X's output. The start time rests on the amendment's text alone until X's log is pushed.
+
+**Second correction (12 October, fifth pass).** The correction above overstated.
+- X's process started at 02:12 UTC with the verification CHECKs. The first training run began only after `meta.started` (05:27:31), which is stamped after verification, and the projection; per `rev9/check_delta_recipe_X.md`, at or after 05:48:43.
+- At this check's time (03:01:36), no run of any arm had begun. "The test has not run" was true of its runs, though the process was running its verification.

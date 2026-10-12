@@ -261,7 +261,10 @@ py_changed = [f for f in rlib.git("diff", "--name-only", TEST_C, RES, "--", "*.p
 res_py = rlib.git("diff", "--numstat", f"{RES}^", RES, "--", "test_split_copy.py").split()
 res_diff = rlib.git("diff", "-U0", f"{RES}^", RES, "--", "test_split_copy.py")
 res_doc_only = all(not l.startswith("-") or l.startswith("---") for l in res_diff.split("\n"))
-rec_unchanged = rlib.git("diff", "--stat", RES, HEAD, "--", REC, "test_split_copy.py").strip() == ""
+json_unchanged = rlib.git("diff", "--stat", RES, HEAD, "--", REC).strip() == ""
+_t_res, _t_head = rlib.git("show", f"{RES}:test_split_copy.py"), rlib.git("show", f"{HEAD}:test_split_copy.py")
+code_unchanged = _t_res.split('"""', 2)[2] == _t_head.split('"""', 2)[2]          # everything after the docstring
+rec_unchanged = json_unchanged and code_unchanged
 fc2_same = rlib.git("diff", "--stat", "ba8901a", TEST_C, "--", "fail_class_v2.py").strip() == ""
 lr_diff = rlib.git("diff", "--numstat", "56c44a7", TEST_C, "--", "longrun.py").split()
 imports_fc2 = "import fail_class_v2 as fc2" in doc
@@ -578,8 +581,9 @@ row(("by the pre-registered C1 (the copy with its reset against the reset alone,
     "rescues are merges is printed in their failure classes, not claimed",
     f"C1 {c1[0]} vs {c1[1]} {c1_state}; the reset arm's outcome on the {len(c1_seeds)} rescued seeds: "
     f"{sorted(set(c1_reset_oc.values()))}",
-    st(c1[:2] == (7, 0) and all(v.startswith("MERGED") for v in c1_reset_oc.values())),
-    "C1 is now the pre-registered support; the merge reading is marked as printed.", old=(40,))
+    "PARTIAL" if c1[:2] == (7, 0) and all(v.startswith("MERGED") for v in c1_reset_oc.values()) else "DISAGREE",
+    f"Unchanged text since c66cc76; true of X. Now stale in scope: C1 is SHOWN pooled ({c1P[0]} vs {c1P[1]}) and on L "
+    f"({c1L[0]} vs {c1L[1]}), as tex5:36, 201 and 358 say; 'on X ... 7 vs 0' was not updated. Wording only.", old=(40,))
 row(("Pre-registered on two machines with disjoint seeds, the copy with its reset beats the reset alone (18/20 against 6/20)",
      "one delta channel binds none of twenty seeds where the recipe binds eighteen; both readings apply"), "conclusion (re-anchored: pooled)",
     "Pre-registered on two machines with disjoint seeds, the copy with its reset beats the reset alone (18/20 against 6/20), the "
@@ -605,7 +609,8 @@ row(("all-position pair was a labelled target", "at 97 (21 of 22, 46 of 47 and 3
 row(("spec \\texttt{fb3acb7} / \\texttt{1f52cd5} / \\texttt{592c574}",), "provenance commits",
     "spec fb3acb7 / 1f52cd5 / 592c574",
     f"{cinfo(SPEC_C)} | {cinfo(TEST_C)} | {cinfo(RES)}; meta.git = {meta['git']}; result commit changes the test by "
-    f"+{res_py[0]}/-{res_py[1]} docstring lines; JSON and test unchanged to head {HEAD_SHORT}: {rec_unchanged}",
+    f"+{res_py[0]}/-{res_py[1]} docstring lines; X's JSON unchanged to {HEAD_SHORT}: {json_unchanged}; test code after the docstring "
+    f"unchanged to {HEAD_SHORT} (ffb0771 added RESULT (L) and pooled to the docstring): {code_unchanged}",
     st(spec_add == [SPEC_C] and test_add == [TEST_C] and rec_add == [RES] and meta['git'] == TEST_C and res_doc_only
        and res_py[1] == "0" and rec_unchanged and py_changed == ["test_split_copy.py"]), "", old=(42,))
 row(("the launcher \\texttt{56c44a7}",), "classifier / launcher", "the classifier ba8901a, the launcher 56c44a7",
@@ -625,19 +630,19 @@ row(("2.10\\,GHz for \\texttt{split\\_copy}",), "X CPU for split_copy", "2.10 GH
     f"meta.cpu '{meta['cpu']}'; per-record {sorted(cpus)}", st(cpus == {meta['cpu']} and "2.10GHz" in meta['cpu']), "",
     old=(45,))
 
-# ── third-pass rows (read from check_split_copy_v3.py's source) located in the fourth draft ───────────────
+# ── fourth-pass rows (read from check_split_copy_v4.py's source) located in the fifth draft ───────────────
 import ast  # noqa: E402
 import json as _json  # noqa: E402
 
-V3_SRC = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "check_split_copy_v3.py")).read()
+V3_SRC = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "check_split_copy_v4.py")).read()
 V3_ROWS = []    # (kind, item, phrases): kind "row" (counted, section 1 of v3) or "row4" (section 4 of v3)
 for node in ast.walk(ast.parse(V3_SRC)):
     if isinstance(node, ast.Call) and getattr(node.func, "id", None) in ("row", "row4"):
         ph = tuple(ast.literal_eval(node.args[0]))
         V3_ROWS.append((node.func.id, ast.literal_eval(node.args[1]), ph))
-V3_ROWS.sort(key=lambda x: (x[0], locate(tex3, x[2]) or 0))
+V3_ROWS.sort(key=lambda x: (x[0], locate(tex4, x[2]) or 0))
 for k_, it, ph in V3_ROWS:
-    assert locate(tex3, ph) is not None, (it, ph)          # every third-pass fragment is in a5f67a2
+    assert locate(tex4, ph) is not None, (it, ph)          # every fourth-pass fragment is in c66cc76
 
 
 # ── section 4: provenance and main-line rows c66cc76 changed, and the delta_recipe statements ─────────────
@@ -677,84 +682,81 @@ def row4(phrases, item, draft, record, status, note=""):
     rows4.append((n, item, draft, record, status, note))
 
 
-# test_delta_recipe: when X's run started (the main line's own statement, committed after this version)
-DR = {c: cinfo(c) for c in ("05256c5", "fad1489", "32c121b", "a581027", "16b04f9", "6f2788d", "55dac50")}
-DR_PATHS = {c: rlib.git("show", "--name-only", "--format=", c).split() for c in DR}
+# test_delta_recipe's status (the main line as of the fifth draft: X complete at 8ae660d)
+DR = {c: cinfo(c) for c in ("05256c5", "fad1489", "32c121b", "a581027", "16b04f9", "6f2788d", "55dac50", "2225f00", "8ae660d")}
 ALL_HEADS = {r: rlib.git("rev-parse", "--short=7", r).strip() for r in refs}
-DR_RES_NOW = {r: [f for f in rlib.git("ls-tree", "-r", "--name-only", h).split("\n")
-                  if "delta_recipe" in f and (f.startswith("results/") or f.endswith((".json", ".log")))
-                  and not f.startswith("docs/")] for r, h in ALL_HEADS.items()}
-DR_RES_NOW = {r: v for r, v in DR_RES_NOW.items() if v}
+DR_RES_5 = {r: [f for f in TREE[r] if "delta_recipe" in f and (f.startswith("results/") or f.endswith((".json", ".log")))
+                and not f.startswith("docs/")] for r in TIP}
+DR_RES_5 = {r: v for r, v in DR_RES_5.items() if v}
+XDR = rlib.load(HEAD, "results/X/delta_recipe_results.json")
+XDR_N = sum(1 for r in XDR["runs"].values() if r.get("ok"))
+XDR_STARTED = dt.datetime.strptime(XDR["meta"]["started"], "%Y-%m-%d %H:%M:%S")       # X records UTC (caption tex5:499)
+TDR_HEAD = rlib.git("show", f"{HEAD}:test_delta_recipe.py")
+TDR_DOC = ("The run started 2026-10-11 02:12 UTC" in TDR_HEAD and "runs began at 05:27 after the verification" in TDR_HEAD)
 AM2 = at("55dac50", "specs/test_delta_recipe.md") or ""
-AM2_START = "Both reached\nthis session after X's full run had started (02:12 UTC, 11 October, test commit a581027)" in AM2 \
-    or "after X's full run had started (02:12 UTC, 11 October, test commit a581027)" in AM2.replace("\n", " ")
-AM2_LINES = "the four perfect-gate runs (CEIL_HEBB 580, 581; CEIL_DELTA 580, 581)" in AM2
-RUN_START = dt.datetime(2026, 10, 11, 2, 12)             # 55dac50: "started 02:12 UTC"
+AM2_START = "after X's full run had started (02:12 UTC, 11 October, test commit a581027)" in " ".join(AM2.split())
+AM2_LINES = ("the four perfect-gate runs (CEIL_HEBB 580, 581; CEIL_DELTA 580, 581)" in AM2 and "None of HEBB_SPLIT or HEBB_SLOW had finished" in AM2)
+PROC_START = dt.datetime(2026, 10, 11, 2, 12)             # 55dac50 and the RESULT (X) docstring: the process started 02:12 UTC
 t_test, t_check, t_rev1, t_rev2, t_amend1 = (ctime(c) for c in ("a581027", "6f2788d", "fad1489", "16b04f9", "32c121b"))
-t_v4 = ctime(NEW_REF)
-sess = {c: (rlib.git("show", "-s", "--format=%B", c).split("claude.ai/code/")[-1].strip().split()[0]
-            if "claude.ai/code/" in rlib.git("show", "-s", "--format=%B", c) else "?")
-        for c in ("a581027", "55dac50", NEW_REF)}
-dr_rec = (f"spec {DR['05256c5']}; review {DR['fad1489']}; Amendment 1 {DR['32c121b']}; test {DR['a581027']}; second review "
-          f"{DR['16b04f9']}; the test check {DR['6f2788d']}; Amendment 2 {DR['55dac50']}, whose text says X's full run "
-          f"started 02:12 UTC on 11 October with a581027: {AM2_START} (24 per-run lines read by its commit: {AM2_LINES}); "
-          f"delta_recipe result or log files on any branch now: {DR_RES_NOW or 'none'}; sessions: test and Amendment 2 "
-          f"{sess['a581027']} / {sess['55dac50']}, this draft {sess[NEW_REF]}")
-check_before_run = t_check < RUN_START
-dr_short = (f"as the tex4:41 row: test a581027 {t_test}; X's full run started 02:12 UTC per Amendment 2 (55dac50, dated "
-            f"{tstamp('55dac50')}): {AM2_START}; delta_recipe result files on any branch now: {DR_RES_NOW or 'none'}")
-row4(("and written, its test file checked against the amended spec before any run",),
-     "delta_recipe: 'its test file checked against the amended spec before any run' (Rev. 9 paragraph)",
-     "a fourth (test_delta_recipe), specified, reviewed by the referee, amended once and written, its test file checked "
-     "against the amended spec before any run", dr_rec,
-     "MATCH" if check_before_run or not AM2_START else "DISAGREE",
-     f"The check (6f2788d, {t_check}) came after X's run started (02:12, a581027 committed {t_test}), by the main line's own "
-     "Amendment 2. Unchanged since a5f67a2; the third pass marked it RESOLVED because no commit then gave the start time. "
-     "55dac50 is dated 15:36, after this version (07:52), and the draft is written by another session, so the draft's "
-     "author may not have known. 'Reviewed by the referee ... before any run' is true of the first review (fad1489).")
-row4(("spec reviewed by the referee and amended; the test written and checked against the amended spec; not run",),
-     "delta_recipe index row: 'not run'", "spec reviewed by the referee and amended; the test written and checked against "
-     "the amended spec; not run", dr_short, "DISAGREE" if AM2_START else "MATCH",
-     "No result exists, but X's run had been under way for 5 h 40 min at this version's commit (02:12 to 07:52), per 55dac50. "
-     "'Running on X since 02:12 (a581027); no result' would be exact.")
-row4(("with the test file checked against the amended spec; not run)",), "delta_recipe, memory section: 'not run'",
-     "(specified ..., reviewed by the referee before any run, amended once on its review, and written, with the test file "
-     "checked against the amended spec; not run)", dr_short, "DISAGREE" if AM2_START else "MATCH", "As the index row.")
-row4(("\\texttt{delta\\_recipe} & spec \\texttt{05256c5}, Amendment~1 \\texttt{32c121b} / test \\texttt{a581027} / not run & not run & ---; ---",),
-     "delta_recipe provenance row", "spec 05256c5, Amendment 1 32c121b / test a581027 / not run & not run & ---; ---",
-     dr_short, "PARTIAL" if AM2_START and not DR_RES_NOW else ("MATCH" if not AM2_START else "DISAGREE"),
-     "The commits are right (spec and Amendment 1 change specs/test_delta_recipe.md; a581027 adds test_delta_recipe.py). "
-     "No result commit exists, so the X column's last slot is empty, but 'not run' is not the state: running since 02:12. "
-     "The L column ('not run') is not contradicted by any record.")
-row4(("then \\texttt{test\\_delta\\_recipe} on both machines (specified, reviewed and amended once)",),
-     "next steps: 'L's half of test_split_copy, then test_delta_recipe on both machines'",
-     "L's half of test_split_copy, then test_delta_recipe on both machines (specified, reviewed and amended once)", dr_short,
-     "PARTIAL" if AM2_START else "MATCH",
-     "X's half was already running at this version's commit (per 55dac50), so the list's order does not describe the state. "
-     "'Amended once' is true at 07:52 (Amendment 2 is 15:36).")
+t_am2, t_22, t_x = ctime("55dac50"), ctime("2225f00"), ctime("8ae660d")
+L_DR5 = [f"{r}:{f}" for r, v in DR_RES_5.items() for f in v if f.startswith("results/L/")]
+dr5 = (f"test a581027 ({t_test}); the referee's second review 16b04f9 ({t_rev2}) and test check 6f2788d ({t_check}); X's process "
+       f"started {PROC_START} (Amendment 2; RESULT (X)), the arms' runs at {XDR_STARTED} (meta.started; 'runs began at 05:27 after "
+       f"the verification': {TDR_DOC}); Amendment 2 55dac50 ({t_am2}) and 2225f00 ({t_22}); X's result 8ae660d ({t_x}), {XDR_N} records, "
+       f"meta.git {XDR['meta']['git']}; L delta_recipe files at the fifth draft: {L_DR5 or 'none'}")
+x_done = XDR_N == 84 and t_x < ctime(NEW_REF) and not L_DR5
+row4(("amended once before any run and written, its test file checked against the amended spec, and complete on X",),
+     "delta_recipe (Rev. 9 paragraph): 'amended once before any run ..., checked against the amended spec, and complete on X (a second "
+     "amendment ... during X's run ...); L's half is next' (re-anchored)", "amended once before any run; checked; complete on X; L next",
+     dr5, st(x_done and t_amend1 < PROC_START and XDR_STARTED < t_x and XDR_STARTED < t_am2 < t_x),
+     "Resolves fourth_pass §1 item 6 (the wording changed). CORRECTION to check_split_copy_v4 §4's DISAGREE on tex4:41: the arms' "
+     f"runs began at {XDR_STARTED} UTC, after the check 6f2788d ({t_check}); 02:12 was the start of the process, which ran the "
+     "3 h 15 min verification first. tex4:41's 'checked ... before any run' was true of the runs.")
+row4(("\\texttt{delta\\_recipe} (specified)", "on X (secondary): D4 SHOWN 10 vs 1", "pooled labels and readings wait for L"),
+     "delta_recipe index row (re-anchored): status", "(specified) ... on X (secondary): ...; pooled labels and readings wait for L", dr5,
+     "PARTIAL" if x_done else "DISAGREE",
+     "Resolves fourth_pass §1 item 7 ('not run' is gone). The label '(specified)' is stale: X's half is complete; '(X; L to run)' "
+     "would match split_copy's row. The D numbers are the X-results check's.")
+row4(("with the test file checked against the amended spec; running on X, where a second amendment confined to the report's rules",),
+     "delta_recipe, memory section (re-anchored): 'running on X, where a second amendment ... was committed during the run'",
+     "running on X", dr5, "PARTIAL" if x_done else "DISAGREE",
+     "Fourth_pass §1 item 8: PARTLY. 'Running on X' is not the state at c5e4508 (X complete at 8ae660d, 07:25:51 on 12 October); "
+     "the same paragraph says 'X's half is complete' further on.")
+row4(("the 24 run lines that had been read, none of them a claim, a reading or a Hebbian run",),
+     "delta_recipe, memory section: '24 run lines ... none of them a claim, a reading or a Hebbian run' (new)",
+     "none a Hebbian run", f"Amendment 2: 24 lines = CEIL_HEBB 580, 581; CEIL_DELTA 580, 581; DELTA_SPLIT 580-598; DELTA_SLOW|580; 'None of "
+     f"HEBB_SPLIT or HEBB_SLOW had finished': {AM2_LINES}", "DISAGREE" if AM2_LINES else "MATCH",
+     "Two of the 24 were Hebbian runs (the Hebbian perfect gate CEIL_HEBB 580, 581). 'None ... of a Hebbian learned arm' is exact.")
+r55, r22, r8a = (rlib.git("show", "--name-only", "--format=", c).split() for c in ("55dac50", "2225f00", "8ae660d"))
+row4(("Amendment~2 during the run \\texttt{55dac50}, \\texttt{2225f00} / \\texttt{8ae660d} (X) & X complete; L to run & 84; ---",),
+     "delta_recipe provenance row (re-anchored)", "spec 05256c5, Amendment 1 32c121b / test a581027, Amendment 2 during the run 55dac50, "
+     "2225f00 / 8ae660d (X) & X complete; L to run & 84; ---",
+     dr5 + f"; 55dac50 changes {r55}; 2225f00 changes {r22}; 8ae660d changes {r8a}",
+     st(x_done and "specs/test_delta_recipe.md" in r55 and "test_delta_recipe.py" in r22 and "results/X/delta_recipe_results.json" in r8a
+        and XDR_STARTED < t_am2 < t_22 < t_x and XDR["meta"]["git"] == "a581027"),
+     "Resolves the fourth pass's §2 bullet tex4:492. Both amendment commits fall between the runs' start and the result; the X "
+     "records carry a581027 (the report was regenerated with --report at 2225f00).")
+row4(("\\texttt{test\\_delta\\_recipe}'s L half (X's is complete)",), "next steps (re-anchored): 'test_delta_recipe's L half (X's is complete)'",
+     "L half next", dr5, st(x_done), "Resolves the fourth pass's §2 bullet tex4:472.")
 row4(("from \\texttt{test\\_delta\\_recipe} on it is reviewed by the referee session before any run",),
      "method: 'from test_delta_recipe on it is reviewed by the referee session before any run'",
      "the specification ... reviewed by the referee session before any run",
-     f"first review fad1489 {t_rev1} and Amendment 1 {t_amend1}, both before the run's start {RUN_START} (55dac50); "
-     f"the second review 16b04f9 {t_rev2} came after it", "MATCH" if t_rev1 < RUN_START else "DISAGREE",
-     "Unchanged text. True of the spec's first review; the review of Amendment 1 (16b04f9) and the code check (6f2788d) "
-     "came after the run had started.")
-# tex4:430 the count test_delta_recipe prints (code at a581027)
-tdr = rlib.git("show", "a581027:test_delta_recipe.py").split("\n")
-pb = [i + 1 for i, ln in enumerate(tdr) if ln.startswith("def probe_blind")]
-pb_body = "\n".join(tdr[pb[0] - 1:pb[0] + 20]) if pb else ""
-pb_cond = ">= tgw.ACC_THR" in pb_body or ">= ACC_THR" in pb_body
-pb_prn = [i + 1 for i, ln in enumerate(tdr) if "probe-blind checks" in ln and "print" in ln]
+     f"first review fad1489 {t_rev1}, Amendment 1 {t_amend1}, second review 16b04f9 {t_rev2}, test check 6f2788d {t_check}; the arms' "
+     f"runs began {XDR_STARTED}", st(t_rev1 < t_rev2 < XDR_STARTED and t_check < XDR_STARTED),
+     "Unchanged text. True of both reviews and of the test check (all before 05:27); the fourth pass's note that the second "
+     "review came after the run had started counted the verification as the run.")
+tdr5 = TDR_HEAD.split("\n")
+pb = [i + 1 for i, ln in enumerate(tdr5) if ln.startswith("def probe_blind")]
+pb_body = "\n".join(tdr5[pb[0] - 1:pb[0] + 22]) if pb else ""
+pb_cond = 'c["acc"] >= tgw.ACC_THR and h < tgw.ACC_THR' in pb_body and 'c["step"] >= tgw.FIRST' in pb_body
+pb_prn = [i + 1 for i, ln in enumerate(tdr5) if "probe-blind checks" in ln and "print" in ln]
 row4(("with the count of checks at which the probe read $\\geq 0.95$ while the held-out accuracy was below it, as \\texttt{test\\_delta\\_recipe} prints",),
-     "method: the count test_delta_recipe prints (rewritten in c66cc76)",
+     "method: the count test_delta_recipe prints (code at the main line as of the fifth draft)",
      "the count of checks at which the probe read >= 0.95 while the held-out accuracy was below it, as test_delta_recipe prints",
-     f"a581027:test_delta_recipe.py probe_blind() at :{pb}, the condition on probe >= ACC_THR and held-out < ACC_THR: {pb_cond}; "
-     f"printed at :{pb_prn} ('... checks read >= ACC_THR on the probe while the held-out ...')",
-     "MATCH" if pb and pb_cond and pb_prn else "DISAGREE",
-     "The third pass's wording point is fixed: it is no longer 'checks the probe blocked'. The printed denominator includes "
-     "the 2400 reference rows (test_check_delta_recipe.md, addendum); Amendment 2 (55dac50, after this version) counts "
-     "from 4800 and adds 'blocked by the probe alone', so the sentence stays true after it.")
-# tex4:205 R's Phase 4 probe-mode counts (the window gate's failure mode, counted on R's records)
+     f"{HEAD}:test_delta_recipe.py probe_blind() at :{pb}, probe >= ACC_THR and held-out < ACC_THR at updates >= FIRST: {pb_cond}; printed "
+     f"at :{pb_prn}; X's RESULT docstring prints 'Probe-blind (checks from 4800)': {'Probe-blind (checks from 4800)' in TDR_HEAD}",
+     st(pb and pb_cond and pb_prn), "Since Amendment 2 the count starts at 4800 (the fourth pass's residual is gone).")
+# R's probe-mode count, now 13 of 282 per seed (tex5:207; the same at tex5:330 with its parenthesis)
 R_TIP = tip("origin/claude/replicate-R")
 
 
@@ -776,100 +778,129 @@ def blocks(path, arm):
     return n_chk, blk, runs_
 
 
-B2, B3, B4 = (blocks("records/phase2.jsonl", "WIN3_SPLIT_D8"), blocks("records/phase3.jsonl", "SPLIT_R1_PROBE"),
-              blocks("records/phase4.jsonl", "WIN3_SPLIT_D8_ML"))
+B2, B3, B4, BR2 = (blocks("records/phase2.jsonl", "WIN3_SPLIT_D8"), blocks("records/phase3.jsonl", "SPLIT_R1_PROBE"),
+                   blocks("records/phase4.jsonl", "WIN3_SPLIT_D8_ML"), blocks("records/phase3.jsonl", "SPLIT_R2_BODYKEYS"))
 fixed_n, fixed_b = B3[0] + B4[0], B3[1] + B4[1]
 fixed_runs = B3[2] + B4[2]
+per_n, per_b = B2[0] + BR2[0], B2[1] + BR2[1]
 dec2 = [s for s, br in B2[2] if not br]
-r205_ok = (fixed_b, fixed_n, B2[1], B2[0]) == (3, 263, 13, 192) and all(br for _, br in fixed_runs) and dec2 == [914]
-row4(("with the fixed probe the mode occurred at 3 of 263 checks and never decided a run, with one probe drawn per seed at 13 of 192",),
-     "window gate: R's count of the probe's failure mode (new in c66cc76; the same numbers at tex4:328)",
-     "with the fixed probe the mode occurred at 3 of 263 checks and never decided a run, with one probe drawn per seed at 13 "
-     "of 192 and it decided one run in twenty",
-     f"R @ {R_TIP}: checks at update >= 4800 with probe >= 0.95 and evaluation < 0.95: R1 (phase3 SPLIT_R1_PROBE, the "
-     f"report's probe) {B3[1]} of {B3[0]}, Phase 4 WIN3_SPLIT_D8_ML {B4[1]} of {B4[0]} -> {fixed_b} of {fixed_n}, runs "
-     f"{fixed_runs} (seed, bound routed); Phase 2 per-seed probes {B2[1]} of {B2[0]}, runs {B2[2]}; not bound routed among "
-     f"them: {dec2}", "MATCH" if r205_ok else "DISAGREE",
-     "Recomputed from R's records. 'Phase 4 counted' is R's Phase 4 report; the fixed-probe 263 pools R1 (Phase 3, 91 "
-     "checks) with Phase 4 (172), as R's table does. 'Decided' is read as 'the run failed': the three fixed-probe runs all "
-     "bound routed; of the two per-seed runs, 914 failed.")
-
-# L's half: on every branch now, not only as of the cutoff
+r207_ok = (fixed_b, fixed_n, per_b, per_n, B2[0], BR2[1]) == (3, 263, 13, 282, 192, 0) and all(br for _, br in fixed_runs) and dec2 == [914]
+row4(("with the fixed probe the mode occurred at 3 of 263 checks and never decided a run, with one probe drawn per seed at 13 of 282 and, on R's inference, it decided one run",),
+     "window gate: R's count of the probe's failure mode (re-anchored: 13 of 282, 'on R's inference')",
+     "with the fixed probe ... 3 of 263 checks and never decided a run, with one probe drawn per seed at 13 of 282 and, on R's "
+     "inference, it decided one run",
+     f"R @ {R_TIP}: checks at update >= 4800 with probe >= 0.95 and evaluation < 0.95: fixed probe R1 {B3[1]} of {B3[0]} + Phase 4 "
+     f"{B4[1]} of {B4[0]} = {fixed_b} of {fixed_n}, runs {fixed_runs}; per-seed probes Phase 2 {B2[1]} of {B2[0]} + R's second rerun "
+     f"(SPLIT_R2_BODYKEYS) {BR2[1]} of {BR2[0]} = {per_b} of {per_n}; not bound routed among them: {dec2}",
+     st(r207_ok),
+     "Resolves the fourth pass's §2 bullet ('13 of 192' unlabelled): the count is now pooled the same way as the fixed-probe one, "
+     "and 'decided one run' is marked as R's inference (tex5:330 gives 13 of 192 for Phase 2 and 13 of 282 with the rerun).")
+# L's half now (complete)
 L_NOW = {r: [f for f in rlib.git("ls-tree", "-r", "--name-only", h).split("\n") if f.startswith("results/L/") and "split_copy" in f]
          for r, h in ALL_HEADS.items()}
 L_NOW = {r: v for r, v in L_NOW.items() if v}
 l_res_now = [r for r, v in L_NOW.items() if L_REC in v]
-row4(("complete on X; L's half has not run",), "L's half of split_copy (Rev. 9 paragraph)", "complete on X; L's half has not run",
-     f"as of {CUTOFF}: {LA_TXT}; at the branch heads now: L split_copy files {L_NOW or 'none'}; {L_REC} on {l_res_now or 'no branch'}",
-     "MATCH" if l_no_runs and not l_res_now else "DISAGREE",
-     "True of runs. No later L start or results file is committed on any branch at the time of this check.")
+row4(("\\texttt{test\\_split\\_copy}, complete on both machines",), "L's half of split_copy (Rev. 9 paragraph): complete",
+     "complete on both machines", f"{L_REC} at {L_RES} ({cinfo(L_RES)}); on branches at the fifth draft: {l_file_on}; {nL_runs} records, all ok {okL}",
+     st(bool(l_file_on) and nL_runs == 54 and okL), "L's half landed at ffb0771 (02:39:51 UTC, 12 October), before the fifth draft.")
 
-# provenance rows: every commit exists and is what the row says
-E_BR, H_BR, G_BR, Rb, V_BR = ("origin/claude/outside-ideas", "origin/claude/explore-H", "origin/claude/explore-G",
-                              "origin/claude/replicate-R", "origin/claude/review-V")
-E_T, H_T, G_T, R_T, V_T = (tip(b) for b in (E_BR, H_BR, G_BR, Rb, V_BR))
-
-
-def prov(commits, br, tip_, want_last):
-    out = []
-    for c, must in commits:
-        s = subj(c)
-        out.append((c, on(c, br), tstamp(c), s[:110], all(m.lower() in s.lower() for m in must)))
-    last = tip_
-    return out, last, rlib.git("rev-parse", "--short=7", want_last).strip() == last
+# ── the provenance tables (tex5:486-524): every commit hash, and each row's commits ─────────────
+CUT_DT = int(rlib.git('show', '-s', '--format=%ct', NEW_REF).strip())
+P0 = locate(tex5, ("\\begin{table}[H]",)) or 0
+PROV_LINES = [i + 1 for i, ln in enumerate(tex5) if "label{tab:prov}" in ln or "label{tab:batches}" in ln]
+PROV_A = max(i for i in range(PROV_LINES[0], 0, -1) if tex5[i - 1].startswith("\\begin{table}"))
+PROV_B = PROV_LINES[-1]
+HEX = {}
+for i in range(PROV_A, PROV_B + 1):
+    for h in __import__("re").findall(r"\\texttt\{([0-9a-f]{7})\}", tex5[i - 1]):
+        HEX.setdefault(h, []).append(i)
+TIPS5 = {r: t for r, t in TIP.items()}
 
 
-def prov_txt(out, last, br, last_ok):
-    return ("; ".join(f"{c} on {br.split('/')[-1]}: {o}, {t}, '{s}' (matches: {m})" for c, o, t, s, m in out)
-            + f"; the branch's last commit at or before the version: {last} (the row's commit column is it: {last_ok})")
+def exists(h):
+    try:
+        rlib.git("cat-file", "-e", f"{h}^{{commit}}")
+        return True
+    except Exception:
+        return False
 
 
-PE, lastE, okE = prov([("e3f5809", ("batch 19 complete", "186/186"))], E_BR, E_T, "e3f5809")
-row4(("19 (E) & S64 width, S65 depth, S66 eight streams, S67 capacity (complete, \\texttt{e3f5809}) & \\texttt{e3f5809} & 186",),
-     "batch 19's row: commit (content checked elsewhere)", "complete, e3f5809 & e3f5809 & 186", prov_txt(PE, lastE, E_BR, okE),
-     "MATCH" if all(x[1] and x[4] for x in PE) and okE else "DISAGREE", "Commit check only; the 186 is the commit's own count.")
-PH, lastH, okH = prov([("1e09ecd", ("report 7",)), ("de11b2a", ()), ("9b72bf6", ("S86 complete", "report 8"))], H_BR, H_T, "9b72bf6")
-de11 = added_in("de11b2a", "report_7.md")
-r8 = added_in("9b72bf6", "report_8.md")
-row4(("S86 all-position targeting (report 8, \\texttt{9b72bf6}) & \\texttt{9b72bf6}",), "H's row: commits (content checked elsewhere)",
-     "report 7 1e09ecd, corrected de11b2a; S86 report 8 9b72bf6 & 9b72bf6", prov_txt(PH, lastH, H_BR, okH)
-     + f"; de11b2a changes {de11}; 9b72bf6 changes {r8}",
-     "MATCH" if all(x[1] for x in PH) and PH[2][4] and de11 and r8 and okH else "DISAGREE",
-     "Commit check only. The third pass's point (report 7 corrected at de11b2a) is met.")
-PG, lastG, okG = prov([("076005d", ("report 6", "S83")), ("b2f9907", ())], G_BR, G_T, "076005d")
-spec83 = added_in("b2f9907", "")
-row4(("S83 the hinge's inputs, the control and the window (report 6, \\texttt{076005d}; spec \\texttt{b2f9907}) & \\texttt{076005d}",),
-     "G's row: commits (content checked elsewhere)", "S83 report 6 076005d; spec b2f9907 & 076005d",
-     prov_txt(PG, lastG, G_BR, okG) + f"; b2f9907 changes {spec83[:4]}",
-     "MATCH" if all(x[1] for x in PG) and PG[0][4] and okG else "DISAGREE", "Commit check only.")
-PR_, lastR, okR = prov([("464be8d", ()), ("1f8be04", ("Phase 4 complete", "35/40"))], Rb, R_T, "1f8be04")
-row4(("Phase 4, the 40-seed count (rule \\texttt{464be8d}; report \\texttt{1f8be04}) & \\texttt{1f8be04}",),
-     "R's row: commits (content checked elsewhere)", "Phase 4 rule 464be8d; report 1f8be04 & 1f8be04",
-     prov_txt(PR_, lastR, Rb, okR) + f"; 464be8d changes {added_in('464be8d', 'phase4')}",
-     "MATCH" if all(x[1] for x in PR_) and PR_[1][4] and okR else "DISAGREE",
-     "Commit check only. The third pass's DISAGREE (Phase 4 'not started', 464be8d) is resolved in the row.")
-V_CITED = (("d2bb959", ()), ("0fdb363", ()), ("ebb9325", ()), ("01bee1f", ()), ("4bf85e9", ("recompute_sessions",)),
-           ("0e6c189", ("registry_L_addendum",)), ("fad1489", ("spec_review_test_delta_recipe",)),
-           ("16b04f9", ("spec_review_test_delta_recipe_2",)), ("6f2788d", ("test_check_delta_recipe",)),
-           ("e8fbb25", ("revision_9_check",)), ("66334b8", ("second_pass",)), ("0d1fa60", ("third_pass",)))
-PV, lastV, okV = prov(V_CITED, V_BR, V_T, "0d1fa60")
-v_missing = rlib.git("log", "--format=%h %s", f"0d1fa60..{V_T}").strip()
-row4(("the test check (\\texttt{6f2788d}); this revision's checks (\\texttt{e8fbb25}, \\texttt{66334b8}, \\texttt{0d1fa60}) & \\texttt{0d1fa60}",),
-     "V's row: commits", "... delta spec reviews (fad1489, 16b04f9); the test check (6f2788d); this revision's checks "
-     "(e8fbb25, 66334b8, 0d1fa60) & 0d1fa60", prov_txt(PV, lastV, V_BR, okV) + f"; V commits after 0d1fa60 up to the version: "
-     f"{v_missing or 'none'}", "MATCH" if all(x[1] and x[4] for x in PV) and okV else "DISAGREE",
-     "The third pass's PARTIAL is resolved: 6f2788d, 66334b8 and the third pass 0d1fa60 are cited, and 0d1fa60 is the "
-     "branch's last commit before 07:52. The session second-pass commits (fc873d2, dccc5cb, 4f3233a) and the third-pass "
-     "session commits (bf62982, b2ee2ec, 67bc1ed, acf76fb) are covered by 'this revision's checks' only through the pass "
-     "commits that follow them; that is a choice of listing, not an error.")
-# F's row is unchanged and checked in check_F_v4 (S81 still running at the version)
+HROWS = []
+for h, lns in sorted(HEX.items(), key=lambda x: (x[1][0], x[0])):
+    ok_ = exists(h)
+    t_ = int(rlib.git('show', '-s', '--format=%ct', h).strip()) if ok_ else None
+    brs = sorted(r.replace("origin/", "").replace("claude/", "") for r, t in TIPS5.items() if ok_ and ancestor(h, t))
+    HROWS.append((h, lns, ok_, t_, t_ is not None and t_ < CUT_DT, brs, subj(h)[:100] if ok_ else ""))
+all_exist = all(x[2] for x in HROWS)
+all_before = all(x[4] for x in HROWS)
+on_some = all(x[5] for x in HROWS)
+row4(("\\label{tab:batches}",), "provenance tables: every commit hash (tex5 tables and captions)", f"{len(HEX)} distinct hashes",
+     f"{len(HEX)} distinct 7-hex hashes on tex5:{PROV_A}-{PROV_B}; exist {sum(x[2] for x in HROWS)}; predate c5e4508 "
+     f"{sum(x[4] for x in HROWS)}; on some remote branch as of the cutoff {sum(1 for x in HROWS if x[5])} (each listed in section 4b)",
+     st(all_exist and all_before and on_some), "")
+
+
+def last_report(br):
+    return TIP[br]
+
+
+SESS = [("E 15--18", "origin/claude/outside-ideas", ["90c3a28", "93bdfe6", "2531480", "7ef4e15"], None),
+        ("E 19", "origin/claude/outside-ideas", ["e3f5809"], "e3f5809"),
+        ("H", "origin/claude/explore-H", ["7e9197f", "72f0bbc", "df57087", "37c1fbf", "1e09ecd", "de11b2a", "9b72bf6"], "9b72bf6"),
+        ("F", "origin/claude/explore-F", ["9a6c2bf", "22ec912", "5b9bc2a", "ed76eea", "d5851b1"], "d5851b1"),
+        ("G", "origin/claude/explore-G", ["6cd36ff", "427db36", "35de6db", "93422cf", "8973d48", "83699a2", "076005d", "b2f9907"], "076005d"),
+        ("I", "origin/claude/explore-I", ["a2588da", "5f03929", "203a5ad", "86652b1", "b649751", "5bc6c2e", "03bffdf"], "03bffdf"),
+        ("R", "origin/claude/replicate-R", ["de8df0f", "00990ea", "100dced", "464be8d", "1f8be04"], "1f8be04"),
+        ("V", "origin/claude/review-V", ["d2bb959", "0fdb363", "ebb9325", "01bee1f", "4bf85e9", "0e6c189", "fad1489", "16b04f9", "6f2788d",
+                                         "e8fbb25", "66334b8", "0d1fa60"], "0d1fa60")]
+SESS_OUT = {}
+for name, br, cited, col in SESS:
+    t_last = TIP[br]
+    after = rlib.git("log", "--format=%h %s", f"{col}..{t_last}").strip().split("\n") if col else []
+    after = [x for x in after if x.strip()]
+    rep_after = [x for x in after if any(w in x.lower() for w in ("report", "pass", "complete", "write-up"))
+                 and "progress" not in x.lower() and "EXPLORATORY" not in x]
+    SESS_OUT[name] = dict(br=br, cited=cited, on=all(ancestor(c, t_last) for c in cited), last=t_last, col=col,
+                          after=after, rep_after=rep_after)
+for name, o in SESS_OUT.items():
+    if o["col"] is None:
+        continue
+    lab = {"E 19": "19 (E) &", "H": "H & S58, S58b, S60", "F": "F & S53, S54, S59", "G": "G & S55 probe", "I": "I & S74 pilot",
+           "R": "R & Phase 2", "V": "V & review"}[name]
+    stv = "MATCH" if o["on"] and not o["rep_after"] else "PARTIAL"
+    note = {"V": "V's branch's last commit before the cutoff is the fourth pass (907eb2c, 15:56:25 UTC on 11 October; fourth_pass.md, "
+                 "with 1545e88 ... 260a3bd), which the draft's own commit fd2fa89 names; the row still ends at the third pass 0d1fa60.",
+            "I": "The S75 paragraph (tex5:458) cites the WIDE_SLOW pairing on nine seeds, recorded at 4c3984a (19:12:59 UTC on 12 October, "
+                 "80 s before the draft); the row's records list (86652b1, b649751) and its count (32) do not include it (41 records at 4c3984a).",
+            "E 19": "E's later commits are batch 20 (code and readings 4acf915, runs and progress): no report yet, so the column is right; "
+                    "batch 20 is running, which bears on tex5:41's 'every session's queue is empty'."}.get(name, "")
+    if name == "I":
+        i_recs = rlib.load(o["last"], "explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json")
+        n_i = len(i_recs.get("runs", i_recs))
+        stv = "PARTIAL" if n_i > 32 else stv
+        note += f" Records at {o['last']}: {n_i}."
+    row4((lab,), f"provenance row {name}: commits, and the last cited commit against the branch",
+         f"cited {', '.join(o['cited'])}; commit column {o['col']}",
+         f"all cited on {o['br'].split('/')[-1]} as of the cutoff: {o['on']}; the branch's last commit before the cutoff {o['last']}; commits "
+         f"after the column's {o['col']}: {len(o['after'])}" + (f", of which reports or passes: {o['rep_after']}" if o["rep_after"] else ""),
+         stv, note)
+MAIN_CITED = ["74f5907", "3e2d171", "2a6ba3d", "9a769c7", "d05f0ca", "2f98f06", "886a668", "628eb7c", "1cd20a1", "fb3acb7", "1f52cd5",
+              "592c574", "ffb0771", "ba8901a", "56c44a7", "05256c5", "32c121b", "a581027", "55dac50", "2225f00", "8ae660d",
+              "9a53302", "9c53e16", "00ac0f2", "d0e6c85", "42af095", "b22da04", "ad8a92e"]
+main_on = {c: ancestor(c, HEAD) for c in MAIN_CITED}
+row4(("\\texttt{muon\\_recipe} & --- / \\texttt{74f5907}",), "main-line table and captions: every cited commit on the main line as of the cutoff",
+     f"{len(MAIN_CITED)} commits", f"on {HEAD}: {sum(main_on.values())} of {len(MAIN_CITED)}; not: {[c for c, v in main_on.items() if not v] or 'none'}",
+     st(all(main_on.values())), "Commit check only; the muon_recipe and window_gate rows are unchanged since the earlier passes.")
+# L's start times caption (unchanged)
 if L_ATTEMPT:
     row4(("L's recorded start times are local time (UTC$-$6)",), "L start times in local time (UTC-6), caption",
          "L's recorded start times are local time (UTC-6)",
-         f"L's split_copy start: '{L_ATTEMPT['started']}' local, epoch {L_ATTEMPT['started_utc']} UTC",
+         f"L's failed split_copy start: '{L_ATTEMPT['started']}' local, epoch {L_ATTEMPT['started_utc']} UTC; L's result meta.started "
+         f"'{LSTORE['meta'].get('started')}' (the RESULT (L) docstring: 'started 09:31 local = 15:31 UTC')",
          "MATCH" if (dt.datetime.strptime(L_ATTEMPT['started_utc'], "%Y-%m-%d %H:%M:%S")
                      - dt.datetime.strptime(L_ATTEMPT['started'], "%Y-%m-%d %H:%M:%S")) == dt.timedelta(hours=6) else "DISAGREE",
-         "Unchanged; checkable for this one L start only.")
+         "Unchanged; checkable for the failed start only (L's result file carries no epoch).")
+
 
 # ── output ───────────────────────────────────────────────────────────────────
 ORDER = {"DISAGREE": 0, "PARTIAL": 1, "NOT RECORD-CHECKABLE": 2, "MATCH": 3}
@@ -884,66 +915,94 @@ def esc(x):
 
 
 P = print
-P("# Revision 9 draft, fourth version, vs test_split_copy on X: referee check (fourth pass)\n")
-P(f"Fourth draft `{DRAFT}` at `{NEW_REF}` (committed {CUTOFF}; `tex4:NNN`, {len(tex4) - (tex4[-1] == '')} lines); third "
-  f"draft `{V3_REF}` (`tex3:NNN`, {len(tex3) - (tex3[-1] == '')} lines; lines move by +2 after tex3:233 and by +3 after "
-  f"tex3:304); first draft `{OLD_REF}` (`tex:NNN`). Records `{REC}` at `{RES}` (identical at the main line's head as of "
-  f"the fourth draft, `{HEAD_SHORT}`: {rec_unchanged}); window_gate records and code at `{HEAD_SHORT}`; test docstring "
-  f"at `{RES}`, spec at `{SPEC_C}`. Outcomes recomputed with `rlib`; they agree with the records' own transition "
-  f"({agree_t}) and bound-routed fields ({agree_rec}); ch_map ties: {len(rlib.TIES)}. L's file `{L_REC}`: on no remote "
-  f"branch as of the fourth draft ({len(TIP)} branches) or at any branch head now; never committed. L split_copy "
-  f"artefacts at the cutoff: { {r.replace('origin/', ''): v for r, v in L_ANY.items()} or 'none'}. Generated by "
-  f"`check_split_copy_v4.py` (a copy of v3 re-anchored on c66cc76).\n")
+P("# Revision 9 draft, fifth version, vs test_split_copy: referee check (fifth pass)\n")
+P(f"Fifth draft `{DRAFT}` at `{NEW_REF}` (committed {CUTOFF}; `tex5:NNN`, {len(tex5) - (tex5[-1] == '')} lines); fourth "
+  f"draft `{V4_REF}` (`tex4:NNN`, {len(tex4) - (tex4[-1] == '')} lines; lines move by +2 after tex4:192 and by +4 after "
+  f"tex4:454); first draft `{OLD_REF}` (`tex:NNN`). X's records `{REC}` at `{RES}` (X's JSON unchanged at the main line as of "
+  f"the fifth draft, `{HEAD_SHORT}`: {json_unchanged}); L's records `{L_REC}` at `{L_RES}` ({nL_runs} records, used LIGHTLY: "
+  f"counts, discordant pairs and exact p for the re-anchored pooled sentences; L's half in depth is another check's); "
+  f"window_gate records and code at `{HEAD_SHORT}`; test docstring at `{RES}`, spec at `{SPEC_C}`. Outcomes recomputed with "
+  f"`rlib`; they agree with X's records' own transition ({agree_t}) and bound-routed fields ({agree_rec}); ch_map ties: "
+  f"{len(rlib.TIES)}. Generated by `check_split_copy_v5.py` (a copy of v4 re-anchored on c5e4508).\n")
 cnt = {k: sum(1 for r in rows if r[4] == k) for k in ORDER}
-removed = [i for i, o in enumerate(OLD) if locate(tex4, o[3]) is None]
+removed = [i for i, o in enumerate(OLD) if locate(tex5, o[3]) is None]
 v3_main = [x for x in V3_ROWS if x[0] == "row"]
 v3_s4 = [x for x in V3_ROWS if x[0] == "row4"]
-v3_gone = [x for x in v3_main if locate(tex4, x[2]) is None]
-v3_s4_gone = [x for x in v3_s4 if locate(tex4, x[2]) is None]
-P("Counts against the fourth draft: " + ", ".join(f"{k} {v}" for k, v in cnt.items())
-  + f" (of {len(rows)} rows). Third-pass section 1 fragments: {len(v3_main) - len(v3_gone)} of {len(v3_main)} found "
-  f"verbatim in the fourth draft, {len(v3_gone)} reworded (re-anchored in section 1). Third-pass section 4 fragments: "
-  f"{len(v3_s4) - len(v3_s4_gone)} of {len(v3_s4)} verbatim, {len(v3_s4_gone)} REMOVED or reworded. First-pass "
-  f"fragments: {len(OLD) - len(removed)} of {len(OLD)} verbatim, {len(removed)} REMOVED or reworded.\n")
+v3_gone = [x for x in v3_main if locate(tex5, x[2]) is None]
+v3_s4_gone = [x for x in v3_s4 if locate(tex5, x[2]) is None]
+P("Counts against the fifth draft: " + ", ".join(f"{k} {v}" for k, v in cnt.items())
+  + f" (of {len(rows)} rows). Fourth-pass section 1 fragments: {len(v3_main) - len(v3_gone)} of {len(v3_main)} found "
+  f"verbatim in the fifth draft, {len(v3_gone)} reworded (re-anchored in section 1). Fourth-pass section 4 fragments: "
+  f"{len(v3_s4) - len(v3_s4_gone)} of {len(v3_s4)} verbatim, {len(v3_s4_gone)} REMOVED or reworded (re-anchored in section 4). "
+  f"First-pass fragments: {len(OLD) - len(removed)} of {len(OLD)} verbatim, {len(removed)} REMOVED or reworded.\n")
 c4 = {k: sum(1 for r in rows4 if r[4] == k) for k in ORDER}
-P("Section 4 (the delta_recipe statements, the window gate's new R count, L's half now, and the provenance rows' "
-  "commits; not in the counts above): " + ", ".join(f"{k} {v}" for k, v in c4.items()) + f" (of {len(rows4)} rows).\n")
+P("Section 4 (test_delta_recipe's status lines, R's probe-mode count, L's half, and the provenance tables; not in the counts "
+  "above): " + ", ".join(f"{k} {v}" for k, v in c4.items()) + f" (of {len(rows4)} rows).\n")
 
-P("## 1. Rows against the fourth draft\n")
-P("| tex4 line | item | draft says | recomputed | status | note | first-pass row |")
+P("## 1. Rows against the fifth draft\n")
+P("| tex5 line | item | draft says | recomputed | status | note | first-pass row |")
 P("|---|---|---|---|---|---|---|")
 for n, item, d, rc, s, note, old in sorted(rows, key=lambda r: (ORDER[r[4]], r[0])):
-    P(f"| tex4:{n} | {esc(item)} | {esc(d)} | {esc(rc)} | **{s}** | {esc(note)} | "
+    P(f"| tex5:{n} | {esc(item)} | {esc(d)} | {esc(rc)} | **{s}** | {esc(note)} | "
       f"{', '.join(f'#{o + 1} (tex:{OLD[o][0]})' for o in old) or 'new'} |")
 
-P("\n## 2. Third-pass rows located in the fourth draft\n")
-P("Each third-pass fragment (from `check_split_copy_v3.py`'s `row(...)` and `row4(...)` calls, read with `ast`) was "
-  "asserted in `a5f67a2` and searched verbatim in `c66cc76`.\n")
-P("| # | v3 section | third-pass item | fragment | tex3 | tex4 |")
+MAP4TO5 = {
+    "abstract: C1 counts": "abstract: C1 counts (re-anchored", "abstract: reset vs no trigger": "abstract: reset vs no trigger (re-anchored",
+    "abstract: C3 counts": "abstract: C3 counts (re-anchored", "abstract: scope of the result": "abstract: scope of the result (re-anchored",
+    "Rev. 9 paragraph": "Rev. 9 paragraph (re-anchored", "index row": "index row (re-anchored", "'address it' (was 'settle')": "'settle it' (re-anchored",
+    "caption: L half": "caption: pooled primary", "reading 1 quoted": "reading 1 applies", "readings pooled only; X's conditions": "reset seeds against none seeds",
+    "C3": "C3 (re-anchored", "one Hebbian channel": "one Hebbian channel (re-anchored", "delta perfect gate": "delta perfect gate (re-anchored",
+    "reading 2 and its content": "reading 2 applies", "synthesis S=8 row: window gate + SLOW and split columns": "synthesis S=8 row: window gate + SLOW and split columns (re-anchored",
+    "synthesis: single channels": "synthesis: single channels (re-anchored", "assessment: copy not reset": "assessment: copy not reset (re-anchored",
+    "assessment: number of contexts": "assessment: number of contexts (re-anchored", "conclusion": "conclusion (re-anchored",
+    "provenance table: L column and runs (re-anchored on c66cc76)": "provenance table: L column and runs (re-anchored on c5e4508",
+    "delta_recipe: 'its test file checked against the amended spec before any run' (Rev. 9 paragraph)": "delta_recipe (Rev. 9 paragraph)",
+    "L's half of split_copy (Rev. 9 paragraph)": "L's half of split_copy (Rev. 9 paragraph): complete",
+    "delta_recipe index row: 'not run'": "delta_recipe index row (re-anchored", "delta_recipe, memory section: 'not run'": "delta_recipe, memory section (re-anchored",
+    "next steps: 'L's half of test_split_copy, then test_delta_recipe on both machines'": "next steps (re-anchored",
+    "delta_recipe provenance row": "delta_recipe provenance row (re-anchored",
+    "window gate: R's count of the probe's failure mode (new in c66cc76; the same numbers at tex4:328)": "window gate: R's count of the probe's failure mode (re-anchored",
+}
+P("\n## 2. Fourth-pass rows located in the fifth draft\n")
+P("Each fourth-pass fragment (from `check_split_copy_v4.py`'s `row(...)` and `row4(...)` calls, read with `ast`) was "
+  "asserted in `c66cc76` and searched verbatim in `c5e4508`.\n")
+P("| # | v4 section | fourth-pass item | fragment | tex4 | tex5 |")
 P("|---|---|---|---|---|---|")
 for i, (k_, it, ph) in enumerate(V3_ROWS):
-    m3, m4 = locate(tex3, ph), locate(tex4, ph)
-    ra = [r_[0] for r_ in rows if r_[1].startswith(it.split(" (re-anchored")[0])] if not m4 else []
-    P(f"| {i + 1} | {'1' if k_ == 'row' else '4'} | {esc(it)} | {esc(' / '.join(ph))} | tex3:{m3} | "
-      f"{f'tex4:{m4}' if m4 else (f'REWORDED; re-anchored at tex4:{ra[0]}' if ra else 'REMOVED (see section 4 / resolution_F_sc_appB4.md)')} |")
+    m4, m5 = locate(tex4, ph), locate(tex5, ph)
+    pool = rows if k_ == "row" else rows4
+    tgt = MAP4TO5.get(it)
+    ra = [r_[0] for r_ in pool if tgt and r_[1].startswith(tgt)] if not m5 else []
+    P(f"| {i + 1} | {'1' if k_ == 'row' else '4'} | {esc(it)} | {esc(' / '.join(ph))} | tex4:{m4} | "
+      f"{f'tex5:{m5}' if m5 else (f'REWORDED; re-anchored at tex5:{ra[0]}' if ra else 'NOT RE-ANCHORED')} |")
 
-P("\n## 3. First-pass rows located in the fourth draft\n")
-P("| # | tex line | item | first-pass status | fragment | in fourth draft | now (section 1) |")
+P("\n## 3. First-pass rows located in the fifth draft\n")
+P("| # | tex line | item | first-pass status | fragment | in fifth draft | now (section 1) |")
 P("|---|---|---|---|---|---|---|")
 for i, (n, item, s, ph) in enumerate(OLD):
-    m = locate(tex4, ph)
-    nows = "; ".join(f"tex4:{rows[j][0]} {rows[j][4]}" for j in new_of.get(i, [])) or "no row"
-    P(f"| {i + 1} | tex:{n} | {esc(item)} | {s} | {esc(' / '.join(ph))} | {f'tex4:{m}' if m else 'REMOVED'} | {nows} |")
+    m = locate(tex5, ph)
+    nows = "; ".join(f"tex5:{rows[j][0]} {rows[j][4]}" for j in new_of.get(i, [])) or "no row"
+    P(f"| {i + 1} | tex:{n} | {esc(item)} | {s} | {esc(' / '.join(ph))} | {f'tex5:{m}' if m else 'REMOVED'} | {nows} |")
 
-P("\n## 4. delta_recipe, the window gate's R count, L's half, and the provenance commits (as of the fourth draft)\n")
-P(f"Each branch is read at its last commit dated at or before {CUTOFF}, except where a row says 'now' (the branch heads "
-  "at the time of this check). Commit dates are not push dates. Amendment 2 (55dac50), which gives X's start time for "
-  "test_delta_recipe, is dated 15:36 UTC, after this version.\n")
-P("| tex4 line | item | draft says | record | status | note |")
+P("\n## 4. test_delta_recipe's status, R's count, L's half, and the provenance tables (as of the fifth draft)\n")
+P(f"Each branch is read at its last commit dated at or before {CUTOFF}, except where a row says 'now'. Commit dates are not "
+  "push dates.\n")
+P("| tex5 line | item | draft says | record | status | note |")
 P("|---|---|---|---|---|---|")
 for n, item, d, rc, s, note in sorted(rows4, key=lambda r: (ORDER[r[4]], r[0])):
-    P(f"| tex4:{n} | {esc(item)} | {esc(d)} | {esc(rc)} | **{s}** | {esc(note)} |")
-
+    P(f"| tex5:{n} | {esc(item)} | {esc(d)} | {esc(rc)} | **{s}** | {esc(note)} |")
+P(f"\n### 4b. Every commit hash in the provenance tables and captions (tex5:{PROV_A}-{PROV_B})\n")
+P("| hash | tex5 lines | exists | committed (UTC) | before c5e4508 | on (as of the cutoff) | subject |")
+P("|---|---|---|---|---|---|---|")
+for h, lns, ok_, t_, bef, brs, sj in HROWS:
+    P(f"| {h} | {', '.join(map(str, lns))} | {ok_} | {dt.datetime.fromtimestamp(t_, dt.timezone.utc):%Y-%m-%d %H:%M:%S} | {bef} | "
+      f"{', '.join(brs)} | {esc(sj)} |")
+P("\n### 4c. Each session's last cited commit against its branch's last commit before the cutoff\n")
+P("| row | branch | commit column | branch's last commit before the cutoff | commits after the column | reports or passes after it |")
+P("|---|---|---|---|---|---|")
+for name, o in SESS_OUT.items():
+    P(f"| {name} | {o['br'].replace('origin/', '')} | {o['col'] or '-'} | {o['last']} ({cinfo(o['last'])[8:27]}) | {len(o['after'])} | "
+      f"{esc('; '.join(o['rep_after'])[:400]) or 'none'} |")
 P("\n## 5. Per-run records (X, seeds 560-569)\n")
 P("| seed | WIN3_SLOW_D8 | WIN3_RESET_D8 | WIN3_SPLIT_D8 | SINGLE_DELTA_D8 (final acc) | SINGLE_HEBB_D8 (final acc) |")
 P("|---|---|---|---|---|---|")
@@ -965,7 +1024,7 @@ P(f"\nPerfect gates: CEIL_C {dict(zip(S['CEIL_C'], ceil_t('CEIL_C')))}, CEIL_DEL
   + "; ".join(f"{a} {nW[a]}/{len(S[a])} {rlib.band(nW[a], len(S[a]))} [{rlib.wilson(nW[a], len(S[a]))[0]:.3f}, "
               f"{rlib.wilson(nW[a], len(S[a]))[1]:.3f}]" for a in PART_A + ("SINGLE_DELTA_D8", "SINGLE_HEBB_D8"))
   + f". RESET failures: {sorted(set(fail_oc['WIN3_RESET_D8']))}; SLOW failures: {sorted(set(fail_oc['WIN3_SLOW_D8']))}.")
-P(("\nNo number in the fourth draft's split_copy statements disagrees with the records. " if cnt["DISAGREE"] == 0 else
+P(("\nNo number in the fifth draft's split_copy statements disagrees with the records (X recomputed; L and pooled lightly). " if cnt["DISAGREE"] == 0 else
    f"\n{cnt['DISAGREE']} row(s) DISAGREE with the records. ")
   + "The first pass's scope points (per machine vs pooled, readings vs claims, printed vs claimed) are addressed; what "
   "remains is listed under PARTIAL above.")

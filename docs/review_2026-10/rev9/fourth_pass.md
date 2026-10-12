@@ -220,3 +220,10 @@ These do not block the draft; they are listed so the reports can be corrected.
    - The same wording is in `check_G_v4.md` (row tex4:269) and `resolution_G4.md` (row 269 and §3 item 2). Their numbers are right; their scope is not.
 
 2. **§2a missed a second interval error in R's `replicate_report.md`.** At line 27 it says 17/20's interval "contains the report's 38/40 (0.95)". Wilson for 17/20 is [0.6396, 0.9476], which does not contain 0.95. The draft does not repeat it. (Found by `check_R_v5`.)
+
+3. **§1 item 6 (tex4:41, "checked against the amended spec before any run") is withdrawn. It was not false.**
+   - The test's process started at 02:12 UTC, but it spent the time until 05:27:31 on verification. `meta.started` is stamped after `verify()` returns (`test_delta_recipe.py`:1321-1326 at `a581027`). The first run began at or after 05:48:43, after the projection (`check_delta_recipe_X.md`).
+   - The referee's check `6f2788d` (03:01:36) and second review `16b04f9` (02:59:08) therefore preceded every run.
+   - The same error is in `check_F_v4` row P3, `check_split_copy_v4` §4 (tex4:41) and `resolution_F_sc_appB4` §5.
+   - **Items 7 and 8 stand ("not run" at 07:52 was false), but on less than this pass said.** Runs had been going for about 2 h, not 5 h 40 min.
+   - **The count changes.** The verdict's "nine false statements" were eight. (Found by `check_F_v5`.)
