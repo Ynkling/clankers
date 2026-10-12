@@ -1,0 +1,39 @@
+{
+ "meta": {
+  "device": "cpu",
+  "torch": "2.14.0+cu130",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "threads": 1,
+  "gpu": null,
+  "started": "2026-10-12 22:52:16",
+  "s75b_sha": "0201896a129f"
+ },
+ "checks": {
+  "B2": {
+   "ok": true,
+   "w_g_untouched_at_4800": true,
+   "fired": [
+    7200,
+    14400,
+    19200
+   ],
+   "blocked": {
+    "4800": "one-to-one",
+    "9600": "gap",
+    "12000": "one-to-one",
+    "16800": "gap",
+    "21600": "cap",
+    "24000": "cap",
+    "26400": "cap"
+   },
+   "all_merged_rows_equal": true,
+   "all_merged_models_equal": true,
+   "all_merged_fired": [
+    4800,
+    9600,
+    14400
+   ],
+   "secs": 9.3
+  }
+ }
+}
