@@ -397,7 +397,7 @@ say("  H: K1 at 80 pooled pairs (40 seeds per machine), indep / nested: " + "; "
     f"{p1} vs {p2}: {power(80, p1, p2, False):.3f}/{power(80, p1, p2, True):.3f}"
     for p2 in (0.8125, 0.8625) for p1 in (0.933, 0.95)))
 say("  H: with 40 seeds per machine, the RELIABLE band per machine (>= 36/40): P(on both machines) " + ", ".join(
-    f"{p}: {p_ge(40, 36, p) ** 2:.3f}" for p in (0.90, 0.933, 0.95, 0.975)) + "; the 18/20 rule for comparison: "
+    f"{p}: {p_ge(40, 36, p) ** 2:.3f}" for p in (0.80, 0.85, 0.90, 0.933, 0.95, 0.975)) + "; the 18/20 rule for comparison: "
     + ", ".join(f"{p}: {p_ge(20, 18, p) ** 2:.3f}" for p in (0.90, 0.933, 0.95, 0.975)))
 say("  H's no-room region: K1 cannot be SHOWN when WIN3_SLOW binds >= 36/40 pooled (b <= 4, p >= 0.0625). P(WIN3_SLOW >= "
     "36/40): " + ", ".join(f"{p}: {p_ge(40, 36, p):.3f}" for p in (0.80, 0.8125, 0.8625, 0.90)))

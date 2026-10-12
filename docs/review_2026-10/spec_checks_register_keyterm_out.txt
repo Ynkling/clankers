@@ -1,17 +1,17 @@
 == 1. Seeds: every JSON / JSONL blob on every remote branch head
-  scanned origin/claude/bdh-growth-hebbian-inference-w90069 at 0754d61
+  scanned origin/claude/bdh-growth-hebbian-inference-w90069 at 80bfc1d
   scanned origin/claude/bdh-repo-curl-obgdqk at a3e0a97
   scanned origin/claude/explore-F at d5851b1
-  scanned origin/claude/explore-G at 076005d
-  scanned origin/claude/explore-H at 5b5deec
-  scanned origin/claude/explore-I at 559b942
+  scanned origin/claude/explore-G at f632291
+  scanned origin/claude/explore-H at f4fd535
+  scanned origin/claude/explore-I at 9034b83
   scanned origin/claude/outside-ideas at 46cb8d0
   scanned origin/claude/relaxed-edison-he00cc at 3c2fb70
-  scanned origin/claude/replicate-R at 1f8be04
-  scanned origin/claude/rev9-draft at c5e4508
-  scanned origin/claude/review-V at e938873
+  scanned origin/claude/replicate-R at 550a736
+  scanned origin/claude/rev9-draft at dbd9a7e
+  scanned origin/claude/review-V at 491601f
   scanned origin/feature/per-channel-plasticity at 4af9d50
-  308 distinct JSON/JSONL blobs (966 branch-paths); 28791 seed values read (keys, 'seed' fields, 'seeds' lists); unparsed: none
+  311 distinct JSON/JSONL blobs (969 branch-paths); 28791 seed values read (keys, 'seed' fields, 'seeds' lists); unparsed: none
   G (X 600-619, L 1600-1619): records using a seed of the block: 0
     integer dict keys with these values (parents): {600: ['1.2e-07', '1e-06', 'by_step', 'dense', 'diag', 'early_evals', 'eta_at', 'exp_avg_sq', 'mem', 'spec', 'value_at'], 1600: ['1.2e-07', '1e-06', 'by_step', 'dense', 'mem', 'rho', 'spec']}
   H (X 620-639, L 1620-1639): records using a seed of the block: 0
@@ -34,6 +34,7 @@
     docs/review_2026-10/rev9/check_G_v5.md (review-V)
     docs/review_2026-10/rev9/check_G_v5.py (review-V)
     docs/review_2026-10/rev9/resolution_G4.md (review-V)
+    docs/review_2026-10/rev9/resolution_G_H5.md (review-V)
     docs/review_2026-10/spec_checks_register_keyterm.py (review-V)
     docs/review_2026-10/spec_checks_register_keyterm_out.txt (review-V)
     docs/review_2026-10/test_check_delta_recipe.md (review-V)
@@ -144,7 +145,7 @@
     pooled pairs for 80% power, empirical 12 vs 2 of 60: 56
     pooled pairs for 80% power, indep 0.95 vs 0.80: 68
   H: K1 at 80 pooled pairs (40 seeds per machine), indep / nested: 0.933 vs 0.8125: 0.681/0.971; 0.95 vs 0.8125: 0.820/0.989; 0.933 vs 0.8625: 0.339/0.673; 0.95 vs 0.8625: 0.507/0.839
-  H: with 40 seeds per machine, the RELIABLE band per machine (>= 36/40): P(on both machines) 0.9: 0.396, 0.933: 0.762, 0.95: 0.906, 0.975: 0.994; the 18/20 rule for comparison: 0.9: 0.458, 0.933: 0.728, 0.95: 0.855, 0.975: 0.974
+  H: with 40 seeds per machine, the RELIABLE band per machine (>= 36/40): P(on both machines) 0.8: 0.006, 0.85: 0.069, 0.9: 0.396, 0.933: 0.762, 0.95: 0.906, 0.975: 0.994; the 18/20 rule for comparison: 0.9: 0.458, 0.933: 0.728, 0.95: 0.855, 0.975: 0.974
   H's no-room region: K1 cannot be SHOWN when WIN3_SLOW binds >= 36/40 pooled (b <= 4, p >= 0.0625). P(WIN3_SLOW >= 36/40): 0.8: 0.076, 0.8125: 0.107, 0.8625: 0.340, 0.9: 0.629
 
 == 6. Readings: every combination (both machines VALID unless stated)
