@@ -94,6 +94,36 @@ everything below), then 158-170, 172 and 173 as specs/test_delta_recipe.md and i
 RUNTIME: projection with pool-load timing before the first run (longrun.projection). Nothing is cut. Perfect gates
 first, then longest first. Runs are cached in delta_recipe_results.json (gitignored, written atomically after each
 run); a restart resumes from the cached records.
+
+RESULT (X): test commit a581027 (spec 05256c5 + Amendment 1 32c121b before the run). The run started 2026-10-11 02:12 UTC
+through longrun.py; runs began at 05:27 after the verification. Intel(R) Xeon(R) Processor @ 2.10GHz, torch
+2.14.0+cu130, 4 workers x 1 thread, one start (two restarts of the agent's worker did not touch it), nothing cut. 84/84
+runs, none failed; 29.2 h wall clock (projection 45.3 h worst case). Amendment 2 (55dac50, report rules only) was
+committed during the run; the figures below are its report, regenerated with --report (2225f00) from the same results
+file. Its claims, bands and checks equal the in-run report's line for line: CHECK 174 dropped no pair.
+- Verification: every inherited and own CHECK passed.
+  - CHECK 130 (Muon, X's 2.80GHz file) printed, not asserted.
+  - 158: identical through the first split at 4800, different from 6000; printed, the record is from 2.80GHz.
+  - 159 (H's COPY_NONOISE|487) and 162 (F's DELTA_SPLIT|1310) bit for bit, asserted.
+  - 161: LOCAL3 1.19e-7 under 1e-6. 173: fused = parallel.
+- Validity: CEIL_HEBB bound 2/2 (3600, 3600); CEIL_DELTA 2/2 (2400, 1200). Both parts VALID on X.
+- Counts (BOUND ROUTED):
+  - HEBB_SPLIT 16/20 (median transition 17400);
+  - HEBB_SLOW 7/20;
+  - DELTA_SPLIT 19/20 (13200);
+  - DELTA_SLOW 19/20 (14400; per seed the same outcome as DELTA_SPLIT, both failing only on s594, MERGED);
+  - every BOUND ROUTED run has overlap <= 0.1.
+- Per machine (SECONDARY; the labels and readings are pooled only and wait for L):
+  - D1: DELTA_SPLIT only 4, HEBB_SPLIT only 1, d = -3; rate difference +0.150, 95% [-0.082, +0.374].
+  - D2: 0 vs 0, p = 1, NOT SHOWN (DELTA_SLOW 19/20).
+  - D4: 10 vs 1, p = 0.0059, SHOWN.
+  - D3: on 15 shared binds, delta earlier on 10, later on 4, tied 1; sign test p = 0.090; medians 13200 vs 16800.
+  - Bands: HEBB_SPLIT MAJORITY [0.584, 0.919]; HEBB_SLOW MINORITY [0.181, 0.567]; DELTA_SPLIT RELIABLE [0.764, 0.991];
+    DELTA_SLOW RELIABLE [0.764, 0.991].
+- Printed:
+  - Firings: Hebbian 39 in 20 runs, every target labelled ok; delta 31 in 20 runs, 10 labelled ok.
+  - Probe-blind (checks from 4800): HEBB_SPLIT 1 of 181, blocked by the probe alone 3; DELTA_SPLIT 1 of 142, alone 5.
+  - CHECK 171 PASS (80 records); CHECK 174 PASS (40 pairs).
 """
 
 import argparse
