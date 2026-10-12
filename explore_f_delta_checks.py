@@ -28,8 +28,9 @@ Runs on this branch's own modules (no main-line hook), 1 torch thread.
   C6  the recorded run, the new code path disabled: batch 16's S43 LOCAL3_SLOW seed 160 (explore_out/
       window_recipe_results.json, code 46867e792241, Intel(R) Xeon(R) Processor @ 2.10GHz), through 2400 updates,
       rerun through explore_window_recipe_child's own run path with the model converted by to_delta(impl="hebb"):
-      curve, statistics and decoder at 1200 and 2400 bit for bit (only on that CPU; elsewhere the check is reported
-      as not applicable and the batch must not pair bit for bit).
+      curve, statistics and decoder at 1200 and 2400 bit for bit. Asserted on any CPU since 12 October (the container
+      moved to a Xeon @ 2.80GHz, where the 2.10GHz records reproduce bit for bit); a batch still pairs runs bit for bit
+      only within one CPU.
 
 Usage: python explore_f_delta_checks.py [--tag TAG]   (writes explore_out/F/checks_<TAG>.json)
 """
@@ -330,9 +331,7 @@ def run_s43_delta(seed, iters, delta_kw):
 
 
 def c6():
-    cpu = cpu_model()
-    if cpu != REC_CPU:
-        return [(f"C6 recorded run: NOT APPLICABLE on {cpu} (the record is from {REC_CPU}); do not pair bit for bit", None)]
+    cpu = cpu_model()                  # asserted on any CPU (12 October: the 2.10GHz records reproduce on the 2.80GHz Xeon)
     with open(REC_FILE) as f:
         rec = json.load(f)["runs"][REC_KEY]
     t = time.time()
@@ -344,7 +343,7 @@ def c6():
     ok = r["curve"] == want and sn == so and dec
     return [(f"C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through {REC_ITERS} with to_delta(impl='hebb'): curve "
              f"{r['curve']} vs {want}; statistics at {[s['step'] for s in sn]} equal ({sn == so}); decoder at 1200/2400 "
-             f"equal ({dec}); bit for bit on {cpu} ({time.time() - t:.0f} s)", ok)]
+             f"equal ({dec}); bit for bit on {cpu} (recorded on {REC_CPU}) ({time.time() - t:.0f} s)", ok)]
 
 
 def main():
