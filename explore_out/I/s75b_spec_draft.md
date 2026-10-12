@@ -110,7 +110,34 @@ descriptions, that change is not blind, and S75b's record must say so.
 
 ## Cost (CPU profile of one update at L = 1536; K9 on the GPU measures it)
 
-__COST__
+These estimates combine a CPU profile of one update at L = 1536 with the GTX 1660 SUPER's measured times at L = 768 from
+the user's CUDA CHECK (K9). The profile's time estimate was scaled by the factor by which K9 exceeded it at L = 768:
+1.10–1.25.
+- **Memory.** Live tensor bytes per run at R = 1, before the 15% allocator margin. At L = 768 the same method matched
+  the 1660's measured peaks to within 0.02 GB, and the 1660 has 5.61 GB usable.
+- **REG3's time** is scaled from its L = 768 measurement; the profiler ran out of CPU memory on it.
+
+| arm | update peak GB (×1.15) | 1660: s / update | 1660: h per 24k run | fits the 1660 at R = 1 |
+|---|---|---|---|---|
+| ORACLE | 1.91 (2.2) | 0.22 | 1.5 | yes (R = 2 also fits) |
+| SINGLE | 1.63 (1.9) | 0.20 | 1.3 | yes |
+| WIDE_SPLIT_G, WIDE_SLOW | 3.05 (3.5) | 0.24 | 1.6 | yes |
+| REG3, register scan | 4.52 (5.2) | ~0.33–0.38 | ~2.2–2.5 | no: 5.2 + context against 5.61 GB is too tight |
+| REG3, register loop | 3.68 (4.2) | ~0.55–0.75 (~27k extra kernel launches) | ~3.7–5 | yes |
+
+The RTX 3070 Laptop is about 0.6× the 1660's time per update by the roofline estimate. Its 8 GB holds REG3 with the scan:
+about 1.4 h per run.
+
+**Stage 1 (the pilot).** Two ORACLE runs, about 3 h on the 1660.
+
+**Stage 2, one possible split.**
+- 3070: REG3 (scan), about 14 h, and WIDE_SPLIT_G, about 10 h, so about 24 h.
+- 1660: ORACLE, SINGLE and WIDE_SLOW, about 32 h.
+- About 1.5 days of wall time.
+- Without WIDE_SLOW (printed only) the 1660 needs about 16 h.
+- Everything on the 1660, with REG3 on the loop, would take about 85–100 h.
+
+S75 at L = 768 took about 16 h on the 1660; S75b is about 4× that.
 
 ## Code S75b needs (not written; written only after the user approves this draft)
 
