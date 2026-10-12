@@ -23,3 +23,14 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   sequential path bit for bit over 2400 free-running updates. The CUDA CHECK is lock-step, with stated tolerances, and is
   for the user to run. S75 at S = 4 (seeds 830-839, L = 768) is fixed in explore_gpu/s75_s4.py, to run on the user's GPU
   once the CUDA CHECK passes. Its outputs go to explore_out/I/gpu/. The runtime estimate is explore_gpu/runtime_estimate.md.
+- **S75 at S = 4, ORACLE and SINGLE (GTX 1660 SUPER, 2026-10-11).**
+  - The CUDA CHECK passed.
+  - ORACLE: 0.892 and 0.880, under the 0.9 bar, so the registered result is **UNTESTED**.
+  - SINGLE: 0.534–0.595, so SINGLE ≤ ORACLE − 0.2 holds on 10/10.
+  - **Pre-run note** (gpu/s75_S4_prerun_note_2026-10-12.md, committed before any learned-arm run): no amendment, and
+    the reasons. It also records a diagnosis: the bar was feasible (bound 0.927), but the decay horizon did not
+    transfer from S = 2.
+  - **Declared hazard.** SPLIT_THR = 0.88 fires on oracle-quality runs at S = 4, so WIDE_SPLIT's ROUTED count is
+    expected to be biased low.
+  - **Fixed run selection.** WIDE_SPLIT and REG3 on the 3070, and WIDE_SLOW as the no-split twin on the 1660.
+  - **Follow-up rule.** Any later S = 4 screen derives its constants from ORACLE and SINGLE data only.
