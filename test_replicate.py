@@ -231,3 +231,98 @@ def test_bound_routed_on_hand_made_gates():
     g = torch.where((b["role"] == R.ROLE_KEY).unsqueeze(-1), sep, gk)
     assert not R.bound_routed(True, R.stream_channel_map(g, b["stream"], b["role"], 8), acc)
     assert R.failure_class(False, [0] * 8, 0.1, acc) == "collapsed"
+
+
+# ----------------------------------------------------------------------------- Phase 5
+
+
+def _seq_delta(q, v, chan, decay, beta, normalize=True):
+    """Step-by-step reference: one memory per channel, S_t = d S_{t-1}(I - beta k k^T) + beta v k^T, y_t = d S_{t-1} q_t."""
+    B, T, N = q.shape
+    D = v.shape[-1]
+    k = F.normalize(q, dim=-1) if normalize else q
+    out = torch.zeros(B, T, D, dtype=q.dtype)
+    for b in range(B):
+        S = {}
+        for t in range(T):
+            c = int(chan[b, t])
+            St = S.get(c, torch.zeros(D, N, dtype=q.dtype))
+            out[b, t] = decay * St @ q[b, t]
+            # every channel decays each step; only channel c is erased and written
+            for cc in list(S):
+                if cc != c:
+                    S[cc] = decay * S[cc]
+            S[c] = decay * St @ (torch.eye(N, dtype=q.dtype) - beta * torch.outer(k[b, t], k[b, t])) \
+                + beta * torch.outer(v[b, t], k[b, t])
+    return out
+
+
+def _mask(chan, decay, k):
+    T = chan.shape[1]
+    t = torch.arange(T)
+    diff = (t.view(-1, 1) - t.view(1, -1)).double()
+    dec = torch.where(diff > 0, decay ** diff.clamp(min=0), torch.zeros((), dtype=torch.float64))
+    g = F.one_hot(chan, k).double()
+    return (g @ g.transpose(1, 2)) * dec
+
+
+def test_delta_parallel_equals_recurrence():
+    torch.manual_seed(0)
+    B, T, N, D = 2, 12, 6, 4
+    q = torch.relu(torch.randn(B, T, N, dtype=torch.float64))
+    v = torch.randn(B, T, D, dtype=torch.float64)
+    for k_, chan in ((1, torch.zeros(B, T, dtype=torch.long)), (3, torch.randint(0, 3, (B, T)))):
+        M = _mask(chan, 0.95, k_)
+        par = R.delta_attend(q, v, M, beta=1.0)
+        seq = _seq_delta(q, v, chan, 0.95, 1.0)
+        assert torch.allclose(par, seq, atol=1e-10), (k_, (par - seq).abs().max())
+
+
+def test_delta_at_beta0_is_hebbian():
+    task = R.Task()
+    b = task.sample(3, torch.Generator().manual_seed(0))
+    for gate, k in (("none", 1), ("perfect", 16)):
+        torch.manual_seed(1)
+        mh = R.MCBDH(task.vocab, k=k, gate=gate)
+        torch.manual_seed(1)
+        md = R.MCBDH(task.vocab, k=k, gate=gate, memory="delta")
+        md.load_state_dict(mh.state_dict())
+        orig = R.delta_attend
+        R.delta_attend = lambda q, v, M, beta: orig(q, v, M, beta=0.0, normalize=False, write=1.0)
+        try:
+            ld = md(b["idx"], b["stream"])
+        finally:
+            R.delta_attend = orig
+        lh = mh(b["idx"], b["stream"])
+        assert torch.allclose(ld, lh, atol=1e-6), (gate, (ld - lh).abs().max())
+
+
+def test_delta1_and_oracle_delta_models():
+    task = R.Task()
+    m = R.MCBDH(task.vocab, k=1, gate="none", memory="delta")
+    assert m.gate_params() == [] and m.memory == "delta" and m.beta == 1.0
+    names = {n for n, _ in m.named_parameters()}
+    assert names == {n for n, _ in R.MCBDH(task.vocab, k=1, gate="none").named_parameters()}  # no parameter added
+
+
+def test_reset_op_leaves_W_g_and_zeroes_state():
+    torch.manual_seed(0)
+    W = torch.nn.Parameter(torch.randn(16, 32) * 0.1)
+    other = torch.nn.Parameter(torch.randn(5))
+    opt = torch.optim.Adam([W, other], lr=1e-3)
+    (W.sum() ** 2 + other.sum() ** 2).backward()
+    opt.step()
+    before, other_state = W.detach().clone(), opt.state[other]["exp_avg"].clone()
+    R.Split(op="reset").apply(W, opt, 3, 7, torch.Generator().manual_seed(0))
+    assert torch.equal(W.detach(), before)
+    assert all((v == 0).all() for v in opt.state[W].values() if torch.is_tensor(v))
+    assert torch.equal(opt.state[other]["exp_avg"], other_state)
+
+
+def test_reset_arm_matches_copy_arm_until_first_fire():
+    kw = dict(S=2, P=2, k=4, budget=40, eval_every=10, n_eval=64, slow_until=20,
+              split_kw=dict(first=20, every=10, min_gap=20))
+    a = R.run("WIN3_SPLIT_D8_ML", 5, **kw)
+    r = R.run("RESET_D8_ML", 5, **kw)
+    first = min(x["update"] for x in a["splits"] + r["splits"])
+    assert [e for e in a["evals"] if e[0] <= first] == [e for e in r["evals"] if e[0] <= first]

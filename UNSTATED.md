@@ -83,3 +83,54 @@ Legend: **[A]** the report is silent; **[B]** the report is ambiguous (two or mo
 | U-42 | Oracle pilot (disclosed) | Before pre-registering, one ORACLE run on seed 1 (outside 900–919, budget 12,000), to catch bugs. No learned-gate run was piloted | Validity check only; it cannot inform the gate comparison. |
 | U-43 | Checkpoint/resume | Each run checkpoints after every evaluation and resumes bit-for-bit (unit-tested) after a container restart | Long runs on an ephemeral container. |
 | U-44 | Statistics | Exact one-sided McNemar p = P[Bin(b+c, ½) ≥ b]; Wilson 95% (z = 1.96) | As instructed. |
+
+---
+
+# Phase 5 — details the spec does not determine, and the choice made
+
+Independent replication, EXPLORATORY, not a result.
+
+Sources: `specs/test_split_copy.md` and the docstring of `test_split_copy.py` at `ffb0771`, plus the "Phase 4, amended" section of `docs/reading/parallel_sessions_prompts.md`. No code below that docstring was read, and nothing from `explore_delta_mem.py`, `explore_f_delta_fast.py` or Session F's branch. Every entry was written **before** any Phase 5 run.
+
+Legend as in Phase 2: **[A]** silent; **[B]** ambiguous; **[C]** carried over from another component; **[S]** stated in the spec, listed for completeness.
+
+## The reset-only arm
+
+| # | What | Choice | Why |
+|---|------|--------|-----|
+| U-50 | What RESET zeroes [B] | **W_g's Adam state only** (`exp_avg`, `exp_avg_sq`, `step`). W_in, the window and the rest are untouched, and W_g itself is untouched | The spec says "W_g's Adam state zeroed, W_g untouched". The user's prompt says "the gate group's Adam state". I followed the spec, so that RESET differs from COPY only by the copy, since COPY zeroes W_g's state only. |
+| U-51 | RESET's trigger [S] | The copy arm's rule exactly: the same probe (`Generator(12345)`), body keys, checks, threshold, rise, cap and gap. c*/c0 are computed and recorded but not used | "the same trigger". |
+
+## The delta-rule channel
+
+| # | What | Choice | Why |
+|---|------|--------|-----|
+| U-52 | Key and query [B] | Key k_t = L2-normalised x_sparse_t (the Q=K activation at that layer). The query stays raw x_sparse_t | "L2-normalised keys". The CHECK "at β = 0 (erase off, write 1, **raw keys**) gives the Hebbian logits" implies only the keys change, and that the Hebbian query is the raw activation. |
+| U-53 | Where the decay sits [A] | S_t = d·S_{t−1}(I − β k_t k_tᵀ) + w·v_t k_tᵀ; read y_t = d·S_{t−1} q_t (read before write) | This is the form whose β = 0, w = 1, raw-key case is exactly the Hebbian score d^{t−s}(x_t·x_s), which the spec's CHECK 149 requires. It is also the report's Session F equation, with α = d. |
+| U-54 | "Tied write" [B] | Write strength w = β = 1 | At the fixed β = 1 both readings give w = 1. |
+| U-55 | Values, LN, layers [C] | v = the conv'd layer input (BDH's V). LayerNorm after the read as in BDH. The same delta memory at each of the 3 applications of the shared layer | The spec: "no parameter added"; everything else as the Hebbian model. |
+| U-56 | Computation [A] | Exact parallel form: pseudo-values U from (I + β (K Kᵀ ⊙ M)) U = w V (unit lower-triangular solve), y = (Q Kᵀ ⊙ M) U | Equal to the step-by-step recurrence to 1e-10 in float64 (unit-tested). The main line used a fused form "equal to the parallel form to 1e-5 relative". |
+| U-57 | Normalisation eps [A] | `F.normalize` default (eps 1e-12). An all-zero activation gives a zero key: nothing is erased or written there, and nothing is read from it | — |
+| U-58 | DELTA1's width [A] | N = 256, D = 32, 3 layers, conv, k = 1, no gate | The spec names "test_short_conv's B_conv" without its width. I took the same model as every other arm, so that only the memory differs. |
+| U-59 | Soft gates [A] | The delta memory is implemented only for k = 1 and one-hot gates (asserted) | Only those are run. The parallel form with G Gᵀ is exact only for them. |
+
+## Recipes, oracles, outcomes
+
+| # | What | Choice | Why |
+|---|------|--------|-----|
+| U-60 | DELTA1 and ORACLE_DELTA recipe [S] | Single Adam group at 1e-3 on every parameter throughout (no SLOW) | Stated (F's S68 recipe). |
+| U-61 | Validity oracles [S/A] | ORACLE_ADAM (Hebbian perfect gate, k = 16, single-rate Adam) and ORACLE_DELTA (perfect gate on delta channels, k = 16), each on 940–941 | The spec: CEIL_C and CEIL_DELTA_D8 on the first two seeds. The k = 16 with 8 unused channels is as the spec says. |
+| U-62 | DELTA1's outcome [S] | BOUND (a transition held to the end). Per-stream accuracy is recorded; there is no routing | Stated. |
+| U-63 | COPY's last check [A] | As in Phases 2–4: checks may run through 43,200 (the main line stops at 40,800, DIFF.md D-5) | The copy arm is "my Phase 4 recipe, kept". It was inert in all 60 earlier split runs, whose latest split was at 36,000. |
+| U-64 | Arms not run [A] | WIN3_SLOW_D8 (needed only for C2) and SINGLE_HEBB_D8 are not run on 940–959 | The user asked for the first and third results only. |
+| U-65 | Job order [A] | Oracles first, then per seed DELTA1, RESET, COPY (longest first), 4 workers × 1 thread | Runtime. |
+
+## Reading
+
+| # | What | Choice | Why |
+|---|------|--------|-----|
+| U-66 | The rule [B] | The user's statement: per arm, "consistent" if x/20 lies in the main line's pooled Wilson interval for that arm, endpoints included; otherwise "outside the main line's interval". No "replicates" label | The "Phase 4, amended" text in the file states a different rule (fresh count ≤ 27/32 reads "below 0.95"). That rule is for the rate test, not for this three-arm comparison. I applied the user's statement and recorded the difference in phase5.py. |
+| U-67 | The intervals [A] | From the main line's pooled bands (docstring): COPY [0.699, 0.972], RESET [0.145, 0.519], DELTA1 [0, 0.161] | Copied as printed, not recomputed (they agree with Wilson z = 1.96 for 18/20, 6/20, 0/20). |
+| U-68 | Edge case [A] | A 20/20 copy count reads "outside" (1.0 > 0.972) | The rule is applied as written; the case is named beforehand. |
+| U-69 | Discordant counts [A] | COPY vs RESET (BOUND ROUTED both) and COPY (BOUND ROUTED) vs DELTA1 (BOUND), over the 20 pairs, with the exact one-sided McNemar p labelled descriptive | "the discordant counts printed". |
+| U-70 | Pilot runs [A] | None. Before the protocol commit, the only Phase 5 executions were unit tests (≤ 60 updates on toy sizes), a 2400-update regression of the recorded Phase 4 run WIN3_SPLIT_D8_ML\|920 (reproduced exactly), and a 30-update timing of the delta model | Disclosure. |

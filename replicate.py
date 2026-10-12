@@ -175,13 +175,32 @@ class CausalConv(nn.Module):
         return F.conv1d(u, self.weight, groups=x.shape[-1]).transpose(1, 2)
 
 
+def delta_attend(q, v, M, beta=1.0, normalize=True, write=None):
+    """Phase 5. The delta-rule memory in parallel form, read before write, for M = (G G^T) * decay with G one-hot or
+    k = 1 (each channel its own memory). Per channel: S_t = d S_{t-1} (I - beta k_t k_t^T) + w v_t k_t^T, read
+    y_t = d S_{t-1} q_t, with k_t = q_t / |q_t| (L2 keys), queries raw, write w tied to beta. Pseudo-values u_t =
+    w v_t - beta d S_{t-1} k_t solve the unit lower-triangular system (I + beta (K K^T * M)) U = w V, and
+    y = (Q K^T * M) U. With beta = 0, w = 1 and raw keys it is the Hebbian memory exactly (unit-tested)."""
+    w = beta if write is None else write
+    k = F.normalize(q, dim=-1) if normalize else q
+    A = (k @ k.transpose(1, 2)) * M
+    eye = torch.eye(q.shape[1], dtype=q.dtype).expand_as(A)
+    U = torch.linalg.solve_triangular(eye + beta * A, w * v, upper=False, unitriangular=True)
+    return ((q @ k.transpose(1, 2)) * M) @ U
+
+
 class MCBDH(nn.Module):
     """Pathway BDH (shared layer, Q=K, LN after attention) with k memory channels:
     score(t,s) = (x_t . x_s) (g_t . g_s) decay^(t-s), s<t."""
 
-    def __init__(self, vocab, D=32, N=256, n_layer=3, k=16, decay=0.95, conv=True, gate="window"):
+    def __init__(self, vocab, D=32, N=256, n_layer=3, k=16, decay=0.95, conv=True, gate="window", memory="hebb",
+                 beta=1.0):
         super().__init__()
         self.D, self.N, self.n_layer, self.k, self.decay = D, N, n_layer, k, decay
+        # Phase 5: memory "delta" = the delta-rule write (U-51..U-56): beta = erase strength (write tied: 1 at beta 1)
+        assert memory in ("hebb", "delta")
+        assert memory == "hebb" or gate in ("perfect", "none"), "the parallel delta form is exact for one-hot gates only"
+        self.memory, self.beta = memory, beta
         self.embed = nn.Embedding(vocab, D)
         nn.init.normal_(self.embed.weight, std=0.02)
         self.encoder = nn.Parameter(torch.randn(D, N) * 0.02)
@@ -202,7 +221,12 @@ class MCBDH(nn.Module):
     def forward(self, idx, stream=None, return_gate=False):
         B, T = idx.shape
         v = self.embed(idx)
-        g = self.gate(v) if self.gate_kind == "window" else F.one_hot(stream, self.k).float()
+        if self.gate_kind == "window":
+            g = self.gate(v)
+        elif self.gate_kind == "none":
+            g = torch.ones(B, T, 1)
+        else:
+            g = F.one_hot(stream, self.k).float()
         t = torch.arange(T)
         diff = (t.view(-1, 1) - t.view(1, -1)).float()
         dec = torch.where(diff > 0, self.decay ** diff.clamp(min=0), torch.zeros(()))
@@ -211,8 +235,11 @@ class MCBDH(nn.Module):
         for _ in range(self.n_layer):
             xc = self.conv(x) if self.conv is not None else x
             xs = F.relu(xc @ self.encoder)  # B,T,N
-            scores = (xs @ xs.transpose(1, 2)) * M
-            yKV = self.ln(scores @ xc)
+            if self.memory == "delta":
+                yKV = self.ln(delta_attend(xs, xc, M, self.beta))
+            else:
+                scores = (xs @ xs.transpose(1, 2)) * M
+                yKV = self.ln(scores @ xc)
             ys = F.relu(yKV @ self.encoder_v)
             y = self.ln((xs * ys) @ self.decoder)
             x = self.ln(x + y)
@@ -279,8 +306,10 @@ class Split:
     rose by < 0.02 since the previous check; at most `max_splits`, at least `min_gap` apart.
     The probe is also read at `first - every` so that the first check has a previous value."""
 
-    def __init__(self, first=4800, every=2400, max_splits=3, min_gap=4800, noise=0.1):
+    def __init__(self, first=4800, every=2400, max_splits=3, min_gap=4800, noise=0.1, op="copy"):
         self.first, self.every, self.max_splits, self.min_gap, self.noise = first, every, max_splits, min_gap, noise
+        assert op in ("copy", "reset")
+        self.op = op  # Phase 5: "reset" zeroes W_g's Adam state where the rule fires and leaves W_g untouched
         self.prev_acc = None
         self.splits = []  # dicts
 
@@ -304,16 +333,20 @@ class Split:
         return int(key_mass.argmax()), int(key_mass.argmin())
 
     def apply(self, W_g, opt, c_star, c0, gen):
-        with torch.no_grad():
-            row = W_g[c_star].clone()
-            sd = row.std()
-            W_g[c0] = row + self.noise * sd * torch.randn(row.shape, generator=gen)
-            W_g[c_star] = row + self.noise * sd * torch.randn(row.shape, generator=gen)
+        if self.op == "copy":
+            self._copy(W_g, c_star, c0, gen)
         st = opt.state.get(W_g)
         if st:
             for key, val in st.items():
                 if torch.is_tensor(val):
                     val.zero_()
+
+    def _copy(self, W_g, c_star, c0, gen):
+        with torch.no_grad():
+            row = W_g[c_star].clone()
+            sd = row.std()
+            W_g[c0] = row + self.noise * sd * torch.randn(row.shape, generator=gen)
+            W_g[c_star] = row + self.noise * sd * torch.randn(row.shape, generator=gen)
 
 
 # ----------------------------------------------------------------------------- training
@@ -329,9 +362,15 @@ ARMS = {
     # Phase 4 (phase4.py): the split as the main line specifies it, and its validity arm
     "WIN3_SPLIT_D8_ML": ("window", True),   # D-1 and D-2 together: probe Generator(12345), body keys only
     "ORACLE_ADAM": ("perfect", False),      # D-3: perfect gate under single-rate Adam at 1e-3
+    # Phase 5 (phase5.py): the copy arm is WIN3_SPLIT_D8_ML; its reset-only control; one delta-rule channel; its oracle
+    "RESET_D8_ML": ("window", True),        # the same trigger; W_g's Adam state zeroed, W_g untouched
+    "DELTA1": ("none", False),              # k = 1, delta-rule write (beta 1, L2 keys, tied write, decay 0.95), no gate
+    "ORACLE_DELTA": ("perfect", False),     # perfect gate, k = 16, delta-rule channels (validity for DELTA1)
 }
-ML_PROBE = ("SPLIT_R1_PROBE", "WIN3_SPLIT_D8_ML")
-BODY_KEYS = ("SPLIT_R2_BODYKEYS", "WIN3_SPLIT_D8_ML")
+ML_PROBE = ("SPLIT_R1_PROBE", "WIN3_SPLIT_D8_ML", "RESET_D8_ML")
+BODY_KEYS = ("SPLIT_R2_BODYKEYS", "WIN3_SPLIT_D8_ML", "RESET_D8_ML")
+SINGLE_RATE = ("ORACLE_ADAM", "DELTA1", "ORACLE_DELTA")
+DELTA = ("DELTA1", "ORACLE_DELTA")
 
 EVAL_SEED = 123_457
 PROBE_SEED_OFFSET = 1_000_003
@@ -364,11 +403,13 @@ def run(arm, seed, S=8, P=4, budget=43_200, batch=32, eval_every=1200, n_eval=20
         slow_until=2400, lr=1e-3, slow_lr=1e-4, split_kw=None, log=None, stop_after=None, ckpt=None):
     torch.set_num_threads(1)
     gate, use_split = ARMS[arm]
-    if arm == "ORACLE_ADAM":
+    if arm in SINGLE_RATE:
         slow_lr = lr  # one rate throughout
+    if arm == "DELTA1":
+        k = 1
     task = Task(S=S, P=P)
     torch.manual_seed(seed)
-    model = MCBDH(task.vocab, k=k, gate=gate)
+    model = MCBDH(task.vocab, k=k, gate=gate, memory="delta" if arm in DELTA else "hebb")
     gate_ids = {id(p) for p in model.gate_params()}
     others = [p for p in model.parameters() if id(p) not in gate_ids]
     groups = [{"params": others, "lr": slow_lr, "name": "memory"}]
@@ -385,7 +426,7 @@ def run(arm, seed, S=8, P=4, budget=43_200, batch=32, eval_every=1200, n_eval=20
         key_role[:, -3:] = False
     noise_gen = torch.Generator().manual_seed(seed + NOISE_SEED_OFFSET)
     evalset = make_eval_set(task, n_eval)
-    split = Split(**(split_kw or {})) if use_split else None
+    split = Split(**dict(split_kw or {}, **({"op": "reset"} if arm == "RESET_D8_ML" else {}))) if use_split else None
 
     evals, probes = [], []
     t0 = time.time()
@@ -483,6 +524,10 @@ def main():
             jobs += [("WIN3_SPLIT_D8", s), ("WIN3_SLOW_D8", s)]
     elif a.phase == 3:  # seeds 900-909, one discrepancy fixed at a time
         jobs = [(arm, s) for arm in ("SPLIT_R1_PROBE", "SPLIT_R2_BODYKEYS") for s in range(900, 910)]
+    elif a.phase == 5:  # phase5.py: seeds 940-959; validity oracles on 940-941; longest arms first
+        jobs = [(o, s) for o in ("ORACLE_ADAM", "ORACLE_DELTA") for s in (940, 941)]
+        for s in range(940, 960):
+            jobs += [("DELTA1", s), ("RESET_D8_ML", s), ("WIN3_SPLIT_D8_ML", s)]
     else:  # Phase 4 (phase4.py): seeds 920-939, the main line's split; validity on 920-921
         jobs = [("ORACLE_ADAM", 920), ("ORACLE_ADAM", 921)]
         for s in range(920, 940):
