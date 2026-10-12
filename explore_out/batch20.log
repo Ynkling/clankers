@@ -290,3 +290,73 @@ EXPLORATORY, NOT A RESULT — batch 20: continue (S68)
   start    0.0 min  s67_continue C_P16_D128     seed 271  (resuming from its checkpoint at step 38400)  (projected worst case 865 min)
   start    0.0 min  s67_continue C_P16_D128     seed 272  (resuming from its checkpoint at step 38400)  (projected worst case 865 min)
   start    0.0 min  s67_continue C_P16_D128     seed 273  (resuming from its checkpoint at step 27600)  (projected worst case 865 min)
+  segment budget reached: 4 run(s) stopped, each to resume from its last checkpoint: s67_continue:C_ORC_P16_D128|270 at step 63600, s67_continue:C_P16_D128|271 at step 58800, s67_continue:C_P16_D128|272 at step 58800, s67_continue:C_P16_D128|273 at step 48000
+  0 runs saved in this segment; batch wall clock 115.2 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN s67_continue
+  idea    are batch 19's unbound P = 16 runs slow or stuck? every unbound S67 learned run on to 86,400, same recipe
+  source  batch 19's S67 (P16_D128 4/10 vs P16_N256 0/10; 12 of 16 failures one-to-one and unbound); the user's batch 20
+  change  only the budget (43,200 -> 86,400); every run regenerated from update 0 and checked against its S67 record
+  arm RCHK_P8_N256 lr 0.001  iters 44400  seeds 272-272 (1)  — the reproduction's run computed through (no checkpoint after 42000), P=8, N256, to 44400
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P8_N256    lr 0.001  iters 86400  seeds 272-272 (1)  — P=8, N256 (N=256, D=32): halts at 43200, a new process resumes it
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_ORC_P16_D128 lr 0.001  iters 86400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm C_P16_N256   lr 0.001  iters 86400  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P16_D128   lr 0.001  iters 86400  seeds [271, 272, 273, 275, 276, 279] (6)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  pairing each run is its own S67 run (same arm, seed, recipe), continued
+----------------------------------------------------------------------------------------------------
+  REPRODUCTION OF A RESUMED RUN (C_P8_N256 272 resumed from its 43200 checkpoint in a new process vs RCHK_P8_N256 272 computed through, at 44400): not run yet
+  ARM RCHK_P8_N256 (the reproduction's run computed through (no checkpoint after 42000), P=8, N256, to 44400), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | yes        | MERGED (2 share)             None  44400  0.73     2+1+1 | 43200:0.48/1.00/0.47/1.00  44400:0.47/1.00/0.47/1.00
+
+  ARM C_P8_N256 (P=8, N256 (N=256, D=32): halts at 43200, a new process resumes it), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | not run
+
+  ARM C_ORC_P16_D128 (oracle, P=16, D128 (N=256, D=128)), seeds 270-270 (1); the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | not bound 0.32             | not run
+
+  ARM C_P16_N256 (LOCAL3 + SLOW, P=16, N256 (N=256, D=32)), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | STREAM-PARTIAL one-to-one 0.15 | not run
+     271 | MERGED (2 share) 0.11      | not run
+     272 | STREAM-PARTIAL one-to-one 0.14 | not run
+     273 | STREAM-PARTIAL one-to-one 0.59 | not run
+     274 | STREAM-PARTIAL one-to-one 0.72 | not run
+     275 | STREAM-PARTIAL one-to-one 0.67 | not run
+     276 | STREAM-PARTIAL one-to-one 0.29 | not run
+     277 | MERGED (2 share) 0.16      | not run
+     278 | MERGED (3 share) 0.18      | not run
+     279 | MERGED (2 share) 0.12      | not run
+
+  ARM C_P16_D128 (LOCAL3 + SLOW, P=16, D128 (N=256, D=128)), seeds [271, 272, 273, 275, 276, 279] (6); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     271 | STREAM-PARTIAL one-to-one 0.29 | not run
+     272 | STREAM-PARTIAL one-to-one 0.40 | not run
+     273 | STREAM-PARTIAL one-to-one 0.28 | not run
+     275 | STREAM-PARTIAL one-to-one 0.31 | not run
+     276 | STREAM-PARTIAL one-to-one 0.27 | not run
+     279 | STREAM-PARTIAL one-to-one 0.31 | not run
+
+  READING S68 N256 (its 6 one-to-one runs, seeds [270, 272, 273, 274, 275, 276] (6)): INCOMPLETE (bind by 86400: 0/6 []; slow, not stuck: >= 4; stuck: 0; unresolved otherwise)
+  READING S68 D128 (its 6 one-to-one runs, seeds [271, 272, 273, 275, 276, 279] (6)): INCOMPLETE (bind by 86400: 0/6 []; slow, not stuck: >= 4; stuck: 0; unresolved otherwise)
+  READING S68 joint: INCOMPLETE, no reading (D128 0/6, N256 0/6; the budget is the lead: both >= 4; the width is the lead: D128 >= 4 and N256 <= 1; neither otherwise)
+  BUDGET for the main-line test: 40800 (the latest transition 38400 of the BOUND ROUTED P = 16 learned runs in S67 and S68 [19200, 26400, 37200, 38400], + 2400, rounded up to a multiple of 2400); no one-to-one run still rising at 86400
+  DESCRIPTIVE (no reading): the MERGED P16_N256 runs 271 not run, 277 not run, 278 not run, 279 not run; P8_N256 272 None; the D128 oracle on 270 None
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S68 reproduction of a resumed run at 44400: not run yet
+  S68 N256: INCOMPLETE (0/6); D128: INCOMPLETE (0/6); joint: INCOMPLETE, no reading
+  S68 budget for the main-line test: 40800
+####################################################################################################
+chain: segment 3 end 2026-10-12T03:53:21Z, 1 of 18 runs saved (driver exit 0)
