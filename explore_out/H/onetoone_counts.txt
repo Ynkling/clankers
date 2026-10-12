@@ -1,0 +1,16 @@
+(a) the 50 runs: the main line at 0282955 (S86's set)
+  file           runs firings key ok all ok map 1:1 before runs BR at end
+  window_gate X    20      47     47     46              0             18
+  window_gate L    20      38     38     30              0             20
+  split_copy X     10      22     22     21              0             10
+  total            50     107    107     97              0             48
+  REPRODUCES S86's count (50 runs, 107 firings, key pair 107, all-position pair 97): True
+(b) now: the main line at 0754d61 (L's split_copy file added)
+  file           runs firings key ok all ok map 1:1 before runs BR at end
+  window_gate X    20      47     47     46              0             18
+  window_gate L    20      38     38     30              0             20
+  split_copy X     10      22     22     21              0             10
+  split_copy L     10      19     19     18              0              8
+  total            60     126    126    115              0             56
+  field: checks[].map_before (routing_k's VAL-position map on the run's probe, before the operation)
+  firings with a one-to-one map before: (a) 0 of 107; (b) 0 of 126
