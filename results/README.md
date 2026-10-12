@@ -49,5 +49,6 @@ Commit = the git head each run was started from (its `meta.git`); date = its `me
 | L/early_recipe_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 9f25dc8 (run at 9437e01) | 2026-10-04 18:38 |
 | L/muon_recipe_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 74f5907 | 2026-10-05 23:08 |
 | L/window_gate_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 886a668 | 2026-10-08 11:33 |
+| L/split_copy_results.json | L: 12th Gen Intel(R) Core(TM) i7-12650H | 1f52cd5 (run at 592c574) | 2026-10-11 11:12 |
 
 X's `meta.started` times are UTC; L's are the laptop's local time (UTC−6). L's Phase III–IV files were committed on 10 October from the laptop's working copies (the test scripts write them next to themselves, gitignored); L's original `channel_binding` file could not be found, so the test was rerun on L on 10 October (torch 2.14.1; the earlier L files are torch 2.14.0) and that record is the one committed. A 5 October commit on the side branch `claude/bdh-repo-curl-obgdqk` (`664729f`) had placed copies of X's files under `results/L/`; those were not L's and were replaced.
