@@ -207,6 +207,540 @@
     }
    },
    "secs": 0.0
+  },
+  "B5": {
+   "ok": true,
+   "cases": {
+    "git_committed: untracked / committed / modified": {
+     "ok": true,
+     "said": "(None, False) ('7ba4cfe2575983dc5b72b061c4b85719d8760bec', True) ('7ba4cfe2575983dc5b72b061c4b85719d8760bec', False)"
+    },
+    "git_committed: outside a repository": {
+     "ok": true,
+     "said": ""
+    },
+    "dirty_code on this checkout (description)": {
+     "ok": true,
+     "said": "[]"
+    },
+    "no record": {
+     "ok": true,
+     "said": "no stage-1 record: run --stage 1 first"
+    },
+    "record != pilot": {
+     "ok": true,
+     "said": "the stage-1 record does not match the pilot records under this code SHA"
+    },
+    "record not committed (untracked)": {
+     "ok": true,
+     "said": "the stage-1 record (/tmp/tmpizm0y6wx/s75b_stage1_record.json) is not committed, or has local changes: commit and push it first"
+    },
+    "pilot results file not committed": {
+     "ok": true,
+     "said": "the pilot results file (../../../tmp/tmpizm0y6wx/s75b_Intel_R__Xeon_R__Processor___2_10GHz_results.json) is not committed: commit and push it"
+    },
+    "both committed -> past the commit checks (to the benchmark)": {
+     "ok": true,
+     "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 12be7c387ee7: run --bench on this card and commit it"
+    },
+    "record modified after its commit": {
+     "ok": true,
+     "said": "the stage-1 record (/tmp/tmpizm0y6wx/s75b_stage1_record.json) is not committed, or has local changes: commit and push it first"
+    },
+    "committed pilot records disagree": {
+     "ok": true,
+     "said": "the committed pilot records do not give the stage-1 record's decision: commit and push the pilot results file"
+    },
+    "incomplete pilot": {
+     "ok": true,
+     "said": "both pilot records under this code SHA are needed (a pilot record is missing or failed operationally: rerun --stage 1 (the same seeds))"
+    },
+    "pilot records under another code SHA": {
+     "ok": true,
+     "said": "both pilot records under this code SHA are needed (a pilot record is missing or failed operationally: rerun --stage 1 (the same seeds))"
+    },
+    "pilot stopped": {
+     "ok": true,
+     "said": "S75b stops: B's pilot did not clear the proceed rule; a pilot run ended below 0.9: S = 4 is not usable at B (S75b stops at stage 1: mean 0.910000 < 0.912; each >= 0.9: False)"
+    },
+    "pilot stopped: 'not usable' wording": {
+     "ok": true,
+     "said": "S75b stops: B's pilot did not clear the proceed rule; a pilot run ended below 0.9: S = 4 is not usable at B (S75b stops at stage 1: mean 0.910000 < 0.912; each >= 0.9: False)"
+    },
+    "duplicate pilot records (stage 2)": {
+     "ok": true,
+     "said": "stage 2: ok records of one arm and seed from two cards (arm, seed, cards): [('ORACLE_PILOT', 840, ['Intel(R) Xeon(R) Processor @ 2.10GHz', 'another card'])]; the driver does not choose between them: t"
+    },
+    "duplicate pilot records (stage 1)": {
+     "ok": true,
+     "said": "stage 1: ok records of one arm and seed from two cards (arm, seed, cards): [('ORACLE_PILOT', 840, ['Intel(R) Xeon(R) Processor @ 2.10GHz', 'another card'])]; the driver does not choose between them: t"
+    },
+    "report: DUPLICATE and incomplete": {
+     "ok": true,
+     "said": ""
+    },
+    "fallback with the 3070's records": {
+     "ok": true,
+     "said": "--machine fallback: records of its arms under code SHA 12be7c387ee7 exist from another card ({'REG3': [853]}); running them here would give two cards' records for one seed: the user decides"
+    },
+    "1660 with the 3070's REG3 records: not its arms -> past (to the benchmark)": {
+     "ok": true,
+     "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 12be7c387ee7: run --bench on this card and commit it"
+    },
+    "machine 1660 on a 3070": {
+     "ok": true,
+     "said": "--machine 1660 expects a GTX 1660, this card is FAKE GeForce RTX 3070 Laptop GPU (checks)"
+    },
+    "machine 3070 on a 1660": {
+     "ok": true,
+     "said": "--machine 3070 expects a RTX 3070, this card is FAKE GeForce GTX 1660 SUPER (checks)"
+    },
+    "no benchmark (stage 2, CUDA)": {
+     "ok": true,
+     "said": "stage 2: no benchmark for FAKE GeForce RTX 3070 Laptop GPU (checks) under code SHA 12be7c387ee7: run --bench on this card and commit it"
+    },
+    "failed benchmark": {
+     "ok": true,
+     "said": "stage 2: this card's benchmark has failed cases: ['REG3 scan']"
+    },
+    "refusing worker rule": {
+     "ok": true,
+     "said": "stage 2: the benchmark's host-memory rule refuses (refuse: test; budget None GB, need None)"
+    },
+    "no CUDA CHECK output": {
+     "ok": true,
+     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpizm0y6wx/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is missing: run python -m explore_gpu.s75b_checks --device cuda and com"
+    },
+    "failed CUDA CHECK output": {
+     "ok": true,
+     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpizm0y6wx/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is failed: ['B7']: run python -m explore_gpu.s75b_checks --device cuda "
+    },
+    "CUDA CHECK output under another SHA": {
+     "ok": true,
+     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpizm0y6wx/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is written under code SHA 000000000000, not 12be7c387ee7: run python -m"
+    },
+    "stage 1: no benchmark (CUDA)": {
+     "ok": true,
+     "said": "stage 1: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 12be7c387ee7: run --bench on this card and commit it"
+    },
+    "stage 1: no CUDA CHECK output": {
+     "ok": true,
+     "said": "stage 1: this card's CUDA CHECK output (/tmp/tmpizm0y6wx/s75b_checks_cuda_FAKE_GeForce_GTX_1660_SUPER__checks__output.json) is missing: run python -m explore_gpu.s75b_checks --device cuda and commit i"
+    },
+    "stage 1: benchmark not committed": {
+     "ok": true,
+     "said": "stage 1: this card's benchmark (/tmp/tmpizm0y6wx/s75b_bench_FAKE_GeForce_GTX_1660_SUPER__checks_.json) is not committed, or has local changes: commit and push it first"
+    },
+    "stage 1: pilot records from another card": {
+     "ok": true,
+     "said": "stage 1: pilot records under code SHA 12be7c387ee7 exist from another card ({'ORACLE_PILOT': [840, 841]}): the pilot runs on one card"
+    },
+    "stage 1: the driver's code not committed": {
+     "ok": true,
+     "said": "stage 1: the driver's code is not committed (['explore_gpu/s75b.py']): run from a clean checkout"
+    },
+    "stage 2: the driver's code not committed": {
+     "ok": true,
+     "said": "stage 2: the driver's code is not committed (['explore_gpu/s75b.py']): run from a clean checkout"
+    },
+    "run_arm: a divergence is not retried or rerun; an operational failure is retried, then cannot run": {
+     "ok": true,
+     "said": "calls [840, 841, 841] [841, 841] []; status {840: 'diverged', 841: 'cannot run'}"
+    },
+    "pilot_of after them: STOP, both phrases": {
+     "ok": true,
+     "said": "S75b stops: B's pilot did not clear the proceed rule; pilot run(s) [840] diverged (a non-finite value) and so did not reach 0.9: S = 4 is not usable at B; pilot seed(s) [841] failed operationally in 2"
+    },
+    "a divergence outranks a later ok record": {
+     "ok": true,
+     "said": ""
+    },
+    "write_stage1_record archives a record under another code": {
+     "ok": true,
+     "said": ""
+    },
+    "stage 2: a STOP under earlier code is final": {
+     "ok": true,
+     "said": "S75b stopped at stage 1 under code SHA ['000000000000']: a stage-1 STOP under any code is final (FAILURES)"
+    },
+    "stage 1: a STOP under earlier code is final": {
+     "ok": true,
+     "said": "stage 1: S75b stopped at stage 1 under code SHA ['000000000000'] (['s75b_stage1_record_000000000000.json']); a stage-1 STOP under any code is final (FAILURES)"
+    },
+    "fallback-3070 without a 1660 benchmark": {
+     "ok": true,
+     "said": "--machine fallback-3070 runs every arm on the RTX 3070 only when the GTX 1660's benchmark under code SHA 12be7c387ee7 exists and failed or refused (FAILURES)"
+    },
+    "fallback-3070 with a usable 1660 benchmark": {
+     "ok": true,
+     "said": "--machine fallback-3070 runs every arm on the RTX 3070 only when the GTX 1660's benchmark under code SHA 12be7c387ee7 exists and failed or refused (FAILURES)"
+    },
+    "fallback-3070 with a failed 1660 benchmark -> past (to this card's benchmark)": {
+     "ok": true,
+     "said": "stage 2: no benchmark for FAKE GeForce RTX 3070 Laptop GPU (checks) under code SHA 12be7c387ee7: run --bench on this card and commit it"
+    },
+    "fallback-3070 on a 1660": {
+     "ok": true,
+     "said": "--machine fallback-3070 expects a RTX 3070, this card is FAKE GeForce GTX 1660 SUPER (checks)"
+    },
+    "report: neither card's benchmark passed -> stops before the pilot": {
+     "ok": true,
+     "said": ""
+    },
+    "gpu-name rule": {
+     "ok": true,
+     "said": ""
+    },
+    "allocation": {
+     "ok": true,
+     "said": ""
+    }
+   },
+   "secs": 64.0
+  },
+  "B6": {
+   "ok": true,
+   "s75_sha": "5fb120a92d69",
+   "s75b_sha": "12be7c387ee7",
+   "secs": 3.8
+  },
+  "B7": {
+   "ok": true,
+   "tol": {
+    "logits": 1e-05,
+    "grad": 0.0001
+   },
+   "updates": 2,
+   "seeds": [
+    850
+   ],
+   "batch": 32,
+   "R": 1,
+   "cases": {
+    "ORACLE seed 850": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "SINGLE seed 850": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "WIDE (WIDE_SPLIT_G / WIDE_SLOW) seed 850": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "REG3 (loop) seed 850": {
+     "ok": true,
+     "updates": 2,
+     "logits": 0.0,
+     "grad": 0.0,
+     "grad_param": null,
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "REG3 (scan vs the sequential loop) seed 850": {
+     "ok": true,
+     "updates": 2,
+     "logits": 1.4901161193847656e-07,
+     "grad": 3.857344062977765e-05,
+     "grad_param": "b_R",
+     "arbitrated": 0,
+     "test_worse": 0,
+     "ref_worse": 0,
+     "sign_p": 1.0,
+     "nonfinite": 0,
+     "worst_arbitration": 0.0,
+     "first_failures": []
+    },
+    "control: W_g gradient doubled (must fail)": {
+     "ok": true,
+     "updates": 20,
+     "logits": 0.0,
+     "grad": 1.0,
+     "grad_param": "W_g",
+     "arbitrated": 20,
+     "test_worse": 20,
+     "ref_worse": 0,
+     "sign_p": 9.5367431640625e-07,
+     "nonfinite": 0,
+     "worst_arbitration": 4817.114559373657,
+     "first_failures": [
+      {
+       "step": 1,
+       "run": 0,
+       "score": 3754.278494382174,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 2,
+       "run": 0,
+       "score": 3627.1082148200094,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 3,
+       "run": 0,
+       "score": 3597.8660174072284,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 4,
+       "run": 0,
+       "score": 4430.069734401145,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      },
+      {
+       "step": 5,
+       "run": 0,
+       "score": 4184.962594835572,
+       "where": "W_g",
+       "raw_logits": 0.0,
+       "raw_grad": 1.0
+      }
+     ],
+     "failed_as_it_should": true
+    }
+   },
+   "secs": 412.5
+  },
+  "B8": {
+   "ok": true,
+   "stage1": {
+    "proceed": true,
+    "split_thr": 0.45280072212219236,
+    "missing": [],
+    "record": true,
+    "record_machine": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "record_changes": true,
+    "record_blind": false
+   },
+   "stage2": {
+    "missing": {},
+    "records": {
+     "ORACLE_PILOT": [
+      840,
+      841
+     ],
+     "ORACLE": [
+      850,
+      851
+     ],
+     "SINGLE": [
+      850,
+      851
+     ],
+     "WIDE_SPLIT_G": [
+      850,
+      851
+     ],
+     "REG3": [
+      850,
+      851
+     ],
+     "WIDE_SLOW": [
+      850,
+      851
+     ]
+    },
+    "split_checks": [
+     [
+      400,
+      false,
+      null,
+      false,
+      false
+     ],
+     [
+      800,
+      true,
+      null,
+      true,
+      false
+     ],
+     [
+      400,
+      false,
+      null,
+      false,
+      false
+     ],
+     [
+      800,
+      true,
+      null,
+      true,
+      false
+     ]
+    ],
+    "rows_record_map": true,
+    "meta": {
+     "machine": "fallback",
+     "split_thr": 0.45280072212219236,
+     "stage1_commit": null,
+     "bench_commit": null,
+     "checks_commit": null,
+     "register_reg3": "loop",
+     "workers": 0,
+     "threads": 1,
+     "provenance": {
+      "design": "1e31409",
+      "design_parent": "5bc6c2e",
+      "merge": "142f47e",
+      "learned_arms": "b649751",
+      "blind_by_git": [
+       "1e31409, the design: built on 5bc6c2e, whose tree holds only S75's ORACLE 830-831 and SINGLE 830-839 records. That it was written blind is the author's statement; git shows the tree, not what was read (b649751 was on the remote at 13:53:11 UTC, 23 min before 1e31409)"
+      ],
+      "not_blind_by_git": [
+       "ee97443, the cost section: made after the merge 142f47e, with b649751's WIDE_SPLIT and REG3 records and s75_S4_summary.md in the tree",
+       "114cd08, the revision (with b649751 in the tree; the same session committed the S75 write-up 03bffdf 130 s later). It loosened the proceed rule from 'both >= 0.912' to 'mean >= 0.912 and each >= 0.9', and made WIDE_SLOW unconditional. It also made corrections and operational choices: the bound 0.963, the gap share, the windowed learner and the fixed-reach case, the stop wording, the guard's precedence, the allocation, R = 1, the register rule, the workers, n = 4096, the memory and the 3070's factor",
+       "every change after 114cd08 (CHANGES_SINCE_SPEC)"
+      ]
+     },
+     "started": "2026-10-13 22:08:18"
+    },
+    "meta_changes": true,
+    "reg3_register": [
+     "loop"
+    ],
+    "host": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ]
+   },
+   "report": {
+    "lines": 51,
+    "missing_sections": []
+   },
+   "report_diverged": {
+    "validity": "k', 851: 'diverged'} -> NOT VALID: ORACLE [851] diverged (counts as below 0.9) -> UNTESTED",
+    "reading": "READING (pre-fixed): UNTESTED (descriptions only; never re-read under a later bar)  (ROUTED {'WIDE_SPLIT_G': 0, 'REG3': ",
+    "row": "| WIDE_SPLIT_G | 0/2 [0.00, 0.66] NEVER (diverged [851]) | - | - / - / - / - | 0.354 | 1 /",
+    "ok": true
+   },
+   "bench": {
+    "stats_workers": 1,
+    "workers_needed": 1,
+    "workers_why": "keeps up",
+    "budget_gb": 10.5,
+    "budget_bound": "total",
+    "main_gb": 5.784748077392578,
+    "worker_gb": 0.6481819152832031,
+    "data_gb": 0.4877052307128906,
+    "data_gb_source": "measured",
+    "payload_gb": 0.021488189697265625,
+    "stats_secs": 3.8097121715545654,
+    "secs_per_update": 0.4513128399848938,
+    "register_reg3": "loop",
+    "all_ok": true,
+    "arms": {
+     "ORACLE": true,
+     "SINGLE": true,
+     "WIDE_SLOW": true,
+     "WIDE_SPLIT_G": true,
+     "REG3 scan": true,
+     "REG3 loop": true
+    },
+    "worker_ru_maxrss_gb": 5.784748077392578,
+    "split_checks": [
+     [
+      2,
+      false,
+      null,
+      false,
+      false
+     ]
+    ]
+   },
+   "guard_in_run": {
+    "850": {
+     "ok": true,
+     "error": null,
+     "eligible": [
+      [
+       4,
+       true,
+       null,
+       false,
+       [
+        "step",
+        "exp_avg",
+        "exp_avg_sq"
+       ]
+      ]
+     ]
+    },
+    "851": {
+     "ok": true,
+     "error": null,
+     "eligible": [
+      [
+       4,
+       true,
+       null,
+       false,
+       [
+        "step",
+        "exp_avg",
+        "exp_avg_sq"
+       ]
+      ]
+     ]
+    }
+   },
+   "secs": 2330.7
   }
  }
 }
