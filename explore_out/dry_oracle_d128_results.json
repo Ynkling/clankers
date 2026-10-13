@@ -1,0 +1,1421 @@
+{
+ "meta": {
+  "arms": {
+   "ORC_A_D128": {
+    "iters": 2400,
+    "key": "ORC_A_D128",
+    "label": "oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "ORC_S_D128": {
+    "iters": 2400,
+    "key": "ORC_S_D128",
+    "label": "oracle, P=16, D128 (N=256, D=128), SLOW",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)",
+    "seeds": [
+     270
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "slow": true,
+     "task": "P16S4"
+    }
+   }
+  },
+  "code_shas": [
+   "f7a606d7399a0b102addea88679d599dde13f79b"
+  ],
+  "dry": true,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "da45c65+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-13 21:04:54",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {
+  "ORC_A_D128|270|f7a606d7399a|Intel(R) Xeon(R) Processor @ 2.80GHz": {
+   "acc": 0.13037109375,
+   "acc_check": null,
+   "arm": "ORC_A_D128",
+   "attempts": 1,
+   "cfg": "k16",
+   "checks": [],
+   "ckpt_saved": 2,
+   "code_sha": "f7a606d7399a0b102addea88679d599dde13f79b",
+   "collapsed": true,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.109375,
+     2.7381460666656494
+    ],
+    [
+     2400,
+     0.13037109375,
+     2.703066110610962
+    ]
+   ],
+   "discovered": false,
+   "dry": true,
+   "early": [
+    [
+     1200,
+     0.109375,
+     2.7381460666656494
+    ],
+    [
+     2400,
+     0.13037109375,
+     2.703066110610962
+    ]
+   ],
+   "end": {
+    "ch_map": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "conv_absmean": [
+     0.9949300289154053,
+     0.07788172364234924,
+     0.05103464797139168,
+     0.06505924463272095
+    ],
+    "ctx_cos": 0.0,
+    "eff_ch": 3.999999538400103,
+    "eta_key_by_half": 0.0,
+    "eta_key_by_index": 0.0035069783528645835,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0,
+    "eta_val_by_index": 0.0035069783528645835,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "etak_key_by_block": 0.0,
+    "etak_key_by_index": 0.0037403106689453125,
+    "etak_key_by_key": 0.0,
+    "etak_key_by_stream": 1.0,
+    "etak_val_by_block": 0.0,
+    "etak_val_by_index": 0.0037403106689453125,
+    "etak_val_by_key": 0.0,
+    "etak_val_by_stream": 1.0,
+    "hs_eta_half": 0.0,
+    "hs_eta_index": 0.0037403106689453125,
+    "hs_eta_key": 0.0,
+    "hs_eta_stream": 1.0,
+    "k": 16,
+    "key_cos": 0.0,
+    "key_sep": 0.003361451004942258,
+    "margin": 1.0,
+    "one_to_one": true,
+    "sep": 1.0,
+    "shared": 0,
+    "spread": 1.0,
+    "step": "end",
+    "stream_acc": [
+     0.12055335938930511,
+     0.12038835138082504,
+     0.12923729419708252,
+     0.14954954385757446
+    ],
+    "stream_gate": [
+     [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "val_cos": 0.0
+   },
+   "git": "6efb3f5+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     5.927119406359625,
+     0.13707091071801958
+    ],
+    "10": [
+     0.0,
+     2.5144472326873677,
+     0.03821015275778407
+    ],
+    "100": [
+     0.0,
+     2.790960820556269,
+     0.010685915566085263
+    ]
+   },
+   "groups": [],
+   "init": {
+    "decoder": {
+     "absmax": 0.08621785789728165,
+     "shape": [
+      256,
+      128
+     ],
+     "std": 0.01993854157626629,
+     "trainable": true
+    },
+    "embed.weight": {
+     "absmax": 0.07279334217309952,
+     "shape": [
+      36,
+      128
+     ],
+     "std": 0.019886944442987442,
+     "trainable": true
+    },
+    "encoder": {
+     "absmax": 0.08257456868886948,
+     "shape": [
+      1,
+      128,
+      256
+     ],
+     "std": 0.019959768280386925,
+     "trainable": true
+    },
+    "encoder_v": {
+     "absmax": 0.08413796126842499,
+     "shape": [
+      1,
+      128,
+      256
+     ],
+     "std": 0.01996338926255703,
+     "trainable": true
+    },
+    "lm_head": {
+     "absmax": 0.0682043731212616,
+     "shape": [
+      128,
+      36
+     ],
+     "std": 0.019694484770298004,
+     "trainable": true
+    },
+    "short_conv.conv_w": {
+     "absmax": 1.0,
+     "shape": [
+      128,
+      4
+     ],
+     "std": 0.43343618512153625,
+     "trainable": true
+    }
+   },
+   "iters": 2400,
+   "k": 16,
+   "key_cos": 0.0,
+   "kind": "perfect",
+   "lr": 0.001,
+   "main_sha": "9c5939ef8ca8db079c87beb489b7c603169c9c57",
+   "maps": {
+    "0": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "1200": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "2400": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   "max_splits": null,
+   "muon_lr": null,
+   "n_embd": 128,
+   "n_feat": 256,
+   "n_layer": 3,
+   "ok": true,
+   "outcome": "not bound",
+   "params": 108032,
+   "passed": null,
+   "resumed": [],
+   "resumed_from": null,
+   "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+   "secs": 1210.7604112625122,
+   "secs_wall": 1242.2185282707214,
+   "seed": 270,
+   "size": [
+    2,
+    128,
+    3
+   ],
+   "spec": {
+    "cfg": "k16",
+    "gate": "perfect",
+    "size": [
+     2,
+     128,
+     3
+    ],
+    "task": "P16S4"
+   },
+   "splits": 0,
+   "stats": [
+    {
+     "ch_map": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "conv_absmean": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999999538400103,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0035069783528645835,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0035069783528645835,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "etak_key_by_block": 0.0,
+     "etak_key_by_index": 0.0037403106689453125,
+     "etak_key_by_key": 0.0,
+     "etak_key_by_stream": 1.0,
+     "etak_val_by_block": 0.0,
+     "etak_val_by_index": 0.0037403106689453125,
+     "etak_val_by_key": 0.0,
+     "etak_val_by_stream": 1.0,
+     "hs_eta_half": 0.0,
+     "hs_eta_index": 0.0037403106689453125,
+     "hs_eta_key": 0.0,
+     "hs_eta_stream": 1.0,
+     "k": 16,
+     "key_cos": 0.0,
+     "key_sep": 0.003361451004942258,
+     "margin": 1.0,
+     "one_to_one": true,
+     "sep": 1.0,
+     "shared": 0,
+     "spread": 1.0,
+     "step": 0,
+     "stream_gate": [
+      [
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "val_cos": 0.0
+    },
+    {
+     "ch_map": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "conv_absmean": [
+      0.9970428347587585,
+      0.042272742837667465,
+      0.05107709392905235,
+      0.0627165138721466
+     ],
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999999538400103,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0035069783528645835,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0035069783528645835,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "etak_key_by_block": 0.0,
+     "etak_key_by_index": 0.0037403106689453125,
+     "etak_key_by_key": 0.0,
+     "etak_key_by_stream": 1.0,
+     "etak_val_by_block": 0.0,
+     "etak_val_by_index": 0.0037403106689453125,
+     "etak_val_by_key": 0.0,
+     "etak_val_by_stream": 1.0,
+     "hs_eta_half": 0.0,
+     "hs_eta_index": 0.0037403106689453125,
+     "hs_eta_key": 0.0,
+     "hs_eta_stream": 1.0,
+     "k": 16,
+     "key_cos": 0.0,
+     "key_sep": 0.003361451004942258,
+     "margin": 1.0,
+     "one_to_one": true,
+     "sep": 1.0,
+     "shared": 0,
+     "spread": 1.0,
+     "step": 1200,
+     "stream_gate": [
+      [
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "val_cos": 0.0
+    },
+    {
+     "ch_map": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "conv_absmean": [
+      0.9949300289154053,
+      0.07788172364234924,
+      0.05103464797139168,
+      0.06505924463272095
+     ],
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999999538400103,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0035069783528645835,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0035069783528645835,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "etak_key_by_block": 0.0,
+     "etak_key_by_index": 0.0037403106689453125,
+     "etak_key_by_key": 0.0,
+     "etak_key_by_stream": 1.0,
+     "etak_val_by_block": 0.0,
+     "etak_val_by_index": 0.0037403106689453125,
+     "etak_val_by_key": 0.0,
+     "etak_val_by_stream": 1.0,
+     "hs_eta_half": 0.0,
+     "hs_eta_index": 0.0037403106689453125,
+     "hs_eta_key": 0.0,
+     "hs_eta_stream": 1.0,
+     "k": 16,
+     "key_cos": 0.0,
+     "key_sep": 0.003361451004942258,
+     "margin": 1.0,
+     "one_to_one": true,
+     "sep": 1.0,
+     "shared": 0,
+     "spread": 1.0,
+     "step": 2400,
+     "stream_gate": [
+      [
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 2400,
+   "task_key": "P16S4",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": 0.0,
+   "w_sha": "103d9e36908ab4c230dbd23139ea6360520c4e9b"
+  },
+  "ORC_S_D128|270|f7a606d7399a|Intel(R) Xeon(R) Processor @ 2.80GHz": {
+   "acc": 0.134765625,
+   "acc_check": null,
+   "arm": "ORC_S_D128",
+   "attempts": 1,
+   "cfg": "k16",
+   "checks": [],
+   "ckpt_saved": 2,
+   "code_sha": "f7a606d7399a0b102addea88679d599dde13f79b",
+   "collapsed": true,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.1220703125,
+     2.7312772274017334
+    ],
+    [
+     2400,
+     0.134765625,
+     2.6772468090057373
+    ]
+   ],
+   "discovered": false,
+   "dry": true,
+   "early": [
+    [
+     1200,
+     0.1220703125,
+     2.7312772274017334
+    ],
+    [
+     2400,
+     0.134765625,
+     2.6772468090057373
+    ]
+   ],
+   "end": {
+    "ch_map": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "conv_absmean": [
+     1.0002501010894775,
+     0.0052598631009459496,
+     0.009904417209327221,
+     0.008368467912077904
+    ],
+    "ctx_cos": 0.0,
+    "eff_ch": 3.999999538400103,
+    "eta_key_by_half": 0.0,
+    "eta_key_by_index": 0.0035069783528645835,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0,
+    "eta_val_by_index": 0.0035069783528645835,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "etak_key_by_block": 0.0,
+    "etak_key_by_index": 0.0037403106689453125,
+    "etak_key_by_key": 0.0,
+    "etak_key_by_stream": 1.0,
+    "etak_val_by_block": 0.0,
+    "etak_val_by_index": 0.0037403106689453125,
+    "etak_val_by_key": 0.0,
+    "etak_val_by_stream": 1.0,
+    "hs_eta_half": 0.0,
+    "hs_eta_index": 0.0037403106689453125,
+    "hs_eta_key": 0.0,
+    "hs_eta_stream": 1.0,
+    "k": 16,
+    "key_cos": 0.0,
+    "key_sep": 0.003361451004942258,
+    "margin": 1.0,
+    "one_to_one": true,
+    "sep": 1.0,
+    "shared": 0,
+    "spread": 1.0,
+    "step": "end",
+    "stream_acc": [
+     0.13438735902309418,
+     0.11067961156368256,
+     0.16101695597171783,
+     0.13513512909412384
+    ],
+    "stream_gate": [
+     [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+     ]
+    ],
+    "val_cos": 0.0
+   },
+   "git": "6efb3f5+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     5.927119406359625,
+     0.13707091071801958
+    ],
+    "10": [
+     0.0,
+     5.569917854785438,
+     0.12660825543954343
+    ],
+    "100": [
+     0.0,
+     3.3554282136007334,
+     0.05613490124017097
+    ]
+   },
+   "groups": [
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [],
+     "tag": "gate"
+    },
+    {
+     "kind": "adam",
+     "lr_end": 0.001,
+     "names": [
+      "decoder",
+      "encoder",
+      "encoder_v",
+      "lm_head",
+      "embed.weight",
+      "short_conv.conv_w"
+     ],
+     "tag": "rest"
+    }
+   ],
+   "init": {
+    "decoder": {
+     "absmax": 0.08621785789728165,
+     "shape": [
+      256,
+      128
+     ],
+     "std": 0.01993854157626629,
+     "trainable": true
+    },
+    "embed.weight": {
+     "absmax": 0.07279334217309952,
+     "shape": [
+      36,
+      128
+     ],
+     "std": 0.019886944442987442,
+     "trainable": true
+    },
+    "encoder": {
+     "absmax": 0.08257456868886948,
+     "shape": [
+      1,
+      128,
+      256
+     ],
+     "std": 0.019959768280386925,
+     "trainable": true
+    },
+    "encoder_v": {
+     "absmax": 0.08413796126842499,
+     "shape": [
+      1,
+      128,
+      256
+     ],
+     "std": 0.01996338926255703,
+     "trainable": true
+    },
+    "lm_head": {
+     "absmax": 0.0682043731212616,
+     "shape": [
+      128,
+      36
+     ],
+     "std": 0.019694484770298004,
+     "trainable": true
+    },
+    "short_conv.conv_w": {
+     "absmax": 1.0,
+     "shape": [
+      128,
+      4
+     ],
+     "std": 0.43343618512153625,
+     "trainable": true
+    }
+   },
+   "iters": 2400,
+   "k": 16,
+   "key_cos": 0.0,
+   "kind": "perfect",
+   "lr": 0.001,
+   "main_sha": "9c5939ef8ca8db079c87beb489b7c603169c9c57",
+   "maps": {
+    "0": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "1200": [
+     0,
+     1,
+     2,
+     3
+    ],
+    "2400": [
+     0,
+     1,
+     2,
+     3
+    ]
+   },
+   "max_splits": null,
+   "muon_lr": null,
+   "n_embd": 128,
+   "n_feat": 256,
+   "n_layer": 3,
+   "ok": true,
+   "outcome": "not bound",
+   "params": 108032,
+   "passed": null,
+   "resumed": [],
+   "resumed_from": null,
+   "sched": "the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)",
+   "secs": 1209.6837027072906,
+   "secs_wall": 1242.2264738082886,
+   "seed": 270,
+   "size": [
+    2,
+    128,
+    3
+   ],
+   "spec": {
+    "cfg": "k16",
+    "gate": "perfect",
+    "size": [
+     2,
+     128,
+     3
+    ],
+    "slow": true,
+    "task": "P16S4"
+   },
+   "splits": 0,
+   "stats": [
+    {
+     "ch_map": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "conv_absmean": [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+     ],
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999999538400103,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0035069783528645835,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0035069783528645835,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "etak_key_by_block": 0.0,
+     "etak_key_by_index": 0.0037403106689453125,
+     "etak_key_by_key": 0.0,
+     "etak_key_by_stream": 1.0,
+     "etak_val_by_block": 0.0,
+     "etak_val_by_index": 0.0037403106689453125,
+     "etak_val_by_key": 0.0,
+     "etak_val_by_stream": 1.0,
+     "hs_eta_half": 0.0,
+     "hs_eta_index": 0.0037403106689453125,
+     "hs_eta_key": 0.0,
+     "hs_eta_stream": 1.0,
+     "k": 16,
+     "key_cos": 0.0,
+     "key_sep": 0.003361451004942258,
+     "margin": 1.0,
+     "one_to_one": true,
+     "sep": 1.0,
+     "shared": 0,
+     "spread": 1.0,
+     "step": 0,
+     "stream_gate": [
+      [
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "val_cos": 0.0
+    },
+    {
+     "ch_map": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "conv_absmean": [
+      1.000349998474121,
+      0.003796353004872799,
+      0.005702124442905188,
+      0.00421664584428072
+     ],
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999999538400103,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0035069783528645835,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0035069783528645835,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "etak_key_by_block": 0.0,
+     "etak_key_by_index": 0.0037403106689453125,
+     "etak_key_by_key": 0.0,
+     "etak_key_by_stream": 1.0,
+     "etak_val_by_block": 0.0,
+     "etak_val_by_index": 0.0037403106689453125,
+     "etak_val_by_key": 0.0,
+     "etak_val_by_stream": 1.0,
+     "hs_eta_half": 0.0,
+     "hs_eta_index": 0.0037403106689453125,
+     "hs_eta_key": 0.0,
+     "hs_eta_stream": 1.0,
+     "k": 16,
+     "key_cos": 0.0,
+     "key_sep": 0.003361451004942258,
+     "margin": 1.0,
+     "one_to_one": true,
+     "sep": 1.0,
+     "shared": 0,
+     "spread": 1.0,
+     "step": 1200,
+     "stream_gate": [
+      [
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "val_cos": 0.0
+    },
+    {
+     "ch_map": [
+      0,
+      1,
+      2,
+      3
+     ],
+     "conv_absmean": [
+      1.0002501010894775,
+      0.0052598631009459496,
+      0.009904417209327221,
+      0.008368467912077904
+     ],
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999999538400103,
+     "eta_key_by_half": 0.0,
+     "eta_key_by_index": 0.0035069783528645835,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0,
+     "eta_val_by_index": 0.0035069783528645835,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "etak_key_by_block": 0.0,
+     "etak_key_by_index": 0.0037403106689453125,
+     "etak_key_by_key": 0.0,
+     "etak_key_by_stream": 1.0,
+     "etak_val_by_block": 0.0,
+     "etak_val_by_index": 0.0037403106689453125,
+     "etak_val_by_key": 0.0,
+     "etak_val_by_stream": 1.0,
+     "hs_eta_half": 0.0,
+     "hs_eta_index": 0.0037403106689453125,
+     "hs_eta_key": 0.0,
+     "hs_eta_stream": 1.0,
+     "k": 16,
+     "key_cos": 0.0,
+     "key_sep": 0.003361451004942258,
+     "margin": 1.0,
+     "one_to_one": true,
+     "sep": 1.0,
+     "shared": 0,
+     "spread": 1.0,
+     "step": 2400,
+     "stream_gate": [
+      [
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ],
+      [
+       0.0,
+       0.0,
+       0.0,
+       1.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0,
+       0.0
+      ]
+     ],
+     "val_cos": 0.0
+    }
+   ],
+   "stopped_at": 2400,
+   "task_key": "P16S4",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": 0.0,
+   "w_sha": "da77aa1928da1fa86bd1b08e4f203525865ea32b"
+  }
+ }
+}

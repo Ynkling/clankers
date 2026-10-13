@@ -207,8 +207,9 @@ def report_all(tag=""):
     ev = s69.report()
     print("#" * 100)
     print(f"SUMMARY — {ec.BANNER}{c2.dry_label()}")
-    print(f"  {tag}S69 ORC_A_D128 (single Adam): {ev['arm_reading']['ORC_A_D128']} ({ev['b']['ORC_A_D128']}/10); ORC_S_D128 (SLOW): "
-          f"{ev['arm_reading']['ORC_S_D128']} ({ev['b']['ORC_S_D128']}/10)")
+    na, ns = len(s69.ARMS["ORC_A_D128"]["seeds"]), len(s69.ARMS["ORC_S_D128"]["seeds"])
+    print(f"  {tag}S69 ORC_A_D128 (single Adam): {ev['arm_reading']['ORC_A_D128']} ({ev['b']['ORC_A_D128']}/{na}); ORC_S_D128 (SLOW): "
+          f"{ev['arm_reading']['ORC_S_D128']} ({ev['b']['ORC_S_D128']}/{ns})")
     print(f"  {tag}S69 for the spec: {ev['spec']}")
     print("#" * 100)
     return ev

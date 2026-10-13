@@ -4,3 +4,109 @@ EXPLORATORY, NOT A RESULT — batch 21: the D128 oracle's validity (S69) — DRY
 ====================================================================================================
   code SHA (the child): f7a606d7399a over 44 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b19_model explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_oracle_child explore_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
   this segment's CPU: Intel(R) Xeon(R) Processor @ 2.80GHz; the batch's CPU (the full CHECK pass): Intel(R) Xeon(R) Processor @ 2.80GHz; checkpoints in /tmp/claude-0/-home-user-clankers/db3e70a0-5544-5116-802e-293fdfffc055/scratchpad/b21_dry_ckpt
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (93s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  PROJECTION (worst case: every run to its iters; batch 19's pool-load timing of this spec, stored 2026-10-09 08:33:09 UTC; S68's observed rate for the D128 oracle was faster):
+    ORC_A_D128   1 runs x   0.4 h (step  506.3 ms, evaluation  28.5 s, 2400 updates)
+    ORC_S_D128   1 runs x   0.4 h (step  506.3 ms, evaluation  28.5 s, 2400 updates)
+    TOTAL 1 h of runs; makespan on 4 workers 0.4 h worst case (a run that binds stops early); nothing is cut (no budget was given)
+  recipe read in a child from main at 9c5939e: test_stream_recipe.LR 0.001 (the recorded validity recipe's single Adam); SLOW: 0.0001 for updates 1-2400, then 0.001; ARCH {'n_layer': 3, 'positional': 'decay'}; evaluation every 1200, bound at 0.95 held, early stop after 3 in a row (after 4800); task P16S4 {'S': 4, 'P': 16, 'vocab': 36, 'n_vals': 16, 'n_q': 1}; 1 torch thread per run
+  lr for dry_oracle_d128 ORC_A_D128: 0.001; iters 2400; seeds 270-270 (1); size [2, 128, 3]; task P16S4; gate perfect; single Adam
+  lr for dry_oracle_d128 ORC_S_D128: 0.001; iters 2400; seeds 270-270 (1); size [2, 128, 3]; task P16S4; gate perfect; SLOW
+  CHECK batch 21: ORC_A_D128 seed 270 reproduces S67's ORC_P16_D128 record through 2400 (curve, statistics, early curve) [curve [[1200, 0.109375, 2.7381460666656494], [2400, 0.13037109375, 2.703066110610962]]]: ok
+  CHECK batch 21: ORC_A_D128 seed 271 reproduces S67's ORC_P16_D128 record through 2400 (curve, statistics, early curve) [curve [[1200, 0.0986328125, 2.7619054317474365], [2400, 0.125, 2.7078566551208496]]]: ok
+  CHECK batch 21: ORC_A_D128 through the real path: one group at [0.001] at update 1, [0.001] at 2400, [0.001] at 2401; groups [] (none: onset_run's single Adam); covers every trainable parameter True; gate perfect, n_embd 128: ok
+  CHECK batch 21: ORC_S_D128 through the real path: groups [['gate', 0], ['rest', 6]] (an empty gate group, every trainable parameter (6) in 'rest'), lrs at update 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]; covers every trainable parameter True; gate perfect, n_embd 128: ok
+  CHECK batch 21: ORC_S_D128 differs from ORC_A_D128 at 1200 on seed 270 (the recipe reaches the run): [[1200, 0.1220703125, 2.7312772274017334]] vs [[1200, 0.109375, 2.7381460666656494]]: ok
+  CHECK batch 21: a checkpoint across the SLOW switch: the oracle on SLOW (P4S4, N256, D32, seed 5) halted after its checkpoint at 3600 and resumed (from [3600]) to 4800 equals the uninterrupted run: fields differing [] of 15: ok
+  CHECK batch 21: S69 arm reading: 10, 9 -> reliable; 8, 5 -> at risk; 4, 0 -> unreliable; incomplete -> INCOMPLETE: ok
+  CHECK batch 21: S69 spec reading on 9 synthetic (b_A, b_S) pairs, each outcome one name; incomplete -> no reading: ok
+  CHECK batch 21: two seeds both bind: b(b-1)/90 (10 -> 1, 9 -> 0.8, 1 -> 0); exact McNemar two-sided (0 vs 5 -> 0.0625; 3 vs 3 -> 1): ok
+  CHECK batch 21: S67 records: ORC_P16_D128 on (270, 271) saved (code 17e56410a1db): 270 not bound, 271 BOUND at 12000: ok
+  CHECK batch 21: the modules served from main are exactly the test modules that differ between this branch and 9c5939e (['test_binding_capacity', 'test_curriculum_confirm', 'test_scale_axes', 'test_short_conv', 'test_slow_start', 'test_stream_channels', 'test_stream_curriculum', 'test_stream_recipe']): ok
+  all CHECKs passed (21.4 min)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_oracle_d128
+  idea    is the D = 128 oracle a usable validity check for the key-load draft? ten seeds, the recorded recipe and SLOW
+  source  the user's batch 21; S67 / S68 (the D128 oracle bound 271 at 12,000; 270 unbound at 86,400); the draft's VALID_N = 2
+  change  the oracle's recipe (one Adam at 1e-3 vs SLOW); ten seeds at the draft's budget, 40,800
+  arm ORC_A_D128   lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_S_D128   lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128), SLOW
+                   schedule: the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)
+  pairing seeds 270-279: ORC_S_D128 with ORC_A_D128 on each seed (same initial weights and batches)
+----------------------------------------------------------------------------------------------------
+  pool: 4 workers (1 torch thread each)
+  start    0.0 min  dry_oracle_d128 ORC_A_D128     seed 270  (projected worst case 21 min)
+  start    0.0 min  dry_oracle_d128 ORC_S_D128     seed 270  (projected worst case 21 min)
+  [  1]   20.7 min  dry_oracle_d128 ORC_A_D128     seed 270  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 6efb3f5+dirty, code f7a606d7399a, attempt 1: acc 0.130  trans  None  stop 2400  outcome not bound
+  [  2]   20.7 min  dry_oracle_d128 ORC_S_D128     seed 270  lr 0.001  (the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 6efb3f5+dirty, code f7a606d7399a, attempt 1: acc 0.135  trans  None  stop 2400  outcome not bound
+  2 runs saved in this segment; batch wall clock 20.7 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_oracle_d128
+  idea    is the D = 128 oracle a usable validity check for the key-load draft? ten seeds, the recorded recipe and SLOW
+  source  the user's batch 21; S67 / S68 (the D128 oracle bound 271 at 12,000; 270 unbound at 86,400); the draft's VALID_N = 2
+  change  the oracle's recipe (one Adam at 1e-3 vs SLOW); ten seeds at the draft's budget, 40,800
+  arm ORC_A_D128   lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_S_D128   lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128), SLOW
+                   schedule: the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)
+  pairing seeds 270-279: ORC_S_D128 with ORC_A_D128 on each seed (same initial weights and batches)
+----------------------------------------------------------------------------------------------------
+  ARM ORC_A_D128 (oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)), seeds 270-270 (1); the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe); 2400 updates; lr 0.001
+    seed | outcome     trans   stop   acc  | per-stream at the end | S67 record (ORC_P16_D128, 43,200)
+     270 | not bound    None   2400  0.13 | 0.12/0.12/0.13/0.15   | not bound trans None acc 0.32
+Traceback (most recent call last):
+  File "/home/user/clankers/explore_batch21.py", line 288, in <module>
+    main()
+  File "/home/user/clankers/explore_batch21.py", line 284, in main
+    report_all("DRY RUN " if args.dry else "")
+  File "/home/user/clankers/explore_batch21.py", line 207, in report_all
+    ev = s69.report()
+         ^^^^^^^^^^^^
+  File "/home/user/clankers/explore_oracle_d128.py", line 217, in report
+    f"both bind: {both_two(b, len(a['seeds'])):.2f}; transitions {tr}; reliable >= {REL_B}, at risk >= {RISK_B}, else unreliable)")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/clankers/explore_oracle_d128.py", line 119, in both_two
+    return b * (b - 1) / (n * (n - 1))
+           ~~~~~~~~~~~~^~~~~~~~~~~~~~~
+ZeroDivisionError: division by zero
+
+ADDENDUM 2026-10-13 21:48:51 UTC — EXPLORATORY, not a result: the report above stopped on a division by zero (the 'two seeds both bind' figure, b(b-1)/(n(n-1)), with the dry run's one seed). Fixed in explore_oracle_d128.both_two (report only; not in the child's code SHA). The report regenerated from the saved dry runs:
+REPORTS — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)] SCREEN dry_oracle_d128
+  idea    is the D = 128 oracle a usable validity check for the key-load draft? ten seeds, the recorded recipe and SLOW
+  source  the user's batch 21; S67 / S68 (the D128 oracle bound 271 at 12,000; 270 unbound at 86,400); the draft's VALID_N = 2
+  change  the oracle's recipe (one Adam at 1e-3 vs SLOW); ten seeds at the draft's budget, 40,800
+  arm ORC_A_D128   lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_S_D128   lr 0.001  iters 2400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128), SLOW
+                   schedule: the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)
+  pairing seeds 270-279: ORC_S_D128 with ORC_A_D128 on each seed (same initial weights and batches)
+----------------------------------------------------------------------------------------------------
+  ARM ORC_A_D128 (oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)), seeds 270-270 (1); the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe); 2400 updates; lr 0.001
+    seed | outcome     trans   stop   acc  | per-stream at the end | S67 record (ORC_P16_D128, 43,200)
+     270 | not bound    None   2400  0.13 | 0.12/0.12/0.13/0.15   | not bound trans None acc 0.32
+  READING S69 ORC_A_D128: unreliable (bound 0/1, Wilson 95% [0.00, 0.79]; two seeds both bind: nan; transitions []; reliable >= 9, at risk >= 5, else unreliable)
+
+  ARM ORC_S_D128 (oracle, P=16, D128 (N=256, D=128), SLOW), seeds 270-270 (1); the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters); 2400 updates; lr 0.001
+    seed | outcome     trans   stop   acc  | per-stream at the end | S67 record (ORC_P16_D128, 43,200)
+     270 | not bound    None   2400  0.13 | 0.13/0.11/0.16/0.14   | -
+  READING S69 ORC_S_D128: unreliable (bound 0/1, Wilson 95% [0.00, 0.79]; two seeds both bind: nan; transitions []; reliable >= 9, at risk >= 5, else unreliable)
+
+  READING S69 for the spec: no D128 validity check at 40,800 (b_A 0, b_S 0; rules: b_A >= 9 keep; else b_S >= 9 SLOW; else max >= 5 VALID_N = 1; else no D128 validity check)
+  DESCRIPTIVE (no reading): paired, both bind 0, single Adam only 0, SLOW only 0, neither 1; exact McNemar two-sided p = 1
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result — DRY RUN (shortened: 1 seed per arm, runs capped at 2400 steps; exercises the code, not for interpretation)
+  S69 ORC_A_D128 (single Adam): unreliable (0/10); ORC_S_D128 (SLOW): unreliable (0/10)
+  S69 for the spec: no D128 validity check at 40,800
+####################################################################################################
+  (note: the SUMMARY line above printed '/10' for the dry run's one seed; the denominator now reads the arm's seeds — report only)

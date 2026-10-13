@@ -116,7 +116,7 @@ def spec_reading(b_a, b_s, complete):
 
 
 def both_two(b, n=10):
-    return b * (b - 1) / (n * (n - 1))
+    return b * (b - 1) / (n * (n - 1)) if n >= 2 else float("nan")
 
 
 def wilson(k, n, z=1.959964):
