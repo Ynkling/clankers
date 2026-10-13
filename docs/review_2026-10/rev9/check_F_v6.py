@@ -1,23 +1,27 @@
 #!/usr/bin/env python3
-"""check_F_v5.py — fifth pass. The referee's check of what Revision 9's draft says about Session F, run against the
-FIFTH version of the draft (c5e4508, multichannel_hebbian_report_v9.tex, 568 lines), with the first (9bfa85a), second
-(f67bc07), third (a5f67a2) and fourth (c66cc76) versions kept for locating the earlier passes' rows.
+"""check_F_v6.py — sixth pass. The referee's check of what Revision 9's draft says about Session F, run against the
+SIXTH version of the draft (42c4557, multichannel_hebbian_report_v9.tex, 568 lines), with the first (9bfa85a), second
+(f67bc07), third (a5f67a2), fourth (c66cc76) and fifth (c5e4508) versions kept for locating the earlier passes' rows.
 
-A copy of check_F_v4.py with every record recomputation and every v4 row kept unchanged (they are still asserted at
-their tex, tex2, tex3 and tex4 lines). What is new in v5:
-  * every row live in v4 is searched for in the fifth draft by text: found -> it stands at that tex5 line; not found ->
-    REMOVED in v5, superseded by a Q row; P8 (the count test_delta_recipe prints) is SUPERSEDED by Q21, re-checked against
-    the test's code at the main line as of the fifth draft (8ae660d);
-  * report 7 (S81, d5851b1, after the fourth pass): every count, discordant pair, p-value, interval, firing and reading
-    recomputed from explore_out/F/trigger_results.json (R7 rows), and the readings' commit against the first S81 record;
-  * Q rows: every changed sentence of the fifth draft about Session F (S81, folded in by 3b06af2), test_delta_recipe's
-    status, and the memory horizon, each with a fragment asserted at its tex5 line;
-  * section 7 records the corrections to the referee's earlier files (X's runs began at 05:27, after the check).
+A copy of check_F_v5.py with every record recomputation and every v5 row kept unchanged (they are still asserted at
+their tex, tex2, tex3, tex4 and tex5 lines). What is new in v6:
+  * F's records are pinned at report 7 (d5851b1). v5 asserted that F's head WAS report 7; F has since committed S88's
+    readings (40087cb, 23:07:15 UTC) and its queue and progress (cdbb886, 23:07:46), both before the sixth draft, and more
+    after it. The assert is replaced by a check that every F store used is byte-identical at d5851b1, at F's last commit
+    before the sixth draft and at F's head now, and by rows on each branch's last commit before 23:14:04 UTC;
+  * every row live in v5 is searched for in the sixth draft by text: found -> it stands at that tex6 line; not found ->
+    REMOVED in v6, superseded by a T row; rows whose fragment survives but whose verdict must be re-read at the sixth
+    draft's time (F's provenance row, the delta_recipe provenance row and next step, S81's unmarked 'because') are
+    SUPERSEDED in v6 by the T row that re-checks them;
+  * T rows: every changed sentence of the sixth draft about Session F (the index row, S81's paragraph, the next steps),
+    the delta write's main-line test (its status lines, the abstract's X numbers recomputed from
+    results/X/delta_recipe_results.json, the memory section's reworded sentences), and the status line tex6:41, each with a
+    fragment asserted at its tex6 line.
 
 Inputs: JSON run records read with `git show <ref>:<path>` (rlib.load); the screens' docstrings; git history. The
 draft's numbers are typed in as DRAFT strings and never used as inputs.
 
-Writes docs/review_2026-10/rev9/check_F_v5.md. Read-only otherwise. Python stdlib + rlib.
+Writes docs/review_2026-10/rev9/check_F_v6.md. Read-only otherwise. Python stdlib + rlib.
 """
 import datetime
 import json
@@ -33,14 +37,16 @@ from rlib import (load, runs, transition, bound, discovered, outcome_k, mcnemar1
                   TIES, ROOT)
 
 BR = "origin/claude/explore-F"
-HEAD = subprocess.check_output(("git", "-C", ROOT, "rev-parse", "--short=7", BR)).decode().strip()
+F_NOW = subprocess.check_output(("git", "-C", ROOT, "rev-parse", "--short=7", BR)).decode().strip()   # F's head now
+HEAD = "d5851b1"     # v6: F's records pinned at report 7 (v5 read them at F's head, which was report 7 then)
 DRAFT_REF, DRAFT_FILE = "9bfa85a", "multichannel_hebbian_report_v9.tex"     # first version (first pass)
 NEW_REF = "f67bc07"                                                         # second version (second pass)
 THIRD_REF = "a5f67a2"                                                       # third version (third pass)
 FOURTH_REF = "c66cc76"                                                      # fourth version (this pass)
 R3, R4, R5, R6 = "9a6c2bf", "22ec912", "5b9bc2a", "ed76eea"     # report commits the draft names (tex:501)
-OUT = os.path.join(HERE, "check_F_v5.md")
-FIFTH_REF = "c5e4508"                                                       # fifth version (this pass)
+OUT = os.path.join(HERE, "check_F_v6.md")
+FIFTH_REF = "c5e4508"                                                       # fifth version (fifth pass)
+SIXTH_REF = "42c4557"                                                       # sixth version (this pass)
 F = "explore_out/F/"
 
 
@@ -84,6 +90,7 @@ TEX2 = git("show", f"{NEW_REF}:{DRAFT_FILE}").split("\n")
 TEX3 = git("show", f"{THIRD_REF}:{DRAFT_FILE}").split("\n")
 TEX4 = git("show", f"{FOURTH_REF}:{DRAFT_FILE}").split("\n")
 TEX5 = git("show", f"{FIFTH_REF}:{DRAFT_FILE}").split("\n")
+TEX6 = git("show", f"{SIXTH_REF}:{DRAFT_FILE}").split("\n")
 
 ROWS = []
 
@@ -1493,8 +1500,8 @@ TIP5 = {b_: git("rev-list", "-1", f"--before={CUT5_ISO}", b_).strip()[:7] for b_
 TIP5 = {b_: t_ for b_, t_ in TIP5.items() if t_}
 R7 = "d5851b1"                                              # report 7 (S81), the commit F's provenance row names
 F5 = TIP5[BR]
-assert F5 == R7, ("F's last commit before the fifth draft is not report 7", F5)
-assert HEAD == R7, ("F's head moved after report 7; pin the records", HEAD)
+assert F5 == R7, ("F's last commit before the fifth draft is not report 7", F5)   # still true: TIP5 is read at the fifth draft's time
+# (v5's 'assert HEAD == R7' is replaced: HEAD is pinned to R7 above; the stores' identity across F's later commits is checked in the sixth pass)
 TG = load(R7, f"{F}trigger_results.json")
 T = {a: runs(TG, a) for a in ("BASE", "GUARD", "EVAL", "GUARD_EVAL", "O_DELTA_C")}
 LA = ("BASE", "GUARD", "EVAL", "GUARD_EVAL")
