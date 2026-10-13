@@ -1,23 +1,24 @@
 #!/usr/bin/env python
-"""check_appendixB_v5.py -- Referee V, fifth pass: Appendix B ("What a replication needs") of the FIFTH Revision 9
-draft (origin/claude/rev9-draft @ c5e4508, 19:14:19 UTC on 12 October, 568 lines) and the body sentences on it, against
-the main line's code and records as of that time (origin/claude/bdh-growth-hebbian-inference-w90069 at 8ae660d; the
-Part C/D path is unchanged since db22857, only test_delta_recipe.py and test_split_copy.py changed) and R's branch as of
-that time (1f8be04).
+"""check_appendixB_v6.py -- Referee V, sixth pass: Appendix B ("What a replication needs") of the SIXTH Revision 9
+draft (origin/claude/rev9-draft @ 42c4557, 23:14:04 UTC on 12 October, 568 lines) and the body sentences on it, against
+the main line's code and records as of that time (origin/claude/bdh-growth-hebbian-inference-w90069 at 80bfc1d; the
+Part C/D path is unchanged since db22857: since 8ae660d only test_split_copy.py's docstring changed) and R's branch as of
+that time (550a736, the Phase 5 protocol).
 
-A copy of check_appendixB_v4.py (fourth pass, draft c66cc76) re-anchored on the fifth draft:
-  * every item's fragment is located in c5e4508 by text search (tex5:NNN; an assertion fails if it is missing); the
-    item labels' line numbers are mapped from tex4 to tex5 (+2 after tex4:192, +4 after tex4:454); the two items whose
-    wording c5e4508 changed (tex5:332, R's labels and the parenthesis now placed after "34 to be guessed") are
-    re-anchored and re-checked against R's UNSTATED.md;
-  * the test_delta_recipe items read the test's code at 8ae660d (Amendment 2's report rules, 2225f00);
-  * every fourth-pass item's fragment (read from check_appendixB_v4.py's own source with ast) is asserted in c66cc76
-    and searched in c5e4508: found, or REWORDED (re-anchored) / REMOVED;
+A copy of check_appendixB_v5.py (fifth pass, draft c5e4508) re-anchored on the sixth draft:
+  * every item's fragment is located in 42c4557 by text search (tex6:NNN; an assertion fails if it is missing); 42c4557
+    replaces lines in place, so tex5 and tex6 line numbers agree; Appendix B (tex6:526-549) is unchanged;
+  * R's UNSTATED.md at 550a736 has 21 Phase 5 entries (U-50 to U-70, added with the Phase 5 protocol at 22:47:46 UTC)
+    after the 44 Phase 2 entries the appendix compiles: the label counts are recomputed on the Phase 2 section only (as
+    in v5), and a new item records the file's total against the draft's "UNSTATED.md (44 entries)";
+  * the 'none is needed' item's supporting count is the sixth draft's (126 of 126 key-position firings, tex6:441);
+  * every fifth-pass item's fragment (read from check_appendixB_v5.py's own source with ast) is asserted in c5e4508 and
+    searched in 42c4557;
   * the record checks are those of the earlier passes, unchanged.
 
 Usage (from the repository root):
-    python3 docs/review_2026-10/rev9/check_appendixB_v5.py [--code DIR] > docs/review_2026-10/rev9/check_appendixB_v5.md
---code DIR: an extracted copy of the main line's *.py (git archive 8ae660d), run with the venv's python; read-only
+    python3 docs/review_2026-10/rev9/check_appendixB_v6.py [--code DIR] > docs/review_2026-10/rev9/check_appendixB_v6.md
+--code DIR: an extracted copy of the main line's *.py (git archive 80bfc1d), run with the venv's python; read-only
 builds of the Part C model at seed 540 and of CEIL_C, and one draw of the held-out batch with Generator(424242). No
 training.
 """
@@ -31,10 +32,11 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import rlib  # noqa: E402
 
-OLD_REF, V2_REF, V3_REF, V4_REF, NEW_REF, DRAFT = "9bfa85a", "f67bc07", "a5f67a2", "c66cc76", "c5e4508", "multichannel_hebbian_report_v9.tex"
-CUTOFF = rlib.git("show", "-s", "--format=%cI", NEW_REF).strip()          # the fifth draft's commit time
+OLD_REF, V2_REF, V3_REF, V4_REF, V5_REF, NEW_REF, DRAFT = ("9bfa85a", "f67bc07", "a5f67a2", "c66cc76", "c5e4508", "42c4557",
+                                                           "multichannel_hebbian_report_v9.tex")
+CUTOFF = rlib.git("show", "-s", "--format=%cI", NEW_REF).strip()          # the sixth draft's commit time
 MAIN = "origin/claude/bdh-growth-hebbian-inference-w90069"
-BR = rlib.git("rev-list", "-1", f"--before={CUTOFF}", MAIN).strip()[:7]    # the main line as of the fifth draft
+BR = rlib.git("rev-list", "-1", f"--before={CUTOFF}", MAIN).strip()[:7]    # the main line as of the sixth draft
 R_BR = rlib.git("rev-list", "-1", f"--before={CUTOFF}", "origin/claude/replicate-R").strip()[:7]
 FILES = dict(twg="test_window_gate.py", tmb="test_multilayer_binding.py", bdh="bdh.py", tbo="test_binding_onset.py",
              tbc="test_binding_capacity.py", trr="test_router_reliability.py", tsa="test_scale_axes.py",
@@ -47,7 +49,8 @@ tex1 = rlib.git("show", f"{OLD_REF}:{DRAFT}").split("\n")
 tex2 = rlib.git("show", f"{V2_REF}:{DRAFT}").split("\n")
 tex3 = rlib.git("show", f"{V3_REF}:{DRAFT}").split("\n")
 tex4 = rlib.git("show", f"{V4_REF}:{DRAFT}").split("\n")
-tex5 = rlib.git("show", f"{NEW_REF}:{DRAFT}").split("\n")
+tex5 = rlib.git("show", f"{V5_REF}:{DRAFT}").split("\n")
+tex6 = rlib.git("show", f"{NEW_REF}:{DRAFT}").split("\n")
 HEAD = rlib.git("rev-parse", "--short", BR).strip()
 PY_DIFF = rlib.git("diff", "--name-only", "db22857", BR, "--", "*.py").split()
 
@@ -144,17 +147,23 @@ def r914():
 R914 = r914()
 UNSTATED = rlib.git("show", f"{R_BR}:UNSTATED.md")
 DIFFMD = rlib.git("show", f"{R_BR}:DIFF.md")
+UNSTATED_ALL = UNSTATED
+N_U_ALL = sum(1 for ln in UNSTATED_ALL.split("\n") if ln.startswith("| U-"))
+P5_HDR = "# Phase 5"
+UNSTATED = UNSTATED_ALL.split(P5_HDR)[0]          # the Phase 2 list (U-1 to U-44), the one the appendix compiles
+P5_IDS = [ln.split("|")[1].strip() for ln in UNSTATED_ALL.split(P5_HDR)[1].split("\n") if ln.startswith("| U-")] if P5_HDR in UNSTATED_ALL else []
+P5_COMMIT = rlib.git("log", "-1", "--format=%h %cI %s", R_BR, "--", "UNSTATED.md").strip()
 N_U = sum(1 for ln in UNSTATED.split("\n") if ln.startswith("| U-"))
 N_D = sum(1 for ln in DIFFMD.split("\n") if ln.startswith("| D-"))
 matched = DIFFMD.split("## Points where my reading of the report matched theirs")[1].split("##")[0]
 N_MATCHED = sum(1 for ln in matched.split("\n") if ln.startswith("- "))
 
 # ── items ────────────────────────────────────────────────────────────────────
-ITEMS = []   # (tex5 line, item, verdict, evidence, note, old item numbers)
+ITEMS = []   # (tex6 line, item, verdict, evidence, note, old item numbers)
 
 
 def item(phrases, what, verdict, evid=(), note="", old=()):
-    n = locate(tex5, phrases)
+    n = locate(tex6, phrases)
     assert n is not None, (what, phrases)
     ITEMS.append((n, what, verdict, ", ".join(ev(a, s) for a, s in evid), note, tuple(old)))
 
@@ -171,7 +180,14 @@ STT = "\\paragraph{Statistics.} Exact one-sided McNemar"
 item(("compiled from session~R's \\texttt{UNSTATED.md} (44 entries), its \\texttt{DIFF.md} (17)",),
      "sources: UNSTATED.md 44 entries, DIFF.md 17", "TRUE" if (N_U, N_D) == (44, 17) else "FALSE", (),
      f"R's branch: {N_U} U-rows, {N_D} D-rows.")
-# Model (tex5:530)
+item(("compiled from session~R's \\texttt{UNSTATED.md} (44 entries), its \\texttt{DIFF.md} (17)",),
+     "sources: UNSTATED.md '44 entries' against the file at R's tip as of the sixth draft (new)",
+     "TRUE" if N_U_ALL == N_U == 44 else ("PARTIAL" if N_U == 44 else "FALSE"), (),
+     f"UNSTATED.md at {R_BR}: {N_U_ALL} U-rows in all; the Phase 2 list (before '{P5_HDR}') {N_U}; the Phase 5 section "
+     f"{len(P5_IDS)} ({P5_IDS[0] if P5_IDS else '-'} to {P5_IDS[-1] if P5_IDS else '-'}), last changed by '{P5_COMMIT[:110]}'. The appendix "
+     "compiles the Phase 2 list, and its entries are those 44; but the file the sentence names has held 65 entries since R's "
+     "Phase 5 protocol, 26 minutes before the draft. 'UNSTATED.md's Phase 2 list (44 entries)' would be exact. Wording only.")
+# Model (tex6:530)
 item((A, "in float32"), "float32", "TRUE",
      (("tmb", "assert self.freqs.dtype == torch.float32"), ("bdh", "torch.zeros((nh * N, D)).normal_(std=0.02)")),
      "No set_default_dtype or .double() on the path; every parameter is created at the default dtype. --code: every "
@@ -263,7 +279,7 @@ item((A, "the perfect gate's model is \\texttt{test\\_stream\\_recipe}'s \\textt
               ("tsr", "t.ctx_tokens = tuple(task.ctx_tokens) + tuple(-(i + 1) for i in range(k - task.S))")),
      "New (missing in the first draft; R's U-28/D-3). --code: CEIL_C builds a 16-channel perfect gate with ctx_tokens "
      "(0..7, -1..-8).")
-# Task (tex5:532, unchanged from tex:519)
+# Task (tex6:532, unchanged from tex:519)
 item((T, "28 tokens at eight streams and four keys"), "28 tokens; 16 values, P keys, S contexts, no query token", "TRUE",
      (("tbc", "self.vocab = S + P + n_vals"), ("tbc", "queries = torch.stack([qs, S + qk, S + P + qv], dim=-1)")), "", (36,))
 item((T, "the sequence of 99 tokens ends with the query's value"), "99 tokens ending with the query's value; reads 98, predicts the 99th from the query's KEY",
@@ -288,7 +304,7 @@ item((T, "\\texttt{torch.manual\\_seed(seed)} before initialisation"), "torch.ma
      (("tbo", "torch.manual_seed(seed)"), ("tmb", "torch.manual_seed(seed)")), "", (44,))
 item((T, "the training batches from \\texttt{Generator(seed + 10000)}"), "training batches from Generator(seed + 10000)", "TRUE",
      (("tbo", "rng = torch.Generator(); rng.manual_seed(seed + 10_000)"),), "", (45,))
-# Training (tex5:534, unchanged)
+# Training (tex6:534, unchanged)
 item((TR, "Adam with default betas, no weight decay"), "Adam, default betas, no weight decay", "TRUE",
      (("tbo", "opt = torch.optim.Adam(param_groups(model), lr=lr)"), ("twg", "def factory(params, lr=1e-3, **kw):")), "", (46,))
 item((TR, "batch 32"), "batch 32", "TRUE", (("tint", "BATCH = 32"), ("tbo", "tokens, _ = bt.make_batch(BATCH, rng)")), "", (47,))
@@ -310,7 +326,7 @@ item((TR, "the perfect gate trains at the single rate $10^{-3}$ without SLOW"), 
      "rc is None for the perfect gate (one_run).", (54,))
 item((TR, "the final per-stream accuracy and map come from a final evaluation of the final model"), "final per-stream accuracy and map from a final evaluation",
      "TRUE", (("trr", 'end = stats_fn(m, task, probe, "end")'), ("tsa", 'out["stream_acc"] = stream_acc(model, task, eval_batch(task))')), "", (55,))
-# Outcomes (tex5:536, changed)
+# Outcomes (tex6:536, changed)
 item((O, "Bound: the first evaluation $\\geq 0.95$ that holds to the end (a run can bind on its last evaluation)"), "bound; can bind on the last evaluation",
      "TRUE", (("tbo", "def transition(curve):"),), "", (56, 87))
 item((O, "the argmax over channels of the mean gate at the body's value positions on a 256-sequence probe (\\texttt{Generator(seed + 99000)})"),
@@ -326,7 +342,7 @@ item((O, "bound routed: bound, the map one-to-one, every stream's accuracy $\\ge
      (("tsr", 'return bool(e["one_to_one"] and min(e["stream_acc"]) >= ROUTED_ACC)'), ("tsa", "return [hit[qs == s].mean().item() for s in range(task.S)]")),
      "", (60,))
 item((O, "failure labels as Section"), "failure labels as Section 3", "TRUE", (("tsr", "def outcome(r):"),), "")
-# The split (tex5:538, changed)
+# The split (tex6:538, changed)
 item((SP, "\\texttt{BindTask.make\\_batch(64, Generator(12345))}, the same for every seed and arm"), "probe: 64 sequences, Generator(12345), same for every seed and arm",
      "TRUE", (("twg", "PROBE_N, PROBE_SEED = 64, 12345"), ("twg", "return task.make_batch(PROBE_N, torch.Generator().manual_seed(PROBE_SEED))[0]")),
      "", (61,))
@@ -362,8 +378,9 @@ item((SP, "a split blocks further splits for 4800 updates; at most three"), "gap
      "", (71, 72))
 item((SP, "no guard against a target that carries key mass"), "no guard", "TRUE", (("twg", "elif eligible:"),), "", (73,))
 item((SP, "(none is needed at $k = 16$, $S = 8$)"), "'none is needed at k = 16, S = 8'", "UNVERIFIABLE", (),
-     "A claim about need, not code. Supporting: 107 of 107 key-position firings on labelled targets (check_split_copy_v3, tex5:441).", (6,))
-# Records (tex5:540, changed)
+     "A claim about need, not code. Supporting: 126 of 126 key-position firings on labelled targets in the 60 recorded split runs "
+     "(tex6:441; check_split_copy_v6 recomputes it with split_copy L added), and none on a map already one-to-one.", (6,))
+# Records (tex6:540, changed)
 rf_ok = REC_FIELDS <= PV["fields"]
 item((RC, "the curve at every evaluation"), "records: curve at every evaluation", "TRUE", (("tbo", "curve.append([step, acc, el])"),), "", (74,))
 item((RC, "the per-stream gate mass at value positions at every evaluation"), "records: per-stream gate mass at value positions at every evaluation",
@@ -389,7 +406,7 @@ item((RC, "The main line's records hold all of these except the zone (its start 
      f"time.strftime formats local time with no zone field; recorded start strings {starts}. The time zone is now a "
      "prescription ('a replication should record it'), and the main line is said not to meet it (first pass row 1 FALSE).",
      (1,))
-# Statistics (tex5:542, unchanged)
+# Statistics (tex6:542, unchanged)
 item((STT, "$p = P[\\mathrm{Bin}(b + c, \\tfrac12) \\geq b]$"), "exact one-sided McNemar", "TRUE",
      (("tcl", "def mcnemar"),), "", (80,))
 item((STT, "Wilson 95\\% intervals with $z = 1.96$"), "Wilson 95%, z = 1.96", "TRUE", (("tsr", "def wilson(k, n, z=1.959963984540054):"),), "", (81,))
@@ -413,16 +430,16 @@ item(("copy the gate row $W_g[c^*]$ of the channel with the largest mean read-ga
      "tex:122 SPLIT description", "TRUE", (("twg", "km = gr[:, 3 * j + 1].mean((0, 1))"),), "Unchanged.", (85,))
 item(("session~H's \\emph{exact copy} does neither",), "tex:122 'session H's exact copy does neither'", "UNVERIFIABLE", (),
      "Unchanged; H's code is on another branch, outside this scope.", (8,))
-# tex5:207 and tex5:395 (first pass rows 2-3)
+# tex6:207 and tex6:395 (first pass rows 2-3)
 item(("The main line's records store the probe's reading at every check beside the evaluation's curve",),
-     "tex5:207 records store the probe's reading beside the curve", "TRUE" if rf_ok else "FALSE",
+     "tex6:207 records store the probe's reading beside the curve", "TRUE" if rf_ok else "FALSE",
      (("twg", "row = dict(step=step, acc=acc, prev=st[\"prev\"], map_before=cmap,"),),
      "Reverses the first draft's false 'store neither ...' (first pass row 2).", (2,))
 hi_txt = "; ".join(f"{h['m']} s{h['s']}@{h['step']}: probe {h['probe']:.3f} eval {h['ev']:.4f}" for h in PV["hi"])
 HI_CHECKS = all(h["step"] >= 4800 for h in PV["hi"])
 N_CHECKS = PV["rows"] - PV["ref_rows"]
 item(("6 of the 353 checks in the split arm's 40 runs read the probe at or above $0.95$ with the evaluation at $0.865$--$0.88$",),
-     "tex5:207 '6 of the 353 checks ... evaluation at 0.865-0.88' (re-anchored)",
+     "tex6:207 '6 of the 353 checks ... evaluation at 0.865-0.88' (re-anchored)",
      "TRUE" if (len(PV["hi"]) == 6 and N_CHECKS == 353 and HI_CHECKS and PV["runs"] == 40
                 and f"{EV_LO:.3f}" == "0.865" and f"{EV_HI:.2f}" == "0.88") else "FALSE",
      (("twg", "eligible = step >= FIRST and st[\"prev\"] is not None and acc < thr and acc - st[\"prev\"] < rise"),),
@@ -431,68 +448,68 @@ item(("6 of the 353 checks in the split arm's 40 runs read the probe at or above
      f"{EV_LO:.4f}-{EV_HI:.4f}. Reworded in a5f67a2 from '393' (the second pass's wording point, from the referee's own A1).",
      (2,))
 item(("in 2 of those the probe alone blocked a split, and both fired at the next check and bound routed; the reset arm had none",),
-     "tex5:207 '2 blocked by the probe alone, both fired next and bound routed; reset arm none'",
+     "tex6:207 '2 blocked by the probe alone, both fired next and bound routed; reset arm none'",
      "TRUE" if (len(ALONE) == 2 and all(h["next_fired"] and h["br"] for h in ALONE) and PV["reset_hi"] == 0) else "FALSE",
      (), "blocked by the probe alone (eligible but for the probe: not gap/cap-blocked, rise < 0.02): "
      + "; ".join(f"{h['m']} s{h['s']}@{h['step']} (next check {h['next_step']} fired {h['next_fired']}; run bound routed {h['br']})" for h in ALONE)
      + f"; the other {len(PV['hi']) - len(ALONE)}: gap/cap or rise >= 0.02. WIN3_RESET_D8: {PV['reset_hi']} of {PV['reset_rows']} rows.", (2,))
-item(("5, 5, 6, 8, 10, 12, 5 and 13 queries for streams 0--7", "identical for every seed"), "tex5:207 probe composition, same for every seed",
+item(("5, 5, 6, 8, 10, 12, 5 and 13 queries for streams 0--7", "identical for every seed"), "tex6:207 probe composition, same for every seed",
      "TRUE", (("twg", "PROBE_N, PROBE_SEED = 64, 12345"),), "--code recomputes the counts.", ())
-item(("costs the probe about $0.08$ where the balanced evaluation loses $0.125$",), "tex5:207 0.08 vs 0.125", "TRUE", (),
+item(("costs the probe about $0.08$ where the balanced evaluation loses $0.125$",), "tex6:207 0.08 vs 0.125", "TRUE", (),
      f"Two 5-query streams halved: (5 + 5)/2/64 = {10 / 2 / 64:.4f}; balanced: (2/8)/2 = 0.125.", ())
-item(("A 64-query probe near $0.9$ has a standard error of about $0.04$",), "tex5:207 SE ~ 0.04", "TRUE", (),
+item(("A 64-query probe near $0.9$ has a standard error of about $0.04$",), "tex6:207 SE ~ 0.04", "TRUE", (),
      f"sqrt(0.9 * 0.1 / 64) = {(0.9 * 0.1 / 64) ** 0.5:.4f}.", ())
 item(("on its seed 914 the 64-query probe read $0.953$--$1.000$ at every check from 16{,}800 on while the 2048-query evaluation sat at $0.871$--$0.887$",),
-     "tex5:207 R's seed 914 (re-anchored)", "TRUE" if R914 and (f"{R914[1]:.3f}", f"{R914[2]:.3f}") == ("0.953", "1.000") and
+     "tex6:207 R's seed 914 (re-anchored)", "TRUE" if R914 and (f"{R914[1]:.3f}", f"{R914[2]:.3f}") == ("0.953", "1.000") and
      (f"{R914[3]:.3f}", f"{R914[4]:.3f}") == ("0.871", "0.887") else "FALSE", (),
      f"R records/phase2.jsonl at {R_BR} (WIN3_SPLIT_D8, 914): {R914[0]} probe readings from 16800, probe "
      f"{R914[1]:.4f}-{R914[2]:.4f} (the maximum at update {R914[6]}), evaluation at those steps {R914[3]:.4f}-{R914[4]:.4f}; "
      f"failure {R914[5]}. Reworded in a5f67a2 from 0.984 (the second pass's FALSE item).", ())
 item(("The next main-line test prints every check's probe reading beside the held-out accuracy",),
-     "tex5:207 the next test prints probe vs held-out", "TRUE",
+     "tex6:207 the next test prints probe vs held-out", "TRUE",
      (("tdr", "def probe_blind(t, k):"), ("tdr", "print(f\"  probe-blind checks, {k} (checks at update >= {tgw.FIRST}): {blind} of {len(rows_pb)} read >= {tgw.ACC_THR} on the \"")),
-     "test_delta_recipe.py at the main line as of the fifth draft (the X run used a581027; 2225f00 changed the print, as Amendment 2 says). It has now printed it on X (RESULT (X): 'Probe-blind (checks from 4800)').", ())
+     "test_delta_recipe.py at the main line as of the sixth draft (the X run used a581027; 2225f00 changed the print, as Amendment 2 says). It has now printed it on X (RESULT (X): 'Probe-blind (checks from 4800)').", ())
 item(("Both could have been read from the project's own records, which store the probe's reading at every check beside the evaluation's",),
-     "tex5:395 records store the probe beside the evaluation", "TRUE" if rf_ok else "FALSE",
+     "tex6:395 records store the probe beside the evaluation", "TRUE" if rf_ok else "FALSE",
      (("twg", 'info["checks"].append(row)'),), "Reverses the first draft's false tex:384 (first pass row 3).", (3,))
-item(("nobody read the two against each other until the referee did (6 of 353 checks;",), "tex5:395 'nobody read them until the referee did' (re-anchored)",
-     "UNVERIFIABLE", (), f"Not a code question. '6 of 353 checks' is now right ({len(PV['hi'])} of {N_CHECKS}; see the tex5:207 row).", (3,))
-# tex5:432 (rewritten in a5f67a2)
+item(("nobody read the two against each other until the referee did (6 of 353 checks;",), "tex6:395 'nobody read them until the referee did' (re-anchored)",
+     "UNVERIFIABLE", (), f"Not a code question. '6 of 353 checks' is now right ({len(PV['hi'])} of {N_CHECKS}; see the tex6:207 row).", (3,))
+# tex6:432 (rewritten in a5f67a2)
 TDR_TRIG = any("tgw.make_trigger" in ln or "make_trigger(" in ln for ln in SRC["tdr"])
-item(("The records keep every check's probe reading beside the evaluation's",), "tex5:432 records keep the probe beside the evaluation",
+item(("The records keep every check's probe reading beside the evaluation's",), "tex6:432 records keep the probe beside the evaluation",
      "TRUE" if rf_ok else "FALSE", (("twg", "row = dict(step=step, acc=acc, prev=st[\"prev\"], map_before=cmap,"),
                                      ("tbo", "curve.append([step, acc, el])")),
      "Rewritten in a5f67a2 (the second pass's item 3: tex2:427 said the records do not keep the readings).", ())
 item(("A test should print them side by side, with the count of checks at which the probe read $\\geq 0.95$ while the held-out accuracy was below it, as \\texttt{test\\_delta\\_recipe} prints",),
-     "tex5:432 test_delta_recipe prints them side by side, with the count of checks where probe >= 0.95 and held-out < 0.95 (re-anchored)", "TRUE",
+     "tex6:432 test_delta_recipe prints them side by side, with the count of checks where probe >= 0.95 and held-out < 0.95 (re-anchored)", "TRUE",
      (("tdr", "def probe_blind(t, k):"), ("tdr", "for c in r.get(\"checks\", []):"),
       ("tdr", "if h is not None and c[\"acc\"] >= tgw.ACC_THR and h < tgw.ACC_THR:"),
       ("twg", 'info["checks"].append(row)'), ("tdr", "if c[\"step\"] >= tgw.FIRST:")),
      "Wording unchanged since c66cc76. The count is as the test computes it (probe >= 0.95 while held-out < 0.95). The "
      "fourth pass's residual (the printed denominator included the 2400 reference rows) is gone: since Amendment 2 "
      f"(55dac50, 2225f00) probe_blind counts checks at update >= FIRST = 4800 (test uses test_window_gate's trigger: {TDR_TRIG}).", ())
-item(("weights the streams unequally, in the same way for every seed",), "tex5:395 unbalanced, same for every seed", "TRUE",
+item(("weights the streams unequally, in the same way for every seed",), "tex6:395 unbalanced, same for every seed", "TRUE",
      (("twg", "return task.make_batch(PROBE_N, torch.Generator().manual_seed(PROBE_SEED))[0]"),), "", ())
 item(("the main line's records store neither the probe's reading nor the per-stream masses at each check (they store both;",),
-     "tex5:349 the referee's finding restated: records store both", "TRUE" if rf_ok and PV["sg_every_eval"] else "FALSE",
+     "tex6:349 the referee's finding restated: records store both", "TRUE" if rf_ok and PV["sg_every_eval"] else "FALSE",
      (("twg", 'info["checks"].append(row)'), ("trr", "stats.append(stats_fn(m, task, probe, step))")),
      "Probe reading in checks[*].acc; per-stream masses in stats[*].stream_gate at every evaluation, which includes every "
      "check step; per-channel key and all-position masses in the check row.", (2,))
-item(("among them that the records do not store the probe's reading",), "tex5:387 the first draft's false statement listed", "TRUE",
+item(("among them that the records do not store the probe's reading",), "tex6:387 the first draft's false statement listed", "TRUE",
      (), "Listed as false; consistent with the records (rows above).", (3,))
-item(("Appendix~\\ref{app:repro} gained the six entries the check found missing",), "tex5:349 'gained the six entries'", "TRUE", (),
-     "See the tex5:332 row.")
-# tex5:332 and tex5:36 on the appendix
+item(("Appendix~\\ref{app:repro} gained the six entries the check found missing",), "tex6:349 'gained the six entries'", "TRUE", (),
+     "See the tex6:332 row.")
+# tex6:332 and tex6:36 on the appendix
 item(("Appendix~\\ref{app:repro} states them, with the entries the referee found missing from this draft's first version",),
-     "tex5:332 the six missing entries now stated", "TRUE", (),
-     "window generator (tex5:530), frozen W_h (tex5:530), dtype (tex5:530), perfect gate's model (tex5:530), tie rules "
-     "(tex5:536, 538), noise estimator (tex5:538): all present and true (rows above).")
-item(("R lists eleven guesses that matched our choices",), "tex5:332 'eleven guesses that matched'", "TRUE" if N_MATCHED == 11 else "FALSE",
+     "tex6:332 the six missing entries now stated", "TRUE", (),
+     "window generator (tex6:530), frozen W_h (tex6:530), dtype (tex6:530), perfect gate's model (tex6:530), tie rules "
+     "(tex6:536, 538), noise estimator (tex6:538): all present and true (rows above).")
+item(("R lists eleven guesses that matched our choices",), "tex6:332 'eleven guesses that matched'", "TRUE" if N_MATCHED == 11 else "FALSE",
      (), f"DIFF.md 'Points where my reading ... matched theirs': {N_MATCHED} bullets. Replaces 'Nine of the 44 guesses were "
      "material and all nine matched'.")
 D10 = [ln for ln in DIFFMD.split("\n") if ln.startswith("| D-10 |")]
 item(("is filed by R as a difference (D-10) that matched in statistic only, since R measured it on the 2048 held-out sequences and the main line on a 256-sequence probe",),
-     "tex5:332 the map: R's D-10, matched in statistic only (re-anchored)",
+     "tex6:332 the map: R's D-10, matched in statistic only (re-anchored)",
      "TRUE" if D10 and "256-sequence probe" in D10[0] and "2048 held-out" in D10[0] else "FALSE",
      (("tmb", "prng = torch.Generator(); prng.manual_seed(seed + 99_000)"),),
      "Reworded in a5f67a2: no longer listed among the eleven matched guesses (the second pass's point). DIFF.md: "
@@ -511,12 +528,12 @@ UNL = sorted((k for k, v in LAB.items() if v == "unlabelled"), key=lambda x: int
 PROC = [k for k in UNL]
 NAMED = {k: LAB.get(k) for k in ("U-6", "U-11", "U-16", "U-23")}
 item(("the text stated four outright and three only in part (the gate's input among the four)",),
-     "tex5:332 R's labels: four stated outright, three in part, the gate's input among the four (re-anchored)",
+     "tex6:332 R's labels: four stated outright, three in part, the gate's input among the four (re-anchored)",
      "TRUE" if (LC["stated"], LC["stated + A"] + LC["A in code, stated in report"]) == (4, 3) and LAB.get("U-9") == "stated" else "FALSE", (),
      f"UNSTATED.md: [stated] {LC['stated']}, [stated + A] {LC['stated + A']}, [A in code, stated in report] "
      f"{LC['A in code, stated in report']}; the gate's input is U-9 [{LAB.get('U-9')}]. Reworded in c66cc76 from 'seven outright or in part'.")
 item(("left 34 to be guessed (the initialisation scales, the parameter dtype, the evaluation's sampling and the trigger's details among them): 20 on which it was silent, 12 on which it was ambiguous and 2 carried over from what the report states for another component, with 3 further entries of process",),
-     "tex5:332 R's labels: 34 guessed = 20 + 12 + 2 ([C] as R defines it), 3 process (re-anchored)",
+     "tex6:332 R's labels: 34 guessed = 20 + 12 + 2 ([C] as R defines it), 3 process (re-anchored)",
      "TRUE" if (n_abc, LC["A"], LC["B"], LC["C"], len(UNL)) == (34, 20, 12, 2, 3) else "FALSE", (),
      f"[A] {LC['A']}, [B] {LC['B']}, [C] {LC['C']} = {n_abc}; unlabelled (process) {len(UNL)}: {', '.join(UNL)}; "
      f"4 + 3 + {n_abc} + {len(UNL)} = {4 + 3 + n_abc + len(UNL)}. The third pass's PARTIAL (37 against 20 + 12 + 2; [C] "
@@ -524,23 +541,24 @@ item(("left 34 to be guessed (the initialisation scales, the parameter dtype, th
 NAMED = {k: LAB.get(k) for k in ("U-6", "U-11", "U-16", "U-22", "U-36", "U-32", "U-37", "U-38", "U-39", "U-41")}
 GUESSED = {"A", "B", "C"}
 item(("left 34 to be guessed (the initialisation scales, the parameter dtype, the evaluation's sampling and the trigger's details among them):",),
-     "tex5:332 the parenthesis, now after '34 to be guessed' (re-anchored)", "TRUE" if all(v in GUESSED for v in NAMED.values()) else "PARTIAL", (),
+     "tex6:332 the parenthesis, now after '34 to be guessed' (re-anchored)", "TRUE" if all(v in GUESSED for v in NAMED.values()) else "PARTIAL", (),
      f"Moved in fabf505 on the fourth pass's item 9. Every entry it names is a guess: the initialisation scales U-6 "
      f"[{NAMED['U-6']}], U-11 [{NAMED['U-11']}]; the dtype U-16 [{NAMED['U-16']}]; the evaluation's sampling U-22 "
      f"[{NAMED['U-22']}], U-32 [{NAMED['U-32']}], U-36 [{NAMED['U-36']}]; the trigger's details U-37 [{NAMED['U-37']}], "
      f"U-38 [{NAMED['U-38']}], U-39 [{NAMED['U-39']}], U-41 [{NAMED['U-41']}]. The process entries ({', '.join(UNL)}) follow "
      "as '3 further entries of process'.")
 item(("the 44 details it logged (34 of them guesses) are stated in an appendix",),
-     "tex5:36 'the 44 details it logged (34 of them guesses) are stated in an appendix' (re-anchored)", "TRUE", (),
-     "Reworded in c66cc76; it now agrees with tex5:332 (34 guesses of 44). Every U-entry's main-line choice is given, "
-     "U-22's held-out generator included (tex5:532, Generator(424242)). Bit for bit, the window's draw layout "
-     "(torch.rand(D, 3), column 0 = current token; D-12) is still not stated (an omission, section 5).")
+     "tex6:36 'the 44 details it logged (34 of them guesses) are stated in an appendix' (re-anchored)", "TRUE", (),
+     "Reworded in c66cc76; it now agrees with tex6:332 (34 guesses of 44). Every U-entry's main-line choice is given, "
+     "U-22's held-out generator included (tex6:532, Generator(424242)). Bit for bit, the window's draw layout "
+     "(torch.rand(D, 3), column 0 = current token; D-12) is still not stated (an omission, section 5). R's UNSTATED.md has since "
+     f"grown by {len(P5_IDS)} Phase 5 entries ({R_BR}); the sentence is about the replication's first phases, so the 44 stand.")
 
-# ── fourth-pass items (read from check_appendixB_v4.py's source) ────────────
+# ── fifth-pass items (read from check_appendixB_v5.py's source) ────────────
 import ast  # noqa: E402
 
-V2_ITEMS = []   # here: the FOURTH pass's items (check_appendixB_v4.py), located in the fifth draft
-for node in ast.walk(ast.parse(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "check_appendixB_v4.py")).read())):
+V2_ITEMS = []   # here: the FIFTH pass's items (check_appendixB_v5.py), located in the sixth draft
+for node in ast.walk(ast.parse(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "check_appendixB_v5.py")).read())):
     if isinstance(node, ast.Call) and getattr(node.func, "id", None) == "item":
         a0 = node.args[0]
         consts = {"A": "\\paragraph{Model.}", "T": "\\paragraph{Task.}", "TR": "\\paragraph{Training and evaluation.}",
@@ -549,7 +567,7 @@ for node in ast.walk(ast.parse(open(os.path.join(os.path.dirname(os.path.abspath
         ph = tuple(consts[e.id] if isinstance(e, ast.Name) else ast.literal_eval(e) for e in a0.elts)
         V2_ITEMS.append((ast.literal_eval(node.args[1]) if isinstance(node.args[1], ast.Constant) else "?", ph))
 for w_, ph_ in V2_ITEMS:
-    assert locate(tex4, ph_) is not None, (w_, ph_)          # every fourth-pass fragment is in c66cc76
+    assert locate(tex5, ph_) is not None, (w_, ph_)          # every fifth-pass fragment is in c5e4508
 
 # ── the --code checks ────────────────────────────────────────────────────────
 
@@ -603,18 +621,20 @@ def main():
         assert CC["CEIL_C"]["n_ch"] == 16 and CC["CEIL_C"]["ctx_tokens"] == tuple(range(8)) + tuple(-(i + 1) for i in range(8))
     ORDER = {"FALSE": 0, "PARTIAL": 1, "UNVERIFIABLE": 2, "TRUE": 3}
     P = print
-    P("# Revision 9, fifth draft: Appendix B and its body sentences against the main line's code and records\n")
-    P(f"Fifth draft: `origin/claude/rev9-draft` at `{NEW_REF}` (committed {CUTOFF}), `{DRAFT}` (`tex5:NNN`, "
-      f"{len(tex5) - (tex5[-1] == '')} lines); fourth draft `{V4_REF}` (`tex4:NNN`, {len(tex4) - (tex4[-1] == '')} lines: lines "
-      f"move by +2 after tex4:192 and by +4 after tex4:454; Appendix B is unchanged apart from the shift: "
-      f"{[tex4[i] for i in range(522, 545)] == [tex5[i] for i in range(526, 549)]}); first draft `{OLD_REF}` (`tex:NNN`). "
-      f"Code and records: the main line as of the fifth draft, `{HEAD}` (read with `git show`; its *.py differ from db22857's "
-      f"only in {PY_DIFF}); R's branch as of the fifth draft, `{R_BR}`. The path "
+    P("# Revision 9, sixth draft: Appendix B and its body sentences against the main line's code and records\n")
+    APPB6 = locate(tex6, ("\\label{app:repro}",)) or locate(tex6, ("What a replication needs",))
+    P(f"Sixth draft: `origin/claude/rev9-draft` at `{NEW_REF}` (committed {CUTOFF}), `{DRAFT}` (`tex6:NNN`, "
+      f"{len(tex6) - (tex6[-1] == '')} lines); fifth draft `{V5_REF}` (`tex5:NNN`, {len(tex5) - (tex5[-1] == '')} lines: 42c4557 "
+      f"replaces lines in place, so the numbers agree; the lines it changed: "
+      f"{[i + 1 for i in range(min(len(tex5), len(tex6))) if tex5[i] != tex6[i]]}; Appendix B, tex6:526-549, unchanged: "
+      f"{tex5[525:549] == tex6[525:549]}); first draft `{OLD_REF}` (`tex:NNN`). "
+      f"Code and records: the main line as of the sixth draft, `{HEAD}` (read with `git show`; its *.py differ from db22857's "
+      f"only in {PY_DIFF}; since 8ae660d only test_split_copy.py's docstring); R's branch as of the sixth draft, `{R_BR}`. The path "
       "is test_window_gate's Part C/D path: `one_run` -> `run_path` -> `test_slow_start.part_run(\"C\")` -> "
       "`test_stream_curriculum.run_sc(ARM[\"D8\"])` -> `test_router_reliability.run_one` -> `test_binding_onset.onset_run`, the "
       "model `test_multilayer_binding.MultiBDH` (on `bdh.BDH`) converted by `test_window_gate.to_local`; the perfect gate "
-      f"`run_sc(CEIL_C_ARM)`. Generated by `check_appendixB_v5.py{' --code DIR' if CC else ''}` (a copy of v4 re-anchored on "
-      "c5e4508); each item's fragment is located in the fifth draft by text search and each piece of evidence is a code "
+      f"`run_sc(CEIL_C_ARM)`. Generated by `check_appendixB_v6.py{' --code DIR' if CC else ''}` (a copy of v5 re-anchored on "
+      "42c4557); each item's fragment is located in the sixth draft by text search and each piece of evidence is a code "
       "snippet resolved to its line at the head.\n")
     P("Abbreviations: " + ", ".join(f"{k} = {v}" for k, v in FILES.items()) + ".\n")
     cnt = {k: sum(1 for x in ITEMS if x[2] == k) for k in ORDER}
@@ -622,39 +642,39 @@ def main():
     P("| verdict | items |\n|---|---|")
     for k, v in cnt.items():
         P(f"| {k} | {v} |")
-    v2_gone = [(w, ph) for w, ph in V2_ITEMS if locate(tex5, ph) is None]
-    P(f"\n({len(ITEMS)} atomic items against the fifth draft. Fourth-pass items: {len(V2_ITEMS) - len(v2_gone)} of "
-      f"{len(V2_ITEMS)} fragments found verbatim in the fifth draft, {len(v2_gone)} reworded and re-anchored or REMOVED; "
+    v2_gone = [(w, ph) for w, ph in V2_ITEMS if locate(tex6, ph) is None]
+    P(f"\n({len(ITEMS)} atomic items against the sixth draft. Fifth-pass items: {len(V2_ITEMS) - len(v2_gone)} of "
+      f"{len(V2_ITEMS)} fragments found verbatim in the sixth draft, {len(v2_gone)} reworded and re-anchored or REMOVED; "
       f"{len(ITEMS) - len(V2_ITEMS)} items are new.)\n")
     P("## 1. Items (FALSE and PARTIAL first)\n")
-    P("| # | tex5 line | item | verdict | code evidence (file:line at the main line as of the fifth draft) | note | first-pass items |")
+    P("| # | tex6 line | item | verdict | code evidence (file:line at the main line as of the sixth draft) | note | first-pass items |")
     P("|---|---|---|---|---|---|---|")
     srt = sorted(ITEMS, key=lambda x: (ORDER[x[2]], x[0]))
     for i, (n, w, v, e, note, old) in enumerate(srt):
-        P(f"| {i + 1} | tex5:{n} | {w.replace('|', '/')} | {v} | {e} | {note.replace('|', '/')} | "
+        P(f"| {i + 1} | tex6:{n} | {w.replace('|', '/')} | {v} | {e} | {note.replace('|', '/')} | "
           f"{', '.join(str(o) for o in old) or 'new'} |")
-    P("\n## 2. Fourth-pass items located in the fifth draft\n")
-    P("Each fourth-pass fragment (from `check_appendixB_v4.py`'s `item(...)` calls, read with `ast`) was asserted in "
-      "`c66cc76` and searched verbatim in `c5e4508`.\n")
-    P("| # | fourth-pass item | tex4 | tex5 |\n|---|---|---|---|")
+    P("\n## 2. Fifth-pass items located in the sixth draft\n")
+    P("Each fifth-pass fragment (from `check_appendixB_v5.py`'s `item(...)` calls, read with `ast`) was asserted in "
+      "`c5e4508` and searched verbatim in `42c4557`.\n")
+    P("| # | fifth-pass item | tex5 | tex6 |\n|---|---|---|---|")
     for i, (w, ph) in enumerate(V2_ITEMS):
-        m5 = locate(tex5, ph)
-        l4 = locate(tex4, ph)
-        ra = [x[0] for x in ITEMS if x[1].endswith("(re-anchored)") and x[0] in (l4, l4 + 2, l4 + 4)] if not m5 else []
-        P(f"| {i + 1} | {w.replace('|', '/')} | tex4:{l4} | "
-          f"{f'tex5:{m5}' if m5 else (f'REWORDED; re-anchored at tex5:{ra[0]}' if ra else 'REMOVED')} |")
-    P("\n## 3. First-pass items (1-87) in the fifth draft\n")
+        m6 = locate(tex6, ph)
+        l5 = locate(tex5, ph)
+        ra = [x[0] for x in ITEMS if x[1].endswith("(re-anchored)") and x[0] == l5] if not m6 else []
+        P(f"| {i + 1} | {w.replace('|', '/')} | tex5:{l5} | "
+          f"{f'tex6:{m6}' if m6 else (f'REWORDED; re-anchored at tex6:{ra[0]}' if ra else 'REMOVED')} |")
+    P("\n## 3. First-pass items (1-87) in the sixth draft\n")
     P("| first-pass items | first verdict | now |\n|---|---|---|")
     mp = {}
     for n, w, v, e, note, old in ITEMS:
         for o in old:
-            mp.setdefault(o, []).append(f"tex5:{n} {v}")
+            mp.setdefault(o, []).append(f"tex6:{n} {v}")
     first = {1: "FALSE", 2: "FALSE", 3: "FALSE", 4: "PARTIAL", 5: "PARTIAL", 6: "UNVERIFIABLE", 7: "UNVERIFIABLE",
              8: "UNVERIFIABLE"}
     for o in range(1, 88):
         P(f"| {o} | {first.get(o, 'TRUE')} | {'; '.join(sorted(set(mp.get(o, ['not mapped']))))} |")
     unm = [o for o in range(1, 88) if o not in mp]
-    P(f"\nFirst-pass items not mapped to a fifth-draft item: {unm or 'none'}.\n")
+    P(f"\nFirst-pass items not mapped to a sixth-draft item: {unm or 'none'}.\n")
     P("## 4. Record and code facts\n")
     P(f"- WIN3_SPLIT_D8 check rows, window_gate X+L: {PV['rows']} in {PV['runs']} runs, of which {PV['ref_rows']} are the "
       f"2400 reference readings, so {N_CHECKS} checks; probe >= 0.95 with the evaluation < 0.95 at the same step: {len(PV['hi'])}, all at checks (>= 4800): {HI_CHECKS} "
@@ -666,7 +686,7 @@ def main():
           f"{h['next_fired']}, run bound routed {h['br']}, map_before {h['map']}")
     P(f"- stream_gate at every evaluation: window_gate split/reset runs {PV['sg_every_eval']}; split_copy split runs {SC_SG}.")
     P(f"- Recorded start strings (no zone field): {starts}; zone-free: {ZONE_FREE}.")
-    P(f"- R: UNSTATED.md {N_U} entries, DIFF.md {N_D} rows, {N_MATCHED} 'matched' bullets; labels {dict(LC)}; seed 914 "
+    P(f"- R: UNSTATED.md {N_U} Phase 2 entries ({N_U_ALL} in the file at {R_BR}, Phase 5's {len(P5_IDS)} included), DIFF.md {N_D} rows, {N_MATCHED} 'matched' bullets; labels {dict(LC)}; seed 914 "
       f"(n, probe min, probe max, eval min, eval max, failure, step of the max): {R914}.")
     if CC:
         P("- --code (read-only builds, no training): " + "; ".join(f"{k} = {v}" for k, v in CC.items()) + ".")
@@ -674,7 +694,7 @@ def main():
         P("- --code not given: the build checks were skipped.")
     P("\n## 5. Omissions noticed (not verdicts)\n")
     P("- The held-out set's generator seed (tbo:" + ev("tbo", "EVAL_SEED = 424_242").split(":")[1]
-      + ", R's D-7) is stated (tex5:532); this second-pass omission stays closed.")
+      + ", R's D-7) is stated (tex6:532); this second-pass omission stays closed.")
     P("- The window's draw layout, `torch.rand(D, 3, generator=g)` with column j the lag-j tap (twg:"
       + ev("twg", "return (torch.rand(D, WIDTH, generator=g) * 2 - 1)").split(":")[1] + "; R's D-12), is not stated. Bit-for-bit only.")
     P("- encoder_v's N(0, 0.02^2) is covered by 'Pathway's initialisation' but missing from the parenthesis that lists the others.")

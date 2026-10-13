@@ -245,3 +245,14 @@ These do not block the draft; they are listed so their authors can correct them.
 - **L's working tree** at its `test_split_copy` run (no file hash is recorded).
 - **Push times**, beyond the GitHub activity that the S75b review read.
 - **Anything after `c916996`.**
+
+## Corrections (13 October, sixth pass)
+
+1. **§4, the row for line 41 ("RESOLVED. E `a876751`, G `3c89f87`, H `5b5deec`/`f4fd535`").** The cited G and H commits do not show a run:
+   - `3c89f87` is G's S87 specification; G's start is `02b3eed` (22:48:43).
+   - `5b5deec` is H's completed one-to-one recount, and `f4fd535` is H's code and readings.
+   - H's first record of a run is `b17517a` (23:00:50), after `c916996` (22:59:26).
+
+   "Running" was right in substance (H's CHECKs ran about 22:47–23:00), but the commits cited do not show it. (`check_G_v6`, `check_H_v6`.)
+2. **`check_H_v5.py` is not reproducible as committed.** Its provenance row and its "after the draft" facts read the moving origin head. Re-run after H's round-5 stores were added, that row flips from MATCH to DISAGREE. `check_H_v6.py` pins `f4fd535` and reproduces all 116 v5 statuses. `check_G_v5.py`'s header reads the moving head too, but only in text.
+3. **A label slip, no line changes.** `check_onetoone_v5.py`'s docstring calls `c916996`'s line "tex6:441"; in this file's numbering it is tex5:441. Tex6 now means `42c4557`; the line number is the same.

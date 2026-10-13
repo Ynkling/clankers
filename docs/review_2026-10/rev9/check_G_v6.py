@@ -113,6 +113,7 @@ V3 = {}          # first needle -> (status, note): the v3 revision of a row whos
 V4 = {}          # first needle -> (status, note): the v4 revision (applied after V3)
 V5 = {}          # first needle -> (status, note): the v5 revision (applied after V4)
 V6 = {}          # first needle -> (status, note): the v6 revision (applied after V5)
+PRE6 = []        # (item, status) of every fifth-pass row as the fifth pass left it (filled in apply_v3)
 V3_GONE = []     # V3 / V4 entries whose row is REMOVED in the fifth draft
 
 
@@ -136,6 +137,9 @@ def apply_v3():
     """Revise the status / note of every row whose first fragment has a V3 entry. A V3 entry whose row is not in the fourth
     draft (REMOVED) is recorded in V3_GONE; every other must be used once. Then the V4 entries, each used exactly once."""
     for tag_, VV, gone_ok in (("V3", V3, True), ("V4", V4, True), ("V5", V5, True), ("V6", V6, False)):
+        if tag_ == "V6":    # (v6) the fifth-pass statuses, before the sixth pass revises any: compared with check_G_v5.md
+            PRE6.extend((r_[2], r_[5]) for r_ in ROWS if r_[7] != "new6")
+            PRE6.extend((r_[2], r_[3]) for r_ in REMOVED5)
         used = Counter()
         for i, r_ in enumerate(ROWS):
             if r_[8] in VV:
@@ -2274,6 +2278,11 @@ V6[r"S83 the hinge's inputs, the control and the window (report 6, \texttt{07600
     f"only S87 files ({len(g_ns6)} added, none changed: {g_rec_same6}); no report after report 6 ({g_rep_after6 or 'none'}); the "
     f"S87 store held {len(runs87)} of {q87} queued runs. The row lists screens by report, so S87, with no report, is rightly "
     f"absent; every record it pins is byte-identical at {GBR6}")
+V6["G's S55--S83"] = (
+    "MATCH" if g_rec_same6 and not g_rep_after6 else "PARTIAL",
+    f"carried (v4 MATCH). 'G's S83 ... complete' still holds at the sixth draft's commit; G's last commit then is {GBR6} "
+    f"(S87 in progress), not report 6, and the line's new status clause ('the sessions' fifth round are running') has its "
+    "own row")
 V6[r"(session~G's drafted specification: the hinged register against the baseline, the plain register and the hinge without the register; 20 seeds per machine; a rate claim of $\geq 18/20$)"] = (
     "MATCH" if spec_reg_arms and spec_reg_same6 else "DISAGREE",
     f"unchanged line (tex6:476). spec_draft_register.md byte-identical at {GBR6} ({spec_reg_same6}); S87 (label-free hinges) does "
@@ -2330,6 +2339,17 @@ row6(r"session~G's S83 found that its KL terms reading positions only, or nothin
      "clamping' remains report 6's account, unmarked (as at tex6:271)")
 
 apply_v3()
+# (v6) every fifth-pass row's status reproduces check_G_v5.md as committed (the records and recomputations are unchanged)
+_v5md = git("show", "HEAD:docs/review_2026-10/rev9/check_G_v5.md").split("\n")
+_i5 = _v5md.index("| tex5 line | origin | item | draft says | recomputed | status | note |")
+V5MD = Counter()
+for _l in _v5md[_i5 + 2:]:
+    if not _l.startswith("| tex5:"):
+        break
+    _c = re.split(r"(?<!\\)\|", _l)
+    V5MD[(_c[3].strip().replace("\\|", "|"), re.search(r"\*\*(.+?)\*\*", _l).group(1))] += 1
+v5_reproduces = Counter(PRE6) == V5MD
+assert v5_reproduces, (Counter(PRE6) - V5MD, V5MD - Counter(PRE6))
 ORDER = {"DISAGREE": 0, "PARTIAL": 1, "NOT RECORD-CHECKABLE": 2, "MATCH": 3}
 ROWS.sort(key=lambda r: (ORDER[r[5]], r[0]))
 C = Counter(r[5] for r in ROWS)
@@ -2440,6 +2460,9 @@ L.append(f"**Rows: {len(ROWS)} — {cnts(C)}.** Carried from the first pass ({su
          f"rows (fifth-pass DISAGREE {sum(1 for r in REMOVED5 if r[3] == 'DISAGREE')}, PARTIAL "
          f"{sum(1 for r in REMOVED5 if r[3] == 'PARTIAL')}, NOT RECORD-CHECKABLE "
          f"{sum(1 for r in REMOVED5 if r[3] == 'NOT RECORD-CHECKABLE')}, MATCH {sum(1 for r in REMOVED5 if r[3] == 'MATCH')}).")
+L.append("")
+L.append(f"The fifth-pass statuses, recomputed here before any v6 revision, reproduce check_G_v5.md's {sum(V5MD.values())} rows "
+         f"item for item: {v5_reproduces}.")
 L.append("")
 L.append("Carried rows on a line that changed in the sixth version (fragment intact): "
          + ("; ".join(f"tex6:{n_} {it_} ({kd_}, {st_})" for n_, it_, st_, kd_ in on_changed6) or "none") + ".")
@@ -2607,8 +2630,8 @@ L.append(f"- KL terms: max over runs at 300 / 600 / 1200 / 2400: POS {kl_max['RE
          f"FLAT { {k: (round(v[0], 3), round(v[1], 3)) for k, v in br83['REG3_FLAT'][2400].items()} }; at the end: POS "
          f"{ {k: (round(v[0], 2), round(v[1], 2)) for k, v in br83['REG3_KEYHINGE_POS'][None].items()} }, FLAT "
          f"{ {k: (round(v[0], 2), round(v[1], 2)) for k, v in br83['REG3_FLAT'][None].items()} }. Report 6 and the README scope the "
-         "flat write 'through 1200 (FLAT through 2400)' / 'for their window'; the fifth draft now says 'through 1200, moving only "
-         "afterwards'.")
+         "flat write 'through 1200 (FLAT through 2400)' / 'for their window'; the fifth and sixth drafts say 'through 1200, moving "
+         "only afterwards'.")
 L.append(f"- KL terms at every recorded update (max over layers per run; runs above 1e-5): " + "; ".join(
     f"{a} " + ", ".join(f"{u}: max {kl_mx[a][u]:.2g} ({len(kl_over[a][u])}/20{' ' + str(kl_over[a][u]) if 0 < len(kl_over[a][u]) < 5 else ''})"
                         for u in KLU) for a in POSFLAT) + f". The weight is 1 at update 2400 and 0 at 2401 in every POS/FLAT run "
@@ -2686,7 +2709,7 @@ L.append(f"Descriptive quantities (REG3_KEYHINGE, median over runs): eta^2 by ke
          f"REG3_NOWIN: end beta^R {nwb['CTX']:.2f}/{nwb['KEY']:.2f}/{nwb['VAL']:.2f}; routed seeds {nw_rb} (REG3's {r3_rb}).")
 L.append("")
 L.append("What the hinge reads (explore_g_devices.py:17-18 at 83699a2): 'It reads key positions and key identities (token types), as "
-         "the key split reads key positions; it reads no stream label.' The fifth draft says so at "
+         "the key split reads key positions; it reads no stream label.' The sixth draft says so at "
          f"{L5('a training-time prior that reads the task' + chr(39) + 's key positions and identities')}, "
          f"{L5('The hinge reads the task' + chr(39) + 's key positions and key identities')}, {L5('reads key positions and key identities, and session~G')} "
          f"and {L5('a solution without stream labels')}.")
@@ -2695,14 +2718,15 @@ L.append(f"Marked as descriptive where it is not a pre-fixed reading? At {L5('Mo
          "(yes); the delta phase 'descriptive by the screen's docstring' (yes); the slow gate's 'which we read as' (yes); 'What the "
          "firing records show, as a description' (yes). Not marked: 'with a register that writes at nearly every token' (the "
          f"records agree). At {L5('Session~G then screened')} (S83): 'on our reading of G's traces' (yes); 'where, on session~G's "
-         "account, the ratio term removes only the share ...' (yes, since fd2fa89); 'both hold the gate at uniform while they act "
-         "(its KL from uniform at most 10^-5 through update 1200 in every run)' (a record statement; see its row: the bound is "
-         "exceeded); 'fails, by clamping the gate' (report 6's account, stated without a marker; the clamp itself is in the records).")
+         "account, the ratio term removes only the share ...' (yes, since fd2fa89); 'both held the gate at uniform from update 300 "
+         "through 1200 (its KL from uniform at most 1.4e-5 in every run; the flat term's through 2400)' (a record statement; "
+         "see its row: it holds at every recorded update); 'fails, by clamping the gate' (report 6's account, stated without a "
+         "marker; the clamp itself is in the records).")
 L.append("")
 # ── readings vs docstring (fourth draft)
-L.append("## Readings vs docstring (fifth draft)")
+L.append("## Readings vs docstring (sixth draft; tex4:N given as tex6:N)")
 L.append("")
-L.append("| screen | reading (docstring) | applies (recomputed) | fifth draft | wording |")
+L.append("| screen | reading (docstring) | applies (recomputed) | sixth draft | wording |")
 L.append("|---|---|---|---|---|")
 r1h = cnt(A["REG_NUDGE"], br56)
 r1d = cnt(nd, br56)
@@ -2739,7 +2763,7 @@ _rd = [
     ("S83", "the register", f"{read83['the register']} (KH only {P83['LOCAL3_KEYHINGE']['KHvs'][0]}, LOCAL3 only {P83['LOCAL3_KEYHINGE']['KHvs'][1]})",
      "tex4:269 'the register is needed', tex4:59", "same"),
     ("S83", "key identity", f"{read83['key identity']} (KH only {P83['REG3_KEYHINGE_POS']['KHvs'][0]}, POS only {P83['REG3_KEYHINGE_POS']['KHvs'][1]})",
-     "tex4:269 'the identity term is needed, 19 vs 0', tex4:59, tex4:439", "same; tex5:441 now 'its KL terms ... fail' and 'S83's one position-only term could not replace'"),
+     "tex4:269 'the identity term is needed, 19 vs 0', tex4:59, tex4:439", "same; tex6:441 'its KL terms ... fail' and 'S83's one position-only term could not replace'"),
     ("S83", "structure", read83["structure"], "tex4:269 'the same term at every body position 0/20'", "count only; name not given"),
     ("S83", "the window", f"{read83['the window']} (KH only {P83['REG3_KEYHINGE_1200']['KHvs'][0]}, 1200 only {P83['REG3_KEYHINGE_1200']['KHvs'][1]})",
      "tex4:269 'one pair short of the short window suffices'", "same"),
@@ -2748,13 +2772,13 @@ _rd = [
     ("S82", "best-device rule", f"{best_re['device']} {best_re['table']}", "tex4:267 (implicit: the hinge is the device run on delta)", "same"),
 ]
 for r_ in _rd:
-    r_ = r_[:3] + (t45(r_[3]),) + r_[4:]
+    r_ = r_[:3] + (t45(r_[3]).replace("tex5:", "tex6:"),) + r_[4:]   # tex5:N = tex6:N (in-place revision)
     L.append("| " + " | ".join(esc(x) for x in r_) + " |")
 L.append("")
 
 # ── register gate
-assert TEX5[124] == TEX4[124]
-L.append("## Register gate description (tex:125 -> tex2:125 = tex3:125 = tex4:125 = tex5:125, unchanged in the fifth version) vs code")
+assert TEX6[124] == TEX5[124] == TEX4[124]
+L.append("## Register gate description (tex:125 -> tex2:125 = ... = tex6:125, unchanged in the sixth version) vs code")
 L.append("")
 L.append("| item | draft | code | status | note |")
 L.append("|---|---|---|---|---|")
@@ -2763,7 +2787,7 @@ for it, d_, c_, s_, nt in reg_rows:
         it = it + " (first draft)"
     L.append(f"| {esc(it)} | {esc(d_)} | {esc(c_)} | **{s_}** | {esc(nt)} |")
 for it, d_, c_, s_, nt in reg_rows2:
-    L.append(f"| {esc(it)} (second to fifth draft) | {esc(d_)} | {esc(c_)} | **{s_}** | {esc(nt)} |")
+    L.append(f"| {esc(it)} (second to sixth draft) | {esc(d_)} | {esc(c_)} | **{s_}** | {esc(nt)} |")
 L.append("")
 
 # ── S82 at the first draft's commit (for A2)
@@ -2776,7 +2800,7 @@ L.append(f"At {DRAFT} ({draft_t}) the last G commit was `{gdraft}`: {len(st_d['r
 L.append("")
 
 # ── descriptive statements, fourth draft
-L.append("## Descriptive statements in the fifth draft: marked or not (session G)")
+L.append("## Descriptive statements in the sixth draft: marked or not (session G)")
 L.append("")
 DESC5 = [
     ("(where, on our reading, the decayed sum of the block still carries the header)", "yes", "unchanged since the fourth version"),
@@ -2788,36 +2812,38 @@ DESC5 = [
     ("with a register that writes at nearly every token", "no", "the records agree (unchanged)"),
     ("each S82 reference arm reproduced bit for bit through 2400 at one seed first", "—", "resolved: one seed (2100) per reference arm"),
     ("on our reading of G's traces, the hinge has nothing to release there", "yes", "firings 1-15; term 0 from 300"),
-    ("both hold the gate at uniform while they act (its KL from uniform at most $10^{-5}$ through update 1200 in every run)", "— (a record statement)",
-     f"the bound is exceeded: POS at 1200 up to {kl_mx['REG3_KEYHINGE_POS']['1200']:.1e} ({len(kl_over['REG3_KEYHINGE_POS']['1200'])} runs), every run "
-     f"at update 1; POS's term acts to 2400, where its KL reaches {kl_mx['REG3_KEYHINGE_POS']['2400']:.3f}"),
+    ("both held the gate at uniform from update 300 through 1200 (its KL from uniform at most $1.4\\times10^{-5}$ in every run; the flat term's through 2400)",
+     "— (a record statement)", f"resolved (b5fd2f2): max {kl_300_1200:.1e} at 300-1200; FLAT at 2400 {kl_mx['REG3_FLAT']['2400']:.0e}"),
     ("and the register's write stays at its initial value through 1200, moving only afterwards", "—", "resolved: within 0.012 through 1200"),
     ("where, on session~G's account, the ratio term removes only the share", "yes (fd2fa89)", "resolved: report 6's exploratory account, now marked"),
     ("and the one form tried of each device that reads less fails, by clamping the gate", "'by clamping': no",
-     "report 6's account; the clamp is in the records. 'which S83's specification had allowed in advance': the spec allowed a null, and expected the opposite mechanism"),
-    ("its KL terms reading positions only, or nothing, fail ($1/20$, $0/20$) by clamping the gate, a weakness its specification had allowed to the form", "'by clamping': no",
-     "scope resolved; the same 'allowed' problem"),
+     "report 6's account; the clamp is in the records. 'allowed in advance': now qualified '(though it expected the term too weak near uniform, not too strong)' (b5fd2f2): resolved"),
+    ("its KL terms reading positions only, or nothing, fail ($1/20$, $0/20$) by clamping the gate, a weakness of the form its specification had allowed for (if not this one)", "'by clamping': no",
+     "scope and 'allowed' resolved (b5fd2f2)"),
     ("the hinge's analogue, which S83's one position-only term could not replace", "—", "resolved"),
-    ("it is the register test proposed to follow \\texttt{test\\_delta\\_recipe}", "—", "no record of the order (tex5:476 keeps it as the plan)"),
+    ("it is the register test proposed to follow \\texttt{test\\_delta\\_recipe}", "—", "no record of the order (tex6:476 keeps it as the plan)"),
     ("Each is marked where it appears", "—", "true of every place the referee listed; the ratio-term clause now marked"),
     ("is found label-free on a fifth of seeds (2 of 20 on the fresh seeds of the device screen)", "count", "resolved"),
-    ("every session's queue is empty", "—", "not a record (G: no commit after report 6)"),
+    ("and the sessions' fifth round are running", "—", f"G: S87 running at {GBR6} ({len(runs87)} of {q87} runs), no result"),
 ]
-L.append("| tex5 line | statement | marked? | note |")
+L.append("| tex6 line | statement | marked? | note |")
 L.append("|---|---|---|---|")
-for s_, m_, nt in DESC5:
+for s_, m_, nt in DESC5:   # (the sixth draft's list)
     L.append(f"| {L5(s_)} | {esc(s_)} | {esc(m_)} | {esc(nt)} |")
 L.append("")
+specs6 = sorted(p_ for p_ in git("ls-tree", "--name-only", "-r", DRAFT6).split("\n") if p_.startswith("specs/"))
 L.append("Not checkable from the records: 'proposed to follow test_delta_recipe' for the register test (no specification is "
-         f"committed on the main line; specs/ at {DRAFT5}: {', '.join(specs5)}); 'every session's queue is empty' (G's half: no "
-         "queue file, no commit after report 6); the bit-for-bit phase-0 reproduction and S83's CHECKs "
+         f"committed on the main line; specs/ at {DRAFT6}: {', '.join(specs6)}); 'the sessions' fifth round' as a count (G's "
+         "records number no rounds; 'running' is checked); the bit-for-bit phase-0 reproduction and S83's CHECKs "
          "(their files and log are read, the comparisons are not rerun); S83's code SHA 24268c2446f8 (not recomputed; the child "
          "file's SHA-1 is); the reasoning attributed to Revision 8's specification (as in the earlier passes); S82's CHECKs and "
-         "wall-clock; the S78, S85 and S86 halves of tex5:230, :441, :443 and :472 (session H's; see check_H_v5); session I's S75 "
-         "results (tex5:456-457; only the arm's name, 'session G's register gate', is checked here).")
+         "wall-clock; the S78, S85 and S86 halves of tex6:230, :441, :443 and :476-477 (session H's; see check_H_v6); session I's S75 "
+         "results (tex6:456-458; only the arm's name, 'session G's register gate', is checked here); S87's own results (none at "
+         "the draft's commit; its four records are read only to count them).")
 L.append("")
 with open(OUT, "w") as fh:
     fh.write("\n".join(L))
 print(f"wrote {OUT}: {len(ROWS)} rows, {dict(C)}; " + "; ".join(f"{k} {dict(v)}" for k, v in CK.items()) +
       f"; removed1 {len(REMOVED)} (newly {len(newly_gone1)}); removed2 {len(REMOVED2)} (newly {len(newly_gone2)}); "
-      f"removed3 {len(REMOVED3)} (newly {len(newly_gone3)}); removed4 {len(REMOVED4)}; gone revisions {V3_GONE}")
+      f"removed3 {len(REMOVED3)} (newly {len(newly_gone3)}); removed4 {len(REMOVED4)} (newly {len(newly_gone4)}); "
+      f"removed5 {len(REMOVED5)}; gone revisions {V3_GONE}; GBR6 {GBR6}")

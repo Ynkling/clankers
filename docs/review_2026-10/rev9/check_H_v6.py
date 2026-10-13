@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
-"""check_H_v5.py — the referee's fifth pass: what the FIFTH version of the Revision 9 draft (c5e4508) says about
+"""check_H_v6.py — the referee's sixth pass: what the SIXTH version of the Revision 9 draft (42c4557, committed
+2026-10-12 23:14:04 UTC) says about Session H, against H's records.
+
+    python3 docs/review_2026-10/rev9/check_H_v6.py      # writes docs/review_2026-10/rev9/check_H_v6.md
+
+A copy of check_H_v5.py with its output moved to check_H_v6.md and its v5 main() disabled; everything below runs and asserts
+as in v5, with H's records still read at the branch head as it stood at the fifth draft's commit (BR = 9b72bf6, report 8),
+and the v5 rows' branch-after-the-draft facts pinned to the head check_H_v5 ran against (f4fd535), so every v5 status
+reproduces (asserted against check_H_v5.md as committed). The v5 assert that H's last commit before the draft is report 8
+(HEAD == R8) is replaced: the section 'SIXTH DRAFT' reads H's last commit before 42c4557's commit time (H6), shows every
+earlier H store byte-identical there, and checks the draft's status sentences against it in rows (tex6:41 'the sessions'
+fifth round are running', the provenance row, the next steps, 'screened once'). It then locates every fifth-pass row in
+42c4557 (tex6:NNN) by text search on its tex5 fragment (FRAG5), re-anchors rewritten sentences (OV6, which must be
+found), revises rows whose sentence is unchanged but whose truth moved with H's branch (REV6), and adds rows (NEW6) for new
+H sentences (the one-to-one count, recomputed from the main line's records independently of H's script). The v5
+docstring follows.
+
+check_H_v5.py — the referee's fifth pass: what the FIFTH version of the Revision 9 draft (c5e4508) says about
 Session H, against H's records, including S86.
 
     python3 docs/review_2026-10/rev9/check_H_v5.py      # writes docs/review_2026-10/rev9/check_H_v5.md
@@ -63,6 +80,8 @@ from rlib import (load, runs, bound, bound_routed, discovered, transition, fail_
 
 BR_NOW = "origin/claude/explore-H"
 DRAFT5_PIN = "c5e4508"
+DRAFT6_PIN = "42c4557"
+H_V5RUN = "f4fd535"    # (v6) the H head check_H_v5 ran against (check_H_v5.md: 'the branch head is now f4fd535')
 # (v5) H's records as they stood at the fifth draft's commit: the last branch commit at or before it
 BR = git("log", "-1", "--format=%h", "--before=" + git("show", "-s", "--format=%cI", DRAFT5_PIN).strip(), BR_NOW).strip()
 HEAD = git("rev-parse", "--short=7", BR).strip()
@@ -71,7 +90,7 @@ DRAFT1, DRAFT2, DRAFT3, DRAFT_PATH = "9bfa85a", "f67bc07", "a5f67a2", "multichan
 TEX = git("show", f"{DRAFT1}:{DRAFT_PATH}").split("\n")     # first draft (tex:NNN)
 TEX2 = git("show", f"{DRAFT2}:{DRAFT_PATH}").split("\n")    # second draft (tex2:NNN)
 TEX3 = git("show", f"{DRAFT3}:{DRAFT_PATH}").split("\n")    # third draft (tex3:NNN)
-OUT = os.path.join(HERE, "check_H_v5.md")
+OUT = os.path.join(HERE, "check_H_v6.md")
 ROWS = []      # (old line, new location, item, draft says, recomputed, status, first-pass status, note)
 READ = []      # readings vs docstring rows
 DESC = []      # descriptive statements rows
@@ -2427,14 +2446,15 @@ assert all((FRAG4[i] is None) == (ROWS4[i][6] == "REMOVED") for i in range(len(R
 assert all(FRAG4[i] is None or where4(FRAG4[i]) for i in range(len(ROWS4)))
 
 # ── H's branch after the draft
-HEAD_NOW = git("rev-parse", "--short=7", BR_NOW).strip()
-h_after5 = [x for x in git("log", "--reverse", "--format=%h %cI %s", f"{R8}..{BR_NOW}").strip().split("\n") if x]
-h_files_after = [x for x in git("diff", "--name-only", R8, BR_NOW).strip().split("\n") if x]
+HEAD_NOW = git("rev-parse", "--short=7", H_V5RUN).strip()
+h_after5 = [x for x in git("log", "--reverse", "--format=%h %cI %s", f"{R8}..{H_V5RUN}").strip().split("\n") if x]
+h_files_after = [x for x in git("diff", "--name-only", R8, H_V5RUN).strip().split("\n") if x]
 h_stores_touched = [x for x in h_files_after if x.endswith("_results.json")]
 h_pre5 = [x for x in git("log", "--format=%h %cI", f"--before={DRAFT5_TIME}", BR_NOW).strip().split("\n") if x][:1]
-assert HEAD == R8 and h_pre5[0].split()[0] == R8
-onetoone = git("show", f"{BR_NOW}:explore_out/H/onetoone_counts.txt") if "explore_out/H/onetoone_counts.txt" in h_files_after else ""
-onetoone_doc = docstring(BR_NOW, "explore_h_onetoone_counts.py") if "explore_h_onetoone_counts.py" in h_files_after else ""
+# (v6) the v5 assert 'HEAD == R8 and h_pre5 == R8' is replaced by the sixth-draft rows below; kept as a flag
+h5_at_r8 = HEAD == R8 and h_pre5[0].split()[0] == R8
+onetoone = git("show", f"{H_V5RUN}:explore_out/H/onetoone_counts.txt") if "explore_out/H/onetoone_counts.txt" in h_files_after else ""
+onetoone_doc = docstring(H_V5RUN, "explore_h_onetoone_counts.py") if "explore_h_onetoone_counts.py" in h_files_after else ""
 
 # ── L's half of test_split_copy (main line, ffb0771), folded into this version: the split runs at eight streams now
 SCL = "ffb0771"
@@ -2596,7 +2616,7 @@ OTHER_S86_5 = sorted({i + 1 for i, l in enumerate(TEX5) if "S86" in l or "all-po
 STALE5 = [i + 1 for i, l in enumerate(TEX5) if "not yet screened" in l or "is the next screen" in l]
 
 
-def main5():
+def main5_unused():
     order = {k: i for i, k in enumerate(ORDER + ("REMOVED",))}
     live = [r for r in ROWS5 if r[6] != "REMOVED"]
     gone = [r for r in ROWS5 if r[6] == "REMOVED"]
@@ -2672,5 +2692,359 @@ def main5():
           f"changed {dict(cc)}; unchanged {dict(cu)}; new {dict(cn)}; transitions {dict(trans)}")
 
 
+# ══ SIXTH DRAFT (42c4557): H's branch at the draft's commit; re-anchor every fifth-pass row ══════════════════════════════
+# The sixth draft replaces lines of the fifth in place (568 lines both; tex5:N = tex6:N). Every row of the fifth pass
+# (ROWS5, located in the fifth draft by FRAG5) is located in the sixth by text search. Where the sentence was rewritten,
+# OV6 re-anchors the row on the new wording (asserted present in tex6 and the tex5 fragment asserted gone), re-checks the
+# number against the same record and sets the status; a row whose fragment is gone without an OV6 entry stops the script.
+# REV6 revises rows whose fragment is unchanged but whose truth moved with H's branch (the branch at 42c4557's time, H6).
+# NEW6 adds rows for sentences about H that only the sixth draft has.
+DRAFT6 = DRAFT6_PIN
+TEX6 = git("show", f"{DRAFT6}:{DRAFT_PATH}").split("\n")
+DRAFT6_TIME = git("show", "-s", "--format=%cI", DRAFT6).strip()
+assert len(TEX6) == len(TEX5), "the sixth draft is not an in-place revision of the fifth"
+CH56 = [i + 1 for i, (a_, b_) in enumerate(zip(TEX5, TEX6)) if a_ != b_]
+C56 = []
+_prev = TEX5
+for _c in git("rev-list", "--reverse", f"{DRAFT5}..{DRAFT6}").split():
+    _t = git("show", f"{_c}:{DRAFT_PATH}").split("\n")
+    C56.append((_c[:7], git("show", "-s", "--format=%cI", _c).strip(), [i + 1 for i, (a_, b_) in enumerate(zip(_prev, _t)) if a_ != b_]))
+    _prev = _t
+assert _prev == TEX6
+
+
+def where6(frag):
+    return [i + 1 for i, l in enumerate(TEX6) if frag in l]
+
+
+def by56(line):
+    return ", ".join(f"{h} ({t[11:16]})" for h, t, ls in C56 if line in ls)
+
+
+# ── the fifth pass's statuses reproduce check_H_v5.md as committed (H's records and every recomputation unchanged)
+_v5md = git("show", "HEAD:docs/review_2026-10/rev9/check_H_v5.md").split("\n")
+_i5 = next(i for i, l in enumerate(_v5md) if l.startswith("| tex5 line | tex4 line |"))
+V5MD = collections.Counter()
+for _l in _v5md[_i5 + 2:]:
+    if not _l.startswith("| tex5:"):
+        break
+    _c = re.split(r"(?<!\\)\|", _l)
+    V5MD[(_c[4].strip(), re.search(r"\*\*(.+?)\*\*", _l).group(1))] += 1
+V5NOW = collections.Counter((esc(r[3]), r[6]) for r in ROWS5 if r[6] != "REMOVED")
+v5_reproduces = V5NOW == V5MD
+assert v5_reproduces, (V5NOW - V5MD, V5MD - V5NOW)
+
+# the tex5 fragment of every fifth-pass row, rebuilt exactly as the v5 apply loop chose it
+FRAG5 = []
+for k, r in enumerate(ROWS4):
+    if r[6] == "REMOVED":
+        FRAG5.append(None)
+        continue
+    o = OV5.get(r[3])
+    FRAG5.append(o["frag5"] if o else FRAG4[k])
+for fr, *_ in NEW5:
+    FRAG5.append(fr)
+assert len(FRAG5) == len(ROWS5)
+assert all((FRAG5[i] is None) == (ROWS5[i][6] == "REMOVED") for i in range(len(ROWS5)))
+assert all(FRAG5[i] is None or where5(FRAG5[i]) for i in range(len(ROWS5)))
+
+# ── H's branch at the sixth draft's commit (replaces the v5 assert HEAD == R8)
+H6 = git("log", "-1", "--format=%h", f"--before={DRAFT6_TIME}", BR_NOW).strip()
+H6_TIME = git("show", "-s", "--format=%cI", H6).strip()
+h_pre6 = [x for x in git("log", "--reverse", "--format=%h %cI %s", f"{R8}..{H6}").strip().split("\n") if x]
+h_ns6 = [x.split("\t") for x in git("diff", "--name-status", R8, H6).strip().split("\n") if x]
+_stores_r8 = [p_ for p_ in git("ls-tree", "-r", "--name-only", R8, "explore_out/H/").split("\n") if p_.endswith("_results.json")]
+h_stores_same6 = all(blob(R8, p_) == blob(H6, p_) for p_ in _stores_r8)
+h_new_stores6 = {p_: len(load(H6, p_)["runs"]) for st_, p_ in h_ns6 if st_ == "A" and p_.endswith("_results.json")}
+h_reports6 = [p_ for st_, p_ in h_ns6 if re.search(r"report_\d+\.md$", p_)]
+log87h = git("show", f"{H6}:explore_out/H/s87.log") if any(p_ == "explore_out/H/s87.log" for _, p_ in h_ns6) else ""
+q87h = re.search(r"(\d+) runs queued", log87h)
+q87h = int(q87h.group(1)) if q87h else None
+started87h = len(re.findall(r"^\s*start\s", log87h, flags=re.M))
+r5_first = next((x.split()[:2] for x in h_pre6 if "round 5" in x), None)
+h_after6 = [x for x in git("log", "--reverse", "--format=%h %cI", f"{H6}..{BR_NOW}").strip().split("\n") if x]
+oto_file = git("show", f"{H6}:explore_out/H/onetoone_counts.txt")
+oto_h = re.search(r"\(a\) (\d+) of (\d+); \(b\) (\d+) of (\d+)", oto_file)
+oto_h = tuple(int(x) for x in oto_h.groups()) if oto_h else None
+oto_commit = git("log", "--diff-filter=A", "--format=%h %cI", H6, "--", "explore_out/H/onetoone_counts.txt").strip().split()
+cites_oto = bool(where6(oto_commit[0])) if oto_commit else False
+spec2k_same6 = blob(R8, "explore_out/H/spec_draft_two_keyterm.md") == blob(H6, "explore_out/H/spec_draft_two_keyterm.md")
+am2_doc = " ".join(docstring(H6, "explore_h_allmass2.py"))
+_ck6 = json.loads(git("show", f"{H6}:explore_out/H/checks.json"))
+ck87h = {k: (v.get("time"), v.get("git")) for k, v in _ck6.items() if k in ("H/allmass2", "H/dose")}
+
+# ── the main line's split firings: the map before each firing (independent of H's onetoone script)
+OTO = {}
+for nm, ref, path in (("window_gate X", MAINREF, "results/X/window_gate_results.json"),
+                      ("window_gate L", MAINREF, "results/L/window_gate_results.json"),
+                      ("split_copy X", "592c574", "results/X/split_copy_results.json"),
+                      ("split_copy L", SCL, "results/L/split_copy_results.json")):
+    rr = runs(load(ref, path), "WIN3_SPLIT_D8")
+    ff = [c for r in rr.values() for c in r.get("checks", []) if c.get("fired")]
+    assert all(len(c["map_before"]) == 8 for c in ff)
+    OTO[nm] = dict(runs=len(rr), fired=len(ff), one=sum(len(set(c["map_before"])) == 8 for c in ff),
+                   all=sum(lab(c, c["all_cs"], c["all_c0"]) for c in ff), key=sum(lab(c, c["key_cs"], c["key_c0"]) for c in ff),
+                   same=sum((c["key_cs"], c["key_c0"]) == (c["all_cs"], c["all_c0"]) for c in ff))
+    assert {k: OTO[nm][k] for k in ML5[nm]} == ML5[nm], nm
+OTOT = {k: sum(v[k] for v in OTO.values()) for k in ("runs", "fired", "one", "all", "key", "same")}
+OTO50 = {k: sum(v[k] for n_, v in OTO.items() if n_ != "split_copy L") for k in ("fired", "one")}
+rate6 = 1 - OTOT["all"] / OTOT["fired"]
+p_le1_6 = sum(math.comb(L86["ALLMASS"]["ops"], i) * rate6 ** i * (1 - rate6) ** (L86["ALLMASS"]["ops"] - i) for i in (0, 1))
+
+OV6 = {}
+REV6 = {}
+NEW6 = []
+OV6["the rounds: 'every session's queue is empty' (H's half)"] = dict(
+    frag6="and the sessions' fifth round are running",
+    draft="E's batch~20 (...) and the sessions' fifth round are running (H's half)",
+    rec=f"H's last commit before the draft ({DRAFT6_TIME}): {H6} ({H6_TIME}). Since report 8 ({R8}): "
+        + "; ".join(x[:95] for x in h_pre6) + f". New stores at {H6}: {h_new_stores6} (records); s87.log: '{q87h} runs "
+        f"queued', {started87h} 'start' lines, no run finished; CHECKs passed (checks.json: {ck87h}); no report after report 8 ({h_reports6 or 'none'}); every "
+        f"earlier H store byte-identical at {H6}: {h_stores_same6}",
+    status=ms(bool(r5_first) and bool(q87h) and started87h > 0 and all(v == 0 for v in h_new_stores6.values()) and not h_reports6),
+    note=f"v5 NOT RECORD-CHECKABLE ('every session's queue is empty', stale for H 3 h 26 min after c5e4508). Rewritten at "
+         f"{by56(41)}: right for H. Round 5 is H's own name ('round 5' in {r5_first[0] if r5_first else '-'} and f4fd535); its "
+         f"one-to-one recount (round 5 (2), 5b5deec) is complete and used by the draft (tex6:441); S87a and S87c were "
+         f"specified with their readings (f4fd535) and started (s87.log at b17517a, {q87h} runs queued), with no record at the "
+         f"draft's commit. 'Running' is right; nothing of S87a/S87c had landed")
+OV6["limits: S86's rate against the main line's"] = dict(
+    frag6="S86 then found 1 mistarget in 21 firings, consistent with that rate (11 in 126)",
+    draft="... and a run that split differently would have gone differently; S86 then found 1 mistarget in 21 firings, "
+          "consistent with that rate (11 in 126)",
+    rec=f"main line (the 60 runs) {OTOT['fired'] - OTOT['all']}/{OTOT['fired']} = {rate6:.3f}; S86 "
+        f"{len(L86['ALLMASS']['bad'])}/{L86['ALLMASS']['ops']} = {rate_86:.3f}; P(<= 1 of 21 | {rate6:.3f}) = {p_le1_6:.2f}",
+    status=ms(OTOT["fired"] - OTOT["all"] == 11 and OTOT["fired"] == 126 and len(L86["ALLMASS"]["bad"]) == 1 and p_le1_6 > 0.05),
+    note="v5 MATCH ('10 in 107', the 50 runs). Now the 60 runs with L's split_copy (b5fd2f2), as check_H_v5's PARTIAL row "
+         "proposed; the comma splice is now a semicolon. Consistent, as said")
+OV6["limits: 'the 50 recorded split runs at eight streams' (new check; line otherwise rewritten)"] = dict(
+    frag6="at the 126 firings of the 60 recorded split runs at eight streams (\\texttt{window\\_gate} X and L, \\texttt{split\\_copy} X and L)",
+    draft="the 126 firings of the 60 recorded split runs at eight streams (window_gate X and L, split_copy X and L)",
+    rec="; ".join(f"{k}: runs {v['runs']}, firings {v['fired']}" for k, v in OTO.items())
+        + f"; total runs {OTOT['runs']}, firings {OTOT['fired']}; L's split_copy file at {SCL} ({SCL_TIME}), before the draft",
+    status=ms(OTOT["runs"] == 60 and OTOT["fired"] == 126 and list(OTO) == ["window_gate X", "window_gate L", "split_copy X", "split_copy L"]),
+    note="v5 PARTIAL (the 50 runs, after this version folded in test_split_copy's L half). Rewritten at b5fd2f2 with the "
+         "60-run count the fifth pass proposed. RESOLVED (the labelled counts: next row)")
+OV6["limits: the main line's all-position count"] = dict(
+    frag6="at 115 (46 of 47, 30 of 38, 21 of 22 and 18 of 19), the key-position pair at all 126; the two pairs coincide at 54",
+    draft="the all-position pair a labelled target at 115 (46 of 47, 30 of 38, 21 of 22 and 18 of 19), the key-position pair "
+          "at all 126; the two pairs coincide at 54",
+    rec="; ".join(f"{k}: all-position labelled {v['all']} of {v['fired']}, key {v['key']}, same pair {v['same']}" for k, v in OTO.items())
+        + f"; total all {OTOT['all']}, key {OTOT['key']}, same {OTOT['same']} of {OTOT['fired']} (labels recomputed from "
+          "map_before: c* holds >= 2 streams and c0 none)",
+    status=ms(OTOT["all"] == 115 and OTOT["key"] == 126 and OTOT["same"] == 54
+              and [(OTO[k]["all"], OTO[k]["fired"]) for k in OTO] == [(46, 47), (30, 38), (21, 22), (18, 19)]),
+    note="v5 MATCH for the 50 runs (97 of 107; 46). Now the 60 runs (b5fd2f2): every per-file count reproduces, and the "
+         "files are listed in the order of the parenthesis before it")
+
+REV6["provenance: H's branch commit at the fifth draft (new check; line unchanged)"] = dict(
+    status="PARTIAL" if (oto_commit and not cites_oto) else "MATCH",
+    note=f"unchanged line. At the sixth draft's commit H's last commit is {H6} ({H6_TIME}), not report 8: round 5 began at "
+         f"{h_pre6[0].split()[0]} ({h_pre6[0].split()[1]}). 9b72bf6 is still H's last report, and its stores are unchanged "
+         f"({h_stores_same6}). But the draft now uses a round-5 result: tex6:441 'None of the 126 fired on a map that was "
+         f"already one-to-one (session~H's count)' is onetoone_counts.txt, added at {oto_commit[0] if oto_commit else '-'} "
+         f"({oto_commit[1] if oto_commit else '-'}), which no line of the draft cites (cited: {cites_oto}). The row should add "
+         f"it (e.g. 'one-to-one recount, \\texttt{{{oto_commit[0] if oto_commit else ''}}}') or the sentence should say it is "
+         "the referee's count as well (check_onetoone_v5)")
+REV6["branch commit"] = dict(
+    status=ms(h_stores_same6 and not h_reports6),
+    note=f"carried (v4/v5 MATCH: the pin was the head). At 42c4557's time the head is {H6}, {len(h_pre6)} commits on (round 5, "
+         f"no report); 9b72bf6 remains the last report commit and every store it holds is byte-identical at {H6}. The missing "
+         "citation of 5b5deec is counted once, on the provenance row above")
+for _it in ("referee's requests: 'not yet screened' (stale)", "limitations list: 'the next screen' (stale)"):
+    REV6[_it] = dict(
+        status=ms(h_new_stores6.get("explore_out/H/allmass2_results.json", 0) == 0),
+        note=f"v5 MATCH (resolved e92e1c6). Still right at 42c4557: H's S87a (ALLMASS vs BASE on 20 more seeds, f4fd535) had "
+             f"{h_new_stores6.get('explore_out/H/allmass2_results.json')} records at {H6}. 'Screened once' becomes stale "
+             "when S87a reports")
+
+NEW6.append(("None of the 126 fired on a map that was already one-to-one (session~H's count)",
+             "limits: no firing on a one-to-one map", "none of the 126 on a map already one-to-one (session H's count)",
+             "map_before (the trigger's stream -> channel map before the operation; one-to-one = 8 distinct channels): "
+             + "; ".join(f"{k} {v['one']} of {v['fired']}" for k, v in OTO.items()) + f"; total {OTOT['one']} of "
+             f"{OTOT['fired']} (the 50 runs {OTO50['one']} of {OTO50['fired']}). H's onetoone_counts.txt at "
+             f"{oto_commit[0] if oto_commit else '-'}: (a) {oto_h[0]} of {oto_h[1]}, (b) {oto_h[2]} of {oto_h[3]}" if oto_h else "",
+             ms(OTOT["one"] == 0 and OTOT["fired"] == 126 and oto_h == (0, 107, 0, 126)),
+             "recomputed from the main line's records (not from H's script); equals H's count and the referee's "
+             "check_onetoone_v5. 'So the guard session~I added ... has nothing to do at k = 16' follows (I's guard is not "
+             "checked here). The count's commit is not cited (see the provenance row)"))
+
+_sp2k = git("show", f"{H6}:explore_out/H/spec_draft_two_keyterm.md")
+_sp2k_add = git("log", "--diff-filter=A", "--format=%h %cI", H6, "--", "explore_out/H/spec_draft_two_keyterm.md").strip().split()
+_sp2k_ok = dict(arms="- WIN3_SLOW_KEYHINGE: WIN3_SLOW + the key term (S52's W2_KEYHINGE), and nothing else." in _sp2k,
+                seeds="**Seeds.** X 620-639, L 1620-1639 (20 each), every arm" in _sp2k,
+                v2="fail_class_v2.fail_class_v2 (primary)" in _sp2k, two="S=2" in _sp2k)
+NEW6.append(("Session~H's proposed test of the key term at two streams (the window recipe with and without it, disjoint seeds, the key-first classifier)",
+             "next: H's proposed test (new check; the line changed around it)",
+             "the window recipe with and without the key term at two streams, disjoint seeds, the key-first classifier",
+             f"explore_out/H/spec_draft_two_keyterm.md (added {_sp2k_add[0]} {_sp2k_add[1]}; byte-identical at {R8} and {H6}: "
+             f"{spec2k_same6}): S=2, WIN3_SLOW and WIN3_SLOW_KEYHINGE ({_sp2k_ok['arms']}), seeds X 620-639 / L 1620-1639 "
+             f"({_sp2k_ok['seeds']}), fail_class_v2 primary ({_sp2k_ok['v2']})",
+             ms(all(_sp2k_ok.values()) and spec2k_same6),
+             f"tex6:477 changed only by dropping F's S81 item ({by56(477)}). H's clause is right and not stale at the draft's "
+             "commit: round 5's S87c (the key term's dose) is exploratory and leaves the drafted test as it was"))
+
+# apply
+ROWS6 = []
+MISSING6 = []
+for k, r in enumerate(ROWS5):
+    n, loc4, loc5, item, d, rc_, st, v4s, note = r
+    if st == "REMOVED":
+        ROWS6.append((n, loc5, "REMOVED", item, d, rc_, "REMOVED", st, note))
+        continue
+    o = OV6.get(item)
+    if o:
+        l6 = where6(o["frag6"])
+        if not l6:
+            raise AssertionError(f"tex6 does not contain {o['frag6']!r} ({item})")
+        if where6(FRAG5[k]):
+            raise AssertionError(f"OV6 for a row whose tex5 fragment is still in tex6: {item}")
+        ROWS6.append((n, loc5, ", ".join(f"tex6:{x}" for x in l6), item, o["draft"] or d, o["rec"] or rc_,
+                      o["status"] or st, st, o["note"] if o.get("note") is not None else note))
+    else:
+        l6 = where6(FRAG5[k])
+        if not l6:
+            MISSING6.append((item, FRAG5[k]))
+            continue
+        rv = REV6.get(item)
+        ROWS6.append((n, loc5, ", ".join(f"tex6:{x}" for x in l6), item, d, rc_, rv["status"] if rv else st, st,
+                      rv["note"] if rv else note))
+for fr, item, d, rc_, st, note in NEW6:
+    l6 = where6(fr)
+    if not l6:
+        raise AssertionError(f"tex6 does not contain {fr!r}")
+    ROWS6.append((None, "—", ", ".join(f"tex6:{x}" for x in l6), item, d, rc_, st,
+                  "new in v6" if not where5(fr) else "new check in v6", note))
+assert not MISSING6, "fifth-pass fragments not in tex6 and no OV6 entry: " + repr(MISSING6)
+assert not set(OV6) - {r[3] for r in ROWS6}
+assert not set(REV6) - {r[3] for r in ROWS6}, set(REV6) - {r[3] for r in ROWS6}
+# carried rows whose line changed in the sixth version but whose fragment survives (listed for the reader)
+ON_CH6 = sorted({(int(r[2].split(",")[0][5:]), r[3], r[6]) for r in ROWS6
+                 if r[6] != "REMOVED" and r[3] not in OV6 and r[7] not in ("new in v6", "new check in v6")
+                 and int(r[2].split(",")[0][5:]) in CH56})
+
+READ6 = [tuple(x.replace("tex5:", "tex6:") if isinstance(x, str) else x for x in t) for t in READ5]
+DESC6 = []
+for loc, sc, stmt, mk, note in DESC5:
+    loc = loc.replace("tex5:", "tex6:")
+    if "small cost in aim" in stmt:
+        note = note.replace("; v5: the comma splice at 'would have gone differently, S86 then found'",
+                            "; v6: the comma splice is now a semicolon (b5fd2f2)")
+    DESC6.append((loc, sc, stmt, mk, note))
+DESC6.append((f"tex6:{where6('None of the 126 fired on a map that was already one-to-one')[0]}", "main line / round 5 (2)",
+              "None of the 126 fired on a map that was already one-to-one (session~H's count)", "'session H's count' (yes)",
+              f"{OTOT['one']} of {OTOT['fired']}, recomputed"))
+
+S86_SENT6 = [where6(x)[0] for x in ("Session~H then screened what the trigger reads", "a trigger reading all positions keeps binding",
+                                    "H's S86 and R's Phase~4 are complete", "was screened once (session~H's S86)",
+                                    "S86 all-position targeting (report 8", "session~H's S86, $8/10$ against $9/10$",
+                                    "a trigger on all positions was screened once (S86)", "(S84, S86, S81)")]
+OTHER_S86_6 = sorted({i + 1 for i, l in enumerate(TEX6) if "S86" in l or "all-position" in l or "all positions" in l}
+                     - set(S86_SENT6))
+STALE6 = [i + 1 for i, l in enumerate(TEX6) if "not yet screened" in l or "is the next screen" in l]
+S87_IN6 = [i + 1 for i, l in enumerate(TEX6) if "S87" in l]
+
+
+def main6():
+    order = {k: i for i, k in enumerate(ORDER + ("REMOVED",))}
+    live = [r for r in ROWS6 if r[6] != "REMOVED"]
+    gone = [r for r in ROWS6 if r[6] == "REMOVED"]
+    rows = sorted(live, key=lambda r: (order[r[6]], int(r[2].split(",")[0][5:])))
+    c = collections.Counter(r[6] for r in live)
+    changed = [r for r in live if r[3] in OV6]
+    revised = [r for r in live if r[3] in REV6]
+    new6 = [r for r in live if r[7] in ("new in v6", "new check in v6")]
+    unchanged = [r for r in live if r[3] not in OV6 and r[3] not in REV6 and r not in new6]
+    cc, cr, cu, cn = (collections.Counter(r[6] for r in x) for x in (changed, revised, unchanged, new6))
+    trans = collections.Counter(f"{r[7]} -> {r[6]}" for r in ROWS6 if r[7] not in ("new in v6", "new check in v6"))
+    L = ["# Revision 9 (sixth draft) on Session H: sixth-pass check against H's records", "",
+         f"Generated by `python3 docs/review_2026-10/rev9/check_H_v6.py` (stdlib + rlib). Sixth draft: "
+         f"{DRAFT6}:{DRAFT_PATH} ({DRAFT6_TIME}, origin/claude/rev9-draft), cited tex6:NNN; fifth draft {DRAFT5} "
+         f"({DRAFT5_TIME}, tex5:NNN). The sixth version replaces lines of the fifth in place ({len(TEX6) - (TEX6[-1] == '')} "
+         f"lines both, tex5:N = tex6:N); its commits: " + "; ".join(f"`{h}` {t[11:19]} lines {ls}" for h, t, ls in C56) + ". "
+         f"A copy of check_H_v5.py: every first- to fifth-pass recomputation and anchor still runs and is asserted as before, "
+         f"and the fifth pass's {sum(V5MD.values())} statuses reproduce check_H_v5.md item for item ({v5_reproduces}). Each "
+         f"fifth-pass row is then located in the sixth draft by text search on its tex5 fragment. Where the sentence was "
+         f"rewritten the row is re-anchored on the new wording (which must be found) and its number re-checked against the "
+         f"record; a rewritten sentence without a re-anchor stops the script. Rows 'revised' keep their sentence but are "
+         f"re-judged against H's branch at the draft's commit. Rows 'new in v6' are sentences about H that only the sixth "
+         f"draft has. Records: origin/claude/explore-H read at {BR} (report 8, its head at the fifth draft's commit, with git "
+         f"show); every store there is byte-identical at {H6}, H's last commit before the sixth draft. No draft number is an "
+         f"input.", "",
+         f"Rows in the sixth draft: {len(live)} — " + ", ".join(f"{k} {c.get(k, 0)}" for k in ORDER), "",
+         f"- rows re-anchored on rewritten sentences: {len(changed)} — " + ", ".join(f"{k} {cc.get(k, 0)}" for k in ORDER),
+         f"- rows revised against H's branch at the draft (sentence unchanged): {len(revised)} — " + ", ".join(f"{k} {cr.get(k, 0)}" for k in ORDER),
+         f"- rows whose fragment and judgement are unchanged: {len(unchanged)} — " + ", ".join(f"{k} {cu.get(k, 0)}" for k in ORDER),
+         f"- rows new in the sixth draft: {len(new6)} — " + ", ".join(f"{k} {cn.get(k, 0)}" for k in ORDER),
+         f"- rows whose sentence is gone: {len(gone)} (REMOVED; all gone since the second draft)",
+         "- fifth-pass status -> sixth-pass status: " + "; ".join(f"{k} {v}" for k, v in sorted(trans.items())), "",
+         "Carried rows on a line that changed in the sixth version (fragment intact): "
+         + ("; ".join(f"tex6:{n_} {it_} ({st_})" for n_, it_, st_ in ON_CH6) or "none") + ".", "",
+         f"S86 sentences in tex6: lines {S86_SENT6}; stale sentences about the all-position trigger ('not yet screened', "
+         f"'is the next screen'): {STALE6 or 'none'}; other lines naming S86 or the all-position pair (covered by rows above "
+         f"or not H's): {OTHER_S86_6}; lines naming S87: {S87_IN6 or 'none'}.", "",
+         "## H's branch at the sixth draft's commit (replaces check_H_v5's assert that it was report 8)", "",
+         f"- Last H commit at or before {DRAFT6_TIME}: `{H6}` ({H6_TIME}). Commits since report 8 (`{R8}`): "
+         + "; ".join(f"`{x.split()[0]}` {x.split()[1]} {x.split(' ', 2)[2][:110]}" for x in h_pre6) + ".",
+         f"- Files: {', '.join(f'{st_} {p_}' for st_, p_ in h_ns6)}. Every store at {R8} byte-identical at {H6}: "
+         f"{h_stores_same6}; new stores and their records: {h_new_stores6}; reports after report 8: {h_reports6 or 'none'}.",
+         f"- Round 5: (2) the one-to-one recount, `5b5deec`, complete (no runs): (a) {oto_h[0]} of {oto_h[1]}, (b) "
+         f"{oto_h[2]} of {oto_h[3]}; recomputed here {OTO50['one']} of {OTO50['fired']} and {OTOT['one']} of {OTOT['fired']}. "
+         f"S87a (ALLMASS vs BASE, 20 more seeds) and S87c (the key term's dose): code and readings `f4fd535`; s87.log "
+         f"'{q87h} runs queued', {started87h} started; 0 records each at `{H6}`. spec_draft_two_keyterm.md (tex6:477's "
+         f"proposed test) byte-identical at `{H6}`: {spec2k_same6}.",
+         f"- What the draft says of it: tex6:41 'the sessions' fifth round are running' (right for H); tex6:441 uses the "
+         f"recount ('session H's count'; right, recomputed) without citing `5b5deec` (the provenance row, tex6:513, pins "
+         f"report 8 only); 'screened once' (S86) still right with S87a at 0 records; S87 named on no line. Both G and H "
+         f"number their new screens S87 (G's S87; H's S87a, S87c). The branch has since moved to "
+         f"`{git('rev-parse', '--short=7', BR_NOW).strip()}` ({len(h_after6)} progress commits after `{H6}`).", "",
+         "## Stores", ""] + [f"- {x}" for x in INFO] + [f"- {x}" for x in V3EXTRA[:1]] + [f"- {FIX86}",
+         f"- The main line's split firings at eight streams, the map before each (map_before; one-to-one = 8 distinct "
+         f"channels): " + "; ".join(f"{k}: runs {v['runs']}, firings {v['fired']}, one-to-one before {v['one']}, all-position "
+                                    f"labelled {v['all']}, key {v['key']}, same pair {v['same']}" for k, v in OTO.items())
+         + f"; total {OTOT}.",
+         f"- F's S81 (d5851b1, report 7): EVAL {THREE['S81'][0]}/10, BASE {THREE['S81'][1]}/10, {e81_only} vs {b81_only} "
+         "(used only for tex6:205's three-screen sum).", "",
+         "## Rows (DISAGREE, PARTIAL, NOT RECORD-CHECKABLE, MATCH)", "",
+         "| tex6 line | tex5 line | first draft | item | draft says (sixth draft) | recomputed | status | fifth pass | note |",
+         "|---|---|---|---|---|---|---|---|---|"]
+    for n, loc5, loc6, item, d, r, s, v5s, note in rows:
+        L.append(f"| {loc6} | {loc5} | {cell(n)} | {esc(item)} | {esc(d)} | {esc(r)} | **{s}** | {v5s} | {esc(note)} |")
+    L += ["", "## Rows whose sentence is gone (REMOVED)", "", "| first draft | item | first-draft text | recomputed now | note |",
+          "|---|---|---|---|---|"]
+    for n, loc5, loc6, item, d, r, s, v5s, note in gone:
+        L.append(f"| {cell(n)} | {esc(item)} | {esc(d)} | {esc(r)} | {esc(note)} |")
+    L += ["", "## Readings vs docstring", "",
+          "Readings commit = oldest commit of the screen file on the branch; first run record = oldest commit of the "
+          f"results file whose `runs` is non-empty; docstring compared between that first commit and {BR}.", "",
+          "| screen | file | first commit (readings) | commits touching it | docstring first vs head | first run record | "
+          "readings precede first run |", "|---|---|---|---|---|---|---|"]
+    for t in TIMING4:
+        L.append("| " + " | ".join(esc(x) for x in t) + " |")
+    L += ["", "| screen | readings as first committed | where the sixth draft uses them | status | note |", "|---|---|---|---|---|"]
+    for t in READ6:
+        L.append("| " + " | ".join(esc(x) for x in t[:3]) + f" | **{t[3]}** | {esc(t[4])} |")
+    L += ["", "## Descriptive statements: marked or not (sixth draft)", "",
+          "| tex6 line | screen | statement | marked? | note |", "|---|---|---|---|---|"]
+    for t in DESC6:
+        L.append("| " + " | ".join(esc(x) for x in t) + " |")
+    L += ["", "## Not checkable from the records", "",
+          "- Literature attributions in tex6:209 and S24's 'near-tie' (tex6:228) are not H records.",
+          "- That seeds 2300-2339 are fresh: taken from the docstrings' scans (explore_h_guard.py l.9-12; explore_h_allmass.py "
+          "l.5-6); not rescanned.",
+          "- Session F's S81 (except the two arms summed at tex6:205, and the flat-start account and the seed-914 mode that "
+          "tex6:205 now attributes to F), session G's S82/S83, session R's probe counts at tex6:207 and the main line's "
+          "test_split_copy L rows (tex6:193-201) are not H records; session I's guard at k = S (tex6:441) is I's.",
+          "- 'Fifth round' as a count: H's own name; whether the round was set before 42c4557 cannot be told from git beyond "
+          "the commits listed.",
+          "- Whether H's S85 and S86 runs, many on dirty trees (s86.log: '+dirty' while the progress commits were made), used "
+          "exactly the committed code: the run code SHA (898867f69ad4 for all 32 S86 runs) is the only evidence.",
+          "- Commit times are committer-set; push order cannot be established from git.", ""]
+    with open(OUT, "w") as f:
+        f.write("\n".join(L))
+    print(f"wrote {OUT}: " + ", ".join(f"{k} {c.get(k, 0)}" for k in ORDER) + f"; REMOVED {len(gone)}; "
+          f"changed {dict(cc)}; revised {dict(cr)}; unchanged {dict(cu)}; new {dict(cn)}; transitions {dict(trans)}; H6 {H6}")
+
+
 if __name__ == "__main__":
-    main5()
+    main6()
+
