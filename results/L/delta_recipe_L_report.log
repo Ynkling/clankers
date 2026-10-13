@@ -1,0 +1,412 @@
+
+####################################################################################################
+PER-SEED RAW RESULTS — every value, before any aggregate (machine L, 12th Gen Intel(R) Core(TM) i7-12650H)
+####################################################################################################
+  (map = stream -> channel argmax at the end; 1:1 = one-to-one; sh = most streams on one channel; ROUTED = one-to-one and every stream >= 0.9; overlap = the largest pairwise sum_c min(g_i[c], g_j[c]) of the value-position gates; fired = the firings' updates, '!' = target not labelled ok; outcome = fail_class_v2.outcome_v2)
+
+  CEIL_HEBB    perfect gate (k=16), Hebbian, Adam 1e-3 (validity, HEBB)   (outcome perfect gate: BOUND)
+  arm          seed     acc transition  per-stream acc (end)                    outcome
+  CEIL_HEBB    1580  0.9995       3600  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00 BOUND
+  CEIL_HEBB    1581  0.9805       3600  0.98/0.97/0.99/0.97/0.98/0.98/0.98/0.99 BOUND
+
+  CEIL_DELTA   perfect gate (k=16), delta (beta 1), Adam 1e-3 (validity, DELTA)   (outcome perfect gate: BOUND)
+  arm          seed     acc transition  per-stream acc (end)                    outcome
+  CEIL_DELTA   1580  1.0000       1200  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00 BOUND
+  CEIL_DELTA   1581  0.9995       8400  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00 BOUND
+
+  HEBB_SPLIT   LOCAL3 + SLOW + the exact-copy split, Hebbian   (outcome BOUND ROUTED)
+  arm          seed     acc transition                     map 1:1 sh  per-stream acc                          ROUTED overlap  fired (ok?)                outcome (v2)
+  HEBB_SPLIT   1580  0.9995      25200      5,12,1,10,2,11,0,3   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.006  4800 14400 21600           BOUND ROUTED
+  HEBB_SPLIT   1581  1.0000      20400     4,12,2,8,10,15,13,3   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.002  4800 12000 16800           BOUND ROUTED
+  HEBB_SPLIT   1582  1.0000      13200      3,7,13,2,11,9,4,14   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.019  4800                       BOUND ROUTED
+  HEBB_SPLIT   1583  1.0000      25200    9,13,11,15,14,10,8,0   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.036  4800 14400 24000           BOUND ROUTED
+  HEBB_SPLIT   1584  1.0000      19200       5,7,14,13,0,2,6,8   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.025  16800                      BOUND ROUTED
+  HEBB_SPLIT   1585  1.0000      15600       1,5,2,4,14,11,6,3   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.016  4800                       BOUND ROUTED
+  HEBB_SPLIT   1586  1.0000      22800       1,4,8,12,7,15,6,2   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.025  9600 16800 21600           BOUND ROUTED
+  HEBB_SPLIT   1587  1.0000      30000       0,3,1,10,9,15,8,2   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.025  4800 19200 28800           BOUND ROUTED
+  HEBB_SPLIT   1588  1.0000      15600       5,1,9,8,12,6,11,4   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.016  9600                       BOUND ROUTED
+  HEBB_SPLIT   1589  1.0000      10800     2,0,15,12,11,10,8,9   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.027  9600                       BOUND ROUTED
+  HEBB_SPLIT   1590  1.0000      27600       7,0,9,12,2,8,15,5   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.020  4800 21600 26400           BOUND ROUTED
+  HEBB_SPLIT   1591  1.0000      22800      6,11,3,8,12,9,7,15   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.001  21600                      BOUND ROUTED
+  HEBB_SPLIT   1592  1.0000      22800       3,0,10,4,5,6,1,12   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.004  12000 16800                BOUND ROUTED
+  HEBB_SPLIT   1593  1.0000      19200     12,14,4,13,5,8,15,1   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.003  4800 12000 16800           BOUND ROUTED
+  HEBB_SPLIT   1594  0.7441         --      3,11,6,10,11,0,6,5   n  2  1.00/0.45/0.45/1.00/0.54/1.00/0.53/1.00      -   0.996  7200 12000 21600           MERGED (2 share)
+  HEBB_SPLIT   1595  1.0000      15600      8,5,13,7,6,4,15,12   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.018  14400                      BOUND ROUTED
+  HEBB_SPLIT   1596  1.0000      24000     11,8,0,12,13,2,14,5   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.023  14400 19200                BOUND ROUTED
+  HEBB_SPLIT   1597  1.0000      13200      15,11,13,2,0,6,8,3   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.014  4800 12000                 BOUND ROUTED
+  HEBB_SPLIT   1598  1.0000      10800     14,10,15,13,6,2,1,5   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.032  4800                       BOUND ROUTED
+  HEBB_SPLIT   1599  1.0000      33600     13,12,15,5,7,1,10,6   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.001  9600 14400 19200           BOUND ROUTED
+
+  HEBB_SLOW    LOCAL3 + SLOW, no trigger, Hebbian (Amendment 1)   (outcome BOUND ROUTED)
+  arm          seed     acc transition                     map 1:1 sh  per-stream acc                          ROUTED overlap  fired (ok?)                outcome (v2)
+  HEBB_SLOW    1580  1.0000      16800      1,7,6,10,11,0,3,14   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.027  --                         BOUND ROUTED
+  HEBB_SLOW    1581  0.8770         --      0,5,1,12,4,15,12,8   n  2  1.00/1.00/1.00/0.49/1.00/1.00/0.51/1.00      -   1.000  --                         MERGED (2 share)
+  HEBB_SLOW    1582  0.8813         --     13,7,8,2,11,14,4,14   n  2  1.00/1.00/1.00/1.00/1.00/0.49/1.00/0.56      -   1.000  --                         MERGED (2 share)
+  HEBB_SLOW    1583  0.8706         --      9,14,3,15,10,9,1,0   n  2  0.46/1.00/1.00/1.00/1.00/0.51/1.00/1.00      -   1.000  --                         MERGED (2 share)
+  HEBB_SLOW    1584  1.0000      19200       5,7,14,13,1,2,6,8   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.027  --                         BOUND ROUTED
+  HEBB_SLOW    1585  1.0000      13200      14,4,8,1,11,0,6,10   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.036  --                         BOUND ROUTED
+  HEBB_SLOW    1586  0.6294         --     1,4,1,12,9,15,12,12   n  3  0.49/1.00/0.48/0.36/1.00/1.00/0.37/0.36      -   1.000  --                         MERGED (3 share)
+  HEBB_SLOW    1587  1.0000      31200      12,3,9,5,13,1,8,11   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.022  --                         BOUND ROUTED
+  HEBB_SLOW    1588  1.0000      15600        5,1,9,8,7,6,11,2   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.015  --                         BOUND ROUTED
+  HEBB_SLOW    1589  0.8750         --       2,0,1,12,11,0,8,9   n  2  1.00/0.53/1.00/1.00/1.00/0.47/1.00/1.00      -   1.000  --                         MERGED (2 share)
+  HEBB_SLOW    1590  0.7417         --       9,5,9,12,0,10,9,2   n  3  0.32/1.00/0.35/1.00/1.00/1.00/0.32/1.00      -   1.000  --                         MERGED (3 share)
+  HEBB_SLOW    1591  0.8799         --       6,11,3,8,9,9,7,15   n  2  1.00/1.00/1.00/1.00/0.47/0.53/1.00/1.00      -   1.000  --                         MERGED (2 share)
+  HEBB_SLOW    1592  1.0000      27600       3,0,8,4,6,5,10,12   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.005  --                         BOUND ROUTED
+  HEBB_SLOW    1593  1.0000      15600    12,3,11,15,9,14,5,13   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.026  --                         BOUND ROUTED
+  HEBB_SLOW    1594  0.8599         --       2,11,8,10,7,5,0,0   n  2  1.00/1.00/1.00/1.00/1.00/1.00/0.49/0.42      -   0.994  --                         MERGED (2 share)
+  HEBB_SLOW    1595  1.0000      24000      8,5,2,7,10,4,15,12   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.015  --                         BOUND ROUTED
+  HEBB_SLOW    1596  0.8857         --    11,8,0,12,13,2,10,13   n  2  1.00/1.00/1.00/1.00/0.52/1.00/1.00/0.54      -   1.000  --                         MERGED (2 share)
+  HEBB_SLOW    1597  1.0000      14400     15,11,6,4,2,3,12,10   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.021  --                         BOUND ROUTED
+  HEBB_SLOW    1598  1.0000      13200     14,10,15,12,5,8,0,4   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.030  --                         BOUND ROUTED
+  HEBB_SLOW    1599  0.6167         --      6,12,15,5,6,13,5,6   n  3  0.30/1.00/1.00/0.51/0.27/1.00/0.51/0.32      -   1.000  --                         MERGED (3 share)
+
+  DELTA_SPLIT  LOCAL3 + SLOW + the exact-copy split, delta (beta 1, L2 keys)   (outcome BOUND ROUTED)
+  arm          seed     acc transition                     map 1:1 sh  per-stream acc                          ROUTED overlap  fired (ok?)                outcome (v2)
+  DELTA_SPLIT  1580  0.9897      13200      1,7,15,13,9,5,14,3   y  1  0.99/0.98/0.99/0.99/1.00/1.00/0.98/0.99      Y   0.001  4800!                      BOUND ROUTED
+  DELTA_SPLIT  1581  0.8745         --      15,11,8,4,12,2,8,5   n  2  1.00/1.00/0.49/1.00/1.00/1.00/0.54/1.00      -   0.996  16800! 21600! 26400!       MERGED (2 share)
+  DELTA_SPLIT  1582  0.9883      36000     3,15,11,11,12,3,9,6   n  2  0.98/1.00/1.00/0.99/1.00/0.99/1.00/0.95      -   0.940  4800! 16800 24000!         BOUND NOT routed
+  DELTA_SPLIT  1583  1.0000      12000      2,3,12,7,5,14,13,6   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.004  7200!                      BOUND ROUTED
+  DELTA_SPLIT  1584  0.9775      16800      9,5,12,8,15,7,4,13   y  1  0.99/0.97/0.98/0.97/0.97/0.98/0.98/0.98      Y   0.002  4800 9600!                 BOUND ROUTED
+  DELTA_SPLIT  1585  1.0000      14400       14,2,7,4,3,11,1,5   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.019  4800! 9600!                BOUND ROUTED
+  DELTA_SPLIT  1586  0.9990      18000     1,11,10,3,4,6,14,15   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.002  4800 12000                 BOUND ROUTED
+  DELTA_SPLIT  1587  0.9868      15600     10,8,13,6,3,9,12,15   y  1  1.00/0.99/0.99/0.99/0.98/0.99/0.99/0.97      Y   0.002  4800 9600                  BOUND ROUTED
+  DELTA_SPLIT  1588  1.0000      12000      1,13,10,4,14,8,2,0   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.007  4800! 9600                 BOUND ROUTED
+  DELTA_SPLIT  1589  1.0000      12000       7,12,13,4,9,5,2,6   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.016  4800                       BOUND ROUTED
+  DELTA_SPLIT  1590  1.0000      15600       8,3,4,9,0,6,12,15   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.012  7200!                      BOUND ROUTED
+  DELTA_SPLIT  1591  0.8657         --       7,6,6,10,9,1,2,15   n  2  1.00/0.49/0.48/1.00/1.00/1.00/1.00/1.00      -   0.992  4800 24000! 28800!         MERGED (2 share)
+  DELTA_SPLIT  1592  1.0000       9600      15,1,12,10,0,9,2,5   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.015  none                       BOUND ROUTED
+  DELTA_SPLIT  1593  1.0000      12000      6,2,8,12,5,14,3,15   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.005  4800!                      BOUND ROUTED
+  DELTA_SPLIT  1594  0.9873      18000      0,7,3,12,14,4,13,8   y  1  0.98/0.98/0.99/0.99/0.99/0.99/0.97/1.00      Y   0.006  4800                       BOUND ROUTED
+  DELTA_SPLIT  1595  0.9023         --      6,2,13,6,11,7,8,14   n  2  0.64/1.00/1.00/0.57/1.00/1.00/1.00/1.00      -   0.998  4800 14400 21600           MERGED (2 share)
+  DELTA_SPLIT  1596  1.0000      15600       9,11,13,5,8,3,7,6   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.001  7200                       BOUND ROUTED
+  DELTA_SPLIT  1597  1.0000      12000      14,5,12,7,9,1,4,10   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.007  4800 9600!                 BOUND ROUTED
+  DELTA_SPLIT  1598  1.0000       7200      9,7,12,15,3,13,2,8   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.017  none                       BOUND ROUTED
+  DELTA_SPLIT  1599  1.0000      10800       9,8,5,12,6,13,1,4   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.007  4800                       BOUND ROUTED
+
+  DELTA_SLOW   LOCAL3 + SLOW, no trigger, delta (beta 1, L2 keys)   (outcome BOUND ROUTED)
+  arm          seed     acc transition                     map 1:1 sh  per-stream acc                          ROUTED overlap  fired (ok?)                outcome (v2)
+  DELTA_SLOW   1580  0.9912      14400      11,5,15,7,1,9,3,14   y  1  0.98/0.99/1.00/0.99/1.00/0.99/0.99/0.99      Y   0.002  --                         BOUND ROUTED
+  DELTA_SLOW   1581  0.9990      43200     15,11,6,9,12,3,10,7   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.023  --                         BOUND ROUTED
+  DELTA_SLOW   1582  1.0000      24000       3,6,0,9,12,8,2,14   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.006  --                         BOUND ROUTED
+  DELTA_SLOW   1583  1.0000      14400       2,3,5,7,11,1,13,6   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.002  --                         BOUND ROUTED
+  DELTA_SLOW   1584  0.9790      20400      9,7,12,13,1,8,4,15   y  1  0.98/0.98/0.99/0.98/0.97/0.98/0.98/0.98      Y   0.004  --                         BOUND ROUTED
+  DELTA_SLOW   1585  1.0000      16800       12,13,4,8,2,9,7,6   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.008  --                         BOUND ROUTED
+  DELTA_SLOW   1586  0.9980      16800     13,1,10,8,5,15,2,12   y  1  1.00/1.00/0.99/1.00/1.00/1.00/1.00/1.00      Y   0.005  --                         BOUND ROUTED
+  DELTA_SLOW   1587  1.0000      13200        10,8,3,0,4,9,5,7   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.012  --                         BOUND ROUTED
+  DELTA_SLOW   1588  0.9814      24000      2,12,11,8,15,6,0,5   y  1  0.97/1.00/0.97/0.98/0.99/1.00/0.97/0.99      Y   0.002  --                         BOUND ROUTED
+  DELTA_SLOW   1589  1.0000      13200     1,3,13,4,0,10,14,11   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.010  --                         BOUND ROUTED
+  DELTA_SLOW   1590  0.9980      14400       12,3,8,10,2,1,9,0   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.007  --                         BOUND ROUTED
+  DELTA_SLOW   1591  0.9976      40800     0,3,13,10,9,15,7,11   y  1  0.99/1.00/1.00/1.00/1.00/1.00/0.99/1.00      Y   0.000  --                         BOUND ROUTED
+  DELTA_SLOW   1592  1.0000       9600      15,1,12,10,0,9,2,5   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.015  --                         BOUND ROUTED
+  DELTA_SLOW   1593  1.0000       9600     11,3,8,1,7,10,12,15   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.005  --                         BOUND ROUTED
+  DELTA_SLOW   1594  0.9873      20400    0,15,6,11,12,10,13,1   y  1  0.99/0.98/0.99/0.98/0.99/0.98/0.99/0.99      Y   0.001  --                         BOUND ROUTED
+  DELTA_SLOW   1595  0.8677         --     15,2,11,15,10,8,1,0   n  2  0.44/1.00/1.00/0.49/1.00/1.00/1.00/1.00      -   1.000  --                         MERGED (2 share)
+  DELTA_SLOW   1596  0.9927      21600      15,12,6,5,13,7,4,0   y  1  0.99/0.99/0.99/1.00/1.00/1.00/1.00/0.99      Y   0.002  --                         BOUND ROUTED
+  DELTA_SLOW   1597  1.0000       9600      14,5,12,8,0,6,15,9   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.011  --                         BOUND ROUTED
+  DELTA_SLOW   1598  1.0000       7200      9,7,12,15,3,13,2,8   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.017  --                         BOUND ROUTED
+  DELTA_SLOW   1599  1.0000       9600       2,12,5,3,4,10,7,9   y  1  1.00/1.00/1.00/1.00/1.00/1.00/1.00/1.00      Y   0.005  --                         BOUND ROUTED
+
+====================================================================================================
+VALIDITY (each part's perfect gate binds both of its seeds)
+====================================================================================================
+  HEBB: CEIL_HEBB bound 2/2 (s1580 BOUND at 3600, s1581 BOUND at 3600)  -> VALID
+  DELTA: CEIL_DELTA bound 2/2 (s1580 BOUND at 1200, s1581 BOUND at 8400)  -> VALID
+
+====================================================================================================
+COUNTS
+====================================================================================================
+  HEBB_SPLIT   LOCAL3 + SLOW + the exact-copy split, Hebbian                 BOUND ROUTED 19/20   overlap <= 0.1 19   MERGED  1   completed 20/20   transition 20400 [10800, 33600]
+  HEBB_SLOW    LOCAL3 + SLOW, no trigger, Hebbian (Amendment 1)              BOUND ROUTED 10/20   overlap <= 0.1 10   MERGED 10   completed 20/20   transition 16200 [13200, 31200]
+  DELTA_SPLIT  LOCAL3 + SLOW + the exact-copy split, delta (beta 1, L2 keys) BOUND ROUTED 16/20   overlap <= 0.1 16   MERGED  3   completed 20/20   transition 12600 [7200, 18000]
+  DELTA_SLOW   LOCAL3 + SLOW, no trigger, delta (beta 1, L2 keys)            BOUND ROUTED 19/20   overlap <= 0.1 19   MERGED  1   completed 20/20   transition 14400 [7200, 43200]
+
+####################################################################################################
+PRE-REGISTERED CLAIMS (Amendments 1-2: D1 labelled by d with a paired interval; D2, D4 exact one-sided McNemar, SHOWN if p < 0.05, NO ROOM if the no-trigger arm binds >= 36/40 pooled; D3 secondary, printed)
+####################################################################################################
+POOLED (PRIMARY): machine L (12th Gen Intel(R) Core(TM) i7-12650H) + machine X (Intel(R) Xeon(R) Processor @ 2.10GHz, results/X/delta_recipe_results.json); b and c summed over both machines' pairs
+  (per machine: D1 X 4 vs 1, L 1 vs 4; D2 X 0 vs 0, L 0 vs 3; D4 X 10 vs 1, L 9 vs 0)
+  D1  DELTA_SPLIT vs HEBB_SPLIT (BOUND ROUTED): 35/40 vs 35/40; DELTA_SPLIT only 5, HEBB_SPLIT only 5; d = HEBB only - DELTA only = 0
+      rate difference DELTA_SPLIT - HEBB_SPLIT +0.000, 95% [-0.162, +0.162] (the hybrid score interval with continuity-corrected phi; method 10 as Fagerland, Lydersen and Laake 2014 give it)
+     *** D1 (pooled): delta not shown worse by more than 2 pairs ***   (at 40 pairs with HEBB_SPLIT at 0.95, P(d <= 2) is 0.29 (independent outcomes) / 0.22 (nested) when DELTA_SPLIT is 0.85, and 0.11 / 0.05 when it is 0.80 (Referee V's spec review, fad1489): a bound, not a non-inferiority test)
+  D2  DELTA_SPLIT beats DELTA_SLOW (BOUND ROUTED): 35/40 vs 38/40; DELTA_SPLIT only 0, DELTA_SLOW only 3; p = 1
+     *** D2 (pooled): NOT SHOWN; DELTA_SLOW 38/40 >= 36: NO ROOM (printed, not read) ***
+  D4  HEBB_SPLIT beats HEBB_SLOW (BOUND ROUTED): 35/40 vs 17/40; HEBB_SPLIT only 19, HEBB_SLOW only 1; p = 2.003e-05
+     *** D4 (pooled): SHOWN ***
+  D3  (secondary) on the 30 seeds both split arms are BOUND ROUTED: median transition DELTA_SPLIT 13200.0, HEBB_SPLIT 18600.0; DELTA earlier on 24, later on 5, tied 1; one-sided sign test p = 0.0002731 (DELTA earlier)
+  band HEBB_SPLIT   pooled (BOUND ROUTED): 35/40 -> MAJORITY   Wilson 95% [0.739, 0.945]  (RELIABLE >= 36, MAJORITY >= 20)
+  band HEBB_SLOW    pooled (BOUND ROUTED): 17/40 -> MINORITY   Wilson 95% [0.285, 0.578]  (RELIABLE >= 36, MAJORITY >= 20)
+  band DELTA_SPLIT  pooled (BOUND ROUTED): 35/40 -> MAJORITY   Wilson 95% [0.739, 0.945]  (RELIABLE >= 36, MAJORITY >= 20)
+  band DELTA_SLOW   pooled (BOUND ROUTED): 38/40 -> RELIABLE   Wilson 95% [0.835, 0.986]  (RELIABLE >= 36, MAJORITY >= 20)
+  READINGS (pooled; Amendments 1-2):
+     the memory rule: "delta not shown worse by more than 2 pairs"
+     the split: delta no room (DELTA_SLOW 38/40, b 0, c 3), Hebbian helps (HEBB_SLOW 17/40, b 19, c 1): "delta: no room; Hebbian: helps"
+
+PER MACHINE (SECONDARY): machine L
+  D1  DELTA_SPLIT vs HEBB_SPLIT (BOUND ROUTED): 16/20 vs 19/20; DELTA_SPLIT only 1, HEBB_SPLIT only 4; d = HEBB only - DELTA only = 3
+      rate difference DELTA_SPLIT - HEBB_SPLIT -0.150, 95% [-0.374, +0.082] (the hybrid score interval with continuity-corrected phi; method 10 as Fagerland, Lydersen and Laake 2014 give it)
+     (per machine: the rate difference only, no label)
+  D2  DELTA_SPLIT beats DELTA_SLOW (BOUND ROUTED): 16/20 vs 19/20; DELTA_SPLIT only 0, DELTA_SLOW only 3; p = 1
+     *** D2: NOT SHOWN ***
+  D4  HEBB_SPLIT beats HEBB_SLOW (BOUND ROUTED): 19/20 vs 10/20; HEBB_SPLIT only 9, HEBB_SLOW only 0; p = 0.001953
+     *** D4: SHOWN ***
+  D3  (secondary) on the 15 seeds both split arms are BOUND ROUTED: median transition DELTA_SPLIT 12000, HEBB_SPLIT 22800; DELTA earlier on 14, later on 1, tied 0; one-sided sign test p = 0.0004883 (DELTA earlier)
+  band HEBB_SPLIT   (BOUND ROUTED): 19/20 -> RELIABLE   Wilson 95% [0.764, 0.991]  (RELIABLE >= 18, MAJORITY >= 10)
+  band HEBB_SLOW    (BOUND ROUTED): 10/20 -> MAJORITY   Wilson 95% [0.299, 0.701]  (RELIABLE >= 18, MAJORITY >= 10)
+  band DELTA_SPLIT  (BOUND ROUTED): 16/20 -> MAJORITY   Wilson 95% [0.584, 0.919]  (RELIABLE >= 18, MAJORITY >= 10)
+  band DELTA_SLOW   (BOUND ROUTED): 19/20 -> RELIABLE   Wilson 95% [0.764, 0.991]  (RELIABLE >= 18, MAJORITY >= 10)
+  (the readings are pooled only)
+
+  Machine X (from --also):
+  D1  DELTA_SPLIT vs HEBB_SPLIT (BOUND ROUTED): 19/20 vs 16/20; DELTA_SPLIT only 4, HEBB_SPLIT only 1; d = HEBB only - DELTA only = -3
+      rate difference DELTA_SPLIT - HEBB_SPLIT +0.150, 95% [-0.082, +0.374] (the hybrid score interval with continuity-corrected phi; method 10 as Fagerland, Lydersen and Laake 2014 give it)
+     (per machine: the rate difference only, no label)
+  D2  DELTA_SPLIT beats DELTA_SLOW (BOUND ROUTED): 19/20 vs 19/20; DELTA_SPLIT only 0, DELTA_SLOW only 0; p = 1
+     *** D2: NOT SHOWN ***
+  D4  HEBB_SPLIT beats HEBB_SLOW (BOUND ROUTED): 16/20 vs 7/20; HEBB_SPLIT only 10, HEBB_SLOW only 1; p = 0.005859
+     *** D4: SHOWN ***
+  D3  (secondary) on the 15 seeds both split arms are BOUND ROUTED: median transition DELTA_SPLIT 13200, HEBB_SPLIT 16800; DELTA earlier on 10, later on 4, tied 1; one-sided sign test p = 0.08978 (DELTA earlier)
+  band HEBB_SPLIT   (BOUND ROUTED): 16/20 -> MAJORITY   Wilson 95% [0.584, 0.919]  (RELIABLE >= 18, MAJORITY >= 10)
+  band HEBB_SLOW    (BOUND ROUTED): 7/20 -> MINORITY   Wilson 95% [0.181, 0.567]  (RELIABLE >= 18, MAJORITY >= 10)
+  band DELTA_SPLIT  (BOUND ROUTED): 19/20 -> RELIABLE   Wilson 95% [0.764, 0.991]  (RELIABLE >= 18, MAJORITY >= 10)
+  band DELTA_SLOW   (BOUND ROUTED): 19/20 -> RELIABLE   Wilson 95% [0.764, 0.991]  (RELIABLE >= 18, MAJORITY >= 10)
+
+====================================================================================================
+DIAGNOSTICS — NOT part of the verdict
+====================================================================================================
+  outcomes (fail_class_v2.outcome_v2):
+    HEBB_SPLIT   BOUND ROUTED 19   MERGED (2 share) 1
+      BOUND ROUTED                       s1580 s1581 s1582 s1583 s1584 s1585 s1586 s1587 s1588 s1589 s1590 s1591 s1592 s1593 s1595 s1596 s1597 s1598 s1599
+      MERGED (2 share)                   s1594
+    HEBB_SLOW    BOUND ROUTED 10   MERGED (2 share) 7   MERGED (3 share) 3
+      BOUND ROUTED                       s1580 s1584 s1585 s1587 s1588 s1592 s1593 s1595 s1597 s1598
+      MERGED (2 share)                   s1581 s1582 s1583 s1589 s1591 s1594 s1596
+      MERGED (3 share)                   s1586 s1590 s1599
+    DELTA_SPLIT  BOUND NOT routed 1   BOUND ROUTED 16   MERGED (2 share) 3
+      BOUND NOT routed                   s1582
+      BOUND ROUTED                       s1580 s1583 s1584 s1585 s1586 s1587 s1588 s1589 s1590 s1592 s1593 s1594 s1596 s1597 s1598 s1599
+      MERGED (2 share)                   s1581 s1591 s1595
+    DELTA_SLOW   BOUND ROUTED 19   MERGED (2 share) 1
+      BOUND ROUTED                       s1580 s1581 s1582 s1583 s1584 s1585 s1586 s1587 s1588 s1589 s1590 s1591 s1592 s1593 s1594 s1596 s1597 s1598 s1599
+      MERGED (2 share)                   s1595
+  CHECK 171 fail_class_v2 vs v1 on every record of this test: 80 records, disagreements 0  -> PASS
+  CHECK 174 each split arm's curve equals its no-trigger arm's on the same seed through the first firing: 40 pairs, PASS
+  probe-blind checks, HEBB_SPLIT (checks at update >= 4800): 3 of 170 read >= 0.95 on the probe while the held-out accuracy was < 0.95; blocked by the probe alone 2
+    (seed@update probe/held-out) s1580@4800:0.12/0.11 s1580@7200:0.23/0.21 s1580@9600:0.66/0.73 s1580@12000:0.69/0.75 s1580@14400:0.69/0.76 s1580@16800:0.75/0.88 s1580@19200:0.80/0.88 s1580@21600:0.81/0.88 s1580@24000:0.78/0.88 s1580@26400:1.00/1.00 s1581@4800:0.05/0.10 s1581@7200:0.12/0.18 s1581@9600:0.72/0.58 s1581@12000:0.72/0.60 s1581@14400:0.86/0.72 s1581@16800:0.86/0.73 s1581@19200:0.95/0.88 s1581@21600:1.00/1.00 s1582@4800:0.14/0.14 s1582@7200:0.73/0.69 s1582@9600:0.80/0.73 s1582@12000:0.91/0.86 s1582@14400:1.00/1.00 s1583@4800:0.14/0.10 s1583@7200:0.61/0.56 s1583@9600:0.67/0.61 s1583@12000:0.89/0.74 s1583@14400:0.84/0.73 s1583@16800:0.88/0.74 s1583@19200:0.94/0.87 s1583@21600:0.97/0.86 s1583@24000:0.94/0.88 s1583@26400:1.00/1.00 s1584@4800:0.08/0.10 s1584@7200:0.20/0.12 s1584@9600:0.33/0.27 s1584@12000:0.59/0.56 s1584@14400:0.77/0.75 s1584@16800:0.70/0.76 s1584@19200:1.00/1.00 s1584@21600:1.00/1.00 s1585@4800:0.06/0.08 s1585@7200:0.06/0.12 s1585@9600:0.16/0.24 s1585@12000:0.45/0.52 s1585@14400:0.73/0.72 s1585@16800:1.00/1.00 s1586@4800:0.16/0.09 s1586@7200:0.45/0.43 s1586@9600:0.44/0.45 s1586@12000:0.61/0.60 s1586@14400:0.67/0.61 s1586@16800:0.59/0.62 s1586@19200:0.78/0.73 s1586@21600:0.80/0.75 s1586@24000:1.00/1.00 s1587@4800:0.09/0.10 s1587@7200:0.09/0.14 s1587@9600:0.28/0.34 s1587@12000:0.50/0.58 s1587@14400:0.56/0.59 s1587@16800:0.66/0.75 s1587@19200:0.62/0.75 s1587@21600:0.81/0.87 s1587@24000:0.84/0.88 s1587@26400:0.89/0.87 s1587@28800:0.77/0.88 s1587@31200:1.00/1.00 s1588@4800:0.11/0.10 s1588@7200:0.38/0.20 s1588@9600:0.31/0.29 s1588@12000:0.67/0.59 s1588@14400:0.83/0.88 s1588@16800:1.00/1.00 s1589@4800:0.50/0.35 s1589@7200:0.86/0.87 s1589@9600:0.88/0.87 s1589@12000:1.00/1.00 s1590@4800:0.03/0.07 s1590@7200:0.11/0.10 s1590@9600:0.14/0.12 s1590@12000:0.33/0.20 s1590@14400:0.56/0.46 s1590@16800:0.67/0.59 s1590@19200:0.84/0.72 s1590@21600:0.83/0.74 s1590@24000:0.91/0.88 s1590@26400:0.92/0.87 s1590@28800:1.00/1.00 s1591@4800:0.12/0.08 s1591@7200:0.28/0.21 s1591@9600:0.50/0.43 s1591@12000:0.67/0.62 s1591@14400:0.75/0.75 s1591@16800:0.80/0.88 s1591@19200:0.84/0.88 s1591@21600:0.80/0.88 s1591@24000:1.00/1.00 s1592@4800:0.19/0.10 s1592@7200:0.47/0.54 s1592@9600:0.67/0.73 s1592@12000:0.69/0.74 s1592@14400:0.88/0.88 s1592@16800:0.81/0.88 s1592@19200:0.73/0.88 s1592@21600:0.86/0.88 s1592@24000:1.00/1.00 s1593@4800:0.08/0.11 s1593@7200:0.16/0.26 s1593@9600:0.86/0.74 s1593@12000:0.86/0.73 s1593@14400:0.92/0.86 s1593@16800:0.92/0.86 s1593@19200:1.00/0.98 s1593@21600:1.00/1.00 s1594@4800:0.12/0.08 s1594@7200:0.08/0.11 s1594@9600:0.30/0.24 s1594@12000:0.30/0.33 s1594@14400:0.44/0.47 s1594@16800:0.58/0.55 s1594@19200:0.80/0.73 s1594@21600:0.72/0.74 s1594@24000:0.78/0.75 s1594@26400:0.78/0.73 s1594@28800:0.75/0.74 s1594@31200:0.80/0.75 s1594@33600:0.78/0.75 s1594@36000:0.75/0.73 s1594@38400:0.80/0.75 s1594@40800:0.81/0.75 s1595@4800:0.12/0.15 s1595@7200:0.58/0.66 s1595@9600:0.73/0.73 s1595@12000:0.81/0.88 s1595@14400:0.81/0.88 s1595@16800:1.00/1.00 s1596@4800:0.08/0.07 s1596@7200:0.11/0.14 s1596@9600:0.38/0.44 s1596@12000:0.70/0.58 s1596@14400:0.72/0.73 s1596@16800:0.84/0.87 s1596@19200:0.86/0.86 s1596@21600:0.89/0.86 s1596@24000:1.00/1.00 s1596@26400:1.00/1.00 s1597@4800:0.05/0.12 s1597@7200:0.70/0.72 s1597@9600:0.88/0.86 s1597@12000:0.86/0.87 s1597@14400:1.00/1.00 s1598@4800:0.08/0.12 s1598@7200:0.72/0.67 s1598@9600:0.94/0.85 s1598@12000:1.00/1.00 s1599@4800:0.22/0.20 s1599@7200:0.52/0.44 s1599@9600:0.41/0.45 s1599@12000:0.62/0.58 s1599@14400:0.56/0.60 s1599@16800:0.58/0.62 s1599@19200:0.56/0.62 s1599@21600:0.88/0.76 s1599@24000:0.92/0.88 s1599@26400:0.89/0.89 s1599@28800:0.89/0.87 s1599@31200:0.95/0.88 s1599@33600:1.00/1.00 s1599@36000:1.00/1.00
+  probe-blind checks, DELTA_SPLIT (checks at update >= 4800): 6 of 149 read >= 0.95 on the probe while the held-out accuracy was < 0.95; blocked by the probe alone 9
+    (seed@update probe/held-out) s1580@4800:0.06/0.07 s1580@7200:0.06/0.10 s1580@9600:0.28/0.27 s1580@12000:0.72/0.74 s1580@14400:1.00/0.99 s1581@4800:0.19/0.12 s1581@7200:0.34/0.27 s1581@9600:0.44/0.41 s1581@12000:0.66/0.61 s1581@14400:0.73/0.65 s1581@16800:0.73/0.69 s1581@19200:0.89/0.79 s1581@21600:0.91/0.83 s1581@24000:0.95/0.85 s1581@26400:0.92/0.86 s1581@28800:0.92/0.87 s1581@31200:0.95/0.87 s1581@33600:0.97/0.87 s1581@36000:0.92/0.87 s1581@38400:0.94/0.87 s1581@40800:0.89/0.87 s1582@4800:0.09/0.14 s1582@7200:0.33/0.29 s1582@9600:0.62/0.62 s1582@12000:0.75/0.70 s1582@14400:0.78/0.72 s1582@16800:0.70/0.73 s1582@19200:0.75/0.73 s1582@21600:0.81/0.74 s1582@24000:0.77/0.75 s1582@26400:0.73/0.74 s1582@28800:0.80/0.75 s1582@31200:0.78/0.73 s1582@33600:0.80/0.79 s1582@36000:1.00/0.98 s1582@38400:0.98/0.99 s1583@4800:0.12/0.08 s1583@7200:0.09/0.13 s1583@9600:0.70/0.59 s1583@12000:1.00/1.00 s1583@14400:1.00/1.00 s1584@4800:0.06/0.06 s1584@7200:0.16/0.08 s1584@9600:0.17/0.16 s1584@12000:0.64/0.61 s1584@14400:0.67/0.79 s1584@16800:0.98/0.95 s1584@19200:0.97/0.98 s1585@4800:0.08/0.07 s1585@7200:0.08/0.07 s1585@9600:0.05/0.10 s1585@12000:0.09/0.12 s1585@14400:1.00/1.00 s1585@16800:1.00/1.00 s1586@4800:0.06/0.08 s1586@7200:0.11/0.11 s1586@9600:0.14/0.10 s1586@12000:0.16/0.18 s1586@14400:0.55/0.55 s1586@16800:0.97/0.95 s1586@19200:1.00/0.99 s1587@4800:0.06/0.06 s1587@7200:0.14/0.08 s1587@9600:0.08/0.10 s1587@12000:0.39/0.30 s1587@14400:0.83/0.83 s1587@16800:1.00/0.98 s1588@4800:0.03/0.06 s1588@7200:0.06/0.08 s1588@9600:0.08/0.11 s1588@12000:1.00/1.00 s1588@14400:1.00/1.00 s1589@4800:0.03/0.06 s1589@7200:0.09/0.10 s1589@9600:0.20/0.25 s1589@12000:1.00/1.00 s1589@14400:1.00/1.00 s1590@4800:0.06/0.06 s1590@7200:0.02/0.08 s1590@9600:0.14/0.15 s1590@12000:0.77/0.70 s1590@14400:0.89/0.84 s1590@16800:1.00/1.00 s1591@4800:0.05/0.07 s1591@7200:0.06/0.09 s1591@9600:0.14/0.09 s1591@12000:0.27/0.31 s1591@14400:0.45/0.42 s1591@16800:0.53/0.53 s1591@19200:0.62/0.62 s1591@21600:0.91/0.84 s1591@24000:0.89/0.85 s1591@26400:0.91/0.86 s1591@28800:0.89/0.85 s1591@31200:0.91/0.86 s1591@33600:0.92/0.86 s1591@36000:0.92/0.86 s1591@38400:0.91/0.86 s1591@40800:0.94/0.87 s1592@4800:0.12/0.08 s1592@7200:0.70/0.76 s1592@9600:1.00/1.00 s1592@12000:1.00/1.00 s1593@4800:0.09/0.09 s1593@7200:0.55/0.54 s1593@9600:0.80/0.72 s1593@12000:1.00/1.00 s1593@14400:1.00/1.00 s1594@4800:0.08/0.06 s1594@7200:0.08/0.07 s1594@9600:0.12/0.08 s1594@12000:0.16/0.16 s1594@14400:0.58/0.53 s1594@16800:0.89/0.91 s1594@19200:0.98/0.99 s1595@4800:0.06/0.07 s1595@7200:0.14/0.14 s1595@9600:0.64/0.73 s1595@12000:0.88/0.86 s1595@14400:0.88/0.88 s1595@16800:0.86/0.87 s1595@19200:0.89/0.87 s1595@21600:0.91/0.87 s1595@24000:0.88/0.87 s1595@26400:0.91/0.88 s1595@28800:0.86/0.87 s1595@31200:0.95/0.87 s1595@33600:0.91/0.90 s1595@36000:0.94/0.90 s1595@38400:0.94/0.90 s1595@40800:0.95/0.90 s1596@4800:0.09/0.06 s1596@7200:0.05/0.08 s1596@9600:0.06/0.08 s1596@12000:0.55/0.58 s1596@14400:0.94/0.94 s1596@16800:1.00/0.99 s1597@4800:0.06/0.09 s1597@7200:0.91/0.83 s1597@9600:0.89/0.84 s1597@12000:1.00/1.00 s1597@14400:1.00/1.00 s1598@4800:0.06/0.07 s1598@7200:1.00/1.00 s1598@9600:1.00/1.00 s1599@4800:0.05/0.07 s1599@7200:0.33/0.30 s1599@9600:0.73/0.69 s1599@12000:1.00/1.00
+
+  per seed: HEBB_SPLIT | HEBB_SLOW | DELTA_SPLIT | DELTA_SLOW (transition):
+    s1580  BOUND ROUTED (25200)           | BOUND ROUTED (16800)           | BOUND ROUTED (13200)           | BOUND ROUTED (14400)          
+    s1581  BOUND ROUTED (20400)           | MERGED (2 share) (--)          | MERGED (2 share) (--)          | BOUND ROUTED (43200)          
+    s1582  BOUND ROUTED (13200)           | MERGED (2 share) (--)          | BOUND NOT routed (36000)       | BOUND ROUTED (24000)          
+    s1583  BOUND ROUTED (25200)           | MERGED (2 share) (--)          | BOUND ROUTED (12000)           | BOUND ROUTED (14400)          
+    s1584  BOUND ROUTED (19200)           | BOUND ROUTED (19200)           | BOUND ROUTED (16800)           | BOUND ROUTED (20400)          
+    s1585  BOUND ROUTED (15600)           | BOUND ROUTED (13200)           | BOUND ROUTED (14400)           | BOUND ROUTED (16800)          
+    s1586  BOUND ROUTED (22800)           | MERGED (3 share) (--)          | BOUND ROUTED (18000)           | BOUND ROUTED (16800)          
+    s1587  BOUND ROUTED (30000)           | BOUND ROUTED (31200)           | BOUND ROUTED (15600)           | BOUND ROUTED (13200)          
+    s1588  BOUND ROUTED (15600)           | BOUND ROUTED (15600)           | BOUND ROUTED (12000)           | BOUND ROUTED (24000)          
+    s1589  BOUND ROUTED (10800)           | MERGED (2 share) (--)          | BOUND ROUTED (12000)           | BOUND ROUTED (13200)          
+    s1590  BOUND ROUTED (27600)           | MERGED (3 share) (--)          | BOUND ROUTED (15600)           | BOUND ROUTED (14400)          
+    s1591  BOUND ROUTED (22800)           | MERGED (2 share) (--)          | MERGED (2 share) (--)          | BOUND ROUTED (40800)          
+    s1592  BOUND ROUTED (22800)           | BOUND ROUTED (27600)           | BOUND ROUTED (9600)            | BOUND ROUTED (9600)           
+    s1593  BOUND ROUTED (19200)           | BOUND ROUTED (15600)           | BOUND ROUTED (12000)           | BOUND ROUTED (9600)           
+    s1594  MERGED (2 share) (--)          | MERGED (2 share) (--)          | BOUND ROUTED (18000)           | BOUND ROUTED (20400)          
+    s1595  BOUND ROUTED (15600)           | BOUND ROUTED (24000)           | MERGED (2 share) (--)          | MERGED (2 share) (--)         
+    s1596  BOUND ROUTED (24000)           | MERGED (2 share) (--)          | BOUND ROUTED (15600)           | BOUND ROUTED (21600)          
+    s1597  BOUND ROUTED (13200)           | BOUND ROUTED (14400)           | BOUND ROUTED (12000)           | BOUND ROUTED (9600)           
+    s1598  BOUND ROUTED (10800)           | BOUND ROUTED (13200)           | BOUND ROUTED (7200)            | BOUND ROUTED (7200)           
+    s1599  BOUND ROUTED (33600)           | MERGED (3 share) (--)          | BOUND ROUTED (10800)           | BOUND ROUTED (9600)           
+
+  D3 rows (seed: HEBB_SPLIT transition, DELTA_SPLIT transition): s1580 25200/13200, s1583 25200/12000, s1584 19200/16800, s1585 15600/14400, s1586 22800/18000, s1587 30000/15600, s1588 15600/12000, s1589 10800/12000, s1590 27600/15600, s1592 22800/9600, s1593 19200/12000, s1596 24000/15600, s1597 13200/12000, s1598 10800/7200, s1599 33600/10800
+
+  HEBB_SPLIT: 41 firings in 20 runs (per run [3, 3, 1, 3, 1, 1, 3, 3, 1, 1, 3, 1, 2, 3, 3, 1, 2, 2, 1, 3]); targets labelled ok 41/41
+    s1580  BOUND ROUTED (transition 25200); fired: 4800: 1->5 ok (map [1,1,1,0,1,0,0,0] 2 ch 4+4 -> [1,1,1,0,1,0,0,0] 2 ch 4+4); 14400: 5->2 ok (map [5,12,1,10,5,14,0,14] 6 ch 2+2+1+1+1+1 -> [2,12,1,10,2,14,0,14] 6 ch 2+2+1+1+1+1); 21600: 14->11 ok (map [5,12,1,10,2,14,0,14] 7 ch 2+1+1+1+1+1+1 -> [5,12,1,10,2,11,0,11] 7 ch 2+1+1+1+1+1+1); blocked: 24000 (cap)
+           maps at the checks (step: distinct channels / probe acc): 2400:4/0.11 4800:2/0.12* 7200:4/0.23 9600:6/0.66 12000:6/0.69 14400:6/0.69* 16800:7/0.75 19200:7/0.80 21600:7/0.81* 24000:7/0.78 26400:8/1.00
+    s1581  BOUND ROUTED (transition 20400); fired: 4800: 4->2 ok (map [4,12,4,12,4,4,12,12] 2 ch 4+4 -> [2,12,2,12,2,2,12,12] 2 ch 4+4); 12000: 2->10 ok (map [2,12,2,8,2,15,12,3] 5 ch 3+2+1+1+1 -> [2,12,2,8,2,15,12,3] 5 ch 3+2+1+1+1); 16800: 12->13 ok (map [2,12,2,8,10,15,12,3] 6 ch 2+2+1+1+1+1 -> [2,12,2,8,10,15,12,3] 6 ch 2+2+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.08 4800:2/0.05* 7200:3/0.12 9600:5/0.72 12000:5/0.72* 14400:6/0.86 16800:6/0.86* 19200:7/0.95 21600:8/1.00
+    s1582  BOUND ROUTED (transition 13200); fired: 4800: 14->9 ok (map [13,2,13,2,14,14,4,14] 4 ch 3+2+2+1 -> [13,2,13,2,9,9,4,9] 4 ch 3+2+2+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.14 4800:4/0.14* 7200:6/0.73 9600:6/0.80 12000:7/0.91 14400:8/1.00
+    s1583  BOUND ROUTED (transition 25200); fired: 4800: 14->13 ok (map [14,14,0,14,14,14,14,0] 2 ch 6+2 -> [13,13,0,13,13,13,13,0] 2 ch 6+2); 14400: 13->8 ok (map [13,13,11,15,14,10,13,0] 6 ch 3+1+1+1+1+1 -> [8,8,11,15,14,10,8,0] 6 ch 3+1+1+1+1+1); 24000: 13->9 ok (map [13,13,11,15,14,10,8,0] 7 ch 2+1+1+1+1+1+1 -> [9,9,11,15,14,10,8,0] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.14 4800:2/0.14* 7200:5/0.61 9600:5/0.67 12000:6/0.89 14400:6/0.84* 16800:6/0.88 19200:7/0.94 21600:7/0.97 24000:7/0.94* 26400:8/1.00
+    s1584  BOUND ROUTED (transition 19200); fired: 16800: 6->0 ok (map [5,2,14,13,6,2,6,8] 6 ch 2+2+1+1+1+1 -> [5,2,14,13,0,2,0,8] 6 ch 2+2+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.02 4800:2/0.08 7200:2/0.20 9600:4/0.33 12000:5/0.59 14400:6/0.77 16800:6/0.70* 19200:8/1.00 21600:8/1.00
+    s1585  BOUND ROUTED (transition 15600); fired: 4800: 6->5 ok (map [6,6,11,6,11,11,6,6] 2 ch 5+3 -> [5,5,11,5,11,11,5,5] 2 ch 5+3); blocked: 7200 (gap)
+           maps at the checks (step: distinct channels / probe acc): 2400:4/0.06 4800:2/0.06* 7200:3/0.06 9600:4/0.16 12000:6/0.45 14400:6/0.73 16800:8/1.00
+    s1586  BOUND ROUTED (transition 22800); fired: 9600: 12->6 ok (map [1,4,1,12,12,15,12,12] 4 ch 4+2+1+1 -> [1,4,1,6,6,15,6,6] 4 ch 4+2+1+1); 16800: 12->7 ok (map [1,4,1,12,12,15,6,6] 5 ch 2+2+2+1+1 -> [1,4,1,7,7,15,6,6] 5 ch 2+2+2+1+1); 21600: 1->8 ok (map [1,4,1,12,7,15,6,6] 6 ch 2+2+1+1+1+1 -> [1,4,1,12,7,15,6,6] 6 ch 2+2+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.08 4800:2/0.16 7200:4/0.45 9600:4/0.44* 12000:5/0.61 14400:5/0.67 16800:5/0.59* 19200:6/0.78 21600:6/0.80* 24000:8/1.00
+    s1587  BOUND ROUTED (transition 30000); fired: 4800: 8->10 ok (map [8,1,1,8,1,1,8,8] 2 ch 4+4 -> [8,1,1,8,1,1,8,8] 2 ch 4+4); 19200: 10->0 ok (map [10,3,1,10,9,15,8,10] 6 ch 3+1+1+1+1+1 -> [0,3,1,0,9,15,8,0] 6 ch 3+1+1+1+1+1); 28800: 10->2 ok (map [0,3,1,10,9,15,8,10] 7 ch 2+1+1+1+1+1+1 -> [0,3,1,2,9,15,8,2] 7 ch 2+1+1+1+1+1+1); blocked: 7200 (gap)
+           maps at the checks (step: distinct channels / probe acc): 2400:1/0.09 4800:2/0.09* 7200:3/0.09 9600:5/0.28 12000:5/0.50 14400:5/0.56 16800:6/0.66 19200:6/0.62* 21600:7/0.81 24000:7/0.84 26400:7/0.89 28800:7/0.77* 31200:8/1.00
+    s1588  BOUND ROUTED (transition 15600); fired: 9600: 9->4 ok (map [5,11,9,8,5,8,11,9] 4 ch 2+2+2+2 -> [5,11,4,8,5,8,11,4] 4 ch 2+2+2+2); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:4/0.06 4800:2/0.11 7200:4/0.38 9600:4/0.31* 12000:5/0.67 14400:7/0.83 16800:8/1.00
+    s1589  BOUND ROUTED (transition 10800); fired: 9600: 0->10 ok (map [2,0,15,12,11,0,8,9] 7 ch 2+1+1+1+1+1+1 -> [2,0,15,12,11,0,8,9] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.08 4800:5/0.50 7200:7/0.86 9600:7/0.88* 12000:8/1.00
+    s1590  BOUND ROUTED (transition 27600); fired: 4800: 9->8 ok (map [9,5,9,9,5,9,9,5] 2 ch 5+3 -> [8,5,8,8,5,8,8,5] 2 ch 5+3); 21600: 9->15 ok (map [9,0,9,12,2,8,9,5] 6 ch 3+1+1+1+1+1 -> [9,0,9,12,2,8,9,5] 6 ch 3+1+1+1+1+1); 26400: 15->7 ok (map [15,0,9,12,2,8,15,5] 7 ch 2+1+1+1+1+1+1 -> [7,0,9,12,2,8,7,5] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.03 4800:2/0.03* 7200:2/0.11 9600:2/0.14 12000:4/0.33 14400:4/0.56 16800:5/0.67 19200:6/0.84 21600:6/0.83* 24000:7/0.91 26400:7/0.92* 28800:8/1.00
+    s1591  BOUND ROUTED (transition 22800); fired: 21600: 9->12 ok (map [6,11,3,8,9,9,7,15] 7 ch 2+1+1+1+1+1+1 -> [6,11,3,8,9,9,7,15] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.06 4800:2/0.12 7200:4/0.28 9600:4/0.50 12000:5/0.67 14400:6/0.75 16800:7/0.80 19200:7/0.84 21600:7/0.80* 24000:8/1.00
+    s1592  BOUND ROUTED (transition 22800); fired: 12000: 10->1 ok (map [3,0,10,4,6,6,10,12] 6 ch 2+2+1+1+1+1 -> [3,0,1,4,6,6,1,12] 6 ch 2+2+1+1+1+1); 16800: 6->11 ok (map [3,0,10,4,6,6,1,12] 7 ch 2+1+1+1+1+1+1 -> [3,0,10,4,6,6,1,12] 7 ch 2+1+1+1+1+1+1); blocked: 19200 (gap)
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.06 4800:2/0.19 7200:6/0.47 9600:6/0.67 12000:6/0.69* 14400:7/0.88 16800:7/0.81* 19200:7/0.73 21600:7/0.86 24000:8/1.00
+    s1593  BOUND ROUTED (transition 19200); fired: 4800: 14->8 ok (map [14,14,14,15,15,14,15,15] 2 ch 4+4 -> [8,8,8,15,15,8,15,15] 2 ch 4+4); 12000: 15->5 ok (map [12,14,14,13,15,8,15,1] 6 ch 2+2+1+1+1+1 -> [12,14,14,13,5,8,5,1] 6 ch 2+2+1+1+1+1); 16800: 14->2 ok (map [12,14,14,13,5,8,15,1] 7 ch 2+1+1+1+1+1+1 -> [12,2,2,13,5,8,15,1] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.12 4800:2/0.08* 7200:4/0.16 9600:6/0.86 12000:6/0.86* 14400:7/0.92 16800:7/0.92* 19200:8/1.00 21600:8/1.00
+    s1594  MERGED (2 share) (transition --); fired: 7200: 8->6 ok (map [8,11,8,10,11,8,8,8] 3 ch 5+2+1 -> [6,11,6,10,11,6,6,6] 3 ch 5+2+1); 12000: 6->5 ok (map [3,11,6,10,11,3,6,6] 4 ch 3+2+2+1 -> [3,11,5,10,11,3,5,5] 4 ch 3+2+2+1); 21600: 6->13 ok (map [3,11,6,10,11,0,6,5] 6 ch 2+2+1+1+1+1 -> [3,11,6,10,11,0,6,5] 6 ch 2+2+1+1+1+1); blocked: 26400 (cap), 28800 (cap), 33600 (cap), 36000 (cap), 40800 (cap)
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.06 4800:2/0.12 7200:3/0.08* 9600:4/0.30 12000:4/0.30* 14400:5/0.44 16800:5/0.58 19200:6/0.80 21600:6/0.72* 24000:6/0.78 26400:6/0.78 28800:6/0.75 31200:6/0.80 33600:6/0.78 36000:6/0.75 38400:6/0.80 40800:6/0.81
+    s1595  BOUND ROUTED (transition 15600); fired: 14400: 12->6 ok (map [8,5,2,7,12,4,15,12] 7 ch 2+1+1+1+1+1+1 -> [8,5,2,7,6,4,15,6] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.05 4800:4/0.12 7200:6/0.58 9600:6/0.73 12000:7/0.81 14400:7/0.81* 16800:8/1.00
+    s1596  BOUND ROUTED (transition 24000); fired: 14400: 13->5 ok (map [11,8,13,12,13,2,14,13] 6 ch 3+1+1+1+1+1 -> [11,8,5,12,5,2,14,5] 6 ch 3+1+1+1+1+1); 19200: 5->6 ok (map [11,8,5,12,13,2,14,5] 7 ch 2+1+1+1+1+1+1 -> [11,8,5,12,13,2,14,5] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.05 4800:2/0.08 7200:3/0.11 9600:4/0.38 12000:5/0.70 14400:6/0.72* 16800:7/0.84 19200:7/0.86* 21600:7/0.89 24000:8/1.00 26400:8/1.00
+    s1597  BOUND ROUTED (transition 13200); fired: 4800: 10->3 ok (map [10,10,6,10,10,6,6,10] 2 ch 5+3 -> [7,3,6,3,3,6,6,3] 3 ch 4+3+1); 12000: 3->11 ok (map [15,3,13,2,0,6,8,3] 7 ch 2+1+1+1+1+1+1 -> [15,3,13,2,0,6,8,3] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.14 4800:2/0.05* 7200:6/0.70 9600:7/0.88 12000:7/0.86* 14400:8/1.00
+    s1598  BOUND ROUTED (transition 10800); fired: 4800: 10->2 ok (map [15,10,15,12,10,10,15,10] 3 ch 4+3+1 -> [15,2,15,12,2,2,15,2] 3 ch 4+3+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.11 4800:3/0.08* 7200:6/0.72 9600:7/0.94 12000:8/1.00
+    s1599  BOUND ROUTED (transition 33600); fired: 9600: 6->7 ok (map [6,12,15,5,6,15,5,6] 4 ch 3+2+2+1 -> [6,12,15,5,6,15,5,6] 4 ch 3+2+2+1); 14400: 6->13 ok (map [6,12,15,5,7,15,5,6] 5 ch 2+2+2+1+1 -> [6,12,15,5,7,15,5,6] 5 ch 2+2+2+1+1); 19200: 5->10 ok (map [6,12,15,5,7,15,5,6] 5 ch 2+2+2+1+1 -> [6,12,15,5,7,15,5,6] 5 ch 2+2+2+1+1); blocked: 16800 (gap), 26400 (cap), 28800 (cap)
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.09 4800:4/0.22 7200:4/0.52 9600:4/0.41* 12000:5/0.62 14400:5/0.56* 16800:5/0.58 19200:5/0.56* 21600:7/0.88 24000:7/0.92 26400:7/0.89 28800:7/0.89 31200:7/0.95 33600:8/1.00 36000:8/1.00
+
+  DELTA_SPLIT: 32 firings in 20 runs (per run [1, 3, 3, 1, 2, 2, 2, 2, 2, 1, 1, 3, 0, 1, 1, 3, 1, 2, 0, 1]); targets labelled ok 16/32
+    s1580  BOUND ROUTED (transition 13200); fired: 4800: 12->7 NOT labelled (map [9,5,5,0,9,9,0,0] 3 ch 3+3+2 -> [9,5,5,0,9,9,0,0] 3 ch 3+3+2); blocked: 7200 (gap)
+           maps at the checks (step: distinct channels / probe acc): 2400:4/0.08 4800:3/0.06* 7200:4/0.06 9600:8/0.28 12000:8/0.72 14400:8/1.00
+    s1581  MERGED (2 share) (transition --); fired: 16800: 11->13 NOT labelled (map [14,11,8,9,12,3,8,5] 7 ch 2+1+1+1+1+1+1 -> [14,11,8,9,12,3,8,5] 7 ch 2+1+1+1+1+1+1); 21600: 12->1 NOT labelled (map [15,11,10,4,12,2,10,5] 7 ch 2+1+1+1+1+1+1 -> [15,11,10,4,1,2,10,5] 7 ch 2+1+1+1+1+1+1); 26400: 5->7 NOT labelled (map [15,11,8,4,12,2,8,5] 7 ch 2+1+1+1+1+1+1 -> [15,11,8,4,12,2,8,5] 7 ch 2+1+1+1+1+1+1); blocked: 28800 (cap), 36000 (cap), 38400 (cap), 40800 (cap)
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.06 4800:5/0.19 7200:5/0.34 9600:6/0.44 12000:7/0.66 14400:7/0.73 16800:7/0.73* 19200:7/0.89 21600:7/0.91* 24000:7/0.95 26400:7/0.92* 28800:7/0.92 31200:7/0.95 33600:7/0.97 36000:7/0.92 38400:7/0.94 40800:7/0.89
+    s1582  BOUND NOT routed (transition 36000); fired: 4800: 2->9 NOT labelled (map [3,15,11,0,10,3,2,14] 7 ch 2+1+1+1+1+1+1 -> [3,15,11,0,10,3,2,14] 7 ch 2+1+1+1+1+1+1); 16800: 0->7 ok (map [5,15,0,0,12,5,2,14] 6 ch 2+2+1+1+1+1 -> [5,15,11,11,12,5,2,14] 6 ch 2+2+1+1+1+1); 24000: 14->6 NOT labelled (map [5,15,0,0,12,5,2,14] 6 ch 2+2+1+1+1+1 -> [5,15,0,0,12,5,2,6] 6 ch 2+2+1+1+1+1); blocked: 26400 (cap), 31200 (cap), 33600 (cap)
+           maps at the checks (step: distinct channels / probe acc): 2400:5/0.11 4800:7/0.09* 7200:7/0.33 9600:6/0.62 12000:6/0.75 14400:6/0.78 16800:6/0.70* 19200:6/0.75 21600:6/0.81 24000:6/0.77* 26400:6/0.73 28800:6/0.80 31200:7/0.78 33600:6/0.80 36000:6/1.00 38400:6/0.98
+    s1583  BOUND ROUTED (transition 12000); fired: 7200: 8->2 NOT labelled (map [8,12,0,0,0,14,9,0] 5 ch 4+1+1+1+1 -> [2,12,0,0,0,14,9,0] 5 ch 4+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.06 4800:5/0.12 7200:5/0.09* 9600:7/0.70 12000:8/1.00 14400:8/1.00
+    s1584  BOUND ROUTED (transition 16800); fired: 4800: 13->0 ok (map [3,3,5,13,13,3,13,13] 3 ch 4+3+1 -> [3,3,5,0,0,3,0,0] 3 ch 4+3+1); 9600: 9->11 NOT labelled (map [9,12,12,6,15,7,10,0] 7 ch 2+1+1+1+1+1+1 -> [9,12,12,6,15,7,10,0] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:5/0.05 4800:3/0.06* 7200:5/0.16 9600:7/0.17* 12000:7/0.64 14400:8/0.67 16800:8/0.98 19200:8/0.97
+    s1585  BOUND ROUTED (transition 14400); fired: 4800: 6->14 NOT labelled (map [6,6,6,6,14,2,6,6] 3 ch 6+1+1 -> [6,6,6,6,0,2,6,6] 3 ch 6+1+1); 9600: 10->12 NOT labelled (map [14,7,7,14,3,9,14,5] 5 ch 3+2+1+1+1 -> [14,7,7,14,3,9,14,5] 5 ch 3+2+1+1+1); blocked: 7200 (gap)
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.06 4800:3/0.08* 7200:3/0.08 9600:5/0.05* 12000:3/0.09 14400:8/1.00 16800:8/1.00
+    s1586  BOUND ROUTED (transition 18000); fired: 4800: 1->5 ok (map [1,2,1,1,2,11,14,14] 4 ch 3+2+2+1 -> [1,2,1,1,2,11,14,14] 4 ch 3+2+2+1); 12000: 10->0 ok (map [10,11,10,13,4,4,2,2] 5 ch 2+2+2+1+1 -> [0,11,0,13,4,4,2,2] 5 ch 2+2+2+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.08 4800:4/0.06* 7200:2/0.11 9600:5/0.14 12000:5/0.16* 14400:8/0.55 16800:8/0.97 19200:8/1.00
+    s1587  BOUND ROUTED (transition 15600); fired: 4800: 1->9 ok (map [1,11,1,11,1,1,11,11] 2 ch 4+4 -> [1,11,1,11,1,1,11,11] 2 ch 4+4); 9600: 10->2 ok (map [10,5,10,7,10,10,11,11] 4 ch 4+2+1+1 -> [2,5,2,7,2,2,11,11] 4 ch 4+2+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.08 4800:2/0.06* 7200:7/0.14 9600:4/0.08* 12000:7/0.39 14400:8/0.83 16800:8/1.00
+    s1588  BOUND ROUTED (transition 12000); fired: 4800: 15->13 NOT labelled (map [9,8,15,14,8,14,9,9] 4 ch 3+2+2+1 -> [9,8,13,14,8,14,9,9] 4 ch 3+2+2+1); 9600: 7->15 ok (map [1,7,1,7,7,7,3,1] 3 ch 4+3+1 -> [1,8,1,7,8,7,3,1] 4 ch 3+2+2+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:5/0.05 4800:4/0.03* 7200:2/0.06 9600:3/0.08* 12000:8/1.00 14400:8/1.00
+    s1589  BOUND ROUTED (transition 12000); fired: 4800: 11->12 ok (map [11,11,4,4,4,4,8,13] 4 ch 4+2+1+1 -> [11,11,4,4,4,4,8,13] 4 ch 4+2+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:6/0.05 4800:4/0.03* 7200:5/0.09 9600:6/0.20 12000:8/1.00 14400:8/1.00
+    s1590  BOUND ROUTED (transition 15600); fired: 7200: 2->0 NOT labelled (map [9,2,12,12,12,13,9,13] 4 ch 3+2+2+1 -> [9,0,12,12,12,13,9,13] 4 ch 3+2+2+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.03 4800:3/0.06 7200:4/0.02* 9600:6/0.14 12000:7/0.77 14400:8/0.89 16800:8/1.00
+    s1591  MERGED (2 share) (transition --); fired: 4800: 9->14 ok (map [10,10,10,10,9,9,10,11] 3 ch 5+2+1 -> [10,10,10,10,9,9,10,11] 3 ch 5+2+1); 24000: 2->12 NOT labelled (map [7,6,6,10,9,1,2,15] 7 ch 2+1+1+1+1+1+1 -> [7,6,6,10,9,1,2,15] 7 ch 2+1+1+1+1+1+1); 28800: 4->8 NOT labelled (map [7,6,6,10,9,1,2,15] 7 ch 2+1+1+1+1+1+1 -> [7,6,6,10,9,1,2,15] 7 ch 2+1+1+1+1+1+1); blocked: 7200 (gap), 26400 (gap), 31200 (cap), 33600 (cap), 36000 (cap), 38400 (cap)
+           maps at the checks (step: distinct channels / probe acc): 2400:7/0.08 4800:3/0.05* 7200:4/0.06 9600:4/0.14 12000:5/0.27 14400:5/0.45 16800:6/0.53 19200:6/0.62 21600:7/0.91 24000:7/0.89* 26400:7/0.91 28800:7/0.89* 31200:7/0.91 33600:7/0.92 36000:7/0.92 38400:7/0.91 40800:7/0.94
+    s1592  BOUND ROUTED (transition 9600); fired: none; blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.05 4800:4/0.12 7200:8/0.70 9600:8/1.00 12000:8/1.00
+    s1593  BOUND ROUTED (transition 12000); fired: 4800: 12->3 NOT labelled (map [6,11,14,7,7,11,7,7] 4 ch 4+2+1+1 -> [6,11,14,7,7,11,7,7] 4 ch 4+2+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.08 4800:4/0.09* 7200:7/0.55 9600:6/0.80 12000:8/1.00 14400:8/1.00
+    s1594  BOUND ROUTED (transition 18000); fired: 4800: 9->6 ok (map [9,12,9,12,12,9,8,9] 3 ch 4+3+1 -> [6,12,6,12,12,6,8,6] 3 ch 4+3+1); blocked: 7200 (gap)
+           maps at the checks (step: distinct channels / probe acc): 2400:5/0.06 4800:3/0.08* 7200:5/0.08 9600:5/0.12 12000:7/0.16 14400:7/0.58 16800:8/0.89 19200:8/0.98
+    s1595  MERGED (2 share) (transition --); fired: 4800: 9->7 ok (map [9,2,2,9,2,9,9,2] 2 ch 4+4 -> [7,2,2,7,2,7,7,2] 2 ch 4+4); 14400: 15->6 ok (map [15,2,13,15,11,7,8,14] 7 ch 2+1+1+1+1+1+1 -> [6,2,13,6,11,7,8,14] 7 ch 2+1+1+1+1+1+1); 21600: 6->0 ok (map [6,2,13,6,11,7,8,14] 7 ch 2+1+1+1+1+1+1 -> [0,2,13,0,11,7,8,14] 7 ch 2+1+1+1+1+1+1); blocked: 16800 (gap), 24000 (cap), 28800 (cap), 33600 (cap), 38400 (cap)
+           maps at the checks (step: distinct channels / probe acc): 2400:4/0.08 4800:2/0.06* 7200:4/0.14 9600:7/0.64 12000:7/0.88 14400:7/0.88* 16800:7/0.86 19200:7/0.89 21600:7/0.91* 24000:7/0.88 26400:7/0.91 28800:7/0.86 31200:7/0.95 33600:7/0.91 36000:7/0.94 38400:7/0.94 40800:7/0.95
+    s1596  BOUND ROUTED (transition 15600); fired: 7200: 8->11 ok (map [15,8,8,15,8,15,15,1] 3 ch 4+3+1 -> [15,8,8,15,8,15,15,1] 3 ch 4+3+1); blocked: 9600 (gap)
+           maps at the checks (step: distinct channels / probe acc): 2400:6/0.05 4800:5/0.09 7200:3/0.05* 9600:5/0.06 12000:8/0.55 14400:8/0.94 16800:8/1.00
+    s1597  BOUND ROUTED (transition 12000); fired: 4800: 2->0 ok (map [6,6,6,6,2,6,10,2] 3 ch 5+2+1 -> [6,6,6,6,0,6,10,0] 3 ch 5+2+1); 9600: 7->15 NOT labelled (map [14,5,14,7,9,1,4,10] 7 ch 2+1+1+1+1+1+1 -> [14,5,14,7,9,1,4,10] 7 ch 2+1+1+1+1+1+1); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:2/0.05 4800:3/0.06* 7200:7/0.91 9600:7/0.89* 12000:8/1.00 14400:8/1.00
+    s1598  BOUND ROUTED (transition 7200); fired: none; blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:4/0.00 4800:4/0.06 7200:8/1.00 9600:8/1.00
+    s1599  BOUND ROUTED (transition 10800); fired: 4800: 5->7 ok (map [9,9,5,5,9,5,5,9] 2 ch 4+4 -> [9,9,5,5,9,5,5,9] 2 ch 4+4); blocked: none
+           maps at the checks (step: distinct channels / probe acc): 2400:3/0.05 4800:2/0.05* 7200:6/0.33 9600:6/0.73 12000:8/1.00
+
+  CEIL_HEBB transitions: s1580 3600, s1581 3600
+  CEIL_DELTA transitions: s1580 1200, s1581 8400
+  CPU labels in the records: {'12th Gen Intel(R) Core(TM) i7-12650H': 84}
+
+====================================================================================================
+X AND L SIDE BY SIDE (each machine's own seeds; pooled counts are the sums)
+====================================================================================================
+                                                        X              L         pooled
+  CEIL_HEBB    perfect gate BOUND                     2/2            2/2            4/4
+  CEIL_DELTA   perfect gate BOUND                     2/2            2/2            4/4
+  HEBB_SPLIT   BOUND ROUTED                         16/20          19/20          35/40
+  HEBB_SLOW    BOUND ROUTED                          7/20          10/20          17/40
+  DELTA_SPLIT  BOUND ROUTED                         19/20          16/20          35/40
+  DELTA_SLOW   BOUND ROUTED                         19/20          19/20          38/40
+  D1 discordant (split arm only vs other only)         4 vs 1         1 vs 4         5 vs 5
+  D2 discordant (split arm only vs other only)         0 vs 0         0 vs 3         0 vs 3
+  D4 discordant (split arm only vs other only)        10 vs 1         9 vs 0        19 vs 1
+
+====================================================================================================
+CURVES — held-out accuracy x100 at every evaluation (1200 steps)
+====================================================================================================
+  CEIL_HEBB    s1580  62  78  96 100 100  -> BOUND
+  CEIL_HEBB    s1581  71  80  96  98  98  -> BOUND
+  CEIL_DELTA   s1580  99 100 100  -> BOUND
+  CEIL_DELTA   s1581  77  77  78  75  76  75 100 100 100  -> BOUND
+  HEBB_SPLIT   s1580   6   9  11  11  11  21  73  73  74  75  75  76  87  88  88  88  88  88  88  88  98 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1581   6  10   9  10  12  18  27  58  59  60  73  72  73  73  87  88  96 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1582   6   8   9  14  28  69  71  73  85  86 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1583   7  10   9  10  15  56  60  61  73  74  74  73  73  74  88  87  88  86  87  88 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1584   6   7   8  10  11  12  17  27  33  56  74  75  76  76  87 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1585   6   7   6   8   8  12  15  24  33  52  66  72 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1586   6   7  10   9  15  43  44  45  57  60  61  61  60  62  73  73  75  75 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1587   6   6   9  10  11  14  22  34  58  58  58  59  74  75  74  75  88  87  88  88  87  87  88  88 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1588   6   6   8  10  13  20  26  29  57  59  63  88 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1589   6   9  15  35  73  87  86  87 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1590   7   6   7   7   9  10  11  12  12  20  26  46  60  59  72  72  72  74  88  88  87  87 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1591   7   6   8   8  10  21  31  43  60  62  75  75  88  88  88  88  88  88 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1592   6  11  10  10  19  54  73  73  74  74  88  88  88  88  88  88  88  88 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1593   6  12  11  11  20  26  47  74  74  73  75  86  87  86  87  98 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1594   7   6   8   8   9  11  18  24  28  33  34  47  54  55  72  73  73  74  74  75  74  73  72  74  75  75  75  75  74  73  74  75  76  75  76  74  -> MERGED (2 share)
+  HEBB_SPLIT   s1595   7   9  10  15  21  66  72  73  75  88  88  88 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1596   6   6   7   7   9  14  23  44  43  58  73  73  86  87  86  86  87  86  87 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1597   6  11   9  12  20  72  86  86  85  87 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1598   6   8   9  12  15  67  85  85 100 100 100  -> BOUND ROUTED
+  HEBB_SPLIT   s1599   7   9  11  20  43  44  43  45  57  58  61  60  63  62  62  62  75  76  87  88  88  89  88  87  88  88  87 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1580   6   9  11  11  14  25  73  72  74  74  76  87  87 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1581   6  10   9  10  12  16  28  46  48  49  48  47  48  61  61  62  62  87  88  87  88  87  88  88  88  88  87  88  88  88  87  88  87  88  88  88  -> MERGED (2 share)
+  HEBB_SLOW    s1582   6   8   9  14  19  37  72  74  75  73  75  75  88  87  88  88  87  88  88  87  88  88  87  87  88  88  88  87  88  88  88  88  88  88  88  88  -> MERGED (2 share)
+  HEBB_SLOW    s1583   7  10   9  10  14  45  47  48  60  73  73  74  75  75  88  88  88  87  88  87  87  87  87  87  87  88  88  88  87  88  88  87  88  87  88  87  -> MERGED (2 share)
+  HEBB_SLOW    s1584   6   7   8  10  11  12  17  27  33  56  74  75  76  76  87 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1585   6   7   6   8  13  18  24  27  34  73 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1586   6   7  10   9  15  43  44  45  58  59  61  60  61  62  60  62  62  62  62  61  61  62  63  62  63  62  64  61  62  62  62  61  62  62  62  63  -> MERGED (3 share)
+  HEBB_SLOW    s1587   6   6   9  10  12  13  16  19  38  61  61  62  61  61  64  63  75  75  75  75  75  75  75  76  88 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1588   6   6   8  10  13  20  26  29  45  47  48  50 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1589   6   9  15  35  73  87  86  87  87  87  87  87  88  87  87  87  88  87  87  88  87  87  88  88  87  87  88  88  88  88  87  87  87  87  87  88  -> MERGED (2 share)
+  HEBB_SLOW    s1590   7   6   7   7  10   9  12  12  14  14  14  15  15  18  23  26  28  30  33  45  59  59  59  61  62  61  62  61  60  74  73  73  74  73  74  74  -> MERGED (3 share)
+  HEBB_SLOW    s1591   7   6   8   8  10  21  31  43  60  62  75  75  88  88  88  88  88  88  89  88  89  88  87  87  87  88  88  87  88  88  87  88  88  87  88  88  -> MERGED (2 share)
+  HEBB_SLOW    s1592   6  11  10  10  19  54  73  73  74  74  74  75  75  75  75  74  75  75  75  76  75  75 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1593   6  12  11  11  18  35  44  56  59  73  75  75 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1594   7   6   8   8   9  11  17  26  30  31  33  36  38  41  44  46  61  61  61  60  61  62  62  63  62  60  63  62  68  68  71  74  87  87  87  86  -> MERGED (2 share)
+  HEBB_SLOW    s1595   7   9  10  15  21  66  72  73  75  88  88  88  88  88  87  88  88  88  88 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1596   6   6   7   7   9  14  23  44  43  58  73  73  74  73  74  87  87  88  88  87  87  88  87  88  88  88  87  88  88  88  88  88  88  88  88  89  -> MERGED (2 share)
+  HEBB_SLOW    s1597   6  11   9  12  21  59  85  85  86  87  87 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1598   6   8   9  12  21  55  54  69  73  74 100 100 100  -> BOUND ROUTED
+  HEBB_SLOW    s1599   7   9  11  20  43  44  43  45  44  46  47  48  49  49  49  48  49  59  62  63  61  63  62  62  62  63  61  62  62  62  61  62  63  63  62  62  -> MERGED (3 share)
+  DELTA_SPLIT  s1580   6   7   7   7   7  10  12  27  61  74  96  99  99  -> BOUND ROUTED
+  DELTA_SPLIT  s1581   7   6   7  12  17  27  33  41  60  61  62  65  66  69  77  79  80  83  84  85  86  86  86  87  87  87  87  87  87  87  87  87  87  87  88  87  -> MERGED (2 share)
+  DELTA_SPLIT  s1582   6   7   7  14  20  29  60  62  69  70  71  72  72  73  75  73  74  74  72  75  74  74  74  75  75  73  75  79  92  98  99  99  -> BOUND NOT routed
+  DELTA_SPLIT  s1583   7   6   7   8   9  13  44  59  72 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1584   6   7   6   6   7   8  10  16  48  61  62  79  92  95  98  98  -> BOUND ROUTED
+  DELTA_SPLIT  s1585   6   7   6   7   6   7   9  10  10  12  27 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1586   6   6   6   8   7  11  10  10  13  18  32  55  82  95  99  99 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1587   6   6   6   6   8   8   9  10  12  30  67  83  96  98  99  -> BOUND ROUTED
+  DELTA_SPLIT  s1588   6   6   7   6   6   8   9  11  60 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1589   6   6   7   6   7  10  14  25  81 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1590   7   6   6   6   7   8   9  15  39  70  84  84 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1591   7   7   6   7   7   9   8   9  24  31  40  42  44  53  54  62  69  84  85  85  85  86  86  85  86  86  86  86  86  86  87  86  86  87  86  87  -> MERGED (2 share)
+  DELTA_SPLIT  s1592   6   7   5   8  42  76  76 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1593   6   6   7   9  10  54  70  72  73 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1594   6   6   7   6   7   7   8   8   9  16  31  53  60  91  98  99  99  -> BOUND ROUTED
+  DELTA_SPLIT  s1595   7   7   7   7  12  14  56  73  73  86  86  88  88  87  88  87  87  87  89  87  87  88  88  87  87  87  90  90  90  90  91  90  91  90  90  90  -> MERGED (2 share)
+  DELTA_SPLIT  s1596   6   6   6   6   7   8   9   8  15  58  81  94 100  99 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1597   6   7   7   9  17  83  84  84  84 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1598   6   6   7   7  10 100 100 100  -> BOUND ROUTED
+  DELTA_SPLIT  s1599   7   7   6   7   9  30  40  69 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1580   6   7   7   7   8  12  24  54  71  73  94  97  98  99  -> BOUND ROUTED
+  DELTA_SLOW   s1581   7   6   7  12  17  27  33  41  60  61  62  65  66  69  77  79  80  83  84  86  86  87  86  87  87  87  86  87  86  86  87  88  90  91  94 100  -> BOUND ROUTED
+  DELTA_SLOW   s1582   6   7   7  14  19  24  29  46  48  53  53  54  54  52  53  53  76  78  89 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1583   7   6   7   8   9  13  42  59  71  91  92  97 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1584   6   7   6   6   7   8   9  13  32  66  68  70  89  92  93  94 100 100  98  -> BOUND ROUTED
+  DELTA_SLOW   s1585   6   7   6   7   6   6   7   7   8   9  13  49  66  99 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1586   6   6   6   8   8  10  11  13  34  58  62  75  94  98  99 100  -> BOUND ROUTED
+  DELTA_SLOW   s1587   6   6   6   6   8   7   8   8  10  85 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1588   6   6   7   6   6   7   9   8  13  23  46  58  71  72  73  76  81  89  94  96  98  98  -> BOUND ROUTED
+  DELTA_SLOW   s1589   6   6   7   6   7  10   9  13  29  48  99 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1590   7   6   6   6   7   8   9  16  33  67  90 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1591   7   7   6   7   7   8  10  11  10  19  27  43  45  45  47  52  53  53  53  63  72  85  87  88  87  86  88  87  87  87  87  86  88  99 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1592   6   7   5   8  42  76  76 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1593   6   6   7   9  11  30  41 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1594   6   6   7   6   6   6   8  10  19  33  41  49  59  75  85  94  97  98  99  -> BOUND ROUTED
+  DELTA_SLOW   s1595   7   7   7   7  11  14  52  85  87  87  86  88  88  87  88  87  87  88  88  87  88  88  87  88  87  87  88  88  88  87  88  88  88  89  88  87  -> MERGED (2 share)
+  DELTA_SLOW   s1596   6   6   6   6   7   8  10  10  16  21  24  35  51  73  89  94  95  96  97  99  -> BOUND ROUTED
+  DELTA_SLOW   s1597   6   7   7   9  19  69  84 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1598   6   6   7   7  10 100 100 100  -> BOUND ROUTED
+  DELTA_SLOW   s1599   7   7   6   7  11  44  85 100 100 100  -> BOUND ROUTED
+
+  total wall clock after verification: 0.0 min (0s)   raw records: delta_recipe_results.json
