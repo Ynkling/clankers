@@ -14,8 +14,7 @@ the test's own CPU records, put through the same functions. The GPU run is never
 | WIN3_SLOW_D8 | 6/20 [0.15, 0.52] | 6/20 [0.15, 0.52] | 9/20 [0.26, 0.66] | 15/40 [0.24, 0.53] |
 
 **Validity, by the test's rule.** Part C (and D) is VALID if CEIL_C binds on both of its two seeds. On the GPU, CEIL_C
-bound on 2540 (transition at step 6000) and on 2541 (at 4800): 2/2, so this run is **VALID** by that rule. X and L were
-2/2 as well.
+bound on 2540 and on 2541: 2/2, so this run is **VALID** by that rule. X and L were 2/2 as well.
 
 **Discordant pairs against the controls, paired by seed.** b counts seeds where only the first arm is BOUND ROUTED; c
 counts seeds where only the control is.
@@ -33,7 +32,8 @@ seed pairing) and `success` (BOUND ROUTED for Parts C and D, `test_stream_recipe
 
 ## Per seed on the GPU (the pairs' basis)
 
-R = BOUND ROUTED, . = not. Every record is ok, so each pairing has n = 20.
+This listing goes beyond the note's fixed list. It is the per-seed outcome (`test_window_gate.success`) from which the
+counts and pairs above are computed. R = BOUND ROUTED, . = not. Every record is ok, so each pairing has n = 20.
 
 | seed | WIN3_SPLIT_D8 | HINGE_D8 | WIN3_SLOW_D8 |
 |---|---|---|---|
@@ -54,15 +54,36 @@ R = BOUND ROUTED, . = not. Every record is ok, so each pairing has n = 20.
   byte-identical to the main line's.
 - **Device.** NVIDIA GeForce GTX 1660 SUPER (5.61 GB, sm 7.5); CUDA 13.0, torch 2.14.0+cu130; TF32 off; host CPU AMD
   Ryzen 5 3600. Every record shows one torch thread, the fix committed with the note.
-- **When.** The results file was started at 03:20:25 UTC on 2026-10-13. That is 4.6 h after the note's commit
-  (22:44:05 UTC on 10-12), so the note was committed before the run. The records were pushed in 148c161 at 15:31 UTC.
-  The runs' own durations sum to 15.1 h: HINGE_D8 9.7 h, WIN3_SLOW_D8 3.3 h, WIN3_SPLIT_D8 2.0 h, CEIL_C 0.1 h.
-- **Order.** The note fixed CEIL_C first, then the three arms. The records carry no start times and the file is saved
-  with sorted keys, so the order cannot be checked from the file.
+- **When.** The results file was started at 03:20:25 on 2026-10-13, by the first command (`mainline.py` sets
+  `started` once).
+  - That time is the server's local clock, which runs on UTC: the same host committed 4371824 at 03:20:22 +0000,
+    three seconds earlier.
+  - The start was 4.6 h after the note's commit (22:44:05 UTC on 10-12), so the note was committed before the run.
+  - The records were committed and pushed in 148c161 at 15:31 UTC.
+  - The runs' own durations (the records' `secs`) sum to 15.0 h: HINGE_D8 9.7 h, WIN3_SLOW_D8 3.3 h, WIN3_SPLIT_D8
+    2.0 h, CEIL_C 0.1 h (each rounded). That is more than the 12.2 h between the start and the commit, so runs
+    overlapped, as the note's `--workers` allows.
+- **Order and commands.** The note fixed CEIL_C first, then the three arms, through four `explore_gpu.mainline`
+  commands.
+  - The records carry no start times, and the file is saved with sorted keys, so the order cannot be checked from the
+    file.
+  - The records do not carry the command line or the worker count either.
+  - What the records do confirm: the arm and seed of each record, the device (cuda:0), the REAL schedule (no
+    `--iters`), and one thread.
 - **The RTX 3070's aborted attempt.** None of its records is in the repository; nothing from it is described.
 - **The descriptions file.** It was not in 148c161, although that commit's message names it. It is generated and
-  committed with this report. After the run, the generator's GPU column label was changed from "GPU GPU:NVIDIA …" to
-  the file's machine name, "GPU:NVIDIA GeForce GTX 1660 SUPER". Nothing it computes changed.
+  committed with this report. The generator was changed after the run, in three ways, and no table cell changed:
+  - the GPU column label, from "GPU GPU:NVIDIA …" to the file's machine name, "GPU:NVIDIA GeForce GTX 1660 SUPER";
+  - the GPU set now uses the planned seeds, as the test's own `tally` does, so a missing record would show as
+    "(k missing)" instead of shrinking n;
+  - each set's header line gives records present / planned, ok, and outside the plan, and every commit the file
+    records.
+- **X's and L's records.** X's file records two starts:
+  - The first start, at 2f98f06, kept only its six perfect-gate records, CEIL_C's two among them.
+  - The other 225 runs, including all three described arms, ran at 886a668 after the Part D amendment.
+
+  This is from test_window_gate.py's RESULT (X) and results/README.md. Before the fix, the descriptions' header named
+  only 2f98f06. L ran entirely at 886a668.
 
 ## What this does and does not say
 
@@ -70,9 +91,21 @@ These are descriptions of 60 new runs of the three arms on new seeds, and two va
 L's records, which were run on CPUs. A CUDA run is not bit-comparable with the CPU runs, so outcomes are compared and
 curves are not.
 
-The CUDA CHECKs passed on this card. They validated the sequential path as mainline runs it (K4b) and, on fake CUDA
-tensors, LocalBDH's forwards and `test_window_gate.split_op`'s noise (K8). Part C's models at S = 8 were not run
-lock-step against the CPU.
+**The CUDA CHECKs on this card** (`explore_gpu/checks_cuda_NVIDIA_GeForce_GTX_1660_SUPER_output.txt`) all passed.
+- **K4b** validated the sequential path as mainline runs it (cpu_io), lock-step against the CPU. It ran arm A 160 for
+  2400 updates and the S75 models ORACLE, SINGLE, WIDE_SPLIT and REG3 for 20 updates each.
+  - Arm A 160 is MultiBDH with the recurrent gate, HINGE_D8's gate kind.
+  - S75's WIDE_SPLIT is `explore_b16_gates.LocalBDH` with a width-16 window, at S = 4 and k = 4. That class's source is
+    identical to test_window_gate's LocalBDH.
+- **K8** is a CPU-only CHECK and was skipped on CUDA. It passed in the CPU CHECK run (`checks_cpu_output.txt`,
+  ce4b9ef). There, on fake CUDA tensors, it ran two things:
+  - the LocalBDH forwards on the S75 task;
+  - the split noise of `test_window_gate.noise_for`, which `split_op` uses.
+
+**Correction to the pre-run note.** The note attributes K8 to "both cards' CUDA CHECKs". That attribution is wrong:
+K8 was skipped on both cards.
+
+No CHECK ran Part C's models (S = 8, P = 4, k = 16, D8) lock-step against the CPU.
 
 The records also hold the test's other diagnostics: transitions, failure classes, the trigger's splits and hinge
 counts. The pre-run note did not fix any of them for description, so none is described here.
