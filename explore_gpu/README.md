@@ -126,6 +126,39 @@ CUDA, torch, CPU), the spec and the code SHA, and is reused only when spec and c
 `explore_out/I/gpu/mainline/<test>_<GPU>_results.json`, with machine `GPU:<model>` in the meta, never to `results/X` or
 `results/L`. A GPU run is a new run of its seed: compare outcomes, not curves.
 
+**(d) S75b** (`s75b.py`; spec `../explore_out/I/s75b_spec_draft.md`, approved at 114cd08, with its appendix of
+post-approval changes, none of them blind). Run each step from the repository root and commit and push its output
+before the next step. The driver refuses to go out of order.
+
+1. **On each card, while no other job is on that GPU:** run the CUDA CHECK, then commit
+   `explore_gpu/s75b_checks_cuda_<GPU>_output.*`. On the 3070, test_delta_recipe is that card's co-tenant: run this step
+   when it is not on the GPU, if possible.
+
+       python -m explore_gpu.s75b_checks --device cuda
+
+2. **The benchmark**, on each card, then commit `explore_out/I/gpu/s75b/s75b_bench_<GPU>.json`.
+   - `--host-ram-gb` is the machine's RAM: 15.2 on the laptop; the user's figure on the server.
+   - `--beside` names a string in the command line of the job that will run beside S75b. That job must be running
+     during the benchmark, so its peak memory is measured.
+   - The benchmark sets REG3's register mode and the number of statistics workers by rule, or refuses.
+
+       python -m explore_gpu.s75b --bench --device cuda --host-ram-gb 15.2 --beside test_delta_recipe   # laptop
+       python -m explore_gpu.s75b --bench --device cuda --host-ram-gb <server RAM> --beside none        # server
+
+3. **The pilot**, on the 1660 after the window_gate run, or on the 3070 if that is free first. Then commit and push
+   `s75b_stage1_record.json`/`.md` together with the pilot's results file.
+
+       python -m explore_gpu.s75b --stage 1 --device cuda
+
+4. **Stage 2**, only if the record says PROCEED. Use `--machine fallback` on the 1660 only if the 3070 is unavailable
+   when stage 2 starts.
+
+       python -m explore_gpu.s75b --stage 2 --device cuda --machine 1660      # ORACLE 850-851, SINGLE, WIDE_SLOW
+       python -m explore_gpu.s75b --stage 2 --device cuda --machine 3070      # REG3, WIDE_SPLIT_G
+
+5. **The report**, once both cards' results files are pulled: `python -m explore_gpu.s75b --report`, which writes
+   `s75b_summary.md`.
+
 **Runtime estimate for S75 at S = 4** (`runtime_estimate.md`; method and assumptions in `profile_s75.py`). It is a CPU
 profile of one update per arm (FLOPs, bytes, kernel launches, live tensor memory) put through a roofline model of each
 GPU with a stated efficiency bracket. K9 measures the real numbers.
@@ -145,7 +178,8 @@ GPU time).
 
 **Files:**
 - `device.py`, `batched.py`, `run.py`: the runner.
-- `s75_s4.py`, `mainline.py`: (b) and (c).
+- `s75_s4.py`, `mainline.py`, `s75b.py`: (b), (c) and (d); `s75b_checks.py` and `s75b_checks_cpu_output.*`: (d)'s
+  CHECKs and this container's outputs.
 - `checks.py` and `checks_cpu_output.*`: the CHECKs and this container's outputs.
 - `calibrate_judge.py` and its output: the lock-step criterion at the CUDA lengths.
 - `profile_s75.py`, `runtime_estimate.md`, `profile_s75.json`: the estimate.

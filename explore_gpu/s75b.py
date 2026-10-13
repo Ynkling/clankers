@@ -36,22 +36,42 @@ MACHINES (fixed): the GTX 1660 SUPER runs ORACLE 850-851, SINGLE and WIDE_SLOW; 
   WIDE_SPLIT_G; if the 3070 is unavailable when stage 2 starts, every arm runs on the 1660 (--machine fallback) and
   nothing is dropped. R = 1 for every arm on both cards. REG3's register mode by rule from this card's benchmark: "scan" if
   the benchmark's peak reserved memory with the scan, plus the context (memory in use beyond this process's reserve),
-  is below the card's total; otherwise "loop". --stats-workers by rule from the benchmark: max(1, min(3, floor((host RAM
-  for S75b - the main process's peak RSS - 0.5 GB for the data process) / one worker's peak RSS))).
+  is below the card's total; otherwise "loop". --stats-workers from the benchmark's host memory, by this driver's
+  formula (workers_rule; listed under CHANGES).
 
-CHANGES SINCE 114cd08 (made after S75's learned-arm records were read; none is a constant of the design):
+CHANGES SINCE 114cd08 (CHANGES_SINCE_SPEC below; written into the benchmark files, the stage-1 record, stage 2's meta and
+  the report). They were made after S75's learned-arm records were read, so they are NOT BLIND; none changes a constant
+  of the design (configuration, seeds, arms, outcomes, bars, the proceed rule, SPLIT_THR's rule, the reading):
   - The pilot may run on the RTX 3070 if it is free before the GTX 1660 (the user's message of 12 October, round 3); the
-    stage-1 record names the machine.
+    stage-1 record names the card.
   - Host memory: in S75b's processes the routing margin (explore_i_common.margin_of) runs in chunks of MARGIN_CHUNK = 16
     sequences instead of 64 (the same value up to float64 summation order: CHECK B3), and the evaluation statistics'
     worker pool is this module's StatsPool (explore_gpu.run.AsyncStats with that patch applied in each worker).
-  - The host RAM S75b may use on a machine is the user's input at the benchmark (--host-ram-gb): the laptop has 15.2 GB
-    and runs test_delta_recipe beside it; the server's figure comes from the user.
+  - --stats-workers: the spec says only "from the benchmark's host memory"; the formula is this driver's (workers_rule).
+    The benchmark measures the main process's, one statistics worker's and the data process's own peak RSS (VmHWM), the
+    tensors one evaluation hands to the statistics, the seconds one evaluation's statistics take and the seconds per
+    update. The budget is the smaller of (the machine's RAM, the user's figure, - the co-running job's measured peak
+    (--beside) - OS_RESERVE_GB) and (MemAvailable at the benchmark's start - the co-running job's possible regrowth to its
+    peak - AVAIL_RESERVE_GB). Workers: the smallest w <= 3 that keeps up with the evaluations and fits; else the largest
+    that fits (the evaluations it falls behind on are held in the main process and counted); else 0 (the statistics in
+    line) if that fits; else the benchmark refuses.
+  - Records of one arm and seed from two cards are not resolved by the driver: stage 1 / 2 refuse, and the report prints
+    them and marks the reading incomplete.
+  - Order: stage 1 needs the driver's code, this card's benchmark and its CUDA CHECK output committed; stage 2 needs the
+    driver's code, the stage-1 record, the pilot results file and this card's benchmark and CUDA CHECK output committed,
+    and the pilot card's benchmark unchanged since the stage-1 record.
+  - CHECK B7 (the spec's lock-step at L = 1536): R = 1 as the runs, each seed alone, batch 8 on CUDA (the R = 2, batch-32
+    lock-step does not fit either card), REG3 in both register modes on both cards.
 
 RUN (from the repository root; every step writes into explore_out/I/gpu/s75b/):
-  python -m explore_gpu.s75b_checks --device cpu            CHECKs (this container); --device cuda on each card
-  python -m explore_gpu.s75b --bench --device cuda --host-ram-gb G      each card, before stage 1 (commit the bench file)
-  python -m explore_gpu.s75b --stage 1 --device cuda        the pilot (either card); then commit and push the record
+  python -m explore_gpu.s75b_checks --device cpu            CHECKs (this container); --device cuda on each card (commit
+                                                            explore_gpu/s75b_checks_cuda_<GPU>_output.*)
+  python -m explore_gpu.s75b --bench --device cuda --host-ram-gb G --beside NAME|none
+        each card, before its first stage: G = the machine's RAM in GB (the user's figure: 15.2 on the laptop), NAME = a
+        string in the command line of the job running beside S75b (the laptop: test_delta_recipe), "none" if nothing
+        does; commit the bench file
+  python -m explore_gpu.s75b --stage 1 --device cuda        the pilot (either card); then commit and push the record and
+                                                            the pilot results file
   python -m explore_gpu.s75b --stage 2 --device cuda --machine 1660|3070|fallback
   python -m explore_gpu.s75b --report                       the counts table -> s75b_summary.md
 """
@@ -103,8 +123,34 @@ STAGE2 = ("ORACLE", "SINGLE", "WIDE_SPLIT_G", "REG3", "WIDE_SLOW")
 MACHINE_ARMS = {"1660": ("ORACLE", "SINGLE", "WIDE_SLOW"), "3070": ("REG3", "WIDE_SPLIT_G"), "fallback": STAGE2}
 MACHINE_GPU = {"1660": "GTX 1660", "3070": "RTX 3070", "fallback": "GTX 1660"}
 MARGIN_CHUNK = 16
-DATA_PROC_GB = 0.5
-MAX_WORKERS = 3
+MAX_WORKERS = 3                            # explore_gpu.run's default on CUDA
+DATA_PROC_GB = 0.5                         # the data process, where its peak cannot be measured (no /proc)
+OS_RESERVE_GB = 1.5                        # the operating system and everything else not measured
+AVAIL_RESERVE_GB = 0.5                     # kept free of MemAvailable
+CHECKS_DIR = os.path.join(HERE, "explore_gpu")   # where explore_gpu.s75b_checks writes its outputs
+
+SPEC_COMMIT = "114cd08"
+CHANGES_SINCE_SPEC = dict(
+    spec=SPEC_COMMIT, blind=False,
+    note="made after S75's learned-arm records were read, so not blind; none changes a constant of the design "
+         "(configuration, seeds, arms, outcomes, bars, the proceed rule, SPLIT_THR's rule, the reading)",
+    items=[
+        "the pilot may run on the RTX 3070 if it is free before the GTX 1660 (the user, 12 October); the stage-1 record "
+        "names the card",
+        "the routing margin in chunks of 16 sequences in S75b's processes and the statistics pool StatsPool (host memory; "
+        "the same value up to float64 summation order, CHECK B3)",
+        "--stats-workers by this driver's formula (workers_rule; the spec says only 'from the benchmark's host memory'): "
+        "measured peaks (VmHWM) of the main process, one statistics worker and the data process, the evaluations held "
+        "while the workers lag, and a budget from the machine's RAM (the user's figure), the co-running job's measured "
+        "peak (--beside) and MemAvailable",
+        "records of one arm and seed from two cards are not resolved: stage 1 / 2 refuse, the report marks the reading "
+        "incomplete",
+        "order: stage 1 needs the driver's code, this card's benchmark and CUDA CHECK output committed; stage 2 needs the "
+        "driver's code, the stage-1 record, the pilot results file and this card's benchmark and CUDA CHECK output "
+        "committed",
+        "CHECK B7 (lock-step at L = 1536): R = 1 as the runs, each seed alone, batch 8 on CUDA, REG3 in both register "
+        "modes (the R = 2, batch-32 lock-step does not fit either card)",
+    ])
 
 
 def task():
@@ -127,7 +173,146 @@ def hw_slug(hw):
     return "".join(c if c.isalnum() else "_" for c in hw)
 
 
-# ── host memory and the routing margin ───────────────────────────────────────
+THREAD_ENV = ("OMP_NUM_THREADS", "MKL_NUM_THREADS", "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS")
+
+
+def one_thread():
+    """One thread per process on every device: the BLAS pools through the environment (inherited by spawned workers),
+    torch's intra-op pool directly."""
+    for k in THREAD_ENV:
+        os.environ[k] = "1"
+    torch.set_num_threads(1)
+
+
+# ── host memory ───────────────────────────────────────────────────────────────
+def _status_kb(pid, key):
+    try:
+        with open(f"/proc/{pid}/status") as f:
+            for line in f:
+                if line.startswith(key + ":"):
+                    return int(line.split()[1])
+    except (OSError, ValueError, IndexError):
+        return None
+    return None
+
+
+def ru_maxrss_gb():
+    """getrusage's peak RSS in GB. In a spawned worker it starts at the parent's peak (exec inherits it), so it is not the
+    worker's own: recorded as a description only."""
+    try:
+        import resource
+        k = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        return k / 2 ** 30 if sys.platform == "darwin" else k / 2 ** 20
+    except Exception:
+        return None
+
+
+def own_peak_gb():
+    """This process's own peak RSS in GB: VmHWM (exec gives a spawned worker a fresh one); ru_maxrss where /proc is
+    missing."""
+    k = _status_kb("self", "VmHWM")
+    return k / 2 ** 20 if k is not None else ru_maxrss_gb()
+
+
+def rss_gb():
+    return own_peak_gb()
+
+
+def meminfo_gb():
+    """MemTotal and MemAvailable in GB from /proc/meminfo ({} where it cannot be read)."""
+    out = {}
+    try:
+        with open("/proc/meminfo") as f:
+            for line in f:
+                k, v = line.split(":", 1)
+                if k in ("MemTotal", "MemAvailable"):
+                    out[k] = int(v.split()[0]) / 2 ** 20
+    except (OSError, ValueError):
+        pass
+    return out
+
+
+def _procs():
+    """{pid: (ppid, command line)} of every process visible in /proc."""
+    out = {}
+    try:
+        names = os.listdir("/proc")
+    except OSError:
+        return out
+    for d in names:
+        if not d.isdigit():
+            continue
+        try:
+            with open(f"/proc/{d}/stat") as f:
+                s = f.read()
+            ppid = int(s[s.rfind(")") + 2:].split()[1])
+            with open(f"/proc/{d}/cmdline", "rb") as f:
+                cmd = f.read().replace(b"\0", b" ").decode(errors="replace").strip()
+            out[int(d)] = (ppid, cmd)
+        except (OSError, ValueError, IndexError):
+            continue
+    return out
+
+
+def _descendants(roots, procs):
+    kids = {}
+    for p, (pp, _) in procs.items():
+        kids.setdefault(pp, []).append(p)
+    seen, todo = set(), list(roots)
+    while todo:
+        p = todo.pop()
+        if p not in seen:
+            seen.add(p)
+            todo += kids.get(p, [])
+    return seen
+
+
+def _ancestors(pid, procs):
+    out = set()
+    while pid in procs and pid not in out:
+        out.add(pid)
+        pid = procs[pid][0]
+    return out
+
+
+def beside_mem(name):
+    """The job running beside S75b: every process whose command line contains `name`, with its descendants (its
+    workers), never this process, its ancestors or its descendants. Summed VmRSS (now) and VmHWM (each process's peak so
+    far) in GB."""
+    procs = _procs()
+    me = os.getpid()
+    mine = _descendants([me], procs) | _ancestors(me, procs)
+    roots = [p for p, (_, cmd) in procs.items() if name in cmd and p not in mine]
+    pids = sorted(_descendants(roots, procs) - mine)
+    return dict(name=name, roots=[dict(pid=p, cmd=procs[p][1][:160]) for p in roots], pids=pids,
+                rss_gb=sum(_status_kb(p, "VmRSS") or 0 for p in pids) / 2 ** 20,
+                hwm_gb=sum(_status_kb(p, "VmHWM") or 0 for p in pids) / 2 ** 20)
+
+
+def children_mem():
+    """{pid: dict(cmd, hwm_gb)} of this process's descendants."""
+    procs = _procs()
+    me = os.getpid()
+    return {p: dict(cmd=procs[p][1][:160], hwm_gb=(_status_kb(p, "VmHWM") or 0) / 2 ** 20)
+            for p in sorted(_descendants([me], procs) - {me})}
+
+
+def payload_gb(*xs):
+    """Bytes of the tensors in xs (tensors, lists / tuples and dicts of them, None), in GB."""
+    n = 0
+    todo = list(xs)
+    while todo:
+        x = todo.pop()
+        if torch.is_tensor(x):
+            n += x.numel() * x.element_size()
+        elif isinstance(x, (list, tuple)):
+            todo += list(x)
+        elif isinstance(x, dict):
+            todo += list(x.values())
+    return n / 2 ** 30
+
+
+# ── the routing margin and the statistics pool ───────────────────────────────
 _MARGIN = {}
 
 
@@ -141,21 +326,7 @@ def small_margin():
         ic.margin_of = margin_of
 
 
-def rss_gb():
-    """This process's peak resident memory in GB (None where it cannot be read)."""
-    try:
-        import resource
-        k = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        return k / 2 ** 30 if sys.platform == "darwin" else k / 2 ** 20
-    except Exception:
-        try:
-            import psutil
-            return psutil.Process().memory_info().peak_wset / 2 ** 30
-        except Exception:
-            return None
-
-
-_WRSS = []
+_JOBS = []                                 # one dict per statistics job collected in this process (host-memory facts)
 
 
 def _stats_init_b(task_, ev, pdata):
@@ -164,12 +335,17 @@ def _stats_init_b(task_, ev, pdata):
 
 
 def _stats_job_b(lg, gates, feats):
+    t0 = time.time()
     out = gr._stats_job(lg, gates, feats)
-    return dict(out, _worker_rss_gb=rss_gb())
+    return dict(out, _worker_gb=own_peak_gb(), _worker_ru_maxrss_gb=ru_maxrss_gb(), _worker_secs=time.time() - t0,
+                _worker_pid=os.getpid())
 
 
 class StatsPool(gr.AsyncStats):
-    """explore_gpu.run.AsyncStats with the small-margin patch in each worker; records the workers' peak RSS."""
+    """explore_gpu.run.AsyncStats with the small-margin patch in each worker; records each job's worker peak RSS, seconds
+    and the tensors handed over (_JOBS). sync (the benchmark only): wait for each job when it is submitted, so this
+    process holds one evaluation's tensors at a time."""
+    sync = False
 
     def __init__(self, task_, ev, pdata, workers):
         import multiprocessing as mp
@@ -179,15 +355,17 @@ class StatsPool(gr.AsyncStats):
         self.jobs = []
 
     def submit(self, key, extra, lg, gates, feats):
-        self.jobs.append((key, extra, self.pool.submit(_stats_job_b, lg, gates, feats)))
+        f = self.pool.submit(_stats_job_b, lg, gates, feats)
+        if StatsPool.sync:
+            f.result()
+        self.jobs.append((key, extra, f, payload_gb(lg, gates, feats)))
 
     def collect(self):
         out = []
-        for key, extra, f in self.jobs:
+        for key, extra, f, pl in self.jobs:
             r = dict(f.result())
-            w = r.pop("_worker_rss_gb", None)
-            if w is not None:
-                _WRSS.append(w)
+            w = {k[1:]: r.pop(k) for k in list(r) if k.startswith("_worker")}
+            _JOBS.append(dict(w, payload_gb=pl))
             out.append((key, dict(r, **extra)))
         self.pool.shutdown()
         return out
@@ -291,7 +469,13 @@ def load_all():
     return out
 
 
+def _card(k, r):
+    return r.get("hw") or k.split("|")[3]
+
+
 def runs_of(st, arm, sha):
+    """{seed: the ok record of arm under sha}. A seed with ok records from two cards is never resolved here: callers
+    check duplicates() first (stage 1 / 2 refuse; the report prints them and marks the reading incomplete)."""
     out = {}
     for k in sorted(st["runs"]):
         r = st["runs"][k]
@@ -299,6 +483,30 @@ def runs_of(st, arm, sha):
         if a == arm and r.get("ok") and sh == sha and int(s) not in out:
             out[int(s)] = r
     return out
+
+
+def duplicates(st, sha, arms=None):
+    """[(arm, seed, cards)] for each arm and seed with ok records under sha from more than one card."""
+    seen = {}
+    for k, r in st["runs"].items():
+        a, s, sh = k.split("|")[:3]
+        if sh == sha and r.get("ok") and (arms is None or a in arms):
+            seen.setdefault((a, int(s)), set()).add(_card(k, r))
+    return [(a, s, sorted(h)) for (a, s), h in sorted(seen.items()) if len(h) > 1]
+
+
+def other_cards(st, sha, arms, hw):
+    """{arm: sorted seeds} with ok records under sha from a card other than hw."""
+    out = {}
+    for k, r in st["runs"].items():
+        a, s, sh = k.split("|")[:3]
+        if sh == sha and r.get("ok") and a in arms and _card(k, r) != hw:
+            out.setdefault(a, set()).add(int(s))
+    return {a: sorted(v) for a, v in sorted(out.items())}
+
+
+def cards_of(rr):
+    return sorted({r.get("hw") for r in rr.values()}, key=str)
 
 
 # ── the stage-1 rules ─────────────────────────────────────────────────────────
@@ -318,21 +526,78 @@ def pilot_decision(pilot):
                 not_usable=any(v < BAR for v in sets.values()), why=why)
 
 
+def stop_words(d):
+    """The stop's wording (the spec's): always that B's pilot did not clear the proceed rule; "S = 4 is not usable at B"
+    only if a pilot run ended below 0.9."""
+    s = "S75b stops: B's pilot did not clear the proceed rule"
+    return s + ("; a pilot run ended below 0.9: S = 4 is not usable at B" if d.get("not_usable") else "")
+
+
 def record_paths():
     return os.path.join(OUT, "s75b_stage1_record.json"), os.path.join(OUT, "s75b_stage1_record.md")
 
 
+# ── git: what is committed ────────────────────────────────────────────────────
+def _git(args, cwd):
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, check=True).stdout
+
+
+def _repo_rel(path):
+    path = os.path.abspath(path)
+    top = _git(["rev-parse", "--show-toplevel"], os.path.dirname(path)).strip()
+    return top, os.path.relpath(path, top)
+
+
 def git_committed(path):
-    """(commit, clean): the last commit touching path, and whether the working tree's file equals it."""
-    rel = os.path.relpath(path, HERE)
+    """(commit, clean) in the repository that contains path: the last commit touching it, and whether the working tree's
+    file equals that commit's (tracked, no staged or unstaged change). (None, False) if it was never committed or there
+    is no repository."""
     try:
-        c = subprocess.run(["git", "log", "-1", "--format=%H", "--", rel], cwd=HERE, capture_output=True, text=True,
-                           check=True).stdout.strip()
-        s = subprocess.run(["git", "status", "--porcelain", "--", rel], cwd=HERE, capture_output=True, text=True,
-                           check=True).stdout.strip()
-        return c or None, not s
+        top, rel = _repo_rel(path)
+        c = _git(["log", "-1", "--format=%H", "--", rel], top).strip()
+        s = _git(["status", "--porcelain", "--", rel], top).strip()
+        return (c or None), bool(c) and not s
     except Exception:
         return None, False
+
+
+def git_committed_json(path):
+    """path's JSON as of the last commit touching it (None if never committed)."""
+    c, _ = git_committed(path)
+    if c is None:
+        return None
+    try:
+        top, rel = _repo_rel(path)
+        return json.loads(_git(["show", f"{c}:{rel}"], top))
+    except Exception:
+        return None
+
+
+def dirty_code():
+    """The source files of the modules in this driver's code SHA that differ from the last commit (or are untracked)."""
+    _, names = code_sha()
+    files = [os.path.join(HERE, *n.split(".")) + ".py" if n != "explore_gpu" else os.path.join(HERE, "explore_gpu",
+                                                                                               "__init__.py")
+             for n in names]
+    try:
+        out = _git(["status", "--porcelain", "--", *[os.path.relpath(f, HERE) for f in files]], HERE)
+    except Exception as e:
+        return [f"git failed: {e}"]
+    return [line[3:] for line in out.splitlines() if line.strip()]
+
+
+def code_or_exit(what, require_commit=True):
+    if require_commit:
+        d = dirty_code()
+        if d:
+            raise SystemExit(f"{what}: the driver's code is not committed ({d}): run from a clean checkout")
+
+
+def committed_or_exit(path, what, require_commit=True):
+    c, clean = git_committed(path)
+    if require_commit and (c is None or not clean):
+        raise SystemExit(f"{what} ({path}) is not committed, or has local changes: commit and push it first")
+    return c
 
 
 # ── the benchmark and the run-mechanics rules ─────────────────────────────────
@@ -340,10 +605,75 @@ def bench_path(hw):
     return os.path.join(OUT, f"{NAME}_bench_{hw_slug(hw)}.json")
 
 
-def workers_rule(host_ram_gb, main_gb, worker_gb):
-    if host_ram_gb is None or main_gb is None or not worker_gb:
-        return None
-    return max(1, min(MAX_WORKERS, int((host_ram_gb - main_gb - DATA_PROC_GB) // worker_gb)))
+def checks_output_path(gpu):
+    return os.path.join(CHECKS_DIR, f"s75b_checks_cuda_{hw_slug(gpu)}_output.json")
+
+
+def checks_status(gpu, sha):
+    """None if this card's CUDA CHECK output exists, was written under sha, holds B1-B8 (B7 run, not skipped) and every
+    CHECK passed; otherwise why not."""
+    p = checks_output_path(gpu)
+    if not os.path.exists(p):
+        return "missing"
+    with open(p) as f:
+        d = json.load(f)
+    ch = d.get("checks") or {}
+    if (d.get("meta") or {}).get("s75b_sha") != sha:
+        return f"written under code SHA {(d.get('meta') or {}).get('s75b_sha')}, not {sha}"
+    keys = [f"B{i}" for i in range(1, 9)]
+    if any(k not in ch for k in keys):
+        return f"incomplete: {[k for k in keys if k not in ch]} missing"
+    bad = [k for k in keys if not ch[k].get("ok")]
+    if bad:
+        return f"failed: {bad}"
+    if ch["B7"].get("skipped"):
+        return "B7 skipped"
+    return None
+
+
+def held_evals(w, n_evals, gap_secs, stats_secs):
+    """The evaluations whose tensors the main process holds at the worst point of a run with w statistics workers: those
+    in the workers and those queued while the workers lag (one job per evaluation at R = 1, one every gap_secs, each
+    taking stats_secs)."""
+    if w <= 0:
+        return 0
+    lag = max(0.0, 1.0 - w * gap_secs / stats_secs) if stats_secs and gap_secs else 0.0
+    return min(n_evals, w + math.ceil(n_evals * lag))
+
+
+def ram_budget(host_ram_gb, mem, beside):
+    """(budget GB, which bound): the smaller of (min(the user's figure, MemTotal) - the co-running job's peak -
+    OS_RESERVE_GB) and (MemAvailable at the benchmark's start - the co-running job's regrowth to its peak -
+    AVAIL_RESERVE_GB)."""
+    total = min(host_ram_gb, mem["MemTotal"]) if mem.get("MemTotal") else host_ram_gb
+    b_total = total - beside["hwm_gb"] - OS_RESERVE_GB
+    if mem.get("MemAvailable") is None:
+        return b_total, "total (MemAvailable not readable)"
+    b_avail = mem["MemAvailable"] - max(0.0, beside["hwm_gb"] - beside["rss_gb"]) - AVAIL_RESERVE_GB
+    return (b_total, "total") if b_total <= b_avail else (b_avail, "available")
+
+
+def workers_rule(budget_gb, main_gb, data_gb, worker_gb, payload, gap_secs, stats_secs, n_evals):
+    """--stats-workers (this driver's formula; CHANGES_SINCE_SPEC). need(w) = main_gb (the benchmark's main-process
+    peak, one evaluation's tensors included) + data_gb + w * worker_gb + (held_evals(w) - 1) * payload for w >= 1;
+    need(0) = main_gb + data_gb + worker_gb (the statistics in line). Workers: the smallest w in 1..MAX_WORKERS with
+    w >= needed (= ceil(stats_secs / gap_secs): no evaluation waits) whose need fits the budget; else the largest w >= 1
+    that fits; else 0 if need(0) fits; else None (refuse). Returns (w, needed, need, why)."""
+    if None in (budget_gb, main_gb, worker_gb) or not gap_secs or stats_secs is None:
+        return None, None, {}, "not measured"
+    needed = max(1, math.ceil(stats_secs / gap_secs))
+    need = {0: main_gb + data_gb + worker_gb}
+    for w in range(1, MAX_WORKERS + 1):
+        need[w] = main_gb + data_gb + w * worker_gb + max(0, held_evals(w, n_evals, gap_secs, stats_secs) - 1) * payload
+    fits = [w for w in range(1, MAX_WORKERS + 1) if need[w] <= budget_gb]
+    keep_up = [w for w in fits if w >= needed]
+    if keep_up:
+        return min(keep_up), needed, need, "keeps up"
+    if fits:
+        return max(fits), needed, need, "falls behind (the evaluations held are counted)"
+    if need[0] <= budget_gb:
+        return 0, needed, need, "in line (no worker fits)"
+    return None, needed, need, "refuse: not even the statistics in line fit the budget"
 
 
 def register_rule(bench):
@@ -353,53 +683,114 @@ def register_rule(bench):
     return "scan" if s["peak_reserved_gb"] + bench["context_gb"] < bench["total_gb"] else "loop"
 
 
-def bench(device, host_ram_gb, iters=9, every=3, log=print):
-    """Each S75b arm at R = 1 on this card for `iters` updates with an evaluation every `every` (device part here, the
-    statistics in one StatsPool worker) and, for WIDE_SPLIT_G, one guarded split check (the trigger's schedule scaled
-    to `every`, threshold 1.01, rise 1.0); REG3 in both register modes. Reads peak device memory and host RSS."""
+def bench(device, host_ram_gb, beside="none", iters=12, every=3, log=print):
+    """Each S75b arm at R = 1 on this card for `iters` updates with an evaluation every `every` (the device part here, the
+    statistics in one StatsPool worker, waited for at each evaluation) and, for WIDE_SPLIT_G, the guarded split checks
+    (the trigger's schedule scaled to `every`, threshold 1.01, rise 1.0); REG3 in both register modes. Reads peak device
+    memory, the host memory of this process, the statistics worker and the data process (VmHWM), the co-running job's
+    (beside), MemTotal / MemAvailable, the seconds per update and per evaluation's statistics; applies register_rule and
+    workers_rule."""
     dev = dv.setup(device)
+    mem0 = meminfo_gb()
+    if beside == "none":
+        bs = dict(name="none", roots=[], pids=[], rss_gb=0.0, hwm_gb=0.0)
+    else:
+        bs = beside_mem(beside)
+        if not bs["pids"]:
+            raise SystemExit(f"--beside {beside!r}: no running process has it in its command line (pass --beside none "
+                             f"if nothing runs beside S75b)")
     T = task()
-    out = dict(device=dv.device_info(dev), host_ram_gb=host_ram_gb, iters=iters, eval_every=every, arms={})
+    out = dict(device=dv.device_info(dev), host_ram_gb=host_ram_gb, beside=bs, meminfo_start=mem0, iters=iters,
+               eval_every=every, arms={}, changes=CHANGES_SINCE_SPEC, written=time.strftime("%Y-%m-%d %H:%M:%S"))
     sched = (ic.SPLIT_EVERY, ic.SPLIT_REF, ic.SPLIT_FIRST)
     cases = [("ORACLE", "ORACLE", "auto"), ("SINGLE", "SINGLE", "auto"), ("WIDE_SLOW", "WIDE_SLOW", "auto"),
              ("WIDE_SPLIT_G", "WIDE_SPLIT_G", "auto"), ("REG3 scan", "REG3", "scan"), ("REG3 loop", "REG3", "loop")]
-    with runtime():
-        for name, arm, reg in cases:
-            _WRSS.clear()
-            ic.SPLIT_EVERY, ic.SPLIT_REF, ic.SPLIT_FIRST = every, every, 2 * every
-            try:
-                with guarded(rise=1.0) if arm == "WIDE_SPLIT_G" else contextlib.nullcontext():
-                    t0 = time.time()
-                    recs = gr.run_batched_icmc(T, arm_spec(arm), [PILOT_SEEDS[0]], iters, device=dev, split_thr=1.01,
-                                               eval_every=every, register=reg, stats_workers=1, prefetch=True)
-                r = recs[0]
-                row = dict(ok=bool(r.get("ok")), error=r.get("error"), secs=time.time() - t0, register=r.get("register"),
-                           secs_per_update=(r.get("train_secs") or 0) / iters, worker_rss_gb=max(_WRSS) if _WRSS else None,
-                           checks=[(c["step"], c.get("blocked_by"), c["fired"]) for c in r.get("checks", [])])
-                if dev.type == "cuda":
-                    free, total = torch.cuda.mem_get_info(dev)
-                    row.update(peak_alloc_gb=torch.cuda.max_memory_allocated(dev) / 2 ** 30,
-                               peak_reserved_gb=torch.cuda.max_memory_reserved(dev) / 2 ** 30,
-                               device_used_gb=(total - free) / 2 ** 30, reserved_now_gb=torch.cuda.memory_reserved(dev) / 2 ** 30)
-            except Exception as e:
-                row = dict(ok=False, error=f"{type(e).__name__}: {e}")
-            finally:
-                ic.SPLIT_EVERY, ic.SPLIT_REF, ic.SPLIT_FIRST = sched
-                if dev.type == "cuda":
-                    torch.cuda.empty_cache()
-            out["arms"][name] = row
-            log(f"  bench {name}: {json.dumps(row, default=str)[:300]}")
-    out["main_rss_gb"] = rss_gb()
+    StatsPool.sync = True
+    try:
+        with runtime():
+            for name, arm, reg in cases:
+                _JOBS.clear()
+                kids = {}
+
+                def sample(bm, views, step):
+                    for p, v in children_mem().items():
+                        k = kids.setdefault(p, dict(v))
+                        k["hwm_gb"] = max(k["hwm_gb"], v["hwm_gb"])
+                ic.SPLIT_EVERY, ic.SPLIT_REF, ic.SPLIT_FIRST = every, every, 2 * every
+                try:
+                    with guarded(rise=1.0) if arm == "WIDE_SPLIT_G" else contextlib.nullcontext():
+                        t0 = time.time()
+                        recs = gr.run_batched_icmc(T, arm_spec(arm), [PILOT_SEEDS[0]], iters, device=dev, split_thr=1.01,
+                                                   eval_every=every, register=reg, stats_workers=1, prefetch=True,
+                                                   on_eval_extra=sample)
+                    r = recs[0]
+                    cv = r.get("curve") or []
+                    wp = {j.get("worker_pid") for j in _JOBS}
+                    data = [v["hwm_gb"] for p, v in kids.items() if p not in wp and "resource_tracker" not in v["cmd"]]
+                    # seconds per update between the first and the last evaluation (the first update's warm-up left
+                    # out) when that is >= 1 s of training (train_secs is rounded to 0.1 s); else over the whole run
+                    dt = cv[-1]["train_secs"] - cv[0]["train_secs"] if len(cv) >= 2 else 0.0
+                    spu = (dt / (cv[-1]["step"] - cv[0]["step"]) if dt >= 1.0 else
+                           (r["train_secs"] / iters if r.get("train_secs") else None))
+                    row = dict(ok=bool(r.get("ok")), error=r.get("error"), secs=time.time() - t0, register=r.get("register"),
+                               secs_per_update=spu, secs_per_update_from="evaluations" if dt >= 1.0 else "whole run",
+                               worker_gb=max((j["worker_gb"] for j in _JOBS if j.get("worker_gb")), default=None),
+                               worker_ru_maxrss_gb=max((j["worker_ru_maxrss_gb"] for j in _JOBS
+                                                        if j.get("worker_ru_maxrss_gb")), default=None),
+                               stats_secs=max((j["worker_secs"] for j in _JOBS), default=None),
+                               payload_gb=max((j["payload_gb"] for j in _JOBS), default=None),
+                               data_gb=max(data) if data else None, main_peak_gb=own_peak_gb(),
+                               checks=[(c["step"], c.get("eligible"), c.get("blocked_by"), c["fired"], c.get("map_one_to_one"))
+                                       for c in r.get("checks", [])])
+                    if dev.type == "cuda":
+                        free, total = torch.cuda.mem_get_info(dev)
+                        row.update(peak_alloc_gb=torch.cuda.max_memory_allocated(dev) / 2 ** 30,
+                                   peak_reserved_gb=torch.cuda.max_memory_reserved(dev) / 2 ** 30,
+                                   device_used_gb=(total - free) / 2 ** 30,
+                                   reserved_now_gb=torch.cuda.memory_reserved(dev) / 2 ** 30)
+                except Exception as e:
+                    row = dict(ok=False, error=f"{type(e).__name__}: {e}")
+                finally:
+                    ic.SPLIT_EVERY, ic.SPLIT_REF, ic.SPLIT_FIRST = sched
+                    if dev.type == "cuda":
+                        torch.cuda.empty_cache()
+                out["arms"][name] = row
+                log(f"  bench {name}: {json.dumps(row, default=str)[:400]}")
+    finally:
+        StatsPool.sync = False
+    out["meminfo_end"] = meminfo_gb()
     if dev.type == "cuda":
         free, total = torch.cuda.mem_get_info(dev)
         out["total_gb"] = total / 2 ** 30
         ctx = [r["device_used_gb"] - r["reserved_now_gb"] for r in out["arms"].values() if "device_used_gb" in r]
         out["context_gb"] = max(ctx) if ctx else 0.0
         out["register_reg3"] = register_rule(out)
-    wr = [r["worker_rss_gb"] for r in out["arms"].values() if r.get("worker_rss_gb")]
-    out["worker_rss_gb"] = max(wr) if wr else None
-    out["stats_workers"] = workers_rule(host_ram_gb, out["main_rss_gb"], out["worker_rss_gb"])
-    out["sha"] = code_sha()[0]
+    else:
+        out["register_reg3"] = "loop"
+    unused = "REG3 loop" if out["register_reg3"] == "scan" else "REG3 scan"   # a failed scan (out of memory) -> loop
+    out["cases_used"] = [n for n in out["arms"] if n != unused]
+    used = [out["arms"][n] for n in out["cases_used"] if out["arms"][n].get("ok")]
+
+    def mx(k):
+        v = [r[k] for r in used if r.get(k) is not None]
+        return max(v) if v else None
+    spu = [r["secs_per_update"] for r in used if r.get("secs_per_update")]
+    out["main_gb"] = own_peak_gb()
+    out["main_ru_maxrss_gb"] = ru_maxrss_gb()
+    out["worker_gb"], out["payload_gb"], out["stats_secs"] = mx("worker_gb"), mx("payload_gb"), mx("stats_secs")
+    out["data_gb"] = mx("data_gb")
+    out["data_gb_source"] = "measured" if out["data_gb"] is not None else f"DATA_PROC_GB = {DATA_PROC_GB} (not measured)"
+    out["secs_per_update"] = min(spu) if spu else None          # the shortest interval between evaluations: the most lag
+    out["n_evals"] = ITERS // EVAL_EVERY
+    out["gap_secs"] = EVAL_EVERY * out["secs_per_update"] if out["secs_per_update"] else None
+    out["budget_gb"], out["budget_bound"] = ram_budget(host_ram_gb, mem0, bs)
+    w, needed, need, why = workers_rule(out["budget_gb"], out["main_gb"],
+                                        out["data_gb"] if out["data_gb"] is not None else DATA_PROC_GB,
+                                        out["worker_gb"], out["payload_gb"] or 0.0, out["gap_secs"], out["stats_secs"],
+                                        out["n_evals"])
+    out.update(stats_workers=w, workers_needed=needed, need_gb=need, workers_why=why,
+               held_evals=held_evals(w, out["n_evals"], out["gap_secs"], out["stats_secs"]) if w else 0,
+               all_ok=all(out["arms"][n].get("ok") for n in out["cases_used"]), sha=code_sha()[0])
     return out
 
 
@@ -412,9 +803,34 @@ def load_bench(hw, sha):
     return b if b.get("sha") == sha else None
 
 
+def card_setup(dev, hw, sha, require_commit, what):
+    """This card's run mechanics from its benchmark (CUDA: required, committed, every case ok, a worker count; and the
+    CUDA CHECK output committed and passing). CPU: the statistics in line, REG3 with the loop. Returns (workers,
+    register, bench_commit, checks_commit)."""
+    if dev.type != "cuda":
+        return 0, "loop", None, None
+    b = load_bench(hw, sha)
+    if b is None:
+        raise SystemExit(f"{what}: no benchmark for {hw} under code SHA {sha}: run --bench on this card and commit it")
+    if not b.get("all_ok"):
+        raise SystemExit(f"{what}: this card's benchmark has failed cases: "
+                         f"{[n for n, r in b['arms'].items() if n in b.get('cases_used', b['arms']) and not r.get('ok')]}")
+    if b.get("stats_workers") is None:
+        raise SystemExit(f"{what}: the benchmark's host-memory rule refuses ({b.get('workers_why')}; budget "
+                         f"{b.get('budget_gb')} GB, need {b.get('need_gb')})")
+    bc = committed_or_exit(bench_path(hw), f"{what}: this card's benchmark", require_commit)
+    why = checks_status(hw, sha)
+    if why is not None:
+        raise SystemExit(f"{what}: this card's CUDA CHECK output ({checks_output_path(hw)}) is {why}: run python -m "
+                         f"explore_gpu.s75b_checks --device cuda and commit its output")
+    cc = committed_or_exit(checks_output_path(hw), f"{what}: this card's CUDA CHECK output", require_commit)
+    return b["stats_workers"], b["register_reg3"], bc, cc
+
+
 # ── running arms ──────────────────────────────────────────────────────────────
 def run_arm(arm, seeds, dev, hw, sha, st, meta_extra, register, workers, split_thr=None, log=print):
-    """Each seed at R = 1; a failed run is retried once. Records keyed arm|seed|sha|hw. Returns the seeds still missing."""
+    """Each seed at R = 1; a failed run is retried once (S75's rule at R = 1). Records keyed arm|seed|sha|hw, with the
+    host memory of the run (descriptions). Returns the seeds still missing."""
     T = task()
     missing = []
     for s in seeds:
@@ -423,11 +839,15 @@ def run_arm(arm, seeds, dev, hw, sha, st, meta_extra, register, workers, split_t
             continue
         for attempt in (1, 2):
             log(f"  {arm} seed {s} (attempt {attempt}) ...")
+            _JOBS.clear()
             ctx = guarded() if arm == "WIDE_SPLIT_G" else contextlib.nullcontext()
             with ctx:
                 rec = gr.run_batched_icmc(T, arm_spec(arm), [s], ITERS, device=dev, split_thr=split_thr, eval_every=EVAL_EVERY,
                                           register=register if arm == "REG3" else "auto", stats_workers=workers, tag=arm)[0]
-            rec.update(arm=arm, sha=sha, hw=hw, attempt=attempt, **meta_extra)
+            rec.update(arm=arm, sha=sha, hw=hw, attempt=attempt, threads=torch.get_num_threads(),
+                       host=dict(main_peak_gb=own_peak_gb(), meminfo=meminfo_gb(),
+                                 worker_peak_gb=max((j["worker_gb"] for j in _JOBS if j.get("worker_gb")), default=None),
+                                 stats_secs_max=max((j["worker_secs"] for j in _JOBS), default=None)), **meta_extra)
             st["runs"][key] = rec
             save_json(st, store_path(hw))
             if rec.get("ok"):
@@ -441,44 +861,63 @@ def run_arm(arm, seeds, dev, hw, sha, st, meta_extra, register, workers, split_t
     return missing
 
 
-def stage1(device, log=print):
+def _dup_exit(dup, what):
+    if dup:
+        raise SystemExit(f"{what}: ok records of one arm and seed from two cards (arm, seed, cards): {dup}; the driver "
+                         f"does not choose between them: the user decides")
+
+
+def stage1(device, log=print, require_commit=True):
     dev = dv.setup(device)
     info = dv.device_info(dev)
     hw = info["gpu"] or info["cpu"]
     sha = code_sha()[0]
-    b = load_bench(hw, sha)
-    if dev.type == "cuda" and b is None:
-        raise SystemExit(f"no benchmark for {hw} under code SHA {sha}: run --bench on this card first")
-    workers = (b or {}).get("stats_workers") or (1 if dev.type == "cuda" else 0)
+    st_all = load_all()
+    _dup_exit(duplicates(st_all, sha, ("ORACLE_PILOT",)), "stage 1")
+    oth = other_cards(st_all, sha, ("ORACLE_PILOT",), hw)
+    if oth:
+        raise SystemExit(f"stage 1: pilot records under code SHA {sha} exist from another card ({oth}): the pilot runs on "
+                         f"one card")
+    code_or_exit("stage 1", require_commit)
+    workers, _, bench_commit, checks_commit = card_setup(dev, hw, sha, require_commit, "stage 1")
     T = task()
     chk = it.check_task(T)
     assert all(chk.values()), f"task CHECK failed: {chk}"
     st = load(hw)
-    st["meta"].update(sha=sha, config=CONFIG, iters=ITERS, device=info, stage1=dict(workers=workers, started=time.strftime("%Y-%m-%d %H:%M:%S")))
+    st["meta"].update(sha=sha, config=CONFIG, iters=ITERS, device=info, changes=CHANGES_SINCE_SPEC,
+                      stage1=dict(workers=workers, threads=torch.get_num_threads(), bench_commit=bench_commit,
+                                  checks_commit=checks_commit, started=time.strftime("%Y-%m-%d %H:%M:%S")))
     save_json(st, store_path(hw))
     log(f"[S75b stage 1] {T.label}; code SHA {sha}; {info}; task CHECK ok; stats workers {workers}")
     with runtime():
         missing = run_arm("ORACLE_PILOT", PILOT_SEEDS, dev, hw, sha, st, dict(stage=1), "auto", workers, log=log)
     pilot = runs_of(load_all(), "ORACLE_PILOT", sha)
     d = pilot_decision(pilot)
-    rec = dict(written=time.strftime("%Y-%m-%d %H:%M:%S"), sha=sha, machine=hw, device=info, config=CONFIG, iters=ITERS,
-               pilot_seeds=list(PILOT_SEEDS), decision=d, missing=missing,
-               note=("commit and push this record before stage 2; --stage 2 refuses otherwise. The pilot ran on " + hw +
-                     " (the spec at 114cd08 assigned the 1660; the user allowed the 3070 if free first)."))
+    cards = {s: r.get("hw") for s, r in pilot.items()}
+    rec = dict(written=time.strftime("%Y-%m-%d %H:%M:%S"), sha=sha, machine=hw, cards=cards, device=info, config=CONFIG,
+               iters=ITERS, pilot_seeds=list(PILOT_SEEDS), decision=d, missing=missing,
+               results_file=os.path.relpath(store_path(hw), HERE), bench_commit=bench_commit, checks_commit=checks_commit,
+               threads=torch.get_num_threads(), changes=CHANGES_SINCE_SPEC,
+               note=(f"Commit and push this record together with the pilot results file {os.path.relpath(store_path(hw), HERE)} "
+                     f"before stage 2: --stage 2 refuses unless both are committed and the committed pilot records give this "
+                     f"decision. The pilot ran on {hw} (the spec at {SPEC_COMMIT} assigned the GTX 1660 SUPER; the user "
+                     f"allowed the RTX 3070 if it was free first)."))
     jp, mp_ = record_paths()
     save_json(rec, jp)
     sets = d.get("sets") or {}
     lines = [f"# S75b stage-1 record (EXPLORATORY), {rec['written']}", "",
-             f"- Pilot: ORACLE_PILOT, seeds {PILOT_SEEDS}, 24,000 updates, on **{hw}** (code SHA {sha}).",
-             f"- end.set: " + ", ".join(f"{s}: {v}" for s, v in sets.items()),
+             f"- Pilot: ORACLE_PILOT, seeds {PILOT_SEEDS}, {ITERS:,} updates, on **{hw}** (code SHA {sha}; stats workers "
+             f"{workers}; threads {rec['threads']}; benchmark commit {bench_commit}; CUDA CHECK commit {checks_commit}).",
+             "- end.set: " + ", ".join(f"{s}: {v}" for s, v in sets.items()),
              f"- Proceed rule (mean >= {PROCEED_MEAN} and each >= {PROCEED_EACH}): {d.get('why')} -> "
              f"**{'PROCEED' if d['proceed'] else ('STOP' if d['complete'] else 'INCOMPLETE')}**"]
     if d["proceed"]:
         lines.append(f"- SPLIT_THR = min(end.set) - {THR_MARGIN} = {d['split_thr']!r}")
     elif d["complete"]:
-        lines.append("- S75b stops. " + ("A pilot run ended below 0.9: S = 4 is not usable at B." if d["not_usable"] else
-                                          "Both pilot runs reached 0.9; B's pilot did not clear the proceed rule."))
-    lines += ["", rec["note"]]
+        lines.append(f"- {stop_words(d)}. No other configuration.")
+    lines += ["", rec["note"], "",
+              f"Changes since the approved spec ({SPEC_COMMIT}), not blind ({CHANGES_SINCE_SPEC['note']}):"]
+    lines += [f"- {x}" for x in CHANGES_SINCE_SPEC["items"]]
     with open(mp_, "w") as f:
         f.write("\n".join(lines) + "\n")
     log("\n".join(lines))
@@ -489,37 +928,52 @@ def stage2(device, machine, log=print, require_commit=True):
     dev = dv.setup(device)
     info = dv.device_info(dev)
     hw = info["gpu"] or info["cpu"]
-    sha = code_sha()[0]
     if dev.type == "cuda" and MACHINE_GPU[machine] not in hw:
         raise SystemExit(f"--machine {machine} expects a {MACHINE_GPU[machine]}, this card is {hw}")
+    sha = code_sha()[0]
     jp, _ = record_paths()
     if not os.path.exists(jp):
         raise SystemExit("no stage-1 record: run --stage 1 first")
-    commit, clean = git_committed(jp)
-    if require_commit and (commit is None or not clean):
-        raise SystemExit(f"the stage-1 record {jp} is not committed (or has local changes): commit and push it first")
-    pilot = runs_of(load_all(), "ORACLE_PILOT", sha)
-    d = pilot_decision(pilot)
+    commit = committed_or_exit(jp, "the stage-1 record", require_commit)
     with open(jp) as f:
         rec1 = json.load(f)
+    st_all = load_all()
+    _dup_exit(duplicates(st_all, sha), "stage 2")
+    pilot = runs_of(st_all, "ORACLE_PILOT", sha)
+    d = pilot_decision(pilot)
     if not d["complete"]:
         raise SystemExit("both pilot records under this code SHA are needed (" + d["why"] + ")")
-    if rec1.get("sha") != sha or rec1["decision"].get("split_thr") != d["split_thr"]:
+    if (rec1.get("sha") != sha or rec1["decision"].get("split_thr") != d["split_thr"]
+            or rec1["decision"].get("proceed") != d["proceed"]):
         raise SystemExit("the stage-1 record does not match the pilot records under this code SHA")
+    if require_commit:
+        pf = os.path.join(HERE, rec1.get("results_file") or "")
+        cj = git_committed_json(pf) if rec1.get("results_file") else None
+        if cj is None:
+            raise SystemExit(f"the pilot results file ({rec1.get('results_file')}) is not committed: commit and push it")
+        dc = pilot_decision(runs_of(cj, "ORACLE_PILOT", sha))
+        if not dc["complete"] or dc.get("split_thr") != d["split_thr"] or dc["proceed"] != d["proceed"]:
+            raise SystemExit("the committed pilot records do not give the stage-1 record's decision: commit and push the "
+                             "pilot results file")
     if not d["proceed"]:
-        raise SystemExit("S75b stops at stage 1 (" + d["why"] + ")")
-    b = load_bench(hw, sha)
-    if dev.type == "cuda" and b is None:
-        raise SystemExit(f"no benchmark for {hw} under code SHA {sha}: run --bench on this card first")
-    register = (b or {}).get("register_reg3") or ("loop" if dev.type == "cpu" else "loop")
-    workers = (b or {}).get("stats_workers") or (1 if dev.type == "cuda" else 0)
+        raise SystemExit(f"{stop_words(d)} (S75b stops at stage 1: {d['why']})")
+    oth = other_cards(st_all, sha, MACHINE_ARMS[machine], hw)
+    if oth:
+        raise SystemExit(f"--machine {machine}: records of its arms under code SHA {sha} exist from another card ({oth}); "
+                         f"running them here would give two cards' records for one seed: the user decides")
+    code_or_exit("stage 2", require_commit)
+    workers, register, bench_commit, checks_commit = card_setup(dev, hw, sha, require_commit, "stage 2")
+    if require_commit and rec1.get("machine") == hw and rec1.get("bench_commit") and bench_commit != rec1["bench_commit"]:
+        raise SystemExit(f"this card's benchmark changed since the stage-1 record (commit {bench_commit}, the record names "
+                         f"{rec1['bench_commit']})")
     st = load(hw)
-    meta2 = dict(machine=machine, split_thr=d["split_thr"], stage1_commit=commit, register_reg3=register, workers=workers,
-                 started=time.strftime("%Y-%m-%d %H:%M:%S"))
+    meta2 = dict(machine=machine, split_thr=d["split_thr"], stage1_commit=commit, bench_commit=bench_commit,
+                 checks_commit=checks_commit, register_reg3=register, workers=workers, threads=torch.get_num_threads(),
+                 changes=CHANGES_SINCE_SPEC, started=time.strftime("%Y-%m-%d %H:%M:%S"))
     st["meta"].update(sha=sha, config=CONFIG, iters=ITERS, device=info, stage2=meta2)
     save_json(st, store_path(hw))
     log(f"[S75b stage 2] machine {machine} ({hw}); arms {MACHINE_ARMS[machine]}; SPLIT_THR {d['split_thr']!r}; "
-        f"stage-1 commit {commit}; REG3 register {register}; stats workers {workers}")
+        f"stage-1 commit {commit}; REG3 register {register}; stats workers {workers}; threads {meta2['threads']}")
     missing = {}
     with runtime():
         for arm in MACHINE_ARMS[machine]:
@@ -537,11 +991,33 @@ def report(log=print, sha=None, out=None):
     st = load_all()
     sha = sha or code_sha()[0]
     R = {a: runs_of(st, a, sha) for a in ARMS}
-    L = [f"# S75b (EXPLORATORY): {task().label}; {ITERS} updates; code SHA {sha}", ""]
+    dup = duplicates(st, sha)
+    L = [f"# S75b (EXPLORATORY): {task().label}; {ITERS} updates; code SHA {sha}", "",
+         f"Changes since the approved spec ({SPEC_COMMIT}), not blind ({CHANGES_SINCE_SPEC['note']}): "
+         + "; ".join(CHANGES_SINCE_SPEC["items"]), "",
+         "Cards per arm: " + "; ".join(f"{a} {cards_of(rr)}" for a, rr in R.items() if rr)]
+    other = {}
+    for k, r in st["runs"].items():
+        sh = k.split("|")[2]
+        if sh != sha:
+            other[(sh, _card(k, r))] = other.get((sh, _card(k, r)), 0) + 1
+    if other:
+        L.append("NOT COUNTED (another code SHA): " + "; ".join(f"{n} records with SHA {sh} on {hw}"
+                                                              for (sh, hw), n in sorted(other.items())))
+    failed = [(k.split("|")[0], k.split("|")[1], _card(k, r), r.get("error")) for k, r in st["runs"].items()
+              if not r.get("ok") and k.split("|")[2] == sha]
+    if failed:
+        L.append("FAILED RUNS (last error; an ok record for the same seed supersedes): " +
+                 "; ".join(f"{a} {s_} on {hw}: {e}" for a, s_, hw, e in failed))
+    if dup:
+        L.append("DUPLICATE RECORDS (arm, seed, cards): " + "; ".join(f"{a} {s} {h}" for a, s, h in dup)
+                 + ". The reading is incomplete until the user decides which card's records count.")
+    L.append("")
     pil = R["ORACLE_PILOT"]
     d = pilot_decision(pil)
     L.append(f"Stage 1 (pilot, never pooled): end.set {[(s, round(r['end']['set'], 4)) for s, r in sorted(pil.items())]}; "
-             f"{d['why']}; {'PROCEED, SPLIT_THR ' + format(d['split_thr'], '.6f') if d['proceed'] else 'not proceeding'}")
+             f"{d['why']}; " + (f"PROCEED, SPLIT_THR {d['split_thr']:.6f}" if d["proceed"] else
+                               stop_words(d) if d["complete"] else "incomplete"))
     orc = [R["ORACLE"].get(s) for s in ORACLE_SEEDS]
     complete_orc = all(r is not None for r in orc)
     valid = complete_orc and all(r["end"]["set"] >= BAR for r in orc)
@@ -551,29 +1027,31 @@ def report(log=print, sha=None, out=None):
              f"{'VALID' if valid else ('UNTESTED' if complete_orc else 'incomplete')}")
     sing = R["SINGLE"]
     L += ["", "| arm | ROUTED (Wilson; band) | median GAP | GAP by bin 1 / 2 / 3-4 / 5+ | median SET | splits fired / blocked "
-              "one-to-one | median eta (layers) | margin |", "|---|---|---|---|---|---|---|---|"]
+              "one-to-one | median eta (layers) | median margin (layers) |", "|---|---|---|---|---|---|---|---|"]
     for a in STAGE2:
         rr = R[a]
         if not rr:
             L.append(f"| {a} | - | | | | | | |")
             continue
         _, _, cl = idense.count_line(a, R, idense.routed)
-        g = [idense.gap(r, sing[s], oset) for s, r in rr.items() if s in sing and oset] if oset else []
+        g = [idense.gap(r, sing[s], oset) for s, r in rr.items() if s in sing] if oset else []
         gb = [idense.med([idense.gap(r, sing[s], oset, f"set_{b}") for s, r in rr.items() if s in sing]) if oset else None
               for b in it.BIN_NAMES]
         fired = sum(c["fired"] for r in rr.values() for c in r.get("checks", []))
         oto = sum(c.get("blocked_by") == "one-to-one" for r in rr.values() for c in r.get("checks", []))
         lay = sorted(next(iter(rr.values()))["end"].get("routing") or {})
-        etas = [idense.med([r["end"]["routing"][y]["eta"] for r in rr.values()]) for y in lay]
-        mg = idense.med([statistics.fmean(v["margin"] for v in r["end"]["routing"].values()) for r in rr.values()
-                         if r["end"].get("routing")])
+        rt = [r for r in rr.values() if r["end"].get("routing")]
+        etas = [idense.med([r["end"]["routing"][y]["eta"] for r in rt]) for y in lay]
+        mgs = [idense.med([r["end"]["routing"][y]["margin"] for r in rt]) for y in lay]
         L.append(f"| {a} | {cl} | {idense.fmt(idense.med(g))} | " + " / ".join(idense.fmt(x) for x in gb) +
                  f" | {idense.fmt(idense.med([r['end']['set'] for r in rr.values()]), 3)} | "
                  f"{(str(fired) + ' / ' + str(oto)) if a == 'WIDE_SPLIT_G' else '-'} | "
-                 f"{' / '.join(idense.fmt(x) for x in etas) or '-'} | {idense.fmt(mg)} |")
+                 f"{' / '.join(idense.fmt(x) for x in etas) or '-'} | {' / '.join(idense.fmt(x) for x in mgs) or '-'} |")
     ks = {a: sum(idense.routed(r) for r in R[a].values()) for a in READ_ARMS}
     done = complete_orc and all(len(R[a]) == len(SEEDS) for a in READ_ARMS)
-    if not done:
+    if dup:
+        tag = "incomplete: records from two cards (the user decides)"
+    elif not done:
         tag = "incomplete"
     elif not valid:
         tag = "UNTESTED (descriptions only; never re-read under a later bar)"
@@ -583,6 +1061,23 @@ def report(log=print, sha=None, out=None):
     if oset and sing:
         us = [s for s, r in sing.items() if r["end"]["set"] <= oset["set"] - 0.2]
         L.append(f"Printed: S74's usability count: ORACLE mean {oset['set']:.4f}; SINGLE <= ORACLE - 0.2 on {len(us)}/{len(sing)}")
+    L += ["", "DIAGNOSTICS (medians at the end): eta^2 by source at word index 1-2 / 5+ (layer 1); the probe per layer; "
+              "REG3's beta^R at SRC / word; train minutes per run; peak device GB; cards"]
+    for a, rr in R.items():
+        if not rr:
+            continue
+        rt = [r for r in rr.values() if r["end"].get("routing")]
+        e12 = idense.med([r["end"]["routing"]["L1"].get("eta_pos12") for r in rt if "L1" in r["end"]["routing"]])
+        e5 = idense.med([r["end"]["routing"]["L1"].get("eta_pos5p") for r in rt if "L1" in r["end"]["routing"]])
+        pk = sorted({k for r in rr.values() for k in (r["end"].get("probe") or {})})
+        pr = [(k, idense.med([r["end"]["probe"][k]["acc"] for r in rr.values() if k in (r["end"].get("probe") or {})]))
+              for k in pk]
+        L.append(f"  {a:<12} eta 1-2 {idense.fmt(e12)} / 5+ {idense.fmt(e5)}; probe "
+                 + (" / ".join(f"{k} {idense.fmt(v)}" for k, v in pr) or "-")
+                 + (f"; beta {idense.fmt(idense.med([r.get('beta_src') for r in rr.values()]))} / "
+                    f"{idense.fmt(idense.med([r.get('beta_word') for r in rr.values()]))}" if a == "REG3" else "")
+                 + f"; train {idense.fmt(idense.med([r.get('train_secs', 0) / 60 for r in rr.values()]), 0)} min; "
+                 f"peak {idense.fmt(idense.med([r.get('peak_mem_gb_batch') for r in rr.values()]))} GB; {cards_of(rr)}")
     L += ["", "WIDE_SPLIT_G's split checks (every eligible check): seed step probe-SET map-before one-to-one outcome"]
     for s, r in sorted(R["WIDE_SPLIT_G"].items()):
         for c in r.get("checks", []):
@@ -597,6 +1092,15 @@ def report(log=print, sha=None, out=None):
         cells = [("R" if idense.routed(r) else ".") if r else "-" for r in (a, b_)]
         cells += [f"{r['end']['set']:.4f}" if r else "-" for r in (a, b_)]
         L.append(f"  {s} " + " ".join(cells))
+    L += ["", "PER RUN: arm seed ROUTED SET GAP; map / eta / margin per layer; splits"]
+    for a, rr in R.items():
+        for s, r in sorted(rr.items()):
+            rt = r["end"].get("routing") or {}
+            g = idense.gap(r, sing[s], oset) if (a != "ORACLE_PILOT" and s in sing and oset) else None
+            L.append(f"  {a:<12} {s} {'R' if idense.routed(r) else '.'} {r['end']['set']:.4f} {idense.fmt(g)} "
+                     + " ".join(f"{y}:{v['ch_map']}/{v['eta']:.2f}/{v['margin']:.2f}" for y, v in rt.items())
+                     + (f" splits {r.get('splits')} at {[c['step'] for c in r.get('checks', []) if c['fired']]}"
+                        if "splits" in r else ""))
     txt = "\n".join(L) + "\n"
     with open(out or os.path.join(OUT, "s75b_summary.md"), "w") as f:
         f.write(txt)
@@ -610,21 +1114,27 @@ def main():
     ap.add_argument("--stage", type=int, choices=(1, 2))
     ap.add_argument("--machine", choices=tuple(MACHINE_ARMS))
     ap.add_argument("--bench", action="store_true")
-    ap.add_argument("--host-ram-gb", type=float, default=None,
-                    help="host RAM S75b may use on this machine (the user's figure; recorded)")
+    ap.add_argument("--host-ram-gb", type=float, default=None, help="the machine's RAM in GB (the user's figure)")
+    ap.add_argument("--beside", default=None,
+                    help="a string in the command line of the job running beside S75b on this machine, or 'none'")
     ap.add_argument("--report", action="store_true")
+    ap.add_argument("--sha", default=None, help="--report: the code SHA whose records count (default: this code's)")
     a = ap.parse_args()
+    one_thread()
     os.makedirs(OUT, exist_ok=True)
     if a.report:
-        report()
+        report(sha=a.sha)
         return
     if a.bench:
-        if a.host_ram_gb is None:
-            raise SystemExit("--bench needs --host-ram-gb (the RAM S75b may use on this machine)")
-        b = bench(a.device, a.host_ram_gb)
+        if a.host_ram_gb is None or a.beside is None:
+            raise SystemExit("--bench needs --host-ram-gb (the machine's RAM, the user's figure) and --beside NAME|none")
+        b = bench(a.device, a.host_ram_gb, a.beside)
         hw = b["device"]["gpu"] or b["device"]["cpu"]
         save_json(b, bench_path(hw))
-        print(json.dumps({k: v for k, v in b.items() if k != "arms"}, indent=1, default=str))
+        print(json.dumps({k: v for k, v in b.items() if k not in ("arms", "changes")}, indent=1, default=str))
+        if b["stats_workers"] is None or not b["all_ok"]:
+            raise SystemExit(f"the benchmark refuses: {b['workers_why']}; failed cases "
+                             f"{[n for n in b['cases_used'] if not b['arms'][n].get('ok')]}")
         return
     if a.stage == 1:
         d, missing = stage1(a.device)

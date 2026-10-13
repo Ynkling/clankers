@@ -244,3 +244,39 @@ descriptions, that change is not blind, and S75b's record must say so.
 3. Run stage 1 (the pilot) and commit its record.
 4. Apply the proceed rule: stop and report, or run stage 2.
 5. Write the report, counts table first.
+
+## Appendix (2026-10-13): changes after approval at 114cd08, NOT BLIND
+
+This spec was approved at 114cd08. Everything below was decided while writing the driver (`explore_gpu/s75b.py`) and
+after reviewing it, which was after S75's learned-arm records had been read, **so none of it is blind**. None of it
+changes a design constant: configuration B, the seeds, the arms, the outcomes, the bars, the proceed rule, SPLIT_THR's
+rule and the reading are as approved above. The same list is the driver's `CHANGES_SINCE_SPEC`. It is written into each
+card's benchmark file, the stage-1 record, stage 2's meta and the report header.
+
+1. **The pilot's card.** The pilot may run on the RTX 3070 if it is free before the GTX 1660 (the user, 12 October). The
+   stage-1 record names the card.
+2. **Host memory.** The routing margin runs in chunks of 16 sequences instead of 64. CHECK B3 shows the same value up
+   to float64 summation order, a relative difference of 2.8e-16. The evaluation statistics' worker pool is the driver's
+   own StatsPool.
+3. **The `--stats-workers` formula is the driver's.** The spec says only "from the benchmark's host memory".
+   - **What the benchmark measures:** each process's own peak RSS (VmHWM) for the main process, one statistics worker
+     and the data process; the tensors one evaluation hands to the statistics; and the seconds per update and per
+     evaluation's statistics.
+   - **The budget** is the smaller of two figures:
+     - min(the machine's RAM, the user's figure; MemTotal) − the co-running job's measured peak (`--beside`) − 1.5 GB;
+     - MemAvailable at the benchmark's start − the co-running job's possible regrowth to its peak − 0.5 GB.
+   - **Workers:**
+     1. The smallest *w* ≤ 3 that keeps up with the evaluations and fits.
+     2. Else the largest *w* that fits. The evaluations it falls behind on are held in the main process and are counted.
+     3. Else 0 (the statistics run in line), if that fits.
+     4. Else the benchmark refuses.
+4. **Records from two cards.** Records of one arm and seed from two cards are not resolved by the driver. Stage 1 and 2
+   refuse; the report prints the duplicates and marks the reading incomplete.
+5. **Order, enforced by the driver.**
+   - Stage 1 needs this card's benchmark and CUDA CHECK output committed.
+   - Stage 2 needs the stage-1 record, the pilot results file, and this card's benchmark and CUDA CHECK output
+     committed.
+   - The pilot card's benchmark must be unchanged since the stage-1 record.
+6. **The lock-step CHECK (B7)** runs at R = 1, as the runs do, with each seed alone, batch 8 on CUDA, and REG3 in both
+   register modes on both cards. The R = 2, batch-32 lock-step does not fit either card at L = 1536: the batched graph
+   and the float64 arbitration share the card. A control with W_g's batched gradient doubled must fail.

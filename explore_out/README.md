@@ -48,3 +48,14 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   - A 2-seed ORACLE pilot with proceed and stop rules fixed in advance.
   - SPLIT_THR set from the pilot, and the split guarded against one-to-one maps.
   - Fresh seeds 850–859, and an estimated ~1.4 days on both cards.
+- **S75b driver** (explore_gpu/s75b.py, with CHECKs in s75b_checks.py). It implements the spec as approved at 114cd08.
+  - **Changes since approval (not blind).** Every change is listed in the spec's appendix and is written into each
+    record. None changes a design constant.
+  - **CPU CHECKs B1–B8 pass.** The CUDA CHECK, the benchmark and the two stages still have to run on the cards.
+- **window_gate on the GTX 1660 SUPER** (gpu/mainline/window_gate_prerun_note_2026-10-12.md). The pre-run note was
+  committed before the run, with no reading. It covers:
+  - CEIL_C on 2540–2541 first;
+  - three arms on 2540–2559;
+  - what is described, beside X, L and the pooled counts.
+
+  `mainline.py` now uses one thread per worker on every device.
