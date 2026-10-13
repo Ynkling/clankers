@@ -692,3 +692,20 @@ The KL terms hold the gate at exactly uniform for their window (value 0.0000 fro
 register learns no write. The key term removes only key-structured variation, and the write at CTX separates while it is
 on. No arm of (1)-(2) was discovered, so the delta phase did not run. Handed back: the main-line spec draft for
 REG3_KEYHINGE with LOCAL3_KEYHINGE and REG3 as controls.
+
+## Session G — S87 (hinges that read no task labels)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. RandHeaderTask-lite, Hebbian, 24000, SLOW, the REG3 model; seeds
+2700-2719 (delta 2720-2729); controls rerun on these seeds after S82's records reproduced bit for bit. Report
+`G/report_7.md`.
+
+| arm (what it reads) | ROUTED-BOUND | vs BASELINE (0/20) | vs REG3_KEYHINGE (20/20) | reading |
+|---|---|---|---|---|
+| REG3_FREQHINGE (the key term at the frequent token types' positions, grouped by token id) | 17/20 | 17 / 0, p 8e-6, discovered | 0 / 3 | "replaces the key hinge" does not apply (two pairs short); key term not shown needed over it (p 0.125) |
+| REG3_SELFKL (KL from the sequence's mean gate) | 0/20 | 0 / 0 | 0 / 20 | "clamps" (commitment 0.0001 at 2400 vs 0.873) |
+| REG3_TEMP (softmax temperature 4 for updates 1-2400) | 3/20 | 3 / 0, p 0.125 | 0 / 17 | none (the gate commits by 1200 anyway) |
+| REG3_FREQHINGE_D (delta, descriptive) | 10/10 | BASELINE_D 0/10: 10 / 0 | REG3_KEYHINGE_D 10/10: 0 / 0 | – |
+
+On this task the frequent token types are both CTX types and all four keys; the context tokens are the most frequent,
+against the premise that they are rare. So FREQHINGE reads the key term's 8 positions plus the 5 CTX and the query's key.
+Handed back: FREQHINGE as a label-free variant for the main-line spec draft, with that caveat. Not: SELFKL, TEMP.
