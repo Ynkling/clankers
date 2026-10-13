@@ -1,0 +1,18 @@
+{
+ "readings": {
+  "reproduction": "{'BASELINE': True, 'REG3_KEYHINGE': True}",
+  "validity": "S71 ORACLE_ALL 10/10 stands; ORACLE_ALL on 2700-2701 bound 2/2",
+  "commitment at 2400 (median spread)": "BASELINE 0.8734, REG3_KEYHINGE 0.9339, REG3_FREQHINGE 0.5913, REG3_SELFKL 0.0001, REG3_TEMP 0.9233",
+  "REG3_FREQHINGE": "discovered yes (b 17, c 0, p 7.63e-06, n 20); vs REG3_KEYHINGE: KH only 3, REG3_FREQHINGE only 0, p(KH >) 0.125; clamps: does not apply (commitment 0.5913 vs BASELINE 0.8734)",
+  "REG3_SELFKL": "discovered no (b 0, c 0, p 1, n 20); vs REG3_KEYHINGE: KH only 20, REG3_SELFKL only 0, p(KH >) 9.54e-07; clamps: APPLIES (commitment 0.0001 vs BASELINE 0.8734)",
+  "REG3_TEMP": "discovered no (b 3, c 0, p 0.125, n 20); vs REG3_KEYHINGE: KH only 17, REG3_TEMP only 0, p(KH >) 7.63e-06; clamps: does not apply (commitment 0.9233 vs BASELINE 0.8734)",
+  "REG3_KEYHINGE (control rerun) vs BASELINE": "b 20, c 0, p 9.54e-07, n 20",
+  "a frequency hinge replaces the key hinge": "does not apply",
+  "a hinge that reads nothing suffices": "does not apply",
+  "the identity term is still needed": "does not apply",
+  "delta arm (rule)": "{'arm': 'REG3_FREQHINGE', 'order': ['REG3_TEMP', 'REG3_SELFKL', 'REG3_FREQHINGE'], 'time': '2026-10-13 01:21:03 UTC'}",
+  "REG3_FREQHINGE_D vs BASELINE_D (descriptive)": "REG3_FREQHINGE_D only 10, BASELINE_D only 0, p(REG3_FREQHINGE_D >) 0.000977, p(BASELINE_D >) 1",
+  "REG3_FREQHINGE_D vs REG3_D (descriptive)": "REG3_FREQHINGE_D only 10, REG3_D only 0, p(REG3_FREQHINGE_D >) 0.000977, p(REG3_D >) 1",
+  "REG3_FREQHINGE_D vs REG3_KEYHINGE_D (descriptive)": "REG3_FREQHINGE_D only 0, REG3_KEYHINGE_D only 0, p(REG3_FREQHINGE_D >) 1, p(REG3_KEYHINGE_D >) 1"
+ }
+}
