@@ -41,8 +41,8 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   - **The split.** 30 fires, all on merged maps; the declared hazard did not arise.
   - **Correction to the pre-run note.** Three WIDE_SPLIT runs had already finished on the 1660 when it was committed.
     It was still blind: no learned-arm record was pushed until 13:53.
-  - **WIDE_SLOW (seeds 830–838; 839 pending).** 0/9 ROUTED and source-blind, as WIDE_SPLIT. Neither arm routed on any
-    shared seed.
+  - **WIDE_SLOW (seeds 830–839).** 0/10 ROUTED and source-blind, as WIDE_SPLIT. Neither arm routed on any shared
+    seed.
 - **S75b draft spec (s75b_spec_draft.md, for the user).** It was designed before S75's learned arms were read (1e31409).
   - Configuration B: S = 4, NB = 32, M = 352, L = 1536, bound 0.963.
   - A 2-seed ORACLE pilot with proceed and stop rules fixed in advance.

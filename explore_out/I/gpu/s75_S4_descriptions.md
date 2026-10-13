@@ -34,7 +34,7 @@ R = ROUTED (eta^2 >= 0.9 and a one-to-one map at every gate layer); o = one-to-o
     838   ....................     -    0.00/0.00/0.00
     839   ....................     -    0.00/0.00/0.00
 
-**WIDE_SLOW** (0/9 ROUTED at the end)
+**WIDE_SLOW** (0/10 ROUTED at the end)
 
     seed  trajectory               end  eta^2 at the end (per gate layer)
     830   ....................     -    0.00
@@ -46,6 +46,7 @@ R = ROUTED (eta^2 >= 0.9 and a one-to-one map at every gate layer); o = one-to-o
     836   ....................     -    0.00
     837   ....................     -    0.00
     838   ....................     -    0.00
+    839   ....................     -    0.00
 
 ## 2. WIDE_SPLIT: every eligible check of the split trigger
 
@@ -142,7 +143,7 @@ Trigger: checks every 2400 updates from 4800; eligible when the 64-sequence prob
 | 836 | - | 3 | 0.00 | 0.536 | - | 0.00 | 0.535 |
 | 837 | - | 3 | 0.00 | 0.529 | - | 0.00 | 0.530 |
 | 838 | - | 3 | 0.00 | 0.536 | - | 0.00 | 0.536 |
-| 839 | - | 3 | 0.00 | 0.534 | pending | - | - |
+| 839 | - | 3 | 0.00 | 0.534 | - | 0.00 | 0.533 |
 
-Paired seeds with both records: 9. ROUTED in both 0, WIDE_SPLIT only 0, WIDE_SLOW only 0, neither 9. WIDE_SLOW records are pending for 1 of 10 seeds; this section is regenerated when they land.
+Paired seeds with both records: 10. ROUTED in both 0, WIDE_SPLIT only 0, WIDE_SLOW only 0, neither 10.
 
