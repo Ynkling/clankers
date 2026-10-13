@@ -125,9 +125,10 @@ give L's offset, UTC-6).
 An earlier start on 2026-10-10 stopped at verification with 0 runs (CHECK 155: --also was given a directory, not X's
 file); its log is kept at the top of results/L/split_copy_L.log, and longrun's counter was reset between the two, so
 both headers read "start 1".
-- Verification: every CHECK passed; every CHECK that compares with L's own records was asserted, and the three that
-  compare with 2.10GHz Xeon records were printed, not asserted, and DIFFER on this CPU (the inherited CHECKs 135 and
-  141, and the test's own CHECK 150, F's S68_SINGLE_S8|300). test_muon_recipe's CHECK 130 asserted (L's
+- Verification: every CHECK passed (ALL VERIFICATION CHECKS PASSED, 24 times); every CHECK that compares with L's own
+  records was asserted, and the comparisons with records from other CPUs were printed, not asserted, and are unequal
+  here, as the specification provides: the inherited CHECKs 122, 123, 135 and 141 (2.10GHz Xeon records), CHECK 112
+  (E's screen records, whose CPU is not recorded) and the test's own CHECK 150 (F's S68_SINGLE_S8|300). test_muon_recipe's CHECK 130 asserted (L's
   test_early_recipe file was written on this CPU). CHECK 146 reproduced L's test_window_gate records at seed 1541 bit
   for bit through 7200 (asserted: same CPU). CHECK 151(a): 65 Part C/D records, v1 = v2; 151(b): 30 Part A records, no disagreement.
 - Validity: CEIL_C bound 2/2 (4800, 3600); CEIL_DELTA_D8 bound 2/2 (1200, 1200). Parts A and B VALID on L.
