@@ -34,7 +34,7 @@
 - the L-status contradiction;
 - one wording point at tex6:528.
 
-**What would make it ready.** Make the six L-status lines agree. If tex6:528 is also changed, the next version is "ready to merge" with no further check of numbers: neither change touches a number.
+**What would make it ready.** Make the L-status statements agree (six statements on five lines). If tex6:528 is also changed, the next version is "ready to merge" with no further check of numbers: neither change touches a number.
 
 ## 1. `fifth_pass.md` §2 and §3, item by item
 
