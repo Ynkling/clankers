@@ -1,0 +1,42 @@
+== 1. Facts the draft cites
+  X WIN3_SPLIT_D8 first firing by seed (Part D): [(540, 4800), (541, 16800), (542, 12000), (543, 12000)]; CPU Intel(R) Xeon(R) Processor @ 2.80GHz
+  L WIN3_SPLIT_D8 first firing by seed (Part D): [(1540, 12000), (1541, 4800), (1542, None), (1543, 4800)]; CPU 12th Gen Intel(R) Core(TM) i7-12650H
+  F S76 arms at 5b9bc2a: {'DELTA_SPLIT': 10, 'HEBB_SPLIT': 10, 'O_B025_L2': 4, 'O_B025_RAW': 4, 'O_B1_L2': 4, 'O_B1_RAW': 4, 'O_HEBB': 4}  (DELTA_SLOW present: False)
+  F S76 HEBB_SPLIT: bound routed 10/10
+  F S76 DELTA_SPLIT: bound routed 9/10
+  H COPY_NONOISE|487: firings [4800]; CPU Intel(R) Xeon(R) Processor @ 2.10GHz
+
+== 2. D1: P(HOLDS) = P(HEBB only - DELTA only <= 2) over 40 pairs, HEBB_SPLIT at 0.95
+  DELTA_SPLIT 0.95: independent 0.905; nested 1.000
+  DELTA_SPLIT 0.90: independent 0.592; nested 0.677
+  DELTA_SPLIT 0.85: independent 0.287; nested 0.223
+  DELTA_SPLIT 0.80: independent 0.109; nested 0.049
+  DELTA_SPLIT 0.75: independent 0.034; nested 0.008
+  DELTA_SPLIT 0.70: independent 0.008; nested 0.001
+  per machine (20 pairs, same margin 2), HEBB 0.95: DELTA 0.95: 0.966/1.000, DELTA 0.85: 0.617/0.677, DELTA 0.75: 0.246/0.206
+
+== 3. D2: P(SHOWN) over 40 pairs, DELTA_SPLIT at 0.90 (S76: 9/10); DELTA_SLOW unknown (no S76 arm)
+  DELTA_SLOW 0.30: independent 1.000; nested 1.000
+  DELTA_SLOW 0.50: independent 0.989; nested 1.000
+  DELTA_SLOW 0.65: independent 0.804; nested 0.984
+  DELTA_SLOW 0.75: independent 0.432; nested 0.737
+  DELTA_SLOW 0.80: independent 0.230; nested 0.371
+  DELTA_SLOW 0.85: independent 0.086; nested 0.048
+  DELTA_SLOW 0.90: independent 0.018; nested 0.000
+  smallest nested discordance that can show: b >= 5 with c = 0 (p = 1/32); b = 4, c = 0 gives p = 0.0625
+
+== 4. What a FAIL can rest on: d = 3 with no DELTA-only pair is 3 vs 0, one-sided McNemar p = 0.125; 4 vs 1 p = 0.188
+
+== 5. A calibrated D1: threshold t on d at n pairs, P(HOLDS) at a 10-point deficit (0.95 vs 0.85) and at equal 0.95
+  n = 40, HOLDS if d <= -1: false HOLD at 0.85 indep 0.040 / nested 0.000; HOLDS at equal 0.95 indep 0.395
+  n = 40, HOLDS if d <=  0: false HOLD at 0.85 indep 0.089 / nested 0.015; HOLDS at equal 0.95 indep 0.605
+  n = 40, HOLDS if d <=  1: false HOLD at 0.85 indep 0.170 / nested 0.080; HOLDS at equal 0.95 indep 0.787
+  n = 40, HOLDS if d <=  2: false HOLD at 0.85 indep 0.287 / nested 0.223; HOLDS at equal 0.95 indep 0.905
+  n = 60, HOLDS if d <= -1: false HOLD at 0.85 indep 0.020 / nested 0.000; HOLDS at equal 0.95 indep 0.415
+  n = 60, HOLDS if d <=  0: false HOLD at 0.85 indep 0.042 / nested 0.002; HOLDS at equal 0.95 indep 0.585
+  n = 60, HOLDS if d <=  1: false HOLD at 0.85 indep 0.079 / nested 0.014; HOLDS at equal 0.95 indep 0.740
+  n = 60, HOLDS if d <=  2: false HOLD at 0.85 indep 0.138 / nested 0.053; HOLDS at equal 0.95 indep 0.857
+  n = 80, HOLDS if d <= -1: false HOLD at 0.85 indep 0.010 / nested 0.000; HOLDS at equal 0.95 indep 0.427
+  n = 80, HOLDS if d <=  0: false HOLD at 0.85 indep 0.020 / nested 0.000; HOLDS at equal 0.95 indep 0.573
+  n = 80, HOLDS if d <=  1: false HOLD at 0.85 indep 0.038 / nested 0.002; HOLDS at equal 0.95 indep 0.710
+  n = 80, HOLDS if d <=  2: false HOLD at 0.85 indep 0.068 / nested 0.011; HOLDS at equal 0.95 indep 0.821

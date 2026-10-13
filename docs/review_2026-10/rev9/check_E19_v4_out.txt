@@ -1,0 +1,92 @@
+== 0. Stores at e3f5809: run counts, ok, dry, CPU, code SHA; stored outcome vs recomputed
+  scale_width: 60 runs; not ok 0; dry 0; cpu {'Intel(R) Xeon(R) Processor @ 2.80GHz'}; code {'17e56410a1db'}; BOUND ROUTED stored-vs-recomputed mismatches []
+  scale_depth: 48 runs; not ok 0; dry 0; cpu {'Intel(R) Xeon(R) Processor @ 2.80GHz'}; code {'17e56410a1db'}; BOUND ROUTED stored-vs-recomputed mismatches []
+  scale_eight: 30 runs; not ok 0; dry 0; cpu {'Intel(R) Xeon(R) Processor @ 2.80GHz'}; code {'17e56410a1db'}; BOUND ROUTED stored-vs-recomputed mismatches []
+  capacity: 48 runs; not ok 0; dry 0; cpu {'Intel(R) Xeon(R) Processor @ 2.80GHz'}; code {'17e56410a1db'}; BOUND ROUTED stored-vs-recomputed mismatches []
+  total 186 (draft tex4:235 and tex4:508: 186)
+  rlib ties (rounded stream_gate) so far: []
+
+== 1. S64 width (seeds 270-279, oracle 270-271; reading: 'scale-free' if every tested d >= -1, 'width-sensitive' if any d <= -4)
+  oracle N256: bound 2/2 at [1200, 1200]
+  oracle N512: bound 2/2 at [1200, 1200]
+  oracle N1024: bound 2/2 at [1200, 1200]
+  oracle D64: bound 2/2 at [1200, 1200]
+  oracle D128: bound 2/2 at [1200, 1200]
+  N256 (reference): 9/10 (RELIABLE, Wilson [0.60, 0.98]); transition median 3600; [3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 4800]
+  N512: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 3600.0; [3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 6000, 12000]; vs N256 1 / 0, d = +1, two-sided p = 1 (one-sided 0.5)
+  N1024: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 3600.0; [2400, 2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 6000]; vs N256 1 / 0, d = +1, two-sided p = 1 (one-sided 0.5)
+  D64: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 3600.0; [2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 3600, 4800]; vs N256 1 / 0, d = +1, two-sided p = 1 (one-sided 0.5)
+  D128: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 3600.0; [2400, 2400, 2400, 3600, 3600, 3600, 3600, 3600, 3600, 6000]; vs N256 1 / 0, d = +1, two-sided p = 1 (one-sided 0.5)
+  ref failures: [(273, 'MERGED (2 share)')]
+  reading: scale-free
+
+== 2. S65 depth (seeds 280-289, oracle 280-281; same rule vs L3; RES6 only if L6 - L3 <= -2)
+  oracle L2: bound 2/2 at [1200, 1200]
+  oracle L3: bound 2/2 at [1200, 1200]
+  oracle L4: bound 2/2 at [1200, 1200]
+  oracle L6: bound 2/2 at [2400, 2400]
+  L3 (reference): 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 3600.0; [3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 6000]
+  L2: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 3600.0; [2400, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600]; vs L3 0 / 0, d = +0, two-sided p = 1
+     failures []
+  L4: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 3600.0; [3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 4800, 6000]; vs L3 0 / 0, d = +0, two-sided p = 1
+     failures []
+  L6: 9/10 (RELIABLE, Wilson [0.60, 0.98]); transition median 4800; [3600, 3600, 4800, 4800, 4800, 4800, 4800, 7200, 25200]; vs L3 0 / 1, d = -1, two-sided p = 1
+     failures [(283, 'BOUND NOT routed')]
+  reading: scale-free; RES6 condition (L6 - L3 <= -2): False; RES6 records: 0
+
+== 3. S66 eight streams (seeds 290-299; reading per arm: 'carries' if d >= -1 vs N256_L3)
+  N256_L3: 8/10 (MAJORITY, Wilson [0.49, 0.94]); transition median 21600.0; [13200, 15600, 15600, 20400, 22800, 22800, 25200, 30000]
+     failures (seed, class, splits, final acc): [(290, 'MERGED (2 share)', 3, 0.63), (296, 'MERGED (3 share)', 3, 0.49)]
+     splits per run [3, 2, 1, 2, 2, 2, 3, 2, 1, 3], total 21
+     probe accuracy at the first check (4800): median 0.094; [0.11, 0.09, 0.09, 0.23, 0.09, 0.14, 0.14, 0.08, 0.06, 0.08]
+     transitions (all bound runs) [13200, 15600, 15600, 20400, 22800, 22800, 25200, 30000]; recorded 'transition' field agrees: True
+  D128_L3: 8/10 (MAJORITY, Wilson [0.49, 0.94]); transition median 15600.0; [10800, 12000, 14400, 15600, 15600, 19200, 21600, 27600]; vs N256_L3 2 / 2, d = +0, two-sided p = 1 (one-sided 0.688) -> carries
+     failures (seed, class, splits, final acc): [(293, 'MERGED (3 share)', 3, 0.49), (299, 'MERGED (2 share)', 3, 0.88)]
+     splits per run [1, 2, 3, 3, 0, 2, 3, 3, 1, 3], total 21
+     probe accuracy at the first check (4800): median 0.188; [0.22, 0.27, 0.42, 0.11, 0.47, 0.12, 0.16, 0.14, 0.61, 0.14]
+     transitions (all bound runs) [10800, 12000, 14400, 15600, 15600, 19200, 21600, 27600]; recorded 'transition' field agrees: True
+  N256_L2: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 15600.0; [13200, 14400, 15600, 15600, 15600, 15600, 20400, 20400, 24000, 25200]; vs N256_L3 2 / 0, d = +2, two-sided p = 0.5 (one-sided 0.25) -> carries
+     failures (seed, class, splits, final acc): []
+     splits per run [1, 1, 2, 3, 1, 3, 2, 3, 1, 2], total 19
+     probe accuracy at the first check (4800): median 0.312; [0.23, 0.66, 0.22, 0.12, 0.28, 0.53, 0.34, 0.17, 0.67, 0.77]
+     transitions (all bound runs) [13200, 14400, 15600, 15600, 15600, 15600, 20400, 20400, 24000, 25200]; recorded 'transition' field agrees: True
+  earliest transition in S66: 10800; any at or before 4800: False; at or before 2400: False
+  docstring ALSO REPORTED rule: 'if an arm's median transition is at or before 4800, the schedule is size-dependent'
+
+== 4. S67 capacity (oracle 270-271, learned 270-279; reading on the P=16 oracles only)
+  oracle P=8 N256: bound 2/2; [(270, 2400, 1.0), (271, 2400, 1.0)]
+  oracle P=8 D128: bound 2/2; [(270, 2400, 1.0), (271, 2400, 1.0)]
+  oracle P=16 N256: bound 2/2; [(270, 27600, 0.98), (271, 24000, 0.99)]
+  oracle P=16 D128: bound 1/2; [(270, None, 0.32), (271, 12000, 0.97)]
+  reading: not capacity-bound at N=256
+  P8_N256: 9/10 (RELIABLE, Wilson [0.60, 0.98]); transition median 7200; [6000, 6000, 7200, 7200, 7200, 8400, 8400, 10800, 37200]
+     failures: [(272, 'MERGED (2 share)', 0.74)]
+     failure classes {'MERGED (2 share)': 1}
+  P8_D128: 10/10 (RELIABLE, Wilson [0.72, 1.00]); transition median 7200.0; [6000, 6000, 6000, 6000, 7200, 7200, 7200, 7200, 7200, 15600]
+     failures: []
+     failure classes {}
+  P=8: D128 only 1 / N256 only 0, two-sided p = 1 (one-sided 0.5); printed, no reading
+  P16_N256: 0/10 (NEVER, Wilson [0.00, 0.28]); transition median None; []
+     failures: [(270, 'STREAM-PARTIAL one-to-one', 0.15), (271, 'MERGED (2 share)', 0.11), (272, 'STREAM-PARTIAL one-to-one', 0.14), (273, 'STREAM-PARTIAL one-to-one', 0.59), (274, 'STREAM-PARTIAL one-to-one', 0.72), (275, 'STREAM-PARTIAL one-to-one', 0.67), (276, 'STREAM-PARTIAL one-to-one', 0.29), (277, 'MERGED (2 share)', 0.16), (278, 'MERGED (3 share)', 0.18), (279, 'MERGED (2 share)', 0.12)]
+     failure classes {'STREAM-PARTIAL one-to-one': 6, 'MERGED (2 share)': 3, 'MERGED (3 share)': 1}
+  P16_D128: 4/10 (MINORITY, Wilson [0.17, 0.69]); transition median 31800.0; [19200, 26400, 37200, 38400]
+     failures: [(271, 'STREAM-PARTIAL one-to-one', 0.29), (272, 'STREAM-PARTIAL one-to-one', 0.4), (273, 'STREAM-PARTIAL one-to-one', 0.28), (275, 'STREAM-PARTIAL one-to-one', 0.31), (276, 'STREAM-PARTIAL one-to-one', 0.27), (279, 'STREAM-PARTIAL one-to-one', 0.31)]
+     failure classes {'STREAM-PARTIAL one-to-one': 6}
+  P=16: D128 only 4 / N256 only 0, two-sided p = 0.125 (one-sided 0.0625); printed, no reading
+
+== 5. Operating characteristic of 'd >= -1 over 10 seeds' (independence approximation, as stats_checks.py §7)
+  reference 0.9, arm 0.7: P(reads 'scale-free' / 'carries') = 0.39
+  reference 0.9, arm 0.6: P(reads 'scale-free' / 'carries') = 0.20
+  reference 0.8, arm 0.8: P(reads 'scale-free' / 'carries') = 0.80
+  reference 0.8, arm 0.6: P(reads 'scale-free' / 'carries') = 0.40
+  reference 0.8, arm 0.5: P(reads 'scale-free' / 'carries') = 0.23
+  reference 0.8, arm 0.4: P(reads 'scale-free' / 'carries') = 0.11
+
+== 6. Readings commit vs first record
+  docstrings first committed: 617681d 2026-10-09 06:17:08 +0000
+  READING blocks unchanged 617681d..e3f5809: True
+  first scale_width record: ('7f1a71d 2026-10-09 09:20:22 +0000', ['ORC_D128|270|17e56410a1db|Intel(R) Xeon(R) Processor @ 2.80GHz'])
+  first scale_depth record: ('e44e794 2026-10-09 14:06:26 +0000', ['ORC_L4|280|17e56410a1db|Intel(R) Xeon(R) Processor @ 2.80GHz'])
+  first scale_eight record: ('1bbf799 2026-10-09 17:21:19 +0000', ['N256_L3|292|17e56410a1db|Intel(R) Xeon(R) Processor @ 2.80GHz'])
+  first capacity record: ('9ee5263 2026-10-10 01:56:39 +0000', ['ORC_P16_D128|271|17e56410a1db|Intel(R) Xeon(R) Processor @ 2.80GHz'])
+  phase-2 decision stored 2026-10-09 16:40:29 UTC: best_width D128, best_depth 2

@@ -1,0 +1,136 @@
+
+test_channel_binding.py: results/L/channel_binding_results.json added 9c53e16 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: none
+  GATE0    [gate/validity] registry: NOT RECORDED 'not printed per gate (P=4 passed, stated in test_router_disc' | file: None -> no stored verdict for this claim
+  GATE1    [gate/validity] registry: NOT RECORDED 'not printed per gate (P=4 passed, stated in test_router_disc' | file: None -> no stored verdict for this claim
+  VERDICT  [bound] registry: PRIMARY      'NOT SUPPORTED' | file: None -> no stored verdict for this claim
+
+test_conv_lr.py: results/L/conv_lr_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID    [gate/validity] registry: NOT RECORDED 'NOT RECORDED (implied: ceiling 5/5 and LR1-M1 carry verdicts' | file: None -> no stored verdict for this claim
+  LR1      [test] registry: SECONDARY    'SECONDARY: SHOWN ("LR1 SHOWN on both")' | file: SHOWN p=0.006363 -> AGREE
+  LR2      [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("LR2 NOT SHOWN on both")' | file: NOT SHOWN p=0.5927 -> AGREE
+  LR3      [test] registry: SECONDARY    'SECONDARY: SHOWN ("L SHOWN (28 vs 16, p = 0.006)")' | file: SHOWN p=0.00646 -> AGREE
+  LR4      [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("LR4 NOT SHOWN on both")' | file: NOT SHOWN p=0.1096 -> AGREE
+  M1       [test] registry: SECONDARY    'SECONDARY: SHOWN ("M1 SHOWN on both (p = 2e-12 and 4e-15)")' | file: SHOWN p=3.892e-15 -> AGREE
+  BAND-B_conv4 [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+  BAND-A_conv4 [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+  READING[LR3-] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+  READING[LR3+LR4+] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+  READING[LR3+LR4-] [reading] registry: NOT RECORDED 'NOT RECORDED (LR3 SHOWN, LR4 NOT SHOWN on L, so this branch ' | file: None -> no stored verdict for this claim
+  READING[A_conv4 RELIABLE] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+
+test_curriculum_confirm.py: results/L/curriculum_confirm_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID    [gate/validity] registry: NOT RECORDED 'not recorded as printed (ceiling 5/5)' | file: None -> no stored verdict for this claim
+  K1       [test] registry: PRIMARY      'NOT SHOWN' | file: NOT SHOWN p=0.5194 -> AGREE
+  K2       [test] registry: PRIMARY      'SHOWN' | file: SHOWN p=0.0001659 -> AGREE
+  K3       [band] registry: PRIMARY      'RELIABLE' | file: RELIABLE -> AGREE
+  RD1      [reading] registry: PRIMARY      "not applicable by L's verdicts (condition not met; never pri" | file: None -> no stored verdict for this claim
+  RD2      [reading] registry: PRIMARY      "condition met by L's verdicts (K1 NOT SHOWN); never printed " | file: None -> no stored verdict for this claim
+  RD3      [reading] registry: PRIMARY      "not applicable by L's verdicts (condition not met; never pri" | file: None -> no stored verdict for this claim
+
+test_load_curriculum.py: results/L/load_curriculum_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID    [gate/validity] registry: NOT RECORDED 'not recorded as printed (ceiling 5/5; claims reported as tes' | file: None -> no stored verdict for this claim
+  C1       [test] registry: PRIMARY      'NOT SHOWN' | file: NOT SHOWN p=0.05766 -> AGREE
+  C2       [test] registry: PRIMARY      'SHOWN' | file: SHOWN p=0.001671 -> AGREE
+  C3       [test] registry: PRIMARY      'SHOWN' | file: SHOWN p=2.514e-05 -> AGREE
+  C4       [band] registry: PRIMARY      'MAJORITY' | file: MAJORITY -> AGREE
+  RD1      [reading] registry: PRIMARY      "not applicable by L's verdicts (condition not met; never pri" | file: None -> no stored verdict for this claim
+  RD2      [reading] registry: PRIMARY      "not applicable by L's verdicts (condition not met; never pri" | file: None -> no stored verdict for this claim
+  RD3      [reading] registry: PRIMARY      "condition met by L's verdicts (C1 NOT SHOWN); never printed " | file: None -> no stored verdict for this claim
+  RD4      [reading] registry: PRIMARY      "not applicable by L's verdicts (condition not met; never pri" | file: None -> no stored verdict for this claim
+
+test_p_scaling.py: results/L/p_scaling_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID    [gate/validity] registry: NOT RECORDED 'NOT RECORDED (implied: ceiling 8/8 and P1-M1-P8 carry verdic' | file: None -> no stored verdict for this claim
+  P1       [test] registry: SECONDARY    'SECONDARY: SHOWN ("SHOWN on L (p = 0.013)")' | file: SHOWN p=0.01285 -> AGREE
+  P2       [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("P2 and P3 NOT SHOWN on both")' | file: NOT SHOWN p=0.7597 -> AGREE
+  P3       [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("P2 and P3 NOT SHOWN on both")' | file: NOT SHOWN p=0.597 -> AGREE
+  M1-P8    [test] registry: SECONDARY    'SECONDARY: SHOWN ("M1-P8 SHOWN on both")' | file: SHOWN p=2.918e-06 -> AGREE
+  READING[P1+P2+] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+  READING[P1+P2-] [reading] registry: NOT RECORDED 'NOT RECORDED (P1 SHOWN, P2 NOT SHOWN on L, so this branch wo' | file: None -> no stored verdict for this claim
+  READING[P1-] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+  READING[P3+] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+
+test_readout_path.py: results/L/readout_path_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  R1       [test] registry: PRIMARY      'CONFIRMED' | file: CONFIRMED p=2.672e-08 -> AGREE
+  R2       [test] registry: PRIMARY      'GRADIENT' | file: GRADIENT p=4.135e-10 -> AGREE
+  R3       [test] registry: PRIMARY      'TIMING HELPS' | file: TIMING HELPS p=9.35e-08 -> AGREE
+
+test_router_confirm.py: results/L/router_confirm_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  INVALID  [gate/validity] registry: PRIMARY      'VALID' | file: None -> no stored verdict for this claim
+  C1       [test] registry: PRIMARY      'SUPPORTED' | file: SUPPORTED p=0.00195 -> AGREE
+  C2       [band] registry: PRIMARY      'MAJORITY' | file: MAJORITY -> AGREE
+  C3       [test] registry: PRIMARY      'NOT SHOWN' | file: NOT SHOWN p=0.7498 -> AGREE
+
+test_router_curriculum.py: results/L/router_curriculum_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  INVALID  [gate/validity] registry: NOT RECORDED "not printed separately (only 'PARTIAL, as on X (... nudge 10" | file: None -> no stored verdict for this claim
+  VERDICT  [band] registry: PRIMARY      'PARTIAL' | file: None -> no stored verdict for this claim
+
+test_router_discovery.py: results/L/router_discovery_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  INVALID  [gate/validity] registry: NOT RECORDED 'NOT PRINTED (no L verdict recorded anywhere; derived count i' | file: None -> no stored verdict for this claim
+  VERDICT  [band] registry: NOT RECORDED 'NOT PRINTED' | file: None -> no stored verdict for this claim
+
+test_router_layout.py: results/L/router_layout_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID-blocked [gate/validity] registry: SECONDARY    'SECONDARY: valid ("Both new layouts were valid and discrimin' | file: None -> no stored verdict for this claim
+  DISCRIMINATIVE-blocked [gate/validity] registry: SECONDARY    'SECONDARY: discriminative ("0/30 in each machine\'s run of it' | file: None -> no stored verdict for this claim
+  VALID-shuffled [gate/validity] registry: SECONDARY    'SECONDARY: valid ("Both new layouts were valid and discrimin' | file: None -> no stored verdict for this claim
+  DISCRIMINATIVE-shuffled [gate/validity] registry: SECONDARY    'SECONDARY: discriminative ("0/30 in each machine\'s run of it' | file: None -> no stored verdict for this claim
+  L1       [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("L1 ... and L2 ... were NOT SHOWN on b' | file: NOT SHOWN p=0.9672 -> AGREE
+  L2       [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("L1 ... and L2 ... were NOT SHOWN on b' | file: NOT SHOWN p=0.5 -> AGREE
+  BAND-A_grouped [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+  BAND-A_blocked [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+  BAND-A_shuffled [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+
+test_router_reliability.py: results/L/router_reliability_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  K8       [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("K4, K8 NOT SHOWN on X and L")' | file: NOT SHOWN p=0.2469 -> AGREE
+  K4       [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("K4, K8 NOT SHOWN on X and L")' | file: NOT SHOWN p=0.4106 -> AGREE
+  BAND-A   [band] registry: SECONDARY    'SECONDARY: MAJORITY ("every arm was MAJORITY")' | file: None -> no stored verdict for this claim
+  BAND-A_k4 [band] registry: SECONDARY    'SECONDARY: MAJORITY ("every arm was MAJORITY")' | file: None -> no stored verdict for this claim
+  BAND-A_k8 [band] registry: SECONDARY    'SECONDARY: MAJORITY ("every arm was MAJORITY")' | file: None -> no stored verdict for this claim
+  RESTART  [band] registry: SECONDARY    'SECONDARY: RELIABLE ("RESTART RELIABLE, 30/30 on both machin' | file: RELIABLE -> AGREE
+
+test_scale_axes.py: results/L/scale_axes_results.json added 42af095 2026-10-06; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID A  [gate/validity] registry: NOT RECORDED 'not printed in repo (json validA = true; ceiling 3/3)' | file: None -> no stored verdict for this claim
+  VALID B  [gate/validity] registry: NOT RECORDED 'not printed in repo (json validB = true)' | file: None -> no stored verdict for this claim
+  M1       [test] registry: PRIMARY      'SHOWN' | file: SHOWN p=0.0005579 -> AGREE
+  S1       [band] registry: PRIMARY      'MINORITY' | file: MINORITY -> AGREE
+  S2       [test] registry: PRIMARY      'NOT SHOWN' | file: NOT SHOWN p=0.1088 -> AGREE
+  RD1      [reading] registry: PRIMARY      'in L json readings: "M1 SHOWN"' | file: None -> no stored verdict for this claim
+  RD2      [reading] registry: PRIMARY      'not applicable (absent from L json readings)' | file: None -> no stored verdict for this claim
+  RD3      [reading] registry: PRIMARY      'not applicable (absent from L json readings)' | file: None -> no stored verdict for this claim
+  RD4      [reading] registry: PRIMARY      'in L json readings: "S1 MINORITY"' | file: None -> no stored verdict for this claim
+
+test_short_conv.py: results/L/short_conv_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID    [gate/validity] registry: NOT RECORDED 'NOT RECORDED (implied: ceiling 5/5 and K1-K3 carry verdicts,' | file: None -> no stored verdict for this claim
+  K1       [test] registry: SECONDARY    'SECONDARY: NOT SHOWN ("K1 NOT SHOWN: B_conv 2/40 on X and 5/' | file: NOT SHOWN p=0.1205 -> AGREE
+  K2       [test] registry: SECONDARY    'SECONDARY: DIFFERENT, with A higher ("K2 DIFFERENT, with A h' | file: DIFFERENT p=0.03389 -> AGREE
+  K3       [test] registry: SECONDARY    'SECONDARY: SHOWN ("K3 SHOWN: A_conv 23/40 on X and 28/40 on ' | file: SHOWN p=1.223e-07 -> AGREE
+  BAND-B_conv [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+  BAND-A_conv [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+  BAND-A   [band] registry: NOT RECORDED 'NOT RECORDED' | file: None -> no stored verdict for this claim
+  READING[K1+K3-] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+  READING[K1+K3+] [reading] registry: NOT RECORDED 'NOT RECORDED (condition not met on L)' | file: None -> no stored verdict for this claim
+  READING[K1-] [reading] registry: NOT RECORDED 'NOT RECORDED (K1 NOT SHOWN on L, so this branch would apply)' | file: None -> no stored verdict for this claim
+
+test_stream_channels.py: results/L/stream_channels_results.json added 9a53302 2026-10-10; CPU 12th Gen Intel(R) Core(TM) i7-12650H; stored verdict: dict
+  VALID    [gate/validity] registry: NOT RECORDED 'not recorded as printed' | file: None -> no stored verdict for this claim
+  K8       [test] registry: PRIMARY      'SHOWN' | file: SHOWN p=0.01929 -> AGREE
+  K16      [test] registry: PRIMARY      'SHOWN' | file: SHOWN p=0.01074 -> AGREE
+  MG       [test] registry: PRIMARY      'SHOWN' | file: SHOWN p=0.02678 -> AGREE
+  band_A4k8 [band] registry: PRIMARY      'MAJORITY' | file: MAJORITY -> AGREE
+  band_A4k16 [band] registry: PRIMARY      'MAJORITY' | file: MAJORITY -> AGREE
+  RD1      [reading] registry: PRIMARY      "condition met by L's verdicts (K8, K16, MG SHOWN); never pri" | file: None -> no stored verdict for this claim
+  RD2      [reading] registry: PRIMARY      "not applicable by L's verdicts (condition not met; never pri" | file: None -> no stored verdict for this claim
+  RD3      [reading] registry: PRIMARY      "not applicable by L's verdicts (condition not met; never pri" | file: None -> no stored verdict for this claim
+
+== tally (registry status, comparison)
+  NOT RECORDED no       32
+  PRIMARY      AGREE    21
+  PRIMARY      no       17
+  SECONDARY    AGREE    17
+  SECONDARY    no       7
+
+== L's 53 hypothesis tests: p from the L results file where it stores one, else as printed
+  tests 53; p from file 34, from the printed text only 17, none 2
+  tests with no p anywhere: stream_curriculum:C3, recipe_scope:Q4
+  with a p: 51; p < 0.05: 32; Holm FWER 0.05 keeps 13; BH FDR 0.05 keeps 27
+  positive verdicts as printed: 32; not kept by BH: short_conv:K2 (0.0339), stream_channels:MG (0.0268), slow_start:HA (0.031), slow_start:S0 (0.046), slow_start:H0S (0.031)
+  p now taken from the file for rows the registry had without a printed p: router_layout:L1 (0.967), router_layout:L2 (0.5), conv_lr:LR1 (0.00636), conv_lr:LR2 (0.593), conv_lr:LR4 (0.11), p_scaling:P2 (0.76), p_scaling:P3 (0.597), p_scaling:M1-P8 (2.92e-06), load_curriculum:C2 (0.00167), load_curriculum:C3 (2.51e-05), curriculum_confirm:K1 (0.519)

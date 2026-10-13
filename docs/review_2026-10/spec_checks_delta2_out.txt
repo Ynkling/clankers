@@ -1,0 +1,44 @@
+== 1. No-room rule (Amendment 1: a no-trigger arm at >= 36 of the pooled 40 makes the split claim NO ROOM)
+  no-trigger arm 32/40: largest possible b (split only) = 8, smallest p = 0.0039 -> SHOWN possible
+  no-trigger arm 33/40: largest possible b (split only) = 7, smallest p = 0.0078 -> SHOWN possible
+  no-trigger arm 34/40: largest possible b (split only) = 6, smallest p = 0.0156 -> SHOWN possible
+  no-trigger arm 35/40: largest possible b (split only) = 5, smallest p = 0.0312 -> SHOWN possible
+  no-trigger arm 36/40: largest possible b (split only) = 4, smallest p = 0.0625 -> SHOWN impossible
+  no-trigger arm 37/40: largest possible b (split only) = 3, smallest p = 0.1250 -> SHOWN impossible
+  no-trigger arm 38/40: largest possible b (split only) = 2, smallest p = 0.2500 -> SHOWN impossible
+  no-trigger arm 39/40: largest possible b (split only) = 1, smallest p = 0.5000 -> SHOWN impossible
+  no-trigger arm 40/40: largest possible b (split only) = 0, smallest p = 1.0000 -> SHOWN impossible
+
+== 2. D2 / D4 labels over 40 pairs, split arm at 0.95 (independent | nested pairing)
+  no-trigger arm 0.60: indep helps 0.985, no room 0.000, not shown 0.015 | nested helps 1.000, no room 0.000, not shown 0.000
+  no-trigger arm 0.70: indep helps 0.877, no room 0.003, not shown 0.121 | nested helps 0.984, no room 0.003, not shown 0.013
+  no-trigger arm 0.75: indep helps 0.731, no room 0.016, not shown 0.252 | nested helps 0.924, no room 0.016, not shown 0.060
+  no-trigger arm 0.80: indep helps 0.516, no room 0.076, not shown 0.409 | nested helps 0.737, no room 0.076, not shown 0.187
+  no-trigger arm 0.85: indep helps 0.275, no room 0.263, not shown 0.462 | nested helps 0.371, no room 0.263, not shown 0.366
+  no-trigger arm 0.90: indep helps 0.088, no room 0.629, not shown 0.283 | nested helps 0.048, no room 0.629, not shown 0.323
+  no-trigger arm 0.95: indep helps 0.008, no room 0.952, not shown 0.040 | nested helps 0.000, no room 0.952, not shown 0.048
+
+== 3. D1 labels over 40 pairs (d = HEBB only - DELTA only): P(d <= -3), P(-2 <= d <= 2), P(d >= 3)
+  HEBB 0.95, DELTA 0.95, indep : 'delta binds more often' 0.095; 'not shown worse by > 2' 0.810; 'not shown non-inferior' 0.095
+  HEBB 0.95, DELTA 0.95, nested: 'delta binds more often' 0.000; 'not shown worse by > 2' 1.000; 'not shown non-inferior' 0.000
+  HEBB 0.95, DELTA 0.90, indep : 'delta binds more often' 0.024; 'not shown worse by > 2' 0.568; 'not shown non-inferior' 0.408
+  HEBB 0.95, DELTA 0.90, nested: 'delta binds more often' 0.000; 'not shown worse by > 2' 0.677; 'not shown non-inferior' 0.323
+  HEBB 0.95, DELTA 0.85, indep : 'delta binds more often' 0.005; 'not shown worse by > 2' 0.282; 'not shown non-inferior' 0.713
+  HEBB 0.95, DELTA 0.85, nested: 'delta binds more often' 0.000; 'not shown worse by > 2' 0.223; 'not shown non-inferior' 0.777
+  HEBB 0.90, DELTA 0.95, indep : 'delta binds more often' 0.408; 'not shown worse by > 2' 0.568; 'not shown non-inferior' 0.024
+  HEBB 0.90, DELTA 0.95, nested: 'delta binds more often' 0.323; 'not shown worse by > 2' 0.677; 'not shown non-inferior' 0.000
+  HEBB 0.85, DELTA 0.95, indep : 'delta binds more often' 0.713; 'not shown worse by > 2' 0.282; 'not shown non-inferior' 0.005
+  HEBB 0.85, DELTA 0.95, nested: 'delta binds more often' 0.777; 'not shown worse by > 2' 0.223; 'not shown non-inferior' 0.000
+  HEBB 0.90, DELTA 0.90, indep : 'delta binds more often' 0.173; 'not shown worse by > 2' 0.654; 'not shown non-inferior' 0.173
+  HEBB 0.90, DELTA 0.90, nested: 'delta binds more often' 0.000; 'not shown worse by > 2' 1.000; 'not shown non-inferior' 0.000
+  the label's own evidence: d = -3 as 0 vs 3 gives one-sided p = 0.125; d = 3 as 3 vs 0 the same
+
+== 4. Newcombe method 10: this file's implementation against test_delta_recipe.newcombe_paired (main line a581027)
+  105993 tables (n = 20, 40, 80): largest absolute difference 0.00e+00
+  rlib.wilson against the Wilson formula used here: largest difference 2.13e-09
+  a, b, c, d = (36, 2, 0, 2): difference +0.050, 95% [-0.050, +0.167]
+  a, b, c, d = (34, 4, 1, 1): difference +0.075, 95% [-0.055, +0.213]
+  a, b, c, d = (30, 0, 3, 7): difference -0.075, 95% [-0.182, +0.025]
+  a, b, c, d = (38, 0, 0, 2): difference +0.000, 95% [-0.092, +0.092]
+  a, b, c, d = (25, 8, 3, 4): difference +0.125, 95% [-0.043, +0.286]
+  G3 (WIN3_SLOW vs HINGE0, 80 pairs, 11 vs 9): +0.025 [-0.088, +0.138] (statistics.md's conditional interval [-0.079, +0.121])
