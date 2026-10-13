@@ -157,7 +157,7 @@ def run_checks():
     rows.append((f"ORC_S_D128 through the real path: groups {ls['groups']} (an empty gate group, every trainable parameter "
                  f"({ls['n_trainable']}) in 'rest'), lrs at update 1 {ls['at1']}, {W} {ls['at_w']}, {W + 1} {ls['at_w1']}; covers every "
                  f"trainable parameter {ls['cover']}; gate {ls['gate_kind']}, n_embd {ls['n_embd']}",
-                 ls["ok"] and ls["n"] == W + 1 and ls["groups"] == [("gate", 0), ("rest", ls["n_trainable"])]
+                 ls["ok"] and ls["n"] == W + 1 and [list(g) for g in ls["groups"]] == [["gate", 0], ["rest", ls["n_trainable"]]]
                  and ls["at1"] == [1e-3, 1e-4] and ls["at_w"] == [1e-3, 1e-4] and ls["at_w1"] == [1e-3, 1e-3] and ls["cover"]
                  and ls["gate_kind"] == "perfect" and ls["n_embd"] == 128))
     ca, cs = res["a270"].get("curve") or [], res["s270"].get("curve") or []
