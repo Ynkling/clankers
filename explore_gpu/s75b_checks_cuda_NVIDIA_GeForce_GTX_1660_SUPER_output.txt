@@ -1,0 +1,23 @@
+explore_gpu.s75b CHECKs on {'device': 'cuda:0', 'torch': '2.14.0+cu130', 'cpu': 'AMD Ryzen 5 3600 6-Core Processor', 'threads': 1, 'gpu': 'NVIDIA GeForce GTX 1660 SUPER', 'capability': '7.5', 'gpu_mem_gb': 5.61, 'cuda': '13.0', 'cudnn': 92400, 'tf32_matmul': False, 'tf32_cudnn': False}; S75b code SHA 0759062126f5
+
+SKIP B1 task CHECK at B (0 s): {"ok": true, "skipped": "cpu only"}
+SKIP B2 guarded trigger mechanics (0 s): {"ok": true, "skipped": "cpu only"}
+SKIP B3 margin in 16-sequence chunks (0 s): {"ok": true, "skipped": "cpu only"}
+SKIP B4 rules (0 s): {"ok": true, "skipped": "cpu only"}
+SKIP B5 refusals and allocation (0 s): {"ok": true, "skipped": "cpu only"}
+SKIP B6 S75's code SHA unchanged (0 s): {"ok": true, "skipped": "cpu only"}
+ok   B7 lock-step at L = 1536, R = 1 (74 s): {"ok": true, "tol": {"logits": 1e-05, "grad": 0.0001}, "updates": 20, "seeds": [850, 851], "batch": 8, "R": 1}
+       ORACLE seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.2945139126534614e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.5739150047302246}
+       ORACLE seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.3164778324839245e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.5747799873352051}
+       SINGLE seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.0356058952092856e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.47005367279052734}
+       SINGLE seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 2.986491283161951e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.47005367279052734}
+       WIDE (WIDE_SPLIT_G / WIDE_SLOW) seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.015288396684912e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.8595809936523438}
+       WIDE (WIDE_SPLIT_G / WIDE_SLOW) seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.185358458262521e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.8595809936523438}
+       REG3 (loop) seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.270424694569616e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 1.0176849365234375}
+       REG3 (loop) seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 2.929526360496887e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 1.0176849365234375}
+       REG3 (scan vs the sequential loop) seed 850: {"ok": true, "updates": 20, "logits": 2.384185791015625e-07, "grad": 0.0001597694103530578, "grad_param": "b_R", "arbitrated": 1, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.33592944461974084, "peak_gb": 2.0182695388793945}
+       REG3 (scan vs the sequential loop) seed 851: {"ok": true, "updates": 20, "logits": 1.4901161193847656e-07, "grad": 0.00010397597044659698, "grad_param": "b_R", "arbitrated": 1, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.43780089598264876, "peak_gb": 2.0182695388793945}
+       control: W_g gradient doubled (must fail): {"ok": true, "updates": 20, "logits": 0.0, "grad": 1.0, "grad_param": "W_g", "arbitrated": 20, "test_worse": 20, "ref_worse": 0, "sign_p": 9.5367431640625e-07, "nonfinite": 0, "worst_arbitration": 4718.837448171445, "peak_gb": 0.05863142013549805, "failed_as_it_should": true}
+SKIP B8 end to end (small configuration) (0 s): {"ok": true, "skipped": "cpu only"}
+
+ALL CHECKS PASSED
