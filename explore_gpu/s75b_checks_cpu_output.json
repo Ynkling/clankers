@@ -464,6 +464,182 @@
     }
    },
    "secs": 327.4
+  },
+  "B8": {
+   "ok": true,
+   "stage1": {
+    "proceed": true,
+    "split_thr": 0.45280072212219236,
+    "missing": [],
+    "record": true,
+    "record_machine": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "record_changes": true,
+    "record_blind": false
+   },
+   "stage2": {
+    "missing": {},
+    "records": {
+     "ORACLE_PILOT": [
+      840,
+      841
+     ],
+     "ORACLE": [
+      850,
+      851
+     ],
+     "SINGLE": [
+      850,
+      851
+     ],
+     "WIDE_SPLIT_G": [
+      850,
+      851
+     ],
+     "REG3": [
+      850,
+      851
+     ],
+     "WIDE_SLOW": [
+      850,
+      851
+     ]
+    },
+    "split_checks": [
+     [
+      400,
+      false,
+      null,
+      false,
+      false
+     ],
+     [
+      800,
+      true,
+      null,
+      true,
+      false
+     ],
+     [
+      400,
+      false,
+      null,
+      false,
+      false
+     ],
+     [
+      800,
+      true,
+      null,
+      true,
+      false
+     ]
+    ],
+    "rows_record_map": true,
+    "meta": {
+     "machine": "fallback",
+     "split_thr": 0.45280072212219236,
+     "stage1_commit": null,
+     "bench_commit": null,
+     "checks_commit": null,
+     "register_reg3": "loop",
+     "workers": 0,
+     "threads": 1,
+     "started": "2026-10-13 00:53:43"
+    },
+    "meta_changes": true,
+    "reg3_register": [
+     "loop"
+    ],
+    "host": [
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true,
+     true
+    ]
+   },
+   "report": {
+    "lines": 49,
+    "missing_sections": []
+   },
+   "bench": {
+    "stats_workers": 1,
+    "workers_needed": 1,
+    "workers_why": "keeps up",
+    "budget_gb": 10.5,
+    "budget_bound": "total",
+    "main_gb": 5.780384063720703,
+    "worker_gb": 0.6461448669433594,
+    "data_gb": 0.48767852783203125,
+    "data_gb_source": "measured",
+    "payload_gb": 0.021488189697265625,
+    "stats_secs": 4.481760263442993,
+    "secs_per_update": 0.46447479724884033,
+    "register_reg3": "loop",
+    "all_ok": true,
+    "arms": {
+     "ORACLE": true,
+     "SINGLE": true,
+     "WIDE_SLOW": true,
+     "WIDE_SPLIT_G": true,
+     "REG3 scan": true,
+     "REG3 loop": true
+    },
+    "worker_ru_maxrss_gb": 5.780384063720703,
+    "split_checks": [
+     [
+      2,
+      false,
+      null,
+      false,
+      false
+     ]
+    ]
+   },
+   "guard_in_run": {
+    "850": {
+     "ok": true,
+     "error": null,
+     "eligible": [
+      [
+       4,
+       true,
+       null,
+       false,
+       [
+        "step",
+        "exp_avg",
+        "exp_avg_sq"
+       ]
+      ]
+     ]
+    },
+    "851": {
+     "ok": true,
+     "error": null,
+     "eligible": [
+      [
+       4,
+       true,
+       null,
+       false,
+       [
+        "step",
+        "exp_avg",
+        "exp_avg_sq"
+       ]
+      ]
+     ]
+    }
+   },
+   "secs": 1797.9
   }
  }
 }
