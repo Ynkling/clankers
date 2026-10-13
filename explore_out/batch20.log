@@ -1812,3 +1812,114 @@ SUMMARY — EXPLORATORY, not a result
   S68 budget for the main-line test: 40800; 86,400 IS NOT ENOUGH (['C_P16_N256|276', 'C_P16_D128|271', 'C_P16_D128|272'])
 ####################################################################################################
 chain: segment 16 start 2026-10-13T02:50:56Z
+#################### RESUME 2026-10-13 02:50:57 UTC — a new segment; saved runs are reused, stopped runs resume from their checkpoints (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 20: continue (S68)
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git a4cabb5+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  code SHA (the child): 78c8b0a643d9 over 44 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b19_model explore_common explore_common2 explore_continue_child explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  this segment's CPU: Intel(R) Xeon(R) Processor @ 2.10GHz; the batch's CPU (the full CHECK pass): Intel(R) Xeon(R) Processor @ 2.10GHz; checkpoints in /tmp/claude-0/-home-user-clankers/db3e70a0-5544-5116-802e-293fdfffc055/scratchpad/b20_ckpt
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (42s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  PROJECTION (worst case: every run to its iters; batch 19's pool-load timing of these specs, stored 2026-10-09 08:33:09 UTC; S67's observed rates were ~1.5x faster):
+    RCHK_P8_N256     1 runs x   1.5 h (step  118.9 ms, evaluation   7.1 s, 44400 updates)
+    C_P8_N256        1 runs x   3.0 h (step  118.9 ms, evaluation   7.1 s, 86400 updates)
+    C_ORC_P16_D128   1 runs x  12.7 h (step  506.3 ms, evaluation  28.5 s, 86400 updates)
+    C_P16_N256      10 runs x   8.4 h (step  328.2 ms, evaluation  25.1 s, 86400 updates)
+    C_P16_D128       6 runs x  14.4 h (step  570.9 ms, evaluation  35.7 s, 86400 updates)
+    TOTAL 188 h of runs; makespan on 4 workers 47.9 h worst case (a run that binds stops early); nothing is cut (no budget was given)
+  recipe read in a child from main at 9c5939e: test_stream_recipe.LR 0.001; SLOW: gate 0.001 throughout, others 0.0001 for updates 1-2400; window width 3; ARCH {'n_layer': 3, 'positional': 'decay'}, D 32; evaluation every 1200, bound at 0.95 held, early stop after 3 in a row (after 4800); no trigger (as S67); 1 torch thread per run
+  lr for s67_continue RCHK_P8_N256: 0.001; iters 44400; seeds 272-272 (1); size [8, 32, 3]; task P8S4; gate local; marks 43200..44400; no checkpoint after 42000
+  lr for s67_continue C_P8_N256: 0.001; iters 86400; seeds 272-272 (1); size [8, 32, 3]; task P8S4; gate local; marks 43200..86400; halts once at 43200
+  lr for s67_continue C_ORC_P16_D128: 0.001; iters 86400; seeds 270-270 (1); size [2, 128, 3]; task P16S4; gate perfect; marks 43200..86400
+  lr for s67_continue C_P16_N256: 0.001; iters 86400; seeds 270-279 (10); size [8, 32, 3]; task P16S4; gate local; marks 43200..86400
+  lr for s67_continue C_P16_D128: 0.001; iters 86400; seeds [271, 272, 273, 275, 276, 279] (6); size [2, 128, 3]; task P16S4; gate local; marks 43200..86400
+  CHECKs skipped (repro check above still run): the code SHA equals the one at the full CHECK pass (2026-10-11 22:16:43 UTC, git 0a2605a+dirty, on Intel(R) Xeon(R) Processor @ 2.10GHz; its output is earlier in this log)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN s67_continue
+  idea    are batch 19's unbound P = 16 runs slow or stuck? every unbound S67 learned run on to 86,400, same recipe
+  source  batch 19's S67 (P16_D128 4/10 vs P16_N256 0/10; 12 of 16 failures one-to-one and unbound); the user's batch 20
+  change  only the budget (43,200 -> 86,400); every run regenerated from update 0 and checked against its S67 record
+  arm RCHK_P8_N256 lr 0.001  iters 44400  seeds 272-272 (1)  — the reproduction's run computed through (no checkpoint after 42000), P=8, N256, to 44400
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P8_N256    lr 0.001  iters 86400  seeds 272-272 (1)  — P=8, N256 (N=256, D=32): halts at 43200, a new process resumes it
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_ORC_P16_D128 lr 0.001  iters 86400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm C_P16_N256   lr 0.001  iters 86400  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P16_D128   lr 0.001  iters 86400  seeds [271, 272, 273, 275, 276, 279] (6)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  pairing each run is its own S67 run (same arm, seed, recipe), continued
+----------------------------------------------------------------------------------------------------
+  pool: 4 workers (1 torch thread each); segment budget 115 min left
+  0 runs saved in this segment; batch wall clock 0.0 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN s67_continue
+  idea    are batch 19's unbound P = 16 runs slow or stuck? every unbound S67 learned run on to 86,400, same recipe
+  source  batch 19's S67 (P16_D128 4/10 vs P16_N256 0/10; 12 of 16 failures one-to-one and unbound); the user's batch 20
+  change  only the budget (43,200 -> 86,400); every run regenerated from update 0 and checked against its S67 record
+  arm RCHK_P8_N256 lr 0.001  iters 44400  seeds 272-272 (1)  — the reproduction's run computed through (no checkpoint after 42000), P=8, N256, to 44400
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P8_N256    lr 0.001  iters 86400  seeds 272-272 (1)  — P=8, N256 (N=256, D=32): halts at 43200, a new process resumes it
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_ORC_P16_D128 lr 0.001  iters 86400  seeds 270-270 (1)  — oracle, P=16, D128 (N=256, D=128)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm C_P16_N256   lr 0.001  iters 86400  seeds 270-279 (10)  — LOCAL3 + SLOW, P=16, N256 (N=256, D=32)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  arm C_P16_D128   lr 0.001  iters 86400  seeds [271, 272, 273, 275, 276, 279] (6)  — LOCAL3 + SLOW, P=16, D128 (N=256, D=128)
+                   schedule: gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+  pairing each run is its own S67 run (same arm, seed, recipe), continued
+----------------------------------------------------------------------------------------------------
+  REPRODUCTION OF A RESUMED RUN (C_P8_N256 272 resumed from its 43200 checkpoint in a new process vs RCHK_P8_N256 272 computed through, at 44400): DIFFERS: C_P8_N256 272's resumes [61200] do not include 43200
+  ARM RCHK_P8_N256 (the reproduction's run computed through (no checkpoint after 42000), P=8, N256, to 44400), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | yes        | MERGED (2 share)             None  44400  0.73     2+1+1 | 43200:0.48/1.00/0.47/1.00  44400:0.47/1.00/0.47/1.00
+
+  ARM C_P8_N256 (P=8, N256 (N=256, D=32): halts at 43200, a new process resumes it), seeds 272-272 (1); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     272 | MERGED (2 share) 0.74      | yes        | MERGED (2 share)             None  86400  0.74     2+1+1 | 43200:0.48/1.00/0.47/1.00  44400:0.47/1.00/0.47/1.00  48000:0.53/1.00/0.54/1.00  52800:0.45/1.00/0.54/1.00  57600:0.55/1.00/0.51/1.00  62400:0.51/1.00/0.53/1.00  67200:0.48/1.00/0.51/1.00  72000:0.47/1.00/0.49/1.00  76800:0.50/1.00/0.50/1.00  81600:0.50/1.00/0.50/1.00  86400:0.49/1.00/0.49/1.00  [resumed at [61200]]  [halted once at 43200]
+
+  ARM C_ORC_P16_D128 (oracle, P=16, D128 (N=256, D=128)), seeds 270-270 (1); the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | not bound 0.32             | yes        | not bound                    None  86400  0.38   1+1+1+1 | 43200:0.31/0.29/0.32/0.35  48000:0.35/0.31/0.29/0.34  52800:0.33/0.30/0.32/0.32  57600:0.35/0.31/0.31/0.31  62400:0.35/0.35/0.33/0.35  67200:0.36/0.34/0.32/0.36  72000:0.37/0.40/0.37/0.37  76800:0.36/0.40/0.34/0.38  81600:0.40/0.38/0.37/0.37  86400:0.36/0.40/0.36/0.37  [resumed at [85200]]
+
+  ARM C_P16_N256 (LOCAL3 + SLOW, P=16, N256 (N=256, D=32)), seeds 270-279 (10); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     270 | STREAM-PARTIAL one-to-one 0.15 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.15   1+1+1+1 | 43200:0.15/0.13/0.17/0.14  48000:0.16/0.12/0.15/0.14  52800:0.14/0.13/0.15/0.13  57600:0.16/0.14/0.18/0.14  62400:0.15/0.14/0.15/0.15  67200:0.17/0.13/0.15/0.14  72000:0.16/0.17/0.14/0.14  76800:0.16/0.13/0.14/0.16  81600:0.16/0.14/0.18/0.14  86400:0.15/0.15/0.16/0.14  [resumed at [64800]]
+     271 | MERGED (2 share) 0.11      | yes        | MERGED (2 share)             None  86400  0.15       2+2 | 43200:0.13/0.11/0.12/0.10  48000:0.11/0.10/0.12/0.10  52800:0.13/0.13/0.13/0.15  57600:0.13/0.13/0.13/0.12  62400:0.11/0.15/0.12/0.14  67200:0.15/0.13/0.14/0.16  72000:0.16/0.14/0.12/0.16  76800:0.15/0.15/0.13/0.16  81600:0.17/0.14/0.17/0.15  86400:0.15/0.15/0.15/0.15  [resumed at [80400]]
+     272 | STREAM-PARTIAL one-to-one 0.14 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.14   1+1+1+1 | 43200:0.15/0.13/0.15/0.12  48000:0.13/0.16/0.15/0.13  52800:0.15/0.14/0.15/0.14  57600:0.16/0.14/0.14/0.14  62400:0.14/0.15/0.16/0.16  67200:0.15/0.16/0.15/0.13  72000:0.14/0.15/0.15/0.16  76800:0.15/0.13/0.13/0.14  81600:0.14/0.14/0.15/0.13  86400:0.14/0.13/0.16/0.14  [resumed at [50400]]
+     273 | STREAM-PARTIAL one-to-one 0.59 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.66   1+1+1+1 | 43200:0.57/0.60/0.61/0.59  48000:0.58/0.60/0.62/0.60  52800:0.58/0.60/0.61/0.60  57600:0.57/0.61/0.59/0.58  62400:0.56/0.59/0.58/0.60  67200:0.60/0.60/0.60/0.59  72000:0.59/0.63/0.61/0.62  76800:0.65/0.65/0.64/0.64  81600:0.65/0.66/0.64/0.66  86400:0.67/0.66/0.67/0.65  [resumed at [72000]]
+     274 | STREAM-PARTIAL one-to-one 0.72 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.70   1+1+1+1 | 43200:0.71/0.70/0.72/0.73  48000:0.77/0.74/0.75/0.75  52800:0.77/0.73/0.76/0.76  57600:0.77/0.75/0.78/0.76  62400:0.74/0.69/0.70/0.70  67200:0.75/0.69/0.70/0.70  72000:0.74/0.68/0.69/0.71  76800:0.73/0.68/0.70/0.69  81600:0.73/0.68/0.69/0.70  86400:0.74/0.66/0.71/0.70  [resumed at [73200]]
+     275 | STREAM-PARTIAL one-to-one 0.67 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.80   1+1+1+1 | 43200:0.66/0.72/0.65/0.66  48000:0.64/0.69/0.65/0.68  52800:0.70/0.76/0.72/0.73  57600:0.77/0.83/0.79/0.82  62400:0.78/0.82/0.77/0.78  67200:0.79/0.84/0.80/0.83  72000:0.80/0.85/0.78/0.82  76800:0.81/0.86/0.82/0.84  81600:0.81/0.84/0.82/0.85  86400:0.77/0.81/0.79/0.81  [resumed at [66000]]
+     276 | STREAM-PARTIAL one-to-one 0.29 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.70   1+1+1+1 | 43200:0.28/0.30/0.28/0.28  48000:0.47/0.45/0.45/0.49  52800:0.46/0.49/0.49/0.50  57600:0.48/0.48/0.51/0.52  62400:0.67/0.61/0.63/0.61  67200:0.70/0.62/0.68/0.62  72000:0.71/0.67/0.72/0.65  76800:0.68/0.63/0.68/0.62  81600:0.72/0.68/0.71/0.66  86400:0.74/0.69/0.73/0.66  [resumed at [73200]]
+     277 | MERGED (2 share) 0.16      | yes        | MERGED (2 share)             None  86400  0.27     2+1+1 | 43200:0.23/0.19/0.12/0.12  48000:0.22/0.25/0.13/0.12  52800:0.32/0.29/0.13/0.13  57600:0.35/0.37/0.15/0.13  62400:0.36/0.37/0.17/0.15  67200:0.39/0.34/0.17/0.16  72000:0.37/0.37/0.15/0.15  76800:0.36/0.34/0.18/0.16  81600:0.37/0.33/0.18/0.18  86400:0.37/0.36/0.18/0.18  [resumed at [60000]]
+     278 | MERGED (3 share) 0.18      | yes        | MERGED (3 share)             None  86400  0.24       3+1 | 43200:0.32/0.14/0.12/0.14  48000:0.35/0.12/0.15/0.15  52800:0.36/0.14/0.14/0.16  57600:0.37/0.13/0.15/0.16  62400:0.37/0.13/0.14/0.15  67200:0.40/0.15/0.16/0.15  72000:0.41/0.17/0.17/0.15  76800:0.39/0.11/0.16/0.16  81600:0.42/0.15/0.15/0.16  86400:0.44/0.17/0.18/0.19  [resumed at [58800]]
+     279 | MERGED (2 share) 0.12      | yes        | STREAM-PARTIAL one-to-one    None  86400  0.20   1+1+1+1 | 43200:0.11/0.11/0.12/0.14  48000:0.14/0.10/0.15/0.17  52800:0.11/0.10/0.15/0.19  57600:0.17/0.16/0.17/0.19  62400:0.19/0.17/0.17/0.19  67200:0.21/0.19/0.17/0.20  72000:0.21/0.18/0.16/0.21  76800:0.20/0.19/0.18/0.19  81600:0.20/0.20/0.18/0.20  86400:0.23/0.19/0.17/0.21  [resumed at [55200]]
+
+  ARM C_P16_D128 (LOCAL3 + SLOW, P=16, D128 (N=256, D=128)), seeds [271, 272, 273, 275, 276, 279] (6); gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67)
+    seed | S67 at 43200               | reproduced | S68 outcome                 trans   stop   acc   end map | per-stream accuracy (step:s0/s1/s2/s3)
+     271 | STREAM-PARTIAL one-to-one 0.29 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.39   1+1+1+1 | 43200:0.30/0.27/0.30/0.28  48000:0.30/0.29/0.33/0.33  52800:0.34/0.33/0.33/0.36  57600:0.31/0.31/0.29/0.35  62400:0.35/0.35/0.31/0.37  67200:0.34/0.34/0.34/0.38  72000:0.36/0.33/0.34/0.36  76800:0.35/0.35/0.33/0.39  81600:0.37/0.39/0.36/0.42  86400:0.38/0.38/0.37/0.41  [resumed at [79200]]
+     272 | STREAM-PARTIAL one-to-one 0.40 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.49   1+1+1+1 | 43200:0.50/0.53/0.28/0.27  48000:0.52/0.51/0.28/0.31  52800:0.53/0.54/0.26/0.30  57600:0.52/0.55/0.31/0.33  62400:0.55/0.60/0.34/0.34  67200:0.58/0.62/0.31/0.35  72000:0.59/0.62/0.35/0.34  76800:0.59/0.59/0.34/0.34  81600:0.61/0.64/0.36/0.37  86400:0.62/0.63/0.35/0.36  [resumed at [79200]]
+     273 | STREAM-PARTIAL one-to-one 0.28 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.33   1+1+1+1 | 43200:0.30/0.26/0.27/0.29  48000:0.30/0.26/0.27/0.28  52800:0.30/0.27/0.31/0.32  57600:0.29/0.28/0.29/0.31  62400:0.30/0.30/0.27/0.32  67200:0.30/0.29/0.30/0.30  72000:0.30/0.30/0.33/0.32  76800:0.34/0.32/0.33/0.33  81600:0.32/0.30/0.32/0.33  86400:0.33/0.30/0.34/0.34  [resumed at [85200]]
+     275 | STREAM-PARTIAL one-to-one 0.31 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.40   1+1+1+1 | 43200:0.44/0.28/0.26/0.26  48000:0.43/0.28/0.30/0.30  52800:0.47/0.29/0.25/0.32  57600:0.48/0.31/0.28/0.33  62400:0.50/0.31/0.30/0.34  67200:0.50/0.33/0.30/0.34  72000:0.50/0.34/0.28/0.34  76800:0.54/0.36/0.31/0.34  81600:0.55/0.35/0.38/0.33  86400:0.55/0.36/0.36/0.34  [resumed at [75600]]
+     276 | STREAM-PARTIAL one-to-one 0.27 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.29   1+1+1+1 | 43200:0.25/0.27/0.28/0.29  48000:0.26/0.28/0.29/0.29  52800:0.25/0.26/0.31/0.28  57600:0.29/0.30/0.30/0.30  62400:0.29/0.30/0.30/0.32  67200:0.30/0.29/0.28/0.29  72000:0.30/0.30/0.30/0.31  76800:0.30/0.31/0.29/0.31  81600:0.29/0.31/0.30/0.30  86400:0.29/0.30/0.29/0.29  [resumed at [68400]]
+     279 | STREAM-PARTIAL one-to-one 0.31 | yes        | STREAM-PARTIAL one-to-one    None  86400  0.38   1+1+1+1 | 43200:0.32/0.32/0.30/0.30  48000:0.31/0.33/0.31/0.31  52800:0.35/0.34/0.33/0.35  57600:0.35/0.35/0.35/0.34  62400:0.36/0.37/0.37/0.39  67200:0.36/0.38/0.39/0.37  72000:0.40/0.35/0.35/0.37  76800:0.39/0.38/0.38/0.38  81600:0.36/0.37/0.36/0.37  86400:0.38/0.39/0.35/0.38  [resumed at [68400]]
+
+  READING S68 N256 (its 6 one-to-one runs, seeds [270, 272, 273, 274, 275, 276] (6)): stuck (bind by 86400: 0/6 []; slow, not stuck: >= 4; stuck: 0; unresolved otherwise)
+  READING S68 D128 (its 6 one-to-one runs, seeds [271, 272, 273, 275, 276, 279] (6)): stuck (bind by 86400: 0/6 []; slow, not stuck: >= 4; stuck: 0; unresolved otherwise)
+  READING S68 joint: neither (D128 0/6, N256 0/6; the budget is the lead: both >= 4; the width is the lead: D128 >= 4 and N256 <= 1; neither otherwise)
+  BUDGET for the main-line test: 40800 (the latest transition 38400 of the BOUND ROUTED P = 16 learned runs in S67 and S68 [19200, 26400, 37200, 38400], + 2400, rounded up to a multiple of 2400); 86,400 IS NOT ENOUGH: still rising at 86400 (>= 0.02 since 76800): ['C_P16_N256|276', 'C_P16_D128|271', 'C_P16_D128|272']
+  DESCRIPTIVE (no reading): the MERGED P16_N256 runs 271 MERGED (2 share), 277 MERGED (2 share), 278 MERGED (3 share), 279 STREAM-PARTIAL one-to-one; P8_N256 272 MERGED (2 share); the D128 oracle on 270 not bound
+
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S68 reproduction of a resumed run at 44400: DIFFERS: C_P8_N256 272's resumes [61200] do not include 43200
+  S68 N256: stuck (0/6); D128: stuck (0/6); joint: neither
+  S68 budget for the main-line test: 40800; 86,400 IS NOT ENOUGH (['C_P16_N256|276', 'C_P16_D128|271', 'C_P16_D128|272'])
+####################################################################################################
+chain: segment 16 end 2026-10-13T02:51:49Z, 19 of 19 runs saved (driver exit 0)
