@@ -1,0 +1,83 @@
+{
+ "meta": {
+  "arms": {
+   "ORC_A_D128": {
+    "iters": 40800,
+    "key": "ORC_A_D128",
+    "label": "oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "task": "P16S4"
+    }
+   },
+   "ORC_S_D128": {
+    "iters": 40800,
+    "key": "ORC_S_D128",
+    "label": "oracle, P=16, D128 (N=256, D=128), SLOW",
+    "lr": 0.001,
+    "opt": "adam",
+    "role": "oracle",
+    "sched": "the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)",
+    "seeds": [
+     270,
+     271,
+     272,
+     273,
+     274,
+     275,
+     276,
+     277,
+     278,
+     279
+    ],
+    "spec": {
+     "cfg": "k16",
+     "gate": "perfect",
+     "size": [
+      2,
+      128,
+      3
+     ],
+     "slow": true,
+     "task": "P16S4"
+    }
+   }
+  },
+  "code_shas": [
+   "f7a606d7399a0b102addea88679d599dde13f79b"
+  ],
+  "dry": false,
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+   "git": "b985c9d+dirty",
+   "python": "3.11.15",
+   "started": "2026-10-13 21:50:02",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
