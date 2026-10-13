@@ -94,6 +94,88 @@ everything below), then 158-170, 172 and 173 as specs/test_delta_recipe.md and i
 RUNTIME: projection with pool-load timing before the first run (longrun.projection). Nothing is cut. Perfect gates
 first, then longest first. Runs are cached in delta_recipe_results.json (gitignored, written atomically after each
 run); a restart resumes from the cached records.
+
+RESULT (X): test commit a581027 (spec 05256c5 + Amendment 1 32c121b before the run). The run started 2026-10-11 02:12 UTC
+through longrun.py; runs began at 05:27 after the verification. Intel(R) Xeon(R) Processor @ 2.10GHz, torch
+2.14.0+cu130, 4 workers x 1 thread, one start (two restarts of the agent's worker did not touch it), nothing cut. 84/84
+runs, none failed; 29.2 h wall clock (projection 45.3 h worst case). Amendment 2 (55dac50, report rules only) was
+committed during the run; the figures below are its report, regenerated with --report (2225f00) from the same results
+file. Its claims, bands and checks equal the in-run report's line for line: CHECK 174 dropped no pair.
+- Verification: every inherited and own CHECK passed.
+  - CHECK 130 (Muon, X's 2.80GHz file) printed, not asserted.
+  - 158: identical through the first split at 4800, different from 6000; printed, the record is from 2.80GHz.
+  - 159 (H's COPY_NONOISE|487) and 162 (F's DELTA_SPLIT|1310) bit for bit, asserted.
+  - 161: LOCAL3 1.19e-7 under 1e-6. 173: fused = parallel.
+- Validity: CEIL_HEBB bound 2/2 (3600, 3600); CEIL_DELTA 2/2 (2400, 1200). Both parts VALID on X.
+- Counts (BOUND ROUTED):
+  - HEBB_SPLIT 16/20 (median transition 17400);
+  - HEBB_SLOW 7/20;
+  - DELTA_SPLIT 19/20 (13200);
+  - DELTA_SLOW 19/20 (14400; per seed the same outcome as DELTA_SPLIT, both failing only on s594, MERGED);
+  - every BOUND ROUTED run has overlap <= 0.1.
+- Per machine (SECONDARY; the labels and readings are pooled only and wait for L):
+  - D1: DELTA_SPLIT only 4, HEBB_SPLIT only 1, d = -3; rate difference +0.150, 95% [-0.082, +0.374].
+  - D2: 0 vs 0, p = 1, NOT SHOWN (DELTA_SLOW 19/20).
+  - D4: 10 vs 1, p = 0.0059, SHOWN.
+  - D3: on 15 shared binds, delta earlier on 10, later on 4, tied 1; sign test p = 0.090; medians 13200 vs 16800.
+  - Bands: HEBB_SPLIT MAJORITY [0.584, 0.919]; HEBB_SLOW MINORITY [0.181, 0.567]; DELTA_SPLIT RELIABLE [0.764, 0.991];
+    DELTA_SLOW RELIABLE [0.764, 0.991].
+- Printed:
+  - Firings: Hebbian 39 in 20 runs, every target labelled ok; delta 31 in 20 runs, 10 labelled ok.
+  - Probe-blind (checks from 4800): HEBB_SPLIT 1 of 181, blocked by the probe alone 3; DELTA_SPLIT 1 of 142, alone 5.
+  - CHECK 171 PASS (80 records); CHECK 174 PASS (40 pairs).
+
+RESULT (L): test commit a581027, run at 8ae660d (a581027's test with Amendment 2's report rules, 55dac50 and 2225f00) on 12th Gen
+Intel(R) Core(TM) i7-12650H, torch 2.14.1, 1 thread per worker. Two starts through longrun.py, both at the top of
+results/L/delta_recipe_L.log (L's times are local, UTC-6): the first on 2026-10-12 at 10:04 on 6 workers passed every
+CHECK and printed its projection, and the laptop went down out of memory (a GPU job beside it) before any run was
+recorded; the second at 13:14 on 5 workers found no cached record (CHECKs 144, 157 and 170: "a first start"), so every
+run below is the second start's; runs from 15:10 after the verification, 84/84, none failed, nothing cut, 1125.8 min of
+runs on five workers (the projection said 32.6 h), exit 0 (results/L/longrun/delta_recipe_L.exit; its json beside it).
+The run was started without --also, so its own report says "POOLED (PRIMARY): not computed here"; the pooled block
+below is the report regenerated with --report --also results/X/delta_recipe_results.json from the same two results
+files (results/L/delta_recipe_L_report.log), which either machine's file produces identically.
+- Verification: every CHECK passed (ALL VERIFICATION CHECKS PASSED at every stage); asserted where the record is this
+  machine's: CHECK 130 (L's test_early_recipe file), 146 and 158 (L's test_window_gate records; 158 identical through
+  the first split at 4800, different from 6000, the exact copy against the noisy one), 161 (LOCAL3 1.19e-7 under 1e-6),
+  173 (fused = parallel); the comparisons with records from other CPUs printed, not asserted, and unequal here, as the
+  specification provides: the inherited CHECKs 112, 122, 123, 135 and 141, and this test's 150 (F's S68_SINGLE_S8|300),
+  159 (H's COPY_NONOISE|487) and 162 (F's DELTA_SPLIT|1310).
+- Validity: CEIL_HEBB bound 2/2 (3600, 3600); CEIL_DELTA 2/2 (1200, 8400). Both parts VALID on L.
+- Counts (BOUND ROUTED):
+  - HEBB_SPLIT 19/20 (median transition 20400 [10800, 33600]; s1594 MERGED);
+  - HEBB_SLOW 10/20 (MERGED 2 share x7, 3 share x3);
+  - DELTA_SPLIT 16/20 (12600 [7200, 18000]; s1581, s1591, s1595 MERGED; s1582 BOUND NOT routed);
+  - DELTA_SLOW 19/20 (14400 [7200, 43200]; s1595 MERGED);
+  - every BOUND ROUTED run has overlap <= 0.1.
+- Per machine (SECONDARY; the labels and readings are pooled only):
+  - D1: DELTA_SPLIT only 1, HEBB_SPLIT only 4, d = +3 (the mirror of X's -3); rate difference -0.150, 95% [-0.374, +0.082].
+  - D2: 0 vs 3, p = 1, NOT SHOWN (DELTA_SLOW 19/20).
+  - D4: 9 vs 0, p = 0.0020, SHOWN.
+  - D3: on 15 shared binds, delta earlier on 14, later on 1, tied 0; sign test p = 0.00049; medians 12000 vs 22800.
+  - Bands: HEBB_SPLIT RELIABLE [0.764, 0.991]; HEBB_SLOW MAJORITY [0.299, 0.701]; DELTA_SPLIT MAJORITY [0.584, 0.919];
+    DELTA_SLOW RELIABLE [0.764, 0.991].
+- Printed:
+  - Firings: Hebbian 41 in 20 runs, every target labelled ok (41/41); delta 32 in 20 runs, 16 labelled ok.
+  - Probe-blind (checks from 4800): HEBB_SPLIT 3 of 170, blocked by the probe alone 2; DELTA_SPLIT 6 of 149, alone 9.
+  - CHECK 171 PASS (80 records); CHECK 174 PASS (40 pairs, none dropped).
+
+RESULT (POOLED, PRIMARY) - X (results/X/delta_recipe_results.json) + L, b and c summed over both machines' pairs, from
+the regenerated report (results/L/delta_recipe_L_report.log); X and L VALID on both parts.
+- D1  DELTA_SPLIT vs HEBB_SPLIT: 35/40 vs 35/40; DELTA_SPLIT only 5, HEBB_SPLIT only 5; d = 0; rate difference +0.000,
+      95% [-0.162, +0.162]. Label: "delta not shown worse by more than 2 pairs" (the bound's operating characteristics,
+      printed beside it: at 40 pairs with HEBB_SPLIT at 0.95, P(d <= 2) is 0.29 / 0.22 when DELTA_SPLIT is 0.85 and
+      0.11 / 0.05 when it is 0.80, independent / nested outcomes).
+- D2  DELTA_SPLIT beats DELTA_SLOW: 35/40 vs 38/40; 0 vs 3; p = 1; NOT SHOWN; DELTA_SLOW 38/40 >= 36: NO ROOM (printed,
+      not read).
+- D4  HEBB_SPLIT beats HEBB_SLOW: 35/40 vs 17/40; 19 vs 1; p = 2.0e-5; SHOWN.
+- D3  (secondary) on the 30 seeds both split arms are BOUND ROUTED: medians DELTA_SPLIT 13200, HEBB_SPLIT 18600; delta
+      earlier on 24, later on 5, tied 1; one-sided sign test p = 0.00027.
+- Bands (pooled): HEBB_SPLIT MAJORITY [0.739, 0.945]; HEBB_SLOW MINORITY [0.285, 0.578]; DELTA_SPLIT MAJORITY
+      [0.739, 0.945]; DELTA_SLOW RELIABLE [0.835, 0.986].
+- READINGS (pooled; Amendments 1-2): the memory rule: "delta not shown worse by more than 2 pairs". The split: delta "no
+  room" (DELTA_SLOW 38/40, b 0, c 3); Hebbian "helps" (HEBB_SLOW 17/40, b 19, c 1): printed as "delta: no room; Hebbian:
+  helps", and by Amendment 2 (e) no combination is named when either write is "no room".
 """
 
 import argparse

@@ -1,0 +1,211 @@
+
+====================================================================================================
+A. Provenance
+====================================================================================================
+commit   parents                         author date (UTC)          committer date (UTC)       author
+86652b1  203a5ad                         2026-10-11T23:42:23+00:00  2026-10-11T23:58:27+00:00  root <root@Docker.home>  (UTC: 2026-10-11 23:42:23|2026-10-11 23:58:27)
+5bc6c2e  86652b1                         2026-10-12T00:46:28+00:00  2026-10-12T00:46:28+00:00  Claude <noreply@anthropic.com>  (UTC: 2026-10-12 00:46:28|2026-10-12 00:46:28)
+b649751  5bc6c2e                         2026-10-12T13:53:09+00:00  2026-10-12T13:53:09+00:00  root <root@Docker.home>  (UTC: 2026-10-12 13:53:09|2026-10-12 13:53:09)
+1e31409  5bc6c2e                         2026-10-12T14:16:14+00:00  2026-10-12T14:16:14+00:00  Claude <noreply@anthropic.com>  (UTC: 2026-10-12 14:16:14|2026-10-12 14:16:14)
+142f47e  1e31409 b649751                 2026-10-12T14:16:14+00:00  2026-10-12T14:16:14+00:00  Claude <noreply@anthropic.com>  (UTC: 2026-10-12 14:16:14|2026-10-12 14:16:14)
+ee97443  142f47e                         2026-10-12T15:20:05+00:00  2026-10-12T15:20:05+00:00  Claude <noreply@anthropic.com>  (UTC: 2026-10-12 15:20:05|2026-10-12 15:20:05)
+13de308  142f47e                         2026-10-12T09:04:44-06:00  2026-10-12T09:04:44-06:00  Ynkling <oarevir56.er@gmail>  (UTC: 2026-10-12 15:04:44|2026-10-12 15:04:44)
+15c5e4f  ee97443 13de308                 2026-10-12T15:20:17+00:00  2026-10-12T15:20:17+00:00  Claude <noreply@anthropic.com>  (UTC: 2026-10-12 15:20:17|2026-10-12 15:20:17)
+114cd08  15c5e4f                         2026-10-12T16:04:21+00:00  2026-10-12T16:04:21+00:00  Claude <noreply@anthropic.com>  (UTC: 2026-10-12 16:04:21|2026-10-12 16:04:21)
+03bffdf  114cd08                         2026-10-12T16:06:31+00:00  2026-10-12T16:06:31+00:00  Claude <noreply@anthropic.com>  (UTC: 2026-10-12 16:06:31|2026-10-12 16:06:31)
+4c3984a  03bffdf                         2026-10-12T19:12:59+00:00  2026-10-12T19:12:59+00:00  root <root@Docker.home>  (UTC: 2026-10-12 19:12:59|2026-10-12 19:12:59)
+
+Is X an ancestor of Y?  (git merge-base --is-ancestor X Y)
+            1e31409  142f47e  ee97443  15c5e4f  114cd08  03bffdf  4c3984a
+86652b1         yes      yes      yes      yes      yes      yes      yes
+5bc6c2e         yes      yes      yes      yes      yes      yes      yes
+b649751          no      yes      yes      yes      yes      yes      yes
+13de308          no       no       no      yes      yes      yes      yes
+03bffdf          no       no       no       no       no      yes      yes
+4c3984a          no       no       no       no       no       no      yes
+
+Files 1e31409 changes against its parent 5bc6c2e (git diff --name-status):
+A	explore_gpu/s75_writeup.py
+A	explore_out/I/s75b_spec_draft.md
+
+S75 files in each tree (explore_out/I/gpu/s75_*), with blob ids:
+  5bc6c2e:
+      7589867874 explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json
+      267de89e4c explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_summary.md
+      5a42d15ad5 explore_out/I/gpu/s75_S4_prerun_note_2026-10-12.md
+  b649751:
+      2fea1716d5 explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json
+      a357ca118a explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_summary.md
+      5a42d15ad5 explore_out/I/gpu/s75_S4_prerun_note_2026-10-12.md
+      a357ca118a explore_out/I/gpu/s75_S4_summary.md
+  1e31409:
+      7589867874 explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json
+      267de89e4c explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_summary.md
+      5a42d15ad5 explore_out/I/gpu/s75_S4_prerun_note_2026-10-12.md
+  142f47e:
+      2fea1716d5 explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json
+      a357ca118a explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_summary.md
+      5a42d15ad5 explore_out/I/gpu/s75_S4_prerun_note_2026-10-12.md
+      a357ca118a explore_out/I/gpu/s75_S4_summary.md
+  114cd08:
+      2fea1716d5 explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json
+      a357ca118a explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_summary.md
+      5a42d15ad5 explore_out/I/gpu/s75_S4_prerun_note_2026-10-12.md
+      a357ca118a explore_out/I/gpu/s75_S4_summary.md
+  4c3984a:
+      44f295caba explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json
+      a357ca118a explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_summary.md
+      433750e990 explore_out/I/gpu/s75_S4_descriptions.md
+      5a42d15ad5 explore_out/I/gpu/s75_S4_prerun_note_2026-10-12.md
+      a357ca118a explore_out/I/gpu/s75_S4_summary.md
+
+S75 records each commit holds (arm: seeds):
+  86652b1: 12 records: ORACLE [830, 831]; SINGLE 830-839 (10)
+  5bc6c2e: 12 records: ORACLE [830, 831]; SINGLE 830-839 (10)
+  b649751: 32 records: ORACLE [830, 831]; REG3 830-839 (10); SINGLE 830-839 (10); WIDE_SPLIT 830-839 (10)
+  1e31409: 12 records: ORACLE [830, 831]; SINGLE 830-839 (10)
+  142f47e: 32 records: ORACLE [830, 831]; REG3 830-839 (10); SINGLE 830-839 (10); WIDE_SPLIT 830-839 (10)
+  ee97443: 32 records: ORACLE [830, 831]; REG3 830-839 (10); SINGLE 830-839 (10); WIDE_SPLIT 830-839 (10)
+  114cd08: 32 records: ORACLE [830, 831]; REG3 830-839 (10); SINGLE 830-839 (10); WIDE_SPLIT 830-839 (10)
+  4c3984a: 41 records: ORACLE [830, 831]; REG3 830-839 (10); SINGLE 830-839 (10); WIDE_SLOW 830-838 (9); WIDE_SPLIT 830-839 (10)
+
+Remote branches containing b649751: ['origin/claude/explore-I']
+Remote branches containing 1e31409: ['origin/claude/explore-I']
+
+Push activity of claude/explore-I (GitHub API, read-only; skipped on error):
+  2026-10-11T23:58:28Z  push         203a5ad -> 86652b1  by Ynkling
+  2026-10-12T00:46:30Z  push         86652b1 -> 5bc6c2e  by Ynkling
+  2026-10-12T13:53:11Z  push         5bc6c2e -> b649751  by Ynkling
+  2026-10-12T14:16:16Z  push         b649751 -> 142f47e  by Ynkling
+  2026-10-12T15:05:06Z  push         142f47e -> 13de308  by Ynkling
+  2026-10-12T15:20:19Z  push         13de308 -> 15c5e4f  by Ynkling
+  2026-10-12T16:04:23Z  push         15c5e4f -> 114cd08  by Ynkling
+  2026-10-12T16:06:33Z  push         114cd08 -> 03bffdf  by Ynkling
+  2026-10-12T19:13:01Z  push         03bffdf -> 4c3984a  by Ynkling
+
+====================================================================================================
+B. Numbers in the spec that occur in S75's learned-arm summaries but in none of the allowed inputs
+====================================================================================================
+tokens only in the learned-arm summaries: 13: ['0.14', '0.15', '0.19', '0.21', '0.529', '0.533', '0.536', '0.539', '0.588', '0.80', '1.37', '16800', '19200']
+(a check of literal numbers only: a number derived from the learned arms and then rounded or transformed is not caught)
+
+  1e31409 (135 lines): 0 hit(s)
+
+  ee97443 (162 lines): 0 hit(s)
+
+  114cd08 (246 lines): 0 hit(s)
+
+====================================================================================================
+C. S75's learned-arm values (records at b649751; WIDE_SLOW at 4c3984a)
+====================================================================================================
+ORACLE      n=2  SET 0.8801-0.8915 (median 0.8858); train s/update median 0.0662 (0.0661-0.0663); peak GB median 0.6935
+            eta_end max 1.0000; margin_end 1.000-1.000; one-to-one at end 2/2; one-to-one maps over all evaluations x layers 40/40
+SINGLE      n=10 SET 0.5344-0.5954 (median 0.5382); train s/update median 0.0616 (0.0615-0.0617); peak GB median 0.552
+WIDE_SPLIT  n=10 SET 0.5293-0.5365 (median 0.5339); train s/update median 0.0753 (0.0751-0.0753); peak GB median 0.983
+            eta_end max 0.0003; margin_end 0.018-0.028; one-to-one at end 0/10; one-to-one maps over all evaluations x layers 0/200
+            check steps [2400, 4800, 7200, 9600, 12000, 14400, 16800, 19200, 21600]
+            fires 30 at steps [7200, 9600, 12000, 14400, 16800, 19200]; probe acc at fires 0.5185-0.5417; on_target 30
+            rises between checks -0.0065..+0.0863
+REG3        n=10 SET 0.5352-0.5881 (median 0.5388); train s/update median 0.0951 (0.0951-0.0952); peak GB median 1.368
+            eta_end max 0.0004; margin_end -0.000-0.033; one-to-one at end 0/10; one-to-one maps over all evaluations x layers 0/600
+            beta_src median 0.803 (0.435-0.902); beta_word median 0.151
+WIDE_SLOW   n=9  SET 0.5300-0.5360 (median 0.5340); train s/update median 0.0752 (0.0750-0.0754); peak GB median 0.983
+            eta_end max 0.0003; margin_end 0.010-0.030; one-to-one at end 0/9; one-to-one maps over all evaluations x layers 0/180
+
+====================================================================================================
+D. K9 and the cost section (114cd08 l.180-216)
+====================================================================================================
+arm            1660 s/upd  3070 s/upd  3070/1660   K9 peak GB  K9 reserved  3070 used-reserved
+ORACLE         0.0656      0.0512      0.781       0.624       0.703        0.746
+SINGLE         0.0608      0.0466      0.766       0.553       0.633        0.746
+WIDE_SPLIT     0.0740      0.0575      0.777       0.913       1.004        0.746
+REG3           0.0939      0.0740      0.788       1.298       1.527        0.746
+R=2 per-run vs R=1 (1660): {'ORACLE': 1.042, 'SINGLE': 1.043, 'WIDE_SPLIT': 1.053, 'REG3': 1.11}
+spec's 1660 s/update at L=1536 over K9 at L=768: {'ORACLE': 3.35, 'SINGLE': 3.29, 'WIDE_SPLIT': 3.24} ; REG3 factor assumed 3.5-4 -> [0.329, 0.376]
+gate tensor 32 x 1 x 767 x 767 float32 = 0.070 GiB
+gate tensor 32 x 1 x 1535 x 1535 float32 = 0.281 GiB
+peak in S75 records minus K9 update-only peak (1660), per arm:
+  ORACLE      record 0.694 - K9 0.624 = +0.070
+  SINGLE      record 0.552 - K9 0.553 = -0.001
+  WIDE_SPLIT  record 0.983 - K9 0.913 = +0.070   (learned arm)
+  REG3        record 1.368 - K9 1.298 = +0.070   (learned arm)
+  WIDE_SLOW   record 0.983 - K9 0.913 = +0.070   (learned arm)
+memory table 114cd08 - ee97443: {'ORACLE': 0.28, 'SINGLE': 0.0, 'WIDE': 0.28, 'REG3 scan': 0.28, 'REG3 loop': 0.28}
+x1.15: {'ORACLE': 2.52, 'SINGLE': 1.87, 'WIDE': 3.83, 'REG3s': 5.52, 'REG3l': 4.55}
+hours per 24k run at the spec's s/update: {'ORACLE': 1.47, 'SINGLE': 1.33, 'WIDE': 1.6, 'REG3s_lo': 2.2, 'REG3s_hi': 2.53, 'REG3l_lo': 3.67, 'REG3l_hi': 5.33}
+stage 2 on the 1660 (ORACLE x2, SINGLE x10, WIDE_SLOW x10): 32.3 h (spec: about 32 h)
+stage 2 on the 3070: WIDE_SPLIT_G 12.3-12.6 h + REG3 17.3-19.7 h = 29.6-32.4 h (spec: 12.5 + 17-20 = 30-32 h)
+everything on the 1660 incl. pilot, REG3 loop: 88-105 h (spec: 85-101 h)
+K9 s75_train_hours R=1: 1660 16.12 h
+
+====================================================================================================
+E. ORACLE/SINGLE-derived numbers (records at 5bc6c2e)
+====================================================================================================
+ORACLE 830: set 0.89154  bins 1/2/3-4/5+ 0.7192 0.8838 0.8941 0.9150
+ORACLE 831: set 0.88010  bins 1/2/3-4/5+ 0.7121 0.8678 0.8832 0.9034
+ORACLE spread (unrounded) 0.01144; 0.9 + spread = 0.91144; sd estimate spread/sqrt(2) = 0.00809
+  95% interval for sigma from one pair (1 df): 0.0036 - 0.258
+ORACLE mean 0.88582; SINGLE median 0.53818; SINGLE median - 0.496 = +0.0422; 0.517 + that = 0.559
+gap share with faded 0.679, bound 0.927: 0.8340 -> at B (faded 0.691): bound 0.964 -> 0.9187; bound 0.963 -> 0.9178
+gap share with faded 0.68, bound 0.927: 0.8333 -> at B (faded 0.691): bound 0.964 -> 0.9185; bound 0.963 -> 0.9177
+ORACLE 830 - 0.03 = 0.8615 (S75's rule applied to S75's ORACLE)
+ORACLE 831 - 0.03 = 0.8501 (S75's rule applied to S75's ORACLE)
+
+====================================================================================================
+F. Pilot proceed rule: P(stop) under a normal model, two independent pilot runs N(mu, sigma)
+====================================================================================================
+mu      sigma   P(stop) old rule   P(stop) new rule   P(stage-2 VALID | mu)   SPLIT_THR median if proceed
+0.900   0.004   1.000              1.000              0.250
+0.900   0.008   0.996              0.983              0.250
+0.900   0.012   0.975              0.928              0.250
+0.905   0.004   0.998              0.993              0.800
+0.905   0.008   0.964              0.894              0.539
+0.905   0.012   0.922              0.809              0.438
+0.910   0.004   0.905              0.760              0.988
+0.910   0.008   0.839              0.642              0.800
+0.910   0.012   0.812              0.616              0.636
+0.914   0.004   0.522              0.240              1.000
+0.914   0.008   0.642              0.366              0.921
+0.914   0.012   0.679              0.433              0.771
+0.916   0.004   0.292              0.079              1.000
+0.916   0.008   0.522              0.244              0.955
+0.916   0.012   0.602              0.345              0.826
+0.920   0.004   0.045              0.002              1.000
+0.920   0.008   0.292              0.081              0.988
+0.920   0.012   0.441              0.196              0.907
+0.922   0.004   0.012              0.000              1.000
+0.922   0.008   0.200              0.040              0.994
+0.922   0.012   0.364              0.139              0.934
+0.928   0.004   0.000              0.000              1.000
+0.928   0.008   0.045              0.003              1.000
+0.928   0.012   0.174              0.040              0.980
+
+The spec's figures (l.89-93): old 0.20 (per-bin, mu 0.922) / 0.64 (fixed reach, mu 0.914); new 0.05 / 0.40; VALID 0.92-0.99; sigma 0.008
+  per-bin      mu 0.922: old 0.200  new 0.040  VALID 0.994
+  fixed reach  mu 0.914: old 0.642  new 0.366  VALID 0.921
+  per-bin as two seed-specific means 0.928 / 0.916, sigma 0.008 per run:
+    old rule P(stop) = 0.324
+
+SPLIT_THR given proceed: min(pilot) >= 0.9 is required, so SPLIT_THR >= 0.87; S75 used 0.88.
+
+====================================================================================================
+G. The guard: S75 WIDE_SPLIT trigger rows replayed under S75b's precedence (rules 1-4, 114cd08 l.121-127)
+====================================================================================================
+{'not_eligible': 21, 'cap': 19, 'gap': 20, 'cap_and_gap': 10, 'one_to_one_blocked': 0, 'fire': 30, 'one_to_one_any': 0, 'eligible_o2o_but_capped': 0, 'not_on_target_fire': 0, 'rows': 90}
+rows whose action differs from S75's record under the guard: 0
+
+====================================================================================================
+H. Seeds 840-859 in records on any remote branch (key 'ARM|seed|' or '"seed": 84x/85x')
+====================================================================================================
+  origin/claude/bdh-growth-hebbian-inference-w90069: 0 file(s)
+  origin/claude/bdh-repo-curl-obgdqk: 0 file(s)
+  origin/claude/explore-F: 0 file(s)
+  origin/claude/explore-G: 0 file(s)
+  origin/claude/explore-H: 0 file(s)
+  origin/claude/explore-I: 0 file(s)
+  origin/claude/outside-ideas: 0 file(s)
+  origin/claude/relaxed-edison-he00cc: 0 file(s)
+  origin/claude/replicate-R: 0 file(s)
+  origin/claude/rev9-draft: 0 file(s)
+  origin/claude/review-V: 0 file(s)
+  origin/feature/per-channel-plasticity: 0 file(s)

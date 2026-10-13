@@ -116,6 +116,46 @@ verification), Intel(R) Xeon(R) Processor @ 2.10GHz, torch 2.14.0+cu130, 4 worke
   (22/22). Resets: 27 in 10 runs, all targets labelled ok. Every reset seed that bound also bound without a trigger
   (s561, s564, s568); s566 and s569 bound under SLOW but not under RESET. The failures of RESET and SLOW are all
   merges (MERGED 2 share; SLOW also 3 and 4 share once each).
+
+RESULT (L) — test commit 1f52cd5, run at 592c574 on 2026-10-11 (started 09:31 local = 15:31 UTC through longrun.py; runs
+from 11:12 local after the verification), 12th Gen Intel(R) Core(TM) i7-12650H, torch 2.14.1, 6 workers x 1 thread, one
+start for the runs, nothing cut, 54/54 runs, none failed; 536 min of runs after the verification (exit 0: the second
+start's longrun json and .exit file are at results/L/longrun/, as the user sent them; the json's epoch and local time
+give L's offset, UTC-6).
+An earlier start on 2026-10-10 stopped at verification with 0 runs (CHECK 155: --also was given a directory, not X's
+file); its log is kept at the top of results/L/split_copy_L.log, and longrun's counter was reset between the two, so
+both headers read "start 1".
+- Verification: every CHECK passed (ALL VERIFICATION CHECKS PASSED, 24 times); every CHECK that compares with L's own
+  records was asserted, and the comparisons with records from other CPUs were printed, not asserted, and are unequal
+  here, as the specification provides: the inherited CHECKs 122, 123, 135 and 141 (2.10GHz Xeon records), CHECK 112
+  (E's screen records, whose CPU is not recorded) and the test's own CHECK 150 (F's S68_SINGLE_S8|300). test_muon_recipe's CHECK 130 asserted (L's
+  test_early_recipe file was written on this CPU). CHECK 146 reproduced L's test_window_gate records at seed 1541 bit
+  for bit through 7200 (asserted: same CPU). CHECK 151(a): 65 Part C/D records, v1 = v2; 151(b): 30 Part A records, no disagreement.
+- Validity: CEIL_C bound 2/2 (4800, 3600); CEIL_DELTA_D8 bound 2/2 (1200, 1200). Parts A and B VALID on L.
+- Counts: WIN3_SPLIT_D8 BOUND ROUTED 8/10 (transition median 19200, 8400-25200; s1566, s1569 MERGED 2 share);
+  WIN3_RESET_D8 3/10 (s1560, s1565, s1568); WIN3_SLOW_D8 3/10 (s1560, s1565, s1568); SINGLE_DELTA_D8 BOUND 0/10 (final
+  accuracy 0.13-0.55); SINGLE_HEBB_D8 BOUND 0/10 (0.08-0.18).
+- Per machine (SECONDARY):
+  C1 SHOWN: 8/10 vs 3/10, split only 5, reset only 0, p = 0.031.
+  C2 HOLDS: 3/10 vs 3/10, reset only 0, slow only 0, d = 0 (bound d <= 2).
+  C3 SHOWN: 8/10 vs 0/10, 8 vs 0, p = 0.0039.
+  Bands: WIN3_SPLIT_D8 MAJORITY [0.490, 0.943]; WIN3_RESET_D8 MINORITY [0.108, 0.603]; WIN3_SLOW_D8 MINORITY
+  [0.108, 0.603]; SINGLE_DELTA_D8 NEVER [0, 0.278]; SINGLE_HEBB_D8 NEVER [0, 0.278].
+- Printed: SINGLE_DELTA_D8 vs SINGLE_HEBB_D8 0 vs 0 (both 0/10). Splits: 19 in 10 runs, every target labelled ok
+  (19/19). Resets: 26 in 10 runs, all targets labelled ok. The reset seeds that bound are the slow seeds that bound
+  (s1560, s1565, s1568). The failures of RESET and SLOW are all merges (RESET 2 share x6, 3 share x1; SLOW 2 share x5,
+  3 share x2).
+
+RESULT (POOLED, PRIMARY) — X (results/X/split_copy_results.json) + L, b and c summed over both machines' pairs
+(printed by L's run with --also results/X/split_copy_results.json; X and L VALID on both parts).
+  C1 SHOWN: WIN3_SPLIT_D8 18/20 vs WIN3_RESET_D8 6/20, split only 12, reset only 0, p = 0.00024.
+  C2 HOLDS: WIN3_RESET_D8 6/20 vs WIN3_SLOW_D8 8/20, reset only 0, slow only 2, d = -2 (bound d <= 2).
+  C3 SHOWN: WIN3_SPLIT_D8 18/20 vs SINGLE_DELTA_D8 0/20, 18 vs 0, p = 3.8e-06.
+  Pooled bands: WIN3_SPLIT_D8 RELIABLE [0.699, 0.972]; WIN3_RESET_D8 MINORITY [0.145, 0.519]; WIN3_SLOW_D8 MINORITY
+  [0.219, 0.613]; SINGLE_DELTA_D8 NEVER [0, 0.161]; SINGLE_HEBB_D8 NEVER [0, 0.161].
+  READINGS (pooled): "the copy, not the reset" (C1 SHOWN; C2 HOLDS); "the partition is necessary at eight streams
+  against a single delta channel" (C3 SHOWN; SINGLE_DELTA_D8 0/20 below MAJORITY; CEIL_DELTA_D8 bound on both
+  machines). Printed, not a claim: SINGLE_DELTA_D8 vs SINGLE_HEBB_D8 0/20 vs 0/20.
 """
 
 import argparse
