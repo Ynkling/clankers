@@ -1,11 +1,66 @@
-explore_gpu.s75b CHECKs on {'device': 'cpu', 'torch': '2.14.0+cu130', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'threads': 1, 'gpu': None}; S75b code SHA 0201896a129f
+explore_gpu.s75b CHECKs on {'device': 'cpu', 'torch': '2.14.0+cu130', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'threads': 1, 'gpu': None}; S75b code SHA 0759062126f5
 
-ok   B7 lock-step at L = 1536 (380 s): {"ok": true, "tol": {"logits": 1e-05, "grad": 0.0001}, "updates": 2, "seeds": [850]}
-       ORACLE: {"ok": true, "updates": 2, "logits": 0.0, "grad": 0.0, "grad_param": null, "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0}
-       SINGLE: {"ok": true, "updates": 2, "logits": 0.0, "grad": 0.0, "grad_param": null, "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0}
-       WIDE (WIDE_SPLIT_G / WIDE_SLOW): {"ok": true, "updates": 2, "logits": 0.0, "grad": 0.0, "grad_param": null, "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0}
-       REG3 (loop): {"ok": true, "updates": 2, "logits": 0.0, "grad": 0.0, "grad_param": null, "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0}
-       REG3 (scan vs the sequential loop): {"ok": true, "updates": 2, "logits": 1.4901161193847656e-07, "grad": 3.857344062977765e-05, "grad_param": "b_R", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0}
-ok   B8 end to end (small configuration) (2243 s): {"ok": true, "stage1": {"proceed": true, "split_thr": 0.45280072212219236, "missing": [], "record": true}, "stage2": {"missing": {}, "records": {"ORACLE_PILOT": [840, 841], "ORACLE": [850, 851], "SINGLE": [850, 851], "WIDE_SPLIT_G": [850, 851], "REG3": [850, 851], "WIDE_SLOW": [850, 851]}, "split_checks": [[400, false, null, false], [800, false, null, false], [400, false, null, false], [800, false, null, false]], "meta": {"machine": "fallback", "split_thr": 0.45280072212219236, "stage1_commit": null, "register_reg3": "loop", "workers": 0, "started": "2026-10-12 23:04:51"}, "reg3_register": ["loop"]}, "report_lines": 21, "bench": {"arms": {"ORACLE": true, "SINGLE": true, "WIDE_SLOW": true, "W
+ok   B4 rules (0 s): {"ok": true}
+       0.915 / 0.910 -> proceed, thr 0.880: {"ok": true, "proceed": true, "thr": 0.88, "why": "mean 0.912500 >= 0.912; each >= 0.9: True"}
+       mean exactly 0.912 -> proceed: {"ok": true, "proceed": true, "thr": 0.881, "why": "mean 0.912000 >= 0.912; each >= 0.9: True"}
+       a run exactly 0.9, mean 0.915 -> proceed: {"ok": true, "proceed": true, "thr": 0.87, "why": "mean 0.915000 >= 0.912; each >= 0.9: True"}
+       0.930 / 0.899 -> stop (one < 0.9): {"ok": true, "proceed": false, "thr": null, "why": "mean 0.914500 >= 0.912; each >= 0.9: False"}
+       0.911 / 0.912 -> stop (mean 0.9115): {"ok": true, "proceed": false, "thr": null, "why": "mean 0.911500 < 0.912; each >= 0.9: True"}
+       one record missing -> not complete: {"ok": true, "proceed": false, "thr": null, "why": "a pilot record is missing or failed"}
+       one record failed -> not complete: {"ok": true, "proceed": false, "thr": null, "why": "a pilot record is missing or failed"}
+       a run exactly 0.9 is not 'not usable': {"ok": true}
+       0.89 / 0.95 -> stop, both stop phrases: {"ok": true, "said": "S75b stops: B's pilot did not clear the proceed rule; a pilot run ended below 0.9: S = 4 is not usable at B"}
+       0.905 / 0.91 -> stop, 'did not clear', not 'not usable': {"ok": true, "said": "S75b stops: B's pilot did not clear the proceed rule"}
+       register_rule: scan fits -> scan: {"ok": true}
+       register_rule: scan does not fit -> loop: {"ok": true}
+       register_rule: scan failed -> loop: {"ok": true}
+       held_evals: keeping up holds the workers' jobs: {"ok": true}
+       held_evals: half speed holds half the run: {"ok": true}
+       held_evals: no workers holds none: {"ok": true}
+       workers_rule: fast statistics -> 1: {"ok": true, "why": "keeps up"}
+       workers_rule: needs 3, fits -> 3: {"ok": true, "why": "keeps up"}
+       workers_rule: needs 3, 3 does not fit -> 2 (behind; 1 holds more evaluations than 2 costs): {"ok": true, "need": {"0": 3.9, "1": 7.140000000000001, "2": 6.75, "3": 7.44}, "why": "falls behind (the evaluations held are counted)"}
+       workers_rule: no worker fits -> 0 (in line): {"ok": true, "need": {"0": 3.9, "1": 8.22, "2": 8.91, "3": 9.600000000000001}, "why": "in line (no worker fits)"}
+       workers_rule: nothing fits -> refuse: {"ok": true, "why": "refuse: not even the statistics in line fit the budget"}
+       ram_budget: total bound: {"ok": true}
+       ram_budget: available bound: {"ok": true}
+       ram_budget: MemTotal below the user's figure: {"ok": true}
+ok   B5 refusals and allocation (50 s): {"ok": true}
+       git_committed: untracked / committed / modified: {"ok": true, "said": "(None, False) ('4d179ffe92d124f681aea59bafa3ee8e7ffe3bba', True) ('4d179ffe92d124f681aea59bafa3ee8e7ffe3bba', False)"}
+       git_committed: outside a repository: {"ok": true, "said": ""}
+       dirty_code on this checkout (description): {"ok": true, "said": "['explore_gpu/s75b.py']"}
+       no record: {"ok": true, "said": "no stage-1 record: run --stage 1 first"}
+       record != pilot: {"ok": true, "said": "the stage-1 record does not match the pilot records under this code SHA"}
+       record not committed (untracked): {"ok": true, "said": "the stage-1 record (/tmp/tmpemtog2zd/s75b_stage1_record.json) is not committed, or has local changes: commit and push it first"}
+       pilot results file not committed: {"ok": true, "said": "the pilot results file (../../../tmp/tmpemtog2zd/s75b_Intel_R__Xeon_R__Processor___2_10GHz_results.json) is not committed: commit and push it"}
+       both committed -> past the commit checks (to the benchmark): {"ok": true, "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0759062126f5: run --bench on this card and commit it"}
+       record modified after its commit: {"ok": true, "said": "the stage-1 record (/tmp/tmpemtog2zd/s75b_stage1_record.json) is not committed, or has local changes: commit and push it first"}
+       committed pilot records disagree: {"ok": true, "said": "the committed pilot records do not give the stage-1 record's decision: commit and push the pilot results file"}
+       incomplete pilot: {"ok": true, "said": "both pilot records under this code SHA are needed (a pilot record is missing or failed)"}
+       pilot records under another code SHA: {"ok": true, "said": "both pilot records under this code SHA are needed (a pilot record is missing or failed)"}
+       pilot stopped: {"ok": true, "said": "S75b stops: B's pilot did not clear the proceed rule; a pilot run ended below 0.9: S = 4 is not usable at B (S75b stops at stage 1: mean 0.910000 < 0.912; each >= 0.9: False)"}
+       pilot stopped: 'not usable' wording: {"ok": true, "said": "S75b stops: B's pilot did not clear the proceed rule; a pilot run ended below 0.9: S = 4 is not usable at B (S75b stops at stage 1: mean 0.910000 < 0.912; each >= 0.9: False)"}
+       duplicate pilot records (stage 2): {"ok": true, "said": "stage 2: ok records of one arm and seed from two cards (arm, seed, cards): [('ORACLE_PILOT', 840, ['Intel(R) Xeon(R) Processor @ 2.10GHz', 'another card'])]; the driver does not choose between them: t"}
+       duplicate pilot records (stage 1): {"ok": true, "said": "stage 1: ok records of one arm and seed from two cards (arm, seed, cards): [('ORACLE_PILOT', 840, ['Intel(R) Xeon(R) Processor @ 2.10GHz', 'another card'])]; the driver does not choose between them: t"}
+       report: DUPLICATE and incomplete: {"ok": true, "said": ""}
+       fallback with the 3070's records: {"ok": true, "said": "--machine fallback: records of its arms under code SHA 0759062126f5 exist from another card ({'REG3': [853]}); running them here would give two cards' records for one seed: the user decides"}
+       1660 with the 3070's REG3 records: not its arms -> past (to the benchmark): {"ok": true, "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0759062126f5: run --bench on this card and commit it"}
+       machine 1660 on a 3070: {"ok": true, "said": "--machine 1660 expects a GTX 1660, this card is FAKE GeForce RTX 3070 Laptop GPU (checks)"}
+       machine 3070 on a 1660: {"ok": true, "said": "--machine 3070 expects a RTX 3070, this card is FAKE GeForce GTX 1660 SUPER (checks)"}
+       no benchmark (stage 2, CUDA): {"ok": true, "said": "stage 2: no benchmark for FAKE GeForce RTX 3070 Laptop GPU (checks) under code SHA 0759062126f5: run --bench on this card and commit it"}
+       failed benchmark: {"ok": true, "said": "stage 2: this card's benchmark has failed cases: ['REG3 scan']"}
+       refusing worker rule: {"ok": true, "said": "stage 2: the benchmark's host-memory rule refuses (refuse: test; budget None GB, need None)"}
+       no CUDA CHECK output: {"ok": true, "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpemtog2zd/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is missing: run python -m explore_gpu.s75b_checks --device cuda and com"}
+       failed CUDA CHECK output: {"ok": true, "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpemtog2zd/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is failed: ['B7']: run python -m explore_gpu.s75b_checks --device cuda "}
+       CUDA CHECK output under another SHA: {"ok": true, "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpemtog2zd/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is written under code SHA 000000000000, not 0759062126f5: run python -m"}
+       stage 1: no benchmark (CUDA): {"ok": true, "said": "stage 1: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0759062126f5: run --bench on this card and commit it"}
+       stage 1: no CUDA CHECK output: {"ok": true, "said": "stage 1: this card's CUDA CHECK output (/tmp/tmpemtog2zd/s75b_checks_cuda_FAKE_GeForce_GTX_1660_SUPER__checks__output.json) is missing: run python -m explore_gpu.s75b_checks --device cuda and commit i"}
+       stage 1: benchmark not committed: {"ok": true, "said": "stage 1: this card's benchmark (/tmp/tmpemtog2zd/s75b_bench_FAKE_GeForce_GTX_1660_SUPER__checks_.json) is not committed, or has local changes: commit and push it first"}
+       stage 1: pilot records from another card: {"ok": true, "said": "stage 1: pilot records under code SHA 0759062126f5 exist from another card ({'ORACLE_PILOT': [840, 841]}): the pilot runs on one card"}
+       stage 1: the driver's code not committed: {"ok": true, "said": "stage 1: the driver's code is not committed (['explore_gpu/s75b.py']): run from a clean checkout"}
+       stage 2: the driver's code not committed: {"ok": true, "said": "stage 2: the driver's code is not committed (['explore_gpu/s75b.py']): run from a clean checkout"}
+       gpu-name rule: {"ok": true, "said": ""}
+       allocation: {"ok": true, "said": ""}
+ok   B6 S75's code SHA unchanged (4 s): {"ok": true, "s75_sha": "5fb120a92d69", "s75b_sha": "0759062126f5"}
 
 ALL CHECKS PASSED
