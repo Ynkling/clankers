@@ -62,7 +62,8 @@ def main(out_path=None):
     for p in gpu_files:
         st = load(p)
         label = st["meta"].get("machine") or ("GPU " + os.path.basename(p))     # "GPU:<model>"
-        # the planned seeds, as the test's tally takes them: a missing record shows as "(k missing)", never shrinks n
+        # the planned seeds, as the test's tally takes them: a missing record shows as "(k missing)" in the BOUND ROUTED
+        # table and never shrinks its n (the pairs' n, as in the test, counts seeds with both records ok)
         sets[label] = (st, dict(GPU_SEEDS), sorted({r.get("code_sha") for r in st["runs"].values()} - {None}))
     for m in ("X", "L"):
         st = load(os.path.join(HERE, "results", m, "window_gate_results.json"))
