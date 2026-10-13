@@ -139,3 +139,39 @@ EXPLORATORY, NOT A RESULT — session H: H/allmass2, H/dose
   [ 38]  393.8 min  H/allmass2       ORACLE                   seed 2600  lr 0.001  (one Adam 1e-3)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git b11c395, code 898867f69ad4, attempt 1: acc 0.998  trans  2400  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
   start  393.8 min  H/allmass2       ORACLE                   seed 2601  (projected worst case 720 min)
+  [ 39]  410.3 min  H/allmass2       ALLMASS                  seed 2617  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger ALLMASS)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0, code 898867f69ad4, attempt 1: acc 1.000  trans 24000  outcome BOUND ROUTED; map [10, 8, 12, 9, 5, 4, 13, 14]; None fired at [4800, 14400, 19200]
+  start  410.3 min  H/dose           KEYHINGE                 seed 2630  (projected worst case 400 min)
+  [ 40]  410.4 min  H/allmass2       ORACLE                   seed 2601  lr 0.001  (one Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 898867f69ad4, attempt 1: acc 1.000  trans  8400  outcome BOUND ROUTED; map [0, 1, 2, 3, 4, 5, 6, 7]
+  start  410.4 min  H/dose           KEYHINGE                 seed 2631  (projected worst case 400 min)
+  [ 41]  411.0 min  H/allmass2       ALLMASS                  seed 2619  lr 0.001  (LOCAL3 + SLOW + exact-copy trigger ALLMASS)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 898867f69ad4, attempt 1: acc 1.000  trans 15600  outcome BOUND ROUTED; map [10, 2, 8, 14, 4, 6, 9, 7]; None fired at [4800, 14400]
+  start  411.0 min  H/dose           KEYHINGE                 seed 2632  (projected worst case 400 min)
+  [ 42]  413.4 min  H/dose           KEYHINGE                 seed 2630  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 0.998  trans  4800  outcome None
+  start  413.4 min  H/dose           KEYHINGE                 seed 2633  (projected worst case 400 min)
+  [ 43]  413.5 min  H/dose           KEYHINGE                 seed 2632  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  3600  outcome None
+  start  413.5 min  H/dose           KEYHINGE                 seed 2634  (projected worst case 400 min)
+  [ 44]  413.9 min  H/dose           KEYHINGE                 seed 2631  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  6000  outcome None
+  start  413.9 min  H/dose           KEYHINGE                 seed 2635  (projected worst case 400 min)
+  [ 45]  416.5 min  H/dose           KEYHINGE                 seed 2634  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  4800  outcome None
+  start  416.5 min  H/dose           KEYHINGE                 seed 2636  (projected worst case 400 min)
+  [ 46]  416.9 min  H/dose           KEYHINGE                 seed 2633  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  6000  outcome None
+  start  416.9 min  H/dose           KEYHINGE                 seed 2637  (projected worst case 400 min)
+  [ 47]  417.9 min  H/dose           KEYHINGE                 seed 2635  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  7200  outcome None
+  start  417.9 min  H/dose           KEYHINGE                 seed 2638  (projected worst case 400 min)
+  [ 48]  419.5 min  H/dose           KEYHINGE                 seed 2636  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  4800  outcome None
+  start  419.5 min  H/dose           KEYHINGE                 seed 2639  (projected worst case 400 min)
+  [ 49]  419.9 min  H/dose           KEYHINGE                 seed 2637  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  4800  outcome None
+  start  419.9 min  H/dose           LAM03                    seed 2630  (projected worst case 400 min)
+  [ 50]  420.9 min  H/dose           KEYHINGE                 seed 2638  lr 0.001  (WIN3_SLOW + key term KEYHINGE)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 8530fb0+dirty, code 65d3498e4511, attempt 1: acc 1.000  trans  4800  outcome None
+  start  420.9 min  H/dose           LAM03                    seed 2631  (projected worst case 400 min)
