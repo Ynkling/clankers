@@ -70,3 +70,6 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [  6]  779.5 min  F/write          DELTA_LEARNED            seed 2406  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git d4ddaeb, code 4473fffc3608, attempt 1: acc 0.347  trans  None  STREAM-PARTIAL one-to-one  splits [(9600, 'NOT'), (14400, 'NOT'), (19200, 'NOT')]  map 1+1+1+1+1+1+1+1 beta med 0.00/0.00/0.00
   start  779.5 min  F/write          DELTA_LEARNED            seed 2409  (projected worst case 216 min)
+  [  7]  862.3 min  F/write          DELTA_LEARNED            seed 2405  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git de74e5b, code 4473fffc3608, attempt 1: acc 0.302  trans  None  MERGED (2 share)  splits [(7200, 'ok'), (14400, 'ok'), (21600, 'ok')]  map 2+1+1+1+1+1+1 beta med 0.01/0.00/0.02
+  start  862.3 min  F/write          DELTA_FIXED              seed 2400  (projected worst case 216 min)
