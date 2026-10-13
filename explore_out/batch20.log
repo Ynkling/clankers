@@ -1739,3 +1739,5 @@ chain: the first chain stopped by hand during segment 15 (its stop count was 18;
   pool: 4 workers (1 torch thread each); segment budget 115 min left
   start    0.0 min  s67_continue C_P16_N256     seed 279  (resuming from its checkpoint at step 55200)  (projected worst case 503 min)
   start    0.0 min  s67_continue C_P8_N256      seed 272  (resuming from its checkpoint at step 61200)  (projected worst case 180 min)
+  [  1]   38.6 min  s67_continue C_P8_N256      seed 272  lr 0.001  (gate W_in/W_g/window 0.001 throughout; every other trainable parameter 0.0001 for updates 1-2400, 0.001 after; W_h frozen (unused); no hinge; no trigger (as S67))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git 13f87f9, code 78c8b0a643d9, attempt 1, resumed at [61200]: acc 0.745  trans  None  stop 86400  outcome MERGED (2 share); halted once at 43200
