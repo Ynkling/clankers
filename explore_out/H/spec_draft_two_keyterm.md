@@ -65,6 +65,7 @@ explore_b18_gates.eta2_key / eta2_pool and explore_aux_gate._Inject on claude/ou
   L_key(u) = w(u) * relu(eta2_key(g) - 0.2),   w(u) = 1.0 for u <= 2400, 0 for u > 2400.
 - u is the hook's count of training forwards (one per update).
 - After update 2400 the hook returns at once and does nothing.
+- (2026-10-13, S87c, exploratory; no change to the constants) The weight 1.0 and window 2400 were screened against weight 0.3 and 3.0 and window 1200 on seeds 2630-2639, paired: every arm discovered 10/10, no discordant pair (report_9). The amendment rule (a variant beating the drafted constants by >= 4 vs 0) did not fire, so the constants stand. The drafted arm was at the ceiling, so the screen could only have shown a worse variant.
 - eta2_key(g) is the eta^2 of the read gate g at the body's KEY positions 3j+1 (j = 0 .. S*P - 1; the query's key is
   excluded), grouped by the key identity there (token - S). It is between-group over total sum of squares, both summed
   over the k = 2 channels, with 1e-12 added to the total. It is differentiable through g, so its gradient reaches the

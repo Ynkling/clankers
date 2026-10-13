@@ -610,3 +610,17 @@ one discordant pair (seed 2334) is ALLMASS's one mistargeted firing. Also writte
 the main-line specification of S85's proposal (WIN3_SLOW +/- S52's key term at S=2, k=2; proposed seeds X 620-639,
 L 1620-1639; claims K1-K3; readings with one name per outcome; the task-structure caveat). Report:
 explore_out/H/report_8.md.
+
+### Session H round 5 (S87a, the one-to-one count, S87c; seeds 2600-2639)
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S87a allmass2 (S=8, k=16, 43200, Hebbian, exact copy; 20 new paired seeds 2600-2619) | BOUND ROUTED: BASE (KEYMASS) 17, ALLMASS 16; oracle 2/2 | keeps it (BASE only 2, ALLMASS only 1); no cost; aims (40/42 labelled ok). Pooled with S86 (30 pairs, no reading): ALLMASS 24, BASE 26; discordant 1 vs 3 |
+| (2) one-to-one guard count (no runs; explore_h_onetoone_counts.py) | firings with a one-to-one map before (checks[].map_before): 0 of 107 in the 50 runs (S86's 107/97 reproduced first); 0 of 126 with L's split_copy | the guard is moot on the main line at k = 16, S = 8; the guarded screen (2620-2629) was not run |
+| S87c dose (S=2, k=2, no conv, 24000, WIN3_SLOW + key term; seeds 2630-2639 paired) | DISCOVERED: KEYHINGE (1.0, 2400) 10, LAM03 10, LAM3 10, WIN1200 10; oracle 2/2 | robust (no discordant pair); the draft's constants stand (dated note added) |
+
+S87a's losses are not mistargets. On both BASE-only pairs, ALLMASS picked a different labelled pair at an early firing,
+and the runs diverged from there. S87c was at the ceiling, so it could only have shown a worse variant. LAM3 slowed the
+median transition (6600 against 4800), and WIN1200 matched KEYHINGE run for run. In this session's own eight-stream runs,
+2 of 498 firings had a one-to-one map before the fire, both on S86 seed 2334; neither changed the map. Report:
+explore_out/H/report_9.md.
