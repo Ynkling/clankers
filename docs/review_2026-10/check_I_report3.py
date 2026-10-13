@@ -715,7 +715,8 @@ row(f"r3:{find(R3, '60 new runs')}-97", "60 new runs plus two validity runs, bes
     f"3 x 20 + 2 = {len(GPU['runs'])}; the 1660's K1 (arm A 160 vs its CPU record) identical = {k1.get('identical')}", "MATCH", "bit-equivalence is disclaimed, not claimed")
 s1660 = CK["NVIDIA_GeForce_GTX_1660_SUPER"]
 row(f"r3:{find(R3, 'The CUDA CHECKs on this card')}-101", "the card's CUDA CHECKs passed every asserted CHECK ('ALL ASSERTED CHECKS PASSED'); K1, K2, K2b, K2c, K9 printed, not asserted; CPU-only CHECKs, K8 among them, skipped",
-    f"verdict '{s1660['verdict']}'; ok {sorted(k for k, v in s1660['status'].items() if v == 'ok')}; info {sorted(k for k, v in s1660['status'].items() if v == 'info')}; SKIP {sorted(k for k, v in s1660['status'].items() if v == 'SKIP')} (file {s1660['commit']})", "MATCH")
+    f"verdict '{s1660['verdict']}'; ok {sorted(k for k, v in s1660['status'].items() if v == 'ok')}; info {sorted(k for k, v in s1660['status'].items() if v == 'info')}; SKIP {sorted(k for k, v in s1660['status'].items() if v == 'SKIP')} (file {s1660['commit']})", "MATCH",
+    f"the CHECK predates the run; explore_gpu/device.py at 203a5ad is the run's blob: {blob('203a5ad', 'explore_gpu/device.py') == blob(NOTE_C, 'explore_gpu/device.py')} (mainline.py changed after it, in 30807ec: the one-thread fix)")
 row(f"r3:{find(R3, '**K4b** validated')}-103", "K4b: sequential path (cpu_io) lock-step vs CPU; arm A 160 for 2400 updates and S75 ORACLE, SINGLE, WIDE_SPLIT, REG3 for 20 updates",
     f"K4b ok {k4b['ok']}; cases {k4b_cases}", "MATCH" if k4b["ok"] and len(k4b_cases) == 5 else "DISAGREE", "device.to_device(cpu_io=True) is what _onset_wrapper uses")
 row(f"r3:{find(R3, 'Arm A 160 is MultiBDH')}", "arm A 160 is MultiBDH with the recurrent gate, HINGE_D8's gate kind",
@@ -963,6 +964,21 @@ P("- Against the main line's docstring: X 47 splits (1-3 per run, all labelled o
   "32400 [13200, 38400]. Every one of these is reproduced by the recomputation above (X HINGE_D8: 8 collapsed / 7 OTHER / "
   "4 + 1 merged; X WIN3_SLOW_D8 8 two-share + 6 three-share; L WIN3_SLOW_D8 11 merges), which validates the extraction of "
   "the test's functions on the CPU records before they are applied to the GPU records.")
+P("")
+P("## Statements about S75, S75b and the GPU package (item 5)")
+P("")
+P("Report 3 says nothing about S75's or S75b's results. Its statements about the GPU package are the CHECK paragraph (rows "
+  "r3:99-117 above: verdicts, K4b's cases, K8's 13 cases, the K8 correction to the note, no lock-step CHECK of Part C's "
+  "models), the code SHA and the one-thread fix (r3:51-56); all MATCH. Its one S75 reference is 4371824 (S75's WIDE_SLOW "
+  "commit) as the clock witness (r3:59-60, MATCH). Outside report 3, explore_out/README.md at 3d7e68e still carries S75's "
+  "'Correction to the pre-run note. Three WIDE_SPLIT runs had already finished on the 1660 when it was committed', which the "
+  "referee's check_S75.md (rows 16, 81-82) found not record-checkable (and, on its own premises, wrong by one run in "
+  "progress); report 3 does not repeat it.")
+P("")
+P("**The referee's own earlier files.** Nothing here contradicts rev9/check_S75.md or check_S75_v6.md. Their clock argument "
+  "(the 1660's clock bounded from one side only) is consistent with what git now shows: the 1660 host commits as "
+  "root@Docker.home with +0000 (4371824, 148c161, 29d0bd6), and the ancestry bound above applies to that host from 13 October "
+  "on; it does not reach back to S75's 11-12 October runs.")
 P("")
 P("## What could not be checked")
 P("")
