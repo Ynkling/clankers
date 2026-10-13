@@ -1923,3 +1923,23 @@ SUMMARY — EXPLORATORY, not a result
   S68 budget for the main-line test: 40800; 86,400 IS NOT ENOUGH (['C_P16_N256|276', 'C_P16_D128|271', 'C_P16_D128|272'])
 ####################################################################################################
 chain: segment 16 end 2026-10-13T02:51:49Z, 19 of 19 runs saved (driver exit 0)
+chain: all runs saved
+
+####################################################################################################
+ADDENDUM 2026-10-13 02:53:13 UTC — EXPLORATORY, not a result: python explore_b20_addendum.py (from the saved records; no run)
+EXPLORATORY, not a result — batch 20 addendum: the 44,400 reproduction, condition by condition
+  C_P8_N256 272: cpu Intel(R) Xeon(R) Processor @ 2.10GHz, git 13f87f9, code 78c8b0a643d9, lr 0.001, seed 272
+  RCHK_P8_N256 272: cpu Intel(R) Xeon(R) Processor @ 2.10GHz, git 0655ff6, code 78c8b0a643d9, lr 0.001, seed 272
+  repro44 as pre-registered: {'ok': False, 'why': "C_P8_N256 272's resumes [61200] do not include 43200", 'acc': [[44400, 0.73486328125, 0.3888678550720215]], 'sha': '6f6cb65a863c04869615896b22f7453fcaa46f2d'}
+    ok   C_P8_N256 halted once at 43200 (the marker, written only by the process that halted after its 43200 checkpoint): 43200
+    FAIL C_P8_N256's `resumed` contains 43200 (per process: the last process only): [61200]
+    ok   RCHK never resumed at or after 43200: []
+    ok   curve equal at every evaluation through 44400 (37 evaluations): [44400, 0.73486328125, 0.3888678550720215]
+    ok   statistics equal at every evaluation through 44400 (stats[0] is update 0)
+    ok   gradient norms equal at every recorded step through 44400: 3 steps
+    ok   per-stream accuracy at 43200 and 44400: [0.46777164936065674, 0.998161792755127, 0.4729166626930237, 1.0]
+    ok   weights' SHA-1 at 43200 and 44400: 6f6cb65a863c04869615896b22f7453fcaa46f2d
+  Reading of the addendum: every measured field agrees through 44,400 and the marker shows the halt at 43,200; the one
+  failed condition is the per-process `resumed` list (the check assumed it accumulates across processes). The
+  pre-registered check's DIFFERS stands as printed; the comparison above is the evidence for the resumed run's 1200 updates.
+####################################################################################################
