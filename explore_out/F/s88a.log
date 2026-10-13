@@ -91,3 +91,9 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 13] 1179.5 min  F/write          DELTA_FIXED              seed 2404  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 907e72b, code 4473fffc3608, attempt 1: acc 0.997  trans 13200  BOUND ROUTED  splits [(4800, 'ok')]  map 1+1+1+1+1+1+1+1
   start 1179.5 min  F/write          DELTA_FIXED              seed 2406  (projected worst case 216 min)
+  [ 14] 1253.9 min  F/write          DELTA_FIXED              seed 2406  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 9728042, code 4473fffc3608, attempt 1: acc 1.000  trans  9600  BOUND ROUTED  splits []  map 1+1+1+1+1+1+1+1
+  start 1253.9 min  F/write          DELTA_FIXED              seed 2407  (projected worst case 216 min)
+  [ 15] 1266.6 min  F/write          DELTA_LEARNED            seed 2407  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 9728042+dirty, code 4473fffc3608, attempt 1: acc 0.996  trans 34800  BOUND ROUTED  splits [(9600, 'ok'), (16800, 'NOT'), (21600, 'NOT')]  map 1+1+1+1+1+1+1+1 beta med 0.05/0.01/0.00
+  start 1266.6 min  F/write          DELTA_FIXED              seed 2408  (projected worst case 216 min)
