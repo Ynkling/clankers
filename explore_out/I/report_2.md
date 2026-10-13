@@ -82,6 +82,11 @@ The registered result is UNTESTED. As descriptions of these 20 runs at S = 4, L 
 gates stayed source-blind on every seed, while the oracle shows that routing is worth 0.35 SET. That is not a "does not
 carry" reading, because the screen's validity gate failed. These runs do not establish why the gates stayed blind.
 
-The follow-up, S75b (`s75b_spec_draft.md`, a draft for the user), was designed before these records were read. Its
-design commit 1e31409 has parent 5bc6c2e, which holds only the ORACLE and SINGLE records. Nothing in it depends on the
-learned arms.
+**The follow-up, S75b** (`s75b_spec_draft.md`).
+- **Its design commit**, 1e31409, has parent 5bc6c2e, which holds only the ORACLE and SINGLE records.
+- **What git can and cannot show.** That the design was written before these records were read is the author's
+  statement. b649751 was on the remote 23 minutes earlier.
+- **Its revisions**, ee97443 and 114cd08, and every later change were made with these records in the tree. They are
+  not blind by git: spec Appendix B.
+- **Corrected on 2026-10-13** after Referee V's review. This paragraph had said "nothing in it depends on the learned
+  arms" of the whole draft.

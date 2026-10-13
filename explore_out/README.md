@@ -43,7 +43,9 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
     It was still blind: no learned-arm record was pushed until 13:53.
   - **WIDE_SLOW (seeds 830–839).** 0/10 ROUTED and source-blind, as WIDE_SPLIT. Neither arm routed on any shared
     seed.
-- **S75b draft spec (s75b_spec_draft.md, for the user).** It was designed before S75's learned arms were read (1e31409).
+- **S75b draft spec (s75b_spec_draft.md, for the user).** The design commit 1e31409 was built on a tree without S75's
+  learned arms; that it was blind is the author's statement. Every change after the merge 142f47e (ee97443, 114cd08
+  and the driver's) is not blind by git: Appendix B.
   - Configuration B: S = 4, NB = 32, M = 352, L = 1536, bound 0.963.
   - A 2-seed ORACLE pilot with proceed and stop rules fixed in advance.
   - SPLIT_THR set from the pilot, and the split guarded against one-to-one maps.
@@ -51,7 +53,15 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
 - **S75b driver** (explore_gpu/s75b.py, with CHECKs in s75b_checks.py). It implements the spec as approved at 114cd08.
   - **Changes since approval (not blind).** Every change is listed in the spec's appendix and is written into each
     record. None changes a design constant.
-  - **CPU CHECKs B1–B8 pass.** The CUDA CHECK, the benchmark and the two stages still have to run on the cards.
+  - **Failure rules (2026-10-13, before the pilot; spec Appendix B).** These cover the four outcomes Referee V found
+    uncovered:
+    - a failed pilot run;
+    - a code change between the stages;
+    - a failed stage-2 ORACLE run;
+    - a failed benchmark.
+  - **Divergence.** A diverged run is an outcome, never rerun. Any other failure is rerun on the same seed.
+  - **CPU CHECKs B1–B8 pass.** The cards' CUDA CHECKs and benchmarks are rerun on the commit that adds these rules; the
+    stages follow.
 - **window_gate on the GTX 1660 SUPER** (gpu/mainline/window_gate_prerun_note_2026-10-12.md). The pre-run note was
   committed before the run, with no reading. It covers:
   - CEIL_C on 2540–2541 first;

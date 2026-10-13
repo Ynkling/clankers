@@ -150,8 +150,12 @@ before the next step. The driver refuses to go out of order.
 
        python -m explore_gpu.s75b --stage 1 --device cuda
 
-4. **Stage 2**, only if the record says PROCEED. Use `--machine fallback` on the 1660 only if the 3070 is unavailable
-   when stage 2 starts.
+4. **Stage 2**, only if the record says PROCEED.
+   - Use `--machine fallback` on the 1660 only if the 3070 is unavailable when stage 2 starts.
+   - Use `--machine fallback-3070` only if the 1660's committed benchmark failed or refused.
+   - A run that fails with a non-finite value has diverged; that is its outcome and it is never rerun.
+   - Any other failure is rerun on the same seed: re-invoke the same stage command.
+   - Spec Appendix B has the rules.
 
        python -m explore_gpu.s75b --stage 2 --device cuda --machine 1660      # ORACLE 850-851, SINGLE, WIDE_SLOW
        python -m explore_gpu.s75b --stage 2 --device cuda --machine 3070      # REG3, WIDE_SPLIT_G

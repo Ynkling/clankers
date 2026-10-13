@@ -246,6 +246,44 @@ def b4_rules(dev):
                                           == (15.2 - 5.0 - sb.OS_RESERVE_GB, "total"))
     b, how = sb.ram_budget(15.2, dict(MemTotal=15.6, MemAvailable=7.0), bs)
     out["ram_budget: available bound"] = dict(ok=how == "available" and abs(b - (7.0 - 1.0 - sb.AVAIL_RESERVE_GB)) < 1e-12)
+    # FAILURES: the failure kinds, the seed status and the pilot decision
+    fk = {"ValueError: non-finite loss in the curve": "diverged", "ValueError: Input X contains NaN.": "diverged",
+          "ValueError: Input contains infinity or a value too large": "diverged",
+          "OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 GiB (info)": "operational",
+          "RuntimeError: CUDA error: an illegal memory access was encountered": "operational", None: "operational"}
+    out["failure_kind"] = dict(ok=all(sb.failure_kind(e) == k for e, k in fk.items()),
+                               got={str(e)[:30]: sb.failure_kind(e) for e in fk})
+    sh = "abc"
+    F = lambda kind, inv: dict(kind=kind, invocation=inv, attempt=1, error="x")
+    st_ = {"runs": {f"ORACLE_PILOT|840|{sh}|c1": dict(ok=True, end=dict(set=0.93)),
+                    f"ORACLE_PILOT|841|{sh}|c1": dict(ok=True, end=dict(set=0.92)),
+                    f"ORACLE|850|{sh}|c1": dict(ok=True, end=dict(set=0.93))},
+           "failures": {f"ORACLE_PILOT|841|{sh}|c1": [F("diverged", "i1")],
+                        f"ORACLE|851|{sh}|c1": [F("operational", "i1"), F("operational", "i1")],
+                        f"SINGLE|852|{sh}|c1": [F("operational", "i1"), F("operational", "i2")]}}
+    got = {(a, s_): sb.seed_status(st_, a, s_, sh) for a, s_ in (("ORACLE_PILOT", 840), ("ORACLE_PILOT", 841),
+                                                                  ("ORACLE", 850), ("ORACLE", 851), ("SINGLE", 852),
+                                                                  ("SINGLE", 853))}
+    want = {("ORACLE_PILOT", 840): "ok", ("ORACLE_PILOT", 841): "diverged", ("ORACLE", 850): "ok",
+            ("ORACLE", 851): "failed", ("SINGLE", 852): "cannot run", ("SINGLE", 853): "missing"}
+    out["seed_status: ok / diverged over ok / failed in one invocation / cannot run / missing"] = dict(
+        ok=got == want, got={f"{a} {s_}": v for (a, s_), v in got.items()})
+    ok2 = {840: _rec(0.93), 841: _rec(0.92)}
+    d = sb.pilot_decision(ok2, {840: "ok", 841: "diverged"})
+    w = sb.stop_words(d)
+    out["pilot: a diverged run -> STOP, 'not usable at B'"] = dict(
+        ok=d["complete"] and not d["proceed"] and d["diverged"] == [841] and "diverged" in w and "not usable at B" in w
+        and "did not clear the proceed rule" in w, said=w)
+    d = sb.pilot_decision({840: _rec(0.93)}, {840: "ok", 841: "cannot run"})
+    w = sb.stop_words(d)
+    out["pilot: a seed that cannot run -> STOP, 'could not be run'"] = dict(
+        ok=d["complete"] and not d["proceed"] and d["cannot_run"] == [841] and "could not be run" in w
+        and "not usable" not in w, said=w)
+    d = sb.pilot_decision({840: _rec(0.93)}, {840: "ok", 841: "failed"})
+    out["pilot: an operational failure -> not complete (rerun the same seed)"] = dict(
+        ok=not d["complete"] and not d["proceed"] and "rerun" in d["why"], why=d["why"])
+    d = sb.pilot_decision({840: _rec(0.93)}, {840: "ok", 841: "missing"})
+    out["pilot: a missing run -> not complete"] = dict(ok=not d["complete"] and not d["proceed"])
     out["ram_budget: MemTotal below the user's figure"] = dict(
         ok=sb.ram_budget(16.0, dict(MemTotal=7.6, MemAvailable=7.5), dict(hwm_gb=0.0, rss_gb=0.0))[0]
         == 7.6 - sb.OS_RESERVE_GB)
@@ -453,6 +491,90 @@ def _b5_temp(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G
     pilot_store((0.93, 0.92))
     _commit(d, sb.store_path(hw), sb.record_paths()[0])
     out["stage 2: the driver's code not committed"] = expect_exit(s2(rc=True, card=G1660), "code is not committed")
+    sb.dirty_code = lambda: []
+    _b5_failures(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070)
+
+
+def _fake_runs(script, calls):
+    """gr.run_batched_icmc -> the next scripted outcome for the seed: 'ok' (a minimal ok record) or an error string."""
+    def f(task, spec, seeds, iters, **kw):
+        s = seeds[0]
+        calls.append(s)
+        outcome = script[s].pop(0) if isinstance(script[s], list) else script[s]
+        if outcome == "ok":
+            return [dict(ok=True, seed=s, end=dict(set=0.93), curve=[])]
+        return [dict(ok=False, seed=s, error=outcome)]
+    return f
+
+
+def _b5_failures(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070):
+    """FAILURES: run_arm's handling (a fake trainer), a STOP final across code SHAs, the record archive, fallback-3070,
+    and the report's stop when neither card's benchmark passed."""
+    import glob
+    for p in glob.glob(os.path.join(d, "s75b_*")):
+        if os.path.isfile(p):
+            os.remove(p)
+    real = gr.run_batched_icmc
+    calls = []
+    script = {840: "ValueError: non-finite loss in the curve",
+              841: "OutOfMemoryError: CUDA out of memory. Tried to allocate 1.00 GiB"}
+    gr.run_batched_icmc = _fake_runs(script, calls)
+    old_inv = sb.INVOCATION
+    try:
+        st = {"meta": {}, "runs": {}}
+        sb.INVOCATION = "checks invocation 1"
+        m1 = sb.run_arm("ORACLE_PILOT", (840, 841), torch.device("cpu"), hw, sha, st, {}, "auto", 0, log=lambda *a: None)
+        c1 = list(calls)
+        sb.INVOCATION = "checks invocation 2"
+        m2 = sb.run_arm("ORACLE_PILOT", (840, 841), torch.device("cpu"), hw, sha, st, {}, "auto", 0, log=lambda *a: None)
+        c2 = calls[len(c1):]
+        sb.INVOCATION = "checks invocation 3"
+        m3 = sb.run_arm("ORACLE_PILOT", (840, 841), torch.device("cpu"), hw, sha, st, {}, "auto", 0, log=lambda *a: None)
+        c3 = calls[len(c1) + len(c2):]
+    finally:
+        gr.run_batched_icmc = real
+        sb.INVOCATION = old_inv
+    stt = sb.statuses_of(sb.load_all(), "ORACLE_PILOT", sha, (840, 841))
+    out["run_arm: a divergence is not retried or rerun; an operational failure is retried, then cannot run"] = (
+        c1 == [840, 841, 841] and c2 == [841, 841] and c3 == [] and m1 == m2 == m3 == [840, 841]
+        and stt == {840: "diverged", 841: "cannot run"}, f"calls {c1} {c2} {c3}; status {stt}")
+    dd = sb.pilot_of(sb.load_all(), sha)
+    w = sb.stop_words(dd)
+    out["pilot_of after them: STOP, both phrases"] = (
+        dd["complete"] and not dd["proceed"] and "not usable at B" in w and "could not be run" in w, w)
+    # a diverged seed that later has an ok record: still diverged (the first outcome counts)
+    st2 = sb.load(hw)
+    st2["runs"][f"ORACLE_PILOT|840|{sha}|other card"] = dict(_rec(0.95), hw="other card")
+    out["a divergence outranks a later ok record"] = (sb.seed_status(st2, "ORACLE_PILOT", 840, sha) == "diverged", "")
+    os.remove(sb.store_path(hw))
+    # a stage-1 STOP under another code is final; the record archive
+    pilot_store((0.93, 0.92))
+    rec_old = dict(sha="000000000000", decision=dict(complete=True, proceed=False, sets={840: 0.95, 841: 0.85}))
+    sb.write_stage1_record(rec_old, ["old"])
+    rec_new = dict(sha=sha, decision=sb.pilot_of(sb.load_all(), sha), results_file=os.path.relpath(sb.store_path(hw), HERE),
+                   machine=hw)
+    sb.write_stage1_record(rec_new, ["new"])
+    arch = sb.record_paths("000000000000")
+    cur = json.load(open(sb.record_paths()[0]))
+    out["write_stage1_record archives a record under another code"] = (
+        os.path.exists(arch[0]) and os.path.exists(arch[1]) and cur.get("sha") == sha, "")
+    out["stage 2: a STOP under earlier code is final"] = expect_exit(s2(), "final")
+    out["stage 1: a STOP under earlier code is final"] = expect_exit(s1(G1660), "final")
+    os.remove(arch[0])
+    os.remove(arch[1])
+    # fallback-3070: only when the 1660's benchmark under this code exists and failed or refused
+    out["fallback-3070 without a 1660 benchmark"] = expect_exit(s2("fallback-3070", card=G3070), "fallback-3070 runs")
+    good = dict(sha=sha, all_ok=True, stats_workers=1, register_reg3="loop", arms={}, device=dict(gpu=G1660))
+    sb.save_json(good, sb.bench_path(G1660))
+    out["fallback-3070 with a usable 1660 benchmark"] = expect_exit(s2("fallback-3070", card=G3070), "fallback-3070 runs")
+    sb.save_json(dict(good, all_ok=False, arms={"ORACLE": dict(ok=False)}, cases_used=["ORACLE"]), sb.bench_path(G1660))
+    out["fallback-3070 with a failed 1660 benchmark -> past (to this card's benchmark)"] = expect_exit(
+        s2("fallback-3070", card=G3070), "no benchmark")
+    out["fallback-3070 on a 1660"] = expect_exit(s2("fallback-3070", card=G1660), "expects a RTX 3070")
+    sb.save_json(dict(good, device=dict(gpu=G3070), stats_workers=None, workers_why="refuse: test"), sb.bench_path(G3070))
+    txt = sb.report(log=lambda *a: None, sha=sha, out=os.path.join(d, "summary_f.md"))
+    out["report: neither card's benchmark passed -> stops before the pilot"] = (
+        "STOPS BEFORE THE PILOT" in txt and "NOT BLIND BY GIT" in txt, "")
 
 
 def b6_s75_sha(dev):
@@ -615,9 +737,25 @@ def b8_end_to_end(dev):
                              reg3_register=sorted({r.get("register") for r in R["REG3"].values()}),
                              host=[r.get("host", {}).get("main_peak_gb") is not None for rr in R.values() for r in rr.values()])
         txt = sb.report(log=logs.append)
-        need = ["Changes since the approved spec", "Cards per arm", "VALIDITY", "median margin (layers)", "READING",
-                "DIAGNOSTICS", "probe L1", "beta", "train", "PER RUN", "split checks", "paired by seed"]
+        need = ["Provenance as git shows it", "NOT BLIND BY GIT", "Changes since the approved spec", "Cards per arm",
+                "VALIDITY", "median margin (layers)", "READING", "DIAGNOSTICS", "probe L1", "beta", "train", "PER RUN",
+                "split checks", "paired by seed"]
         out["report"] = dict(lines=len(txt.splitlines()), missing_sections=[n for n in need if n not in txt])
+        # FAILURES in the report: ORACLE 851 and WIDE_SPLIT_G 851 diverged (their ok records replaced by a divergence)
+        hw = dv.device_info("cpu")["cpu"]
+        stc = sb.load(hw)
+        for arm in ("ORACLE", "WIDE_SPLIT_G"):
+            k = f"{arm}|851|{sha}|{hw}"
+            stc["runs"][k] = dict(ok=False, error="ValueError: non-finite loss in the curve", arm=arm, hw=hw)
+            stc.setdefault("failures", {})[k] = [dict(attempt=1, invocation="b8", kind="diverged", error="non-finite")]
+        sb.save_json(stc, sb.store_path(hw))
+        txt2 = sb.report(log=lambda *a: None, out=os.path.join(d, "summary_div.md"))
+        rd = next(l for l in txt2.splitlines() if l.startswith("READING"))
+        vl = next(l for l in txt2.splitlines() if l.startswith("VALIDITY"))
+        row = next(l for l in txt2.splitlines() if l.startswith("| WIDE_SPLIT_G"))
+        out["report_diverged"] = dict(validity=vl[-90:], reading=rd[:120], row=row[:90],
+                                      ok=("NOT VALID" in vl and "diverged" in vl and "UNTESTED" in rd
+                                          and "/2 " in row and "diverged [851]" in row))
         b = sb.bench("cpu", host_ram_gb=12.0, beside="none", iters=4, every=2, log=logs.append)
         out["bench"] = {k: b.get(k) for k in ("stats_workers", "workers_needed", "workers_why", "budget_gb", "budget_bound",
                                               "main_gb", "worker_gb", "data_gb", "data_gb_source", "payload_gb",
@@ -631,7 +769,7 @@ def b8_end_to_end(dev):
           and out["stage1"]["record_blind"] is False and out["stage1"]["record_machine"]
           and all(len(v) == 2 for v in out["stage2"]["records"].values())
           and len(out["stage2"]["split_checks"]) > 0 and out["stage2"]["rows_record_map"] and out["stage2"]["meta_changes"]
-          and all(out["stage2"]["host"]) and not out["report"]["missing_sections"]
+          and all(out["stage2"]["host"]) and not out["report"]["missing_sections"] and out["report_diverged"]["ok"]
           and bn["all_ok"] and bn["stats_workers"] is not None and bn["worker_gb"] and bn["payload_gb"]
           and bn["stats_secs"] is not None and bn["secs_per_update"] and g_ok)
     return dict(ok=bool(ok), **out)
