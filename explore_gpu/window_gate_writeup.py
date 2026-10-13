@@ -61,7 +61,7 @@ def main(out_path=None):
     gpu_files = [p for p in [os.path.join(GPU_DIR, GPU_FILE)] if os.path.exists(p)]
     for p in gpu_files:
         st = load(p)
-        label = "GPU " + (st["meta"].get("machine") or os.path.basename(p))
+        label = st["meta"].get("machine") or ("GPU " + os.path.basename(p))     # "GPU:<model>"
         seeds = {k: tuple(s for s in v if f"{k}|{s}" in st["runs"]) for k, v in GPU_SEEDS.items()}
         sets[label] = (st, seeds, sorted({r.get("code_sha") for r in st["runs"].values()} - {None}))
     for m in ("X", "L"):

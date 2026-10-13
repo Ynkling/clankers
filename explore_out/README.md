@@ -59,3 +59,10 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   - what is described, beside X, L and the pooled counts.
 
   `mainline.py` now uses one thread per worker on every device.
+- **window_gate on the GTX 1660 SUPER: the run (report_3.md).** Descriptions only, with no reading, as the note fixed.
+  The records are 148c161.
+  - **Validity.** VALID by the test's rule: CEIL_C bound on 2540 and 2541.
+  - **BOUND ROUTED on 2540–2559.** WIN3_SPLIT_D8 19/20, HINGE_D8 0/20, WIN3_SLOW_D8 6/20.
+  - **Discordant pairs.** Against HINGE_D8, b 19 and c 0. Against WIN3_SLOW_D8, b 13 and c 0.
+  - **Beside the CPU runs.** These sit beside X's, L's and the pooled counts in `gpu/mainline/window_gate_descriptions.md`
+    and are never pooled with them.
