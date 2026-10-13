@@ -162,3 +162,62 @@ With the report's probe, the failure mode appeared at 3 of 263 checks, and never
 - Specify the probe as one fixed draw, as the main line does.
 - Say that its 64 queries can over-read a merged model.
 - Better still, gate the trigger on more queries per probe sequence.
+
+---
+
+## Phase 5: the copy against its reset, and one delta-rule channel (added after Phase 4; earlier sections unchanged)
+
+**Independent replication, EXPLORATORY, not a result.**
+
+**What was replicated.** The first and third results of the main line's `test_split_copy`, from its specification and docstring at `ffb0771` only.
+- **Not read:** no code below that docstring, and nothing from Session F's delta-memory modules.
+- **Protocol:** committed before the first run (`550a736`). It is the reading rule you stated, "consistent" if the count lies in the main line's pooled Wilson interval for that arm, applied per arm, with no "replicates" label. The "Phase 4, amended" text in the main line's file states a different rule (a ≤ 27/32 threshold on fresh seeds). That difference is recorded in `phase5.py`.
+- **Guesses:** every detail I had to guess is in UNSTATED.md, U-50 to U-70. The ones that matter most:
+  - RESET zeroes W_g's Adam state only (the spec's wording, against "the gate group" in your message);
+  - the delta memory keeps raw queries with L2-normalised keys;
+  - the decay is placed so that β = 0 recovers the Hebbian memory exactly;
+  - DELTA1 has the same width as the other arms.
+
+**Arms.** Seeds 940–959, paired by seed.
+
+| arm | what it is |
+|---|---|
+| COPY | WIN3_SPLIT_D8_ML: my Phase 4 recipe, unchanged |
+| RESET | the same trigger; W_g's Adam state is zeroed and nothing is copied |
+| DELTA1 | k = 1, no gate, a delta-rule write at β = 1 (L2 keys, tied write, decay 0.95), single-rate Adam 1e-3 |
+| validity | the Hebbian perfect gate (ORACLE_ADAM) and the perfect gate on delta channels (ORACLE_DELTA), each on 940–941 |
+
+**Results.**
+
+| arm | this replication | Wilson 95% | main line, pooled | main line's interval | reading |
+|---|---|---|---|---|---|
+| COPY (bound routed) | **18/20** | [0.699, 0.972] | 18/20 | [0.699, 0.972] | **consistent** |
+| RESET (bound routed) | **9/20** | [0.258, 0.658] | 6/20 | [0.145, 0.519] | **consistent** (0.45 is inside) |
+| DELTA1 (bound) | **0/20** | [0, 0.161] | 0/20 | [0, 0.161] | **consistent** |
+| validity | ORACLE_ADAM 2/2 (6000, 6000); ORACLE_DELTA 2/2 (1200, 1200) | | CEIL_C 4/4; CEIL_DELTA_D8 4/4 (all at 1200) | | valid |
+
+Discordant counts (printed, not read; p is the exact one-sided McNemar, descriptive):
+- COPY vs RESET: 9 vs 0 (p = 0.0020). The main line had 12 vs 0.
+- COPY vs DELTA1: 18 vs 0 (p = 3.8×10⁻⁶). The main line had 18 vs 0.
+
+**What the runs show (diagnostics, not claims).**
+- **No seed went the other way.** On no seed did the reset bind where the copy failed.
+- **What the 9 shared binds were.**
+  - On two of them (941, 943) the trigger never fired. Those seeds bind on their own, and both arms are bit-identical there.
+  - On the other seven the reset fired and the run still bound.
+- **RESET runs higher here than on the main line** (0.45 against 0.30). It is still inside their interval.
+- **Every failure was a merge.** All 11 RESET failures and both COPY failures (945 and 947, three streams sharing a channel) ended with two or three streams sharing one channel. RESET failed on both of COPY's failing seeds too.
+- **Trigger targets.** The trigger fired 37 copies and 46 resets. By the labels, every target was a channel holding ≥ 2 streams copied or reset onto one holding none.
+- **Probe-versus-evaluation blocks** (seed 914's failure mode): 1 of 175 checks in COPY (seed 958, which bound), and 2 of 246 in RESET (neither eligible). Again they decided no run.
+- **DELTA1.**
+  - It never bound. Its final accuracy ranged 0.09–0.78 (median 0.29); the main line reports 0.08–0.76.
+  - Per-stream accuracy is roughly even within a run (for example 0.72–0.79 on seed 942). The single channel learns some bindings for every stream rather than separating them.
+  - The same delta memory under the perfect gate bound at 1200 on both seeds, so the failure is not in the delta write.
+- **Cost.** 78.3 h of training on 4 workers × 1 thread; each DELTA1 run took about 2 h.
+
+**What this phase adds.** From the written specification alone, an independent implementation reproduces:
+- the copy arm's count exactly;
+- the reset arm within the main line's interval;
+- the single delta channel's 0/20.
+
+The copy's advantage over its reset holds in direction (9 vs 0 against 12 vs 0). It is smaller here because RESET bound more often. With 20 seeds, 9 vs 0 and 12 vs 0 are not distinguishable. Only a pre-registered paired test would turn "the copy, not the reset" into a claim; this phase reads per-arm consistency only.

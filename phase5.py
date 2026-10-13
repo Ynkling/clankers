@@ -43,9 +43,17 @@ READING RULE (the amended rule as stated by the user for this phase):
 Also printed: every split and reset (update, c*, c0, streams on c*/c0 by the labels); the probe-versus-evaluation
 blocks (phase4.probe_blocks); DELTA1's final accuracy by stream; Wilson intervals for every arm.
 
-RESULT (filled in after the run)
+RESULT (filled in after the run; records/phase5.jsonl, records/phase5_table.md)
 -------------------------------------------------------------------------------
-(not yet run)
+  Validity: ORACLE_ADAM 2/2 (6000, 6000); ORACLE_DELTA 2/2 (1200, 1200).
+  COPY   18/20 [0.699, 0.972]   main line 18/20 [0.699, 0.972]  -> consistent
+  RESET   9/20 [0.258, 0.658]   main line  6/20 [0.145, 0.519]  -> consistent
+  DELTA1  0/20 [0.000, 0.161]   main line  0/20 [0.000, 0.161]  -> consistent
+  Discordant (printed, not read): COPY vs RESET 9 vs 0 (p = 0.0020, descriptive); COPY vs DELTA1 18 vs 0
+  (p = 3.8e-6, descriptive). Trigger: COPY 37 splits, RESET 46 resets, every target labelled ok; probe blocks
+  1 of 175 checks (COPY, s958, bound routed) and 2 of 246 (RESET, none eligible). DELTA1 final accuracy
+  0.09-0.78 (median 0.29). 78.3 h of training, 4 workers x 1 thread.
+Independent replication, EXPLORATORY, not a result.
 """
 
 import sys
