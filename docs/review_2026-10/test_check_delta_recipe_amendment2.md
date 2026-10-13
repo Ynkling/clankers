@@ -90,3 +90,16 @@ The check of §2 was therefore done against the records' times, the code's sched
 - **The log is still needed for three things:** the start time, the absence of a manual report, and the two reports.
 
 **Correction (12 October, fifth pass).** "All three fixes were written during the run, 47 to 82 minutes after its start" holds only of the process: until 05:27:31 the process was running its verification (`meta.started` is stamped after `verify()`). The fixes (02:59–03:34) were committed before any arm's run began.
+
+## Addendum (13 October): X's log is committed (`7d7661d`)
+
+The log is at `results/X/delta_recipe_X.log`; the check is `check_amendment2_log.py` (output `check_amendment2_log_out.txt`). Each per-run line carries its elapsed minutes since `meta.started` (05:27:31). The log's header gives the process start as 02:12:34 in the same clock; `a581027` was committed at 02:12:29 UTC, so the clock is UTC.
+
+**Results.**
+- **The 24 runs.** At 15:36:08 (`55dac50`) and at 15:37:52 (`2225f00`), exactly the amendment's 24 runs had finished: CEIL_HEBB 580 and 581, CEIL_DELTA 580 and 581, DELTA_SPLIT 580–598, and DELTA_SLOW 580.
+  - The next run to finish was DELTA_SPLIT 599, at 15:38:19: 131 s after `55dac50` and 27 s after `2225f00`.
+  - The first HEBB_SPLIT or HEBB_SLOW run finished at 00:00:25 on 12 October.
+- **The start.** It is recorded: 02:12:34 UTC on 11 October.
+- **No report before the amendment.** The log has two report blocks. The in-run report comes after the last run, with a total wall clock after verification of 1557.5 min. The `--report` regeneration says 0.0 min. Neither comes before the amendment.
+
+**Verdict.** The amendment's statement of what had been seen is exact against the log. Every item §2 of this note left to the log is now confirmed. The one run near the line, DELTA_SPLIT 599, finished after the commit, and the reconstruction of 12 October had allowed for that (15:36:04 to about 15:41:49).
