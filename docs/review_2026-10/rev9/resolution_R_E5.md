@@ -105,3 +105,5 @@ Every line of `git diff c66cc76 c5e4508 -- multichannel_hebbian_report_v9.tex` t
 - Phase 4's start time and the chat history of the amended prompt (the two NOT rows).
 - Batch 20's records: in progress, not a result, and not cited by the draft.
 - The PDF.
+
+**Correction (13 October, sixth pass).** This file (lines 5 and 22) says R's branch is "still `1f8be04`; nothing newer", and so does `check_R_v5.md` (:5, :56, :236). That was true at `c5e4508`'s time (19:14 on 12 October), which is what the check was pinned to. It was stale when these files were committed in `3f7d84b` (22:50:37): R had pushed `550a736` ("Phase 5 protocol", no records) at 22:47:46. See `check_R_v6.md`.
