@@ -187,3 +187,8 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [101/102]  130.5 min  REG3_TEMP    seed 2718  acc 0.472 trans  None KEY
   [102/102]  135.2 min  REG3_SELFKL  seed 2719  acc 0.505 trans  None KEY
   S87 phase 2 arm (rule): REG3_FREQHINGE
+  S87 phase 2 reproduction of S82's delta references at 2100 through 2400: {'BASELINE_D': True, 'REG3_D': True, 'REG3_KEYHINGE_D': True}
+  s87: code SHA f205db31dfed (33 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  40 runs queued on 4 workers
+  [  1/40]    2.3 min  REG3_KEYHINGE_D seed 2720  acc 1.000 trans  2400 ROUTED-BOUND
+  [  2/40]    2.9 min  REG3_FREQHINGE_D seed 2720  acc 1.000 trans  3600 ROUTED-BOUND
