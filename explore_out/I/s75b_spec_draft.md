@@ -16,14 +16,19 @@ statement; every change after the merge 142f47e is not blind by git (Appendix B)
 - **What git can and cannot show.** The learned-arm records (b649751) had been fetched into the local object store at
   14:10 UTC, before that commit. On the author's statement they were neither merged nor opened then; a parent shows
   only what the tree held. They were merged at 142f47e (14:16).
-- **Later edits.** The cost section (ee97443) and the revisions from a blind review on 2026-10-12 were made after that
-  merge, without opening S75's learned-arm files. They use only:
+- **Later edits.** The cost section (ee97443) and the revision 114cd08 were made after that merge, with b649751's
+  records and `s75_S4_summary.md` in the tree. They are not blind by git (Appendix B).
+  - The review behind 114cd08 was run in this session.
+  - That it, and the edits, were made without opening S75's learned-arm files is the author's statement.
+  - The same session committed the S75 write-up (03bffdf) 130 s after 114cd08.
+  - The edits use only:
   - the two CUDA CHECKs' K9 benchmarks;
   - CPU profiles and memory measurements at L = 1536;
   - ideal-learner computations;
   - the 5bc6c2e ORACLE and SINGLE records.
 - **The revision.** It changed one constant, the pilot proceed rule, from "both runs ≥ 0.912" to the rule below; the
-  reason is given there. It made run decisions that had been open fixed, and it corrected numbers. The diff from
+  reason is given there. It made run decisions that had been open fixed, among them WIDE_SLOW unconditional, which
+  Appendix B.1 counts with the proceed rule as its two design changes. It also corrected numbers. The diff from
   1e31409 shows every change.
 
 ## Question
@@ -87,7 +92,7 @@ the 1024 held-out sequences, unrounded. Go to stage 2 if **both**:
 1. the mean of the two pilot runs is ≥ 0.912, which is 0.9 plus S75's ORACLE seed spread (0.892 − 0.880 = 0.012);
 2. each pilot run is ≥ 0.9.
 
-**Why this rule.** The blind commit had "both runs ≥ 0.912". The review showed that under the fixed-reach prediction
+**Why this rule.** The design commit 1e31409 had "both runs ≥ 0.912". The review showed that under the fixed-reach prediction
 that rule stops the screen about 64% of the time, even though such a screen would usually be VALID. Under the per-bin
 prediction it stops about 20% of the time. Under this rule the stop rates are about 0.05 (per-bin) and 0.40 (fixed
 reach), with a seed sd of about 0.008. When the screen proceeds, both of its ORACLE runs are expected to clear 0.9 with
@@ -95,7 +100,7 @@ probability about 0.92–0.99.
 
 **Stop rule.** If the pilot fails, S75b stops.
 - The report says that B's pilot did not clear the proceed rule. It says "S = 4 is not usable at B" only if a pilot run
-  ended below 0.9, S74's usability bar.
+  ended below 0.9, S74's usability bar, or diverged (Appendix B.3, a later change).
 - No further configuration is tried under this spec.
 - Any successor is a new spec under the pre-run note's follow-up rule. It may use S75b's pilot only as a stated ORACLE
   input, and it records whether its author had read S75's learned-arm records.
@@ -168,7 +173,7 @@ separate, and a fire would overwrite a live channel: the hazard S75's note decla
 | pilot proceed rule | mean ≥ 0.912 and both ≥ 0.9 | S75's ORACLE seed spread; the stop rates under the ORACLE predictions |
 | SPLIT_THR | min(pilot) − 0.03 | S75's rule; the pilot's ORACLE |
 | split trigger | every 2400 from 4800 to 21,600; rise 0.02; ≤ 3 fires, ≥ 4800 apart; 64-sequence probe | S75 (explore_i_common), unchanged |
-| the guard | no fire on a one-to-one map, with the precedence above | the pre-run note's commitment (5bc6c2e, before any learned-arm record was in git); its precedence was written in 114cd08, which is not blind by git |
+| the guard | no fire on a one-to-one map, with the precedence above | the pre-run note offered a guard or a spare channel (5bc6c2e l.119, before any learned-arm record was in git); 1e31409 chose the guard (on a tree without the learned arms; blind on the author's statement); its precedence was written in 114cd08, not blind by git |
 | updates, B, lr, evaluation, probe | as S75 | S75, unchanged |
 | arms, outcomes, reading | as S75, plus the guard; WIDE_SLOW printed | S75's registered design |
 | run mechanics | R = 1; register by rule; arm → machine as above; workers per machine | fixed by rule in this spec |
@@ -288,17 +293,28 @@ Referee V's review of this draft (`docs/review_2026-10/spec_review_s75b_draft.md
 - **Provenance.** The draft states its blindness as fact, but git shows only what each tree held.
 - **Outcomes.** Four outcomes have no rule.
 
-Both are settled here before the pilot. Everything in this appendix was written with S75's learned-arm records in the
-tree and read, so **none of it is blind**. None of it changes a design constant. The driver carries the same text:
-`SPEC_PROVENANCE` and the last six items of `CHANGES_SINCE_SPEC`. Both are written into the benchmark files, the stage-1
-record, stage 2's meta and the report.
+Both are settled here before the pilot. The rules were written, reviewed adversarially in this session, and revised
+once (B.4). Everything in this appendix was written with S75's learned-arm records in the tree and read, so **none of
+it is blind**. None of it changes a design constant (configuration, seeds, arms, bars, the proceed rule, SPLIT_THR's
+rule). The failure rules extend the outcomes, VALID and the reading to failed runs.
+
+The driver carries the same text, in `SPEC_PROVENANCE`, in its docstring's FAILURES section, and in the last items of
+`CHANGES_SINCE_SPEC`.
+- SPEC_PROVENANCE is written into the benchmark files, the results files' meta, the stage-1 record, stage 2's meta and
+  the report.
+- CHANGES_SINCE_SPEC goes to the same places.
+- Per-run records carry neither.
 
 ### B.1 Provenance labels
 
 **Blind by git, as far as git can show:**
 - **1e31409, the design.** Its parent is 5bc6c2e, whose tree holds only S75's ORACLE 830–831 and SINGLE 830–839 records.
-- **What git cannot show.** That the design was written blind is the author's statement. b649751, which holds the
-  WIDE_SPLIT and REG3 records, was on the remote at 13:53:11 UTC, 23 minutes before 1e31409.
+- **What git cannot show.**
+  - That the design was written blind is the author's statement. b649751, which holds the WIDE_SPLIT and REG3 records,
+    was on the remote at 13:53:11 UTC, 23 minutes before 1e31409.
+  - 1e31409 also adds `explore_gpu/s75_writeup.py`, the generator of the learned-arm descriptions. It is unchanged
+    since and was later run on the learned-arm records. Git cannot show whether it was run on b649751's records before
+    the commit.
 - **Earlier evidence.** Configuration B itself was already named in the pre-run note (5bc6c2e, note l.116–118), 13 h
   before any learned-arm record reached git.
 
@@ -314,69 +330,132 @@ record, stage 2's meta and the report.
     - the windowed learner and the fixed-reach case;
     - the stop wording and the guard's precedence;
     - the allocation, R = 1, the register rule and the workers;
-    - n = 4096, the memory, and the 3070's factor.
+    - n = 4096, the memory and the 3070's factor.
+  - **The other rules in 15c5e4f..114cd08:**
+    - ORACLE_PILOT as its own arm, never substituting for ORACLE 850–851;
+    - every arm runs all its seeds;
+    - not VALID means descriptions only, never re-read, and the pilot is never pooled;
+    - the successor rule;
+    - the trigger's transcription and precedence;
+    - the CHECK list and the Order.
 
-  Neither design change is a function of a learned-arm quantity: the review found no learned-arm number in any version.
-  Neither is blind by git.
+  The review judged neither design change to be a function of a learned-arm quantity:
+  - the proceed rule follows from ORACLE-only inputs;
+  - the pre-run note had already given WIDE_SLOW its role.
+
+  Its literal-number check found no learned-arm number in any version, but that check does not catch rounded or
+  transformed numbers. Neither change is blind by git.
 - **Everything after 114cd08:** the driver, Appendix A and this appendix.
 
-The heading of the Provenance section and the guard's row of the constants table are reworded to match. Those are this
-appendix's only edits above it. report_2.md's closing paragraph is corrected the same way.
+**This appendix's edits above it.**
+- The heading of the Provenance section and its "Later edits" and "The revision" bullets.
+- "The design commit 1e31409" in "Why this rule".
+- The stop rule's pointer to B.3.
+- The guard's row of the constants table.
+- report_2.md's closing paragraph, corrected the same way.
+
+The stage-1 record labels 1e31409 "built on a tree without the learned arms (git); blind on the author's statement
+only".
 
 ### B.2 Failed runs
 
-A failed run (a record with `ok: False`, after the driver's one retry) falls into one of two kinds.
-- **Diverged.** The error reports a non-finite value: the record's non-finite-loss check, or a NaN or inf reaching a
-  statistic.
-  - That is an **outcome**. It is never retried and never rerun, on any card.
+**Two kinds of failure:**
+- **Diverged.** A run whose evaluation logits are not all finite. The driver checks every evaluation, and the split
+  trigger's probe, before anything else, on CPU and on CUDA. Without that check, a non-finite run fails first at the
+  residual replay's assert, whose message names no NaN. The record's non-finite-loss check and a NaN or inf reaching a
+  statistic also count.
+  - A divergence is an **outcome**. It is never retried and never rerun, under any code, on any card.
   - It stays the seed's outcome even if a later run of that seed completed.
 - **Operational.** Any other failure: out of memory, a crash, a driver error.
-  - It is **rerun on the same seed**, by re-invoking the stage, on either card. No seed is ever replaced by a fresh one.
-  - A seed with operational failures in two invocations, and no ok record, **cannot run**.
+  - A process that ends without a record (killed, interrupted) leaves an open start marker. That counts as an
+    operational failure of its invocation.
 
-Every failed attempt is logged with its kind, error and invocation, and printed in the report.
+**What happens after an operational failure:**
+- **The invocation stops** at the first operational failure that survives the driver's one retry. Only that seed is
+  charged, not the seeds after it.
+- **Rerun.** An operational failure is rerun on the same seed, never a fresh one. It runs on whichever card runs that
+  arm, and the records keep each seed's card.
+- **Halt.** A seed with operational failures in two invocations is **halted**.
+  - The driver does not run it again until the user clears it (`--retry-halted`, recorded with its time) or the code
+    changes before stage 2.
+  - A halt waits on the user. It is never a STOP, never final, and says nothing about B.
+
+Every failure entry is kept, with its kind, error, invocation and time, and the report prints them for every code.
 
 ### B.3 The four uncovered outcomes
 
 1. **A failed pilot run.**
-   - **Diverged.** The run did not reach 0.9. S75b stops: "B's pilot did not clear the proceed rule; pilot run(s) …
-     diverged … and so did not reach 0.9: S = 4 is not usable at B."
-   - **Cannot run.** S75b stops: "… B's pilot could not be run on these cards."
-   - **Otherwise.** A pilot seed without an ok record is rerun (`--stage 1` again). The stage-1 record says INCOMPLETE
-     until then.
-   - No other configuration is tried, and no fresh seed is drawn.
-2. **A code change between the stages.**
-   - The driver's code, every module in its code SHA, is frozen from stage 1 to the end of stage 2.
-   - A change that cannot be avoided (a bug that stops a stage) is committed with a dated note before any further run.
-   - Then the CUDA CHECKs and the benchmarks are rerun, and the pilot is rerun on 840–841 under the new code.
-   - **A stage-1 STOP under any code is final.** Stage 1 and stage 2 both refuse after one.
-   - Stage 2 runs only if every complete stage-1 record, under every code, says PROCEED. SPLIT_THR comes from the pilot
-     under the code stage 2 runs.
-   - Earlier stage-1 records are kept as `s75b_stage1_record_<sha>.*`, printed, and never pooled.
-   - Stage-2 records under an earlier code are printed as NOT COUNTED. Their seeds are rerun under the new code.
+   - **A value STOP** is decided as soon as a pilot run ends below 0.9 or diverges, whatever the other seed.
+     - Wording: "B's pilot did not clear the proceed rule …: S = 4 is not usable at B" (for a divergence, "pilot run(s)
+       … diverged … and so did not reach 0.9").
+     - No other configuration is tried.
+   - **An operational failure** is rerun on the same seed (`--stage 1` again). The stage-1 record says INCOMPLETE.
+   - **A halted seed** leaves the decision to the user (HALTED).
+2. **A code change.**
+   - **Before stage 2 starts.**
+     - The driver's code, every module in its code SHA, is frozen from stage 1.
+     - A change that cannot be avoided (a bug that stops a stage) is committed with a dated note before any further run.
+     - The CUDA CHECKs, the benchmarks and the pilot (840–841) are then rerun under the new code.
+     - **A value STOP under any code is final.** It is recomputed from every code's pilot records, not only from the
+       record files.
+     - Stage 2 needs every complete stage-1 decision, under every code, to be PROCEED. SPLIT_THR comes from the pilot
+       under the code stage 2 runs.
+     - Earlier stage-1 records are kept as `s75b_stage1_record_<sha>.*`, printed, and never pooled.
+   - **After stage 2 starts.** Once stage 2 has a record or a failure under one code, the code is frozen for good.
+     - Stage 1 and stage 2 refuse under any other code.
+     - A change halts the screen for the user, and no stage-2 outcome is re-drawn.
+     - The report reads only the stage-2 code; a second stage-2 code means no reading.
 3. **A stage-2 ORACLE run missing or failed** (and the other stage-2 arms).
    - **ORACLE.**
      - A diverged ORACLE 850 or 851 run counts as below 0.9: NOT VALID, so the reading is UNTESTED.
-     - An ORACLE seed that cannot run leaves VALID unestablished: UNTESTED.
-     - Any other missing ORACLE run is rerun; until then the screen is incomplete.
-   - **The pilot never substitutes for an ORACLE run**, as the draft already says.
+     - A halted ORACLE seed leaves validity incomplete until the user decides.
+     - Any other missing ORACLE run is rerun.
+   - **The pilot never substitutes for an ORACLE run**, as 114cd08 says (not blind by git).
    - **Learned arms.** A diverged run is not ROUTED, and its seed stays in n (n stays 10).
    - **SINGLE.** A diverged run gives no GAP for its seed.
-   - **The read arms.** A seed of WIDE_SPLIT_G or REG3 that cannot run leaves the reading INCOMPLETE: descriptions only.
-4. **A failure of the L = 1536 benchmark.**
-   - A card whose benchmark fails a case it would run, or whose host-memory rule refuses, runs no S75b arm.
-   - If only one card is usable, it runs everything, the pilot included.
-     - On the 1660 this is `--machine fallback`, as before.
-     - On the 3070 it is the new `--machine fallback-3070`, allowed only when the 1660's committed benchmark under this
-       code failed or refused.
-   - If neither card is usable, S75b stops before the pilot: "B cannot be run on these cards".
-   - R, the batch and the configuration are never changed to make a card fit.
+   - **A halted read-arm seed** leaves the reading incomplete until the user decides.
+4. **The L = 1536 benchmark.**
+   - **When a card is usable.** For a set of arms, a card is usable iff its latest benchmark under this code:
+     - finished;
+     - passed every case those arms use (REG3 in the register mode the benchmark chose);
+     - got workers from its host-memory rule.
+
+     The pilot needs only the ORACLE case.
+   - **Reruns.** A benchmark may be rerun under the same code, since it measures and decides no outcome. Each earlier
+     file is kept in `bench_archive/`. A benchmark that crashes leaves its file "in progress", which counts as failed.
+   - **Fallbacks.** If one card is unusable or unavailable, the other runs everything: `--machine fallback` on the
+     1660, `--machine fallback-3070` on the 3070. Both need `--reason`, which is written into stage 2's meta.
+   - **No usable card.** If no card's benchmark allows the pilot, S75b cannot start, and the report says so. No
+     configuration, R or batch is changed to make a card fit; the user decides.
+
+**Sync.** With commits required, stage 1 and stage 2 refuse unless:
+- the checkout is up to date with its upstream, after a `git fetch`;
+- every S75b JSON file in `explore_out/I/gpu/s75b/` is committed.
+
+The stage-1 record and the results files are committed and pushed whatever the decision, so the finality rules on
+either machine see the other's state. `--device cpu` is for the CHECKs only.
+
+### B.4 How the rules were checked
+
+The first version of these rules (403538b) was reviewed adversarially. The review found real faults:
+- **A real divergence was classed operational.** It failed at the replay assert, whose message names no NaN. Fixed by
+  the finiteness check; CHECK B9 now poisons real runs, on CPU and on CUDA.
+- **One environmental fault was charged to every seed after it.** Fixed: the invocation stops.
+- **"Cannot run" was final, which locked out a code fix.** It is now a halt.
+- **A pilot already below 0.9 could be re-drawn by a code change.** Fixed: a value STOP is decided early and
+  recomputed from every code.
+- **A code change could re-draw stage-2 outcomes.** Fixed: the freeze.
+- **Killed processes went uncounted, and so did crashed benchmarks.** Fixed: start markers and progress files.
+- **Finality read only local files.** Fixed: the sync check.
+- **The text and the code disagreed in places.**
+
+The CHECKs B4, B5 and B9 cover each rule.
 
 **What is not covered here.** The review's other points stay open for the user:
 - σ from one pair, and the rounding of 0.912;
 - the "not usable" statistic against S74's ORACLE mean;
 - a replay of the trigger on the pilot's curves;
 - the guard's wording (one_to_one alone, at the first gate layer) and its double-rule cases;
-- the 2400 reference check, and the cost sources.
+- the 2400 reference check, the cost sources, and a rule for runtimes over the estimate.
 
 None of them changes what the driver does at the pilot.

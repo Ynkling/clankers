@@ -54,14 +54,13 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   - **Changes since approval (not blind).** Every change is listed in the spec's appendix and is written into each
     record. None changes a design constant.
   - **Failure rules (2026-10-13, before the pilot; spec Appendix B).** These cover the four outcomes Referee V found
-    uncovered:
-    - a failed pilot run;
-    - a code change between the stages;
-    - a failed stage-2 ORACLE run;
-    - a failed benchmark.
-  - **Divergence.** A diverged run is an outcome, never rerun. Any other failure is rerun on the same seed.
-  - **CPU CHECKs B1–B8 pass.** The cards' CUDA CHECKs and benchmarks are rerun on the commit that adds these rules; the
-    stages follow.
+    uncovered (a failed pilot run, a code change, a failed ORACLE run, a failed benchmark). They were reviewed
+    adversarially and revised once.
+    - **Divergence.** A diverged run, detected from non-finite evaluation logits, is an outcome and is never rerun.
+    - **Other failures.** They are rerun on the same seed. Two invocations halt the seed for the user.
+    - **The pilot.** A run below 0.9, or a diverged run, is a final STOP.
+    - **Stage 2.** The code freezes for good once stage 2 starts.
+  - **CPU CHECKs B1–B9 pass.** The cards' CUDA CHECKs and benchmarks are rerun on the commit that adds these rules.
 - **window_gate on the GTX 1660 SUPER** (gpu/mainline/window_gate_prerun_note_2026-10-12.md). The pre-run note was
   committed before the run, with no reading. It covers:
   - CEIL_C on 2540–2541 first;
