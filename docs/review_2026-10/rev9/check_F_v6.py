@@ -1988,6 +1988,265 @@ for r in LIVE4:
         flips.append((r.get("id") or r["tex"], r["item"][:80], old_, r["status"]))
 
 
+# ══ sixth pass: every live fifth-pass row in the sixth draft; T rows for 42c4557's changes ══════════════════
+import rlib as _rlib  # noqa: E402
+
+CUT6_ISO = git("show", "-s", "--format=%cI", SIXTH_REF).strip()
+CUT6 = ctime(SIXTH_REF)
+TIP6 = {b_: git("rev-list", "-1", f"--before={CUT6_ISO}", b_).strip()[:7] for b_ in REMOTES}
+TIP6 = {b_: t_ for b_, t_ in TIP6.items() if t_}
+F6, ML6 = TIP6[BR], TIP6[MAIN]
+F6_AFTER = git("log", "--format=%h %cI %s", f"{R7}..{F6}").strip().split("\n")
+F6_AFTER = [x for x in F6_AFTER if x.strip()]
+F_NOW_AFTER = len(git("log", "--format=%h", f"{F6}..{F_NOW}").split())
+# every F store this check reads: byte-identical at report 7, at F's last commit before the sixth draft and at F's head now
+F_STORES = sorted({f"{F}{n}_results.json" for n in list(SAME)} | {f"{F}trigger_results.json", f"{F}eight_delta_star.json"})
+STORE_ID = {p_: (git("rev-parse", f"{R7}:{p_}").strip() == git("rev-parse", f"{F6}:{p_}").strip()
+                 == git("rev-parse", f"{F_NOW}:{p_}").strip()) for p_ in F_STORES}
+stores_same6 = all(STORE_ID.values())
+s81_6 = s81_state(F6)
+r7_still_last = not any(("report" in x.lower() and "progress" not in x.lower()) for x in F6_AFTER)
+TROWS = []
+
+
+def trow(tid, tex6, item, draft, rec, status, note, q6):
+    loc = find(TEX6, q6)
+    assert tex6 in loc, ("fragment not at the cited sixth-draft line", tid, tex6, q6, loc)
+    TROWS.append(dict(id=tid, tex=f"tex6:{tex6}", item=item, draft=str(draft), rec=str(rec), status=status, note=note,
+                      q=q6, loc6=loc, kind="sixth", old=find(TEX5, q6)))
+
+
+# test_delta_recipe at the sixth draft: X's records (unchanged since 8ae660d), L's state (the main line's round-5 prompts)
+XREC6_same = git("rev-parse", f"{ML6}:{XREC}").strip() == git("rev-parse", f"{ML5}:{XREC}").strip()
+XS6 = load(ML6, XREC)
+XR = {a: runs(XS6, a) for a in ("DELTA_SPLIT", "DELTA_SLOW", "HEBB_SPLIT", "HEBB_SLOW")}
+xbr = {a: sum(_rlib.bound_routed(r) for r in v.values()) for a, v in XR.items()}
+pr_ds_hs = pairs(XR["DELTA_SPLIT"], XR["HEBB_SPLIT"], _rlib.bound_routed)      # (delta only, Hebb only, n)
+pr_dw_hw = pairs(XR["DELTA_SLOW"], XR["HEBB_SLOW"], _rlib.bound_routed)
+pr_hs_hw = pairs(XR["HEBB_SPLIT"], XR["HEBB_SLOW"], _rlib.bound_routed)
+pr_ds_dw = pairs(XR["DELTA_SPLIT"], XR["DELTA_SLOW"], _rlib.bound_routed)
+d1 = pr_ds_hs[1] - pr_ds_hs[0]                                                  # Hebb only - delta only
+L_DR6 = {b_: [f_ for f_ in git("ls-tree", "-r", "--name-only", t_).split("\n") if f_.startswith("results/L/") and "delta_recipe" in f_]
+         for b_, t_ in TIP6.items()}
+L_DR6 = {b_: v for b_, v in L_DR6.items() if v}
+R5DOC = git("show", f"{ML6}:docs/reading/parallel_sessions_prompts.md")
+r5_ln = [i + 1 for i, ln in enumerate(R5DOC.split("\n")) if ln.startswith("## Round 5") and "L runs test_delta_recipe" in ln]
+r5_c = git("log", "-1", "--format=%h", ML6, "--", "docs/reading/parallel_sessions_prompts.md").strip()
+L_running6 = bool(r5_ln) and not L_DR6
+r5_rec = (f"the main line's round-5 prompts ({r5_c}, {cdate(r5_c)}) docs/reading/parallel_sessions_prompts.md:{r5_ln}: '## Round 5 "
+          f"(12 October, evening): ... L runs test_delta_recipe ...'; L delta_recipe files on any branch at the sixth draft: {L_DR6 or 'none'}")
+dr6 = (f"X's result {x_add} ({cdate(x_add[0])}): {sum(x_arms.values())} records, unchanged at {ML6}: {XREC6_same}; bound routed DELTA_SPLIT "
+       f"{xbr['DELTA_SPLIT']}/20, DELTA_SLOW {xbr['DELTA_SLOW']}/20, HEBB_SPLIT {xbr['HEBB_SPLIT']}/20, HEBB_SLOW {xbr['HEBB_SLOW']}/20; {r5_rec}")
+x_done6 = dr5_ok and XREC6_same and not L_DR6
+t_check6 = ctime(DR["tcheck"])
+chk_h = (t_rb - t_check6) / 3600
+ver_h = (t_rb - run_start) / 3600
+trow("T1", 41, "test_delta_recipe: 'its test file checked against the amended spec before any arm's run (the check preceded the runs by two "
+     "and a half hours; X's verification took three)'", "check before any arm's run; 2.5 h; verification three hours",
+     f"the referee's test check {DR['tcheck']} ({cdate(DR['tcheck'])}); X's runs began {xm['started']} UTC (meta.started); the process "
+     f"started 02:12 UTC (Amendment 2; RESULT (X)): check -> runs {chk_h:.2f} h; process start -> runs {ver_h:.2f} h; Amendment 1 "
+     f"{DR['amend']} ({cdate(DR['amend'])}) before the process: {am1_before}",
+     "MATCH" if t_check6 < t_rb and 2.25 <= chk_h <= 2.75 and 2.75 <= ver_h <= 3.5 and am1_before else "DISAGREE",
+     f"Supersedes Q1 (removed). Takes the fifth pass's correction. 'Three' is {ver_h:.2f} h (3 h 15 min), rounded down.",
+     "its test file checked against the amended spec before any arm's run (the check preceded the runs by two and a half hours; X's verification took three)")
+trow("T2", 41, "'F's S81, G's S83, H's S86 and R's Phase 4 are complete' (F's part), at the sixth draft", "S81 complete",
+     f"F at {F6} ({cdate(F6)}), F's last commit before the sixth draft ({cdate(SIXTH_REF)}): S81 records {s81_6['n']}, log 'S81 done' "
+     f"{s81_6['done']}, report 7 {s81_6['report']}; F's commits after report 7: {F6_AFTER}",
+     "MATCH" if s81_6["done"] and s81_6["report"] and s81_6["n"] == 42 else "DISAGREE",
+     "Re-reads Q2 at the sixth draft's time (F's branch moved: S88's readings and queue). G, H and R are other checks'.",
+     ("F's S81, G's S83, H's S86 and R's Phase~4 are complete",))
+R5_BR6 = {"V": "origin/claude/review-V", "G": "origin/claude/explore-G", "H": "origin/claude/explore-H", "F": BR,
+          "R": "origin/claude/replicate-R", "I": I_BR}
+R5_AFT6 = {k: [x for x in git("log", "--format=%h %s", f"--since={git('show', '-s', '--format=%cI', r5_c).strip()}", TIP6[b_]).strip().split("\n")
+               if x.strip()] for k, b_ in R5_BR6.items()}
+e_tip6 = TIP6[E_BR]
+e_rd6 = [ln for ln in git("show", f"{e_tip6}:explore_out/README.md").split("\n") if "batch20.log" in ln and "IN PROGRESS" in ln]
+e_b20code = git("show", f"{e_tip6}:explore_batch20.py")
+trow("T3", 41, "'E's batch 20 (S67's unbound runs continued to 86,400 updates) and the sessions' fifth round are running'",
+     "batch 20 running; round 5 running",
+     f"E at {e_tip6} ({cdate(e_tip6)}, '{git('log', '-1', '--format=%s', e_tip6).strip()[:60]}'); README '{e_rd6[0][:150] if e_rd6 else '-'}'; "
+     f"explore_batch20.py continues S67's runs to 86,400: {'86,400' in e_b20code and 'S67' in e_b20code}; round-5 prompts {r5_c} "
+     f"({cdate(r5_c)}); commits after them before the cutoff: " + "; ".join(f"{k} {len(v)} (last '{v[0][:60]}')" for k, v in R5_AFT6.items() if v)
+     + f"; none: {[k for k, v in R5_AFT6.items() if not v] or 'none'}",
+     "MATCH" if e_rd6 and all(R5_AFT6.values()) else "DISAGREE",
+     "Supersedes Q3 (removed; 'every session's queue is empty'). F's part: S88a/S88b readings fixed at 40087cb and the queue at "
+     "cdbb886, 6-7 min before the draft.", ("E's batch~20 (S67's unbound runs continued to 86{,}400 updates) and the sessions' fifth round are running",))
+trow("T4", 41, "'L's half is next' and 'test_delta_recipe's L half has not run'", "L next; L has not run",
+     dr6 + "; the draft elsewhere: '(X; L running)' (tex6:54), 'L's half is running' (tex6:360), 'runs on the other' (tex6:36)",
+     "PARTIAL" if x_done6 and L_running6 else "MATCH",
+     "Unchanged text (Q1's second fragment) that this version's tex6:36, 54 and 360 contradict: L runs the test by the main line's "
+     "round-5 prompts. 'Has not run' is true of results only.", ("L's half is next", "\\texttt{test\\_delta\\_recipe}'s L half has not run"))
+trow("T5", 54, "index row delta_recipe: '(X; L running) ... pooled labels and readings wait for L'", "X complete; L running", dr6,
+     "MATCH" if x_done6 and L_running6 else "PARTIAL",
+     "Supersedes Q4 (removed; '(specified)'). 'L running' is not in a record; the main line's round-5 prompts say so.",
+     ("\\texttt{delta\\_recipe} (X; L running)", "pooled labels and readings wait for L"))
+trow("T6", 256, "memory section: 'with the test file checked against the amended spec before any arm's run; run on X, where a second amendment "
+     "... was committed during the run'", "checked before any arm's run; run on X", dr6 + f"; Amendment 2 {AM2_REF} ({cdate(AM2_REF)}) between "
+     f"the runs' start and the result: {t_rb < ctime(AM2_REF) < (t_x or 0)}", "MATCH" if x_done6 and t_rb < ctime(AM2_REF) < t_x else "DISAGREE",
+     "Supersedes Q5 (removed; 'running on X').",
+     ("with the test file checked against the amended spec before any arm's run; run on X, where a second amendment confined to the report's rules",))
+trow("T7", 256, "'none of them a claim, a reading or a Hebbian learned-gate run; two were the Hebbian perfect gate's'",
+     "no Hebbian learned-gate run; two Hebbian perfect-gate lines", f"Amendment 2 ({AM2_REF}): the 24 lines are CEIL_HEBB 580, 581; CEIL_DELTA 580, "
+     f"581; DELTA_SPLIT 580-598; DELTA_SLOW|580; 'None of HEBB_SPLIT or HEBB_SLOW had finished': {am2_lines}",
+     "MATCH" if am2_lines else "NOT RECORD-CHECKABLE", "Supersedes Q6 (removed; the fifth pass's DISAGREE).",
+     ("none of them a claim, a reading or a Hebbian learned-gate run; two were the Hebbian perfect gate's",))
+SC_X, SC_L = load("592c574", "results/X/split_copy_results.json"), load("ffb0771", "results/L/split_copy_results.json")
+c3m = {}
+for m_, st_ in (("X", SC_X), ("L", SC_L)):
+    sp_, sd_ = runs(st_, "WIN3_SPLIT_D8"), runs(st_, "SINGLE_DELTA_D8")
+    c3m[m_] = (sum(1 for s_ in sp_ if _rlib.bound_routed(sp_[s_]) and not _rlib.bound(sd_[s_])),
+               sum(1 for s_ in sp_ if _rlib.bound(sd_[s_]) and not _rlib.bound_routed(sp_[s_])))
+c3p = (c3m["X"][0] + c3m["L"][0], c3m["X"][1] + c3m["L"][1])
+p3 = {k_: mcnemar1(*v) for k_, v in list(c3m.items()) + [("pooled", c3p)]}
+trow("T8", 256, "'(S68, whose reading of that name did not apply; the pre-registered support for the partition is C3, pooled and on each machine)'",
+     "C3 pooled and on each machine", f"C3 (WIN3_SPLIT_D8 bound routed vs SINGLE_DELTA_D8 bound): X {c3m['X'][0]} vs {c3m['X'][1]} (p = {p3['X']:.5f}), "
+     f"L {c3m['L'][0]} vs {c3m['L'][1]} (p = {p3['L']:.4f}), pooled {c3p[0]} vs {c3p[1]} (p = {p3['pooled']:.2e}); S68: {r68}",
+     "MATCH" if all(v < 0.05 for v in p3.values()) and c3p == (18, 0) else "DISAGREE",
+     "Supersedes Q8 (removed; 'C3 on X'). C3 recomputed lightly from split_copy X (592c574) and L (ffb0771).",
+     ("the pre-registered support for the partition is C3, pooled and on each machine",))
+trow("T9", 476, "next steps: 'test_delta_recipe's L half (X's is complete)', at the sixth draft", "L half next; X complete", dr6,
+     "MATCH" if x_done6 else "DISAGREE", "Re-reads Q9: L's half running (the round-5 prompts) and listed as the next step are compatible.",
+     ("\\texttt{test\\_delta\\_recipe}'s L half (X's is complete)",))
+trow("T10", 477, "next steps: S81 no longer listed", "S81 removed",
+     f"'session~F's trigger on delta channels (S81)' in tex6: {find(TEX6, 'session~F' + chr(39) + 's trigger on delta channels (S81)') or 'absent'}; "
+     f"S81 complete at {R7}, in the draft at tex6:205", "MATCH" if not find(TEX6, "session~F's trigger on delta channels (S81)") else "DISAGREE",
+     "Supersedes Q10 (removed; the fifth pass's PARTIAL).",
+     ("Session~H's proposed test of the key term at two streams", "batch~19's lead, sixteen keys per stream"))
+trow("T11", 496, "provenance row delta_recipe: '... / 8ae660d (X) & X complete; L to run & 84; ---', at the sixth draft", "X complete; L to run",
+     dr6, "PARTIAL" if x_done6 and L_running6 and prov_ok else ("MATCH" if prov_ok else "DISAGREE"),
+     "Re-reads Q11: the commits and the count are right; 'L to run' is stale beside this version's '(X; L running)' (tex6:54), "
+     "'L's half is running' (tex6:360) and against the main line's round-5 prompts.",
+     ("Amendment~2 during the run \\texttt{55dac50}, \\texttt{2225f00} / \\texttt{8ae660d} (X) & X complete; L to run & 84; ---",))
+trow("T12", 514, "F's provenance row: 'S81 the trigger on delta (report 7, d5851b1) & d5851b1 & 322; 102; 30; 40; 48; 42', at the sixth draft",
+     "report 7 d5851b1 the last; 42 S81 runs",
+     f"F's last commit before the sixth draft {F6} ({cdate(F6)}); F's commits after {R7}: {F6_AFTER}; a report among them: {not r7_still_last}; "
+     f"S81 records at {F6}: {s81_6['n']}; F's head now {F_NOW} ({F_NOW_AFTER} commits after {F6}); every F store used here identical at {R7}, "
+     f"{F6} and {F_NOW}: {stores_same6}",
+     "MATCH" if r7_still_last and s81_6["n"] == 42 and stores_same6 else "DISAGREE",
+     "Re-reads Q12 at the sixth draft's time (v5 asserted that F's last commit was report 7; F has since started round 5: S88a/S88b "
+     "readings fixed before any run at 40087cb, queue and progress at cdbb886). No report after d5851b1, so the row's commit and "
+     "counts are right; the row lists reports, and S88 has none yet.",
+     ("S81 the trigger on delta (report 7, \\texttt{d5851b1}) & \\texttt{d5851b1} & 322; 102; 30; 40; 48; 42",))
+trow("T13", 58, "index row, session F: 'on delta the flat-start guard lost two seeds and the evaluation trigger none (no reading applies)'",
+     "guard lost two seeds; evaluation none; no reading applies",
+     f"GUARD {nT['GUARD']}/10 vs BASE {nT['BASE']}/10: arm only {b_g}, BASE only {c_g} {dsT['GUARD']}; EVAL {nT['EVAL']}/10: arm only {b_e}, "
+     f"BASE only {c_e}; F's readings: aims {aims}, guard costs {g_costs}, evaluation better {better}, evaluation costs {e_costs}; none applies {none_applies}",
+     "MATCH" if (b_g, c_g, c_e) == (0, 2, 0) and none_applies else "DISAGREE",
+     "Supersedes Q13 (removed; the fifth pass's PARTIAL, whose suggested wording this is).",
+     ("on delta the flat-start guard lost two seeds and the evaluation trigger none (no reading applies)",))
+r7_ph = [i + 1 for i, ln in enumerate(R7T) if ln.startswith("## What happened (post hoc")]
+trow("T14", 205, "'..., on session F's post-hoc account because on delta channels the base's flat-start splits precede runs that bind (all eight "
+     "... bound, though only 10 of the base's 19 firings were on labelled targets), and the guard removes exactly those'",
+     "post hoc, marked; 8 runs; 10 of 19",
+     f"report 7 '## What happened (post hoc; one screen, ten seeds)' at report_7.md:{r7_ph}; BASE firings below 0.5: {len(flatB)} in runs "
+     f"{flatB_runs}, all bound routed {all(flatB_bound)}; labelled {labT['BASE']}/{len(FT['BASE'])}; GUARD's firings {gu_f}",
+     "MATCH" if r7_ph and len(flatB_runs) == 8 and all(flatB_bound) and (labT["BASE"], len(FT["BASE"])) == (10, 19) else "DISAGREE",
+     "Re-reads Q16: the 'because' is now marked as session F's post-hoc account (the fifth pass's PARTIAL resolved).",
+     ("on session~F's post-hoc account because on delta channels the base's flat-start splits precede runs that bind",))
+ge25_fire = [c["step"] for s_, c in FT["GUARD_EVAL"] if s_ == 2025]
+ge25_914 = [(u, round(p_, 3), round(e_, 3)) for s_, u, p_, e_ in m914["GUARD_EVAL"] if s_ == 2025]
+trow("T15", 205, "'The seed-914 mode appeared in one guarded run where it could block the rule (and at four checks of that seed's evaluation-read "
+     "guarded run, which fired, and at two of the base's) (the probe at 0.95-0.98 against the evaluation's 0.87-0.92 at five checks; MERGED at 0.93)'",
+     "GUARD 2025: 5 checks, 0.95-0.98 vs 0.87-0.92, MERGED 0.93; GUARD_EVAL 2025: 4 checks, fired; BASE: 2",
+     "; ".join(f"{a}: {[(s_, u, round(p_, 3), round(e_, 3)) for s_, u, p_, e_ in m914[a]]}" for a in LA)
+     + f"; GUARD_EVAL 2025 fired at {ge25_fire} (the mode at {[x[0] for x in ge25_914]}); each arm's rule reads: "
+     + ", ".join(f"{a} {srcT[a]}" for a in LA),
+     "MATCH" if g25_ok and len(m914["GUARD_EVAL"]) == 4 and {s_ for s_, *_ in m914["GUARD_EVAL"]} == {2025} and ge25_fire
+     and len(m914["BASE"]) == 2 and not m914["EVAL"] else "DISAGREE",
+     "Supersedes Q18 (removed; the fifth pass's PARTIAL). The counts match. Two readings remain loose, wording only: the mode could "
+     "block the rule in BASE too (BASE reads the probe; its two checks preceded binding), so 'one guarded run where it could block "
+     "the rule' is exact of the guarded arms only; and the numbers parenthesis now follows the inserted one, so it describes the "
+     "GUARD run only by position.",
+     ("The seed-914 mode appeared in one guarded run where it could block the rule (and at four checks of that seed's evaluation-read guarded run, which fired, and at two of the base's)",
+      "(the probe at $0.95$--$0.98$ against the evaluation's $0.87$--$0.92$ at five checks; MERGED at $0.93$)"))
+trow("T16", 36, "abstract: 'its pre-registered test is complete on one machine (the delta recipe 19/20 against the Hebbian 16/20, and without a "
+     "trigger 19/20 against 7/20, 12 vs 0; the split helps the Hebbian write, 10 vs 1) and runs on the other'",
+     "19/20 vs 16/20; 19/20 vs 7/20, 12 vs 0; Hebbian split vs none 10 vs 1; L running",
+     f"bound routed (rlib) DELTA_SPLIT {xbr['DELTA_SPLIT']}/20 vs HEBB_SPLIT {xbr['HEBB_SPLIT']}/20 ({pr_ds_hs[0]} vs {pr_ds_hs[1]}); "
+     f"DELTA_SLOW {xbr['DELTA_SLOW']}/20 vs HEBB_SLOW {xbr['HEBB_SLOW']}/20 ({pr_dw_hw[0]} vs {pr_dw_hw[1]}); HEBB_SPLIT vs HEBB_SLOW "
+     f"{pr_hs_hw[0]} vs {pr_hs_hw[1]} (p = {mcnemar1(pr_hs_hw[0], pr_hs_hw[1]):.4f}); {r5_rec}",
+     "MATCH" if (xbr["DELTA_SPLIT"], xbr["HEBB_SPLIT"], xbr["DELTA_SLOW"], xbr["HEBB_SLOW"]) == (19, 16, 19, 7)
+     and pr_dw_hw[:2] == (12, 0) and pr_hs_hw[:2] == (10, 1) and x_done6 and L_running6 else "DISAGREE",
+     "Supersedes Q20 (removed; the fifth pass's PARTIAL: 'the next main-line test, specified and reviewed'). '12 vs 0' is the "
+     "no-trigger pair (DELTA_SLOW vs HEBB_SLOW), '10 vs 1' is D4 (HEBB_SPLIT vs HEBB_SLOW), as the fifth pass asked. 'Complete on "
+     "one machine' is X (8ae660d); 'runs on the other' is the round-5 prompts' statement, not a record.",
+     ("its pre-registered test is complete on one machine (the delta recipe $19/20$ against the Hebbian $16/20$, and without a trigger $19/20$ against $7/20$, 12 vs 0; the split helps the Hebbian write, 10 vs 1) and runs on the other",))
+trow("T17", 360, "assessment: 'A pre-registered test is specified and complete on X (Section~ref{sec:memory}); L's half is running'",
+     "complete on X; L running", dr6, "MATCH" if x_done6 and L_running6 else "PARTIAL", "New in 42c4557.",
+     ("A pre-registered test is specified and complete on X (Section~\\ref{sec:memory}); L's half is running",))
+sp_v = {c_: git("show", f"{c_}:specs/test_delta_recipe.md") for c_ in (DR["spec"], DR["amend"], AM2_REF)}
+lab_old = '"delta binds more often"' in " ".join(sp_v[DR["amend"]].split())        # the labels first appear in Amendment 1
+lab_spec0 = '"delta binds more often"' in " ".join(sp_v[DR["spec"]].split())
+lab_new = '"delta not shown worse; ahead by >= 3 pairs (untested)"' in " ".join(sp_v[AM2_REF].split())
+trow("T18", 256, "D1's label: ''delta not shown worse; ahead by >= 3 pairs (untested)'' (d <= -3; Amendment 2's wording, the first draft of the "
+     "label having read ''delta binds more often'')'; 'D1 d = -3 (delta ahead by three pairs, the first label's case; ...)'",
+     "Amendment 2's wording; first draft 'delta binds more often'; d = -3",
+     f"the original spec {DR['spec']} has D1 as a bound with HOLDS/FAILS and no such label ('delta binds more often' present: {lab_spec0}); "
+     f"Amendment 1 {DR['amend']}, which introduced the labels, reads d <= -3 'delta binds more often': {lab_old}; Amendment 2 {AM2_REF}: 'delta not shown "
+     f"worse; ahead by >= 3 pairs (untested)': {lab_new}; X: DELTA_SPLIT only {pr_ds_hs[0]}, HEBB_SPLIT only {pr_ds_hs[1]}, d = {d1}",
+     "MATCH" if lab_old and not lab_spec0 and lab_new and d1 == -3 else "DISAGREE",
+     "New in 42c4557 (the fifth pass's 'pre-amendment label quoted for D1'). 'The first draft of the label' is Amendment 1's, where "
+     "the labels were introduced. Per machine, secondary; the D-label itself is pooled and waits for L.",
+     ("Amendment~2's wording, the first draft of the label having read ``delta binds more often''", "the first label's case"))
+room_spec = 'if W_SLOW binds routed on >= 36/40' in " ".join(sp_v[DR["amend"]].split()) and 'if W_SLOW binds routed on >= 36/40' in " ".join(sp_v[AM2_REF].split())
+trow("T19", 256, "'D2 0 vs 0, NOT SHOWN on X, the delta no-trigger arm at 19/20 leaving at most one pair of room (''no room'' is the pooled label, "
+     ">= 36/40, and waits for L)'; 'with the no-trigger arm already binding routed 19/20 where its Hebbian counterpart binds 7/20'",
+     "D2 0 vs 0; at most one pair of room; 'no room' pooled >= 36/40",
+     f"DELTA_SPLIT vs DELTA_SLOW {pr_ds_dw[0]} vs {pr_ds_dw[1]} (p = {mcnemar1(pr_ds_dw[0], pr_ds_dw[1]):.3g}); DELTA_SLOW {xbr['DELTA_SLOW']}/20, so "
+     f"split-only pairs at most {20 - xbr['DELTA_SLOW']}; HEBB_SLOW {xbr['HEBB_SLOW']}/20; Amendment 1 {DR['amend']} and Amendment 2 {AM2_REF}: '\"no room\" if W_SLOW binds routed on >= 36/40' (pooled): {room_spec}",
+     "MATCH" if pr_ds_dw[:2] == (0, 0) and xbr["DELTA_SLOW"] == 19 and xbr["HEBB_SLOW"] == 7 and room_spec else "DISAGREE",
+     "New in 42c4557. 'NOT SHOWN' is the per-machine reading of a one-sided McNemar at 0 vs 0.",
+     ("D2 0 vs 0, NOT SHOWN on X, the delta no-trigger arm at $19/20$ leaving at most one pair of room (``no room'' is the pooled label, $\\geq 36/40$, and waits for L)",
+      "with the no-trigger arm already binding routed $19/20$ where its Hebbian counterpart binds $7/20$"))
+
+# ── every live fifth-pass row located in the sixth draft ──────────────────
+LIVE5 = [r for r in LIVE4 if r["state5"] == "stands"] + QROWS
+SUP6 = {"Q1": "T1", "Q3": "T3", "Q4": "T5", "Q5": "T6", "Q6": "T7", "Q8": "T8", "Q10": "T10", "Q13": "T13", "Q18": "T15", "Q20": "T16"}
+RESUP6 = {"Q2": "T2", "Q9": "T9", "Q11": "T11", "Q12": "T12", "Q16": "T14"}
+SUP6_FIRST = {}
+
+
+def key6(r):
+    if r["kind"] == "first":
+        for (t_, pre), v in SUP6_FIRST.items():
+            if r["tex"] == t_ and r["item"].startswith(pre):
+                return v
+        return None
+    return r.get("id")
+
+
+for r in LIVE5:
+    q = r["q"]
+    r["loc6"] = (find(TEX6, q) or "REMOVED") if q is not None else r.get("loc5")
+    k6 = key6(r)
+    if r["loc6"] == "REMOVED":
+        sup = SUP6.get(k6, k6 if k6 and k6.startswith("T") else None)
+        assert sup, ("row removed in tex6 without a superseding T row", r.get("id"), r["tex"], r["item"][:70], r["q"])
+        r["sup6"], r["state6"] = sup, "REMOVED in v6"
+    elif k6 in RESUP6:
+        r["sup6"], r["state6"] = RESUP6[k6], "SUPERSEDED in v6 (re-read at the sixth draft's time, or its point fixed in place)"
+    else:
+        r["sup6"], r["state6"] = None, "stands"
+for k in list(SUP6) + list(RESUP6):
+    assert any(r.get("id") == k for r in LIVE5), ("SUP6/RESUP6 key matches no live row", k)
+for k, v in SUP6.items():
+    assert next(r for r in LIVE5 if r.get("id") == k)["state6"] == "REMOVED in v6", ("SUP6 row not removed", k)
+# statuses of the fifth-pass rows as recomputed now, against check_F_v5.md
+V5MD = open(os.path.join(HERE, "check_F_v5.md")).read().split("\n")
+v5stat = {}
+for ln in V5MD:
+    if ln.startswith("| ") and "**" in ln:
+        c_ = [x.strip() for x in ln.split(" | ")]
+        if len(c_) >= 9 and c_[0].lstrip("| ").isdigit():
+            v5stat.setdefault((c_[1], c_[4]), c_[7].strip("*"))
+flips6 = []
+for r in LIVE5:
+    k_ = (r.get("id", "") or "", str(r["item"]).replace("|", "\\|").replace("\n", " "))
+    old_ = v5stat.get(k_)
+    if old_ is not None and old_ != r["status"]:
+        flips6.append((r.get("id") or r["tex"], r["item"][:80], old_, r["status"]))
+
+
 # ══ write ═══════════════════════════════════════════════════════════════════
 ORDER = {"DISAGREE": 0, "PARTIAL": 1, "NOT RECORD-CHECKABLE": 2, "MATCH": 3}
 

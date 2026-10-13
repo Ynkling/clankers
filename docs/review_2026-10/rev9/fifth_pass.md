@@ -256,3 +256,10 @@ These do not block the draft; they are listed so their authors can correct them.
    "Running" was right in substance (H's CHECKs ran about 22:47–23:00), but the commits cited do not show it. (`check_G_v6`, `check_H_v6`.)
 2. **`check_H_v5.py` is not reproducible as committed.** Its provenance row and its "after the draft" facts read the moving origin head. Re-run after H's round-5 stores were added, that row flips from MATCH to DISAGREE. `check_H_v6.py` pins `f4fd535` and reproduces all 116 v5 statuses. `check_G_v5.py`'s header reads the moving head too, but only in text.
 3. **A label slip, no line changes.** `check_onetoone_v5.py`'s docstring calls `c916996`'s line "tex6:441"; in this file's numbering it is tex5:441. Tex6 now means `42c4557`; the line number is the same.
+4. **§3, tex5:201: "the three comparing with Xeon records".** This pass's proposed fix undercounts, and the draft and the main line's docstring (`bbb600c`) both took it over.
+   - On L, the inherited CHECKs 122 and 123 also print, not asserted, a comparison with a record written on the 2.10 GHz host, and both are unequal (log:2191, 2195).
+   - CHECK 112 ("informative, not asserted", log:2125) compares with E's screen records, whose CPU is not recorded.
+   - `check_split_copy_L.py` searched for the phrase "printed, not asserted" and missed all three. (`check_split_copy_L_v6`.)
+   - The log's own verdict is "ALL VERIFICATION CHECKS PASSED", 24 times. This file's "that is not 'passed'" is therefore a reading of the word, not of the log. The exact wording is "the cross-CPU comparisons printed and unequal, as the specification provides".
+5. **§2 item 1's fix carries a pooled label onto one machine.** The fix was "the split helps the Hebbian write, 10 vs 1". "Helps" is D4's pooled label, which X alone cannot give; that is the same objection this pass raised to "no room". The exact wording is "shown on X (10 vs 1)".
+6. **§3, "True of 29 of 30 runs"** (the residual's source probe by 3600). There are 29 gated runs (10 + 10 + 9), so it should read "28 of 29". `check_S75.py`:347 hard-codes the same slip.

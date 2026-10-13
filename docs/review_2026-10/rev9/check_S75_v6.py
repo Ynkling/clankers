@@ -752,7 +752,7 @@ rd = show(HEAD, README).splitlines()
 rl = next(i + 1 for i, x in enumerate(rd) if "Three WIDE_SPLIT runs had already finished" in x)
 row(f"{README}:{rl}", "Correction to the pre-run note: three WIDE_SPLIT runs had already finished on the 1660 when it "
     "was committed", "no per-run time in the records (timeline section)", "NOT RECORD-CHECKABLE",
-    f"session I's index at {HEAD} (unchanged by 559b942) still states report_2's reconstruction as fact; the draft "
+    f"session I's index at {HEAD} (559b942 edited the WIDE_SLOW bullet below it, not this line) still states report_2's reconstruction as fact; the draft "
     "(tex6:458) no longer does", "session I")
 
 # ── timeline (report_2 l.27-36, the draft's parenthesis) ─────────────────────────────────────────────────────────────

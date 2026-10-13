@@ -40,15 +40,19 @@ ROOT = os.path.dirname(os.path.dirname(REVIEW))
 sys.path.insert(0, REVIEW)
 import rlib  # noqa: E402
 
-REC, A2CODE, RUNCODE, A2SPEC, DRAFT, DRAFT_X = "8ae660d", "2225f00", "a581027", "55dac50", "c5e4508", "902c39a"
+REC, A2CODE, RUNCODE, A2SPEC, DRAFT, DRAFT_X = "8ae660d", "2225f00", "a581027", "55dac50", "42c4557", "902c39a"
+OLD_DRAFT, DRAFT_T, MAIN = "c5e4508", "2026-10-12T23:14:04Z", "origin/claude/bdh-growth-hebbian-inference-w90069"
 RESULTS = "results/X/delta_recipe_results.json"
 TEST = "test_delta_recipe.py"
 TEX = "multichannel_hebbian_report_v9.tex"
 rows = []          # (line, statement, recomputed, status, note)
 
 
+OUTLOG = []
+
+
 def say(*a):
-    print(" ".join(str(x) for x in a))
+    OUTLOG.append(" ".join(str(x) for x in a))
 
 
 def git(*args):
@@ -475,11 +479,33 @@ say("=" * 100)
 tex = src(DRAFT, TEX).split("\n")
 
 
-def tex_has(n, frag):
-    ok = frag in tex[n - 1]
-    if not ok:
-        raise AssertionError(f"tex5:{n} lacks {frag!r}")
-    return ok
+tex5 = src(OLD_DRAFT, TEX).split("\n")
+CHANGED = [i + 1 for i, (a, b) in enumerate(zip(tex5, tex)) if a != b]
+
+
+def tex_has(frag):
+    """the tex6 line holding the verbatim fragment (asserted present and unique)."""
+    hits = [i + 1 for i, x in enumerate(tex) if frag in x]
+    if len(hits) != 1:
+        raise AssertionError(f"tex6 fragment {frag!r}: lines {hits}")
+    return hits[0]
+
+
+def st6(ok):
+    return "MATCH" if ok else "DISAGREE"
+
+
+# the main line when the sixth draft was committed, and what it holds of test_delta_recipe
+MAIN_AT = git("rev-list", "-1", f"--before={DRAFT_T}", MAIN).strip()[:7]
+main_l = "results/L/delta_recipe_results.json" in git("ls-tree", "-r", "--name-only", MAIN_AT, "results/L/").split()
+main_rec_same = git("diff", "--stat", REC, MAIN_AT, "--", RESULTS, TEST).strip() == ""
+main_after = git("log", "--format=%h %cI %s", f"{REC}..{MAIN_AT}").strip().splitlines()
+any_delta_log = sorted({l for l in git("log", "--all", "--format=", "--name-only").split("\n")
+                        if ("delta" in l and ("log" in l or "longrun" in l)) or l.startswith("results/X/longrun")
+                        or l.startswith("results/L/delta")})
+L_NOTE = ("no L record on any ref; session I's window_gate pre-run note (30807ec, explore-I, 22:44 UTC 12 Oct) says that run "
+          "'moved here from the RTX 3070, which ran out of host memory running it beside test_delta_recipe' (which machine holds "
+          "the 3070 is not recorded); the round-5 prompts (0754d61) say L is running it")
 
 
 def res_has(frag):
@@ -586,107 +612,258 @@ row("msg 902c39a", "draft commit title: 'D2 no room'", "the test printed D2 NOT 
 row("RESULT", "Verification: CHECKs 130, 158, 159, 162, 161 (1.19e-7), 173", "not in the records (no log)",
     "NOT RECORD-CHECKABLE", "")
 
-# draft rows
-tex_has(41, "complete on X (a second amendment, to the report's rules only, was committed during X's run with a statement of what had been seen); L's half is next")
-row("tex5:41", "test_delta_recipe ... complete on X (a second amendment ... committed during X's run ...); L's half is next",
-    f"{len(R)}/84 records ok; 55dac50 15:36:08 between meta.started and the reconstructed end; no L file at {REC}",
+# draft rows (tex6; every row anchored by a verbatim fragment located in tex6)
+CHK = "6f2788d"                                          # the referee's test-file check (test_check_delta_recipe.md)
+T_CHK = dt.datetime.fromisoformat(git("show", "-s", "--format=%cI", CHK).strip()).astimezone(dt.timezone.utc).replace(tzinfo=None)
+first_sub = STARTED + dt.timedelta(seconds=P_MIN)
+nf = lambda s: ", ".join(f"s{x}" for x in s)
+a_ss, b_ss, c_ss = disc("DELTA_SLOW", "HEBB_SLOW")
+a_hh, b_hh, c_hh = disc("HEBB_SPLIT", "HEBB_SLOW")
+a_dh, b_dh, c_dh = disc("DELTA_SPLIT", "HEBB_SPLIT")
+
+# tex6:36, the abstract (changed)
+L = tex_has("its pre-registered test is complete on one machine")
+row(f"tex6:{L}", "abstract: 'its pre-registered test is complete on one machine (...) and runs on the other' [changed: tex5 "
+    "'is the next main-line test, specified and reviewed']", f"X: {len(R)}/84 records ok at {REC}; L: no results file on any "
+    f"ref at {MAIN_AT} (main line {MAIN_AT})", "MATCH", "the 'one machine' half; 'runs on the other' is the next row")
+row(f"tex6:{L}", "abstract: '... and runs on the other'", f"no L file or log on any ref; {L_NOTE}", "NOT RECORD-CHECKABLE",
+    "consistent with session I's note; not a record")
+row(f"tex6:{tex_has('the delta recipe $19/20$ against the Hebbian $16/20$')}",
+    "abstract: 'the delta recipe 19/20 against the Hebbian 16/20' (D1's arms; no pair count given)",
+    f"DELTA_SPLIT {cnt['DELTA_SPLIT']}/20, HEBB_SPLIT {cnt['HEBB_SPLIT']}/20; discordant DELTA only {len(b_dh)} ({nf(b_dh)}), "
+    f"HEBB only {len(c_dh)} ({nf(c_dh)}), d = {len(c_dh) - len(b_dh)}", st6(cnt["DELTA_SPLIT"] == 19 and cnt["HEBB_SPLIT"] == 16),
+    "the 4 vs 1 is not stated in the abstract (it is at tex6:256 as d = -3)")
+row(f"tex6:{tex_has('and without a trigger $19/20$ against $7/20$, 12 vs 0;')}",
+    "abstract: 'without a trigger 19/20 against 7/20, 12 vs 0' [changed at 42c4557: c916996 said '10 vs 1']",
+    f"DELTA_SLOW {cnt['DELTA_SLOW']}/20, HEBB_SLOW {cnt['HEBB_SLOW']}/20; DELTA_SLOW only {len(b_ss)} ({nf(b_ss)}), HEBB_SLOW only "
+    f"{len(c_ss)}; both {len(a_ss)}", st6((cnt["DELTA_SLOW"], cnt["HEBB_SLOW"], len(b_ss), len(c_ss)) == (19, 7, 12, 0)),
+    "printed nowhere by the test (no claim compares the two no-trigger arms): the referee's pairing, as check_onetoone_v5 "
+    "gave it; the fifth pass's §2 item 1, resolved")
+row(f"tex6:{tex_has('the split helps the Hebbian write, 10 vs 1)')}",
+    "abstract: 'the split helps the Hebbian write, 10 vs 1'",
+    f"D4 HEBB_SPLIT only {len(b_hh)} ({nf(b_hh)}), HEBB_SLOW only {len(c_hh)} ({nf(c_hh)}); p = {res['D4'][2]:.4f}; per machine the "
+    f"test prints '{T['split_verdict'](c4)}' (secondary); 'helps' is a pooled label (READINGS (pooled), split_label: 'helps' "
+    f"(SHOWN), 'no room', 'not shown'), not printed on X",
+    "PARTIAL",
+    "the pair is right; 'helps' is the pre-registered pooled label for D4, which waits for L, while tex6:256 says 'The pooled "
+    "labels and readings wait for L' -- the same objection this check raised against 'no room' for D2 on X alone. "
+    "fifth_pass.md §2 item 1's suggested fix used this word ('the split helps the Hebbian write, 10 vs 1'): the referee's own "
+    "fix carried the pooled label onto one machine. 'shown on X (10 vs 1)' would match")
+
+# tex6:41 (changed)
+L = tex_has("its test file checked against the amended spec before any arm's run (the check preceded the runs by two and a half hours; X's verification took three)")
+row(f"tex6:{L}", "Revision 9 paragraph: the test file checked against the amended spec before any arm's run",
+    f"the check {CHK} committed {T_CHK:%Y-%m-%d %H:%M:%S} UTC; meta.started (verification end) {meta['started']} UTC; first runs "
+    f"submitted >= {first_sub:%H:%M:%S} (§3)", st6(T_CHK < STARTED), "the referee's fourth-pass item 6, withdrawn at e733dca")
+row(f"tex6:{L}", "'(the check preceded the runs by two and a half hours; X's verification took three)'",
+    f"check -> meta.started {(STARTED - T_CHK).total_seconds() / 3600:.2f} h; check -> first submitted run >= "
+    f"{(first_sub - T_CHK).total_seconds() / 3600:.2f} h; test commit {RUNCODE} (02:12:29) -> meta.started "
+    f"{(STARTED - T_RUN).total_seconds() / 3600:.2f} h", "MATCH",
+    "approximate: 2.43 h to the end of the verification, at least 2.79 h to the first run (the projection ran in between); the "
+    "verification's 3.25 h counts from the test commit, the process start (02:12) being stated only by Amendment 2 and the "
+    "RESULT")
+row(f"tex6:{tex_has('complete on X (a second amendment, to the report' + chr(39) + 's rules only, was committed during X' + chr(39) + 's run with a statement of what had been seen); L' + chr(39) + 's half is next')}",
+    "test_delta_recipe ... complete on X (a second amendment ... committed during X's run ...); L's half is next",
+    f"{len(R)}/84 records ok; 55dac50 15:36:08 between meta.started and the reconstructed end; no L file at {MAIN_AT}",
     "MATCH")
-tex_has(41, "\\texttt{test\\_delta\\_recipe}'s L half has not run")
-row("tex5:41", "test_delta_recipe's L half has not run", f"results/L/delta_recipe_results.json at {REC}: "
-    f"{'results/L/delta_recipe_results.json' in git('ls-tree', '-r', '--name-only', REC, 'results/L/')}", "MATCH",
-    "As of the record; the round-5 prompts (0754d61) say L is running it")
-tex_has(54, "on X (secondary): D4 SHOWN 10 vs 1, D2 0 vs 0 with the delta no-trigger arm at $19/20$, D1 $d = -3$; pooled labels and readings wait for L")
-row("tex5:54", "index row: on X (secondary): D4 SHOWN 10 vs 1, D2 0 vs 0 with DELTA_SLOW 19/20, D1 d = -3; pooled waits for L",
+row(f"tex6:{tex_has(chr(92) + 'texttt{test' + chr(92) + '_delta' + chr(92) + '_recipe}' + chr(39) + 's L half has not run')}",
+    "test_delta_recipe's L half has not run", f"results/L/delta_recipe_results.json at {MAIN_AT}: "
+    f"{'results/L/delta_recipe_results.json' in git('ls-tree', '-r', '--name-only', MAIN_AT, 'results/L/')}", "MATCH",
+    f"as of the records; {L_NOTE}")
+l_lines = {k: tex_has(f) for k, f in (("36", "and runs on the other"), ("41a", "L's half is next"),
+                                       ("41b", "L half has not run"), ("54", "(X; L running)"),
+                                       ("360", "L's half is running"), ("476", "L half (X's is complete)"),
+                                       ("496", "X complete; L to run"))}
+row(", ".join(sorted({f"tex6:{v}" for v in l_lines.values()}, key=lambda x: int(x.split(':')[1]))),
+    "L's status across the draft: 'runs on the other' (36), 'L's half is next' and 'has not run' (41), '(X; L running)' (54), "
+    "'L's half is running' (360), next step 'L's half' (476), 'L to run' (496)",
+    L_NOTE, "PARTIAL",
+    "not record-checkable either way, but the draft is inconsistent with itself: three lines say L is running, three that it is "
+    "next or has not run (tex6:41 was rewritten in this version and kept 'is next' and 'has not run')")
+
+# tex6:54
+row(f"tex6:{tex_has('on X (secondary): D4 SHOWN 10 vs 1, D2 0 vs 0 with the delta no-trigger arm at $19/20$, D1 $d = -3$; pooled labels and readings wait for L')}",
+    "index row: on X (secondary): D4 SHOWN 10 vs 1, D2 0 vs 0 with DELTA_SLOW 19/20, D1 d = -3; pooled waits for L",
     f"D4 {res['D4'][0]} vs {res['D4'][1]} SHOWN; D2 {res['D2'][0]} vs {res['D2'][1]}, DELTA_SLOW {cnt['DELTA_SLOW']}/20; d = {d_val}",
-    "MATCH", "The first column still says '(specified)' though X has run")
-tex_has(256, "a statement of the 24 run lines that had been read, none of them a claim, a reading or a Hebbian run")
-row("tex5:256", "Amendment 2's statement: 24 run lines read, 'none of them a claim, a reading or a Hebbian run'",
-    "Amendment 2 lists CEIL_HEBB 580, 581 among the 24: two Hebbian (perfect-gate) runs; it says no HEBB_SPLIT or "
-    "HEBB_SLOW run had finished", "DISAGREE",
-    "Should read 'no Hebbian learned-gate run' (or 'no HEBB_SPLIT or HEBB_SLOW run'). The count 24 matches the amendment "
-    "and the reconstruction (§3)")
-tex_has(256, "labelled ``delta binds more often'' ($d \\leq -3$)")
-row("tex5:256", "D1 labels: 'delta binds more often' (d <= -3), ...",
-    f"Amendment 2 (a) replaced it: '{T['D1_LABELS'][0]}' (D1_LABELS[0] at 2225f00/8ae660d)", "DISAGREE",
-    "Pre-Amendment-2 label in the same paragraph that reports the amendment; with d = -3 on X, it is the label the "
-    "pooled D1 would print if L's d <= 0")
-tex_has(256, "(a ten-point deficit passes it 22--29\\% of the time at 40 pairs)")
-row("tex5:256", "a ten-point deficit passes it 22-29% of the time at 40 pairs", "D1_OC: P(d <= 2) 0.29/0.22 at DELTA 0.85 "
-    "vs HEBB 0.95", "MATCH", "Unchanged text; quoted from the test's D1_OC")
-tex_has(256, "X's half is complete (seeds 580--599, 84 runs, 29.2 h; both perfect gates $2/2$; CHECK 174 dropped no pair)")
-row("tex5:256", "X's half is complete (seeds 580-599, 84 runs, 29.2 h; both perfect gates 2/2; CHECK 174 dropped no pair)",
+    "MATCH", "")
+row(f"tex6:{tex_has('(X; L running)')}", "index row, first column: '(X; L running)' [changed: tex5 '(specified)']",
+    f"X recorded ({REC}); L: {L_NOTE}", "NOT RECORD-CHECKABLE", "the X half right; 'L running' not in any record")
+
+# tex6:256 (changed)
+L = tex_has("with the test file checked against the amended spec before any arm's run; run on X")
+row(f"tex6:{L}", "'with the test file checked against the amended spec before any arm's run; run on X' [changed: tex5 "
+    "'checked against the amended spec; running on X']",
+    f"{CHK} {T_CHK:%H:%M:%S} < meta.started {STARTED:%H:%M:%S} < first runs >= {first_sub:%H:%M:%S} (11 Oct, UTC)",
+    st6(T_CHK < STARTED), "'run on X' replaces 'running' (check_delta_recipe_X's tense note, resolved)")
+L = tex_has("none of them a claim, a reading or a Hebbian learned-gate run; two were the Hebbian perfect gate's")
+row(f"tex6:{L}", "Amendment 2's statement: 24 run lines read, 'none of them a claim, a reading or a Hebbian learned-gate run; two "
+    "were the Hebbian perfect gate's' [changed: tex5 '... or a Hebbian run']",
+    f"Amendment 2's 24 = CEIL_HEBB 580, 581, CEIL_DELTA 580, 581, DELTA_SPLIT 580-598, DELTA_SLOW 580 ({len(AMEND)} runs; §3: "
+    f"the set finished at 15:36:08 in {sets55.get(AMEND, 0) / acc:.3f} of the accepted draws, otherwise the same plus the boundary "
+    f"case DELTA_SPLIT 599); Hebbian perfect gates among them: {sum(k == 'CEIL_HEBB' for k, _ in AMEND)}; HEBB_SPLIT/HEBB_SLOW "
+    f"finished by then: {sum(1 for (k, _), (_, f) in base.items() if k.startswith('HEBB') and f <= T_55)} (first >= "
+    f"{hebb_first:%m-%d %H:%M})",
+    st6(len(AMEND) == 24 and sum(k == "CEIL_HEBB" for k, _ in AMEND) == 2
+        and not any(k.startswith("HEBB") and f <= T_55 for (k, _), (_, f) in base.items())),
+    "check_delta_recipe_X's DISAGREE, resolved")
+L = tex_has("labelled ``delta not shown worse; ahead by $\\geq 3$ pairs (untested)'' ($d \\leq -3$; Amendment~2's wording, the first draft of the label having read ``delta binds more often'')")
+lab0 = T["D1_LABELS"][0]
+run_lab0 = Trun["D1_LABELS"][0] if "D1_LABELS" in Trun else None
+row(f"tex6:{L}", "D1's first label: 'delta not shown worse; ahead by >= 3 pairs (untested)' (d <= -3; Amendment 2's wording, the first "
+    "draft having read 'delta binds more often') [changed: tex5 quoted the first draft only]",
+    f"D1_LABELS[0] at {REC} = {lab0!r}; at {RUNCODE} (before Amendment 2) = {run_lab0!r}",
+    st6(lab0 == "delta not shown worse; ahead by >= 3 pairs (untested)" and run_lab0 == "delta binds more often"),
+    "check_delta_recipe_X's DISAGREE, resolved")
+row(f"tex6:{tex_has('(a ten-point deficit passes it 22--29' + chr(92) + '% of the time at 40 pairs)')}",
+    "a ten-point deficit passes it 22-29% of the time at 40 pairs", "D1_OC: P(d <= 2) 0.29/0.22 at DELTA 0.85 vs HEBB 0.95",
+    "MATCH", "Unchanged text; quoted from the test's D1_OC")
+row(f"tex6:{tex_has('X' + chr(39) + 's half is complete (seeds 580--599, 84 runs, 29.2 h; both perfect gates $2/2$; CHECK 174 dropped no pair)')}",
+    "X's half is complete (seeds 580-599, 84 runs, 29.2 h; both perfect gates 2/2; CHECK 174 dropped no pair)",
     f"seeds {min(SEEDS20)}-{max(SEEDS20)}, {len(R)} runs; CEIL 2/2 and 2/2; dropped D2 {c2['dropped']}, D4 {c4['dropped']}",
     "MATCH", "29.2 h: " + wall_note)
-tex_has(256, "bound routed, DELTA\\_SPLIT $19/20$, DELTA\\_SLOW $19/20$ (the same outcome on every seed, both failing only on one, a merge), HEBB\\_SPLIT $16/20$, HEBB\\_SLOW $7/20$")
-row("tex5:256", "BR: DELTA_SPLIT 19/20, DELTA_SLOW 19/20 (same outcome every seed, both failing on one, a merge), HEBB_SPLIT "
-    "16/20, HEBB_SLOW 7/20", ", ".join(f"{a} {cnt[a]}/20" for a in ARMS[2:]) + f"; differing seeds {same_outcome or 'none'}; "
-    f"MERGED {merged['DELTA_SPLIT']}", "MATCH")
-tex_has(256, "D1 $d = -3$ (delta ahead by three pairs; rate difference $+0.15$, 95\\% $[-0.08, +0.37]$)")
-row("tex5:256", "D1 d = -3 (delta ahead by three pairs; +0.15, 95% [-0.08, +0.37])",
-    f"d = {d_val} ({len(b1_)} vs {len(c1)}); {nc[0]:+.3f} [{nc[1]:+.3f}, {nc[2]:+.3f}]", "MATCH",
-    "Rounded from the printed +0.150 [-0.082, +0.374]")
-tex_has(256, "D2 0 vs 0, the delta no-trigger arm leaving no room")
-row("tex5:256", "D2 0 vs 0, the delta no-trigger arm leaving no room",
-    f"0 vs 0, NOT SHOWN; DELTA_SLOW {cnt['DELTA_SLOW']}/20: on X at most 1 split-only pair was possible (best p = 0.5). "
-    f"The test printed NOT SHOWN and no NO ROOM: the rule is pooled (>= 36/40) and print_claims applies it only pooled",
-    "PARTIAL", "True as a description, but 'no room' is a pre-registered label, which X alone cannot give; it becomes "
-    f"the label only if L's DELTA_SLOW >= {36 - cnt['DELTA_SLOW']}/20. Commit 902c39a's title says 'D2 no room'")
-tex_has(256, "D4 SHOWN, 10 vs 1, $p = 0.0059$")
-row("tex5:256", "D4 SHOWN, 10 vs 1, p = 0.0059", f"{res['D4'][0]} vs {res['D4'][1]}, p = {res['D4'][2]:.4f}", "MATCH")
-tex_has(256, "D3 delta sooner on 10 of 15 shared binds, later on 4, sign test $p = 0.09$")
-row("tex5:256", "D3 delta sooner on 10 of 15 shared binds, later on 4, p = 0.09",
+row(f"tex6:{tex_has('bound routed, DELTA' + chr(92) + '_SPLIT $19/20$, DELTA' + chr(92) + '_SLOW $19/20$ (the same outcome on every seed, both failing only on one, a merge), HEBB' + chr(92) + '_SPLIT $16/20$, HEBB' + chr(92) + '_SLOW $7/20$')}",
+    "BR: DELTA_SPLIT 19/20, DELTA_SLOW 19/20 (same outcome every seed, both failing on one, a merge), HEBB_SPLIT 16/20, HEBB_SLOW 7/20",
+    ", ".join(f"{a} {cnt[a]}/20" for a in ARMS[2:]) + f"; differing seeds {same_outcome or 'none'}; MERGED {merged['DELTA_SPLIT']}",
+    "MATCH")
+L = tex_has("D1 $d = -3$ (delta ahead by three pairs, the first label's case; rate difference $+0.15$, 95\\% $[-0.08, +0.37]$)")
+row(f"tex6:{L}", "D1 d = -3 (delta ahead by three pairs, the first label's case; +0.15, 95% [-0.08, +0.37]) [', the first label's "
+    "case' added]", f"d = {d_val} ({len(b1_)} vs {len(c1)}); {nc[0]:+.3f} [{nc[1]:+.3f}, {nc[2]:+.3f}]; d <= -3 -> D1_LABELS[0]: "
+    f"{d_val <= -3}", st6(d_val == -3), "per machine; the label itself is pooled and is not printed on X (the sentence does not "
+    "say it was)")
+L = tex_has("D2 0 vs 0, NOT SHOWN on X, the delta no-trigger arm at $19/20$ leaving at most one pair of room (``no room'' is the pooled label, $\\geq 36/40$, and waits for L)")
+row(f"tex6:{L}", "D2 0 vs 0, NOT SHOWN on X, DELTA_SLOW 19/20 leaving at most one pair of room ('no room' is the pooled label, "
+    ">= 36/40, and waits for L) [changed: tex5 'leaving no room']",
+    f"{res['D2'][0]} vs {res['D2'][1]}, p = {res['D2'][2]:g}, {T['split_verdict'](c2)}; DELTA_SLOW {cnt['DELTA_SLOW']}/20 -> at most "
+    f"{20 - cnt['DELTA_SLOW']} DELTA_SPLIT-only pair; NO_ROOM = {T['NO_ROOM']} (of 40, pooled); pooled no room iff L's DELTA_SLOW >= "
+    f"{36 - cnt['DELTA_SLOW']}/20", st6(T["split_verdict"](c2) == "NOT SHOWN" and T["NO_ROOM"] == 36 and cnt["DELTA_SLOW"] == 19),
+    "check_delta_recipe_X's PARTIAL, resolved")
+row(f"tex6:{tex_has('D4 SHOWN, 10 vs 1, $p = 0.0059$')}", "D4 SHOWN, 10 vs 1, p = 0.0059",
+    f"{res['D4'][0]} vs {res['D4'][1]}, p = {res['D4'][2]:.4f}", "MATCH")
+row(f"tex6:{tex_has('D3 delta sooner on 10 of 15 shared binds, later on 4, sign test $p = 0.09$')}",
+    "D3 delta sooner on 10 of 15 shared binds, later on 4, p = 0.09",
     f"{pos} of {len(d3)}, later {neg}, tie {len(d3) - pos - neg}; p = {p3:.4f}", "MATCH",
     "Record commit 8ae660d's message says 'earlier on 10 of 14' (14 = the untied); the draft follows the RESULT")
-tex_has(256, "every Hebbian firing on a labelled target (39 of 39), the delta firings on 10 of 31")
-row("tex5:256", "every Hebbian firing on a labelled target (39 of 39), the delta firings on 10 of 31",
+row(f"tex6:{tex_has('every Hebbian firing on a labelled target (39 of 39), the delta firings on 10 of 31')}",
+    "every Hebbian firing on a labelled target (39 of 39), the delta firings on 10 of 31",
     f"{fire['HEBB_SPLIT'][1]}/{fire['HEBB_SPLIT'][0]}; {fire['DELTA_SPLIT'][1]}/{fire['DELTA_SPLIT'][0]}", "MATCH")
-tex_has(256, "the probe blocked 3 Hebbian and 5 delta checks alone")
-row("tex5:256", "the probe blocked 3 Hebbian and 5 delta checks alone",
+row(f"tex6:{tex_has('the probe blocked 3 Hebbian and 5 delta checks alone')}", "the probe blocked 3 Hebbian and 5 delta checks alone",
     f"blocked by the probe alone: HEBB_SPLIT {pb['HEBB_SPLIT'][2]}, DELTA_SPLIT {pb['DELTA_SPLIT'][2]}", "MATCH",
-    f"The other count (probe >= 0.95 while held-out < 0.95: 1 and 1) is not given")
-tex_has(256, "on delta channels at eight streams the split did not change a single seed's outcome, because the no-trigger arm already binds routed $19/20$ where its Hebbian counterpart binds $7/20$")
-row("tex5:256", "on delta channels the split did not change a single seed's outcome, because the no-trigger arm already "
-    "binds 19/20 where its Hebbian counterpart binds 7/20",
+    "The other count (probe >= 0.95 while held-out < 0.95: 1 and 1) is not given")
+L = tex_has("on delta channels at eight streams the split did not change a single seed's outcome, with the no-trigger arm already binding routed $19/20$ where its Hebbian counterpart binds $7/20$")
+row(f"tex6:{L}", "on delta channels the split did not change a single seed's outcome, with the no-trigger arm already binding routed "
+    "19/20 where its Hebbian counterpart binds 7/20 [changed: tex5 'because ...']",
     f"DELTA pairs: outcomes identical on all 20 seeds; DELTA_SLOW {cnt['DELTA_SLOW']}/20, HEBB_SLOW {cnt['HEBB_SLOW']}/20; "
-    f"DELTA_SPLIT fired in {fire['DELTA_SPLIT'][2]} of 20 runs ({fire['DELTA_SPLIT'][0]} firings)", "PARTIAL",
-    "Counts true; 'because' is the draft's inference (labelled a description pending L). The split fired 31 times in "
-    "delta runs, 21 of them off-target, and changed no outcome; the 19/20 bounds the room, it does not show the cause")
-tex_has(256, "the exact-copy split on Hebbian channels, $16/20$ here, sits below the noisy copy's $18/20$ of \\texttt{test\\_split\\_copy} on other seeds")
-row("tex5:256", "the exact-copy split on Hebbian channels, 16/20 here, sits below the noisy copy's 18/20 of test_split_copy "
-    "on other seeds", f"HEBB_SPLIT {cnt['HEBB_SPLIT']}/20 (580-599); split_copy WIN3_SPLIT_D8 X {sc_br['X']}/10 + L "
-    f"{sc_br['L']}/10 = {sc_br['X'] + sc_br['L']}/20 (seeds 560-569, 1560-1569)", "MATCH",
+    f"DELTA_SPLIT fired in {fire['DELTA_SPLIT'][2]} of 20 runs ({fire['DELTA_SPLIT'][0]} firings)",
+    st6(not same_outcome and cnt["DELTA_SLOW"] == 19 and cnt["HEBB_SLOW"] == 7),
+    "descriptive, labelled 'pending L'; the unmarked inference ('because') removed: check_delta_recipe_X's PARTIAL, resolved")
+row(f"tex6:{tex_has('the exact-copy split on Hebbian channels, $16/20$ here, sits below the noisy copy' + chr(39) + 's $18/20$ of ' + chr(92) + 'texttt{test' + chr(92) + '_split' + chr(92) + '_copy} on other seeds')}",
+    "the exact-copy split on Hebbian channels, 16/20 here, sits below the noisy copy's 18/20 of test_split_copy on other seeds",
+    f"HEBB_SPLIT {cnt['HEBB_SPLIT']}/20 (580-599); split_copy WIN3_SPLIT_D8 X {sc_br['X']}/10 + L {sc_br['L']}/10 = "
+    f"{sc_br['X'] + sc_br['L']}/20 (seeds 560-569, 1560-1569)", "MATCH",
     "split_copy's split also zeroes Adam's state (copy + noise + reset); the exact copy here does not, so two things differ")
-tex_has(256, "a difference two screens of ten seeds had not seen")
-row("tex5:256", "a difference two screens of ten seeds had not seen", "other sessions' screens (H's S79 and the like); "
-    "not in this record", "NOT RECORD-CHECKABLE", "")
-tex_has(256, "running on X, where a second amendment confined to the report's rules")
-row("tex5:256", "'running on X, where a second amendment ... was committed during the run' (the sentence before the "
-    "X results)", "historical at the amendment's time; the run is complete by the same paragraph", "MATCH",
-    "Reads as the time of the amendment; tense mixes with 'X's half is complete'")
-tex_has(476, "\\texttt{test\\_delta\\_recipe}'s L half (X's is complete)")
-row("tex5:476", "next: test_delta_recipe's L half (X's is complete)", f"X {len(R)}/84; no L file", "MATCH")
-tex_has(496, "test \\texttt{a581027}, Amendment~2 during the run \\texttt{55dac50}, \\texttt{2225f00} / \\texttt{8ae660d} (X) & X complete; L to run & 84; ---")
-row("tex5:496", "provenance: spec 05256c5, A1 32c121b / test a581027, A2 55dac50, 2225f00 / 8ae660d (X); X complete; L to run; 84",
+row(f"tex6:{tex_has('a difference two screens of ten seeds had not seen')}", "a difference two screens of ten seeds had not seen",
+    "other sessions' screens (H's S79 and the like); not in this record", "NOT RECORD-CHECKABLE", "")
+row(f"tex6:{tex_has('The pooled labels and readings wait for L.')}", "The pooled labels and readings wait for L.",
+    f"print_claims prints labels only pooled; no L file at {MAIN_AT}", "MATCH", "")
+row(f"tex6:{tex_has(chr(92) + 'texttt{test' + chr(92) + '_delta' + chr(92) + '_recipe}' + chr(39) + 's L half (X' + chr(39) + 's is complete)')}",
+    "next: test_delta_recipe's L half (X's is complete)", f"X {len(R)}/84; no L file at {MAIN_AT}", "MATCH")
+row(f"tex6:{tex_has('test ' + chr(92) + 'texttt{a581027}, Amendment~2 during the run ' + chr(92) + 'texttt{55dac50}, ' + chr(92) + 'texttt{2225f00} / ' + chr(92) + 'texttt{8ae660d} (X) & X complete; L to run & 84; ---')}",
+    "provenance: spec 05256c5, A1 32c121b / test a581027, A2 55dac50, 2225f00 / 8ae660d (X); X complete; L to run; 84",
     f"meta.git {meta['git']}; record commit {REC}; {len(R)} records; 55dac50 and 2225f00 committed during the run "
-    f"(between 05:27:31 and >= {end_min:%m-%d %H:%M})", "MATCH")
-tex_has(499, "X's are UTC")
-row("tex5:499", "caption: X's recorded start times are UTC", f"meta.started {meta['started']}: UTC is the only zone consistent "
-    f"with the 02:12 start and 29.2 h (other zones shift the end by whole hours, §3)", "MATCH",
-    "Inferred, not recorded: X's times carry no zone")
-tex_has(36, "so the memory rule is open again and is the next main-line test, specified and reviewed")
-row("tex5:36", "abstract: the memory rule ... is the next main-line test, specified and reviewed", "X's half complete at "
-    f"{REC} (07:25 UTC 12 Oct), before the draft's X-half commit {DRAFT_X} (07:28)", "PARTIAL",
-    "Stale: the abstract cites no X result; the test has run on X and its X results are in tex5:54 and 256")
-tex_has(472, "The write rule is open: with its write strength fixed, the delta rule is not shown worse than the Hebbian one on screens at every size tried.")
-row("tex5:472", "conclusion: the write rule is open ... on screens", "cites no X result; X's D1 (d = -3) does not contradict it",
-    "MATCH", "No mention that the pre-registered test has run on X")
-tex_has(360, "A pre-registered test is specified.")
-row("tex5:360", "assessment: 'A pre-registered test is specified.'", f"it has run on X ({REC})", "PARTIAL",
-    "Stale since 902c39a; not an X number")
+    f"(between 05:27:31 and >= {end_min:%m-%d %H:%M})", "MATCH", "'L to run' vs 'L running' elsewhere: the consistency row above")
+row(f"tex6:{tex_has('X' + chr(39) + 's are UTC')}", "caption: X's recorded start times are UTC",
+    f"meta.started {meta['started']}: UTC is the only zone consistent with the 02:12 start and 29.2 h (other zones shift the end "
+    f"by whole hours, §3)", "MATCH", "Inferred, not recorded: X's times carry no zone")
+row(f"tex6:{tex_has('The write rule is open: with its write strength fixed, the delta rule is not shown worse than the Hebbian one on screens at every size tried.')}",
+    "conclusion: the write rule is open ... on screens", "cites no X result; X's D1 (d = -3) does not contradict it",
+    "MATCH", "unchanged; no mention that the pre-registered test has run on X")
+L = tex_has("A pre-registered test is specified and complete on X (Section~\\ref{sec:memory}); L's half is running.")
+row(f"tex6:{L}", "assessment: 'A pre-registered test is specified and complete on X; L's half is running.' [changed: tex5 'is "
+    "specified.']", f"X {len(R)}/84 at {REC}; L: {L_NOTE}", "MATCH",
+    "check_delta_recipe_X's PARTIAL (stale), resolved; 'L's half is running' is not record-checkable (consistency row above)")
 
-say("")
-say(f"{'line':<10} {'status':<22} statement  ||  recomputed")
-for ln, st, rc, status, note in rows:
-    say(f"{ln:<10} {status:<22} {st[:90]}  ||  {rc[:150]}")
+# tex6:349, the referee section's sentence on the passes (changed): its test_delta_recipe clauses
+L = tex_has("a pre-amendment label quoted for D1, a pair of discordant counts attached to the wrong arms in the abstract")
+t5_256 = src(OLD_DRAFT, TEX).split("\n")[255]
+c916 = src("c916996", TEX).split("\n")[35]
+row(f"tex6:{L}", "referee section: the passes found 'a pre-amendment label quoted for D1, a pair of discordant counts attached to the "
+    "wrong arms in the abstract'",
+    f"tex5:256 had \"labelled ``delta binds more often'' ($d \\leq -3$)\": {'labelled ``delta binds more often' in t5_256}; c916996:36 "
+    f"had 'without a trigger $19/20$ against $7/20$, 10 vs 1': {'against $7/20$, 10 vs 1' in c916}", st6(
+        "labelled ``delta binds more often" in t5_256 and "against $7/20$, 10 vs 1" in c916), "")
+L = tex_has("the fifth pass found every number of every pre-registered claim reproducing, and withdrew one of its own earlier items (the test-file check did precede every run of \\texttt{test\\_delta\\_recipe})")
+fp = git("show", "e384a87:docs/review_2026-10/rev9/fifth_pass.md")
+row(f"tex6:{L}", "referee section: 'the fifth pass found every number of every pre-registered claim reproducing, and withdrew one of "
+    "its own earlier items (the test-file check did precede every run of test_delta_recipe)'",
+    f"fifth_pass.md (e384a87): 'every number of a claim reproduces from its record' {('every number of a claim reproduces' in fp)}; "
+    f"'fourth_pass.md §1 item 6 is withdrawn' {('item 6 is withdrawn' in fp)}; the check {CHK} {T_CHK:%H:%M} before meta.started "
+    f"{STARTED:%H:%M}", st6("every number of a claim reproduces" in fp and "item 6 is withdrawn" in fp and T_CHK < STARTED),
+    "the fifth pass's verdict was on c916996, before 78b7aaf and 42c4557")
+
+# ════════════════════════════════════════════════════════════════════════════
+# output: the whole of check_delta_recipe_X_v6.md
+esc = lambda x: str(x).replace("|", "\\|")
+KS = ("MATCH", "PARTIAL", "DISAGREE", "NOT RECORD-CHECKABLE")
+scope = lambda ln: "draft (tex6)" if ln.startswith("tex6") else ("commit messages" if ln.startswith("msg") else "RESULT (X)")
 c = collections.Counter(r[3] for r in rows)
-say(f"\ncounts over {len(rows)} rows: " + ", ".join(f"{k} {c[k]}" for k in ("MATCH", "PARTIAL", "DISAGREE", "NOT RECORD-CHECKABLE")))
+print("# test_delta_recipe on X (`8ae660d`) and the sixth draft's lines that cite it: referee check, v6")
+print()
+print("*Referee V. Generated in full by `python3 docs/review_2026-10/rev9/check_delta_recipe_X_v6.py > "
+      "docs/review_2026-10/rev9/check_delta_recipe_X_v6.md` (standard library only; git objects only; nothing run or "
+      "trained). The v6 copy of `check_delta_recipe_X.py`: every record recomputation is kept (sections 1-3 of the log below), "
+      "every draft row is anchored by a verbatim fragment located in tex6, and rows were added for every changed sentence that "
+      "cites the test.*")
+print()
+print("## Inputs and branch status")
+print()
+print(f"- **Draft:** `claude/rev9-draft` at `{DRAFT}` ({git('show', '-s', '--format=%cI', DRAFT).strip()}), `{TEX}` = tex6. "
+      f"Lines changed from `{OLD_DRAFT}` (tex5), in place: {CHANGED}; the test is cited on "
+      f"{sorted({int(x.split(':')[1]) for r in rows for x in r[0].replace(',', ' ').split() if x.startswith('tex6:')})}.")
+print(f"- **Main line at the draft's time** (`{MAIN}`, 23:14:04 UTC): head `{MAIN_AT}`. Commits after the record commit "
+      f"`{REC}`: " + "; ".join(f"`{x[:7]}` {x[8:33]} {x[34:110]}" for x in main_after) + ". "
+      f"`{RESULTS}` and `{TEST}` unchanged since `{REC}`: {main_rec_same}. **L's half has not been pushed** "
+      f"(`results/L/delta_recipe_results.json` at `{MAIN_AT}`: {main_l}), and **X's log has not been pushed**: no path on any "
+      f"ref matching a delta log, `results/X/longrun/*` or `results/L/delta*` after `git fetch --all` (paths found: "
+      f"{any_delta_log or 'none'}; `explore_out/G/s56_delta.log` is session G's S56, unrelated).")
+print(f"- **Records:** `{RESULTS}` at `{REC}`: {len(R)} records, all ok; meta.git {meta['git']}; meta.started "
+      f"{meta['started']!r} (no zone; UTC by §3).")
+print()
+print("## Counts")
+print()
+print("| scope | rows | " + " | ".join(KS) + " |")
+print("|---|---|" + "---|" * len(KS))
+for sc_ in ("RESULT (X)", "commit messages", "draft (tex6)"):
+    cc = collections.Counter(r[3] for r in rows if scope(r[0]) == sc_)
+    print(f"| {sc_} | {sum(cc.values())} | " + " | ".join(str(cc[k]) for k in KS) + " |")
+print(f"| **total** | **{len(rows)}** | " + " | ".join(f"**{c[k]}**" for k in KS) + " |")
+print()
+print("check_delta_recipe_X (tex5) had 47 rows: MATCH 35, PARTIAL 8, DISAGREE 2, NOT RECORD-CHECKABLE 2.")
+print()
+print("## Every non-MATCH row")
+print()
+print("| line | statement | recomputed | status | note |")
+print("|---|---|---|---|---|")
+for ln, st_, rc, status, note in rows:
+    if status != "MATCH":
+        print(f"| {ln} | {esc(st_)} | {esc(rc)} | **{status}** | {esc(note)} |")
+print()
+print("## Table")
+print()
+print("| line | statement | recomputed | status | note |")
+print("|---|---|---|---|---|")
+for ln, st_, rc, status, note in rows:
+    print(f"| {ln} | {esc(st_)} | {esc(rc)} | {status} | {esc(note)} |")
+print()
+print("## Recomputation log (sections 0-3, unchanged from check_delta_recipe_X)")
+print()
+print("```")
+for x in OUTLOG:
+    print(x)
+print("```")
+print()
+print("## What could not be checked")
+print()
+print("- X's log (on no ref): the per-run lines and timestamps, the verification CHECKs (130, 158, 159, 161, 162, 172, 173), "
+      "that both reports are kept, the 02:12 process start.")
+print("- L's half: not on any ref at the draft's time; 'L running' / 'runs on the other' rest on session I's note and the prompts.")
+print("- The time zone of meta.started (inferred, §3).")
