@@ -133,3 +133,12 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [ 27] 2278.4 min  F/write          DELTA_LEARNED_SLOW       seed 2407  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 60aa831, code 4473fffc3608, attempt 1: acc 0.319  trans  None  STREAM-PARTIAL one-to-one  splits [(4800, 'ok'), (12000, 'NOT'), (16800, 'NOT')]  map 1+1+1+1+1+1+1+1 beta med 0.07/0.01/0.04
   start 2278.4 min  F/write          O_DELTA                  seed 2400  (projected worst case 208 min)
+  [ 28] 2287.8 min  F/write          DELTA_LEARNED_SLOW       seed 2409  lr 0.001  (gate 1e-3 throughout; rest 1e-4 for 1-2400, 1e-3 after; KEYMASS trigger, exact row copy)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 7377291, code 4473fffc3608, attempt 1: acc 0.773  trans  None  STREAM-PARTIAL one-to-one  splits [(4800, 'ok'), (16800, 'ok'), (21600, 'NOT')]  map 1+1+1+1+1+1+1+1 beta med 0.00/0.00/0.00
+  start 2287.8 min  F/write          O_DELTA                  seed 2401  (projected worst case 208 min)
+  [ 29] 2298.4 min  F/write          O_DELTA                  seed 2400  lr 0.001  (Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 7377291+dirty, code 4473fffc3608, attempt 1: acc 1.000  trans  1200  BOUND ROUTED  splits []  map 1+1+1+1+1+1+1+1
+  start 2298.4 min  F/write          O_DELTA_LEARNED          seed 2400  (projected worst case 197 min)
+  [ 30] 2308.4 min  F/write          O_DELTA                  seed 2401  lr 0.001  (Adam 1e-3)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 7377291+dirty, code 4473fffc3608, attempt 1: acc 1.000  trans  1200  BOUND ROUTED  splits []  map 1+1+1+1+1+1+1+1
+  start 2308.4 min  F/write          O_DELTA_LEARNED          seed 2401  (projected worst case 197 min)
