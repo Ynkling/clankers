@@ -89,3 +89,36 @@ Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pyto
   [  6]   27.5 min  F/horizon        ROUTED_2X                seed 2427  lr 0.001  (Adam 1e-3 throughout)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git dfc71c5+dirty, code e9c41e74d945, attempt 1: acc 1.000  trans  3600 by distance 2:1.00 6:1.00 10:1.00
   start   27.5 min  F/horizon        ROUTED_2X                seed 2429  (projected worst case 21 min)
+/home/user/clankers/explore_f_horizon_child.py:260: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  rec["decay_params"] = dict(w_norm=float(m.attn.rel.w.norm()), delta=float(m.attn.rel.delta),
+  [  7]   36.5 min  F/horizon        ROUTED_2X                seed 2425  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 99482c5+dirty, code e9c41e74d945, attempt 1: acc 0.506  trans  None by distance 2:0.52 6:0.50 10:0.48
+  start   36.5 min  F/horizon        O_FIXED_2X               seed 2420  (projected worst case 21 min)
+  [  8]   39.9 min  F/horizon        O_FIXED_2X               seed 2420  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 99482c5+dirty, code e9c41e74d945, attempt 1: acc 1.000  trans  1200 by distance 2:1.00 6:1.00 10:1.00
+  start   39.9 min  F/horizon        O_FIXED_2X               seed 2421  (projected worst case 21 min)
+/home/user/clankers/explore_f_horizon_child.py:260: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  rec["decay_params"] = dict(w_norm=float(m.attn.rel.w.norm()), delta=float(m.attn.rel.delta),
+  [  9]   40.1 min  F/horizon        ROUTED_2X                seed 2426  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 99482c5+dirty, code e9c41e74d945, attempt 1: acc 0.482  trans  None by distance 2:0.49 6:0.47 10:0.47
+  start   40.1 min  F/horizon        FIXED_2X                 seed 2420  (projected worst case 20 min)
+  [ 10]   43.2 min  F/horizon        O_FIXED_2X               seed 2421  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 99482c5+dirty, code e9c41e74d945, attempt 1: acc 1.000  trans  1200 by distance 2:1.00 6:1.00 10:1.00
+  start   43.2 min  F/horizon        FIXED_2X                 seed 2421  (projected worst case 20 min)
+/home/user/clankers/explore_f_horizon_child.py:260: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  rec["decay_params"] = dict(w_norm=float(m.attn.rel.w.norm()), delta=float(m.attn.rel.delta),
+  [ 11]   48.0 min  F/horizon        ROUTED_2X                seed 2429  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 99482c5+dirty, code e9c41e74d945, attempt 1: acc 1.000  trans 20400 by distance 2:1.00 6:1.00 10:1.00
+  start   48.0 min  F/horizon        FIXED_2X                 seed 2422  (projected worst case 20 min)
+/home/user/clankers/explore_f_horizon_child.py:260: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  rec["decay_params"] = dict(w_norm=float(m.attn.rel.w.norm()), delta=float(m.attn.rel.delta),
+  [ 12]   48.1 min  F/horizon        ROUTED_2X                seed 2428  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 99482c5+dirty, code e9c41e74d945, attempt 1: acc 0.508  trans  None by distance 2:0.51 6:0.52 10:0.50
+  start   48.1 min  F/horizon        FIXED_2X                 seed 2423  (projected worst case 20 min)
+  [ 13]   53.1 min  F/horizon        FIXED_2X                 seed 2420  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 99482c5+dirty, code e9c41e74d945, attempt 1: acc 1.000  trans 14400 by distance 2:1.00 6:1.00 10:1.00
+  start   53.1 min  F/horizon        FIXED_2X                 seed 2424  (projected worst case 20 min)
