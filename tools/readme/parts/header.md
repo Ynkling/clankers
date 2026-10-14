@@ -1,0 +1,10 @@
+# Multi-Channel Hebbian Plasticity in Multilayer BDH
+
+> **Status (14 October 2026): paused.** Revision 9 is the current refereed report. Results recorded after it — the fourth pre-registered test complete on both machines, a GPU run of the headline on fresh seeds, a second clean-room replication — are listed in [STATUS.md](STATUS.md), which also says where every thread stands and how to resume.
+
+**Solves context-conditional binding by partitioning memory.** A window gate, slow memory and a targeted channel split find an eight-way partition without labels or restarts, on two machines with disjoint seeds; an independent clean-room replication agrees, and a referee has recomputed every number from the records.
+
+This repository is a research fork of Pathway's [BDH (Dragon Hatchling)](https://github.com/pathwaycom/bdh). It extends BDH's Hebbian working memory with several memory channels and a gate that spreads each token's write over the channels and blends its read from them. The research sections below follow Revision 9 (draft) of the project's technical report, *A Learned Partition of Working Memory on a Synthetic Binding Task with Local Cues*: the PDF is [`multichannel_hebbian_report_v9.pdf`](multichannel_hebbian_report_v9.pdf), with its LaTeX source alongside. Revision 8.1's account of Phase VI's first tests is kept in [`docs/revision8.md`](docs/revision8.md), Revision 7's account of Phase V in [`docs/revision7.md`](docs/revision7.md) and Revision 6's account of Phases I–IV in [`docs/revision6.md`](docs/revision6.md). The October 2026 audit of the project's records is [`docs/audit_2026-10.md`](docs/audit_2026-10.md); the twelve-paper review of context routing and memory is in [`docs/reading/`](docs/reading/); the independent referee's report, claim registry and its passes over every draft of this revision, each recomputing the numbers from the records, are in [`docs/review_2026-10/`](docs/review_2026-10/). The original BDH README from Pathway follows the research part, [unchanged](#about-bdh-upstream-readme-from-pathway).
+
+---
+
