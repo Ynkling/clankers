@@ -614,3 +614,20 @@ Descriptive summary:
   disagreement clause (my definition, fixed before the runs). Under Session H's S84 rule (EVAL ≥ BASE − 1 pair) it would
   read "the evaluation is the better probe".
 - R's probe failure (the probe ≥ 0.95 at a true 0.87-0.92) occurred once with consequence (GUARD 2025).
+
+### Session F, S88a and S88b (`explore_out/F/report_8.md`; run on a Xeon @ 2.80GHz, where the 2.10GHz records reproduce bit for bit)
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| S88a the write strength, S=8, k=16, delta recipe + exact-copy split (2400-2409, paired) | BOUND ROUTED | DELTA_FIXED (β 1) 10/10; DELTA_LEARNED (β = 2 sigmoid(w·v + b), gate group) 7/10 (0 vs 3); DELTA_LEARNED_SLOW (slow group) 3/10 (0 vs 7, p = 0.008); perfect gate 2/2 at 1200 (learned β: 21600, 30000) | no reading applies (keeps: better learned arm 3 pairs behind; costs: needs both 4 vs 0, LEARNED is 3 vs 0) |
+| S88b the horizon, one delta channel, RandHeaderTask-lite at 1x and 2x cue-to-key distance (2420-2429) | BOUND | 1x: FIXED 9/10, ROUTED 6/10; 2x: FIXED 4/10, ROUTED 5/10; perfect gates 2/2 at both lengths | untested (ROUTED 6/10 < 8/10 at 1x) |
+
+Descriptive summary:
+- A learned write strength collapses: β falls from 1 to below 0.1 within about 1200 updates of its lr reaching 1e-3, under
+  both schedules and with the perfect gate. With the tied write, the learned memory then writes almost only at layer-1
+  VAL positions; this is a near-Hebbian memory, not a tuned delta rule. β never diverges by stream. β fixed at 1 stays
+  the strongest arm.
+- One delta channel's failures on the lite task are stream confusions at 0.5 (flat across cue-to-key distance and write
+  order), not lost far keys. The fixed decay drops from 9/10 to 4/10 at 2x, the routed gate from 6/10 to 5/10. But the
+  routed gate starts lower, and the screen is untested by its own rule.
+- Learned-β runs hit denormal arithmetic as β collapses: up to 15 h per run, against 1.2-3.2 h with β fixed.
