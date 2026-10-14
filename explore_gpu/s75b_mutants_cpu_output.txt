@@ -1,42 +1,56 @@
-explore_gpu.s75b mutation pass: each mutant of explore_gpu/s75b.py (s75b_mutants.M) at 5f6f840, run against
-python -m explore_gpu.s75b_checks --device cpu --only B4,B5 in a copy of the repository. rc 1 = caught (a CHECK failed).
-false_cases = lines with a failed case or CHECK in the log (a CHECK that raised counts as one).
+explore_gpu.s75b mutation pass: each mutant of explore_gpu/s75b.py (s75b_mutants.M) at 3cef609 (code SHA ee04da11a164),
+run against python -m explore_gpu.s75b_checks --device cpu --only B4,B5 in a copy of the repository.
+rc 1 = caught (a CHECK failed). false_cases = lines with a failed case or CHECK in the log (a CHECK that raised counts as one).
+(The first pass, on 5f6f840, ran the first 35 of these: all caught.)
 
-sync_stage1_removed          rc=1  false_cases=2
-sync_or_exit_noop            rc=1  false_cases=2
 baseline                     rc=0  false_cases=0
-stage2_runs_refused          rc=1  false_cases=2
-sync_untracked_only          rc=1  false_cases=2
+sync_or_exit_noop            rc=1  false_cases=2
+sync_stage1_removed          rc=1  false_cases=2
 sync_stage2_removed          rc=1  false_cases=2
-report_no_reading_pilot      rc=1  false_cases=2
-abort_missing_all            rc=1  false_cases=2
+sync_untracked_only          rc=1  false_cases=2
+stage2_runs_refused          rc=1  false_cases=2
 stage1_wrong_arms            rc=1  false_cases=2
-note_not_recorded            rc=1  false_cases=3
+abort_missing_all            rc=1  false_cases=2
+report_no_reading_pilot      rc=1  false_cases=2
+report_nobody                rc=1  false_cases=3
 report_no_s2inv              rc=1  false_cases=2
-report_nobody                rc=1  false_cases=2
-records_no_bench             rc=1  false_cases=3
-reason_records               rc=1  false_cases=3
+note_not_recorded            rc=1  false_cases=3
 record_one_invocation        rc=1  false_cases=2
+reason_records               rc=1  false_cases=3
+records_no_bench             rc=1  false_cases=3
+stage2_retry_noop            rc=1  false_cases=2
 bench_archive_early          rc=1  false_cases=1
 bench_archive_fixed_name     rc=1  false_cases=2
-stage2_retry_noop            rc=1  false_cases=2
+stage1_records_no_bench      rc=1  false_cases=2
 no_record_at_start           rc=1  false_cases=2
 note_only_record             rc=1  false_cases=2
-stage1_records_no_bench      rc=1  false_cases=2
-lock_noop                    rc=1  false_cases=2
 superseded_archive_only      rc=1  false_cases=2
+lock_noop                    rc=1  false_cases=3
 others_noop                  rc=1  false_cases=3
-code_before_noop             rc=1  false_cases=2
 idle_ignored                 rc=1  false_cases=1
+code_before_noop             rc=1  false_cases=4
 code_after_noop              rc=1  false_cases=1
-report_cc_noop               rc=1  false_cases=2
 code_changed_refusal_noop    rc=1  false_cases=2
+report_cc_noop               rc=1  false_cases=2
 report_superseded_noop       rc=1  false_cases=2
+running_ignored              rc=1  false_cases=3
 utc_local                    rc=1  false_cases=4
-running_ignored              rc=1  false_cases=2
 abort_summary_old            rc=1  false_cases=2
-ended_not_marked             rc=1  false_cases=2
 arms_ignored                 rc=1  false_cases=1
+ended_not_marked             rc=1  false_cases=2
 sync_after_record            rc=1  false_cases=2
+code_now_constant            rc=1  false_cases=2
+stage1_never_ended           rc=1  false_cases=2
+dirty_code_empty             rc=1  false_cases=2
+dup_ok_only                  rc=1  false_cases=4
+decision_ignored_stage2      rc=1  false_cases=1
+rerun_as_keep                rc=1  false_cases=2
+effective_noop               rc=1  false_cases=2
+machine_lock_off             rc=1  false_cases=2
+stop_this_code_tag_off       rc=1  false_cases=2
+stage1_no_push_message       rc=1  false_cases=2
+stage1_hint_stage2           rc=1  false_cases=2
+set_aside_not_merged         rc=1  false_cases=2
+nobody_line_old              rc=1  false_cases=2
 
-baseline (no mutation): rc=0; mutants caught: 35/35
+baseline (no mutation): rc=0; mutants caught: 48/48
