@@ -138,6 +138,14 @@ of post-approval changes, none of them blind).
   `explore_gpu/run.py`, `explore_i_*` and `test_*`. The CUDA CHECKs and the benchmarks must then be rerun on that commit.
   - Before stage 2, the first stage 1 under the new code needs `--code-change-note PATH` (a committed, dated note).
   - After stage 2 starts, a change halts the screen.
+- **Do not pull or edit code while a stage runs.** Each run's workers load the code from disk, so the driver compares
+  it before and after every run. A change stops the invocation, and a change during a run halts the screen for you.
+  - If the push at the start of stage 2 is rejected because the other machine pushed first, run `git fetch` and then
+    `git diff --stat HEAD @{u}`. If that lists no `.py` file, `git pull` and push again. If it does, push nothing until
+    this stage ends.
+- **One invocation per card.** A second stage or benchmark on a card refuses while the first runs. A stage also
+  refuses while the other card's last invocation, as pushed, has not ended and runs any of the same arms.
+  - If that process was killed, add `--other-card-idle` (recorded) once you are sure no S75b process runs there.
 
 1. **The CUDA CHECK**, on each card while no other job is on that GPU. Then commit
    `explore_gpu/s75b_checks_cuda_<GPU>_output.*`. It takes about 2 minutes. It runs B7, the lock-step, and B9, a real
@@ -156,8 +164,11 @@ of post-approval changes, none of them blind).
        python -m explore_gpu.s75b --bench --device cuda --host-ram-gb 15.2 --beside test_delta_recipe   # laptop
        python -m explore_gpu.s75b --bench --device cuda --host-ram-gb <server RAM> --beside none        # server
 
-3. **The pilot**, on the 1660 after the window_gate run, or on the 3070 if that is free first.
+3. **The pilot**, on one card: the 1660 after the window_gate run, or the 3070 if that is free first. The other card
+   waits until the stage-1 record is pushed.
    - Afterwards, commit and push the stage-1 record (`.json` / `.md`) and every results file, whatever the decision.
+   - The record is written when the pilot starts, marked running, and rewritten when it ends. Stage 2 refuses a
+     record still marked running; after a hard kill, run stage 1 again.
    - A run below 0.9, or a diverged run, is a final STOP.
    - Any other failure stops the invocation. Re-invoke the same command, on either card: it reruns the same seed.
    - Two invocations with failures halt the seed. Then you decide: add `--retry-halted` to clear it, or fix the code.
@@ -165,10 +176,13 @@ of post-approval changes, none of them blind).
        python -m explore_gpu.s75b --stage 1 --device cuda
 
 4. **Stage 2**, only if the record says PROCEED. Commit and push the results file as soon as stage 2 has started, so the
-   other machine sees the freeze.
+   other machine sees the freeze and which arms run there.
    - If one card is unusable or unavailable, run everything on the other card, with a reason:
      `--machine fallback --reason "..."` on the 1660, or `--machine fallback-3070 --reason "..."` on the 3070.
-   - A card runs only the arms its benchmark allows, and names the rest.
+   - A card runs only the arms its benchmark allows, and names the rest. To run just the refused arms on the other
+     card, use the fallback with `--arms`, after that card's own stage 2 has ended. For example:
+     `--machine fallback-3070 --arms WIDE_SLOW --reason "the 1660's benchmark refuses WIDE_SLOW"`.
+   - A fallback for a card that died mid-stage needs `--other-card-idle` as well.
    - Failures are handled as in stage 1: re-invoke, and use `--retry-halted` after a halt.
    - Spec Appendix B has the rules.
 

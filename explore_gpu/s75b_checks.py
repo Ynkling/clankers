@@ -42,8 +42,18 @@ are s75b.CHANGES_SINCE_SPEC). EXPLORATORY tooling.
         a diverged ORACLE (NOT VALID), halted ORACLE / read-arm seeds (incomplete), SINGLE diverged (no GAP), 8/10
         ROUTED (carries), no reading after a value STOP or under two stage-2 codes, the failure log across codes,
         'cannot start' only when both cards' benchmarks refuse the pilot;
-      - sync_state on temporary repositories: behind, up to date, an uncommitted JSON, unpushed commits, a failed
-        fetch; git_committed itself; the machine allocation.                                                     cpu
+      - sync_state on temporary repositories: behind, up to date, an uncommitted JSON, a tracked results file modified
+        after its commit, unpushed commits, a failed fetch; git_committed itself; the machine allocation;
+      - the third review's points: code_now equals code_sha; the stage-1 record written before the first run (running;
+        the earlier code's record archived), so a later code killed mid-pilot still supersedes the earlier one; the
+        code-change note when another code left only pilot entries; the record's invocations from every card's results
+        file; another card's unfinished invocation (stage 1 and stage 2 refuse overlapping arms; --other-card-idle;
+        --arms; recorded); the per-card lock; the code compared before and after each run (nothing charged before; the
+        record kept with code_changed during; stages refuse; no reading); stage 2 runs only the arms the benchmark
+        allows; stage 1 needs the ORACLE case; the stage-1 abort record; stage 2's --retry-halted and abort summary;
+        the run records' reason and benchmark fields; UTC times; the stages' sync wiring; a record still running; the
+        report's STAGE-2 INVOCATIONS, ARMS NO CARD'S BENCHMARK ALLOWS, pilot-not-PROCEED and superseded-code lines;
+        --beside refusing before the archive; archives never overwritten.                                       cpu
   B6  S75's code SHA is still 5fb120a92d69 (S75b imports S75's modules and changes none).                            cpu
   B7  LOCK-STEP at L = 1536, R = 1 (as the runs): batched (explore_gpu.batched) vs sequential (the project's model) on
       the same device, explore_gpu.checks.Judge at same-device tolerances, each seed alone; per update the batched
@@ -62,6 +72,9 @@ are s75b.CHANGES_SINCE_SPEC). EXPLORATORY tooling.
   B9  a real divergence: parameters poisoned with NaN or inf after the first evaluation of real run_batched_icmc runs
       (in line and with a StatsPool worker; ORACLE, SINGLE, REG3 loop, and scan on CUDA, WIDE_SPLIT_G guarded) fail
       with an error classed 'diverged'; run_arm on a poisoned run: one attempt, status diverged, no abort.  cpu and cuda
+
+A CHECK that raises (SystemExit included) fails with its error and the later CHECKs still run; the output .txt is
+rewritten at the start, so an interrupted run never leaves an earlier verdict.
 """
 
 import argparse
@@ -462,6 +475,8 @@ def b5_refusals(dev):
         with temp_out() as d:
             _b5_more(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070)
         with temp_out() as d:
+            _b5_third(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070)
+        with temp_out() as d:
             _b5_reports(d, out, sha, hw, G1660, G3070)
         sb.sync_state = real["sync"]
         _b5_sync(out)
@@ -799,6 +814,325 @@ def _b5_more(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G
     out["a crashing benchmark leaves its file 'in progress' (counted as failed); the earlier file is archived"] = (
         crashed and b.get("status") == "in progress" and "did not finish" in (sb.bench_why(b, ("ORACLE_PILOT",)) or "")
         and len(arch) == 1, f"{crashed} {b.get('status')} {arch}")
+    typo = expect_exit(lambda: sb.bench("cpu", 12.0, beside="no_such_process_xyz_checks", iters=2, every=1,
+                                        log=lambda *a: None, path=bp), "--beside")
+    arch2 = sorted(os.listdir(os.path.join(os.path.dirname(bp), "bench_archive")))
+    out["--beside naming no process: the benchmark refuses before archiving (the file stays in place)"] = (
+        typo[0] and os.path.exists(bp) and arch2 == arch, f"{typo[1][:60]} {arch2}")
+    gr.run_batched_icmc = boom
+    try:
+        for _ in range(2):                     # the same 'written' twice: the archive is never overwritten
+            sb.save_json(dict(json.load(open(bp)), written="2026-01-02 00:00:00Z"), bp)
+            try:
+                sb.bench("cpu", 12.0, beside="none", iters=2, every=1, log=lambda *a: None, path=bp)
+            except KeyboardInterrupt:
+                pass
+    finally:
+        gr.run_batched_icmc = _trap
+    arch3 = sorted(os.listdir(os.path.join(os.path.dirname(bp), "bench_archive")))
+    out["two archives of files written in the same second are both kept; 'written' is UTC"] = (
+        len(arch3) == 3 and str(json.load(open(bp)).get("written")).endswith("Z"), f"{arch3}")
+
+
+@contextlib.contextmanager
+def as_code(fake, now=None):
+    """The stages under a code SHA `fake` (code_sha stubbed); code_now -> fake unless `now` is given."""
+    real = sb.code_sha, sb.code_now
+    sb.code_sha = lambda: (fake, [])
+    sb.code_now = now or (lambda s: fake)
+    try:
+        yield
+    finally:
+        sb.code_sha, sb.code_now = real
+
+
+def _fake_tags(script, tags):
+    """gr.run_batched_icmc -> scripted outcomes per (arm, seed) or per seed, default 'ok'; tags gets (arm, seed) per call."""
+    def f(task, spec, seeds, iters, **kw):
+        s, a = seeds[0], kw.get("tag")
+        tags.append((a, s))
+        o = script.get((a, s), script.get(s, "ok"))
+        o = o.pop(0) if isinstance(o, list) else o
+        if o == "kill":
+            raise KeyboardInterrupt("checks: the process dies mid-run")
+        if o == "ok":
+            return [dict(ok=True, seed=s, end=dict(set=0.93), curve=[])]
+        return [dict(ok=False, seed=s, error=o)]
+    return f
+
+
+def _fresh():
+    """Empties OUT (the temporary output directory) between scenarios, the git repository and the note kept."""
+    for n in os.listdir(sb.OUT):
+        p = os.path.join(sb.OUT, n)
+        if n in (".git", "note.md"):
+            continue
+        if os.path.isdir(p):
+            import shutil
+            shutil.rmtree(p)
+        else:
+            os.remove(p)
+
+
+def _b5_third(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070):
+    """The third review's points: the record written before the first run (a killed later pilot still supersedes), the
+    code-change note when another code left only pilot entries, the record's invocations from every card, another card's
+    unfinished invocation, the per-card lock, the code compared before and after each run, --arms, stage 2 running only
+    the allowed arms, stage 1's ORACLE case, the stage-1 abort record, stage 2's --retry-halted and abort summary, the
+    record fields, UTC times, the sync wiring."""
+    q = lambda *a: None
+    A, B = "aaaaaaaaaaaa", "bbbbbbbbbbbb"
+    note = os.path.join(d, "note.md")
+    with open(note, "w") as f:
+        f.write("2026-10-14: a dated note (checks)\n")
+    out["code_now (in this process) equals code_sha (a child process)"] = (sb.code_now(sha) == sha, sb.code_now(sha))
+    # 1. the record is written before the first run: a later code's stage 1 supersedes the earlier one as soon as it starts
+    _fresh()
+    tags, seen = [], {}
+    with as_code(A):
+        gr.run_batched_icmc = _fake_tags({}, tags)
+        dA, _ = sb.stage1("cpu", require_commit=False, log=q)
+
+    def peek(task, spec, seeds, iters, **kw):
+        if seeds[0] == 840:
+            r = json.load(open(sb.record_paths()[0]))
+            seen.update(sha=r.get("sha"), running=r.get("running"), archived=os.path.exists(sb.record_paths(A)[0]))
+            return [dict(ok=True, seed=840, end=dict(set=0.97), curve=[])]
+        raise KeyboardInterrupt("checks: the process dies mid-run")
+    killed = False
+    with as_code(B):
+        gr.run_batched_icmc = peek
+        try:
+            sb.stage1("cpu", require_commit=False, log=q, code_change_note=note)
+        except KeyboardInterrupt:
+            killed = True
+    gr.run_batched_icmc = _trap
+    recB = json.load(open(sb.record_paths()[0]))
+    with as_code(A):
+        b1 = expect_exit(lambda: sb.stage1("cpu", require_commit=False, log=q), "superseded")
+        b2 = expect_exit(lambda: sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=q), "superseded")
+    nB = recB.get("code_change_note") or {}
+    out["the record is written before the first run (running, the earlier code's record archived); a later code killed "
+        "mid-pilot still supersedes the earlier one: a revert refuses; the note is recorded"] = (
+        dA["proceed"] and killed and seen.get("sha") == B and str(seen.get("running")).startswith("stage 1")
+        and seen.get("archived") and recB["sha"] == B and recB.get("running") is None and b1[0] and b2[0]
+        and "interrupted" in str(recB["invocations"][-1].get("aborted")) and nB.get("other_codes") == [A]
+        and nB.get("from_sha") == A and str(nB.get("path")).endswith("note.md"),
+        f"{seen} killed {killed}; {b1[1][:60]}; {b2[1][:60]}; note {nB}")
+    # 2. another code left only pilot entries (killed before any record): the note is required; that code is superseded
+    _fresh()
+    sb.save_json({"meta": {}, "runs": {f"ORACLE_PILOT|840|{A}|{hw}": dict(_rec(0.95), hw=hw)}}, sb.store_path(hw))
+    tags = []
+    with as_code(B):
+        r1 = expect_exit(lambda: sb.stage1("cpu", require_commit=False, log=q), "--code-change-note")
+        gr.run_batched_icmc = _fake_tags({}, tags)
+        try:
+            dB, _ = sb.stage1("cpu", require_commit=False, log=q, code_change_note=note)
+        finally:
+            gr.run_batched_icmc = _trap
+    recB = json.load(open(sb.record_paths()[0]))
+    nB = recB.get("code_change_note") or {}
+    out["pilot entries under another code and no record: stage 1 needs --code-change-note; with it the note is recorded "
+        "and the other code is superseded"] = (
+        r1[0] and dB["proceed"] and nB.get("other_codes") == [A] and nB.get("from_sha") is None and sb.superseded(A)
+        and not sb.superseded(B), f"{r1[1][:80]}; {nB}")
+    # 3. the record's invocations come from every card's results file; another card's unfinished invocation
+    _fresh()
+    O = "another card (checks)"
+    o1 = "stage 1 2026-10-14 00:00:00Z pid 1"
+    oinv = dict(invocation=o1, sha=sha, card=O, workers=1, threads=1, bench_commit=None, bench_written=None,
+                checks_commit=None, started="2026-10-14 00:00:00Z", ended="2026-10-14 01:00:00Z")
+    ost = {"meta": {"stage1_invocations": [oinv], "last_invocation": dict(invocation=o1, stage=1,
+                                                                          arms=["ORACLE_PILOT"], ended=False)},
+           "runs": {f"ORACLE_PILOT|840|{sha}|{O}": dict(_rec(0.93), hw=O)},
+           "failures": {f"ORACLE_PILOT|841|{sha}|{O}": [dict(kind="operational", open=True, invocation=o1,
+                                                              attempt=1, at="x", error=sb.OPEN_ATTEMPT)]}}
+    sb.save_json(ost, sb.store_path(O))
+    busy = expect_exit(lambda: sb.stage1("cpu", require_commit=False, log=q), "has not ended")
+    tags = []
+    gr.run_batched_icmc = _fake_tags({}, tags)
+    try:
+        d3, _ = sb.stage1("cpu", require_commit=False, log=q, other_card_idle=True)
+        ost["meta"]["last_invocation"]["ended"] = True
+        sb.save_json(ost, sb.store_path(O))
+        sb.stage1("cpu", require_commit=False, log=q)
+    finally:
+        gr.run_batched_icmc = _trap
+    rec3 = json.load(open(sb.record_paths()[0]))
+    invs = rec3["invocations"]
+    out["another card's unfinished stage 1 refuses stage 1 (--other-card-idle runs, recorded; its open marker counts "
+        "as killed); the record lists every card's invocations; a second invocation adds one"] = (
+        busy[0] and tags == [("ORACLE_PILOT", 841)] and d3["proceed"] and [i["invocation"] for i in invs][0] == o1
+        and len(invs) == 3 and invs[1].get("other_card_idle") is True and invs[2].get("other_card_idle") is False
+        and rec3["cards"] == {"840": O, "841": hw}, f"{busy[1][:60]}; {tags}; {[i['invocation'] for i in invs]}")
+    # 4. one invocation per card: the lock
+    with sb.card_lock(hw, "checks"):
+        l1 = expect_exit(lambda: sb.stage1("cpu", require_commit=False, log=q), "running on this card")
+        l2 = expect_exit(lambda: sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=q),
+                         "running on this card")
+    with sb.card_lock(hw, "checks again"):    # released at the end of the earlier holder
+        pass
+    out["a second invocation on a card refuses while the first holds the card's lock (stage 1 and stage 2)"] = (
+        l1[0] and l2[0], f"{l1[1][:100]}")
+    # 5. the code compared before and after each run
+    _fresh()
+    pilot_store((0.93, 0.92))
+    record()
+    tags = []
+    gr.run_batched_icmc = _fake_tags({}, tags)
+    real_now = sb.code_now
+    try:
+        sb.code_now = lambda s: "c0dec0dec0de"
+        _, a1 = _run("SINGLE", (850,), hw, sha, sb.load(hw), "inv cc1")
+        f1 = sb.load(hw).get("failures") or {}
+        seq = iter([sha, "c0dec0dec0de"])
+        sb.code_now = lambda s: next(seq)
+        _, a2 = _run("SINGLE", (850, 851), hw, sha, sb.load(hw), "inv cc2")
+    finally:
+        sb.code_now = real_now
+        gr.run_batched_icmc = _trap
+    k850 = f"SINGLE|850|{sha}|{hw}"
+    r850 = sb.load(hw)["runs"].get(k850) or {}
+    c1 = expect_exit(lambda: sb.stage1("cpu", require_commit=False, log=q), "changed while these runs ran")
+    c2 = expect_exit(lambda: sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=q),
+                     "changed while these runs ran")
+    t = sb.report(log=q, sha=sha, out=os.path.join(d, "r_cc.md"))
+    out["a code change before a run stops the invocation, nothing charged; during a run the record is kept "
+        "(code_changed), the invocation stops, stages refuse and the report gives no reading"] = (
+        bool(a1) and "not charged" in a1 and not f1 and tags == [("SINGLE", 850)] and bool(a2)
+        and (r850.get("code_changed") or {}).get("sha_on_disk") == "c0dec0dec0de" and c1[0] and c2[0]
+        and "CODE CHANGED WHILE RUNS RAN" in next(l for l in t.splitlines() if l.startswith("READING")),
+        f"{str(a1)[:60]}; {tags}; {c1[1][:60]}")
+    # 6. another card's unfinished stage 2; --arms; --other-card-idle
+    _fresh()
+    pilot_store((0.93, 0.92))
+    record()
+    sb.save_json({"meta": {"last_invocation": dict(invocation="stage 2 o2", stage=2, arms=["ORACLE", "SINGLE"],
+                                                   ended=False)}, "runs": {}}, sb.store_path(O))
+    s2busy = expect_exit(lambda: sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=q), "has not ended")
+    s2bad = expect_exit(lambda: sb.stage2("cpu", "1660", require_commit=False, log=q, arms=("REG3",)), "must name some")
+    tags = []
+    gr.run_batched_icmc = _fake_tags({}, tags)
+    try:
+        m6 = sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=q, arms=("WIDE_SLOW",))
+        m2a = sb.load(hw)["meta"]["stage2_invocations"][-1]
+        t6a = list(tags)
+        m6b = sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=q, arms=("SINGLE",), other_card_idle=True)
+        m2b = sb.load(hw)["meta"]["stage2_invocations"][-1]
+    finally:
+        gr.run_batched_icmc = _trap
+    li = sb.load(hw)["meta"]["last_invocation"]
+    out["another card's unfinished stage 2 refuses overlapping arms; --arms runs only those (recorded); "
+        "--other-card-idle runs the overlap (recorded); the invocation's end is recorded; times are UTC"] = (
+        s2busy[0] and s2bad[0] and {a for a, _ in t6a} == {"WIDE_SLOW"} and not m6 and m2a.get("arms_given") == ["WIDE_SLOW"]
+        and m2a.get("arms") == ["WIDE_SLOW"] and {a for a, _ in tags[len(t6a):]} == {"SINGLE"} and not m6b
+        and m2b.get("other_card_idle") is True and m2b.get("other_cards_not_ended") == [[os.path.basename(
+            sb.store_path(O)), "stage 2 o2"]] and li.get("ended") is True and str(m2b.get("started")).endswith("Z")
+        and str(m2b.get("ended")).endswith("Z"), f"{s2busy[1][:60]}; {s2bad[1][:60]}; {sorted(set(tags))[:4]}")
+    t = sb.report(log=q, sha=sha, out=os.path.join(d, "r_inv.md"))
+    il = next((l for l in t.splitlines() if l.startswith("STAGE-2 INVOCATIONS")), "")
+    out["report: STAGE-2 INVOCATIONS with the reason, --arms and --other-card-idle"] = (
+        "(reason: x)" in il and "--arms ['WIDE_SLOW']" in il and "--other-card-idle" in il, il[:160])
+    # 7. stage 2 runs only the arms the card's benchmark allows; the run records carry the reason and the benchmark
+    _fresh()
+    pilot_store((0.93, 0.92))
+    record()
+    b1 = dict(_bench_ok(sha, G1660), written="2026-10-14 00:00:00Z")
+    b1["arms"]["REG3 loop"] = dict(ok=False)
+    sb.save_json(b1, sb.bench_path(G1660))
+    sb.save_json(dict(meta=dict(s75b_sha=sha), checks={f"B{i}": dict(ok=True) for i in range(1, 10)}),
+                 sb.checks_output_path(G1660))
+    tags = []
+    gr.run_batched_icmc = _fake_tags({}, tags)
+    try:
+        with fake_card(G1660):
+            m7 = sb.stage2("cpu", "fallback", require_commit=False, reason="checks reason", log=q)
+    finally:
+        gr.run_batched_icmc = _trap
+    r7 = sb.load(G1660)["runs"].get(f"SINGLE|850|{sha}|{G1660}") or {}
+    out["stage 2: an arm the benchmark refuses never reaches the trainer; run records carry reason, bench_commit and "
+        "bench_written"] = (
+        "REG3" not in {a for a, _ in tags} and {a for a, _ in tags} == set(sb.STAGE2) - {"REG3"}
+        and m7.get("(refused)") == ["REG3"] and r7.get("reason") == "checks reason" and "bench_commit" in r7
+        and r7.get("bench_written") == "2026-10-14 00:00:00Z", f"{sorted({a for a, _ in tags})} {m7}")
+    # 8. stage 1 needs the benchmark's ORACLE case
+    _fresh()
+    b8 = _bench_ok(sha, G1660)
+    b8["arms"]["ORACLE"] = dict(ok=False)
+    sb.save_json(b8, sb.bench_path(G1660))
+    out["stage 1: a benchmark whose ORACLE case failed allows no pilot"] = expect_exit(s1(G1660), "allows none")
+    # 9. the stage-1 abort record; the record's fields; UTC
+    _fresh()
+    tags = []
+    gr.run_batched_icmc = _fake_tags({841: "OutOfMemoryError: CUDA out of memory."}, tags)
+    try:
+        d9, m9 = sb.stage1("cpu", require_commit=False, log=q)
+    finally:
+        gr.run_batched_icmc = _trap
+    rec9 = json.load(open(sb.record_paths()[0]))
+    r840 = sb.load(hw)["runs"].get(f"ORACLE_PILOT|840|{sha}|{hw}") or {}
+    i9 = rec9["invocations"][-1]
+    out["stage 1 abort: the record's missing is [841] (840 ok), the invocation says why it stopped; record fields and "
+        "UTC times"] = (
+        rec9["missing"] == [841] and m9 == [841] and rec9["decision"]["statuses"] in ({"840": "ok", "841": "failed"},)
+        and "failed operationally twice" in str(i9.get("aborted")) and tags == [("ORACLE_PILOT", 840), ("ORACLE_PILOT", 841),
+                                                                             ("ORACLE_PILOT", 841)]
+        and "bench_commit" in r840 and "bench_written" in r840 and rec9["written"].endswith("Z")
+        and i9["started"].endswith("Z") and i9["ended"].endswith("Z") and rec9.get("running") is None,
+        f"{rec9['missing']} {rec9['decision']['statuses']} {str(i9.get('aborted'))[:60]}")
+    # 10. stage 2: --retry-halted, and the summary after an abort
+    _fresh()
+    pilot_store((0.93, 0.92))
+    record()
+    op = lambda inv: dict(kind="operational", invocation=inv, attempt=1, at="x", error="OOM")
+    st10 = sb.load(hw)
+    st10["failures"] = {f"SINGLE|852|{sha}|{hw}": [op("a"), op("b")]}
+    sb.save_json(st10, sb.store_path(hw))
+    tags = []
+    gr.run_batched_icmc = _fake_tags({}, tags)
+    try:
+        h_before = sb.seed_status(sb.load_all(), "SINGLE", 852, sha)
+        m10 = sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=q, arms=("SINGLE",), retry_halted=True)
+    finally:
+        gr.run_batched_icmc = _trap
+    cl = [f for f in sb.load(hw)["failures"].get(f"SINGLE|852|{sha}|{hw}", []) if f.get("kind") == "cleared"]
+    out["stage 2 --retry-halted: the clear names both invocations, the seed runs once"] = (
+        h_before == "halted" and tags.count(("SINGLE", 852)) == 1 and not m10 and len(cl) == 1
+        and set(cl[0].get("clears") or []) == {"a", "b"}, f"{h_before} {tags.count(('SINGLE', 852))} {cl}")
+    _fresh()
+    pilot_store((0.93, 0.92))
+    record()
+    logs = []
+    tags = []
+    gr.run_batched_icmc = _fake_tags({("ORACLE", 850): "OutOfMemoryError: CUDA out of memory."}, tags)
+    try:
+        m11 = sb.stage2("cpu", "fallback", require_commit=False, reason="x", log=logs.append, arms=("ORACLE", "SINGLE"))
+    finally:
+        gr.run_batched_icmc = _trap
+    lg = "\n".join(map(str, logs))
+    r11 = sb.load(hw)["runs"].get(f"ORACLE|850|{sha}|{hw}") or {}
+    out["stage 2 abort: the summary lists the aborted arm's seeds and the arms not reached; the failed record carries "
+        "the reason and the benchmark"] = (
+        "(aborted)" in m11 and m11.get("(not reached)") == ["SINGLE"] and m11.get("ORACLE") == [850, 851]
+        and "'ORACLE': {850: 'failed', 851: 'missing'}" in lg and "arms not reached: ['SINGLE']" in lg
+        and r11.get("reason") == "x" and "bench_commit" in r11 and "bench_written" in r11,
+        f"{ {k: v for k, v in m11.items() if k != '(aborted)'} }")
+    # 11. the stages' sync wiring (stage 2 checks it before the record)
+    _fresh()
+    sb.sync_state = lambda: (False, "checks: behind")
+    try:
+        y1 = expect_exit(s1(G1660, rc=True), "checks: behind")
+        y2 = expect_exit(s2(rc=True, card=G1660), "checks: behind")
+    finally:
+        sb.sync_state = lambda: (True, "checks")
+    out["stage 1 and stage 2 call the sync check (stage 2 before the record checks)"] = (y1[0] and y2[0], y2[1][:80])
+    # 12. a running record: stage 2 refuses; the report says so
+    pilot_store((0.93, 0.92))
+    record(running="stage 1 x")
+    rr = expect_exit(s2(), "has not rewritten it")
+    t = sb.report(log=q, sha=sha, out=os.path.join(d, "r_running.md"))
+    out["a stage-1 record still marked running: stage 2 refuses; the report says so"] = (
+        rr[0] and "STAGE-1 RECORD WRITTEN BY A STAGE 1 THAT HAS NOT ENDED" in t, rr[1][:80])
 
 
 def _arm_records(arm, seeds, sha, card, sets=0.6, routed=False):
@@ -884,6 +1218,30 @@ def _b5_reports(d, out, sha, hw, G1660, G3070):
     t = rep_("bench_mixed")
     out["report: 'cannot start' only when both cards' benchmarks refuse the pilot"] = (
         ok1 and ok2 and "CANNOT START" not in t, f"{ok1} {ok2}")
+    b_reg = dict(_bench_ok(sha, "x"))
+    b_reg["arms"] = dict(b_reg["arms"], **{"REG3 loop": dict(ok=False), "REG3 scan": dict(ok=False)})
+    sb.save_json(dict(b_reg, device=dict(gpu=G1660)), sb.bench_path(G1660))
+    sb.save_json(dict(b_reg, device=dict(gpu=G3070)), sb.bench_path(G3070))
+    t = rep_("bench_reg3")
+    out["report: ARMS NO CARD'S BENCHMARK ALLOWS when both benchmarks fail REG3"] = (
+        "ARMS NO CARD'S BENCHMARK ALLOWS: ['REG3']" in t, "")
+    os.remove(sb.bench_path(G1660))
+    os.remove(sb.bench_path(G3070))
+    # a STOP pilot under this code (mean below 0.912, each >= 0.9) with stage-2 rows: no reading
+    store({K("ORACLE_PILOT", 840): dict(_rec(0.905), hw=hw), K("ORACLE_PILOT", 841): dict(_rec(0.91), hw=hw)}, {})
+    t = rep_("pilot_stop")
+    rd = next(l for l in t.splitlines() if l.startswith("READING"))
+    out["report: the pilot under this code did not PROCEED -> NO READING"] = ("did not PROCEED" in rd, rd[:100])
+    # the stage-2 code superseded (its record archived, the current one under another code): no reading
+    store({}, {})
+    sb.save_json(dict(sha=sha, decision=dict(complete=True, proceed=True)), sb.record_paths(sha)[0])
+    sb.save_json(dict(sha="cccccccccccc", decision=dict(complete=True, proceed=True)), sb.record_paths()[0])
+    t = rep_("superseded")
+    rd = next(l for l in t.splitlines() if l.startswith("READING"))
+    out["report: the stage-2 code superseded after stage 2 started -> CODE CHANGED AFTER STAGE 2 STARTED"] = (
+        "CODE CHANGED AFTER STAGE 2 STARTED" in rd and "carries" not in rd, rd[:110])
+    os.remove(sb.record_paths(sha)[0])
+    os.remove(sb.record_paths()[0])
 
 
 def _b5_sync(out):
@@ -926,12 +1284,18 @@ def _b5_sync(out):
             nofetch = sb.sync_state()
             _git(a, "remote", "set-url", "origin", url)
             again = sb.sync_state()
+            with open(os.path.join(a, "out", "s75b_x_results.json"), "a") as f:
+                f.write(" \n")
+            modified = sb.sync_state()
+            _git(a, "checkout", "--", "out/s75b_x_results.json")
         finally:
             sb.OUT = old
     out["sync_state: behind / up to date / an uncommitted JSON / unpushed commits / a failed fetch / up to date again"] = (
         (not behind[0]) and "behind" in behind[1] and fresh[0] and (not dirty[0]) and "uncommitted" in dirty[1]
         and (not unpushed[0]) and "unpushed" in unpushed[1] and (not nofetch[0]) and "fetch failed" in nofetch[1]
         and again[0], f"{behind} {fresh} {dirty} {unpushed} {nofetch} {again}")
+    out["sync_state: a tracked results file modified after its commit"] = (
+        (not modified[0]) and "uncommitted" in modified[1], str(modified))
 
 
 def b6_s75_sha(dev):
@@ -1180,7 +1544,7 @@ def b9_divergence(dev):
             gr.run_batched_icmc = poisoned
             sb.INVOCATION = "b9"
             hw = dv.device_info(dev)["gpu"] or dv.device_info(dev)["cpu"]
-            sha = "b9b9b9b9b9b9"
+            sha = sb.code_sha()[0]                 # run_arm compares the code on disk with sha before each run
             with sb.runtime():
                 m = sb.run_arm("ORACLE", (850,), dev, hw, sha, {"meta": {}, "runs": {}}, {}, "auto", 0, log=lambda *a: None)
             stt = sb.seed_status(sb.load_all(), "ORACLE", 850, sha)
@@ -1211,17 +1575,23 @@ def main():
             ("B7", "lock-step at L = 1536, R = 1", b7_lockstep), ("B8", "end to end (small configuration)", b8_end_to_end),
             ("B9", "a real divergence is recognised", b9_divergence)]
     only = None if a.only is None else set(a.only.split(","))
-    res = dict(meta=dict(info, started=time.strftime("%Y-%m-%d %H:%M:%S"), s75b_sha=sb.code_sha()[0],
+    res = dict(meta=dict(info, started=sb.utc_now(), s75b_sha=sb.code_sha()[0],
                          only=sorted(only) if only else None), checks={})
     lines = [f"explore_gpu.s75b CHECKs on {info}; S75b code SHA {res['meta']['s75b_sha']}", ""]
     print(lines[0], flush=True)
+    with open(out_txt, "w") as fh:            # an interrupted run never leaves an earlier verdict on disk
+        fh.write(lines[0] + "\n\nRUNNING (no verdict yet)\n")
+    with open(out_json, "w") as fh:
+        json.dump(res, fh, indent=1, default=str)
     for key, name, f in plan:
         if only and key not in only:
             continue
         t0 = time.time()
         try:
             r = f(dev)
-        except Exception as e:
+        except KeyboardInterrupt:
+            raise
+        except BaseException as e:            # SystemExit included: a refusal that escapes a CHECK fails that CHECK
             r = dict(ok=False, error=f"{type(e).__name__}: {e}", traceback=traceback.format_exc()[-3000:])
         r["secs"] = round(time.time() - t0, 1)
         res["checks"][key] = r

@@ -283,7 +283,7 @@ card's benchmark file, the stage-1 record, stage 2's meta and the report header.
    refuse; the report prints the duplicates and marks the reading incomplete.
 5. **Order, enforced by the driver.**
    - Stage 1 needs this card's benchmark and CUDA CHECK output committed.
-   - Stage 2 needs the stage-1 record, the pilot results file, and this card's benchmark and CUDA CHECK output
+   - Stage 2 needs the stage-1 record, every results file, and this card's benchmark and CUDA CHECK output
      committed.
    - (Withdrawn in Appendix B.3.4: the pilot card's benchmark may be rerun after the stage-1 record. Each run record
      carries the benchmark it ran under.)
@@ -297,8 +297,8 @@ Referee V's review of this draft (`docs/review_2026-10/spec_review_s75b_draft.md
 - **Provenance.** The draft states its blindness as fact, but git shows only what each tree held.
 - **Outcomes.** Four outcomes have no rule.
 
-Both are settled here before the pilot. The rules were written, reviewed adversarially in this session, and revised
-once (B.4). Everything in this appendix was written with S75's learned-arm records in the tree and read, so **none of
+Both are settled here before the pilot. The rules were written, reviewed adversarially in this session three times,
+and revised after each review (B.4). Everything in this appendix was written with S75's learned-arm records in the tree and read, so **none of
 it is blind**. None of it changes a design constant (configuration, seeds, arms, bars, the proceed rule, SPLIT_THR's
 rule). The failure rules extend the outcomes, VALID and the reading to failed runs.
 
@@ -386,7 +386,7 @@ only".
 - **Halt.** A seed with operational failures in two invocations is **halted**.
   - The driver does not run it again until the user clears it (`--retry-halted`) or the code changes before stage 2.
   - A clear names exactly the invocations it clears. No rule compares times across machines (the server runs on UTC,
-    the laptop on UTC−6), and every time written is UTC.
+    the laptop on UTC−6). Every time S75b writes is UTC, marked with its zone.
   - A halt waits on the user. It is never a STOP, never final, and says nothing about B.
 
 Every failure entry is kept, with its kind, error, invocation and time, and the report prints them for every code.
@@ -400,30 +400,45 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
      - No other configuration is tried.
    - **An operational failure** is rerun on the same seed (`--stage 1` again). The stage-1 record says INCOMPLETE.
    - **A halted seed** leaves the decision to the user (HALTED).
-   - **The record.** The stage-1 record lists every invocation (card, benchmark, workers) and each seed's card. A pilot
-     may be split across the cards. Stage 2 reads the pilot from every card's committed results file.
+   - **The record.** Stage 1 writes its record before the pilot's first run, marked running, and rewrites it when the
+     invocation ends, however it ends short of a hard kill. Stage 2 refuses a record still marked running.
+     - The record lists every stage-1 invocation under its code, from every card's results file (card, benchmark,
+       workers, why it stopped), and each seed's card.
+     - The pilot runs on one card. A stage-1 invocation refuses while another card's stage 1 has not ended (One
+       invocation per card, below). A pilot may still be split across the cards, for example after one card fails.
+     - Stage 2 reads the pilot from every card's committed results file.
 2. **A code change.**
    - **Before stage 2 starts.**
      - The driver's code, every module in its code SHA, is frozen from stage 1.
      - A change that cannot be avoided (a bug that stops a stage) is committed with a dated note before any further run.
        The first stage 1 under the new code refuses without `--code-change-note PATH` naming that committed note, and
-       records it.
+       records it. The note is needed whenever another code has a stage-1 record, current or archived, or any pilot
+       entries, including a code whose stage 1 was killed before it wrote anything else.
      - The CUDA CHECKs, the benchmarks and the pilot (840–841) are then rerun under the new code.
      - **A value STOP under any code is final.** It is recomputed from every code's pilot records, not only from the
        record files.
      - Stage 2 needs every complete stage-1 decision, under every code, to be PROCEED. SPLIT_THR comes from the pilot
        under the code stage 2 runs.
      - Earlier stage-1 records are kept as `s75b_stage1_record_<sha>.*`, printed, and never pooled.
-     - A superseded code, one whose record was archived, is never used again. A revert cannot re-adopt an earlier
-       pilot.
+     - A superseded code is never used again, so a revert cannot re-adopt an earlier pilot. A code is superseded when
+       its record was archived, or when it has pilot entries while the record is under another code. Since stage 1
+       writes its record before its first run, a later code supersedes the earlier one as soon as its stage 1 starts,
+       even if that stage 1 is then killed.
      - A code change re-draws ok pilot runs of 0.9 or more whose values have been seen. That is the price of the bug's
        fix; the dated note records why the change could not be avoided.
    - **After stage 2 starts.** Once stage 2 has a record or a failure under one code, the code is frozen for good.
      - Stage 1 and stage 2 refuse under any other code.
      - A change halts the screen for the user, and no stage-2 outcome is re-drawn.
      - The report reads only the stage-2 code; a second stage-2 code means no reading. The report also gives no
-       reading after a value STOP under any code.
+       reading after a value STOP under any code, or if the stage-2 code was superseded after stage 2 started.
      - The other machine sees the freeze once stage 2's results file is pushed. It is pushed as soon as stage 2 starts.
+   - **While a stage runs.** The data and statistics workers that each run spawns import the code from disk, so a pull
+     or an edit during a stage would reach the runs. The driver compares the code on disk with the invocation's code
+     before and after every run.
+     - A change found before a run stops the invocation. Nothing is charged.
+     - A change found after a run keeps that run's record, marked `code_changed`, and stops the invocation. The screen
+       halts: both stages refuse, and the report gives no reading, until the user decides.
+     - So code is not pulled or edited while a stage runs.
 3. **A stage-2 ORACLE run missing or failed** (and the other stage-2 arms).
    - **ORACLE.**
      - A diverged ORACLE 850 or 851 run counts as below 0.9: NOT VALID, so the reading is UNTESTED.
@@ -447,7 +462,11 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
      progress", which counts as failed. Each run record carries the benchmark it ran under (commit and time) and its
      workers.
    - **Fallbacks.** If one card is unusable or unavailable, the other runs everything: `--machine fallback` on the
-     1660, `--machine fallback-3070` on the 3070. Both need `--reason`, which is written into stage 2's meta.
+     1660, `--machine fallback-3070` on the 3070. Both need `--reason`, which is written into stage 2's meta and
+     records.
+     - If the other card's benchmark refuses only some of its arms, the fallback runs just those, with `--arms`
+       (recorded).
+     - A fallback never runs arms that the other card's unfinished invocation runs (One invocation per card, below).
    - **No usable card.**
      - If no card's benchmark allows the pilot, S75b cannot start.
      - If no card's benchmark allows a stage-2 arm, that arm cannot run and the reading is incomplete.
@@ -457,8 +476,20 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
 - a `git fetch` succeeds, and the checkout is neither behind nor ahead of its upstream;
 - every S75b JSON file in `explore_out/I/gpu/s75b/` is committed.
 
-The stage-1 record and the results files are committed and pushed whatever the decision, so the finality rules on
-either machine see the other's state. `--device cpu` is for the CHECKs only.
+Stage 2 checks this before anything else, so a checkout that is behind is told to pull. The stage-1 record and the
+results files are committed and pushed whatever the decision, so the finality rules on either machine see the other's
+state. `--device cpu` is for the CHECKs only.
+
+**One invocation per card.**
+- **On one card.** A stage or a benchmark holds a lock on its card for its whole run, so a second invocation on that
+  card refuses. The operating system releases the lock when the process ends, however it ends.
+- **Across the cards.** Each results file records its card's last invocation, its arms, and whether it ended. A stage
+  refuses while another card's last invocation, as pushed, has not ended and runs any of the same arms.
+  - Stage 1's arm is the pilot, so the pilot runs on one card.
+  - A killed process never records its end. `--other-card-idle` is the user's statement that no S75b invocation runs
+    on that card. It is recorded, and that card's open markers then count as killed.
+- Records of one seed from two cards (a start that was not pushed) are still caught: stages refuse and the report
+  marks the reading incomplete.
 
 ### B.4 How the rules were checked
 
@@ -486,9 +517,38 @@ The revision (4437f75) was reviewed again. That review found:
   the record keeps every invocation, and each run record carries its benchmark.
 - **Text and coverage gaps.**
 
-CHECK B4 covers the decision rules. B5 covers the refusals, the run mechanics on a fake trainer, the report on
-synthetic stores, and the sync check on temporary repositories. B9 covers a real divergence. Not checked by a CHECK:
-`main()`'s argument wiring, and the cards' real `git push`.
+The second revision (f4cf7a8) was reviewed a third time. That review found:
+- **Two invocations on one card could overwrite each other's results file**, drawing seeds twice and losing records
+  (high). Fixed: one invocation per card, by a lock.
+- **A killed later pilot could be undone.** A code counted as superseded only once its record was archived, and the
+  record was written only at the end of stage 1. Fixed: the record is written before the first run.
+- **The code-change note was not required when the earlier code left only pilot entries.** Fixed.
+- **A fallback could rerun a seed still running on the other card**, since that seed's open marker counted as failed.
+  Fixed: each card records its last invocation, stages refuse overlapping arms until it has ended, and `--arms` and
+  `--other-card-idle` are recorded.
+- **A pull during a stage reached the runs unchecked**, through the workers each run spawns. Fixed: the code is compared
+  before and after every run.
+- **Four times were written in local time**, against this appendix's text. Fixed: UTC with its zone.
+- **The report read a stage-2 code that a later pilot had superseded.** Fixed.
+- **Smaller faults.**
+  - Stage 2 checked the record before the sync.
+  - The stage-2 summary after an abort was empty.
+  - The stage-1 record left out killed invocations.
+  - The text still said "the pilot results file" and "revised once".
+- **Coverage.** 18 mutants of the driver's rules passed every CHECK. A CHECK that raised SystemExit ended the CHECK
+  process and left the previous run's "ALL CHECKS PASSED" on disk. Fixed: a CHECK for each, a failing CHECK no longer
+  ends the run, and the output file is rewritten at the start.
+
+CHECK B4 covers the decision rules. B5 covers the refusals, the run mechanics on a fake trainer, the third review's
+points, the report on synthetic stores, and the sync check on temporary repositories. B9 covers a real divergence.
+
+After the third revision, MUTATION_SENTENCE
+
+Not checked by a CHECK:
+- `main()`'s argument wiring (`--arms`, `--other-card-idle`, the benchmark's lock);
+- the cards' real `git push`;
+- a lock held by another process: the CHECK holds it in the same process;
+- a hard kill: the CHECKs interrupt with KeyboardInterrupt and read the record during a run.
 
 **What is not covered here.** The review's other points stay open for the user:
 - σ from one pair, and the rounding of 0.912;
