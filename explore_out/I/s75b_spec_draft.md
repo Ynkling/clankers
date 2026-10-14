@@ -542,7 +542,7 @@ The second revision (f4cf7a8) was reviewed a third time. That review found:
 CHECK B4 covers the decision rules. B5 covers the refusals, the run mechanics on a fake trainer, the third review's
 points, the report on synthetic stores, and the sync check on temporary repositories. B9 covers a real divergence.
 
-After the third revision, MUTATION_SENTENCE
+After the third revision, 35 mutants of the driver's rules were each run against B4 and B5 (`explore_gpu/s75b_mutants.py`, results in `s75b_mutants_cpu_output.txt`, at 5f6f840). They are the third review's 18, which had passed every CHECK, and 17 that break the new rules. Every one is caught, and the unmutated driver passes.
 
 Not checked by a CHECK:
 - `main()`'s argument wiring (`--arms`, `--other-card-idle`, the benchmark's lock);

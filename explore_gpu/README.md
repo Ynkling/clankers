@@ -212,7 +212,8 @@ GPU time).
 **Files:**
 - `device.py`, `batched.py`, `run.py`: the runner.
 - `s75_s4.py`, `mainline.py`, `s75b.py`: (b), (c) and (d); `s75b_checks.py` and `s75b_checks_cpu_output.*`: (d)'s
-  CHECKs and this container's outputs.
+  CHECKs and this container's outputs; `s75b_mutants.py` and `s75b_mutants_cpu_output.txt`: the mutation pass on (d)'s
+  rules.
 - `checks.py` and `checks_cpu_output.*`: the CHECKs and this container's outputs.
 - `calibrate_judge.py` and its output: the lock-step criterion at the CUDA lengths.
 - `profile_s75.py`, `runtime_estimate.md`, `profile_s75.json`: the estimate.
