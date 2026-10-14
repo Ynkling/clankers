@@ -358,3 +358,40 @@ EXPLORATORY, NOT A RESULT — batch 21: the D128 oracle's validity (S69)
   start    0.0 min  oracle_d128  ORC_A_D128     seed 278  (resuming from its checkpoint at step 13200)  (projected worst case 360 min)
 chain: the container restarted early in segment 5 (processes stopped; checkpoints kept, unchanged since segment 5 began); the new container is a Xeon @ 2.80GHz. A new chain resumes from segment 6.
 chain: segment 6 start 2026-10-14T05:17:15Z
+#################### RESUME 2026-10-14 05:18:12 UTC — a new segment; saved runs are reused, stopped runs resume from their checkpoints (EXPLORATORY, not a result) ####################
+====================================================================================================
+EXPLORATORY, NOT A RESULT — batch 21: the D128 oracle's validity (S69)
+  cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git 28796bb+dirty | python 3.11.15 | torch threads 1
+====================================================================================================
+  code SHA (the child): f7a606d7399a over 44 modules (8 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b19_model explore_common explore_common2 explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_oracle_child explore_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
+  this segment's CPU: Intel(R) Xeon(R) Processor @ 2.80GHz; the batch's CPU (the full CHECK pass): Intel(R) Xeon(R) Processor @ 2.80GHz; checkpoints in /tmp/claude-0/-home-user-clankers/db3e70a0-5544-5116-802e-293fdfffc055/scratchpad/b21_ckpt
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (119s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  PROJECTION (worst case: every run to its iters; batch 19's pool-load timing of this spec, stored 2026-10-09 08:33:09 UTC; S68's observed rate for the D128 oracle was faster):
+    ORC_A_D128  10 runs x   6.0 h (step  506.3 ms, evaluation  28.5 s, 40800 updates)
+    ORC_S_D128  10 runs x   6.0 h (step  506.3 ms, evaluation  28.5 s, 40800 updates)
+    TOTAL 120 h of runs; makespan on 4 workers 30.0 h worst case (a run that binds stops early); nothing is cut (no budget was given)
+  recipe read in a child from main at 9c5939e: test_stream_recipe.LR 0.001 (the recorded validity recipe's single Adam); SLOW: 0.0001 for updates 1-2400, then 0.001; ARCH {'n_layer': 3, 'positional': 'decay'}; evaluation every 1200, bound at 0.95 held, early stop after 3 in a row (after 4800); task P16S4 {'S': 4, 'P': 16, 'vocab': 36, 'n_vals': 16, 'n_q': 1}; 1 torch thread per run
+  lr for oracle_d128 ORC_A_D128: 0.001; iters 40800; seeds 270-279 (10); size [2, 128, 3]; task P16S4; gate perfect; single Adam
+  lr for oracle_d128 ORC_S_D128: 0.001; iters 40800; seeds 270-279 (10); size [2, 128, 3]; task P16S4; gate perfect; SLOW
+  CHECKs skipped (repro check above still run): the code SHA equals the one at the full CHECK pass (2026-10-13 22:13:16 UTC, git 5c34bca+dirty, on Intel(R) Xeon(R) Processor @ 2.80GHz; its output is earlier in this log)
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN oracle_d128
+  idea    is the D = 128 oracle a usable validity check for the key-load draft? ten seeds, the recorded recipe and SLOW
+  source  the user's batch 21; S67 / S68 (the D128 oracle bound 271 at 12,000; 270 unbound at 86,400); the draft's VALID_N = 2
+  change  the oracle's recipe (one Adam at 1e-3 vs SLOW); ten seeds at the draft's budget, 40,800
+  arm ORC_A_D128   lr 0.001  iters 40800  seeds 270-279 (10)  — oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_S_D128   lr 0.001  iters 40800  seeds 270-279 (10)  — oracle, P=16, D128 (N=256, D=128), SLOW
+                   schedule: the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)
+  pairing seeds 270-279: ORC_S_D128 with ORC_A_D128 on each seed (same initial weights and batches)
+----------------------------------------------------------------------------------------------------
+  pool: 4 workers (1 torch thread each); segment budget 114 min left
+  start    0.0 min  oracle_d128  ORC_A_D128     seed 275  (resuming from its checkpoint at step 25200)  (projected worst case 360 min)
+  start    0.0 min  oracle_d128  ORC_A_D128     seed 276  (resuming from its checkpoint at step 16800)  (projected worst case 360 min)
+  start    0.0 min  oracle_d128  ORC_A_D128     seed 277  (resuming from its checkpoint at step 16800)  (projected worst case 360 min)
+  start    0.0 min  oracle_d128  ORC_A_D128     seed 278  (resuming from its checkpoint at step 13200)  (projected worst case 360 min)
+  [  1]   72.7 min  oracle_d128  ORC_A_D128     seed 278  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 28796bb+dirty, code f7a606d7399a, attempt 1, resumed at [13200]: acc 0.989  trans 19200  stop 21600  outcome BOUND
+  start   72.7 min  oracle_d128  ORC_A_D128     seed 279  (projected worst case 360 min)
