@@ -5,322 +5,46 @@
   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
   "threads": 1,
   "gpu": null,
-  "started": "2026-10-14 00:50:03",
+  "started": "2026-10-14 00:53:20",
   "s75b_sha": "0c128cddd799",
-  "only": [
-   "B5"
-  ]
+  "only": null
  },
  "checks": {
-  "B5": {
+  "B1": {
    "ok": true,
-   "cases": {
-    "git_committed: untracked / committed / modified": {
-     "ok": true,
-     "said": "(None, False) ('d3968f03428347c565421e7b51b74bf368424fc1', True) ('d3968f03428347c565421e7b51b74bf368424fc1', False)"
-    },
-    "git_committed: outside a repository": {
-     "ok": true,
-     "said": ""
-    },
-    "dirty_code on this checkout (description)": {
-     "ok": true,
-     "said": "['explore_gpu/s75b.py']"
-    },
-    "no record": {
-     "ok": true,
-     "said": "no stage-1 record: run --stage 1 first"
-    },
-    "record != pilot": {
-     "ok": true,
-     "said": "the stage-1 record does not match the pilot records under this code SHA"
-    },
-    "record not committed (untracked)": {
-     "ok": true,
-     "said": "the stage-1 record (/tmp/tmpy74on0oh/s75b_stage1_record.json) is not committed, or has local changes: commit and push it first"
-    },
-    "pilot results file not committed": {
-     "ok": true,
-     "said": "the committed pilot records (every results file) do not give the stage-1 record's decision: commit and push every results file"
-    },
-    "both committed -> past the commit checks (to the benchmark)": {
-     "ok": true,
-     "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "record modified after its commit": {
-     "ok": true,
-     "said": "the stage-1 record (/tmp/tmpy74on0oh/s75b_stage1_record.json) is not committed, or has local changes: commit and push it first"
-    },
-    "committed pilot records disagree": {
-     "ok": true,
-     "said": "the committed pilot records (every results file) do not give the stage-1 record's decision: commit and push every results file"
-    },
-    "incomplete pilot": {
-     "ok": true,
-     "said": "both pilot records under this code SHA are needed (a pilot record is missing or failed operationally: rerun --stage 1 (the same seeds))"
-    },
-    "pilot records under another code SHA": {
-     "ok": true,
-     "said": "both pilot records under this code SHA are needed (a pilot record is missing or failed operationally: rerun --stage 1 (the same seeds))"
-    },
-    "pilot stopped": {
-     "ok": true,
-     "said": "S75b stops: B's pilot did not clear the proceed rule; a pilot run ended below 0.9: S = 4 is not usable at B (S75b stops at stage 1: pilot run(s) [841] ended below 0.9: [0.89])"
-    },
-    "pilot stopped: 'not usable' wording": {
-     "ok": true,
-     "said": "S75b stops: B's pilot did not clear the proceed rule; a pilot run ended below 0.9: S = 4 is not usable at B (S75b stops at stage 1: pilot run(s) [841] ended below 0.9: [0.89])"
-    },
-    "duplicate pilot records (stage 2)": {
-     "ok": true,
-     "said": "stage 2: ok records of one arm and seed from two cards (arm, seed, cards): [('ORACLE_PILOT', 840, ['Intel(R) Xeon(R) Processor @ 2.10GHz', 'another card'])]; the driver does not choose between them: t"
-    },
-    "duplicate pilot records (stage 1)": {
-     "ok": true,
-     "said": "stage 1: ok records of one arm and seed from two cards (arm, seed, cards): [('ORACLE_PILOT', 840, ['Intel(R) Xeon(R) Processor @ 2.10GHz', 'another card'])]; the driver does not choose between them: t"
-    },
-    "report: DUPLICATE and incomplete": {
-     "ok": true,
-     "said": ""
-    },
-    "machine 1660 on a 3070": {
-     "ok": true,
-     "said": "--machine 1660 expects a GTX 1660, this card is FAKE GeForce RTX 3070 Laptop GPU (checks)"
-    },
-    "machine 3070 on a 1660": {
-     "ok": true,
-     "said": "--machine 3070 expects a RTX 3070, this card is FAKE GeForce GTX 1660 SUPER (checks)"
-    },
-    "fallback-3070 on a 1660": {
-     "ok": true,
-     "said": "--machine fallback-3070 expects a RTX 3070, this card is FAKE GeForce GTX 1660 SUPER (checks)"
-    },
-    "fallback without --reason": {
-     "ok": true,
-     "said": "--machine fallback needs --reason (why the other card cannot run its arms: unavailable, or its benchmark does not allow them); it is written into stage 2's meta and records (FAILURES)"
-    },
-    "fallback-3070 without --reason": {
-     "ok": true,
-     "said": "--machine fallback-3070 needs --reason (why the other card cannot run its arms: unavailable, or its benchmark does not allow them); it is written into stage 2's meta and records (FAILURES)"
-    },
-    "fallback-3070 with --reason -> past (to the benchmark)": {
-     "ok": true,
-     "said": "stage 2: no benchmark for FAKE GeForce RTX 3070 Laptop GPU (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "no benchmark (stage 2, CUDA)": {
-     "ok": true,
-     "said": "stage 2: no benchmark for FAKE GeForce RTX 3070 Laptop GPU (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "a benchmark that allows none of the machine's arms": {
-     "ok": true,
-     "said": "stage 2: this card's benchmark allows none of ['REG3', 'WIDE_SPLIT_G']: {'REG3': \"failed cases ['REG3 loop']\", 'WIDE_SPLIT_G': \"failed cases ['WIDE_SPLIT_G']\"} (FAILURES: the other card runs them, --m"
-    },
-    "a benchmark that did not finish counts as failed": {
-     "ok": true,
-     "said": "stage 2: this card's benchmark allows none of ['REG3', 'WIDE_SPLIT_G']: {'REG3': \"the benchmark did not finish (status 'in progress'): it counts as failed\", 'WIDE_SPLIT_G': \"the benchmark did not fini"
-    },
-    "refusing worker rule": {
-     "ok": true,
-     "said": "stage 2: this card's benchmark allows none of ['REG3', 'WIDE_SPLIT_G']: {'REG3': 'the host-memory rule refuses (refuse: test; budget None GB, need None)', 'WIDE_SPLIT_G': 'the host-memory rule refuses"
-    },
-    "1660: a failed REG3 case still allows its own arms (-> past, to the CUDA CHECK output)": {
-     "ok": true,
-     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpy74on0oh/s75b_checks_cuda_FAKE_GeForce_GTX_1660_SUPER__checks__output.json) is missing: run python -m explore_gpu.s75b_checks --device cuda and commit i"
-    },
-    "card_setup per arm: a failed REG3 case refuses REG3 only, the other arms run": {
-     "ok": true,
-     "said": "allowed ('ORACLE', 'SINGLE', 'WIDE_SPLIT_G', 'WIDE_SLOW'), refused ['REG3']"
-    },
-    "no CUDA CHECK output": {
-     "ok": true,
-     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpy74on0oh/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is missing: run python -m explore_gpu.s75b_checks --device cuda and com"
-    },
-    "failed CUDA CHECK output": {
-     "ok": true,
-     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpy74on0oh/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is failed: ['B7']: run python -m explore_gpu.s75b_checks --device cuda "
-    },
-    "CUDA CHECK output without B9": {
-     "ok": true,
-     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpy74on0oh/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is incomplete: ['B9'] missing: run python -m explore_gpu.s75b_checks --"
-    },
-    "CUDA CHECK output under another SHA": {
-     "ok": true,
-     "said": "stage 2: this card's CUDA CHECK output (/tmp/tmpy74on0oh/s75b_checks_cuda_FAKE_GeForce_RTX_3070_Laptop_GPU__checks__output.json) is written under code SHA 000000000000, not 0c128cddd799: run python -m"
-    },
-    "stage 1: no benchmark (CUDA)": {
-     "ok": true,
-     "said": "stage 1: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "stage 1: no CUDA CHECK output": {
-     "ok": true,
-     "said": "stage 1: this card's CUDA CHECK output (/tmp/tmpy74on0oh/s75b_checks_cuda_FAKE_GeForce_GTX_1660_SUPER__checks__output.json) is missing: run python -m explore_gpu.s75b_checks --device cuda and commit i"
-    },
-    "stage 1: benchmark not committed": {
-     "ok": true,
-     "said": "stage 1: this card's benchmark (/tmp/tmpy74on0oh/s75b_bench_FAKE_GeForce_GTX_1660_SUPER__checks_.json) is not committed, or has local changes: commit and push it first"
-    },
-    "stage 1 / 2 on --device cpu with commits required": {
-     "ok": true,
-     "said": ""
-    },
-    "stage 1: the driver's code not committed": {
-     "ok": true,
-     "said": "stage 1: the driver's code is not committed (['explore_gpu/s75b.py']): run from a clean checkout"
-    },
-    "stage 2: the driver's code not committed": {
-     "ok": true,
-     "said": "stage 2: the driver's code is not committed (['explore_gpu/s75b.py']): run from a clean checkout"
-    },
-    "run_arm: a divergence is tried once; an operational failure is retried, then the invocation stops (842 not run); 2 invocations halt the seed; a halted seed is not run": {
-     "ok": true,
-     "said": "calls [840, 841, 841] [841, 841] []; aborts True True None; 841 after 2: halted"
-    },
-    "--retry-halted clears a halt (recorded)": {
-     "ok": true,
-     "said": ""
-    },
-    "pilot_of: a diverged pilot run is a value STOP, 'not usable at B'": {
-     "ok": true,
-     "said": "S75b stops: B's pilot did not clear the proceed rule; pilot run(s) [840] diverged (a non-finite value) and so did not reach 0.9: S = 4 is not usable at B"
-    },
-    "a killed process: its open marker is not counted in its own invocation, and counts as operational after": {
-     "ok": true,
-     "said": "True missing failed"
-    },
-    "run_arm: a seed ok on another card, diverged on another card or under another code is not run": {
-     "ok": true,
-     "said": "calls [], missing [851, 853]"
-    },
-    "write_stage1_record archives a record under another code": {
-     "ok": true,
-     "said": ""
-    },
-    "stage 2: a STOP record under earlier code is final": {
-     "ok": true,
-     "said": "S75b stopped at stage 1 under code SHA ['000000000000']: a value STOP under any code is final (FAILURES)"
-    },
-    "stage 1: a STOP record under earlier code is final": {
-     "ok": true,
-     "said": "stage 1: S75b stopped at stage 1 under code SHA ['000000000000'] (['s75b_stage1_record_000000000000.json']); a value STOP under any code is final (FAILURES)"
-    },
-    "an archived PROCEED record does not stop stage 2 (-> past, to the benchmark)": {
-     "ok": true,
-     "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "an archived halted record does not stop stage 2 (-> past, to the benchmark)": {
-     "ok": true,
-     "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "a value STOP only in another code's pilot records (no record file) is final": {
-     "ok": true,
-     "said": ""
-    },
-    "another code's incomplete pilot is not a STOP (-> past, to the benchmark)": {
-     "ok": true,
-     "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "stage 2 under another code: stages refuse (the code is frozen)": {
-     "ok": true,
-     "said": ""
-    },
-    "report under a code that is not stage 2's -> no reading": {
-     "ok": true,
-     "said": ""
-    },
-    "stage 2: a diverged pilot seed outranks its ok record elsewhere": {
-     "ok": true,
-     "said": "the stage-1 record does not match the pilot records under this code SHA"
-    },
-    "a pilot split across two cards' committed files passes stage 2's commit check (-> the benchmark)": {
-     "ok": true,
-     "said": "stage 2: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "stage 1 under a new code without --code-change-note": {
-     "ok": true,
-     "said": "stage 1: the stage-1 record is under code SHA 000000000000; a code change before stage 2 needs --code-change-note PATH, a committed, dated note saying why the change could not be avoided (FAILURES)"
-    },
-    "stage 1 with an uncommitted code-change note": {
-     "ok": true,
-     "said": "stage 1: the code-change note (/tmp/tmpygq86cqo/code_change_note.md) is not committed, or has local changes: commit and push it first"
-    },
-    "stage 1 with a committed code-change note -> past (to the benchmark)": {
-     "ok": true,
-     "said": "stage 1: no benchmark for FAKE GeForce GTX 1660 SUPER (checks) under code SHA 0c128cddd799: run --bench on this card and commit it"
-    },
-    "a superseded code: stage 1 and stage 2 refuse": {
-     "ok": true,
-     "said": ""
-    },
-    "the freeze through an open marker only": {
-     "ok": true,
-     "said": ""
-    },
-    "--retry-halted through stage 1: the halt is cleared (naming its invocations), the seed runs once, the pilot decides": {
-     "ok": true,
-     "said": "[841] mean 0.930000 >= 0.912; each >= 0.9: True"
-    },
-    "stage 2: an operational failure that survives the retry stops the invocation; the reason is recorded": {
-     "ok": true,
-     "said": "[850, 850] ['(aborted)']"
-    },
-    "a crashing benchmark leaves its file 'in progress' (counted as failed); the earlier file is archived": {
-     "ok": true,
-     "said": "True in progress ['s75b_bench_Intel_R__Xeon_R__Processor___2_10GHz_2026_01_01_00_00_00.json']"
-    },
-    "report: VALID, a diverged read-arm seed -> the reading resolves, n stays 10": {
-     "ok": true,
-     "said": "| WIDE_SPLIT_G | 0/10 [0.00, 0.28] NEVER (diverged [851]) | 0.06 | 0.06 / 0.06 /"
-    },
-    "report: a divergence outranks an ok record (counted once in n)": {
-     "ok": true,
-     "said": "| WIDE_SPLIT_G | 0/10 [0.00, 0.28] NEVER (diverged [851]) | 0.06 | 0.06 / 0.06 /"
-    },
-    "report: ORACLE 850 at 0.95, 851 diverged -> NOT VALID (the divergence branch) -> UNTESTED": {
-     "ok": true,
-     "said": ""
-    },
-    "report: ORACLE 851 halted -> incomplete (the user decides)": {
-     "ok": true,
-     "said": ""
-    },
-    "report: a read-arm seed halted -> incomplete": {
-     "ok": true,
-     "said": ""
-    },
-    "report: SINGLE diverged -> no GAP for its seed (printed)": {
-     "ok": true,
-     "said": ""
-    },
-    "report: REG3 ROUTED on 8/10 -> 'carries to four sources'": {
-     "ok": true,
-     "said": ""
-    },
-    "report: a value STOP under another code -> NO READING; the failure log prints every code": {
-     "ok": true,
-     "said": "READING (pre-fixed): NO READING: S75b stopped at stage 1 under code ['stopsha00000'] (a value STOP i"
-    },
-    "report: stage-2 records under two codes -> CODE CHANGED DURING STAGE 2, no reading": {
-     "ok": true,
-     "said": "READING (pre-fixed): CODE CHANGED DURING STAGE 2 (stage-2 records under ['0c128cddd799', 'zzzzzzzzzz"
-    },
-    "report: 'cannot start' only when both cards' benchmarks refuse the pilot": {
-     "ok": true,
-     "said": "True True"
-    },
-    "sync_state: behind / up to date / an uncommitted JSON / unpushed commits / a failed fetch / up to date again": {
-     "ok": true,
-     "said": "(False, 'the checkout is 1 commits behind origin/master: pull first') (True, '') (False, \"uncommitted S75b state ['out/s75b_stage1_record.json']: commit and push it first\") (False, 'the checkout has 1"
-    },
-    "gpu-name rule": {
-     "ok": true,
-     "said": ""
-    },
-    "allocation": {
-     "ok": true,
-     "said": ""
-    }
+   "failed": [],
+   "n": 4096,
+   "secs": 9.0
+  },
+  "B2": {
+   "ok": true,
+   "w_g_untouched_at_4800": true,
+   "fired": [
+    7200,
+    14400,
+    19200
+   ],
+   "blocked": {
+    "4800": "one-to-one",
+    "9600": "gap",
+    "12000": "one-to-one",
+    "16800": "gap",
+    "21600": "cap",
+    "24000": "cap",
+    "26400": "cap"
    },
-   "secs": 103.5
+   "map_fields_every_row": true,
+   "map_one_to_one_as_scripted": true,
+   "all_merged_rows_equal": true,
+   "all_merged_models_equal": true,
+   "all_merged_adam_equal": true,
+   "adam_state_shared": false,
+   "all_merged_fired": [
+    4800,
+    9600,
+    14400
+   ],
+   "secs": 7.6
   }
  }
 }
