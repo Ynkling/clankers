@@ -13,7 +13,8 @@ committed in `explore_out/I/gpu/s75_S4_prerun_note_2026-10-12.md` (5bc6c2e):
 statement; every change after the merge 142f47e is not blind by git (Appendix B).**
 - **The design.** The configuration, the predictions, the pilot rules, the guard, the arms and the seeds were committed
   at 1e31409. Its parent is 5bc6c2e, whose tree holds only the ORACLE 830–831 and SINGLE 830–839 records.
-- **What git can and cannot show.** The learned-arm records (b649751) had been fetched into the local object store at
+- **What git can and cannot show.** On the author's account (git cannot show it: the reflog is not pushed), the
+  learned-arm records (b649751) had been fetched into the local object store at
   14:10 UTC, before that commit. On the author's statement they were neither merged nor opened then; a parent shows
   only what the tree held. They were merged at 142f47e (14:16).
 - **Later edits.** The cost section (ee97443) and the revision 114cd08 were made after that merge, with b649751's
@@ -21,11 +22,12 @@ statement; every change after the merge 142f47e is not blind by git (Appendix B)
   - The review behind 114cd08 was run in this session.
   - That it, and the edits, were made without opening S75's learned-arm files is the author's statement.
   - The same session committed the S75 write-up (03bffdf) 130 s after 114cd08.
-  - The edits use only:
-  - the two CUDA CHECKs' K9 benchmarks;
-  - CPU profiles and memory measurements at L = 1536;
-  - ideal-learner computations;
-  - the 5bc6c2e ORACLE and SINGLE records.
+  - On the author's statement, the edits draw on:
+    - the two CUDA CHECKs' K9 benchmarks;
+    - CPU profiles and memory measurements at L = 1536;
+    - ideal-learner computations;
+    - the 5bc6c2e ORACLE and SINGLE records and the pre-run note (5bc6c2e);
+    - the review behind 114cd08.
 - **The revision.** It changed one constant, the pilot proceed rule, from "both runs ≥ 0.912" to the rule below; the
   reason is given there. It made run decisions that had been open fixed, among them WIDE_SLOW unconditional, which
   Appendix B.1 counts with the proceed rule as its two design changes. It also corrected numbers. The diff from
@@ -180,7 +182,8 @@ separate, and a fire would overwrite a live channel: the hazard S75's note decla
 | task CHECK | `check_task` at n = 4096 | its default; S75's n = 512 fails at B on a tolerance (verified) |
 | seeds | pilot 840–841; screen 850–859 | fresh, within Session I's 800–859 |
 
-S75's WIDE_SPLIT, REG3 and WIDE_SLOW records feed nothing in this table. If the user changes S75b after reading S75's
+S75's WIDE_SPLIT, REG3 and WIDE_SLOW records feed nothing in this table, on the author's statement. The referee found
+no constant derived from them; the rows written in 114cd08 are not blind by git (Appendix B.1). If the user changes S75b after reading S75's
 descriptions, that change is not blind, and S75b's record must say so.
 
 ## Cost
@@ -256,7 +259,7 @@ descriptions, that change is not blind, and S75b's record must say so.
 This spec was approved at 114cd08. Everything below was decided while writing the driver (`explore_gpu/s75b.py`) and
 after reviewing it, which was after S75's learned-arm records had been read, **so none of it is blind**. None of it
 changes a design constant: configuration B, the seeds, the arms, the outcomes, the bars, the proceed rule, SPLIT_THR's
-rule and the reading are as approved above. The same list is the driver's `CHANGES_SINCE_SPEC`. It is written into each
+rule and the reading are as approved above. These items are the first six of the driver's `CHANGES_SINCE_SPEC`. It is written into each
 card's benchmark file, the stage-1 record, stage 2's meta and the report header.
 
 1. **The pilot's card.** The pilot may run on the RTX 3070 if it is free before the GTX 1660 (the user, 12 October). The
@@ -282,7 +285,8 @@ card's benchmark file, the stage-1 record, stage 2's meta and the report header.
    - Stage 1 needs this card's benchmark and CUDA CHECK output committed.
    - Stage 2 needs the stage-1 record, the pilot results file, and this card's benchmark and CUDA CHECK output
      committed.
-   - The pilot card's benchmark must be unchanged since the stage-1 record.
+   - (Withdrawn in Appendix B.3.4: the pilot card's benchmark may be rerun after the stage-1 record. Each run record
+     carries the benchmark it ran under.)
 6. **The lock-step CHECK (B7)** runs at R = 1, as the runs do, with each seed alone, batch 8 on CUDA, and REG3 in both
    register modes on both cards. The R = 2, batch-32 lock-step does not fit either card at L = 1536: the batched graph
    and the float64 arbitration share the card. A control with W_g's batched gradient doubled must fail.
@@ -316,7 +320,8 @@ The driver carries the same text, in `SPEC_PROVENANCE`, in its docstring's FAILU
     since and was later run on the learned-arm records. Git cannot show whether it was run on b649751's records before
     the commit.
 - **Earlier evidence.** Configuration B itself was already named in the pre-run note (5bc6c2e, note l.116–118), 13 h
-  before any learned-arm record reached git.
+  before any learned-arm record reached git. WIDE_SPLIT 830–832 had already finished on the user's machine about 2
+  minutes before that note (report_2.md); git holds no learned-arm record before b649751.
 
 **Not blind by git.** These were made after the merge 142f47e (14:16), which brought b649751's records and
 `s75_S4_summary.md` into the tree:
@@ -348,7 +353,10 @@ The driver carries the same text, in `SPEC_PROVENANCE`, in its docstring's FAILU
 - **Everything after 114cd08:** the driver, Appendix A and this appendix.
 
 **This appendix's edits above it.**
-- The heading of the Provenance section and its "Later edits" and "The revision" bullets.
+- The heading of the Provenance section; its "What git can and cannot show", "Later edits" and "The revision"
+  bullets.
+- The qualifier after the constants table.
+- Appendix A's pointer to `CHANGES_SINCE_SPEC`, and its item 5's last line (withdrawn).
 - "The design commit 1e31409" in "Why this rule".
 - The stop rule's pointer to B.3.
 - The guard's row of the constants table.
@@ -376,8 +384,9 @@ only".
 - **Rerun.** An operational failure is rerun on the same seed, never a fresh one. It runs on whichever card runs that
   arm, and the records keep each seed's card.
 - **Halt.** A seed with operational failures in two invocations is **halted**.
-  - The driver does not run it again until the user clears it (`--retry-halted`, recorded with its time) or the code
-    changes before stage 2.
+  - The driver does not run it again until the user clears it (`--retry-halted`) or the code changes before stage 2.
+  - A clear names exactly the invocations it clears. No rule compares times across machines (the server runs on UTC,
+    the laptop on UTC−6), and every time written is UTC.
   - A halt waits on the user. It is never a STOP, never final, and says nothing about B.
 
 Every failure entry is kept, with its kind, error, invocation and time, and the report prints them for every code.
@@ -391,20 +400,30 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
      - No other configuration is tried.
    - **An operational failure** is rerun on the same seed (`--stage 1` again). The stage-1 record says INCOMPLETE.
    - **A halted seed** leaves the decision to the user (HALTED).
+   - **The record.** The stage-1 record lists every invocation (card, benchmark, workers) and each seed's card. A pilot
+     may be split across the cards. Stage 2 reads the pilot from every card's committed results file.
 2. **A code change.**
    - **Before stage 2 starts.**
      - The driver's code, every module in its code SHA, is frozen from stage 1.
      - A change that cannot be avoided (a bug that stops a stage) is committed with a dated note before any further run.
+       The first stage 1 under the new code refuses without `--code-change-note PATH` naming that committed note, and
+       records it.
      - The CUDA CHECKs, the benchmarks and the pilot (840–841) are then rerun under the new code.
      - **A value STOP under any code is final.** It is recomputed from every code's pilot records, not only from the
        record files.
      - Stage 2 needs every complete stage-1 decision, under every code, to be PROCEED. SPLIT_THR comes from the pilot
        under the code stage 2 runs.
      - Earlier stage-1 records are kept as `s75b_stage1_record_<sha>.*`, printed, and never pooled.
+     - A superseded code, one whose record was archived, is never used again. A revert cannot re-adopt an earlier
+       pilot.
+     - A code change re-draws ok pilot runs of 0.9 or more whose values have been seen. That is the price of the bug's
+       fix; the dated note records why the change could not be avoided.
    - **After stage 2 starts.** Once stage 2 has a record or a failure under one code, the code is frozen for good.
      - Stage 1 and stage 2 refuse under any other code.
      - A change halts the screen for the user, and no stage-2 outcome is re-drawn.
-     - The report reads only the stage-2 code; a second stage-2 code means no reading.
+     - The report reads only the stage-2 code; a second stage-2 code means no reading. The report also gives no
+       reading after a value STOP under any code.
+     - The other machine sees the freeze once stage 2's results file is pushed. It is pushed as soon as stage 2 starts.
 3. **A stage-2 ORACLE run missing or failed** (and the other stage-2 arms).
    - **ORACLE.**
      - A diverged ORACLE 850 or 851 run counts as below 0.9: NOT VALID, so the reading is UNTESTED.
@@ -415,21 +434,27 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
    - **SINGLE.** A diverged run gives no GAP for its seed.
    - **A halted read-arm seed** leaves the reading incomplete until the user decides.
 4. **The L = 1536 benchmark.**
-   - **When a card is usable.** For a set of arms, a card is usable iff its latest benchmark under this code:
+   - **When a card is usable.** Usability is per arm. An arm runs on a card iff the card's latest benchmark under this
+     code:
      - finished;
-     - passed every case those arms use (REG3 in the register mode the benchmark chose);
+     - passed every case the arm uses (REG3 in the register mode the benchmark chose);
      - got workers from its host-memory rule.
 
-     The pilot needs only the ORACLE case.
-   - **Reruns.** A benchmark may be rerun under the same code, since it measures and decides no outcome. Each earlier
-     file is kept in `bench_archive/`. A benchmark that crashes leaves its file "in progress", which counts as failed.
+     The pilot needs only the ORACLE case. A stage runs the arms its card allows and names the ones it refuses; a stage
+     with no allowed arm refuses.
+   - **Reruns.** A benchmark may be rerun under the same code at any time, even after stage 1, since it measures and
+     decides no outcome. Each earlier file is kept in `bench_archive/`. A benchmark that crashes leaves its file "in
+     progress", which counts as failed. Each run record carries the benchmark it ran under (commit and time) and its
+     workers.
    - **Fallbacks.** If one card is unusable or unavailable, the other runs everything: `--machine fallback` on the
      1660, `--machine fallback-3070` on the 3070. Both need `--reason`, which is written into stage 2's meta.
-   - **No usable card.** If no card's benchmark allows the pilot, S75b cannot start, and the report says so. No
-     configuration, R or batch is changed to make a card fit; the user decides.
+   - **No usable card.**
+     - If no card's benchmark allows the pilot, S75b cannot start.
+     - If no card's benchmark allows a stage-2 arm, that arm cannot run and the reading is incomplete.
+     - The report says which. No configuration, R or batch is changed to make a card fit; the user decides.
 
 **Sync.** With commits required, stage 1 and stage 2 refuse unless:
-- the checkout is up to date with its upstream, after a `git fetch`;
+- a `git fetch` succeeds, and the checkout is neither behind nor ahead of its upstream;
 - every S75b JSON file in `explore_out/I/gpu/s75b/` is committed.
 
 The stage-1 record and the results files are committed and pushed whatever the decision, so the finality rules on
@@ -449,7 +474,21 @@ The first version of these rules (403538b) was reviewed adversarially. The revie
 - **Finality read only local files.** Fixed: the sync check.
 - **The text and the code disagreed in places.**
 
-The CHECKs B4, B5 and B9 cover each rule.
+The revision (4437f75) was reviewed again. That review found:
+- **A pilot split across the cards could never reach stage 2.** Fixed: stage 2 reads every committed results file.
+- **A failed `git fetch` passed the sync check silently**, and unpushed commits were not refused. Fixed.
+- **Halt clears compared times across machines.** Fixed: a clear names its invocations.
+- **A reverted code could re-adopt an earlier pilot.** Fixed: superseded codes are refused.
+- **A code change before stage 2 had no machine check.** Fixed: `--code-change-note`.
+- **The report could read after a value STOP.** Fixed.
+- **A REG3 failure on both cards blocked WIDE_SPLIT_G too.** Fixed: usability per arm.
+- **A benchmark rerun after stage 1 blocked stage 2**, and a no-op stage 1 rewrote the record. Fixed: reruns are allowed,
+  the record keeps every invocation, and each run record carries its benchmark.
+- **Text and coverage gaps.**
+
+CHECK B4 covers the decision rules. B5 covers the refusals, the run mechanics on a fake trainer, the report on
+synthetic stores, and the sync check on temporary repositories. B9 covers a real divergence. Not checked by a CHECK:
+`main()`'s argument wiring, and the cards' real `git push`.
 
 **What is not covered here.** The review's other points stay open for the user:
 - σ from one pair, and the rounding of 0.912;

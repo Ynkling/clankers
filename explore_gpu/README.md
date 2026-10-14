@@ -132,8 +132,12 @@ of post-approval changes, none of them blind).
 **General rules.**
 - Run every step from the repository root, on an up-to-date checkout of `claude/explore-I`.
 - Commit and push each step's output before the next step. The driver refuses to go out of order. With commits
-  required, the stages also refuse when the checkout is behind its upstream or an S75b JSON file is uncommitted.
-- Any change to the driver changes its code SHA. The CUDA CHECKs and the benchmarks must then be rerun on that commit.
+  required, the stages also refuse when `git fetch` fails, when the checkout is behind or ahead of its upstream, or when
+  an S75b JSON file is uncommitted.
+- Any change to a module in the code SHA changes it: `s75b.code_sha()[1]` lists the 33 modules, including
+  `explore_gpu/run.py`, `explore_i_*` and `test_*`. The CUDA CHECKs and the benchmarks must then be rerun on that commit.
+  - Before stage 2, the first stage 1 under the new code needs `--code-change-note PATH` (a committed, dated note).
+  - After stage 2 starts, a change halts the screen.
 
 1. **The CUDA CHECK**, on each card while no other job is on that GPU. Then commit
    `explore_gpu/s75b_checks_cuda_<GPU>_output.*`. It takes about 2 minutes. It runs B7, the lock-step, and B9, a real
@@ -145,25 +149,27 @@ of post-approval changes, none of them blind).
    - `--host-ram-gb` is the machine's RAM: 15.2 on the laptop, and the user's figure on the server.
    - `--beside` names a string in the command line of the job that will run beside S75b. That job must be running
      during the benchmark, so its peak memory is measured; use `none` if nothing will.
-   - The benchmark may be rerun. Earlier files go to `bench_archive/`.
-   - A card is usable for the arms whose cases passed. The pilot needs only ORACLE's case.
+   - The benchmark may be rerun at any time; earlier files go to `bench_archive/`.
+   - Usability is per arm: an arm runs on a card if its latest benchmark finished, passed that arm's cases, and its
+     host-memory rule gave workers. The pilot needs only ORACLE's case.
 
        python -m explore_gpu.s75b --bench --device cuda --host-ram-gb 15.2 --beside test_delta_recipe   # laptop
        python -m explore_gpu.s75b --bench --device cuda --host-ram-gb <server RAM> --beside none        # server
 
 3. **The pilot**, on the 1660 after the window_gate run, or on the 3070 if that is free first.
-   - Afterwards, commit and push `s75b_stage1_record.json` / `.md` and the results file, whatever the decision.
+   - Afterwards, commit and push the stage-1 record (`.json` / `.md`) and every results file, whatever the decision.
    - A run below 0.9, or a diverged run, is a final STOP.
-   - Any other failure stops the invocation. Re-invoke the same command: it reruns the same seed.
+   - Any other failure stops the invocation. Re-invoke the same command, on either card: it reruns the same seed.
    - Two invocations with failures halt the seed. Then you decide: add `--retry-halted` to clear it, or fix the code.
 
        python -m explore_gpu.s75b --stage 1 --device cuda
 
-4. **Stage 2**, only if the record says PROCEED.
+4. **Stage 2**, only if the record says PROCEED. Commit and push the results file as soon as stage 2 has started, so the
+   other machine sees the freeze.
    - If one card is unusable or unavailable, run everything on the other card, with a reason:
      `--machine fallback --reason "..."` on the 1660, or `--machine fallback-3070 --reason "..."` on the 3070.
+   - A card runs only the arms its benchmark allows, and names the rest.
    - Failures are handled as in stage 1: re-invoke, and use `--retry-halted` after a halt.
-   - Once stage 2 has started, the code is frozen for good.
    - Spec Appendix B has the rules.
 
        python -m explore_gpu.s75b --stage 2 --device cuda --machine 1660      # ORACLE 850-851, SINGLE, WIDE_SLOW

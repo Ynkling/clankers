@@ -27,7 +27,8 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   - The CUDA CHECK passed.
   - ORACLE: 0.892 and 0.880, under the 0.9 bar, so the registered result is **UNTESTED**.
   - SINGLE: 0.534–0.595, so SINGLE ≤ ORACLE − 0.2 holds on 10/10.
-  - **Pre-run note** (gpu/s75_S4_prerun_note_2026-10-12.md, committed before any learned-arm run): no amendment, and
+  - **Pre-run note** (gpu/s75_S4_prerun_note_2026-10-12.md, committed before the remaining learned-arm runs; see the
+    correction below): no amendment, and
     the reasons. It also records a diagnosis: the bar was feasible (bound 0.927), but the decay horizon did not
     transfer from S = 2.
   - **Declared hazard.** SPLIT_THR = 0.88 fires on oracle-quality runs at S = 4, so WIDE_SPLIT's ROUTED count is
@@ -40,7 +41,7 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
     evaluation, and SET stayed at SINGLE's level, with GAP ≈ 0.
   - **The split.** 30 fires, all on merged maps; the declared hazard did not arise.
   - **Correction to the pre-run note.** Three WIDE_SPLIT runs had already finished on the 1660 when it was committed.
-    It was still blind: no learned-arm record was pushed until 13:53.
+    On the author's statement it was still blind: no learned-arm record was in git until 13:53.
   - **WIDE_SLOW (seeds 830–839).** 0/10 ROUTED and source-blind, as WIDE_SPLIT. Neither arm routed on any shared
     seed.
 - **S75b draft spec (s75b_spec_draft.md, for the user).** The design commit 1e31409 was built on a tree without S75's
@@ -51,8 +52,10 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   - SPLIT_THR set from the pilot, and the split guarded against one-to-one maps.
   - Fresh seeds 850–859, and an estimated ~1.4 days on both cards.
 - **S75b driver** (explore_gpu/s75b.py, with CHECKs in s75b_checks.py). It implements the spec as approved at 114cd08.
-  - **Changes since approval (not blind).** Every change is listed in the spec's appendix and is written into each
-    record. None changes a design constant.
+  - **Changes since approval (not blind).** Every change is listed in the spec's appendices.
+    - They are written into the benchmark files, the results files' meta, the stage-1 record, stage 2's meta and the
+      report; not into per-run records.
+    - None changes a design constant.
   - **Failure rules (2026-10-13, before the pilot; spec Appendix B).** These cover the four outcomes Referee V found
     uncovered (a failed pilot run, a code change, a failed ORACLE run, a failed benchmark). They were reviewed
     adversarially and revised once.
@@ -60,7 +63,8 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
     - **Other failures.** They are rerun on the same seed. Two invocations halt the seed for the user.
     - **The pilot.** A run below 0.9, or a diverged run, is a final STOP.
     - **Stage 2.** The code freezes for good once stage 2 starts.
-  - **CPU CHECKs B1–B9 pass.** The cards' CUDA CHECKs and benchmarks are rerun on the commit that adds these rules.
+  - **CHECKs.** The CPU CHECKs B1–B9 are run on the final commit, and the cards' CUDA CHECKs and benchmarks are rerun on
+    it.
 - **window_gate on the GTX 1660 SUPER** (gpu/mainline/window_gate_prerun_note_2026-10-12.md). The pre-run note was
   committed before the run, with no reading. It covers:
   - CEIL_C on 2540–2541 first;

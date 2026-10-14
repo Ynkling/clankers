@@ -18,15 +18,32 @@ are s75b.CHANGES_SINCE_SPEC). EXPLORATORY tooling.
       rows equal explore_i_common.make_split's on the same model (the fields both record), the two models end bitwise
       equal and so do W_g's Adam states (the second optimizer loaded from a deep copy of the first's state).          cpu
   B3  the routing margin in chunks of 16 sequences equals the 64-sequence chunks to 1e-12 (relative), at L = 1536.  cpu
-  B4  the rules on constructed inputs: proceed iff mean >= 0.912 and each >= 0.9 (edges included: mean exactly 0.912,
-      a run exactly 0.9); SPLIT_THR = min - 0.03 unrounded; a missing or failed record never proceeds; the stop's
-      wording; register_rule (scan fits / does not fit / failed); held_evals, workers_rule and ram_budget.            cpu
-  B5  refusals (stage 1 and stage 2) in a temporary output directory: no record; the record, the pilot results file
-      not committed (a temporary git repository: untracked, committed, modified; the committed pilot records disagreeing);
-      record != pilot; an incomplete pilot; pilot records under another code SHA; the pilot stopped; records of one seed
-      from two cards; a machine's arms with records from another card; a card that is not the machine's; on a (faked)
-      CUDA card: no benchmark, a failed benchmark, a refusing worker rule, no CUDA CHECK output; pilot records from
-      another card at stage 1; the machine -> arms allocation; git_committed itself.                                 cpu
+  B4  the rules on constructed inputs: proceed iff mean >= 0.912 and each >= 0.9 (edges included); SPLIT_THR =
+      min - 0.03 unrounded; the stop's wording; register_rule; held_evals, workers_rule, ram_budget; FAILURES:
+      failure_kind (the finiteness check's error diverged, the replay assert operational), seed_status (diverged
+      outranks ok and holds under any code; halted after operational failures in two invocations; a clear names the
+      invocations it clears, its time irrelevant; an open marker counts after its own invocation), pilot_decision (a
+      value STOP as soon as a run is below 0.9 or diverged; a halted seed leaves the decision to the user), bench_why
+      per arm (status, the arm's cases, workers).                                                                  cpu
+  B5  refusals and mechanics in temporary output directories:
+      - stage 1 / 2 refusals: no record; record != pilot; the record, every results file and the code not committed
+        (a temporary git repository); the pilot incomplete, under another code, stopped; records from two cards;
+        machine / card names; fallbacks without --reason; a benchmark that allows none of the machine's arms, did not
+        finish, or refuses on host memory; per-arm usability (card_setup); the CUDA CHECK output missing, failed,
+        without B9 or under another code; --device cpu with commits required;
+      - run_arm on a fake trainer: a divergence tried once; an operational failure retried, then the invocation stops
+        (later seeds not charged); two invocations halt; --retry-halted clears; a killed process's open marker; seeds
+        ok or diverged on another card or under another code are not run;
+      - value STOPs final under any code (record files and pilot records alone); archived PROCEED / halted records do
+        not stop; the stage-2 freeze (also through an open marker only); a superseded code; --code-change-note;
+      - a pilot split across two cards' committed files reaches stage 2; --retry-halted through stage 1; the stage-2
+        abort and its recorded reason; a crashing benchmark ('in progress', the earlier file archived);
+      - the report on synthetic stores: a diverged read-arm seed (n stays 10), a divergence outranking an ok record,
+        a diverged ORACLE (NOT VALID), halted ORACLE / read-arm seeds (incomplete), SINGLE diverged (no GAP), 8/10
+        ROUTED (carries), no reading after a value STOP or under two stage-2 codes, the failure log across codes,
+        'cannot start' only when both cards' benchmarks refuse the pilot;
+      - sync_state on temporary repositories: behind, up to date, an uncommitted JSON, unpushed commits, a failed
+        fetch; git_committed itself; the machine allocation.                                                     cpu
   B6  S75's code SHA is still 5fb120a92d69 (S75b imports S75's modules and changes none).                            cpu
   B7  LOCK-STEP at L = 1536, R = 1 (as the runs): batched (explore_gpu.batched) vs sequential (the project's model) on
       the same device, explore_gpu.checks.Judge at same-device tolerances, each seed alone; per update the batched
@@ -38,10 +55,13 @@ are s75b.CHANGES_SINCE_SPEC). EXPLORATORY tooling.
       must fail (small configuration).                                                                      cpu and cuda
   B8  the whole driver end to end on a small configuration (S = 4, NB = 3, M = 30; 1200 updates; evaluation every 400;
       the split's schedule 400 / 400 / 800, rise 1.0; the proceed bar at 0 so stage 2 runs): stage 1, the stage-1 record,
-      stage 2 (fallback: every arm; every WIDE_SPLIT_G row records the map), the report (its sections); the guarded
-      trigger inside run_batched_icmc (split schedule 2 / 2 / 4, threshold 1.01, R = 2): each run's eligible check
-      fires (W_g's Adam state zeroed, the rows moved) or is blocked one-to-one on a one-to-one map; the benchmark path
-      on the small configuration (both register modes, the host-memory measurements and the worker rule).            cpu
+      stage 2 (fallback with a reason: every arm; every WIDE_SPLIT_G row records the map), the report (its sections; an
+      injected divergence of ORACLE 851 with ORACLE 850 above 0.9 gives NOT VALID by the divergence branch); the guarded
+      trigger inside run_batched_icmc (split schedule 2 / 2 / 4, threshold 1.01, R = 2); the benchmark path on the small
+      configuration (both register modes, the host-memory measurements and the worker rule).                       cpu
+  B9  a real divergence: parameters poisoned with NaN or inf after the first evaluation of real run_batched_icmc runs
+      (in line and with a StatsPool worker; ORACLE, SINGLE, REG3 loop, and scan on CUDA, WIDE_SPLIT_G guarded) fail
+      with an error classed 'diverged'; run_arm on a poisoned run: one attempt, status diverged, no abort.  cpu and cuda
 """
 
 import argparse
@@ -265,7 +285,9 @@ def b4_rules(dev):
                         f"ORACLE|851|{sh}|c1": [F("operational", "i1"), F("operational", "i1")],
                         f"SINGLE|852|{sh}|c1": [F("operational", "i1"), F("operational", "i2")],
                         f"SINGLE|853|{sh}|c1": [F("operational", "i1"), F("operational", "i2"),
-                                                F("cleared", "i3", at="2026-01-01 00:00:02.000000")],
+                                                F("cleared", "i3", at="2020-01-01 00:00:00", clears=["i1", "i2"])],
+                        f"SINGLE|857|{sh}|c1": [F("operational", "i1"), F("operational", "i2"),
+                                                F("cleared", "i3", clears=["i1"])],
                         f"SINGLE|854|{sh}|c1": [F("operational", "i1", open=True)],
                         f"SINGLE|855|old|c2": [F("diverged", "i0")]}}
     old_inv = sb.INVOCATION
@@ -273,15 +295,16 @@ def b4_rules(dev):
     got = {(a, s_): sb.seed_status(st_, a, s_, sh) for a, s_ in (("ORACLE_PILOT", 840), ("ORACLE_PILOT", 841),
                                                                   ("ORACLE", 850), ("ORACLE", 851), ("SINGLE", 852),
                                                                   ("SINGLE", 853), ("SINGLE", 854), ("SINGLE", 855),
-                                                                  ("SINGLE", 856))}
+                                                                  ("SINGLE", 856), ("SINGLE", 857))}
     sb.INVOCATION = "i1"
     own = sb.seed_status(st_, "SINGLE", 854, sh)
     sb.INVOCATION = old_inv
     want = {("ORACLE_PILOT", 840): "ok", ("ORACLE_PILOT", 841): "diverged", ("ORACLE", 850): "ok",
             ("ORACLE", 851): "failed", ("SINGLE", 852): "halted", ("SINGLE", 853): "missing",
-            ("SINGLE", 854): "failed", ("SINGLE", 855): "diverged", ("SINGLE", 856): "missing"}
-    out["seed_status: ok / diverged over ok / failed in one invocation / halted in two / cleared / an open marker of "
-        "another invocation / a divergence under another code / missing"] = dict(
+            ("SINGLE", 854): "failed", ("SINGLE", 855): "diverged", ("SINGLE", 856): "missing", ("SINGLE", 857): "failed"}
+    out["seed_status: ok / diverged over ok / failed in one invocation / halted in two / a clear naming both (its time "
+        "irrelevant) / a clear naming one / an open marker of another invocation / a divergence under another code / "
+        "missing"] = dict(
         ok=got == want and own == "missing", got={f"{a} {s_}": v for (a, s_), v in got.items()}, own_open=own)
     ok2 = {840: _rec(0.93), 841: _rec(0.92)}
     d = sb.pilot_decision(ok2, {840: "ok", 841: "diverged"})
@@ -437,6 +460,8 @@ def b5_refusals(dev):
         with temp_out() as d:
             _b5_failures(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070)
         with temp_out() as d:
+            _b5_more(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070)
+        with temp_out() as d:
             _b5_reports(d, out, sha, hw, G1660, G3070)
         sb.sync_state = real["sync"]
         _b5_sync(out)
@@ -466,7 +491,7 @@ def _b5_temp(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G
     _git_repo(d)
     out["record not committed (untracked)"] = expect_exit(s2(rc=True, card=G1660), "the stage-1 record (")
     _commit(d, sb.record_paths()[0])
-    out["pilot results file not committed"] = expect_exit(s2(rc=True, card=G1660), "pilot results file")
+    out["pilot results file not committed"] = expect_exit(s2(rc=True, card=G1660), "every results file")
     _commit(d, sb.store_path(hw))
     out["both committed -> past the commit checks (to the benchmark)"] = expect_exit(s2(rc=True, card=G1660),
                                                                                      "no benchmark")
@@ -511,8 +536,9 @@ def _b5_temp(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G
                                                                                 "no benchmark")
     out["no benchmark (stage 2, CUDA)"] = expect_exit(s2("3070", card=G3070), "no benchmark")
     b3 = _bench_ok(sha, G3070)
-    sb.save_json(dict(b3, all_ok=False, arms=dict(b3["arms"], **{"REG3 loop": dict(ok=False)})), sb.bench_path(G3070))
-    out["failed benchmark case of the machine's arms"] = expect_exit(s2("3070", card=G3070), "failed cases ['REG3 loop']")
+    sb.save_json(dict(b3, all_ok=False, arms=dict(b3["arms"], **{"REG3 loop": dict(ok=False),
+                                                                 "WIDE_SPLIT_G": dict(ok=False)})), sb.bench_path(G3070))
+    out["a benchmark that allows none of the machine's arms"] = expect_exit(s2("3070", card=G3070), "allows none")
     sb.save_json(dict(b3, status="in progress"), sb.bench_path(G3070))
     out["a benchmark that did not finish counts as failed"] = expect_exit(s2("3070", card=G3070), "did not finish")
     sb.save_json(dict(b3, stats_workers=None, workers_why="refuse: test"), sb.bench_path(G3070))
@@ -521,8 +547,13 @@ def _b5_temp(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G
     sb.save_json(dict(b1, all_ok=False, arms=dict(b1["arms"], **{"REG3 loop": dict(ok=False)})), sb.bench_path(G1660))
     out["1660: a failed REG3 case still allows its own arms (-> past, to the CUDA CHECK output)"] = expect_exit(
         s2("1660", card=G1660), "CUDA CHECK output")
-    out["1660 fallback: a failed REG3 case does not allow every arm"] = expect_exit(s2("fallback", card=G1660),
-                                                                                  "failed cases ['REG3 loop']")
+    res0 = dict(meta=dict(s75b_sha=sha), checks={f"B{i}": dict(ok=True) for i in range(1, 10)})
+    sb.save_json(res0, sb.checks_output_path(G1660))
+    with fake_card(G1660):
+        cs = sb.card_setup(torch.device("cuda"), G1660, sha, False, "checks", sb.STAGE2)
+    out["card_setup per arm: a failed REG3 case refuses REG3 only, the other arms run"] = (
+        set(cs[4]) == set(sb.STAGE2) - {"REG3"} and set(cs[5]) == {"REG3"}, f"allowed {cs[4]}, refused {sorted(cs[5])}")
+    os.remove(sb.checks_output_path(G1660))
     sb.save_json(b3, sb.bench_path(G3070))
     out["no CUDA CHECK output"] = expect_exit(s2("3070", card=G3070), "CUDA CHECK output")
     res = dict(meta=dict(s75b_sha=sha), checks={f"B{i}": dict(ok=True) for i in range(1, 10)})
@@ -667,8 +698,7 @@ def _b5_failures(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G166
     out["stage 2 under another code: stages refuse (the code is frozen)"] = (
         expect_exit(s2(card=G1660), "frozen")[0] and expect_exit(s1(G1660), "frozen")[0], "")
     txt = sb.report(log=lambda *a: None, sha=sha, out=os.path.join(d, "summary_frozen.md"))
-    out["report: a code change during stage 2 -> no reading"] = (
-        "NOT THE STAGE-2 CODE" in txt or "CODE CHANGED DURING STAGE 2" in txt, "")
+    out["report under a code that is not stage 2's -> no reading"] = ("NOT THE STAGE-2 CODE" in txt, "")
     # a diverged pilot seed with an ok record on another card: the divergence counts
     os.remove(sb.store_path(hw))
     pilot_store((0.93, 0.92))
@@ -677,6 +707,98 @@ def _b5_failures(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G166
     st3["failures"] = {f"ORACLE_PILOT|841|{sha}|other card": [dict(kind="diverged", invocation="o", attempt=1, at="x")]}
     sb.save_json(st3, sb.store_path(hw))
     out["stage 2: a diverged pilot seed outranks its ok record elsewhere"] = expect_exit(s2(card=G1660), "does not match")
+
+
+def _b5_more(d, out, expect_exit, pilot_store, record, s2, s1, sha, hw, G1660, G3070):
+    """A pilot split across two cards, the code-change note, a superseded code, the freeze through an open marker,
+    --retry-halted through stage 1, the stage-2 abort, a crashing benchmark and its archive."""
+    _git_repo(d)
+    sb.save_json({"meta": {}, "runs": {f"ORACLE_PILOT|840|{sha}|{G3070}": dict(_rec(0.93), hw=G3070)}},
+                 sb.store_path(G3070))
+    sb.save_json({"meta": {}, "runs": {f"ORACLE_PILOT|841|{sha}|{G1660}": dict(_rec(0.92), hw=G1660)}},
+                 sb.store_path(G1660))
+    sb.write_stage1_record(dict(sha=sha, decision=sb.pilot_of(sb.load_all(), sha), machine=[G1660, G3070]), ["split"])
+    _commit(d, sb.store_path(G3070), sb.store_path(G1660), *sb.record_paths())
+    out["a pilot split across two cards' committed files passes stage 2's commit check (-> the benchmark)"] = expect_exit(
+        s2(rc=True, card=G1660), "no benchmark")
+    os.remove(sb.store_path(G3070))
+    os.remove(sb.store_path(G1660))
+    for p_ in sb.record_paths():
+        os.remove(p_)                     # (a record under this code, then one under 000000000000, would supersede it)
+    # the code-change note
+    sb.write_stage1_record(dict(sha="000000000000", decision=dict(complete=True, proceed=True,
+                                                                  sets={840: 0.95, 841: 0.95})), ["old"])
+    out["stage 1 under a new code without --code-change-note"] = expect_exit(s1(G1660), "--code-change-note")
+    note = os.path.join(d, "code_change_note.md")
+    with open(note, "w") as f:
+        f.write("2026-10-14: a dated note (checks)\n")
+
+    def s1n(rc):
+        def f():
+            with fake_card(G1660):
+                sb.stage1("cpu", require_commit=rc, code_change_note=note)
+        return f
+    out["stage 1 with an uncommitted code-change note"] = expect_exit(s1n(True), "code-change note")
+    _commit(d, note)
+    out["stage 1 with a committed code-change note -> past (to the benchmark)"] = expect_exit(s1n(True), "no benchmark")
+    # a superseded code is never used again
+    sb.save_json(dict(sha=sha, decision=dict(complete=True, proceed=True)), sb.record_paths(sha)[0])
+    out["a superseded code: stage 1 and stage 2 refuse"] = (
+        expect_exit(s1(G1660), "superseded")[0] and expect_exit(s2(card=G1660), "superseded")[0], "")
+    os.remove(sb.record_paths(sha)[0])
+    # the freeze through an open marker only (a stage-2 process killed under another code)
+    sb.save_json({"meta": {}, "runs": {}, "failures": {f"REG3|852|oldsha000000|{hw}": [
+        dict(kind="operational", open=True, invocation="x", attempt=1, at="x")]}}, sb.store_path(hw))
+    out["the freeze through an open marker only"] = (expect_exit(s1(G1660), "frozen")[0]
+                                                     and expect_exit(s2(card=G1660), "frozen")[0], "")
+    os.remove(sb.store_path(hw))
+    for p_ in sb.record_paths():
+        os.remove(p_)
+    # --retry-halted through stage 1 (CPU, the fake trainer)
+    k841 = f"ORACLE_PILOT|841|{sha}|{hw}"
+    op = lambda inv: dict(kind="operational", invocation=inv, attempt=1, at="x", error="OOM")
+    sb.save_json({"meta": {}, "runs": {f"ORACLE_PILOT|840|{sha}|{hw}": dict(_rec(0.93), hw=hw)},
+                  "failures": {k841: [op("a"), op("b")]}}, sb.store_path(hw))
+    calls = []
+    gr.run_batched_icmc = _fake_runs({841: "ok"}, calls)
+    try:
+        d1, _ = sb.stage1("cpu", require_commit=False, retry_halted=True, log=lambda *a: None)
+    finally:
+        gr.run_batched_icmc = _trap
+    fl = sb.load(hw)["failures"].get(k841) or []
+    out["--retry-halted through stage 1: the halt is cleared (naming its invocations), the seed runs once, the pilot "
+        "decides"] = (calls == [841] and d1["proceed"] and any(f.get("kind") == "cleared" and set(f.get("clears") or [])
+                                                               == {"a", "b"} for f in fl), f"{calls} {d1.get('why')}")
+    # the stage-2 abort
+    calls = []
+    gr.run_batched_icmc = _fake_runs({850: "OutOfMemoryError: CUDA out of memory.", 851: "ok"}, calls)
+    try:
+        miss = sb.stage2("cpu", "fallback", require_commit=False, reason="checks", log=lambda *a: None)
+    finally:
+        gr.run_batched_icmc = _trap
+    meta2 = (sb.load(hw)["meta"].get("stage2_invocations") or [{}])[-1]
+    out["stage 2: an operational failure that survives the retry stops the invocation; the reason is recorded"] = (
+        "(aborted)" in miss and calls == [850, 850] and meta2.get("reason") == "checks", f"{calls} {sorted(miss)}")
+    # a crashing benchmark leaves its file 'in progress'; an earlier file is archived
+    bp = sb.bench_path(hw)
+    sb.save_json(dict(written="2026-01-01 00:00:00", status="done"), bp)
+
+    def boom(*a, **kw):
+        raise KeyboardInterrupt("checks: the benchmark dies")
+    gr.run_batched_icmc = boom
+    try:
+        try:
+            sb.bench("cpu", 12.0, beside="none", iters=2, every=1, log=lambda *a: None, path=bp)
+            crashed = False
+        except KeyboardInterrupt:
+            crashed = True
+    finally:
+        gr.run_batched_icmc = _trap
+    b = json.load(open(bp))
+    arch = sorted(os.listdir(os.path.join(os.path.dirname(bp), "bench_archive")))
+    out["a crashing benchmark leaves its file 'in progress' (counted as failed); the earlier file is archived"] = (
+        crashed and b.get("status") == "in progress" and "did not finish" in (sb.bench_why(b, ("ORACLE_PILOT",)) or "")
+        and len(arch) == 1, f"{crashed} {b.get('status')} {arch}")
 
 
 def _arm_records(arm, seeds, sha, card, sets=0.6, routed=False):
@@ -691,7 +813,7 @@ def _arm_records(arm, seeds, sha, card, sets=0.6, routed=False):
 def _b5_reports(d, out, sha, hw, G1660, G3070):
     """The report's rules on synthetic stores (no training)."""
     def store(mods=None, fails=None):
-        runs = {}
+        runs = {f"ORACLE_PILOT|{s_}|{sha}|{hw}": dict(_rec(0.95), hw=hw) for s_ in sb.PILOT_SEEDS}   # PROCEED
         runs.update(_arm_records("ORACLE", sb.ORACLE_SEEDS, sha, hw, 0.95))
         for a in ("SINGLE", "WIDE_SPLIT_G", "REG3", "WIDE_SLOW"):
             runs.update(_arm_records(a, sb.SEEDS, sha, hw, 0.6 if a == "SINGLE" else 0.62))
@@ -737,6 +859,18 @@ def _b5_reports(d, out, sha, hw, G1660, G3070):
     sb.save_json(runs, sb.store_path(hw))
     t = rep_("carries")
     out["report: REG3 ROUTED on 8/10 -> 'carries to four sources'"] = ("carries to four sources" in t, "")
+    # no reading after a value STOP under another code; two stage-2 codes; the failure log across codes
+    store({f"ORACLE_PILOT|840|stopsha00000|{hw}": dict(_rec(0.85), hw=hw)},
+          {f"ORACLE_PILOT|841|othersha0000|{hw}": F("operational", "z")})
+    t = rep_("stop")
+    rd = next(l for l in t.splitlines() if l.startswith("READING"))
+    out["report: a value STOP under another code -> NO READING; the failure log prints every code"] = (
+        "NO READING: S75b stopped at stage 1" in rd and "code othersha0000" in t, rd[:100])
+    store({f"REG3|850|zzzzzzzzzzzz|{hw}": dict(_rec(0.6), hw=hw)}, {})
+    t = sb.report(log=lambda *a: None, out=os.path.join(d, "r_twocodes.md"))
+    rd = next(l for l in t.splitlines() if l.startswith("READING"))
+    out["report: stage-2 records under two codes -> CODE CHANGED DURING STAGE 2, no reading"] = (
+        "CODE CHANGED DURING STAGE 2" in rd and "carries" not in rd, rd[:100])
     # the benchmark lines
     store({}, {})
     bad = dict(_bench_ok(sha, "x"), stats_workers=None, workers_why="refuse: test")
@@ -783,11 +917,21 @@ def _b5_sync(out):
             with open(os.path.join(a, "out", "s75b_stage1_record.json"), "w") as f:
                 f.write("{}\n")
             dirty = sb.sync_state()
+            _git(a, "add", "-A")
+            _git(a, "commit", "-q", "-m", "record")
+            unpushed = sb.sync_state()
+            _git(a, "push", "-q")
+            url = _git(a, "remote", "get-url", "origin")
+            _git(a, "remote", "set-url", "origin", os.path.join(t, "nonexistent.git"))
+            nofetch = sb.sync_state()
+            _git(a, "remote", "set-url", "origin", url)
+            again = sb.sync_state()
         finally:
             sb.OUT = old
-    out["sync_state: behind the upstream / up to date / an uncommitted JSON in OUT"] = (
-        (not behind[0]) and "behind" in behind[1] and fresh[0] and (not dirty[0]) and "uncommitted" in dirty[1],
-        f"{behind} {fresh} {dirty}")
+    out["sync_state: behind / up to date / an uncommitted JSON / unpushed commits / a failed fetch / up to date again"] = (
+        (not behind[0]) and "behind" in behind[1] and fresh[0] and (not dirty[0]) and "uncommitted" in dirty[1]
+        and (not unpushed[0]) and "unpushed" in unpushed[1] and (not nofetch[0]) and "fetch failed" in nofetch[1]
+        and again[0], f"{behind} {fresh} {dirty} {unpushed} {nofetch} {again}")
 
 
 def b6_s75_sha(dev):
@@ -985,6 +1129,7 @@ def b8_end_to_end(dev):
           and all(len(v) == 2 for v in out["stage2"]["records"].values())
           and len(out["stage2"]["split_checks"]) > 0 and out["stage2"]["rows_record_map"] and out["stage2"]["meta_changes"]
           and all(out["stage2"]["host"]) and not out["report"]["missing_sections"] and out["report_diverged"]["ok"]
+          and out["stage2"]["meta"].get("reason") == "checks (CPU)"
           and bn["all_ok"] and bn["stats_workers"] is not None and bn["worker_gb"] and bn["payload_gb"]
           and bn["stats_secs"] is not None and bn["secs_per_update"] and g_ok)
     return dict(ok=bool(ok), **out)

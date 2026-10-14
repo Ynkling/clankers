@@ -45,8 +45,8 @@ OUTCOMES, VALID, READING (S75's): ROUTED := at every gate layer eta^2 by source 
   GAP, eta^2, margin and the probe are descriptions only, never re-read under a later bar, and the pilot is never pooled
   with 850-851).
 MACHINES (fixed): the GTX 1660 SUPER runs ORACLE 850-851, SINGLE and WIDE_SLOW; the RTX 3070 Laptop runs REG3 and
-  WIDE_SPLIT_G; if the 3070 is unavailable when stage 2 starts, every arm runs on the 1660 (--machine fallback) and
-  nothing is dropped; if the 1660 is unavailable or its benchmark does not allow its arms, every arm runs on the 3070
+  WIDE_SPLIT_G; if the 3070 is unavailable or unusable when stage 2 starts, every arm runs on the 1660 (--machine
+  fallback) and nothing is dropped; if the 1660 is unavailable or its benchmark does not allow its arms, every arm runs on the 3070
   (--machine fallback-3070); both fallbacks need --reason (FAILURES). R = 1 for every arm on both cards. REG3's register mode by rule from this card's benchmark: "scan" if
   the benchmark's peak reserved memory with the scan, plus the context (memory in use beyond this process's reserve),
   is below the card's total; otherwise "loop". --stats-workers from the benchmark's host memory, by this driver's
@@ -66,7 +66,8 @@ after this driver's own review; NOT BLIND; spec Appendix B):
     record keeps each seed's card).
   - HALTS.
     - A seed with operational failures in OPERATIONAL_LIMIT = 2 invocations is HALTED. The driver does not run it again
-      until the user clears it (--retry-halted, recorded with its time) or the code changes before stage 2.
+      until the user clears it (--retry-halted) or the code changes before stage 2.
+    - A clear names exactly the invocations it clears; no rule compares times across machines.
     - A halt waits on the user. It is never a STOP, never final, and says nothing about B.
   - THE PILOT.
     - A value STOP is decided as soon as a pilot run ends below 0.9 or diverges, whatever the other seed: "S = 4 is not
@@ -74,36 +75,44 @@ after this driver's own review; NOT BLIND; spec Appendix B):
     - Otherwise the proceed rule applies once both runs are ok.
     - A halted pilot seed leaves the decision to the user.
   - A CODE CHANGE.
-    - Before stage 2 starts: the code is frozen from stage 1. A change that cannot be avoided (a bug that stops a stage)
-      is committed with a dated note, and the CUDA CHECKs, the benchmarks and the pilot (840-841) are rerun under the
-      new code.
+    - Before stage 2 starts: the code (every module in the code SHA) is frozen from stage 1. A change that cannot be
+      avoided (a bug that stops a stage) needs a committed, dated note, passed as --code-change-note to the first stage 1
+      under the new code; the CUDA CHECKs, the benchmarks and the pilot (840-841) are rerun under it.
     - A value STOP under any code is final. It is recomputed from every code's pilot records, not only from the record
       files.
     - Stage 2 needs every complete stage-1 decision, under every code, to be PROCEED. SPLIT_THR comes from the pilot
       under the code stage 2 runs. Earlier stage-1 records are kept as s75b_stage1_record_<sha>.*, printed, never pooled.
+    - A superseded code (its record archived) is never used again: a revert cannot re-adopt an earlier pilot.
     - Once stage 2 has a record or a failure under one code, the code is frozen for good. Stage 1 and stage 2 refuse
-      under any other code: a change halts the screen for the user, and no outcome is re-drawn.
+      under any other code: a change halts the screen for the user, and no outcome is re-drawn. The other machine sees
+      the freeze once stage 2's results file is pushed, so it is pushed as soon as stage 2 starts.
   - STAGE 2.
     - A diverged ORACLE 850 / 851 run counts as below 0.9: NOT VALID, so the reading is UNTESTED.
     - A diverged learned-arm run is not ROUTED, and its seed stays in n (n stays 10).
     - A diverged SINGLE run gives no GAP for its seed.
     - A halted seed leaves validity or the reading incomplete until the user decides.
   - THE BENCHMARK.
-    - A card is usable for a set of arms iff its latest benchmark under this code finished, passed every case those arms
-      use (REG3 in the chosen register mode), and its host-memory rule gave workers.
-    - A benchmark may be rerun under the same code: it measures and decides no outcome. Each earlier file is kept in
-      bench_archive/. A benchmark that crashes leaves its file "in progress", which counts as failed.
+    - Usability is per arm: an arm runs on a card iff the card's latest benchmark under this code finished, passed every
+      case the arm uses (REG3 in the chosen register mode), and its host-memory rule gave workers.
+    - A stage runs the arms its card allows and names the ones it refuses; a stage with no allowed arm refuses.
+    - A benchmark may be rerun under the same code at any time: it measures and decides no outcome. Each earlier file is
+      kept in bench_archive/. A benchmark that crashes leaves its file "in progress", which counts as failed. Each run
+      record carries the benchmark it ran under (commit, written) and its workers.
     - If one card is unusable or unavailable, the other runs everything: --machine fallback on the 1660, --machine
-      fallback-3070 on the 3070. Both need --reason, which is written into stage 2's meta.
-    - If no card's benchmark allows the pilot, S75b cannot start. No configuration, R or batch is changed to make a card
-      fit; the user decides.
-  - SYNC. With commits required, stage 1 and stage 2 refuse unless the checkout is up to date with its upstream (after a
-    git fetch) and every S75b JSON file in OUT is committed. The stage-1 record and the results files are committed and
-    pushed whatever the decision. --device cpu is for the CHECKs only.
+      fallback-3070 on the 3070. Both need --reason, which is written into stage 2's meta and records.
+    - If no card's benchmark allows the pilot, S75b cannot start. If no card's benchmark allows a stage-2 arm, that arm
+      cannot run and the reading is incomplete. No configuration, R or batch is changed to make a card fit; the user
+      decides.
+  - SYNC. With commits required, stage 1 and stage 2 refuse unless a git fetch succeeds, the checkout is neither
+    behind nor ahead of its upstream, and every S75b JSON file in OUT is committed. Stage 2 reads the pilot from every
+    card's committed results file. The stage-1 record and the results files are committed and pushed whatever the
+    decision. --device cpu is for the CHECKs only.
 
-CHANGES SINCE 114cd08 (CHANGES_SINCE_SPEC below; written into the benchmark files, the stage-1 record, stage 2's meta and
-  the report). They were made after S75's learned-arm records were read, so they are NOT BLIND; none changes a constant
-  of the design (configuration, seeds, arms, outcomes, bars, the proceed rule, SPLIT_THR's rule, the reading):
+CHANGES SINCE 114cd08 (spec Appendix A; CHANGES_SINCE_SPEC below holds these items and Appendix B's failure, sync and
+  provenance items, and is written into the benchmark files, the results files' meta, the stage-1 record, stage 2's meta
+  and the report). They were made after S75's learned-arm records were read, so they are NOT BLIND. None changes a
+  design constant (configuration, seeds, arms, bars, the proceed rule, SPLIT_THR's rule); the failure rules (FAILURES)
+  extend the outcomes, VALID and the reading to failed runs:
   - The pilot may run on the RTX 3070 if it is free before the GTX 1660 (the user's message of 12 October, round 3); the
     stage-1 record names the card.
   - Host memory: in S75b's processes the routing margin (explore_i_common.margin_of) runs in chunks of MARGIN_CHUNK = 16
@@ -120,8 +129,7 @@ CHANGES SINCE 114cd08 (CHANGES_SINCE_SPEC below; written into the benchmark file
   - Records of one arm and seed from two cards are not resolved by the driver: stage 1 / 2 refuse, and the report prints
     them and marks the reading incomplete.
   - Order: stage 1 needs the driver's code, this card's benchmark and its CUDA CHECK output committed; stage 2 needs the
-    driver's code, the stage-1 record, the pilot results file and this card's benchmark and CUDA CHECK output committed,
-    and the pilot card's benchmark unchanged since the stage-1 record.
+    driver's code, the stage-1 record, every results file, and this card's benchmark and CUDA CHECK output committed.
   - CHECK B7 (the spec's lock-step at L = 1536): R = 1 as the runs, each seed alone, batch 8 on CUDA (the R = 2, batch-32
     lock-step does not fit either card), REG3 in both register modes on both cards.
 
@@ -186,7 +194,7 @@ STAGE2 = ("ORACLE", "SINGLE", "WIDE_SPLIT_G", "REG3", "WIDE_SLOW")
 MACHINE_ARMS = {"1660": ("ORACLE", "SINGLE", "WIDE_SLOW"), "3070": ("REG3", "WIDE_SPLIT_G"), "fallback": STAGE2,
                 "fallback-3070": STAGE2}
 MACHINE_GPU = {"1660": "GTX 1660", "3070": "RTX 3070", "fallback": "GTX 1660", "fallback-3070": "RTX 3070"}
-OPERATIONAL_LIMIT = 2                      # invocations with an operational failure of one seed before it CANNOT RUN
+OPERATIONAL_LIMIT = 2                      # invocations with an operational failure of one seed before it is HALTED
 MARGIN_CHUNK = 16
 MAX_WORKERS = 3                            # explore_gpu.run's default on CUDA
 DATA_PROC_GB = 0.5                         # the data process, where its peak cannot be measured (no /proc)
@@ -236,31 +244,34 @@ CHANGES_SINCE_SPEC = dict(
         "committed",
         "CHECK B7 (lock-step at L = 1536): R = 1 as the runs, each seed alone, batch 8 on CUDA, REG3 in both register "
         "modes (the R = 2, batch-32 lock-step does not fit either card)",
-        "failed runs (rules added 2026-10-13, before the pilot, revised after review): DIVERGED = the evaluation's "
+        "failed runs (rules added 2026-10-13, before the pilot, revised after two reviews): DIVERGED = the evaluation's "
         "logits not all finite (checked before anything else), the non-finite-loss check, or a NaN / inf in a "
         "statistic: an outcome, never retried or rerun, under any code, on any card; any other failure, including a "
         "process that ended without a record (an open start marker), is OPERATIONAL: rerun on the same seed, never a "
         "fresh seed, on whichever card runs the arm; an invocation stops at the first operational failure that "
         "survives the retry; operational failures in 2 invocations HALT the seed until the user clears it "
-        "(--retry-halted) or the code changes before stage 2; a halt is never a STOP",
+        "(--retry-halted, naming the invocations it clears) or the code changes before stage 2; a halt is never a STOP",
         "the pilot: a value STOP as soon as a pilot run ends below 0.9 or diverges, whatever the other seed ('S = 4 is "
-        "not usable at B'); a halted seed leaves the decision to the user",
-        "a code change: before stage 2, an unavoidable change is committed with a dated note and the CUDA CHECKs, the "
-        "benchmarks and the pilot (840-841) are rerun under it; a value STOP under any code is final (recomputed from "
-        "every code's pilot records); stage 2 needs every complete stage-1 decision to PROCEED, SPLIT_THR from the "
-        "pilot under its code; earlier records kept as s75b_stage1_record_<sha>.*, never pooled; once stage 2 has a "
-        "record or failure, the code is frozen for good: a change halts the screen for the user, no outcome re-drawn",
+        "not usable at B'); a halted seed leaves the decision to the user; the record lists every invocation and each "
+        "seed's card, and stage 2 reads the pilot from every card's committed results file",
+        "a code change: before stage 2, an unavoidable change needs a committed, dated note (--code-change-note) and "
+        "the CUDA CHECKs, the benchmarks and the pilot (840-841) are rerun under it; a value STOP under any code is "
+        "final (recomputed from every code's pilot records); stage 2 needs every complete stage-1 decision to PROCEED, "
+        "SPLIT_THR from the pilot under its code; earlier records kept as s75b_stage1_record_<sha>.*, never pooled; a "
+        "superseded code is never used again; once stage 2 has a record or failure, the code is frozen for good: a "
+        "change halts the screen for the user, no outcome re-drawn",
         "stage 2: a diverged ORACLE run counts as below 0.9 (UNTESTED); a diverged learned-arm run is not ROUTED (n "
         "stays 10); a diverged SINGLE run gives no GAP for its seed; a halted seed leaves validity or the reading "
-        "incomplete until the user decides",
-        "the benchmark: a card is usable for arms iff its latest benchmark under this code finished, passed the cases "
-        "those arms use and gave workers; a benchmark may be rerun (earlier files kept in bench_archive/; a crashed one "
-        "counts as failed); one card unusable or unavailable: the other runs everything (--machine fallback or "
-        "fallback-3070, each with --reason in stage 2's meta); no card allows the pilot: S75b cannot start, no "
-        "configuration, R or batch change, the user decides",
-        "sync: with commits required, stages refuse unless the checkout is up to date with its upstream and every S75b "
-        "JSON file in OUT is committed; the stage-1 record and results files are pushed whatever the decision; "
-        "--device cpu is for the CHECKs only; seeds may be rerun on either card (the 'one card' pilot refusal is gone)",
+        "incomplete until the user decides; the report gives no reading after a value STOP or a code change in stage 2",
+        "the benchmark: usability per arm (finished, the arm's cases passed, workers given); a stage runs the arms its "
+        "card allows and names the rest; a benchmark may be rerun at any time (earlier files kept in bench_archive/; a "
+        "crashed one counts as failed; each run record carries its benchmark); one card unusable or unavailable: the "
+        "other runs everything (--machine fallback or fallback-3070, each with --reason in stage 2's meta and records); "
+        "no card allows the pilot: S75b cannot start; no card allows an arm: the arm cannot run, the reading is "
+        "incomplete; no configuration, R or batch change; the user decides",
+        "sync: with commits required, stages refuse unless git fetch succeeds, the checkout is neither behind nor ahead "
+        "of its upstream, and every S75b JSON file in OUT is committed; results files are pushed whatever the decision, "
+        "and as soon as stage 2 starts; --device cpu is for the CHECKs only",
         "provenance labels: SPEC_PROVENANCE marks every change after the merge 142f47e (ee97443, 114cd08 and this "
         "list) as not blind by git",
     ])
@@ -503,8 +514,8 @@ def _finite_logits(orig):
 
 @contextlib.contextmanager
 def runtime():
-    """S75b's process-level patches: the small routing margin, the statistics pool, the finiteness check on every
-    evaluation's logits. Restored on exit."""
+    """S75b's process-level patches: the statistics pool and the finiteness check on every evaluation's logits (both
+    restored on exit), and the small routing margin (permanent in S75b's processes)."""
     small_margin()
     old, old_lc = gr.AsyncStats, ic.logits_chunked
     gr.AsyncStats = StatsPool
@@ -604,14 +615,14 @@ def load_all():
 
 
 # ── failed runs (FAILURES in the module docstring) ────────────────────────────
-INVOCATION = f"{time.strftime('%Y-%m-%d %H:%M:%S')} pid {os.getpid()}"   # reset at the start of each stage
+INVOCATION = f"{time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())}Z pid {os.getpid()}"   # reset by each stage
 OPEN_ATTEMPT = "started; the process ended without a record (killed or interrupted)"
 
 
 def now_ts():
-    """This machine's time to the microsecond (failure entries; a clear compares with later entries)."""
+    """UTC with its offset, to the microsecond (failure entries; descriptions only: no rule compares times)."""
     import datetime
-    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    return datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="microseconds")
 
 
 class InvocationAborted(RuntimeError):
@@ -642,12 +653,18 @@ def seed_status(st, arm, seed, sha):
     if any(k.split("|")[:3] == [arm, str(seed), sha] and r.get("ok") for k, r in st["runs"].items()):
         return "ok"
     fl = _fails(st, arm, seed, sha)
-    cleared = max((f.get("at") or "" for f in fl if f.get("kind") == "cleared"), default="")
-    inv = {f.get("invocation") for f in fl if f.get("kind") == "operational" and (f.get("at") or "") > cleared
-           and not (f.get("open") and f.get("invocation") == INVOCATION)}
+    inv = counted_invocations(fl)
     if len(inv) >= OPERATIONAL_LIMIT:
         return "halted"
     return "failed" if inv else "missing"
+
+
+def counted_invocations(fl):
+    """The invocations whose operational failures count toward a halt: every invocation with an operational entry (an
+    open marker of the current invocation excluded: that attempt is running), less those a user's clear named."""
+    cleared = {i for f in fl if f.get("kind") == "cleared" for i in (f.get("clears") or [])}
+    return {f.get("invocation") for f in fl if f.get("kind") == "operational"
+            and not (f.get("open") and f.get("invocation") == INVOCATION)} - cleared
 
 
 def statuses_of(st, arm, sha, seeds=None):
@@ -848,6 +865,24 @@ def code_or_exit(what, require_commit=True):
             raise SystemExit(f"{what}: the driver's code is not committed ({d}): run from a clean checkout")
 
 
+def committed_store():
+    """The S75b state as committed: every s75b_*_results.json in OUT read at its last commit, merged as load_all does."""
+    import glob
+    out = {"meta": {}, "runs": {}, "failures": {}}
+    for p in sorted(glob.glob(os.path.join(OUT, f"{NAME}_*_results.json"))):
+        st = git_committed_json(p)
+        if st:
+            out["meta"][os.path.basename(p)] = st.get("meta", {})
+            out["runs"].update(st.get("runs", {}))
+            out["failures"].update(st.get("failures") or {})
+    return out
+
+
+def superseded(sha):
+    """A code whose stage-1 record was archived when a later code's pilot ran: never used again (FAILURES)."""
+    return os.path.exists(record_paths(sha)[0])
+
+
 def committed_or_exit(path, what, require_commit=True):
     c, clean = git_committed(path)
     if require_commit and (c is None or not clean):
@@ -960,6 +995,7 @@ def bench(device, host_ram_gb, beside="none", iters=12, every=3, log=print, path
                eval_every=every, arms={}, status="in progress", all_ok=False, sha=code_sha()[0],
                provenance=SPEC_PROVENANCE, changes=CHANGES_SINCE_SPEC, written=time.strftime("%Y-%m-%d %H:%M:%S"))
     if path:
+        archive_bench(path)
         save_json(out, path)
     sched = (ic.SPLIT_EVERY, ic.SPLIT_REF, ic.SPLIT_FIRST)
     cases = [("ORACLE", "ORACLE", "auto"), ("SINGLE", "SINGLE", "auto"), ("WIDE_SLOW", "WIDE_SLOW", "auto"),
@@ -1060,6 +1096,22 @@ def bench(device, host_ram_gb, beside="none", iters=12, every=3, log=print, path
     return out
 
 
+def archive_bench(path):
+    """An earlier benchmark file is kept: moved to OUT/bench_archive/ under its 'written' time (FAILURES)."""
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path) as f:
+            old = json.load(f)
+    except Exception:
+        old = {}
+    arch = os.path.join(os.path.dirname(path), "bench_archive")
+    os.makedirs(arch, exist_ok=True)
+    dst = os.path.join(arch, os.path.basename(path)[:-5] + "_" + hw_slug(str(old.get("written") or time.time())) + ".json")
+    os.replace(path, dst)
+    return dst
+
+
 def load_bench(hw, sha):
     p = bench_path(hw)
     if not os.path.exists(p):
@@ -1109,17 +1161,20 @@ def benches(sha):
 
 
 def card_setup(dev, hw, sha, require_commit, what, arms):
-    """This card's run mechanics from its latest benchmark under this code (CUDA: committed, usable for these arms; and the
-    CUDA CHECK output committed and passing). CPU: the statistics in line, REG3 with the loop. Returns (workers,
-    register, bench_commit, checks_commit)."""
+    """This card's run mechanics from its latest benchmark under this code (CUDA: committed; and the CUDA CHECK output
+    committed and passing). Usability is per arm (FAILURES): an arm whose cases the benchmark did not pass is refused
+    and named, the others run; if none of the arms is allowed, the stage refuses. CPU: every arm, the statistics in
+    line, REG3 with the loop. Returns (workers, register, bench_commit, checks_commit, allowed arms, {refused arm: why},
+    the benchmark's 'written')."""
     if dev.type != "cuda":
-        return 0, "loop", None, None
+        return 0, "loop", None, None, tuple(arms), {}, None
     b = load_bench(hw, sha)
     if b is None:
         raise SystemExit(f"{what}: no benchmark for {hw} under code SHA {sha}: run --bench on this card and commit it")
-    why = bench_why(b, arms)
-    if why is not None:
-        raise SystemExit(f"{what}: this card's benchmark does not allow {sorted(arms)}: {why} (FAILURES: the other card "
+    refused = {a: bench_why(b, (a,)) for a in arms if bench_why(b, (a,))}
+    allowed = tuple(a for a in arms if a not in refused)
+    if not allowed:
+        raise SystemExit(f"{what}: this card's benchmark allows none of {sorted(arms)}: {refused} (FAILURES: the other card "
                          f"runs them, --machine fallback / fallback-3070 with --reason)")
     bc = committed_or_exit(bench_path(hw), f"{what}: this card's benchmark", require_commit)
     why = checks_status(hw, sha)
@@ -1127,7 +1182,7 @@ def card_setup(dev, hw, sha, require_commit, what, arms):
         raise SystemExit(f"{what}: this card's CUDA CHECK output ({checks_output_path(hw)}) is {why}: run python -m "
                          f"explore_gpu.s75b_checks --device cuda and commit its output")
     cc = committed_or_exit(checks_output_path(hw), f"{what}: this card's CUDA CHECK output", require_commit)
-    return b["stats_workers"], b["register_reg3"], bc, cc
+    return b["stats_workers"], b["register_reg3"], bc, cc, allowed, refused, b.get("written")
 
 
 def sync_state():
@@ -1139,13 +1194,23 @@ def sync_state():
     except Exception as e:
         return False, f"OUT ({OUT}) is not in a git repository ({type(e).__name__})"
     try:
-        subprocess.run(["git", "fetch", "--quiet"], cwd=top, capture_output=True, text=True, timeout=120)
+        r = subprocess.run(["git", "fetch", "--quiet"], cwd=top, capture_output=True, text=True, timeout=120,
+                           env=dict(os.environ, GIT_TERMINAL_PROMPT="0"))
+    except subprocess.TimeoutExpired:
+        return False, "git fetch timed out: the other machine's state cannot be seen"
+    if r.returncode != 0:
+        return False, (f"git fetch failed (rc {r.returncode}: {r.stderr.strip()[:160]}): the other machine's state "
+                       f"cannot be seen")
+    try:
         up = _git(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"], top).strip()
         behind = int(_git(["rev-list", "--count", "HEAD..@{u}"], top).strip() or 0)
+        ahead = int(_git(["rev-list", "--count", "@{u}..HEAD"], top).strip() or 0)
     except Exception as e:
         return False, f"no upstream branch to compare with ({type(e).__name__}): push the branch and set its upstream"
     if behind:
         return False, f"the checkout is {behind} commits behind {up}: pull first"
+    if ahead:
+        return False, f"the checkout has {ahead} unpushed commits: push first, so the other machine sees them"
     try:
         dirty = [l[3:] for l in _git(["status", "--porcelain", "--untracked-files=all", "--", os.path.dirname(rel)],
                                      top).splitlines() if l.strip().endswith(".json")]
@@ -1238,9 +1303,10 @@ def _clear_halted(st, hw, arm, seeds, sha, log):
     stt = load_all()
     for s in seeds:
         if seed_status(stt, arm, s, sha) == "halted":
+            clears = sorted(counted_invocations(_fails(stt, arm, s, sha)))
             st.setdefault("failures", {}).setdefault(f"{arm}|{s}|{sha}|{hw}", []).append(dict(
-                kind="cleared", invocation=INVOCATION, at=now_ts(),
-                error="cleared by the user (--retry-halted)"))
+                kind="cleared", invocation=INVOCATION, at=now_ts(), clears=clears,
+                error=f"cleared by the user (--retry-halted): invocations {clears}"))
             log(f"  {arm} seed {s}: halt cleared by the user (--retry-halted)")
     save_json(st, store_path(hw))
 
@@ -1254,9 +1320,22 @@ def _frozen_or_exit(st, sha, what):
                          f"starts: a code change halts the screen and the user decides (FAILURES)")
 
 
-def stage1(device, log=print, require_commit=True, retry_halted=False):
+def _pilot_files(sha):
+    """The results files (relative paths) that hold an ORACLE_PILOT record or failure entry under sha."""
+    import glob
+    out = []
+    for p in sorted(glob.glob(os.path.join(OUT, f"{NAME}_*_results.json"))):
+        with open(p) as f:
+            st = json.load(f)
+        keys = list(st.get("runs", {})) + list(st.get("failures") or {})
+        if any(k.split("|")[0] == "ORACLE_PILOT" and k.split("|")[2] == sha for k in keys):
+            out.append(os.path.relpath(p, HERE))
+    return out
+
+
+def stage1(device, log=print, require_commit=True, retry_halted=False, code_change_note=None):
     global INVOCATION
-    INVOCATION = f"stage 1 {time.strftime('%Y-%m-%d %H:%M:%S')} pid {os.getpid()}"
+    INVOCATION = f"stage 1 {time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())}Z pid {os.getpid()}"
     dev = dv.setup(device)
     info = dv.device_info(dev)
     hw = info["gpu"] or info["cpu"]
@@ -1264,6 +1343,9 @@ def stage1(device, log=print, require_commit=True, retry_halted=False):
         raise SystemExit("stage 1: --device cpu is for the CHECKs only")
     sha = code_sha()[0]
     sync_or_exit("stage 1", require_commit)
+    if superseded(sha):
+        raise SystemExit(f"stage 1: code SHA {sha} was superseded (its stage-1 record was archived when a later code's "
+                         f"pilot ran): it is never used again (FAILURES)")
     st_all = load_all()
     stops = earlier_stops(sha, st_all)
     if stops:
@@ -1271,54 +1353,78 @@ def stage1(device, log=print, require_commit=True, retry_halted=False):
                          f"a value STOP under any code is final (FAILURES)")
     _frozen_or_exit(st_all, sha, "stage 1")
     _dup_exit(duplicates(st_all, sha, ("ORACLE_PILOT",)), "stage 1")
+    jp, _ = record_paths()
+    prev = json.load(open(jp)) if os.path.exists(jp) else None
+    note = (prev or {}).get("code_change_note") if prev and prev.get("sha") == sha else None
+    if prev and prev.get("sha") != sha:
+        if not code_change_note or not os.path.exists(code_change_note):
+            raise SystemExit(f"stage 1: the stage-1 record is under code SHA {prev.get('sha')}; a code change before stage 2 "
+                             f"needs --code-change-note PATH, a committed, dated note saying why the change could not be "
+                             f"avoided (FAILURES)")
+        nc = committed_or_exit(code_change_note, "stage 1: the code-change note", require_commit)
+        note = dict(path=os.path.relpath(os.path.abspath(code_change_note), HERE), commit=nc, from_sha=prev.get("sha"))
     code_or_exit("stage 1", require_commit)
-    workers, _, bench_commit, checks_commit = card_setup(dev, hw, sha, require_commit, "stage 1", ("ORACLE_PILOT",))
+    workers, _, bench_commit, checks_commit, _, _, bench_written = card_setup(dev, hw, sha, require_commit, "stage 1",
+                                                                             ("ORACLE_PILOT",))
     T = task()
     chk = it.check_task(T)
     assert all(chk.values()), f"task CHECK failed: {chk}"
     st = load(hw)
     if retry_halted:
         _clear_halted(st, hw, "ORACLE_PILOT", PILOT_SEEDS, sha, log)
+    inv = dict(invocation=INVOCATION, card=hw, workers=workers, threads=torch.get_num_threads(), bench_commit=bench_commit,
+               bench_written=bench_written, checks_commit=checks_commit, retry_halted=retry_halted,
+               started=time.strftime("%Y-%m-%d %H:%M:%S"))
     st["meta"].update(sha=sha, config=CONFIG, iters=ITERS, device=info, provenance=SPEC_PROVENANCE,
-                      changes=CHANGES_SINCE_SPEC,
-                      stage1=dict(workers=workers, threads=torch.get_num_threads(), bench_commit=bench_commit,
-                                  checks_commit=checks_commit, started=time.strftime("%Y-%m-%d %H:%M:%S")))
+                      changes=CHANGES_SINCE_SPEC, stage1=inv)
+    st["meta"].setdefault("stage1_invocations", []).append(inv)
     save_json(st, store_path(hw))
     log(f"[S75b stage 1] {T.label}; code SHA {sha}; {info}; task CHECK ok; stats workers {workers}")
     aborted = None
     try:
         with runtime():
-            missing = run_arm("ORACLE_PILOT", PILOT_SEEDS, dev, hw, sha, st, dict(stage=1), "auto", workers, log=log)
+            run_arm("ORACLE_PILOT", PILOT_SEEDS, dev, hw, sha, st, dict(stage=1, workers=workers, bench_commit=bench_commit,
+                                                                      bench_written=bench_written), "auto", workers, log=log)
     except InvocationAborted as e:
-        aborted, missing = str(e), [s for s in PILOT_SEEDS]
+        aborted = str(e)
         log(f"[S75b stage 1] {aborted}")
     st_all = load_all()
     pilot = runs_of(st_all, "ORACLE_PILOT", sha)
     d = dict(pilot_of(st_all, sha), aborted=aborted)
+    missing = [s for s, v in d["statuses"].items() if v != "ok"]
     cards = {s: r.get("hw") for s, r in pilot.items()}
     fails = {k: v for k, v in st_all["failures"].items() if k.startswith("ORACLE_PILOT|")}
-    rf = os.path.relpath(store_path(hw), HERE)
-    rec = dict(written=time.strftime("%Y-%m-%d %H:%M:%S"), sha=sha, machine=hw, cards=cards, device=info, config=CONFIG,
-               iters=ITERS, pilot_seeds=list(PILOT_SEEDS), decision=d, missing=missing, failures=fails,
-               results_file=rf, bench_commit=bench_commit, checks_commit=checks_commit,
-               threads=torch.get_num_threads(), provenance=SPEC_PROVENANCE, changes=CHANGES_SINCE_SPEC,
-               note=(f"Commit and push this record together with the pilot results file {rf}, whatever the decision: the "
-                     f"finality rules on both machines read the committed state, and --stage 2 refuses unless both are "
-                     f"committed and the committed pilot records give this decision. This invocation ran on {hw} (the "
-                     f"spec at {SPEC_COMMIT} assigned the GTX 1660 SUPER; the user allowed the RTX 3070 if it was free "
-                     f"first); each pilot seed's card: {cards}."))
+    files = _pilot_files(sha)
+    invs = (prev.get("invocations") or []) if prev and prev.get("sha") == sha else []
+    invs = invs + [dict(inv, aborted=aborted, statuses_after=d["statuses"])]
+    rec = dict(written=time.strftime("%Y-%m-%d %H:%M:%S"), sha=sha, machine=sorted(set(cards.values())), cards=cards,
+               config=CONFIG, iters=ITERS, pilot_seeds=list(PILOT_SEEDS), decision=d, missing=missing, failures=fails,
+               results_files=files, invocations=invs, code_change_note=note, provenance=SPEC_PROVENANCE,
+               changes=CHANGES_SINCE_SPEC,
+               note=(f"Commit and push this record together with the pilot's results files {files}, whatever the decision: "
+                     f"the finality rules on both machines read the committed state, and --stage 2 refuses unless every "
+                     f"results file is committed and the committed pilot records give this decision. Each pilot seed's "
+                     f"card: {cards} (the spec at {SPEC_COMMIT} assigned the GTX 1660 SUPER; the user allowed the RTX 3070 "
+                     f"if it was free first). Each invocation, with its card, benchmark and workers, is listed."))
     sets = d.get("sets") or {}
     lines = [f"# S75b stage-1 record (EXPLORATORY), {rec['written']}", "",
-             f"- Pilot: ORACLE_PILOT, seeds {PILOT_SEEDS}, {ITERS:,} updates; this invocation on **{hw}** (code SHA {sha}; "
-             f"stats workers {workers}; threads {rec['threads']}; benchmark commit {bench_commit}; CUDA CHECK commit "
-             f"{checks_commit}); cards per seed {cards}.",
+             f"- Pilot: ORACLE_PILOT, seeds {PILOT_SEEDS}, {ITERS:,} updates, code SHA {sha}; cards per seed {cards}; "
+             f"results files {files}.",
+             "- Invocations: " + "; ".join(f"{i['invocation']} on {i['card']} (workers {i['workers']}, threads "
+                                           f"{i['threads']}, benchmark {i['bench_commit']} written {i['bench_written']}, "
+                                           f"CUDA CHECK {i['checks_commit']}"
+                                           + (", --retry-halted" if i.get("retry_halted") else "")
+                                           + (f"; stopped: {i['aborted'][:120]}" if i.get("aborted") else "") + ")"
+                                           for i in invs),
              "- end.set: " + ", ".join(f"{s}: {v}" for s, v in sets.items()),
              "- Seed status (FAILURES): " + ", ".join(f"{s}: {v}" for s, v in (d.get("statuses") or {}).items())
              + (f"; failure log: {[(k, [(f.get('kind'), f.get('invocation'), str(f.get('error'))[:80]) for f in v]) for k, v in fails.items()]}"
-                if fails else "")
-             + (f"; this invocation stopped: {aborted}" if aborted else ""),
+                if fails else ""),
              f"- Proceed rule (mean >= {PROCEED_MEAN} and each >= {PROCEED_EACH}): {d.get('why')} -> "
              f"**{'PROCEED' if d['proceed'] else ('STOP' if d['complete'] else ('HALTED: the user decides' if d.get('halted') else 'INCOMPLETE'))}**"]
+    if note:
+        lines.append(f"- Code change before stage 2 from {note.get('from_sha')}: note {note.get('path')} (commit "
+                     f"{note.get('commit')}).")
     if d["proceed"]:
         lines.append(f"- SPLIT_THR = min(end.set) - {THR_MARGIN} = {d['split_thr']!r}")
     elif d["complete"]:
@@ -1336,7 +1442,7 @@ def stage1(device, log=print, require_commit=True, retry_halted=False):
 
 def stage2(device, machine, log=print, require_commit=True, reason=None, retry_halted=False):
     global INVOCATION
-    INVOCATION = f"stage 2 {time.strftime('%Y-%m-%d %H:%M:%S')} pid {os.getpid()}"
+    INVOCATION = f"stage 2 {time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime())}Z pid {os.getpid()}"
     dev = dv.setup(device)
     info = dv.device_info(dev)
     hw = info["gpu"] or info["cpu"]
@@ -1346,7 +1452,7 @@ def stage2(device, machine, log=print, require_commit=True, reason=None, retry_h
         raise SystemExit("stage 2: --device cpu is for the CHECKs only")
     if machine.startswith("fallback") and not reason:
         raise SystemExit(f"--machine {machine} needs --reason (why the other card cannot run its arms: unavailable, or its "
-                         f"benchmark failed or refused); it is written into stage 2's meta (FAILURES)")
+                         f"benchmark does not allow them); it is written into stage 2's meta and records (FAILURES)")
     sha = code_sha()[0]
     jp, _ = record_paths()
     if not os.path.exists(jp):
@@ -1355,6 +1461,8 @@ def stage2(device, machine, log=print, require_commit=True, reason=None, retry_h
     with open(jp) as f:
         rec1 = json.load(f)
     sync_or_exit("stage 2", require_commit)
+    if superseded(sha):
+        raise SystemExit(f"stage 2: code SHA {sha} was superseded: it is never used again (FAILURES)")
     st_all = load_all()
     stops = earlier_stops(sha, st_all)
     if stops:
@@ -1369,39 +1477,41 @@ def stage2(device, machine, log=print, require_commit=True, reason=None, retry_h
             or rec1["decision"].get("proceed") != d["proceed"]):
         raise SystemExit("the stage-1 record does not match the pilot records under this code SHA")
     if require_commit:
-        pf = os.path.join(HERE, rec1.get("results_file") or "")
-        cj = git_committed_json(pf) if rec1.get("results_file") else None
-        if cj is None:
-            raise SystemExit(f"the pilot results file ({rec1.get('results_file')}) is not committed: commit and push it")
-        dc = pilot_of(cj, sha)
+        dc = pilot_of(committed_store(), sha)
         if not dc["complete"] or dc.get("split_thr") != d["split_thr"] or dc["proceed"] != d["proceed"]:
-            raise SystemExit("the committed pilot records do not give the stage-1 record's decision: commit and push the "
-                             "pilot results file")
+            raise SystemExit("the committed pilot records (every results file) do not give the stage-1 record's decision: "
+                             "commit and push every results file")
     if not d["proceed"]:
         raise SystemExit(f"{stop_words(d)} (S75b stops at stage 1: {d['why']})")
     code_or_exit("stage 2", require_commit)
-    workers, register, bench_commit, checks_commit = card_setup(dev, hw, sha, require_commit, "stage 2",
-                                                                MACHINE_ARMS[machine])
-    if require_commit and rec1.get("machine") == hw and rec1.get("bench_commit") and bench_commit != rec1["bench_commit"]:
-        raise SystemExit(f"this card's benchmark changed since the stage-1 record (commit {bench_commit}, the record names "
-                         f"{rec1['bench_commit']})")
+    workers, register, bench_commit, checks_commit, allowed, refused, bench_written = card_setup(
+        dev, hw, sha, require_commit, "stage 2", MACHINE_ARMS[machine])
     st = load(hw)
     if retry_halted:
-        for arm in MACHINE_ARMS[machine]:
+        for arm in allowed:
             _clear_halted(st, hw, arm, seeds_of(arm), sha, log)
-    meta2 = dict(machine=machine, reason=reason, split_thr=d["split_thr"], stage1_commit=commit, bench_commit=bench_commit,
-                 checks_commit=checks_commit, register_reg3=register, workers=workers, threads=torch.get_num_threads(),
-                 provenance=SPEC_PROVENANCE, changes=CHANGES_SINCE_SPEC, started=time.strftime("%Y-%m-%d %H:%M:%S"))
+    meta2 = dict(machine=machine, reason=reason, invocation=INVOCATION, split_thr=d["split_thr"], stage1_commit=commit,
+                 bench_commit=bench_commit, bench_written=bench_written, checks_commit=checks_commit,
+                 register_reg3=register, workers=workers, threads=torch.get_num_threads(), arms=list(allowed),
+                 refused_arms=refused, retry_halted=retry_halted, provenance=SPEC_PROVENANCE,
+                 changes=CHANGES_SINCE_SPEC, started=time.strftime("%Y-%m-%d %H:%M:%S"))
     st["meta"].update(sha=sha, config=CONFIG, iters=ITERS, device=info, stage2=meta2)
+    st["meta"].setdefault("stage2_invocations", []).append(meta2)
     save_json(st, store_path(hw))
-    log(f"[S75b stage 2] machine {machine} ({hw}){' (' + reason + ')' if reason else ''}; arms {MACHINE_ARMS[machine]}; "
-        f"SPLIT_THR {d['split_thr']!r}; stage-1 commit {commit}; REG3 register {register}; stats workers {workers}; "
-        f"threads {meta2['threads']}")
+    log(f"[S75b stage 2] machine {machine} ({hw}){' (' + reason + ')' if reason else ''}; arms {list(allowed)}"
+        + (f"; REFUSED by this card's benchmark: {refused}" if refused else "")
+        + f"; SPLIT_THR {d['split_thr']!r}; stage-1 commit {commit}; REG3 register {register}; stats workers {workers}; "
+        f"threads {meta2['threads']}. Commit and push the results file now, so the other machine sees that stage 2 has "
+        f"started (the freeze).")
     missing = {}
+    if refused:
+        missing["(refused)"] = sorted(refused)
     try:
         with runtime():
-            for arm in MACHINE_ARMS[machine]:
-                m = run_arm(arm, seeds_of(arm), dev, hw, sha, st, dict(stage=2, machine=machine), register, workers,
+            for arm in allowed:
+                m = run_arm(arm, seeds_of(arm), dev, hw, sha, st,
+                            dict(stage=2, machine=machine, reason=reason, workers=workers, bench_commit=bench_commit,
+                                 bench_written=bench_written), register, workers,
                             split_thr=d["split_thr"] if arm == "WIDE_SPLIT_G" else None, log=log)
                 if m:
                     missing[arm] = m
@@ -1411,9 +1521,10 @@ def stage2(device, machine, log=print, require_commit=True, reason=None, retry_h
     if missing:
         stt = load_all()
         log(f"[S75b stage 2] seeds without an ok record: "
-            f"{ {a: {s: seed_status(stt, a, s, sha) for s in m} for a, m in missing.items() if a in ARMS} } (FAILURES: "
-            f"an operational failure is rerun by re-invoking --stage 2; a divergence is an outcome; a halted seed waits "
-            f"for the user)")
+            f"{ {a: {s: seed_status(stt, a, s, sha) for s in m} for a, m in missing.items() if a in ARMS} }"
+            + (f"; arms this card's benchmark refused: {refused}" if refused else "")
+            + " (FAILURES: an operational failure is rerun by re-invoking --stage 2; a divergence is an outcome; a halted "
+              "seed waits for the user)")
     return missing
 
 
@@ -1452,6 +1563,11 @@ def report(log=print, sha=None, out=None):
         if {"1660", "3070"} <= set(cards) and not any(cards.values()):
             L.append("S75b CANNOT START: no card's benchmark allows the pilot (FAILURES: no configuration, R or batch is "
                      "changed to make a card fit; the user decides).")
+        if {"1660", "3070"} <= set(cards):
+            nobody = [a for a in STAGE2 if not any(bench_usable(b, (a,)) for p, b in bs.values())]
+            if nobody:
+                L.append(f"ARMS NO CARD'S BENCHMARK ALLOWS: {nobody}. They cannot run, and the reading is incomplete until "
+                         f"the user decides (FAILURES).")
     other = {}
     for k, r in st["runs"].items():
         sh = k.split("|")[2]
@@ -1467,6 +1583,12 @@ def report(log=print, sha=None, out=None):
                      f"{k.split('|')[0]} {k.split('|')[1]} code {k.split('|')[2]} on {k.split('|')[3]} "
                      f"[{f.get('kind')}{' open' if f.get('open') else ''}] attempt {f.get('attempt')} invocation "
                      f"{f.get('invocation')}: {str(f.get('error'))[:100]}" for k, f in fl))
+    s2inv = [m for meta in st["meta"].values() for m in (meta.get("stage2_invocations") or []) if meta.get("sha") == sha]
+    if s2inv:
+        L.append("STAGE-2 INVOCATIONS: " + "; ".join(
+            f"{m.get('invocation')} --machine {m.get('machine')}" + (f" (reason: {m.get('reason')})" if m.get("reason") else "")
+            + f": arms {m.get('arms')}" + (f", refused {sorted(m.get('refused_arms') or {})}" if m.get("refused_arms") else "")
+            for m in s2inv))
     if dup:
         L.append("DUPLICATE RECORDS (arm, seed, cards): " + "; ".join(f"{a} {s} {h}" for a, s, h in dup)
                  + ". The reading is incomplete until the user decides which card's records count.")
@@ -1532,10 +1654,16 @@ def report(log=print, sha=None, out=None):
     kr = {a: ks[a] for a in READ_ARMS}
     halt_read = {a: HALT[a] for a in READ_ARMS if HALT[a]}
     done = resolved and all(ns[a] == len(SEEDS) for a in READ_ARMS)
+    stops_ = earlier_stops(sha, st)
     if dup:
         tag = "incomplete: records from two cards (the user decides)"
     elif code_note:
         tag = code_note
+    elif stops_:
+        tag = (f"NO READING: S75b stopped at stage 1 under code {[x for _, x in stops_]} (a value STOP is final under any "
+               f"code; FAILURES); the stage-2 rows are descriptions only")
+    elif not d["proceed"] and any(R[a] or DIV[a] for a in STAGE2):
+        tag = "NO READING: the pilot under this code did not PROCEED; the stage-2 rows are descriptions only"
     elif resolved and not valid:
         tag = "UNTESTED (descriptions only; never re-read under a later bar)"
     elif halt_read:
@@ -1606,6 +1734,8 @@ def main():
     ap.add_argument("--reason", default=None, help="--machine fallback / fallback-3070: why the other card cannot run its "
                                                     "arms (written into stage 2's meta)")
     ap.add_argument("--retry-halted", action="store_true", help="the user clears this stage's halted seeds (recorded)")
+    ap.add_argument("--code-change-note", default=None, help="--stage 1 under a new code before stage 2: a committed, "
+                                                            "dated note on why the change could not be avoided")
     ap.add_argument("--bench", action="store_true")
     ap.add_argument("--host-ram-gb", type=float, default=None, help="the machine's RAM in GB (the user's figure)")
     ap.add_argument("--beside", default=None,
@@ -1622,14 +1752,7 @@ def main():
         if a.host_ram_gb is None or a.beside is None:
             raise SystemExit("--bench needs --host-ram-gb (the machine's RAM, the user's figure) and --beside NAME|none")
         info = dv.device_info(dv.setup(a.device))
-        path = bench_path(info["gpu"] or info["cpu"])
-        if os.path.exists(path):                       # an earlier benchmark is kept (FAILURES: a rerun is allowed)
-            with open(path) as f:
-                old = json.load(f)
-            arch = os.path.join(OUT, "bench_archive")
-            os.makedirs(arch, exist_ok=True)
-            os.replace(path, os.path.join(arch, os.path.basename(path)[:-5] + "_" +
-                                          hw_slug(str(old.get("written") or time.time())) + ".json"))
+        path = bench_path(info["gpu"] or info["cpu"])   # an earlier file is archived by bench() (FAILURES: reruns allowed)
         b = bench(a.device, a.host_ram_gb, a.beside, path=path)
         print(json.dumps({k: v for k, v in b.items() if k not in ("arms", "changes", "provenance")}, indent=1, default=str))
         why = bench_why(b, STAGE2)
@@ -1638,7 +1761,7 @@ def main():
                   f"; for its own arms: see --report (FAILURES)")
         return
     if a.stage == 1:
-        d, missing = stage1(a.device, retry_halted=a.retry_halted)
+        d, missing = stage1(a.device, retry_halted=a.retry_halted, code_change_note=a.code_change_note)
         sys.exit(0 if d["complete"] else 1)
     if a.stage == 2:
         if a.machine is None:
@@ -1648,7 +1771,7 @@ def main():
         sha = code_sha()[0]
         open_ = [(arm, s) for arm, m in missing.items() if arm in ARMS for s in m
                  if seed_status(stt, arm, s, sha) != "diverged"]
-        sys.exit(1 if open_ or "(aborted)" in missing else 0)
+        sys.exit(1 if open_ or "(aborted)" in missing or "(refused)" in missing else 0)
     ap.print_help()
 
 
