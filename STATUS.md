@@ -57,7 +57,7 @@ source at two sources and nothing routes at four on the one screen run, which it
 | `claude/rev9-draft` | the seven versions of Revision 9's draft that the referee checked | merged into the main line; kept because the report cites its commits |
 | `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged at 00290a8; its last items were the reviews of the three spec drafts below |
 | `claude/outside-ideas` | session E: batches 1–20 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 20 complete; `explore_out/spec_draft_keyload.md` written |
-| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–7) | S88 (a learned write strength; the horizon) was running on 14 October: its records land in `explore_out/F/write_results.json` as they finish; no report 8 yet |
+| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–7) | session closed on 14 October with S88 half done: S88a (the write strength) complete at `401d25a` (`explore_out/F/write_results.json`, `write_tables.md`); S88b (the horizon) stopped after 6 of its 44 runs (`horizon_results.json` at `99482c5`); no report 8 |
 | `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–7) | S87 complete; `explore_out/G/spec_draft_register.md` awaits revision after the referee's review |
 | `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams (reports 1–9) | round 5 complete; `explore_out/H/spec_draft_two_keyterm.md` awaits revision after the referee's review |
 | `claude/explore-I` | session I: the dense-loss task (S74, S75), the GPU package (`explore_gpu/`), the GPU run of `test_window_gate` (report 3), S75b (`explore_out/I/s75b_spec_draft.md`, `explore_gpu/s75b.py`) | S75 closed; S75b's driver final (3cef609, mutation pass 8d2e89f), CPU CHECKs pass, the cards' CUDA CHECKs passed on the driver of 13 October and must be rerun on the final one; the pilot was not run |
@@ -88,8 +88,17 @@ source at two sources and nothing routes at four on the one screen run, which it
    on each card with the final driver, run the pilot (two perfect-gate runs, about three hours), and stage 2 on both
    cards (about a day and a half) only if the pilot record says PROCEED. The referee's review of the draft
    (`spec_review_s75b_draft.md`) has points to take before the pilot.
-6. **F's S88**, running at the pause: the learned write strength at eight streams (S88a) and the horizon on the lite
-   task (S88b). Its readings were fixed before the first run (`40087cb`); the records are on the branch.
+6. **F's S88**, half done when its session closed (readings fixed before the first run, `40087cb`; EXPLORATORY,
+   not a result). **S88a**, the write strength (34 runs, 160 h, seeds 2400–2409, the delta recipe with the exact-copy
+   split at eight streams): the fixed write strength binds and routes 10/10, a learned per-token strength 7/10 (0 vs 3
+   discordant pairs) and the learned strength on the slow schedule 3/10 (0 vs 7, *p* = 0.0078); the pre-fixed reading
+   is "no reading applies" (the better learned arm is 3 pairs behind the fixed one — more than the 1 pair that "keeps the
+   partition" allowed, fewer than the 4 that "costs it" needed). Printed, not a reading: every learned run drives its
+   write strength to about 0 by update 4800 and it never diverges by stream (0/20), so the learned arms are mostly
+   writing nothing. Tables in `explore_out/F/write_tables.md`. **S88b**, the horizon (one delta channel on the lite
+   task at 1× and 2× cue-to-key distance, fixed decay against the learned forget gate; 44 runs planned): 6 ROUTED_2X
+   runs recorded (4 bound) before the session closed; no reading can be taken from a single arm. To finish it, a new
+   session on `claude/explore-F` runs `explore_f_horizon.py` (resumes from the cached records) and writes report 8.
 7. **Round 6 of screens**, proposed in `docs/reading/plan_2026-10-13.md` §4E, none started.
 
 ## 5. How to resume
