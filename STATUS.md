@@ -56,7 +56,7 @@ source at two sources and nothing routes at four on the one screen run, which it
 | `claude/bdh-growth-hebbian-inference-w90069` (the main line) | the tests (`test_*.py`), their specifications (`specs/`), the records (`results/`), the report, the referee's files, this file | Revision 9 merged; `test_delta_recipe` complete on both machines |
 | `claude/rev9-draft` | the seven versions of Revision 9's draft that the referee checked | merged into the main line; kept because the report cites its commits |
 | `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged at 00290a8; its last items were the reviews of the three spec drafts below |
-| `claude/outside-ideas` | session E: batches 1–20 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 20 complete; `explore_out/spec_draft_keyload.md` written |
+| `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 20 complete; `explore_out/spec_draft_keyload.md` written; batch 21 (the key-load test's validity screen, S69) still running at 18:12 UTC on 14 October: 13 of 20 runs saved (`4fedf9c`), records in `explore_out/oracle_d128_results.json`, pushed after every run; its SUMMARY and reading come at the end of `explore_out/batch21.log` |
 | `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–7) | session closed on 14 October with S88 half done: S88a (the write strength) complete at `401d25a` (`explore_out/F/write_results.json`, `write_tables.md`); S88b (the horizon) stopped after 6 of its 44 runs (`horizon_results.json` at `99482c5`); no report 8 |
 | `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–7) | S87 complete; `explore_out/G/spec_draft_register.md` awaits revision after the referee's review |
 | `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams (reports 1–9) | round 5 complete; `explore_out/H/spec_draft_two_keyterm.md` awaits revision after the referee's review |
@@ -81,8 +81,17 @@ source at two sources and nothing routes at four on the one screen run, which it
    (`spec_review_two_keyterm_draft.md`); it needs more seeds, a harder configuration or a different primary claim before
    adoption. H's dose screen found the drafted constants robust.
 4. **The key-load test** (sixteen keys at *D* = 128 against *D* = 32). E's draft (`explore_out/spec_draft_keyload.md`,
-   budget 40,800 by its rule) is unreviewed; its validity rule is at risk because the *D* = 128 oracle on the one seed
-   tried never bound, so a validity screen comes first.
+   budget 40,800 by its rule) is unreviewed; its validity rule was at risk because the *D* = 128 oracle on the one seed
+   tried never bound, so E ran the validity screen first (batch 21, S69: the perfect gate at *D* = 128, sixteen keys,
+   seeds 270–279, the recorded single-Adam recipe against SLOW, 40,800 updates; readings fixed before any run). State at
+   the pause: the single-Adam arm is done at **4 of 10** bound (271, 273, 274, 278; three more ended at 0.91–0.92, just
+   under the 0.95 bar) — "unreliable" by the pre-fixed rule, so two validity seeds would both bind with probability
+   about 0.13; the SLOW arm stands at 0 of 3 (270–272 ended near 0.35; 271 had bound at 12,000 under single Adam)
+   with seven seeds running or queued. The spec's reading now rests on SLOW: 5 or more of its remaining seven bind →
+   the draft falls back to one validity seed at *D* = 128 (VALID_N = 1) on SLOW; fewer → the draft has no validity
+   check at 40,800 and does not go to the referee as written. Whoever resumes reads the SUMMARY at the end of
+   `explore_out/batch21.log` (or finishes the batch from its checkpoints if the container died) before touching the
+   draft.
 5. **S75b** (the dense loss at four sources on a configuration where the perfect gate can reach its bar). Approved spec
    with a mechanical pilot rule; what remains is in `explore_gpu/README.md` (d): rerun the CUDA CHECK and the benchmark
    on each card with the final driver, run the pilot (two perfect-gate runs, about three hours), and stage 2 on both
