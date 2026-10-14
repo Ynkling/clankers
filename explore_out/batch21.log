@@ -224,3 +224,5 @@ EXPLORATORY, NOT A RESULT — batch 21: the D128 oracle's validity (S69)
   [  1]   64.8 min  oracle_d128  ORC_A_D128     seed 273  lr 0.001  (the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe))
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git dc1e74e+dirty, code f7a606d7399a, attempt 1, resumed at [25200]: acc 0.999  trans 31200  stop 33600  outcome BOUND
   start   64.8 min  oracle_d128  ORC_A_D128     seed 275  (projected worst case 360 min)
+chain: the container restarted during segment 3 (processes stopped; checkpoints kept: ORC_A_D128 270 and 272 at 37200, 274 at 22800, 275 at 3600); the new container is a Xeon @ 2.10GHz (segments 1-3 ran on a 2.80GHz Xeon). Adam runs reproduce across these two CPUs (CHECKed in batches 20-21 and in S68's 18 runs); each segment still runs the repro check. A new chain resumes from segment 4.
+chain: segment 4 start 2026-10-14T03:17:12Z
