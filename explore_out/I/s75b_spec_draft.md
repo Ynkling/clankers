@@ -297,7 +297,7 @@ Referee V's review of this draft (`docs/review_2026-10/spec_review_s75b_draft.md
 - **Provenance.** The draft states its blindness as fact, but git shows only what each tree held.
 - **Outcomes.** Four outcomes have no rule.
 
-Both are settled here before the pilot. The rules were written, reviewed adversarially in this session three times,
+Both are settled here before the pilot. The rules were written, reviewed adversarially in this session four times,
 and revised after each review (B.4). Everything in this appendix was written with S75's learned-arm records in the tree and read, so **none of
 it is blind**. None of it changes a design constant (configuration, seeds, arms, bars, the proceed rule, SPLIT_THR's
 rule). The failure rules extend the outcomes, VALID and the reading to failed runs.
@@ -404,8 +404,10 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
      invocation ends, however it ends short of a hard kill. Stage 2 refuses a record still marked running.
      - The record lists every stage-1 invocation under its code, from every card's results file (card, benchmark,
        workers, why it stopped), and each seed's card.
-     - The pilot runs on one card. A stage-1 invocation refuses while another card's stage 1 has not ended (One
-       invocation per card, below). A pilot may still be split across the cards, for example after one card fails.
+     - The pilot runs on one card. Stage 1's start is pushed (the results file and the running record), and a stage-1
+       invocation refuses while another card's stage 1, as pushed, has not ended (One invocation per card, below).
+       Two pilots started before either start was pushed are caught afterwards, as seeds with outcomes from two cards.
+       A pilot may still be split across the cards, for example after one card fails.
      - Stage 2 reads the pilot from every card's committed results file.
 2. **A code change.**
    - **Before stage 2 starts.**
@@ -432,12 +434,17 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
      - The report reads only the stage-2 code; a second stage-2 code means no reading. The report also gives no
        reading after a value STOP under any code, or if the stage-2 code was superseded after stage 2 started.
      - The other machine sees the freeze once stage 2's results file is pushed. It is pushed as soon as stage 2 starts.
+       If that push is rejected and the upstream holds a code change, the user is told at once: the change is reverted
+       before the other machine runs any stage, and then the start is pushed.
    - **While a stage runs.** The data and statistics workers that each run spawns import the code from disk, so a pull
      or an edit during a stage would reach the runs. The driver compares the code on disk with the invocation's code
      before and after every run.
      - A change found before a run stops the invocation. Nothing is charged.
      - A change found after a run keeps that run's record, marked `code_changed`, and stops the invocation. The screen
        halts: both stages refuse, and the report gives no reading, until the user decides.
+     - The decision is recorded by re-invoking the stage, on the card that ran those records and with the code on disk
+       the invocation's again, with `--code-changed-decision keep` (the records count) or `rerun` (they are set aside,
+       kept and printed, never counted, and their seeds are rerun). The report prints the decision.
      - So code is not pulled or edited while a stage runs.
 3. **A stage-2 ORACLE run missing or failed** (and the other stage-2 arms).
    - **ORACLE.**
@@ -447,7 +454,10 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
    - **The pilot never substitutes for an ORACLE run**, as 114cd08 says (not blind by git).
    - **Learned arms.** A diverged run is not ROUTED, and its seed stays in n (n stays 10).
    - **SINGLE.** A diverged run gives no GAP for its seed.
-   - **A halted read-arm seed** leaves the reading incomplete until the user decides.
+   - **A halted read-arm seed** leaves the reading incomplete until the user decides. A halted SINGLE seed gives no GAP
+     for it, and a halted WIDE_SLOW seed no paired row.
+   - **A seed drawn on two cards**, with an outcome (an ok record or a divergence) from each, leaves the reading
+     incomplete until the user decides which draw counts. Stages refuse meanwhile.
 4. **The L = 1536 benchmark.**
    - **When a card is usable.** Usability is per arm. An arm runs on a card iff the card's latest benchmark under this
      code:
@@ -466,10 +476,12 @@ Every failure entry is kept, with its kind, error, invocation and time, and the 
      records.
      - If the other card's benchmark refuses only some of its arms, the fallback runs just those, with `--arms`
        (recorded).
-     - A fallback never runs arms that the other card's unfinished invocation runs (One invocation per card, below).
+     - A fallback never runs arms that the other card's unfinished invocation, as pushed, runs (One invocation per
+       card, below).
    - **No usable card.**
      - If no card's benchmark allows the pilot, S75b cannot start.
-     - If no card's benchmark allows a stage-2 arm, that arm cannot run and the reading is incomplete.
+     - If no card's benchmark allows a stage-2 arm, that arm cannot run. Without ORACLE, validity stays incomplete;
+       without a read arm, the reading does. Without SINGLE there is no GAP, and without WIDE_SLOW no paired rows.
      - The report says which. No configuration, R or batch is changed to make a card fit; the user decides.
 
 **Sync.** With commits required, stage 1 and stage 2 refuse unless:
@@ -481,15 +493,19 @@ results files are committed and pushed whatever the decision, so the finality ru
 state. `--device cpu` is for the CHECKs only.
 
 **One invocation per card.**
-- **On one card.** A stage or a benchmark holds a lock on its card for its whole run, so a second invocation on that
-  card refuses. The operating system releases the lock when the process ends, however it ends.
-- **Across the cards.** Each results file records its card's last invocation, its arms, and whether it ended. A stage
-  refuses while another card's last invocation, as pushed, has not ended and runs any of the same arms.
+- **On one card.** A stage or a benchmark holds two locks on its card for its whole run, one in the checkout and one
+  per machine, so a second invocation on that card refuses, from any checkout on the machine. The operating system
+  releases the locks when the process ends, however it ends.
+- **Across the cards.** Each results file records its card's last invocation, its arms, and whether it ended. Both
+  stages push their start. A stage refuses while another card's last invocation, as pushed, has not ended and runs any
+  of the same arms.
   - Stage 1's arm is the pilot, so the pilot runs on one card.
-  - A killed process never records its end. `--other-card-idle` is the user's statement that no S75b invocation runs
-    on that card. It is recorded, and that card's open markers then count as killed.
-- Records of one seed from two cards (a start that was not pushed) are still caught: stages refuse and the report
-  marks the reading incomplete.
+  - A killed process never records its end. Its card's results file is first committed and pushed from its own
+    machine, because it holds the runs that finished before the kill. Only then does `--other-card-idle` state that no
+    S75b invocation runs on that card. The statement is recorded, and that card's open markers then count as killed.
+  - If that machine cannot be reached, the user decides: a fallback would draw its unpushed runs again.
+- A seed with outcomes from two cards (an ok record or a divergence on each, for example after a start that was not
+  pushed) is still caught: stages refuse and the report marks the reading incomplete.
 
 ### B.4 How the rules were checked
 
@@ -539,14 +555,36 @@ The second revision (f4cf7a8) was reviewed a third time. That review found:
   process and left the previous run's "ALL CHECKS PASSED" on disk. Fixed: a CHECK for each, a failing CHECK no longer
   ends the run, and the output file is rewritten at the start.
 
-CHECK B4 covers the decision rules. B5 covers the refusals, the run mechanics on a fake trainer, the third review's
-points, the report on synthetic stores, and the sync check on temporary repositories. B9 covers a real divergence.
+The third revision (5f6f840) was reviewed a fourth time. That review found:
+- **A fallback with `--other-card-idle` for a card that died re-drew that card's unpushed runs** (high). Fixed in the
+  procedure, the refusal text and this appendix: the dead card's results file is pushed from its own machine first, and
+  if that machine cannot be reached, the user decides.
+- **Stage 1 never pushed its start**, so the pilot's one-card rule was not enforced while a pilot ran. Fixed: stage 1
+  asks for a push at its start, and the text says "as pushed".
+- **The rejected-push procedure hid the freeze when the upstream held a code change.** Fixed: the user is told at
+  once, and the change is reverted first.
+- **A `code_changed` record had no recorded way out.** Fixed: `--code-changed-decision keep|rerun`.
+- **The report's "no card allows" line said the reading was incomplete for any arm.** Fixed: per arm.
+- **A seed diverged on one card and ok on the other was not caught as drawn twice.** Fixed: an outcome is an ok record
+  or a divergence.
+- **Smaller faults.**
+  - The lock covered one checkout only; it now also holds per machine.
+  - Stage 2 named a running record before a superseded code.
+  - The report said "incomplete" after a value STOP under its own code.
+  - Stage 1's refusal on a failed ORACLE case named a stage-2 fallback.
+  - `--only` runs of the CHECKs printed "ALL CHECKS PASSED".
+  - The README's commit lists left out archived files.
+  - Coverage: the real `code_now`, stage 1's end mark and the real `dirty_code` had no CHECK.
 
-After the third revision, 35 mutants of the driver's rules were each run against B4 and B5 (`explore_gpu/s75b_mutants.py`, results in `s75b_mutants_cpu_output.txt`, at 5f6f840). They are the third review's 18, which had passed every CHECK, and 17 that break the new rules. Every one is caught, and the unmutated driver passes.
+CHECK B4 covers the decision rules. B5 covers the refusals, the run mechanics on a fake trainer, the third and fourth
+reviews' points, the report on synthetic stores, and the sync check on temporary repositories. B9 covers a real
+divergence.
+
+MUTATION_SENTENCE
 
 Not checked by a CHECK:
-- `main()`'s argument wiring (`--arms`, `--other-card-idle`, the benchmark's lock);
-- the cards' real `git push`;
+- `main()`'s argument wiring (`--arms`, `--other-card-idle`, `--code-changed-decision`, the benchmark's lock);
+- the cards' real `git push`, and whether the operator pushes each start;
 - a lock held by another process: the CHECK holds it in the same process;
 - a hard kill: the CHECKs interrupt with KeyboardInterrupt and read the record during a run.
 

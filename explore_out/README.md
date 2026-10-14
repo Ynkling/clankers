@@ -58,13 +58,16 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
     - None changes a design constant.
   - **Failure rules (2026-10-13, before the pilot; spec Appendix B).** These cover the four outcomes Referee V found
     uncovered (a failed pilot run, a code change, a failed ORACLE run, a failed benchmark). They were reviewed
-    adversarially three times and revised after each review.
+    adversarially four times and revised after each review.
     - **Divergence.** A diverged run, detected from non-finite evaluation logits, is an outcome and is never rerun.
     - **Other failures.** They are rerun on the same seed. Two invocations halt the seed for the user.
-    - **The pilot.** A run below 0.9, or a diverged run, is a final STOP. The pilot runs on one card.
+    - **The pilot.** A run below 0.9, or a diverged run, is a final STOP. The pilot runs on one card, and its start
+      is pushed.
     - **Code changes.** A change before stage 2 needs a dated note and supersedes the earlier code as soon as its
-      stage 1 starts. The code freezes for good once stage 2 starts, and a change found during a run halts the screen.
-    - **One invocation per card**, and no card runs arms whose invocation on the other card has not ended.
+      stage 1 starts. The code freezes for good once stage 2 starts, and a change found during a run halts the screen
+      until the user records a decision.
+    - **One invocation per card**, and no card runs arms that the other card's unfinished invocation, as pushed, runs.
+      A seed drawn on two cards is never resolved by the driver.
   - **CHECKs.** The CPU CHECKs B1–B9 are run on the final commit, and the cards' CUDA CHECKs and benchmarks are rerun on
     it.
 - **window_gate on the GTX 1660 SUPER** (gpu/mainline/window_gate_prerun_note_2026-10-12.md). The pre-run note was

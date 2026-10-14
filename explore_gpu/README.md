@@ -131,7 +131,8 @@ of post-approval changes, none of them blind).
 
 **General rules.**
 - Run every step from the repository root, on an up-to-date checkout of `claude/explore-I`.
-- Commit and push each step's output before the next step. The driver refuses to go out of order. With commits
+- Commit and push each step's output before the next step: `git add explore_out/I/gpu/s75b` takes everything there,
+  including `bench_archive/` and any archived stage-1 record. The driver refuses to go out of order. With commits
   required, the stages also refuse when `git fetch` fails, when the checkout is behind or ahead of its upstream, or when
   an S75b JSON file is uncommitted.
 - Any change to a module in the code SHA changes it: `s75b.code_sha()[1]` lists the 33 modules, including
@@ -140,12 +141,17 @@ of post-approval changes, none of them blind).
   - After stage 2 starts, a change halts the screen.
 - **Do not pull or edit code while a stage runs.** Each run's workers load the code from disk, so the driver compares
   it before and after every run. A change stops the invocation, and a change during a run halts the screen for you.
-  - If the push at the start of stage 2 is rejected because the other machine pushed first, run `git fetch` and then
-    `git diff --stat HEAD @{u}`. If that lists no `.py` file, `git pull` and push again. If it does, push nothing until
-    this stage ends.
-- **One invocation per card.** A second stage or benchmark on a card refuses while the first runs. A stage also
-  refuses while the other card's last invocation, as pushed, has not ended and runs any of the same arms.
-  - If that process was killed, add `--other-card-idle` (recorded) once you are sure no S75b process runs there.
+  - If the push at the start of a stage is rejected because the other machine pushed first, run `git fetch` and then
+    `git diff --stat HEAD @{u}`. If that lists no `.py` file, `git pull --no-rebase` and push again. If it does, stop
+    and tell the user at once: that code change must be reverted before the other machine runs any stage, and only then
+    is this start pulled and pushed.
+- **One invocation per card.** A second stage or benchmark on a card refuses while the first runs, from any checkout on
+  that machine. A stage also refuses while the other card's last invocation, as pushed, has not ended and runs any of
+  the same arms.
+  - If that process was killed: first commit and push that card's results file from its own machine, because it holds
+    the runs that finished before the kill. Then pull, and add `--other-card-idle` (recorded) once you are sure no S75b
+    process runs there.
+  - If that machine cannot be reached, do not fall back: tell the user, because its unpushed runs would be drawn again.
 
 1. **The CUDA CHECK**, on each card while no other job is on that GPU. Then commit
    `explore_gpu/s75b_checks_cuda_<GPU>_output.*`. It takes about 2 minutes. It runs B7, the lock-step, and B9, a real
@@ -166,9 +172,10 @@ of post-approval changes, none of them blind).
 
 3. **The pilot**, on one card: the 1660 after the window_gate run, or the 3070 if that is free first. The other card
    waits until the stage-1 record is pushed.
-   - Afterwards, commit and push the stage-1 record (`.json` / `.md`) and every results file, whatever the decision.
-   - The record is written when the pilot starts, marked running, and rewritten when it ends. Stage 2 refuses a
-     record still marked running; after a hard kill, run stage 1 again.
+   - As soon as it starts, commit and push the results file and the stage-1 record, which is marked running. The
+     other card's stages then refuse while the pilot runs.
+   - When it ends, commit and push the stage-1 record (`.json` / `.md`) and every results file, whatever the decision.
+   - Stage 2 refuses a record still marked running; after a hard kill, run stage 1 again.
    - A run below 0.9, or a diverged run, is a final STOP.
    - Any other failure stops the invocation. Re-invoke the same command, on either card: it reruns the same seed.
    - Two invocations with failures halt the seed. Then you decide: add `--retry-halted` to clear it, or fix the code.
@@ -182,8 +189,11 @@ of post-approval changes, none of them blind).
    - A card runs only the arms its benchmark allows, and names the rest. To run just the refused arms on the other
      card, use the fallback with `--arms`, after that card's own stage 2 has ended. For example:
      `--machine fallback-3070 --arms WIDE_SLOW --reason "the 1660's benchmark refuses WIDE_SLOW"`.
-   - A fallback for a card that died mid-stage needs `--other-card-idle` as well.
+   - A fallback for a card that died mid-stage needs `--other-card-idle` as well, after that card's results file has
+     been pushed from its own machine (general rules).
    - Failures are handled as in stage 1: re-invoke, and use `--retry-halted` after a halt.
+   - If the code changed on disk during a run, the screen halts. Restore the code, and record your decision on that
+     card with `--code-changed-decision keep` (the run counts) or `rerun` (it is set aside, and its seed is rerun).
    - Spec Appendix B has the rules.
 
        python -m explore_gpu.s75b --stage 2 --device cuda --machine 1660      # ORACLE 850-851, SINGLE, WIDE_SLOW

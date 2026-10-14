@@ -8,7 +8,8 @@ The pass ran each mutant in a copy of the repository (no .git, no explore_out), 
     python -m explore_gpu.s75b_checks --device cpu --only B4,B5
 
 A mutant is caught if the run fails (rc 1). The first 18 are the third review's mutants that passed every CHECK at f4cf7a8;
-the other 17 break the rules added after it. Results: s75b_mutants_cpu_output.txt.
+the next 17 break the rules added after it (at 5f6f840), and the last 13 the fourth review's fixes. Results:
+s75b_mutants_cpu_output.txt.
 """
 
 M = {
@@ -74,8 +75,39 @@ M = {
  "sync_after_record": [('''    sync_or_exit("stage 2", require_commit)          # first: a checkout that is behind is told to pull
 ''', ''''''), ('''    with open(jp) as f:
         rec1 = json.load(f)
-    if rec1.get("running"):''', '''    with open(jp) as f:
+    st_all = load_all()
+    if superseded(sha, st_all):
+        raise SystemExit(f"stage 2: code SHA''', '''    with open(jp) as f:
         rec1 = json.load(f)
     sync_or_exit("stage 2", require_commit)
-    if rec1.get("running"):''')],
+    st_all = load_all()
+    if superseded(sha, st_all):
+        raise SystemExit(f"stage 2: code SHA''')],
+ "code_now_constant": [('''    import hashlib
+    names = _CODE_NAMES.get(sha)''', '''    return sha
+    import hashlib
+    names = _CODE_NAMES.get(sha)''')],
+ "stage1_never_ended": [('''        st["meta"]["last_invocation"].update(ended=True, at=inv["ended"], aborted=aborted)''', '''        pass''')],
+ "dirty_code_empty": [('''    return [line[3:] for line in out.splitlines() if line.strip()]''', '''    return []''')],
+ "dup_ok_only": [('''        if sh == sha and (arms is None or a in arms) and any(_effective(f).get("kind") == "diverged" for f in fl):''', '''        if False:''')],
+ "decision_ignored_stage2": [('''    if code_changed_decision:
+        decide_code_changed(load(hw), hw, sha, code_changed_decision, log)
+        st_all = load_all()
+    _code_changed_or_exit(st_all, sha, "stage 2")''', '''    if False:
+        decide_code_changed(load(hw), hw, sha, code_changed_decision, log)
+        st_all = load_all()
+    _code_changed_or_exit(st_all, sha, "stage 2")''')],
+ "rerun_as_keep": [('''        if choice == "keep":
+            st["runs"][k]["decided"] = dec''', '''        if True:
+            st["runs"][k]["decided"] = dec''')],
+ "effective_noop": [('''    if f.get("code_changed") and (f.get("decided") or {}).get("choice") == "rerun" and f.get("kind") != "operational":''', '''    if False:''')],
+ "machine_lock_off": [('''    return list(dict.fromkeys([os.path.join(OUT, f"{NAME}_{hw_slug(hw)}.lock"),
+                               os.path.join(MACHINE_LOCK_DIR, f"{NAME}_{hw_slug(hw)}.lock")]))''', '''    return [os.path.join(OUT, f"{NAME}_{hw_slug(hw)}.lock")]''')],
+ "stop_this_code_tag_off": [('''    elif d["complete"] and not d["proceed"]:
+        tag = ("NO READING: S75b stopped at stage 1 under this code''', '''    elif False:
+        tag = ("NO READING: S75b stopped at stage 1 under this code''')],
+ "stage1_no_push_message": [('''f"the results file and this running stage-1 record now (git add explore_out/I/gpu/s75b), so the other card "''', '''f"the results file (git add explore_out/I/gpu/s75b), so the other card "''')],
+ "stage1_hint_stage2": [('''if what == "stage 1" else''', '''if False else''')],
+ "set_aside_not_merged": [('''        out["set_aside"].update(st.get("set_aside") or {})''', '''        pass''')],
+ "nobody_line_old": [('''"SINGLE": "no GAP"''', '''"SINGLE": "the reading stays incomplete"''')],
 }
