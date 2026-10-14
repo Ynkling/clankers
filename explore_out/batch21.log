@@ -758,3 +758,55 @@ EXPLORATORY, NOT A RESULT — batch 21: the D128 oracle's validity (S69)
   [  2]   67.4 min  oracle_d128  ORC_S_D128     seed 270  lr 0.001  (the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters))
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 11c0b82, code f7a606d7399a, attempt 1, resumed at [33600]: acc 0.348  trans  None  stop 40800  outcome not bound
   start   67.4 min  oracle_d128  ORC_S_D128     seed 274  (projected worst case 360 min)
+  segment budget reached: 4 run(s) stopped, each to resume from its last checkpoint: oracle_d128:ORC_S_D128|271 at step 36000, oracle_d128:ORC_S_D128|272 at step 36000, oracle_d128:ORC_S_D128|273 at step 9600, oracle_d128:ORC_S_D128|274 at step 3600
+  2 runs saved in this segment; batch wall clock 114.2 min (this segment)
+####################################################################################################
+REPORTS — EXPLORATORY, not a result
+####################################################################################################
+----------------------------------------------------------------------------------------------------
+[EXPLORATORY, not a result] SCREEN oracle_d128
+  idea    is the D = 128 oracle a usable validity check for the key-load draft? ten seeds, the recorded recipe and SLOW
+  source  the user's batch 21; S67 / S68 (the D128 oracle bound 271 at 12,000; 270 unbound at 86,400); the draft's VALID_N = 2
+  change  the oracle's recipe (one Adam at 1e-3 vs SLOW); ten seeds at the draft's budget, 40,800
+  arm ORC_A_D128   lr 0.001  iters 40800  seeds 270-279 (10)  — oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)
+                   schedule: the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe)
+  arm ORC_S_D128   lr 0.001  iters 40800  seeds 270-279 (10)  — oracle, P=16, D128 (N=256, D=128), SLOW
+                   schedule: the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters)
+  pairing seeds 270-279: ORC_S_D128 with ORC_A_D128 on each seed (same initial weights and batches)
+----------------------------------------------------------------------------------------------------
+  ARM ORC_A_D128 (oracle, P=16, D128 (N=256, D=128), the recorded recipe (single Adam)), seeds 270-279 (10); the perfect gate; a single Adam at 0.001 on every parameter (the recorded validity recipe); 40800 updates; lr 0.001
+    seed | outcome     trans   stop   acc  | per-stream at the end | S67 record (ORC_P16_D128, 43,200)
+     270 | not bound    None  40800  0.32 | 0.31/0.30/0.32/0.34   | not bound trans None acc 0.32  [resumed at [37200]]
+     271 | BOUND       12000  14400  0.97 | 0.95/0.97/0.97/0.97   | BOUND trans 12000 acc 0.97  [resumed at [10800]]
+     272 | not bound    None  40800  0.29 | 0.27/0.30/0.27/0.30   | -  [resumed at [37200]]
+     273 | BOUND       31200  33600  1.00 | 1.00/1.00/1.00/0.99   | -  [resumed at [25200]]
+     274 | BOUND       27600  30000  0.98 | 0.98/0.98/0.98/0.99   | -  [resumed at [22800]]
+     275 | not bound    None  40800  0.91 | 0.90/0.92/0.91/0.92   | -  [resumed at [37200]]
+     276 | not bound    None  40800  0.30 | 0.30/0.30/0.27/0.32   | -  [resumed at [28800]]
+     277 | not bound    None  40800  0.91 | 0.90/0.90/0.91/0.92   | -  [resumed at [28800]]
+     278 | BOUND       19200  21600  0.99 | 0.99/0.99/0.99/0.99   | -  [resumed at [13200]]
+     279 | not bound    None  40800  0.92 | 0.92/0.91/0.92/0.94   | -  [resumed at [39600]]
+  READING S69 ORC_A_D128: unreliable (bound 4/10, Wilson 95% [0.17, 0.69]; two seeds both bind: 0.13; transitions [12000, 19200, 27600, 31200]; reliable >= 9, at risk >= 5, else unreliable)
+
+  ARM ORC_S_D128 (oracle, P=16, D128 (N=256, D=128), SLOW), seeds 270-279 (10); the perfect gate; SLOW: every trainable parameter 0.0001 for updates 1-2400, 0.001 after (no gate parameters); 40800 updates; lr 0.001
+    seed | outcome     trans   stop   acc  | per-stream at the end | S67 record (ORC_P16_D128, 43,200)
+     270 | not bound    None  40800  0.35 | 0.35/0.36/0.33/0.35   | -  [resumed at [33600]]
+     271 | not run
+     272 | not run
+     273 | not run
+     274 | not run
+     275 | not run
+     276 | not run
+     277 | not run
+     278 | not run
+     279 | not run
+  READING S69 ORC_S_D128: INCOMPLETE (bound 0/10, Wilson 95% [0.00, 0.28]; two seeds both bind: 0.00; transitions []; reliable >= 9, at risk >= 5, else unreliable)
+
+  READING S69 for the spec: INCOMPLETE, no reading (b_A 4, b_S 0; rules: b_A >= 9 keep; else b_S >= 9 SLOW; else max >= 5 VALID_N = 1; else no D128 validity check)
+  DESCRIPTIVE (no reading): paired, both bind 0, single Adam only 4, SLOW only 0, neither 6; exact McNemar two-sided p = 0.125
+####################################################################################################
+SUMMARY — EXPLORATORY, not a result
+  S69 ORC_A_D128 (single Adam): unreliable (4/10); ORC_S_D128 (SLOW): INCOMPLETE (0/10)
+  S69 for the spec: INCOMPLETE, no reading
+####################################################################################################
+chain: segment 10 end 2026-10-14T14:59:13Z, 11 of 20 runs saved (driver exit 0)
