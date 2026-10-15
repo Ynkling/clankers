@@ -5,6 +5,26 @@ the user and X to adopt, change or drop. Nothing here is fixed on the main line 
 below that comes from a screen (S64-S68) is EXPLORATORY, not a result. The CHECK numbers are provisional: they continue
 from the main line's last (test_delta_recipe's 173 at eb5fd49) and are renumbered on adoption.
 
+## Status after batch 21 (EXPLORATORY, not a result): NOT READY FOR V
+
+Batch 21 (S69, `explore_oracle_d128.py`, readings fixed before any run) tested the D128 oracle, the validity check this draft
+relies on, on ten seeds (270-279) at the draft's budget of 40,800:
+- the recorded recipe (a single Adam at 1e-3) bound **4/10** (transitions 12,000-31,200), so two seeds both bind with chance
+  0.13. Three more seeds were close (0.91-0.92 at 40,800, never held at 0.95). Three were stuck near 0.30, and one of them
+  (270) was still at 0.38 at 86,400 in S68;
+- SLOW bound **0/10** (every seed 0.33-0.36).
+The pre-registered reading is **"no D128 validity check at 40,800"**: the draft does not go to V as written. With VALID_N = 2
+the D128 claims (K1, K2) would be UNTESTED on most machines, and a seed's oracle failure says nothing about the learned gate.
+
+Options for the user and X. None is screened and none is adopted here:
+1. A longer budget for the D128 oracle only, keeping the learned arms at 40,800. The three close seeds suggest some gain,
+   but at least one seed is stuck to 86,400. It needs a screen at the chosen budget.
+2. A different D128 validity check, e.g. the D128 oracle at P = 8, which bound S67's two seeds at 2400. It validates the
+   D128 model and path, not P = 16 capacity.
+3. VALID_N = 1 at D128, with the recorded recipe (at least one of two seeds drawn from these ten binds with chance 1 - 6·5/90 = 0.67).
+4. Drop the D128 oracle requirement and state K1/K2 as conditional on the learned arms alone (weaker; V should rule).
+5. Drop the D128 arm and the test until a D128 configuration has a reliable oracle.
+
 ## The user's specification (verbatim, from the batch 20 prompt)
 
 > Then write explore_out/spec_draft_keyload.md: a main-line specification in the form of
@@ -93,12 +113,10 @@ recorded validity recipe, a single Adam at 1e-3 on every parameter (test_window_
 **Validity** (test_window_gate's rule, VALID_N = 2). A width is VALID on a machine if its oracle binds on both of the
 machine's first two seeds within the budget. K1 uses both widths; K2 uses D128. A claim is UNTESTED on a machine where a
 width it uses is not VALID, and UNTESTED pooled unless it is VALID on both machines. UNTESTED is not a negative.
-**A validity risk, for the user and X to decide before adoption.** At D = 128 the oracle on its recorded recipe (a single
-Adam at 1e-3) bound one of S67's two seeds (271 at 12000); seed 270 did not bind by 43,200, and S68 ran it to 86,400:
-still unbound (0.38, all four streams 0.36-0.40). With VALID_N = 2 at D128, K1 and K2 may be UNTESTED on a machine for a
-reason that has nothing to do with the learned gate. The draft keeps the user's rule as written. Two alternatives, not
-adopted here: (a) the D128 oracle on the SLOW recipe (other parameters at 1e-4 for 2400 updates, as the learned arms);
-(b) VALID_N = 1 at D128. Either would need its own screen first: neither was run.
+**The validity risk, measured (batch 21; see the status section at the top).** At D = 128 the oracle on its recorded recipe
+bound 4/10 seeds within 40,800 and on SLOW 0/10. With VALID_N = 2 at D128, K1 and K2 would be UNTESTED on most machines, for
+a reason that has nothing to do with the learned gate. The rule above is kept as the user wrote it until the user and X
+choose among the options in the status section.
 
 **Seeds: X 660-679, L 1660-1679; the oracles on 660-661 / 1660-1661.** The blocks were checked against:
 - the main line's seed list (claude/bdh-growth-hebbian-inference-w90069 at eb5fd49): `test_split_copy.earlier_seeds()`
