@@ -10,7 +10,8 @@ failed CHECK stops the invocation before any screen run. Only Adam runs are used
 container's CPU is bit for bit; records from other CPUs are compared by counts only.
 
 Run:  python explore_h_run.py SCREEN [SCREEN ...] [--workers 4] [--report-only]
-      SCREEN: collapse (S58) | eight (S58b) | stability (S60) | copy2x2 (S61) | query (S62) | hardness (S63) | two (S78) | constants (S79) | guard (S84) | two_b (S85) | allmass (S86) | allmass2 (S87a) | dose (S87c)
+      SCREEN: collapse (S58) | eight (S58b) | stability (S60) | copy2x2 (S61) | query (S62) | hardness (S63) | two (S78) | constants (S79) | guard (S84) | two_b (S85) | allmass (S86) | allmass2 (S87a) | dose (S87c) | s89 (S89)
+      --push-each: commit explore_out/H and push after every saved run (S89 onward)
 """
 
 import argparse
@@ -26,13 +27,14 @@ sys.path.insert(0, HERE)
 import explore_common as ec
 import explore_common16 as c16
 import explore_main9c as mt
+import subprocess
 
 MODS = {"collapse": "explore_h_collapse", "eight": "explore_h_eight", "stability": "explore_h_stability",
         "copy2x2": "explore_h_copy2x2", "query": "explore_h_query_gate", "hardness": "explore_h_hardness",
         "two": "explore_h_two", "constants": "explore_h_constants",
         "guard": "explore_h_guard", "two_b": "explore_h_two_b",
         "allmass": "explore_h_allmass",
-        "allmass2": "explore_h_allmass2", "dose": "explore_h_dose"}
+        "allmass2": "explore_h_allmass2", "dose": "explore_h_dose", "s89": "explore_h_s89"}
 OUT = os.path.join(ec.OUT_DIR, "H")
 CHECKS = os.path.join(OUT, "checks.json")
 
@@ -60,11 +62,30 @@ def line(j, rec):
     return s
 
 
+PUSH_LOCK = "/tmp/explore_h_push.lock"
+TRAILER = ("Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\n"
+           "Claude-Session: https://claude.ai/code/session_01TbPDvaPvEHX8LrqZ7KD9QE")
+
+
+def push_after(line_fn):
+    """line() is called in the parent right after each save_run: commit explore_out/H and push, in the background, one at
+    a time (flock), retrying the push with backoff."""
+    def wrapped(j, rec):
+        msg = f"explore_out/H: {j['name']} {j['arm']}|{j['seed']} saved (EXPLORATORY, not a result)"
+        cmd = (f"cd {HERE} && git add explore_out/H && git commit -q -m '{msg}' -m '{TRAILER}'; "
+               f"for i in 2 4 8 16; do git -c rebase.autoStash=true pull -q --rebase origin claude/explore-H && "
+               f"git push -q -u origin claude/explore-H && break; sleep $i; done")
+        subprocess.Popen(["flock", PUSH_LOCK, "bash", "-c", cmd], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return line_fn(j, rec)
+    return wrapped
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("screens", nargs="+", choices=sorted(MODS))
     ap.add_argument("--workers", type=int, default=ec.WORKERS)
     ap.add_argument("--report-only", action="store_true")
+    ap.add_argument("--push-each", action="store_true")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     screens = [importlib.import_module(MODS[s]) for s in args.screens]
@@ -118,7 +139,8 @@ def main():
             print(f"  not run: {skipped}")
         print(f"  {len(jobs)} runs queued on {args.workers} workers (1 torch thread each)", flush=True)
         t0 = time.time()
-        c16.run_pool(jobs, args.workers, lambda j: sys.modules[j["screen"]].ARMS[j["arm"]]["iters"], None, line)
+        c16.run_pool(jobs, args.workers, lambda j: sys.modules[j["screen"]].ARMS[j["arm"]]["iters"], None,
+                     push_after(line) if args.push_each else line)
         print(f"  wall clock {(time.time() - t0) / 60:.1f} min", flush=True)
     for m in screens:
         res, got = m.report()
