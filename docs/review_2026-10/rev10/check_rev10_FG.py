@@ -282,7 +282,7 @@ row(S, rep(F, R8, 22, "VALID"), "validity: the perfect gate with beta = 1 bound 
     ok_if(vo == {2400: 1200, 2401: 1200}))
 row(S, rep(F, R8, 23, "bound at 30000 and 21600"), "the learned-beta perfect gate bound at 30000 and 21600", f"O_DELTA_LEARNED {vl}",
     ok_if(vl == {2400: 30000, 2401: 21600}))
-fails = [(a, s, outcome_k(r), r.get("outcome"), r.get("outcome_v2"), round(r["acc"], 3))
+fails = [(a, s, outcome_k(r), r.get("outcome"), r.get("outcome_v2"), r["acc"])
          for a in ("DELTA_LEARNED", "DELTA_LEARNED_SLOW") for s, r in sorted(WA[a].items()) if not br_screen(r)]
 sp = [f for f in fails if f[2] == "STREAM-PARTIAL one-to-one"]
 mg = [f for f in fails if f[2].startswith("MERGED")]
@@ -369,7 +369,7 @@ row(S, rep(F, R8, 53, "holds at 0.6-1.0"), "SLOW: beta holds at 0.6-1.0 while w,
     ok_if(rng(slow_hold, 1) == "0.6-1.0" and (fbs[0], fbs[-1]) == (3600, 8400)))
 row(S, rep(F, R8, 55, "same collapse"), "the learned-beta perfect gate shows the same collapse; 'that is why it binds at 21600-30000'",
     f"O_DELTA_LEARNED first all-layer median < 0.1 at {fb['O_DELTA_LEARNED']} (lr 1e-3 from update 1; transitions {vl})",
-    "PARTIAL", "the collapse is there but slower (by 8400-9600, against 3600 in DELTA_LEARNED); 'that is why' is a mechanism, not a reading")
+    "PARTIAL", f"the collapse is there but slower (by {sorted(fb['O_DELTA_LEARNED'].values())}, against 3600 in DELTA_LEARNED with the same lr); 'that is why' is a mechanism, not a reading")
 end = {a: {s: bt(r)[max(bt(r))] for s, r in WA[a].items()} for a in LRN}
 ctx_max = max((L["by_role"]["ctx"], a, s, i + 1) for a in LRN for s, e in end[a].items() for i, L in enumerate(e))
 key_max = max((L["by_role"]["key"], a, s, i + 1) for a in LRN for s, e in end[a].items() for i, L in enumerate(e))
@@ -411,7 +411,9 @@ slower = {a: [(s, WA[a][s]["transition"], FX[s]["transition"]) for s in SEEDS_A 
 row(S, rep(F, R8, 67, "every learned variant is"), "with beta fixed at 1 the recipe is the strongest arm (10/10, median 13200); every learned variant is slower or fails",
     "per seed, learned transition vs FIXED's where the learned run binds: "
     + "; ".join(f"{a[6:]} slower on {sum(t > f for _, t, f in v)}/{len(v)}" for a, v in slower.items()),
-    ok_if(all(t > f for v in slower.values() for _, t, f in v)), "marked post hoc in the report")
+    "MATCH" if all(t > f for v in slower.values() for _, t, f in v) else "PARTIAL",
+    "true of the arms (medians 33600 and 28800 against 13200); per seed one learned run bound before its fixed pair: "
+    + str([(a, s, t, f) for a, v in slower.items() for s, t, f in v if t <= f]) + "; marked post hoc in the report")
 
 # S88b descriptive
 ub = [(a, s, r) for a in ("FIXED_1X", "ROUTED_1X", "FIXED_2X", "ROUTED_2X") for s, r in HA[a].items() if not bound(r)]
@@ -429,7 +431,7 @@ ub_wo = [x for _, _, r in ub for x in (r["write_order"]["acc_last"], r["write_or
 row(S, rep(F, R8, 74, "0.48-0.51 accuracy"),
     "every unbound run ends at 0.48-0.51 accuracy; that holds equally at every distance and whether or not the queried pair was its key's last write",
     f"{len(ub)} unbound runs: end acc {rng(ub_acc, 3)}; by distance (last evaluation) {rng(ub_dist, 3)}; last-write / not {rng(ub_wo, 3)}",
-    "PARTIAL", "the overall accuracy is 0.48-0.51, but split by distance it spans 0.42-0.58 and by write order 0.44-0.56: near chance "
+    "PARTIAL", f"the overall accuracy is 0.48-0.51, but split by distance it spans {rng(ub_dist)} and by write order {rng(ub_wo)}: near chance "
     "between two streams in every cell, not 0.48-0.51 in each")
 conf = [r["write_order"]["acc_notlast"] + r["write_order"]["lastval_notlast"] for _, _, r in ub]
 row(S, rep(F, R8, 76, "stream confusion"), "the channel retrieves the key's two values but cannot tell which stream: a stream confusion",
@@ -459,7 +461,7 @@ sb_h = sum(r["secs_wall"] for a in HA.values() for r in a.values()) / 3600
 row(S, rep(F, R8, 125, "159.9 h"), "S88a 159.9 h of run time, 23:07 UTC 12 Oct to 17:03 UTC 14 Oct; S88b 8.7 h, 17:03-19:26 UTC 14 Oct",
     f"sum secs_wall {sa_h:.2f} h / {sb_h:.2f} h; s88a.log '{re.search(r'=== S88a start (.*)', LOGA).group(1)}' to "
     f"'{re.search(r'=== S88a done (.*)', LOGA).group(1)}'; s88b.log to '{re.search(r'=== S88b done (.*)', LOGB).group(1)}'",
-    ok_if(round(sa_h, 1) == 159.9 and round(sb_h, 1) == 8.7))
+    ok_if(abs(sa_h - 159.9) < 0.06 and abs(sb_h - 8.7) < 0.06), "159.85 h printed as 159.9")
 per_upd = {a: [r["secs"] / r["stopped_at"] for r in WA[a].values()] for a in WA}
 lr_max_h = max(r["secs_wall"] for a in LRN for r in WA[a].values()) / 3600
 row(S, rep(F, R8, 133, "0.34-1.51 s against 0.30-0.37 s"), "learned-beta runs slower per update: 0.34-1.51 s against 0.30-0.37 s; up to 15 h per run",
@@ -470,7 +472,7 @@ row(S, rep(F, R8, 138, "complete within about 1200 updates"), "under both lr sch
     f"all-layer median < 0.1 at, minus the step the lr reached 1e-3: DELTA_LEARNED (1e-3 from update 1) {sorted(fb['DELTA_LEARNED'].values())}; "
     f"SLOW (1e-3 from 2401) +{sorted(x - 2400 for x in fbs)}; O_DELTA_LEARNED {sorted(fb['O_DELTA_LEARNED'].values())}",
     "DISAGREE", "contradicts the report's own lines 52-54 (by 3600 with the lr at 1e-3 from update 1; 1200-6000 after the switch); within "
-    "1200 updates holds for 5 of the 10 slow runs only")
+    f"1200 updates holds for {sum(x - 2400 <= 1200 for x in fbs)} of the 10 slow runs only")
 nchk_a = len(re.findall(r"CHECK F/write: .*: ok\n", LOGA + "\n"))
 nchk_b = len(re.findall(r"CHECK F/horizon: .*: ok\n", LOGB + "\n"))
 cj = json.loads(show(F, FD + "checks_s88a_20261012_230728.json"))
@@ -503,19 +505,26 @@ row(S, tex(266, "Neither pre-fixed reading applies"), "neither reading applies; 
 row(S, tex(266, "within about 1200 updates of its learning rate reaching $10^{-3}$ (by 3600 in the first arm, 3600--8400 in the slow one"),
     "'in every learned run beta falls from 1 to below 0.1 in every layer within about 1200 updates of its learning rate reaching 1e-3 (by 3600 in the first arm, 3600-8400 in the slow one ...)'",
     f"first evaluation with every layer's median < 0.1: DELTA_LEARNED {sorted(fb['DELTA_LEARNED'].values())} with the lr at 1e-3 from update 1 "
-    f"(= 2400-3600 updates after it, not 1200); SLOW {fbs} (switch at 2400: +{sorted(x - 2400 for x in fbs)}); the perfect gate {sorted(fb['O_DELTA_LEARNED'].values())}",
-    "DISAGREE", "the parentheses contradict the clause: the first arm's rate is 1e-3 from update 1 and it collapses by 3600 (at 2400 a layer "
-    "median is still up to 0.38); the slow arm takes 1200-6000 updates after its switch (within 1200 on 5 of 10). 'in every learned run' "
-    "would also take in the learned perfect gate, which takes 8400-9600. Exact: 'below 0.1 in every layer by update 3600 in the first arm "
+    f"(3600 updates after it, not 1200; at 2400 a layer median is still up to {max(L['median'] for r in WA['DELTA_LEARNED'].values() for L in bt(r)[2400]):.2f}); SLOW {fbs} (switch at 2400: +{sorted(x - 2400 for x in fbs)}); the perfect gate {sorted(fb['O_DELTA_LEARNED'].values())}",
+    "DISAGREE", "the parentheses contradict the clause: the first arm's rate is 1e-3 from update 1 and it collapses by 3600; the slow arm "
+    f"takes 1200-6000 updates after its switch (within 1200 on {sum(x - 2400 <= 1200 for x in fbs)} of 10). 'in every learned run' "
+    f"would also take in the learned perfect gate, which takes {sorted(fb['O_DELTA_LEARNED'].values())}. Exact: 'below 0.1 in every layer by update 3600 in the first arm "
     "(rate 1e-3 throughout) and 1200-6000 updates after the slow arm's switch to 1e-3'. The other session's first pass (6.3) passed this as F's description")
 row(S, tex(266, "holds it at $0.6$--$1.0$ while its rate is $10^{-4}$"), "the slow arm holds beta at 0.6-1.0 while its rate is 1e-4",
     f"SLOW medians at 1200 and 2400: {rng(slow_hold)}", "MATCH")
+hi_eta = [(L["eta_key_by_stream"], max(L["key_by_stream"]) - min(L["key_by_stream"]), L["median"], i)
+          for a in LRN for r in WA[a].values() for st in bt(r).values() for i, L in enumerate(st) if L["eta_key_by_stream"] >= 0.5]
 row(S, tex(266, "never diverges by stream"), "beta never diverges by stream", f"'DIVERGES' (eta^2 at KEY >= 0.5 in a layer) at the end {divN}; at any evaluation "
-    f"{div_any}; max eta^2 {eta_max:.2f}", ok_if(all(v == 0 for v in div_any.values())))
+    f"{div_any} runs (max eta^2 {eta_max:.2f}; {len(hi_eta)} run-evaluations, all at layer {sorted({i + 1 for *_, i in hi_eta})}, per-stream spread "
+    f"<= {max(x[1] for x in hi_eta):.3f} with the layer median <= {max(x[2] for x in hi_eta):.2f})",
+    "MATCH" if all(v == 0 for v in div_any.values()) else "PARTIAL",
+    "by the screen's own definition (at the end) 0 of 22; at earlier evaluations layer 1's eta^2 at KEY passes 0.5 in 10 runs, but as a "
+    "stream-structured share of a beta already near 0 (the 8 stream medians within 0.013). Exact: 'does not diverge by stream (at the end; "
+    "earlier the stream share of a near-zero beta is at most 0.013)'")
 row(S, tex(266, "stays of order 1 only at the first layer's value positions"), "beta stays of order 1 only at the first layer's value positions",
     f"end medians >= 0.5 outside layer-1 VAL: VAL at layers 2-3 in {len(l23)} run-layers {l23}; CTX {ctx_hi}", "PARTIAL",
     "report 8 says KEY and CTX are about 0 everywhere and VAL of order 1 at layer 1; it says nothing of layers 2-3 VAL, where the median "
-    "is >= 0.5 in 12 run-layers (up to 1.85). 'Only' is the draft's; exact: 'about 0 at key and context positions (one run's layer-3 CTX at 0.72), "
+    f"is >= 0.5 in {len(l23)} run-layers (up to {max(x[3] for x in l23)}). 'Only' is the draft's; exact: 'about 0 at key and context positions (one run's layer-3 CTX at 0.72), "
     "of order 1 at the first layer's value positions in most runs'")
 row(S, tex(266, "a $\\beta$ near zero both erases and writes almost nothing"), "with the tied write, a beta near zero both erases and writes almost nothing",
     "explore_f_write.py:24-35 (beta scales the tied write and the erase)", "NOT RECORD-CHECKABLE", "a property of the rule, not a record")
@@ -538,7 +547,7 @@ row(S, tex(268, "so the screen is \\emph{untested}"), "untested by the rule; had
 row(S, tex(268, "Every failure at either length is a stream confusion at $0.5$, flat across the queried key's distance to its cue"),
     "every failure is a stream confusion at 0.5, flat across distance; 'what fails is the stream's identity rather than the memory's reach'",
     f"unbound end acc {rng(ub_acc, 3)}; by distance {rng(ub_dist, 3)}; correct + other stream's value (not-last queries) {rng(conf, 3)}",
-    "MATCH", "'at 0.5' holds per run; per distance 0.42-0.58 (no trend with distance). The last clause is an interpretation of an untested screen")
+    "MATCH", f"'at 0.5' holds per run; per distance {rng(ub_dist)} (no trend with distance)." " The last clause is an interpretation of an untested screen")
 r8 = sorted(p for p in git("ls-tree", "-r", "--name-only", F, FD).split() if re.search(r"report_\d+\.md$", p))
 row(S, tex(268, "its branch holds eight reports"), "the two screens close F's programme; its branch holds eight reports",
     f"{len(r8)} reports at {F}; the branch head is {short('origin/claude/explore-F')}", ok_if(len(r8) == 8 and short("origin/claude/explore-F") == F))
@@ -704,8 +713,11 @@ for a, (ln, rbs, bs, cls_, t_, cm_) in R7T.items():
         ok_if(good))
 bdb = [(s, transition(r["curve"]), gcls(r), round(r["end"]["eta_key_by_key"], 2)) for s, r in sorted(GA["BASELINE_D"].items()) if gbound(r)]
 row(S, rep(G, R7, 20, "3/10 (key splits)"), "BASELINE_D: BOUND 3/10 '(key splits)'",
-    f"bound unrouted runs (seed, transition, v1 class of the end gate, end eta^2 by key): {bdb}",
-    ok_if(len(bdb) == 3 and all(c == "KEY" for _, _, c, _ in bdb)))
+    f"bound unrouted runs (seed, transition, v1 class of the end gate, end eta^2 by key, end margin): "
+    f"{[(s, t, c, e, round(GA['BASELINE_D'][s]['end']['margin'], 2)) for s, t, c, e in bdb]}",
+    ok_if(len(bdb) == 3 and all(c == "KEY" for _, _, c, _ in bdb)),
+    "one is a key split (2721); 2726 and 2728 are half-routed (one-to-one VAL map at every layer, margin 0.47, eta^2 by key 0.00), as "
+    "S82's bound delta baselines were; not in the draft")
 
 # readings
 disc = {a: gp(a, "BASELINE") for a in ("REG3_FREQHINGE", "REG3_SELFKL", "REG3_TEMP", "REG3_KEYHINGE")}
@@ -771,7 +783,7 @@ kh300 = [max(r["hinge"]["eta_at"]["300"]) for r in GA["REG3_KEYHINGE"].values()]
 row(S, rep(G, R7, 53, "drives its η² to 0 by update 300"), "FREQHINGE fires 53-115 times in 1-2400 (median 80) and drives its eta^2 to 0 by update 300, like the key term",
     f"firings {min(fq)}-{max(fq)} (median {med(fq)}); the term relu(eta^2 - 0.2) at 300: max over runs and layers {max(v300)}; the key term "
     f"(control) fired {min(khf)}-{max(khf)}, its eta^2 at 300 up to {max(kh300):.3f}", "PARTIAL",
-    "the counts hold; the record has the term, not eta^2: 0 at 300 means eta^2 <= 0.2 in every layer, not 0 (the key term's own eta^2 at 300 is up to 0.09)")
+    "the counts hold; the record has the term, not eta^2: 0 at 300 means eta^2 <= 0.2 in every layer, not 0 (the key term's own recorded eta^2 at 300 is up to " + f"{max(kh300):.2f})")
 b24 = {a: {ro: med([at(r, 2400)["beta"][ro] for r in GA[a].values()]) for ro in ("CTX", "KEY", "VAL")} for a in ("REG3_FREQHINGE", "REG3_KEYHINGE")}
 row(S, rep(G, R7, 56, "0.24 / 0.19 / 0.19"), "beta^R CTX/KEY/VAL at 2400: FREQ 0.24/0.19/0.19 vs KH 0.32/0.20/0.21; commitment 0.59 vs 0.93",
     f"medians {', '.join(f'{a} ' + '/'.join(f'{v:.2f}' for v in b.values()) for a, b in b24.items())}; commitment {CM['REG3_FREQHINGE']:.3f} vs {CM['REG3_KEYHINGE']:.3f}",
@@ -794,9 +806,19 @@ row(S, rep(G, R7, 64, "0.84, as BASELINE's 0.85"), "TEMP commits by 1200 (0.84, 
     + "/".join(f"{med([at(r, 1200)['beta'][ro] for r in tp.values()]):.2f}" for ro in ("CTX", "KEY", "VAL"))
     + f"; KEY failures {sum(gcls(r) == 'KEY' for r in tp.values() if not gbound(r))}; routed {sorted(s for s, r in tp.items() if rbd(r))}", "MATCH",
     "'its logits simply grow fourfold' is not in the record")
-pl = [c["acc"] for a in ("BASELINE", "REG3_FREQHINGE", "REG3_SELFKL", "REG3_TEMP") for r in GA[a].values() if not gbound(r) for c in r["acc_by_cell"].values()]
-row(S, rep(G, R7, 67, "0.45-0.60"), "every unbound arm sits at 0.45-0.60 across the 12 (stream, block, pair) cells", f"unbound Hebbian runs' cells {rng(pl, 3)} ({len(pl)} cells)",
-    "MATCH" if 0.44 <= min(pl) and max(pl) <= 0.61 else "PARTIAL", "cells with small n spread wider" if not (0.445 <= min(pl) and max(pl) <= 0.605) else "")
+pl = {}
+for a in ("BASELINE", "REG3_FREQHINGE", "REG3_SELFKL", "REG3_TEMP"):
+    cells = collections.defaultdict(list)
+    for r in GA[a].values():
+        if not gbound(r):
+            for c, v in r["acc_by_cell"].items():
+                cells[c].append(v["acc"])
+    pl[a] = [med(v) for v in cells.values()]
+pall = [x for v in pl.values() for x in v]
+row(S, rep(G, R7, 67, "0.45-0.60"), "every unbound arm sits at 0.45-0.60 across the 12 (stream, block, pair) cells",
+    "per arm, the median over its unbound runs per cell: " + "; ".join(f"{a} {rng(v, 3)}" for a, v in pl.items()),
+    ok_if(round(min(pall), 2) >= 0.45 and round(max(pall), 2) <= 0.60),
+    "the explore_g_rhl_parent PLATEAU statistic (median over runs); single runs' cells range wider")
 
 # ── Revision 10 on S87 ─────────────────────────────────────────────────────────────────────────────────────────────
 S = "G-tex10"
