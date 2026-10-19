@@ -29,7 +29,7 @@
 - The PDF shows the tex.
 
 **What must change.**
-- **Eleven statements are false against the records or git (§1).** None is a number of a claim. The worst of them:
+- **Nine statements, in sixteen places, are false against the records or git (§1).** None is a number of a claim. They are:
   - an account of who checked what (§1.1–1.3);
   - a run count made stale by S75's tenth seed (§1.4);
   - a sentence made stale by H's S87a on three lines (§1.5);
@@ -45,7 +45,7 @@
   - the provenance rows;
   - the carried-over text;
   - the PDF.
-- **The rest of the record checks were missed.** They missed eight of the eleven false statements below.
+- **Five of the nine false statements were missed** (§1.4–1.8). Two more (§1.1, §1.9) were flagged but not followed through, and two (§1.2, §1.3) came in the merged version, which no pass read.
 - **Their independence from the draft's author cannot be shown from git.**
 
 ## 1. False statements (must change)
@@ -167,7 +167,7 @@ Neither non-referee pass checked these rows.
    - Not checked: any screen's pre-registration order (readings before records), seed freshness, or code identity (hashes, ast). This pass checked all of these, and all hold.
    - Not checked: the provenance rows (§1.8), the carried-over text, the README, `STATUS.md` or the PDF.
    - Outcomes were read from recorded `transition` and `end.one_to_one` fields rather than re-derived. That cost nothing here, since `rlib` agrees on every record, but it is not the "independent outcome function" the README describes.
-4. **They missed errors in the records' own terms.** These are §1.4–1.8: 29 against 30 gated runs, "screened once", β's timing, SELFKL's description, and the provenance rows.
+4. **They missed five false statements.** These are §1.4–1.8: 29 against 30 gated runs, "screened once", β's timing, SELFKL's description, and the provenance rows.
 5. **13 MATCH rows rest on a session's report, not a record** (§1.2).
 6. **The files' form.**
    - The three scripts carry placeholder paths and cannot run from the repository.
