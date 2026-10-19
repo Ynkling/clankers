@@ -13,11 +13,15 @@ Phase 0, positional solvability (no memory; held-out accuracy at the end, seeds 
 | task | NOMEM (zero read) | NOMEM_SELF (own V only) | stopped |
 |---|---|---|---|
 | LITE | 0.166 / 0.168 | 0.407 / 0.374 | (reference) |
-| POOL | 0.167 / 0.168 | 0.401 / 0.398 | None |
-| ALLPOOL | 0.169 / 0.169 | 0.381 / 0.372 | None |
+| POOL | 0.167 / 0.168 | 0.401 / 0.398 | False |
+| ALLPOOL | 0.169 / 0.169 | 0.381 / 0.372 | False |
 
 Phase 1, validity pilots (the perfect gate, SLOW; transition per seed, or final accuracy if unbound):
 
+- O_HEBB_POOL: 2800 unbound 0.62; 2801 unbound 0.48
+- O_DELTA_POOL: 2800 bound @3600; 2801 bound @2400
+- O_HEBB_ALLPOOL: 2800 unbound 0.33; 2801 unbound 0.50
+- O_DELTA_ALLPOOL: 2800 bound @3600; 2801 bound @3600
 
 READINGS (per task): **POOL: INCOMPLETE, no reading**; **ALLPOOL: INCOMPLETE, no reading**
 
@@ -29,4 +33,4 @@ Phase 2, baselines (seeds 2802-2811; no reading; ROUTED*@end = end margin >= 0.9
 Per run (BASELINE: end margin / η² by stream at KEY / η² by key at KEY; B = bound):
 
 
-F/s89_tasks: 12 runs ok (failed records 0), 1.57 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.80GHz']; code SHA ea9728c636c6; decision {}
+F/s89_tasks: 20 runs ok (failed records 0), 2.51 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.80GHz']; code SHA ea9728c636c6; decision {'phase0': {'POOL': {'acc': {'NOMEM': [0.1669921875, 0.16796875], 'NOMEM_SELF': [0.40087890625, 0.3984375]}, 'stopped': False}, 'ALLPOOL': {'acc': {'NOMEM': [0.16943359375, 0.1689453125], 'NOMEM_SELF': [0.38134765625, 0.37158203125]}, 'stopped': False}}, 'budget': {}}
