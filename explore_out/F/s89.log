@@ -95,3 +95,48 @@ EXPLORATORY, NOT A RESULT — Session F s89 (F/s89_tasks)
   [  8]   16.0 min  F/s89_tasks      NOMEM_POOL               seed 2801  lr 0.001  (Adam 1e-3 throughout)
           on Intel(R) Xeon(R) Processor @ 2.80GHz, git 0378b3a+dirty, code ea9728c636c6, attempt 1: acc 0.168  trans  None
   start   16.0 min  F/s89_tasks      NOMEM_ALLPOOL            seed 2801  (projected worst case 7 min)
+  [  9]   22.8 min  F/s89_tasks      NOMEM_ALLPOOL            seed 2800  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 40ea56e, code ea9728c636c6, attempt 1: acc 0.169  trans  None
+  [ 10]   22.9 min  F/s89_tasks      NOMEM_ALLPOOL            seed 2801  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 40ea56e+dirty, code ea9728c636c6, attempt 1: acc 0.169  trans  None
+  [ 11]   24.1 min  F/s89_tasks      NOMEM_SELF_ALLPOOL       seed 2800  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 40ea56e+dirty, code ea9728c636c6, attempt 1: acc 0.381  trans  None
+  [ 12]   24.4 min  F/s89_tasks      NOMEM_SELF_ALLPOOL       seed 2801  lr 0.001  (Adam 1e-3 throughout)
+          on Intel(R) Xeon(R) Processor @ 2.80GHz, git 40ea56e+dirty, code ea9728c636c6, attempt 1: acc 0.372  trans  None
+  segment saved 12 runs
+  runs left: 0
+### S89-F the lite task without marked keys (seeds 2800-2811)
+
+Token-type frequencies over S87's sample (4096 sequences, torch.Generator(87_000), input tokens) and the two cuts:
+
+| task | CTX types (frequency) | KEY types | VAL types | largest-ratio cut selects | half-mass cut selects |
+|---|---|---|---|---|---|
+| LITE | 2 (0.1136-0.1137) | 4 (0.1017-0.1027) | 16 (0.0220-0.0236) | 2 CTX, 4 KEY | 2 CTX, 3 KEY (mass 0.535) |
+| POOL | 2 (0.1136-0.1137) | 32 (0.0120-0.0138) | 16 (0.0220-0.0236) | 2 CTX | 2 CTX, 12 VAL (mass 0.502) |
+| ALLPOOL | 16 (0.0128-0.0151) | 32 (0.0120-0.0138) | 16 (0.0220-0.0236) | 16 VAL | 10 CTX, 16 VAL (mass 0.509) |
+
+Phase 0, positional solvability (no memory; held-out accuracy at the end, seeds 2800 / 2801; rule: stopped if > 0.6):
+
+| task | NOMEM (zero read) | NOMEM_SELF (own V only) | stopped |
+|---|---|---|---|
+| LITE | 0.166 / 0.168 | 0.407 / 0.374 | (reference) |
+| POOL | 0.167 / 0.168 | 0.401 / 0.398 | None |
+| ALLPOOL | 0.169 / 0.169 | 0.381 / 0.372 | None |
+
+Phase 1, validity pilots (the perfect gate, SLOW; transition per seed, or final accuracy if unbound):
+
+
+READINGS (per task): **POOL: INCOMPLETE, no reading**; **ALLPOOL: INCOMPLETE, no reading**
+
+Phase 2, baselines (seeds 2802-2811; no reading; ROUTED*@end = end margin >= 0.9 and η² by stream at KEY > 0.9):
+
+| task | arm | n | BOUND | ROUTED-BOUND | DISCOVERED | transitions (median; all) | unbound: final acc / class |
+|---|---|---|---|---|---|---|---|
+
+Per run (BASELINE: end margin / η² by stream at KEY / η² by key at KEY; B = bound):
+
+
+F/s89_tasks: 12 runs ok (failed records 0), 1.57 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.80GHz']; code SHA ea9728c636c6; decision {}
+exit 0
+  code SHA F/s89_tasks: ea9728c636c6 over 26 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_delta_fast, explore_f_s89_tasks_child, explore_f_tasks, explore_f_window_delta_child, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  decision: {"phase0": {"POOL": {"acc": {"NOMEM": [0.1669921875, 0.16796875], "NOMEM_SELF": [0.40087890625, 0.3984375]}, "stopped": false}, "ALLPOOL": {"acc": {"NOMEM": [0.16943359375, 0.1689453125], "NOMEM_SELF": [0.38134765625, 0.37158203125]}, "stopped": false}}, "budget": {}}
