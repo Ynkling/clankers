@@ -2,7 +2,7 @@
 
 This file is the entry point for anyone picking the project up, including its author after a break. It says what the
 project is, what it found, what is pre-registered and what is not, where every thread stands, and how to resume. The
-technical report (Revision 10, `multichannel_hebbian_report_v10.pdf`, 19 October) is the current account; the README
+technical report (Revision 10.1, `multichannel_hebbian_report_v10.pdf`, 19 October) is the current account; the README
 follows it; this file covers what the report does not. The project paused on 14 October and resumed on 19 October with
 Revision 10, which records everything listed here as "not yet in the report" on 14 October; the 1660 server left the
 project the same day.
@@ -75,8 +75,9 @@ source at two sources and nothing routes at four on the one screen run, which it
    closed and S75b's state, and the referee's round-6 checks and spec reviews; no claim of Revision 9 changes. Its
    draft was checked in two passes by a session that had not written it, every number recomputed from the records
    (`docs/review_2026-10/rev10/`): every number of every claim reproduced; the statements that did not were corrected.
-   Referee V has not seen it, nor the fifth round's screens (V closed on 13 October); a V pass over Revision 10 is the
-   first thing to ask of a restarted referee session.
+   Referee V then passed the merged revision and the fifth round's screens (`rev10/referee_pass.md`): every number holds;
+   nine statements false, corrected in **Revision 10.1** the same day, with V's loose items; V's judgement that the
+   checking agent's passes were not a substitute for a referee pass is recorded in the report (§15, §17).
 2. **The register test** (the next pre-registered test; the project's open question, a distant cue discovered
    label-free). G's draft specification exists; the referee's review (`docs/review_2026-10/spec_review_register_draft.md`)
    lists what must change (a named outcome function with a CHECK against the recorded verdicts, the validity rule's

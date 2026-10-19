@@ -1,0 +1,124 @@
+
+====================================================================================================
+§1 S69 (batch 21) recount from explore_out/oracle_d128_results.json at 419368a
+====================================================================================================
+ORC_A_D128: n 10, bound 4 [271, 273, 274, 278], transitions [12000, 19200, 27600, 31200]; Wilson [0.168, 0.687], Clopper-Pearson [0.122, 0.738]; iters [40800]
+   270: not bound  trans None  final 0.318  max 0.318  last 9 evals [0.297, 0.288, 0.294, 0.304, 0.3, 0.31, 0.31, 0.304, 0.318]  cpu  2.10GHz
+   271: BOUND      trans 12000  final 0.966  max 0.980  last 9 evals [0.146, 0.162, 0.181, 0.191, 0.278, 0.881, 0.976, 0.98, 0.966]  cpu  2.80GHz
+   272: not bound  trans None  final 0.287  max 0.288  last 9 evals [0.279, 0.288, 0.285, 0.27, 0.278, 0.279, 0.275, 0.287, 0.287]  cpu  2.10GHz
+   273: BOUND      trans 31200  final 0.999  max 1.000  last 9 evals [0.709, 0.794, 0.945, 0.975, 0.998, 0.94, 0.988, 1.0, 0.999]  cpu  2.80GHz
+   274: BOUND      trans 27600  final 0.982  max 0.989  last 9 evals [0.896, 0.93, 0.9, 0.937, 0.941, 0.928, 0.976, 0.989, 0.982]  cpu  2.10GHz
+   275: not bound  trans None  final 0.911  max 0.949  last 9 evals [0.948, 0.915, 0.943, 0.942, 0.926, 0.949, 0.889, 0.887, 0.911]  cpu  2.80GHz
+   276: not bound  trans None  final 0.296  max 0.296  last 9 evals [0.278, 0.282, 0.287, 0.287, 0.29, 0.291, 0.29, 0.285, 0.296]  cpu  2.80GHz
+   277: not bound  trans None  final 0.906  max 0.938  last 9 evals [0.835, 0.835, 0.782, 0.833, 0.855, 0.866, 0.899, 0.867, 0.906]  cpu  2.80GHz
+   278: BOUND      trans 19200  final 0.989  max 0.989  last 9 evals [0.889, 0.868, 0.892, 0.972, 0.979, 0.927, 0.984, 0.963, 0.989]  cpu  2.80GHz
+   279: not bound  trans None  final 0.921  max 0.950  last 9 evals [0.919, 0.883, 0.95, 0.947, 0.918, 0.883, 0.915, 0.924, 0.921]  cpu  2.80GHz
+ORC_S_D128: n 10, bound 0 [], transitions []; Wilson [0.000, 0.278], Clopper-Pearson [0.000, 0.308]; iters [40800]
+   270: not bound  trans None  final 0.348  max 0.358  last 9 evals [0.321, 0.327, 0.315, 0.34, 0.315, 0.327, 0.327, 0.358, 0.348]  cpu  2.80GHz
+   271: not bound  trans None  final 0.356  max 0.356  last 9 evals [0.308, 0.312, 0.341, 0.329, 0.333, 0.331, 0.325, 0.346, 0.356]  cpu  2.80GHz
+   272: not bound  trans None  final 0.332  max 0.337  last 9 evals [0.298, 0.308, 0.316, 0.314, 0.319, 0.313, 0.325, 0.337, 0.332]  cpu  2.80GHz
+   273: not bound  trans None  final 0.341  max 0.341  last 9 evals [0.319, 0.317, 0.322, 0.335, 0.332, 0.321, 0.321, 0.339, 0.341]  cpu  2.80GHz
+   274: not bound  trans None  final 0.330  max 0.343  last 9 evals [0.328, 0.32, 0.335, 0.316, 0.315, 0.336, 0.339, 0.343, 0.33]  cpu  2.80GHz
+   275: not bound  trans None  final 0.350  max 0.350  last 9 evals [0.309, 0.313, 0.322, 0.302, 0.311, 0.319, 0.325, 0.336, 0.35]  cpu  2.80GHz
+   276: not bound  trans None  final 0.339  max 0.347  last 9 evals [0.301, 0.303, 0.322, 0.31, 0.334, 0.347, 0.337, 0.337, 0.339]  cpu  2.80GHz
+   277: not bound  trans None  final 0.352  max 0.352  last 9 evals [0.309, 0.318, 0.301, 0.321, 0.311, 0.333, 0.335, 0.347, 0.352]  cpu  2.80GHz
+   278: not bound  trans None  final 0.337  max 0.337  last 9 evals [0.295, 0.319, 0.314, 0.313, 0.325, 0.336, 0.334, 0.321, 0.337]  cpu  2.80GHz
+   279: not bound  trans None  final 0.336  max 0.336  last 9 evals [0.325, 0.313, 0.318, 0.314, 0.317, 0.332, 0.328, 0.32, 0.336]  cpu  2.80GHz
+ORC_A_D128: bound 4/10; close (unbound, final > 0.8) [275, 277, 279]; stuck (unbound, final <= 0.8) [270, 272, 276]
+S68 C_ORC_P16_D128|270: outcome not bound, final step 86400, acc 0.376; max over run 0.386
+
+====================================================================================================
+§2 S67 (batch 19) from explore_out/capacity_results.json at e3f5809
+====================================================================================================
+ORC_P16_D128: 270 not bound (acc 0.32), 271 BOUND at 12000
+ORC_P16_N256: 270 BOUND at 27600, 271 BOUND at 24000
+ORC_P8_D128: 270 BOUND at 2400, 271 BOUND at 2400
+ORC_P8_N256: 270 BOUND at 2400, 271 BOUND at 2400
+Seed by seed, S69 ORC_A_D128 (40,800) against S67 P16_D128 learned BOUND ROUTED (43,200):
+   both [274, 278]; oracle only [271, 273]; learned only [270, 277]; neither [272, 275, 276, 279]
+   Fisher exact two-sided p = 1.000; learned rate given oracle bound 2/4, given oracle unbound 2/6
+   learned P16_D128 270 transition 38400 (its oracle: unbound at 40,800 here and at 86,400 in S68)
+   SLOW: oracle 0/10 (S69 ORC_S_D128) against learned 4/10 (S67 P16_D128) on the same seeds and recipe schedule
+
+====================================================================================================
+§3 Validity pass probability: k of n validity seeds bind, rate p per seed, seeds independent
+====================================================================================================
+Hypergeometric, two seeds drawn from S69's ten (the draft's model):
+   both bind: 4*3/90 = 0.133   at least one binds: 1 - 6*5/90 = 0.667
+Binomial (fresh seeds, as 660-661 / 1660-1661 are):
+rate                        2of2 mach  2of2 both  1of2 mach  1of2 both  1of3 mach  1of3 both  1of4 mach  1of4 both  2of4 mach  2of4 both  1of6 mach  1of6 both  2of6 mach  2of6 both
+Wilson lower 0.168              0.028      0.001      0.308      0.095      0.424      0.180      0.521      0.272      0.134      0.018      0.669      0.447      0.267      0.071
+CP lower 0.122                  0.015      0.000      0.228      0.052      0.322      0.104      0.405      0.164      0.075      0.006      0.540      0.292      0.159      0.025
+point 4/10 0.400                0.160      0.026      0.640      0.410      0.784      0.615      0.870      0.758      0.525      0.275      0.953      0.909      0.767      0.588
+Wilson upper 0.687              0.472      0.223      0.902      0.814      0.969      0.940      0.990      0.981      0.906      0.822      0.999      0.998      0.987      0.974
+CP upper 0.738                  0.544      0.296      0.931      0.867      0.982      0.964      0.995      0.991      0.942      0.887      1.000      0.999      0.994      0.988
+0.7 (close seeds bind) 0.700      0.490      0.240      0.910      0.828      0.973      0.947      0.992      0.984      0.916      0.840      0.999      0.999      0.989      0.978
+0.9 0.900                       0.810      0.656      0.990      0.980      0.999      0.998      1.000      1.000      0.996      0.993      1.000      1.000      1.000      1.000
+0.95 0.950                      0.902      0.815      0.998      0.995      1.000      1.000      1.000      1.000      1.000      0.999      1.000      1.000      1.000      1.000
+Smallest n with P(>= 1 of n binds on both machines) >= 0.90 and >= 0.80:
+   Wilson lower 0.168: 0.9: n = 17; 0.8: n = 13
+   CP lower 0.122: 0.9: n = 23; 0.8: n = 18
+   point 4/10 0.400: 0.9: n = 6; 0.8: n = 5
+   Wilson upper 0.687: 0.9: n = 3; 0.8: n = 2
+   CP upper 0.738: 0.9: n = 3; 0.8: n = 2
+
+Records with 2/2 (D32 oracle at P=16 in S67; D128 and D32 oracles at P=8 in S67): rate unknown
+   2/2: Wilson [0.342, 1], Clopper-Pearson [0.158, 1]
+   predictive under uniform Beta(1,1): P(next 2 both bind) = 0.600; P(4 of 4: both machines, VALID_N 2) = 0.429
+   predictive under Jeffreys Beta(.5,.5): P(next 2 both bind) = 0.729; P(4 of 4: both machines, VALID_N 2) = 0.602
+   rate 0.342: VALID_N 2 per machine 0.117, both machines 0.014
+   rate 0.800: VALID_N 2 per machine 0.640, both machines 0.410
+   rate 0.900: VALID_N 2 per machine 0.810, both machines 0.656
+   rate 0.950: VALID_N 2 per machine 0.902, both machines 0.815
+Joint: pooled claims need D128 AND D32 VALID on both machines (draft l.113-115).
+   D128 2of2 @0.4          D32 2of2 @0.80: 0.010  D32 2of2 @0.90: 0.017  D32 2of2 @0.95: 0.021  D32 2of2 @1.00: 0.026
+   D128 1of2 @0.4          D32 2of2 @0.80: 0.168  D32 2of2 @0.90: 0.269  D32 2of2 @0.95: 0.334  D32 2of2 @1.00: 0.410
+   D128 1of4 @0.4          D32 2of2 @0.80: 0.310  D32 2of2 @0.90: 0.497  D32 2of2 @0.95: 0.617  D32 2of2 @1.00: 0.758
+   D128 1of6 @0.4          D32 2of2 @0.80: 0.372  D32 2of2 @0.90: 0.596  D32 2of2 @0.95: 0.740  D32 2of2 @1.00: 0.909
+   D128 none (option 4)    D32 2of2 @0.80: 0.410  D32 2of2 @0.90: 0.656  D32 2of2 @0.95: 0.815  D32 2of2 @1.00: 1.000
+
+====================================================================================================
+§4 Screen rules: P(rule passes | true per-seed rate)
+====================================================================================================
+rule                             0.4     0.5     0.7     0.8     0.9    0.95    0.99
+S69's 'reliable' >= 9/10       0.002   0.011   0.149   0.376   0.736   0.914   0.996
+>= 10/10                       0.000   0.001   0.028   0.107   0.349   0.599   0.904
+>= 18/20                       0.000   0.000   0.035   0.206   0.677   0.925   0.999
+>= 19/20                       0.000   0.000   0.008   0.069   0.392   0.736   0.983
+   9/10: Wilson [0.596, 0.982], Clopper-Pearson [0.555, 0.997]
+   10/10: Wilson [0.722, 1.000], Clopper-Pearson [0.692, 1.000]
+   18/20: Wilson [0.699, 0.972], Clopper-Pearson [0.683, 0.988]
+   20/20: Wilson [0.839, 1.000], Clopper-Pearson [0.832, 1.000]
+Selection over m configurations screened at the same true rate, the best one passing >= 9/10:
+   p = 0.7: one config 0.149; m=2: 0.276, m=3: 0.384, m=4: 0.476
+   p = 0.8: one config 0.376; m=2: 0.610, m=3: 0.757, m=4: 0.848
+Option 1 ceiling on S69's own seeds: 270 is unbound at 86,400 (S68), so at any budget <= 86,400 the ten seeds
+   give at most 9/10; 'reliable' (>= 9/10) on 270-279 needs 272 and 276 (flat at 0.29-0.30) and all of 275, 277, 279.
+
+====================================================================================================
+§5 K1 / K2 thresholds and power as stated in the draft (l.139-145), re-derived
+====================================================================================================
+   K2 n=40, >= 13: P(>= k | 0.2) = 0.0432; power at 0.4 = 0.871
+   K2 n=40, >= 12: P(>= k | 0.2) = 0.0875; power at 0.4 = 0.929
+   K2 n=20, >= 8: P(>= k | 0.2) = 0.0321; power at 0.4 = 0.584
+   K2 n=20, >= 7: P(>= k | 0.2) = 0.0867; power at 0.4 = 0.750
+   K1 with c = 0: b = 5 gives one-sided p = 0.0312; b = 4 gives 0.0625
+   K1 power, 40 pairs, D128 0.2 vs D32 0.0 (independent): 0.924
+   K1 power, 40 pairs, D128 0.2 vs D32 0.1 (independent): 0.230
+   K1 power, 40 pairs, D128 0.3 vs D32 0.0 (independent): 0.997
+   K1 power, 40 pairs, D128 0.3 vs D32 0.1 (independent): 0.639
+   K1 power, 40 pairs, D128 0.4 vs D32 0.0 (independent): 1.000
+   K1 power, 40 pairs, D128 0.4 vs D32 0.1 (independent): 0.909
+
+====================================================================================================
+§6 Validity at a 10/10-screened check, and the D128 oracle rate's lower bound with more screen seeds
+====================================================================================================
+   10/10 Wilson lower 0.722: 2 of 2 per machine 0.522, both 0.272; >= 1 of 2 per machine 0.923, both 0.852
+   10/10 CP lower 0.692: 2 of 2 per machine 0.478, both 0.229; >= 1 of 2 per machine 0.905, both 0.819
+   2/2 Wilson lower 0.342: 2 of 2 per machine 0.117, both 0.014; >= 1 of 2 per machine 0.568, both 0.322
+If a fresh screen keeps the D128 oracle's observed rate at 0.4 (x of n), its Wilson lower bound, and the
+smallest number of validity seeds per machine for P(>= 1 binds on both machines) >= 0.90 at that bound:
+   4/10: Wilson lower 0.168; validity seeds needed 17
+   8/20: Wilson lower 0.219; validity seeds needed 13
+   12/30: Wilson lower 0.246; validity seeds needed 11
+   16/40: Wilson lower 0.263; validity seeds needed 10
