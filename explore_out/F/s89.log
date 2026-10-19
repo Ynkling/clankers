@@ -418,3 +418,110 @@ EXPLORATORY, NOT A RESULT — Session F s89 (F/s89_tasks)
   cpu Intel(R) Xeon(R) Processor @ 2.80GHz | torch 2.14.0+cu130 | git 15b550d+dirty | python 3.11.17 | torch threads 1 | started 2026-10-19 19:15:13
 ==============================================================================================================
   code SHA F/s89_tasks: ea9728c636c6 over 26 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_delta_fast, explore_f_s89_tasks_child, explore_f_tasks, explore_f_window_delta_child, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  CHECK C1 parallel = sequential over 24 cases (beta 0 / 0.5 / 1 / per token, write tied / 1, decay fixed / routed / per-channel): forward max |diff| 4.44e-16 <= 1e-10, gradients 2.22e-15 <= 1e-8: ok
+  CHECK C2 LOCAL3 S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 2.38e-06 (relative 2.4e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.49e-07, attention outputs 3.81e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 perfect S=2 k=2, parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.27e-07, attention outputs 6.68e-06 (relative 4.5e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 perfect S=2 k=2, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 single k=1 (arm B), parallel, beta 0 / write 1 / raw keys: logits max |diff| 0.00e+00, attention outputs 0.00e+00 (relative 0.0e+00) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.34e-07, attention outputs 8.58e-06 (relative 5.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 single k=1 (arm B), impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, parallel, beta 0 / write 1 / raw keys: logits max |diff| 1.19e-07, attention outputs 5.96e-07 (relative 3.8e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, sequential, beta 0 / write 1 / raw keys: logits max |diff| 1.79e-07, attention outputs 4.77e-07 (relative 3.9e-07) over 3 layers, all <= 1e-5: ok
+  CHECK C2 LOCAL3 S=8 k=16 conv, impl hebb (beta 1 set, path disabled): logits bit-identical to the current model: ok
+  CHECK C3 oracle gate, grouped, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, grouped, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay fixed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, parallel: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C3 oracle gate, header, decay routed, sequential: U^c = 0 outside stream c and the read gate 0 on other channels in all 3 layers (True); stream-s logits bit-identical with the other stream's VAL tokens replaced (True) and changed by its own (True): ok
+  CHECK C4 overwrite (beta 1, L2 keys, one channel, decay 0.95, float32): ‖S k̂ − v2‖ = 1.56e-06 after (k, v1), (k, v2); 1.09e-06 with 6 other writes between; the parallel read at a later key-k position equals 0.95·v2 to 1.59e-06 / 1.46e-06; all < 1e-5: ok
+  CHECK C5 learned beta = 0.5 exactly at init (True); to_delta keeps every existing parameter (True) and adds ['attn.w_b', 'attn.b_b']: ok
+  CHECK C5 routed decay at init: alpha at g = 1 0.9500000 (0.95 to 1e-6), at g = 0 1.0 (exactly 1), at g = 0.3 / 0.7 0.98473 / 0.96473; delta0 -2.6037: ok
+  CHECK C5 GDN decay init (seed 350, k = 2): A [2.198, 13.653], dt [0.06425, 0.00468] (softplus(b_dt) recovers dt), alpha at init [0.8683, 0.9381]; w_a = 0; same seed same draw, another seed another: ok
+  CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.80GHz (recorded on Intel(R) Xeon(R) Processor @ 2.10GHz) (72 s): ok
+  ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
+  (explore_f_delta_checks: 80 s, all passed)
+  CHECK F/s89_tasks: explore_f_tasks.py's first 13771 bytes (everything before the round-6 section) equal a199d5e's file: ok
+  CHECK F/s89_tasks: POOL: shape: L 23 (lite 23), vocab 50; batch (4096, 23): ok
+  CHECK F/s89_tasks: POOL: the batch is lite's batch with the identities renamed: roles at the same positions (True), the same value ids (True), a one-to-one key map per sequence (True): ok
+  CHECK F/s89_tasks: POOL: each sequence's 4 key types are distinct and from the pool of 32 (True); every key occurs exactly 2 times, once under each stream, i.e. in one block of each stream (True); its 2 values are distinct (True): ok
+  CHECK F/s89_tasks: POOL: the query's (stream, key) occurs exactly once in the body (True) and its target is that pair's value (True); the query stream from make_batch equals stream_labels at the query (True): ok
+  CHECK F/s89_tasks: POOL: 4 CTX tokens in each body, each followed by a key, position 0 a CTX: ok
+  CHECK F/s89_tasks: POOL: pool: stream_labels equal BindTask's (CTX id) and perfect_gate equals perfect_gate_general(tokens, (0, 1)): ok
+  CHECK F/s89_tasks: POOL: pool: no key type above any value type's frequency (max KEY 0.0138 < min VAL 0.0220): ok
+  CHECK F/s89_tasks: ALLPOOL: shape: L 23 (lite 23), vocab 64; batch (4096, 23): ok
+  CHECK F/s89_tasks: ALLPOOL: the batch is lite's batch with the identities renamed: roles at the same positions (True), the same value ids (True), a one-to-one key map per sequence (True): ok
+  CHECK F/s89_tasks: ALLPOOL: each sequence's 4 key types are distinct and from the pool of 32 (True); every key occurs exactly 2 times, once under each stream, i.e. in one block of each stream (True); its 2 values are distinct (True): ok
+  CHECK F/s89_tasks: ALLPOOL: the query's (stream, key) occurs exactly once in the body (True) and its target is that pair's value (True); the query stream from make_batch equals stream_labels at the query (True): ok
+  CHECK F/s89_tasks: ALLPOOL: 4 CTX tokens in each body, each followed by a key, position 0 a CTX: ok
+  CHECK F/s89_tasks: ALLPOOL: allpool: each sequence's 2 CTX types are distinct (True); the stream index is by first appearance (stream 0 at position 0: True); the perfect gate is its one-hot (True): ok
+  CHECK F/s89_tasks: ALLPOOL: allpool: no token type above 1/8 (max 0.0236; CTX 0.0151, KEY 0.0138, VAL 0.0236): ok
+  CHECK F/s89_tasks: LITE frequencies (S87's sample): CTX 2 types 0.1136-0.1137; KEY 4 types 0.1017-0.1027; VAL 16 types 0.0220-0.0236; largest-ratio cut 6 types ['CTX', 'KEY']; half-mass cut 5 types {'CTX': 2, 'KEY': 3}: ok
+  CHECK F/s89_tasks: POOL frequencies (S87's sample): CTX 2 types 0.1136-0.1137; VAL 16 types 0.0220-0.0236; KEY 32 types 0.0120-0.0138; largest-ratio cut 2 types ['CTX']; half-mass cut 14 types {'CTX': 2, 'VAL': 12}: ok
+  CHECK F/s89_tasks: ALLPOOL frequencies (S87's sample): VAL 16 types 0.0220-0.0236; CTX 16 types 0.0128-0.0151; KEY 32 types 0.0120-0.0138; largest-ratio cut 16 types ['VAL']; half-mass cut 26 types {'CTX': 10, 'VAL': 16}: ok
+  CHECK F/s89_tasks: LITE's table equals G's published S87 table ([(0, 0.1137), (1, 0.1136), (3, 0.1027), (4, 0.1026), (5, 0.1022), (2, 0.1017)]) and its cut G's set {0, 1, 2, 3, 4, 5} ([0, 1, 2, 3, 4, 5]): ok
+  CHECK F/s89_tasks: the first training batch at seed 2700 (onset_run's generator, seed + 10000, batch 32) from this module equals the one from G's vendored explore_f_tasks.py at e46799a: ok
+  CHECK F/s89_tasks: S70's own path (S70_HEBB = G's BASELINE) on seed 2700, on this CPU (Intel(R) Xeon(R) Processor @ 2.80GHz), reproduces G's S87 BASELINE|2700|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit: curve [[1200, 0.30615234375, 2.3695068359375], [2400, 0.322265625, 2.017455816268921]] vs [[1200, 0.30615234375, 2.3695068359375], [2400, 0.322265625, 2.017455816268921]]; gradient norms at updates ['1', '10', '100'] (functions of the first batch) True: ok
+  CHECK F/s89_tasks: S70 reproduction on this CPU (Intel(R) Xeon(R) Processor @ 2.80GHz): S70_DELTA|330|ff908bdbc0b2|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit with S70's own path: curve [[1200, 0.4306640625, 2.2808918952941895], [2400, 0.498046875, 1.5674972534179688]] vs [[1200, 0.4306640625, 2.2808918952941895], [2400, 0.498046875, 1.5674972534179688]]; statistics True: ok
+  CHECK F/s89_tasks: POOL perfect gate on HEBB: one-hot with k = 2, equal to task.perfect_gate (True): ok
+  CHECK F/s89_tasks: POOL perfect gate on DELTA: one-hot with k = 2, equal to task.perfect_gate (True); the delta memory receives the k = 2 gate (True): ok
+  CHECK F/s89_tasks: ALLPOOL perfect gate on HEBB: one-hot with k = 2, equal to task.perfect_gate (True); logits equal the built-in perfect gate over the 16 CTX types bit for bit (True): ok
+  CHECK F/s89_tasks: ALLPOOL perfect gate on DELTA: one-hot with k = 2, equal to task.perfect_gate (True); the delta memory receives the k = 2 gate (True): ok
+  CHECK F/s89_tasks: NOMEM on POOL (conv 'in'): the query position's logits ignore a token 4 back (True) and see one 3 back (True); the read is zero (True); k 1: ok
+  CHECK F/s89_tasks: NOMEM on ALLPOOL (conv 'in'): the query position's logits ignore a token 4 back (True) and see one 3 back (True); the read is zero (True); k 1: ok
+  CHECK F/s89_tasks: NOMEM_SELF on POOL (conv 'layer'): the query position's logits ignore a token 10 back (True) and see one 9 back (True); the read is the own V (True); k 1: ok
+  CHECK F/s89_tasks: NOMEM_SELF on ALLPOOL (conv 'layer'): the query position's logits ignore a token 10 back (True) and see one 9 back (True); the read is the own V (True); k 1: ok
+  CHECK F/s89_tasks: BASELINE_POOL: groups ['W_in', 'W_g', 'gate_conv.conv_w'] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s89_tasks: SINGLE_DELTA_ALLPOOL: groups [] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s89_tasks: O_DELTA_ALLPOOL: groups [] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  timings reused from explore_out/F/s89_runtime.json
+  0 runs queued; projected worst case 0.00 h of runs, makespan 0.00 h on 4 workers
+  runs left: 0
+### S89-F the lite task without marked keys (seeds 2800-2811)
+
+Token-type frequencies over S87's sample (4096 sequences, torch.Generator(87_000), input tokens) and the two cuts:
+
+| task | CTX types (frequency) | KEY types | VAL types | largest-ratio cut selects | half-mass cut selects |
+|---|---|---|---|---|---|
+| LITE | 2 (0.1136-0.1137) | 4 (0.1017-0.1027) | 16 (0.0220-0.0236) | 2 CTX, 4 KEY | 2 CTX, 3 KEY (mass 0.535) |
+| POOL | 2 (0.1136-0.1137) | 32 (0.0120-0.0138) | 16 (0.0220-0.0236) | 2 CTX | 2 CTX, 12 VAL (mass 0.502) |
+| ALLPOOL | 16 (0.0128-0.0151) | 32 (0.0120-0.0138) | 16 (0.0220-0.0236) | 16 VAL | 10 CTX, 16 VAL (mass 0.509) |
+
+Phase 0, positional solvability (no memory; held-out accuracy at the end, seeds 2800 / 2801; rule: stopped if > 0.6):
+
+| task | NOMEM (zero read) | NOMEM_SELF (own V only) | stopped |
+|---|---|---|---|
+| LITE | 0.166 / 0.168 | 0.407 / 0.374 | (reference) |
+| POOL | 0.167 / 0.168 | 0.401 / 0.398 | False |
+| ALLPOOL | 0.169 / 0.169 | 0.381 / 0.372 | False |
+
+Phase 1, validity pilots (the perfect gate, SLOW; transition per seed, or final accuracy if unbound):
+
+- O_HEBB_POOL: 2800 unbound 0.62; 2801 unbound 0.48
+- O_DELTA_POOL: 2800 bound @3600; 2801 bound @2400
+- O_HEBB_POOL_48K: 2800 unbound 0.72; 2801 unbound 0.51
+- O_DELTA_POOL_48K: 2800 bound @3600; 2801 bound @2400
+- O_HEBB_ALLPOOL: 2800 unbound 0.33; 2801 unbound 0.50
+- O_DELTA_ALLPOOL: 2800 bound @3600; 2801 bound @3600
+- O_HEBB_ALLPOOL_48K: 2800 unbound 0.32; 2801 unbound 0.48
+- O_DELTA_ALLPOOL_48K: 2800 bound @3600; 2801 bound @3600
+
+READINGS (per task): **POOL: untested**; **ALLPOOL: untested**
+
+Phase 2, baselines (seeds 2802-2811; no reading; ROUTED*@end = end margin >= 0.9 and η² by stream at KEY > 0.9):
+
+| task | arm | n | BOUND | ROUTED-BOUND | DISCOVERED | transitions (median; all) | unbound: final acc / class |
+|---|---|---|---|---|---|---|---|
+
+Per run (BASELINE: end margin / η² by stream at KEY / η² by key at KEY; B = bound):
+
+
+F/s89_tasks: 28 runs ok (failed records 0), 4.05 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.80GHz']; code SHA ea9728c636c6; decision {'phase0': {'POOL': {'acc': {'NOMEM': [0.1669921875, 0.16796875], 'NOMEM_SELF': [0.40087890625, 0.3984375]}, 'stopped': False}, 'ALLPOOL': {'acc': {'NOMEM': [0.16943359375, 0.1689453125], 'NOMEM_SELF': [0.38134765625, 0.37158203125]}, 'stopped': False}}, 'budget': {'POOL': 'UNTESTED', 'ALLPOOL': 'UNTESTED'}, 'pilots': {'POOL': {'at24': False, 'double': True}, 'ALLPOOL': {'at24': False, 'double': True}}}
+exit 0
+  code SHA F/s89_tasks: ea9728c636c6 over 26 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_delta_fast, explore_f_s89_tasks_child, explore_f_tasks, explore_f_window_delta_child, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  decision: {"phase0": {"POOL": {"acc": {"NOMEM": [0.1669921875, 0.16796875], "NOMEM_SELF": [0.40087890625, 0.3984375]}, "stopped": false}, "ALLPOOL": {"acc": {"NOMEM": [0.16943359375, 0.1689453125], "NOMEM_SELF": [0.38134765625, 0.37158203125]}, "stopped": false}}, "budget": {"POOL": "UNTESTED", "ALLPOOL": "UNTESTED"}, "pilots": {"POOL": {"at24": false, "double": true}, "ALLPOOL": {"at24": false, "double": true}}}
