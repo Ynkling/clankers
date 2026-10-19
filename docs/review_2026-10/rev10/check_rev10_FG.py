@@ -399,7 +399,8 @@ eta_max = max(L["eta_key_by_stream"] for a in LRN for r in WA[a].values() for st
 spr = max(max(L["key_by_stream"]) - min(L["key_by_stream"]) for a in LRN for e in end[a].values() for L in e)
 row(S, rep(F, R8, 62, "0/10, 0/10 and 0/2"), "beta does not diverge by stream: 0/10, 0/10, 0/2 reach eta^2 >= 0.5 at KEY; 8 per-stream medians within 0.04 in every run",
     f"at the end {divN}; at any evaluation {div_any} (max eta^2 {eta_max:.2f}); end spread max {spr:.3f}",
-    ok_if(all(v == 0 for v in divN.values()) and round(spr, 2) <= 0.04))
+    ok_if(all(v == 0 for v in divN.values()) and round(spr, 2) <= 0.04),
+    "at the end, the screen's definition (explore_f_write.py:50-52); at earlier evaluations layer 1 passes 0.5 in some runs (tex10:266 row)")
 sF, sL, sS = splits(FX), splits(WA["DELTA_LEARNED"]), splits(WA["DELTA_LEARNED_SLOW"])
 row(S, rep(F, R8, 64, "The splits misfire more often"),
     "the splits misfire more often: labelled ok on 10/26 and 11/27 (DELTA_FIXED 2/8); they fire about three times as often",
@@ -556,7 +557,7 @@ row(S, tex(377, "collapses to about zero everywhere but the first layer's value 
     f"counts {cnt['DELTA_LEARNED']}/10 vs {cnt['DELTA_FIXED']}/10; end medians >= 0.5 outside layer-1 VAL in {len(l23) + len(ctx_hi)} run-layers", "PARTIAL",
     "the counts and 'no reading applies' are right; 'everywhere but' has the exceptions of the tex10:266 row (layers 2-3 VAL, one CTX). The other session's second pass (row 25) passed it")
 row(S, tex(495, "a learned write strength collapses on a screen"), "conclusion: 'a learned write strength collapses on a screen'",
-    "the all-position median falls below 0.1 in every layer in every learned run (3600-9600)", "MATCH", "scoped 'on a screen'")
+    f"the all-position median falls below 0.1 in every layer in every learned run (first at {min(x for v in fb.values() for x in v.values())}-{max(x for v in fb.values() for x in v.values())})", "MATCH", "scoped 'on a screen'")
 row(S, tex(487, "its reading on the horizon itself read ``it does not''"), "limits, memory horizon: 'a learned forget gate raises one delta channel's binding ... its reading on the horizon itself read \"it does not\"'",
     "S88b (the direct horizon screen) is untested by its rule and not mentioned here", "PARTIAL",
     "not wrong, but not updated: the limit should add that S88b, the direct screen, was untested (ROUTED 6/10 at 1x) and that its failures at "
@@ -716,8 +717,7 @@ row(S, rep(G, R7, 20, "3/10 (key splits)"), "BASELINE_D: BOUND 3/10 '(key splits
     f"bound unrouted runs (seed, transition, v1 class of the end gate, end eta^2 by key, end margin): "
     f"{[(s, t, c, e, round(GA['BASELINE_D'][s]['end']['margin'], 2)) for s, t, c, e in bdb]}",
     ok_if(len(bdb) == 3 and all(c == "KEY" for _, _, c, _ in bdb)),
-    "one is a key split (2721); 2726 and 2728 are half-routed (one-to-one VAL map at every layer, margin 0.47, eta^2 by key 0.00), as "
-    "S82's bound delta baselines were; not in the draft")
+    "one is a key split (2721); 2726 and 2728 are half-routed (one-to-one VAL map at every layer, margin 0.47, eta^2 by key 0.00); not in the draft")
 
 # readings
 disc = {a: gp(a, "BASELINE") for a in ("REG3_FREQHINGE", "REG3_SELFKL", "REG3_TEMP", "REG3_KEYHINGE")}
@@ -769,9 +769,9 @@ row(S, rep(G, R7, 50, "14 per"), "that covers all 8 of the key term's positions,
     "MATCH", "the caveat: on this task the cut is exactly 'not a value token', i.e. the key term's positions and identities plus the stream "
     "tokens (grouped by token id = by stream) and the query's key")
 fc_src = show(G, "explore_g_s87_child.py").split("\n")
-calls = [i for i, l in enumerate(fc_src, 1) if "freq_types(" in l]
+calls = [i for i, l in enumerate(fc_src, 1) if "freq_types(" in l and i > 44]
 row(S, rep(G, R7, 73, "computed from token ids only"), "the frequency table is computed from token ids only (one parameter, a LongTensor asserted, a float refused); frequent types {0,...,5}",
-    f"call path: freq_types(tokens) (explore_g_s87_child.py:80-89) is called at lines {calls}: frequent() -> freq_types(sample_tokens()), "
+    f"call path: freq_types(tokens) (explore_g_s87_child.py:80-89) is defined / called at lines {calls}: frequent() -> freq_types(sample_tokens()), "
     "sample_tokens = task.make_batch(4096, Generator(87000))[0][:, :-1] (:92-93; make_batch returns (tokens, query streams), the "
     "streams dropped); the term (term_value, :107-115) reads the gates, the forward's input token ids and that table; the CHECK row passed",
     "MATCH", "no label reaches the statistic. The CHECK's float-refusal does not by itself exclude labels (stream labels are LongTensors "
@@ -783,7 +783,8 @@ kh300 = [max(r["hinge"]["eta_at"]["300"]) for r in GA["REG3_KEYHINGE"].values()]
 row(S, rep(G, R7, 53, "drives its η² to 0 by update 300"), "FREQHINGE fires 53-115 times in 1-2400 (median 80) and drives its eta^2 to 0 by update 300, like the key term",
     f"firings {min(fq)}-{max(fq)} (median {med(fq)}); the term relu(eta^2 - 0.2) at 300: max over runs and layers {max(v300)}; the key term "
     f"(control) fired {min(khf)}-{max(khf)}, its eta^2 at 300 up to {max(kh300):.3f}", "PARTIAL",
-    "the counts hold; the record has the term, not eta^2: 0 at 300 means eta^2 <= 0.2 in every layer, not 0 (the key term's own recorded eta^2 at 300 is up to " + f"{max(kh300):.2f})")
+    "the counts hold; the record has the term, not eta^2: the term is 0 at 300 in " + f"{sum(x == 0 for x in v300)} of 20 runs (median 0, max {max(v300):.3f}, "
+    "i.e. eta^2 up to " + f"{0.2 + max(v300):.2f}" + " in one layer), and 0 means eta^2 <= 0.2, not 0; the key term's own recorded eta^2 at 300 is up to " + f"{max(kh300):.2f}")
 b24 = {a: {ro: med([at(r, 2400)["beta"][ro] for r in GA[a].values()]) for ro in ("CTX", "KEY", "VAL")} for a in ("REG3_FREQHINGE", "REG3_KEYHINGE")}
 row(S, rep(G, R7, 56, "0.24 / 0.19 / 0.19"), "beta^R CTX/KEY/VAL at 2400: FREQ 0.24/0.19/0.19 vs KH 0.32/0.20/0.21; commitment 0.59 vs 0.93",
     f"medians {', '.join(f'{a} ' + '/'.join(f'{v:.2f}' for v in b.values()) for a, b in b24.items())}; commitment {CM['REG3_FREQHINGE']:.3f} vs {CM['REG3_KEYHINGE']:.3f}",
