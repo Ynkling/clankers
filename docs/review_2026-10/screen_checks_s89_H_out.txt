@@ -1,0 +1,192 @@
+== 0. State
+  origin/claude/bdh-growth-hebbian-inference-w90069 at 7c4ceb8 2026-10-19T17:28:15+00:00
+  origin/claude/bdh-repo-curl-obgdqk at 5b82707 2026-10-19T10:15:45-06:00
+  origin/claude/explore-F at 0378b3a 2026-10-19T18:05:38+00:00
+  origin/claude/explore-G at 7ab98c1 2026-10-19T17:54:12+00:00
+  origin/claude/explore-H at 0dd88bf 2026-10-19T18:16:29+00:00
+  origin/claude/explore-I at 8d2e89f 2026-10-14T04:52:59+00:00
+  origin/claude/outside-ideas at 419368a 2026-10-15T03:40:12+00:00
+  origin/claude/relaxed-edison-he00cc at 3c2fb70 2026-10-06T05:21:37+00:00
+  origin/claude/replicate-R at 31c39fc 2026-10-13T18:41:38+00:00
+  origin/claude/rev10-draft at f342d1d 2026-10-19T16:15:23+00:00
+  origin/claude/rev9-draft at 010a085 2026-10-13T01:22:12+00:00
+  origin/claude/review-V at 480a2de 2026-10-19T18:07:54+00:00
+  origin/feature/per-channel-plasticity at 4af9d50 2026-06-30T08:59:20-06:00
+  explore-H head: 0dd88bf explore_out/H: S89 CHECKs passed; the perfect gate running (EXPLORATORY, not a result)
+  s89_oracle.log at 7820b12: 9 lines; lines with 'CHECK': 0; with 'ORACLE': 0; last line: X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  files named *s89* on the heads: [('explore-F', 'explore_f_s89_tasks.py'), ('explore-F', 'explore_f_s89_tasks_child.py'), ('explore-F', 'explore_out/F/checks_s89_20261019_180221.json'), ('explore-F', 'explore_out/F/run_s89.sh'), ('explore-F', 'explore_out/F/s89.log'), ('explore-F', 'explore_out/F/s89_runtime.json'), ('explore-G', 'explore_g_s89.py'), ('explore-G', 'explore_g_s89_child.py'), ('explore-H', 'explore_h_s89.py'), ('explore-H', 'explore_h_s89_child.py'), ('explore-H', 'explore_out/H/s89_oracle.log'), ('explore-H', 'explore_out/H/s89_results.json')]
+  S89 store (explore_out/H/s89_results.json) on explore-H: present; checks.json has H/s89: False
+
+== 1. Seeds 2900-2959
+  heads: 336 distinct JSON/JSONL blobs (1058 branch-paths); 31832 seed values read; unparsed: none
+  heads: records using a seed in 2900-2959: 2
+    [('explore-H', 'explore_out/H/s89_results.json')]: [('seeds list', 'ORACLE', 2900), ('seeds list', 'ORACLE', 2901)]
+  heads: integer dict keys in 2900-2959 (parents; update steps, not seeds): none
+  history (every ref, every commit): 2284 distinct JSON/JSONL blobs; 319768 seed values read; unparsed: 0
+  history: blobs with a record using a seed in 2900-2959: 1
+    explore_out/H/s89_results.json: [('seeds list', 'ORACLE', 2900), ('seeds list', 'ORACLE', 2901)]
+  text mentions of a number 2900-2959 on the heads (*.py *.md *.tex *.txt *.log; branch, path, lines):
+    bdh-growth-hebbian-inference-w90069 docs/reading/parallel_sessions_prompts.md [1108, 1198, 1210]
+    bdh-growth-hebbian-inference-w90069 docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+    bdh-growth-hebbian-inference-w90069 results/L/delta_recipe_L.log [2556]
+    bdh-repo-curl-obgdqk docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+    bdh-repo-curl-obgdqk results/L/delta_recipe_L.log [2556]
+    explore-F explore_out/batch2.log [220, 364, 468]
+    explore-G explore_out/batch2.log [220, 364, 468]
+    explore-H explore_h_s89.py [5, 6, 30, 32, 37, 65, 93, 96] ...
+    explore-H explore_h_s89_child.py [261, 319]
+    explore-H explore_out/H/s89_oracle.log [12, 23, 24, 25, 28, 29]
+    explore-H explore_out/batch2.log [220, 364, 468]
+    outside-ideas explore_out/batch2.log [220, 364, 468]
+    replicate-R records/phase4.log [19]
+    replicate-R records/phase5.log [40, 51]
+    rev10-draft docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+    rev10-draft results/L/delta_recipe_L.log [2556]
+    review-V docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+
+== 2. The readings: explore_h_s89.report() at d4a9a7d on every distinct outcome statistic (10 seeds, 4 arms)
+  3268760 compositions of 10 seeds into 16 patterns; 1261260 distinct sufficient statistics (BASE count; b, c of NOSPLIT/BASE, ALLMASS/BASE, ALLMASS/NOSPLIT, REPEATMASS/BASE, REPEATMASS/NOSPLIT)
+  1772 distinct patterns of the predicates the rules test (BASE < 7; NOSPLIT within 1; per trigger arm: within 1 of BASE, beats NOSPLIT >= 4, NOSPLIT only 0, BASE only >= 4, T only 0); report() run on one composition per pattern and on 20000 random distinct statistics: 21735 calls
+  report() vs the prompt's rules re-implemented: 0 disagreements over 1261260 statistics
+  every statistic got exactly one name per reading key (S89 | split, ALLMASS, REPEATMASS); combinations (name tuple: number of distinct statistics):
+    ('FAILS',): 15866
+    ('NEEDED', 'NONE', 'NONE'): 2210
+    ('NOT NEEDED', 'NONE', 'NONE'): 1352
+    ('NEEDED', 'NONE', 'NEEDS KEYPOS'): 483
+    ('NEEDED', 'NEEDS KEYPOS', 'NONE'): 478
+    ('NEEDED', 'NONE', 'SURVIVES'): 266
+    ('NEEDED', 'SURVIVES', 'NONE'): 243
+    ('NOT NEEDED', 'NEEDS KEYPOS', 'NONE'): 208
+    ('NOT NEEDED', 'NONE', 'NEEDS KEYPOS'): 208
+    ('NEEDED', 'NEEDS KEYPOS', 'NEEDS KEYPOS'): 178
+    ('NEEDED', 'NEEDS KEYPOS', 'SURVIVES'): 58
+    ('NEEDED', 'SURVIVES', 'NEEDS KEYPOS'): 51
+    ('NOT NEEDED', 'NEEDS KEYPOS', 'NEEDS KEYPOS'): 44
+    ('NEEDED', 'SURVIVES', 'SURVIVES'): 43
+    ('NOT NEEDED', 'NONE', 'SURVIVES'): 21
+    ('NOT NEEDED', 'SURVIVES', 'NONE'): 21
+    ('NOT NEEDED', 'SURVIVES', 'NEEDS KEYPOS'): 3
+    ('NOT NEEDED', 'SURVIVES', 'SURVIVES'): 1
+    ('NOT NEEDED', 'NEEDS KEYPOS', 'SURVIVES'): 1
+  'moot' statistics where a trigger reading still carries a name (printed 'moot (...): T: the trigger ...'): {('ALLMASS', 'NEEDS KEYPOS'): 253, ('REPEATMASS', 'NEEDS KEYPOS'): 255, ('ALLMASS', 'SURVIVES'): 25, ('REPEATMASS', 'SURVIVES'): 23}
+  (BASE, NOSPLIT, ALLMASS) counts at which 'the split is not needed here' and 'ALLMASS: the trigger survives' are printed together: [(7, 6, 10)]
+  ORACLE 1/2: {'S89': 'UNTESTED (ORACLE bound 1/2); no learned arm runs'}
+  ORACLE 2/2, BASE 9 of 10 runs stored: {'S89': 'INCOMPLETE, no reading'}
+
+== 3. The outcome
+  explore_h_fail_class_v2.py at d4a9a7d vs fail_class_v2.py at 7c4ceb8: byte-identical True
+  test_stream_recipe at 9c5939e (served to the child) vs 7c4ceb8: outcome True, routed True, padded_task True, model_fn True
+  test_scale_axes at 9c5939e (served to the child) vs 7c4ceb8: routing_k True, fail_class_k True, scale_stats True, stream_acc True
+  test_stream_channels at 9c5939e (served to the child) vs 7c4ceb8: merged True, shared_max True
+  test_router_layout.fail_class at d4a9a7d vs 7c4ceb8: True
+  where the outcome is set: explore_b16_main.finish -> rec['outcome'] = tsr.outcome(rec) (imported); hc.br(r) = r['outcome'] == 'BOUND ROUTED'; outcome_v2 = explore_h_fail_class_v2.outcome_v2(rec, tsr.routed)
+
+== 4. The records the CHECKs compare against
+  S87a ALLMASS|2600 (code 898867f69ad4): cpu Intel(R) Xeon(R) Processor @ 2.10GHz; outcome MERGED (3 share); transition None; fired at [4800, 12000, 21600]
+  S87a BASE|2600 (code 898867f69ad4): cpu Intel(R) Xeon(R) Processor @ 2.10GHz; outcome MERGED (3 share); transition None; fired at [4800, 12000, 21600]
+  S87a ORACLE|2600 (code 898867f69ad4): cpu Intel(R) Xeon(R) Processor @ 2.10GHz; outcome BOUND ROUTED; transition 2400; fired at []
+  batch 16 LOCAL3_SLOW_D8_A|260 (code 01767493e840): cpu Intel(R) Xeon(R) Processor @ 2.80GHz; outcome MERGED (3 share)
+  X WIN3_SPLIT_D8|540 (main at 7c4ceb8): cpu Intel(R) Xeon(R) Processor @ 2.80GHz; transition 20400; fired at [4800, 12000, 19200]
+  commits touching results/X/window_gate_results.json on the main line: ['628eb7c 2026-10-09T18:42:10+00:00']
+  explore_h_s89.py MAINREF = 'origin/claude/bdh-growth-hebbian-inference-w90069' (a branch name, not a commit)
+  s79.log: CHECK lines reproducing the 2.80GHz record LOCAL3_SLOW_D8_A|260 on this CPU: 6
+  s86.log: CHECK lines reproducing the 2.80GHz record LOCAL3_SLOW_D8_A|260 on this CPU: 1
+  s87.log: CHECK lines reproducing the 2.80GHz record LOCAL3_SLOW_D8_A|260 on this CPU: 1
+
+== 5. Operating characteristics (exact multinomial over the 8 per-seed patterns of BASE, T, NOSPLIT)
+  BASE 0.9 throughout; 'fails' = BASE < 7/10 (14/20 at 20 seeds, the same 0.7); 'moot' = NOSPLIT within 1 pair; survives / needs counted with and without the moot runs; rho = share of seeds on which one difficulty decides all three arms
+    N   pT   pN  rho |  fails   moot |   surv  surv* |  needs needs* |  none*    (* = not moot, not failed: the reading printed without 'moot')
+   10  0.5  0.3  0.0 |  0.013  0.005 |  0.031  0.031 |  0.468  0.467 |  0.483
+   10  0.5  0.3  0.5 |  0.013  0.003 |  0.032  0.032 |  0.545  0.545 |  0.408
+   10  0.5  0.3  1.0 |  0.013  0.001 |  0.017  0.017 |  0.615  0.615 |  0.354
+   10  0.5  0.6  0.0 |  0.013  0.191 |  0.005  0.005 |  0.468  0.416 |  0.375
+   10  0.5  0.6  0.5 |  0.013  0.171 |  0.001  0.001 |  0.545  0.501 |  0.315
+   10  0.5  0.6  1.0 |  0.013  0.145 |  0.000  0.000 |  0.615  0.598 |  0.244
+   10  0.7  0.3  0.0 |  0.013  0.005 |  0.200  0.200 |  0.157  0.157 |  0.625
+   10  0.7  0.3  0.5 |  0.013  0.003 |  0.255  0.255 |  0.146  0.146 |  0.583
+   10  0.7  0.3  1.0 |  0.013  0.001 |  0.287  0.287 |  0.121  0.121 |  0.579
+   10  0.7  0.6  0.0 |  0.013  0.191 |  0.053  0.053 |  0.157  0.145 |  0.598
+   10  0.7  0.6  0.5 |  0.013  0.171 |  0.039  0.039 |  0.146  0.142 |  0.635
+   10  0.7  0.6  1.0 |  0.013  0.145 |  0.008  0.008 |  0.121  0.121 |  0.714
+   10  0.8  0.3  0.0 |  0.013  0.005 |  0.391  0.391 |  0.049  0.049 |  0.542
+   10  0.8  0.3  0.5 |  0.013  0.003 |  0.505  0.504 |  0.030  0.030 |  0.449
+   10  0.8  0.3  1.0 |  0.013  0.001 |  0.637  0.637 |  0.013  0.013 |  0.337
+   10  0.8  0.6  0.0 |  0.013  0.191 |  0.134  0.132 |  0.049  0.046 |  0.618
+   10  0.8  0.6  0.5 |  0.013  0.171 |  0.138  0.138 |  0.030  0.029 |  0.649
+   10  0.8  0.6  1.0 |  0.013  0.145 |  0.102  0.102 |  0.013  0.013 |  0.728
+   10  0.9  0.3  0.0 |  0.013  0.005 |  0.663  0.662 |  0.005  0.005 |  0.315
+   10  0.9  0.3  0.5 |  0.013  0.003 |  0.796  0.796 |  0.001  0.001 |  0.187
+   10  0.9  0.3  1.0 |  0.013  0.001 |  0.937  0.937 |  0.000  0.000 |  0.049
+   10  0.9  0.6  0.0 |  0.013  0.191 |  0.300  0.295 |  0.005  0.005 |  0.496
+   10  0.9  0.6  0.5 |  0.013  0.171 |  0.334  0.333 |  0.001  0.000 |  0.483
+   10  0.9  0.6  1.0 |  0.013  0.145 |  0.349  0.349 |  0.000  0.000 |  0.493
+   20  0.5  0.3  0.0 |  0.002  0.000 |  0.001  0.001 |  0.358  0.358 |  0.639
+   20  0.5  0.3  0.5 |  0.002  0.000 |  0.002  0.002 |  0.598  0.598 |  0.398
+   20  0.5  0.3  1.0 |  0.002  0.000 |  0.000  0.000 |  0.982  0.982 |  0.015
+   20  0.5  0.6  0.0 |  0.002  0.038 |  0.000  0.000 |  0.358  0.354 |  0.606
+   20  0.5  0.6  0.5 |  0.002  0.023 |  0.000  0.000 |  0.598  0.593 |  0.382
+   20  0.5  0.6  1.0 |  0.002  0.008 |  0.000  0.000 |  0.982  0.978 |  0.012
+   20  0.7  0.3  0.0 |  0.002  0.000 |  0.047  0.047 |  0.205  0.205 |  0.745
+   20  0.7  0.3  0.5 |  0.002  0.000 |  0.073  0.073 |  0.370  0.370 |  0.555
+   20  0.7  0.3  1.0 |  0.002  0.000 |  0.069  0.069 |  0.588  0.588 |  0.341
+   20  0.7  0.6  0.0 |  0.002  0.038 |  0.011  0.011 |  0.205  0.204 |  0.744
+   20  0.7  0.6  0.5 |  0.002  0.023 |  0.031  0.031 |  0.370  0.369 |  0.574
+   20  0.7  0.6  1.0 |  0.002  0.008 |  0.015  0.015 |  0.588  0.588 |  0.388
+   20  0.8  0.3  0.0 |  0.002  0.000 |  0.174  0.174 |  0.107  0.107 |  0.716
+   20  0.8  0.3  0.5 |  0.002  0.000 |  0.277  0.277 |  0.147  0.147 |  0.574
+   20  0.8  0.3  1.0 |  0.002  0.000 |  0.390  0.390 |  0.133  0.133 |  0.475
+   20  0.8  0.6  0.0 |  0.002  0.038 |  0.062  0.061 |  0.107  0.107 |  0.791
+   20  0.8  0.6  0.5 |  0.002  0.023 |  0.162  0.161 |  0.147  0.147 |  0.667
+   20  0.8  0.6  1.0 |  0.002  0.008 |  0.254  0.254 |  0.133  0.133 |  0.603
+   20  0.9  0.3  0.0 |  0.002  0.000 |  0.480  0.480 |  0.020  0.020 |  0.498
+   20  0.9  0.3  0.5 |  0.002  0.000 |  0.689  0.689 |  0.005  0.005 |  0.304
+   20  0.9  0.3  1.0 |  0.002  0.000 |  0.998  0.998 |  0.000  0.000 |  0.000
+   20  0.9  0.6  0.0 |  0.002  0.038 |  0.271  0.266 |  0.020  0.020 |  0.673
+   20  0.9  0.6  0.5 |  0.002  0.023 |  0.502  0.499 |  0.005  0.005 |  0.470
+   20  0.9  0.6  1.0 |  0.002  0.008 |  0.891  0.891 |  0.000  0.000 |  0.099
+  exact one-sided McNemar at 4 vs 0: p = 0.0625; at 5 vs 0: 0.0312
+
+== 6. The pool task and the trigger
+  numpy re-implementation of PoolTask(32).make_batch's distribution, 4096 sequences (not torch's bit stream):
+    input positions 401408; repeat set 385143 (0.959); CTX 131072 of 131072; KEY 131072 of 131072; VAL 114807 of 131072 (0.8759); query CTX 4096, query KEY 4096 of 4096
+    key positions / repeat set = 0.340
+    within a sequence: distinct key types [4]; count of each present key type [8, 9] (8 in the body, 9 for the queried one); CTX type counts [4, 5]; VAL type counts (present) [1, 2, 3, 4]
+  exact: P(a VAL position's type repeats) = 1 - (1/2)^3 = 0.875 (each other key holds a given value with prob. 8/16); expected repeat set per sequence = 32 + 32 + 28 + 2 = 94 of 98 = 0.9592; H's docstring: 385,149 of 401,408 = 0.9595; VAL 114,813 of 131,072 = 0.8760
+  exact corpus frequencies per type: CTX 33/98/8 = 0.0421; KEY 33/98/32 = 0.0105; VAL 32/98/16 = 0.0204; main line KEY (4 types) 33/98/4 = 0.0842
+  across the 64-sequence trigger probe: a key type appears in Bin(64, 1/8) sequences (mean 8); P(absent) = 0.00019
+  syntax-tree (unparsed) diff, S86 explore_h_allmass_child.make_trigger_target -> S89 make_trigger_s89:
+    --- S86 make_trigger_target
+    +++ S89 make_trigger_s89
+    @@ -1 +1 @@
+    -def make_trigger_target(task, seed, info, opt_of, last, op, every, ref_at, first, gap, cap, probe_n, rise, thr, guard, source, target):
+    +def make_trigger_s89(task, seed, info, opt_of, last, op, every, ref_at, first, gap, cap, probe_n, rise, thr, guard, source, target):
+    @@ -11 +11,3 @@
+    -        (kc, k0, km), (ac, a0, am) = s37c.select(s37c.read_gate(m, data), task.S, task.P)
+    +        gr = s37c.read_gate(m, data)
+    +        (kc, k0, km), (ac, a0, am) = s37c.select(gr, task.S, task.P)
+    +        rc, r0, rm = select_repeat(gr, data[:, :-1])
+    @@ -13 +15 @@
+    -        row = dict(step=step, acc=acc, source=source, target=target, prev=st['prev'], map_before=cmap, key_masses=[round(float(v), 5) for v in km], all_masses=[round(float(v), 5) for v in am], key_cs=kc, key_c0=k0, all_cs=ac, all_c0=a0, key_ok=s37c.targeting(cmap, kc, k0), all_ok=s37c.targeting(cmap, ac, a0), fired=False, blocked=False)
+    +        row = dict(step=step, acc=acc, source=source, target=target, prev=st['prev'], map_before=cmap, key_masses=[round(float(v), 5) for v in km], all_masses=[round(float(v), 5) for v in am], key_cs=kc, key_c0=k0, all_cs=ac, all_c0=a0, key_ok=s37c.targeting(cmap, kc, k0), all_ok=s37c.targeting(cmap, ac, a0), fired=False, blocked=False, rep_masses=[round(float(v), 5) for v in rm], rep_cs=rc, rep_c0=r0, rep_ok=s37c.targeting(cmap, rc, r0))
+    @@ -25 +27 @@
+    -            cs, c0 = (kc, k0) if target == 'key' else (ac, a0)
+    +            cs, c0 = {'key': (kc, k0), 'all': (ac, a0), 'repeat': (rc, r0)}[target]
+  repeat_mask: def repeat_mask(x): |     """(B, T) bool: the positions of x whose token type occurs more than once in that row of x. Token ids only.""" |     return (x.unsqueeze(2) == x.unsqueeze(1)).sum(-1) > 1
+  select_repeat: def select_repeat(gr, x): |     rm = gr[repeat_mask(x)].mean(0) |     return (int(rm.argmax()), int(rm.argmin()), rm)
+  explore_split_target_child.select: def select(gr, S, P): |     """(KEYMASS c*, c0, key masses), (all-position c*, c0, masses) from a read gate gr (B, T, k).""" |     j = torch.arange(S * P) |     km = gr[:, 3 * j + 1].mean((0, 1)) |     am = gr.mean((0, 1)) |     return ((int(km.argmax()), int(km.argmin()), km), (int(am.argmax()), int(am.argmin()), am))
+  explore_split_child.probe_data: def probe_data(task): |     return task.make_batch(PROBE_N, torch.Generator().manual_seed(PROBE_SEED))[0]
+  PoolTask.make_batch (explore_h_s89_child.py:80-93) and BindTask.make_batch (test_binding_capacity.py at 9c5939e) draw order: vals (B,K|P,nv), korder (B,K|P), sorder (B,P,S), q (B,S*P)
+
+== 7. Other
+  F's explore_f_tasks.py at 50dc8e4 (2026-10-19T17:54:31+00:00): classes ['RandHeaderTask', 'RandHeaderTaskPool', 'RandHeaderTaskAllPool']; H's commit d4a9a7d at 2026-10-19T17:54:28+00:00
+  'grouped' in a pool class of F's module: ['RandHeaderTaskPool', 'RandHeaderTaskAllPool'] subclass RandHeaderTask (S70's lite layout, S = 2); H's tree has explore_f_tasks.py: False
+  explore_h_s89.py cites F at: []
+  S86 + S87a BASE vs ALLMASS on the same seeds (BASE, ALLMASS bound routed): {(True, True): 23, (False, False): 3, (True, False): 3, (False, True): 1}
+  S86 + S87a firings and firings on a one-to-one map: {('BASE', 'fired'): 61, ('BASE', 'one-to-one before'): 1, ('ALLMASS', 'fired'): 63, ('ALLMASS', 'one-to-one before'): 0}
+  S86 + S87a run time, ALLMASS: median 35 min (range 18-85), 30 runs
+  S86 + S87a run time, BASE: median 33 min (range 18-74), 30 runs
+  S86 + S87a run time, EVAL: median 35 min (range 19-70), 10 runs
+  S86 + S87a run time, ORACLE: median 10 min (range 7-16), 4 runs
+  batch 16 LOCAL3_SLOW_D8* (the recipe without a trigger): {('LOCAL3_SLOW_D8_A', False): 7, ('LOCAL3_SLOW_D8_A', True): 3, ('LOCAL3_SLOW_D8_M', False): 7, ('LOCAL3_SLOW_D8_M', True): 3}
+  X test_window_gate WIN3_SLOW_D8: BOUND ROUTED 6/20 (tsr.outcome's rule applied to the record)
+  X test_window_gate WIN3_SPLIT_D8: BOUND ROUTED 18/20 (tsr.outcome's rule applied to the record)
