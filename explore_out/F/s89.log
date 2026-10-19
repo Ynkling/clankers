@@ -207,3 +207,9 @@ EXPLORATORY, NOT A RESULT — Session F s89 (F/s89_tasks)
   CHECK F/s89_tasks: BASELINE_POOL: groups ['W_in', 'W_g', 'gate_conv.conv_w'] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
   CHECK F/s89_tasks: SINGLE_DELTA_ALLPOOL: groups [] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
   CHECK F/s89_tasks: O_DELTA_ALLPOOL: groups [] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  timings measured (32 s): F/s89_tasks:NOMEM_LITE 16.4 ms/step, F/s89_tasks:NOMEM_SELF_LITE 21.0 ms/step, F/s89_tasks:NOMEM_POOL 18.6 ms/step, F/s89_tasks:NOMEM_SELF_POOL 21.5 ms/step, F/s89_tasks:NOMEM_ALLPOOL 19.2 ms/step, F/s89_tasks:NOMEM_SELF_ALLPOOL 21.8 ms/step, F/s89_tasks:O_HEBB_POOL 24.0 ms/step, F/s89_tasks:O_DELTA_POOL 34.6 ms/step, F/s89_tasks:O_HEBB_ALLPOOL 24.2 ms/step, F/s89_tasks:O_DELTA_ALLPOOL 35.3 ms/step
+  8 runs queued; projected worst case 1.69 h of runs, makespan 0.42 h on 4 workers
+  start    0.0 min  F/s89_tasks      O_DELTA_ALLPOOL          seed 2800  (projected worst case 15 min)
+  start    0.0 min  F/s89_tasks      O_DELTA_ALLPOOL          seed 2801  (projected worst case 15 min)
+  start    0.0 min  F/s89_tasks      O_DELTA_POOL             seed 2800  (projected worst case 15 min)
+  start    0.0 min  F/s89_tasks      O_DELTA_POOL             seed 2801  (projected worst case 15 min)
