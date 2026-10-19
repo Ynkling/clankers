@@ -1,0 +1,97 @@
+=== X ===
+ meta {'git': 'a581027', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'torch': '2.14.0+cu130', 'workers': 4, 'started': '2026-10-11 05:27:31', 'projected_wall_h': 45.28027912735939}
+ seeds (580, 599, 20) nruns 84 all_ok True
+ ceil {'CEIL_HEBB': [(580, 3600), (581, 3600)], 'CEIL_DELTA': [(580, 2400), (581, 1200)]}
+ counts {'HEBB_SPLIT': 16, 'HEBB_SLOW': 7, 'DELTA_SPLIT': 19, 'DELTA_SLOW': 19}
+  band HEBB_SPLIT 16/20 MAJORITY [0.584, 0.919]
+  band HEBB_SLOW 7/20 MINORITY [0.181, 0.567]
+  band DELTA_SPLIT 19/20 RELIABLE [0.764, 0.991]
+  band DELTA_SLOW 19/20 RELIABLE [0.764, 0.991]
+ D1 a=15 b(DELTA only)=4 c(HEBB only)=1 dd=0 d=-3 diff=+0.150 [-0.082, +0.374]
+ D2 {'b': 0, 'c': 0, 'p': 1.0, 'slow': 19, 'split': 19}
+ D4 {'b': 10, 'c': 1, 'p': 0.005859375, 'slow': 7, 'split': 16}
+ D3 n=15 earlier=10 later=4 ties=1 p=0.08978 med_h=16800 med_d=13200
+ CHECK174 bad []
+ firings {'HEBB_SPLIT': {'n': 39, 'ok': 39, 'checks_from_4800': 181, 'blind': 1, 'alone': 3}, 'DELTA_SPLIT': {'n': 31, 'ok': 10, 'checks_from_4800': 142, 'blind': 1, 'alone': 5}}
+ overlap max over BR runs 0.0341
+ run secs total 6066.6 min = 101.11 h; by arm {CEIL_DELTA: 33.7, CEIL_HEBB: 15.0, DELTA_SLOW: 2023.3, DELTA_SPLIT: 2172.8, HEBB_SLOW: 1047.3, HEBB_SPLIT: 774.5}
+ med transition (BR) {'HEBB_SPLIT': 17400.0, 'HEBB_SLOW': 18000, 'DELTA_SPLIT': 13200, 'DELTA_SLOW': 14400}
+ failures {'HEBB_SPLIT': [(582, 'unbound', False, 7), (586, 'unbound', True, 8), (590, 'unbound', False, 7), (595, 'unbound', False, 7)], 'HEBB_SLOW': [(580, 'unbound', False, 7), (582, 'unbound', False, 5), (583, 'unbound', False, 7), (585, 'unbound', False, 4), (586, 'unbound', False, 5), (587, 'unbound', False, 7), (588, 'unbound', False, 7), (590, 'unbound', False, 6), (591, 'unbound', False, 7), (594, 'unbound', False, 7), (596, 'unbound', False, 7), (597, 'unbound', False, 6), (598, 'unbound', False, 7)], 'DELTA_SPLIT': [(594, 'unbound', False, 7)], 'DELTA_SLOW': [(594, 'unbound', False, 7)]}
+ per seed:
+    580 {'HEBB_SPLIT': ('BR', 21600), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 6000), 'DELTA_SLOW': ('BR', 6000)}
+    581 {'HEBB_SPLIT': ('BR', 16800), 'HEBB_SLOW': ('BR', 15600), 'DELTA_SPLIT': ('BR', 10800), 'DELTA_SLOW': ('BR', 13200)}
+    582 {'HEBB_SPLIT': ('unbound', None), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 15600), 'DELTA_SLOW': ('BR', 13200)}
+    583 {'HEBB_SPLIT': ('BR', 15600), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 13200), 'DELTA_SLOW': ('BR', 13200)}
+    584 {'HEBB_SPLIT': ('BR', 18000), 'HEBB_SLOW': ('BR', 26400), 'DELTA_SPLIT': ('BR', 26400), 'DELTA_SLOW': ('BR', 19200)}
+    585 {'HEBB_SPLIT': ('BR', 32400), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 13200), 'DELTA_SLOW': ('BR', 10800)}
+    586 {'HEBB_SPLIT': ('unbound', None), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 16800), 'DELTA_SLOW': ('BR', 14400)}
+    587 {'HEBB_SPLIT': ('BR', 15600), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 26400), 'DELTA_SLOW': ('BR', 15600)}
+    588 {'HEBB_SPLIT': ('BR', 20400), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 10800), 'DELTA_SLOW': ('BR', 20400)}
+    589 {'HEBB_SPLIT': ('BR', 10800), 'HEBB_SLOW': ('BR', 10800), 'DELTA_SPLIT': ('BR', 10800), 'DELTA_SLOW': ('BR', 14400)}
+    590 {'HEBB_SPLIT': ('unbound', None), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 13200), 'DELTA_SLOW': ('BR', 10800)}
+    591 {'HEBB_SPLIT': ('BR', 22800), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 20400), 'DELTA_SLOW': ('BR', 25200)}
+    592 {'HEBB_SPLIT': ('BR', 12000), 'HEBB_SLOW': ('BR', 19200), 'DELTA_SPLIT': ('BR', 13200), 'DELTA_SLOW': ('BR', 12000)}
+    593 {'HEBB_SPLIT': ('BR', 14400), 'HEBB_SLOW': ('BR', 27600), 'DELTA_SPLIT': ('BR', 22800), 'DELTA_SLOW': ('BR', 14400)}
+    594 {'HEBB_SPLIT': ('BR', 18000), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('unbound', None), 'DELTA_SLOW': ('unbound', None)}
+    595 {'HEBB_SPLIT': ('unbound', None), 'HEBB_SLOW': ('BR', 18000), 'DELTA_SPLIT': ('BR', 37200), 'DELTA_SLOW': ('BR', 19200)}
+    596 {'HEBB_SPLIT': ('BR', 27600), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 21600), 'DELTA_SLOW': ('BR', 22800)}
+    597 {'HEBB_SPLIT': ('BR', 15600), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 12000), 'DELTA_SLOW': ('BR', 12000)}
+    598 {'HEBB_SPLIT': ('BR', 18000), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 14400), 'DELTA_SLOW': ('BR', 18000)}
+    599 {'HEBB_SPLIT': ('BR', 15600), 'HEBB_SLOW': ('BR', 18000), 'DELTA_SPLIT': ('BR', 12000), 'DELTA_SLOW': ('BR', 12000)}
+=== L ===
+ meta {'git': '8ae660d', 'cpu': '12th Gen Intel(R) Core(TM) i7-12650H', 'torch': '2.14.1', 'workers': 5, 'started': '2026-10-12 15:10:00', 'projected_wall_h': 32.58710791349411}
+ seeds (1580, 1599, 20) nruns 84 all_ok True
+ ceil {'CEIL_HEBB': [(1580, 3600), (1581, 3600)], 'CEIL_DELTA': [(1580, 1200), (1581, 8400)]}
+ counts {'HEBB_SPLIT': 19, 'HEBB_SLOW': 10, 'DELTA_SPLIT': 16, 'DELTA_SLOW': 19}
+  band HEBB_SPLIT 19/20 RELIABLE [0.764, 0.991]
+  band HEBB_SLOW 10/20 MAJORITY [0.299, 0.701]
+  band DELTA_SPLIT 16/20 MAJORITY [0.584, 0.919]
+  band DELTA_SLOW 19/20 RELIABLE [0.764, 0.991]
+ D1 a=15 b(DELTA only)=1 c(HEBB only)=4 dd=0 d=3 diff=-0.150 [-0.374, +0.082]
+ D2 {'b': 0, 'c': 3, 'p': 1.0, 'slow': 19, 'split': 16}
+ D4 {'b': 9, 'c': 0, 'p': 0.001953125, 'slow': 10, 'split': 19}
+ D3 n=15 earlier=14 later=1 ties=0 p=0.00049 med_h=22800 med_d=12000
+ CHECK174 bad []
+ firings {'HEBB_SPLIT': {'n': 41, 'ok': 41, 'checks_from_4800': 170, 'blind': 3, 'alone': 2}, 'DELTA_SPLIT': {'n': 32, 'ok': 16, 'checks_from_4800': 149, 'blind': 6, 'alone': 9}}
+ overlap max over BR runs 0.036000000000000004
+ run secs total 5394.9 min = 89.91 h; by arm {CEIL_DELTA: 51.6, CEIL_HEBB: 14.4, DELTA_SLOW: 1906.9, DELTA_SPLIT: 2013.1, HEBB_SLOW: 798.2, HEBB_SPLIT: 610.8}
+ med transition (BR) {'HEBB_SPLIT': 20400, 'HEBB_SLOW': 16200.0, 'DELTA_SPLIT': 12600.0, 'DELTA_SLOW': 14400}
+ failures {'HEBB_SPLIT': [(1594, 'unbound', False, 6)], 'HEBB_SLOW': [(1581, 'unbound', False, 7), (1582, 'unbound', False, 7), (1583, 'unbound', False, 7), (1586, 'unbound', False, 5), (1589, 'unbound', False, 7), (1590, 'unbound', False, 6), (1591, 'unbound', False, 7), (1594, 'unbound', False, 7), (1596, 'unbound', False, 7), (1599, 'unbound', False, 5)], 'DELTA_SPLIT': [(1581, 'unbound', False, 7), (1582, 'B-notR', False, 6), (1591, 'unbound', False, 7), (1595, 'unbound', False, 7)], 'DELTA_SLOW': [(1595, 'unbound', False, 7)]}
+ per seed:
+    1580 {'HEBB_SPLIT': ('BR', 25200), 'HEBB_SLOW': ('BR', 16800), 'DELTA_SPLIT': ('BR', 13200), 'DELTA_SLOW': ('BR', 14400)}
+    1581 {'HEBB_SPLIT': ('BR', 20400), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('unbound', None), 'DELTA_SLOW': ('BR', 43200)}
+    1582 {'HEBB_SPLIT': ('BR', 13200), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('B-notR', 36000), 'DELTA_SLOW': ('BR', 24000)}
+    1583 {'HEBB_SPLIT': ('BR', 25200), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 12000), 'DELTA_SLOW': ('BR', 14400)}
+    1584 {'HEBB_SPLIT': ('BR', 19200), 'HEBB_SLOW': ('BR', 19200), 'DELTA_SPLIT': ('BR', 16800), 'DELTA_SLOW': ('BR', 20400)}
+    1585 {'HEBB_SPLIT': ('BR', 15600), 'HEBB_SLOW': ('BR', 13200), 'DELTA_SPLIT': ('BR', 14400), 'DELTA_SLOW': ('BR', 16800)}
+    1586 {'HEBB_SPLIT': ('BR', 22800), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 18000), 'DELTA_SLOW': ('BR', 16800)}
+    1587 {'HEBB_SPLIT': ('BR', 30000), 'HEBB_SLOW': ('BR', 31200), 'DELTA_SPLIT': ('BR', 15600), 'DELTA_SLOW': ('BR', 13200)}
+    1588 {'HEBB_SPLIT': ('BR', 15600), 'HEBB_SLOW': ('BR', 15600), 'DELTA_SPLIT': ('BR', 12000), 'DELTA_SLOW': ('BR', 24000)}
+    1589 {'HEBB_SPLIT': ('BR', 10800), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 12000), 'DELTA_SLOW': ('BR', 13200)}
+    1590 {'HEBB_SPLIT': ('BR', 27600), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 15600), 'DELTA_SLOW': ('BR', 14400)}
+    1591 {'HEBB_SPLIT': ('BR', 22800), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('unbound', None), 'DELTA_SLOW': ('BR', 40800)}
+    1592 {'HEBB_SPLIT': ('BR', 22800), 'HEBB_SLOW': ('BR', 27600), 'DELTA_SPLIT': ('BR', 9600), 'DELTA_SLOW': ('BR', 9600)}
+    1593 {'HEBB_SPLIT': ('BR', 19200), 'HEBB_SLOW': ('BR', 15600), 'DELTA_SPLIT': ('BR', 12000), 'DELTA_SLOW': ('BR', 9600)}
+    1594 {'HEBB_SPLIT': ('unbound', None), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 18000), 'DELTA_SLOW': ('BR', 20400)}
+    1595 {'HEBB_SPLIT': ('BR', 15600), 'HEBB_SLOW': ('BR', 24000), 'DELTA_SPLIT': ('unbound', None), 'DELTA_SLOW': ('unbound', None)}
+    1596 {'HEBB_SPLIT': ('BR', 24000), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 15600), 'DELTA_SLOW': ('BR', 21600)}
+    1597 {'HEBB_SPLIT': ('BR', 13200), 'HEBB_SLOW': ('BR', 14400), 'DELTA_SPLIT': ('BR', 12000), 'DELTA_SLOW': ('BR', 9600)}
+    1598 {'HEBB_SPLIT': ('BR', 10800), 'HEBB_SLOW': ('BR', 13200), 'DELTA_SPLIT': ('BR', 7200), 'DELTA_SLOW': ('BR', 7200)}
+    1599 {'HEBB_SPLIT': ('BR', 33600), 'HEBB_SLOW': ('unbound', None), 'DELTA_SPLIT': ('BR', 10800), 'DELTA_SLOW': ('BR', 9600)}
+=== POOLED ===
+ counts {'HEBB_SPLIT': 35, 'HEBB_SLOW': 17, 'DELTA_SPLIT': 35, 'DELTA_SLOW': 38}
+  band HEBB_SPLIT 35/40 MAJORITY [0.739, 0.945]
+  band HEBB_SLOW 17/40 MINORITY [0.285, 0.578]
+  band DELTA_SPLIT 35/40 MAJORITY [0.739, 0.945]
+  band DELTA_SLOW 38/40 RELIABLE [0.835, 0.986]
+ D1 a=30 b=5 c=5 dd=0 d=0 diff=+0.000 [-0.162, +0.162]  label: delta not shown worse by more than 2 pairs
+ D2 b=0 c=3 p=1.000e+00 NOT SHOWN; no-trigger 38/40 -> label 'no room'
+ D4 b=19 c=1 p=2.003e-05 SHOWN; no-trigger 17/40 -> label 'helps'
+ D3 n=30 earlier=24 later=5 ties=1 p=0.00027 med_h=18600.0 med_d=13200.0
+ firings HEBB_SPLIT: 80 total, 80 ok; probe-alone 5; blind 4
+ firings DELTA_SPLIT: 63 total, 26 ok; probe-alone 14; blind 7
+ X: DELTA_SLOW BR & DELTA_SPLIT not: []
+ X: DELTA_SPLIT BR & DELTA_SLOW not: []
+ L: DELTA_SLOW BR & DELTA_SPLIT not: [(1581, ('unbound', None)), (1582, ('B-notR', 36000)), (1591, ('unbound', None))]
+ L: DELTA_SPLIT BR & DELTA_SLOW not: []
+ two-sided exact p for 0 vs 3: 0.25

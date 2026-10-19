@@ -1,0 +1,15 @@
+meta keys ['device', 'machine', 'note', 'started', 'test']
+  started 2026-10-13 03:20:25
+  device {'capability': '7.5', 'cpu': 'AMD Ryzen 5 3600 6-Core Processor', 'cuda': '13.0', 'cudnn': 92400, 'device': 'cuda:0', 'gpu': 'NVIDIA GeForce GTX 1660 SUPER', 'gpu_mem_gb': 5.61, 'tf32_cudnn': False, 'tf32_matmul': False, 'threads': 1, 'torch': '2.14.0+cu130'}
+arms {'CEIL_C': 2, 'HINGE_D8': 20, 'WIN3_SLOW_D8': 20, 'WIN3_SPLIT_D8': 20} total 62
+CEIL_C [(2540, 6000, True), (2541, 4800, True)]
+seeds 2540 2559 20 all ok True
+BR counts {'WIN3_SPLIT_D8': 19, 'WIN3_SLOW_D8': 6, 'HINGE_D8': 0}
+ WIN3_SPLIT_D8 vs HINGE_D8: b=19 c=0 p=1.91e-06
+ WIN3_SPLIT_D8 vs WIN3_SLOW_D8: b=13 c=0 p=1.22e-04
+ WIN3_SLOW_D8 vs HINGE_D8: b=6 c=0 p=1.56e-02
+code shas in records {'05bbaaaac7a3'}
+record keys ['acc', 'acc_check', 'arm', 'checks', 'code_sha', 'collapsed', 'cpu', 'ctx_cos', 'curve', 'curve_stage', 'device', 'discovered', 'end', 'gpu', 'grad', 'group_names', 'iters', 'k', 'key_cos', 'max_splits', 'ok', 'params', 'passed', 'secs', 'seed', 'spec', 'splits', 'st1', 'st2', 'stats', 'stopped_at', 'transition', 'transition_full', 'trigger_op', 'val_cos', 'wall_secs']
+device/torch fields: {'device': {'capability': '7.5', 'cpu': 'AMD Ryzen 5 3600 6-Core Processor', 'cuda': '13.0', 'cudnn': 92400, 'device': 'cuda:0', 'gpu': 'NVIDIA GeForce GTX 1660 SUPER', 'gpu_mem_gb': 5.61, 'tf32_cudnn': False, 'tf32_matmul': False, 'threads': 1, 'torch': '2.14.0+cu130'}, 'torch': None, 'threads': None, 'cpu': 'AMD Ryzen 5 3600 6-Core Processor', 'iters': 43200, 'code_sha': '05bbaaaac7a3'}
+secs sum h 15.0252491443687
+GPU WIN3_SPLIT firings 39 one-to-one before 0
