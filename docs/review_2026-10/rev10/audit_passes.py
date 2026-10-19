@@ -64,10 +64,10 @@ def rows_of(md):
     out = []
     sec_lines = []
     for ln in md.splitlines():
-        m = re.match(r"^## (\d+)\..*?\(tex:([^)]*)\)", ln)
-        if m:
-            sec_lines = [int(x) for x in re.findall(r"\d{2,3}", m.group(2))]
-            rng = re.search(r"(\d{2,3})[–-](\d{2,3})", m.group(2))
+        if re.match(r"^## \d+\.", ln):
+            refs = " ".join(re.findall(r"\(tex:([^)]*)\)", ln))
+            sec_lines = [int(x) for x in re.findall(r"\d{2,3}", refs)]
+            rng = re.search(r"(\d{2,3})[–-](\d{2,3})", refs)
             if rng:
                 sec_lines += list(range(int(rng.group(1)), int(rng.group(2)) + 1))
         if not ln.startswith("| "):
@@ -111,6 +111,11 @@ def section_A():
         summ = re.search(r"\*\*Summ[^*]*\*\*(.{0,200})", md, re.S)
         print(f"{name}: {len(rows)} rows; first verdict word: {dict(cnt)}; rows carrying two verdicts: {multi}")
         print("   stated:", summ.group(1).strip().split(".")[0] if summ else "?")
+        if name == "first_pass.md":
+            rep = [r["id"] for r in rows if verdict_class(r["verdict"]) == "MATCH"
+                   and re.search(r"report|README", r["src"].replace("check_I_report3", "")) and not re.search(r"json|recompute|\.log|\.py", r["src"])]
+            print(f"   MATCH rows checked against a session report or README only (no record, script or log named): "
+                  f"{len(rep)} {rep}")
         res[name] = rows
     return res
 
@@ -480,6 +485,54 @@ def section_H():
           f"{'recompute_delta_out.txt' in fp.split('What must change')[1][:1200]}")
 
 
+def section_I():
+    hdr("I. spot checks of first-pass rows that cite only a session report or README")
+    F = by_arm(jshow("origin/claude/explore-F", "explore_out/F/write_results.json"))
+    print("  6.4 perfect gates: O_DELTA_LEARNED", {s: r["transition"] for s, r in F["O_DELTA_LEARNED"].items()},
+          "O_DELTA", {s: r["transition"] for s, r in F["O_DELTA"].items()})
+    fails = [(a, s, bool(r["end"]["one_to_one"]), round(r["acc"], 3)) for a in ("DELTA_LEARNED", "DELTA_LEARNED_SLOW")
+             for s, r in sorted(F[a].items()) if not rlib.bound_routed(r)]
+    print("  6.5 learned-arm failures (arm, seed, one-to-one, final acc):", fails)
+    H = by_arm(jshow("origin/claude/explore-F", "explore_out/F/horizon_results.json"))
+    acc = [round(r["acc"], 3) for a in ("FIXED_1X", "FIXED_2X", "ROUTED_1X", "ROUTED_2X") for r in H[a].values() if not r.get("bound")]
+    print(f"  6.8 S88b unbound final accuracies: min {min(acc)} max {max(acc)} (n {len(acc)})")
+    S = by_arm(jshow("origin/claude/explore-I", "explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json"))
+    for a in ("WIDE_SLOW", "WIDE_SPLIT"):
+        sets = [r["end"]["set"] for r in S[a].values()]
+        evals = [L for r in S[a].values() for c in r["curve"] for L in (c.get("routing") or {}).values()]
+        print(f"  11.1 S75 {a}: seeds {sorted(S[a])}; final set {min(sets):.4f}-{max(sets):.4f}; layer-evaluations {len(evals)}; "
+              f"max eta {max(e['eta'] for e in evals):.5f}; one-to-one {sum(bool(e['one_to_one']) for e in evals)}")
+    print("  11.1 per seed WIDE_SLOW - WIDE_SPLIT final set:",
+          {s: round(S['WIDE_SLOW'][s]['end']['set'] - S['WIDE_SPLIT'][s]['end']['set'], 4) for s in sorted(S['WIDE_SLOW'])})
+    C = jshow("origin/claude/outside-ideas", "explore_out/s67_continue_results.json")["runs"]
+    for k, r in sorted(C.items()):
+        a, s = k.split("|")[:2]
+        if a in ("C_P16_D128", "C_P16_N256"):
+            d = {x[0]: x[1] for x in r["curve"]}
+            if 43200 in d and 86400 in d:
+                print(f"  4.3 {a} {s}: acc 43200 {d[43200]:.4f} -> 86400 {d[86400]:.4f} (change {d[86400]-d[43200]:+.4f}); "
+                      f"end one-to-one {r['end'].get('one_to_one')}; transition {r['transition']}")
+
+
+def section_J():
+    hdr("J. the third version's new statements (checked by no pass)")
+    # tex:481 "no learned-arm record was in git until b649751 at 13:53 UTC"
+    print("  b649751:", git("show", "-s", "--format=%cI %s", "b649751").strip()[:90])
+    cs = git("log", "--all", "--format=%h %cI", "--until=2026-10-12T13:53:08Z", "--",
+             "explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json").split()
+    for h in cs[::2]:
+        txt = show(h, "explore_out/I/gpu/s75_S4_NVIDIA_GeForce_GTX_1660_SUPER_results.json")
+        n = len(set(re.findall(r'"((?:WIDE_SPLIT|WIDE_SLOW|REG3)\|\d+)', txt)))
+        print(f"  earlier commit {h} holds the S75 results file with {n} learned-arm run keys")
+    # tex:44 / tex:495: what docs/review_2026-10/rev10/ holds for each fifth-round screen at d2b7abd
+    files = git("ls-tree", "--name-only", D3, PASS).split()
+    print("  files under rev10/ at d2b7abd:", [f.split("/")[-1] for f in files])
+    for scr, pat in (("H S87a/S87c", "allmass2|dose"), ("F S88a/S88b", "write_results|horizon_results"),
+                     ("G S87", "s87_results"), ("E batches 20-21", "s67_continue|oracle_d128"), ("S75 seed 839", "s75_S4")):
+        hit = [f.split("/")[-1] for f in files if f.endswith(".py") and re.search(pat, show(D3, f))]
+        print(f"  {scr}: a committed script reading its records: {hit if hit else 'none'}")
+
+
 def main():
     rows = section_A()
     section_B(rows)
@@ -489,6 +542,8 @@ def main():
     section_F()
     section_G()
     section_H()
+    section_I()
+    section_J()
 
 
 if __name__ == "__main__":
