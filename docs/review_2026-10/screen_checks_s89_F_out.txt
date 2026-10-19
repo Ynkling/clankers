@@ -1,0 +1,228 @@
+
+==============================================================================================================
+A  The readings (explore_f_s89_tasks.decide at 8ba99bb, exec'd; explore_f_reports6's reading expression)
+==============================================================================================================
+reports6 reading expression (l.73-74): 'the task is valid' if b == 24000 else 'the task needs the longer budget' if b == 48000 else 'untested' if b == 'UNTESTED' else 'INCOMPLETE, no reading'
+combinations run: 24576 (phase-0 accs in {0.3, 0.6, 0.61} with at most one above 0.6, x 2^4 24K x 2^4 48K patterns, each task as target with the other valid)
+readings given: {'the task is valid': 512, 'the task needs the longer budget': 480, 'untested': 7200, 'solvable without memory (stopped)': 16384}
+combinations where the pipeline's reading differs from the docstring's rule, or an error: 0
+a failed 24K pilot record (O_HEBB_POOL seed 2800 ok False): reading 'INCOMPLETE, no reading'; decision None, budget {}; errors []
+a failed phase-0 record (NOMEM_SELF_POOL seed 2800 ok False): readings {'POOL': 'INCOMPLETE, no reading', 'ALLPOOL': 'INCOMPLETE, no reading'}; phase0 recorded: False; errors []
+a failed 48K record: reading 'INCOMPLETE, no reading'; budget {'ALLPOOL': 24000}
+
+P(the task is valid) = p_H^2 p_D^2 if each pilot run binds independently with probability p:
+  p = 1.00: P(valid) = 1.000; P(at least one of the 4 unbound) = 0.000
+  p = 0.95: P(valid) = 0.815; P(at least one of the 4 unbound) = 0.185
+  p = 0.90: P(valid) = 0.656; P(at least one of the 4 unbound) = 0.344
+  p = 0.80: P(valid) = 0.410; P(at least one of the 4 unbound) = 0.590
+  p = 0.70: P(valid) = 0.240; P(at least one of the 4 unbound) = 0.760
+
+==============================================================================================================
+B  The outcome functions (ast)
+==============================================================================================================
+--- 8ba99bb:explore_f_reports6.py l.19 routed_end
+def routed_end(r):
+    e = (r or {}).get('end') or {}
+    return bool(e.get('margin', 0) >= 0.9 and e.get('eta_key_by_stream', 0) > 0.9)
+--- 8ba99bb:explore_f_reports.py l.182 routed_star_end
+def routed_star_end(r):
+    e = (r or {}).get('end') or {}
+    return bool(e.get('margin') is not None and e['margin'] >= 0.9 and (e.get('eta_key_by_stream', 0) > 0.9))
+--- origin/claude/explore-G:explore_g_rhl_parent.py l.43 routed_star
+def routed_star(r):
+    e = r['end']
+    return bool(e.get('margin', 0.0) >= ROUTE_MARGIN and e.get('eta_key_by_stream', 0.0) > ROUTE_ETA)
+--- 7c4ceb8:test_stream_recipe.py l.751 routed
+def routed(r):
+    e = r['end']
+    return bool(e['one_to_one'] and min(e['stream_acc']) >= ROUTED_ACC)
+--- 7c4ceb8:test_stream_recipe.py l.756 outcome
+def outcome(r):
+    if r['transition'] is not None:
+        return 'BOUND ROUTED' if routed(r) else 'BOUND NOT routed'
+    fc = fail_class_k(r)
+    if fc == 'STREAM-PARTIAL':
+        return f'MERGED ({shared_max(r)} share)' if merged(r) else 'STREAM-PARTIAL one-to-one'
+    return f'non-stream {fc}'
+--- 7c4ceb8:fail_class_v2.py l.62 outcome_v2
+def outcome_v2(r, routed):
+    """test_stream_recipe.outcome under v2 (routed: test_stream_recipe.routed or an equivalent)."""
+    if r['transition'] is not None:
+        return 'BOUND ROUTED' if routed(r) else 'BOUND NOT routed'
+    fc = fail_class_k_v2(r)
+    if fc == 'STREAM-PARTIAL':
+        return f'MERGED ({shared_max(r)} share)' if merged(r) else 'STREAM-PARTIAL one-to-one'
+    return f'non-stream {fc}'
+--- 7c4ceb8:test_window_gate.py l.319 success
+def success(key, r):
+    """The part's outcome: DISCOVERED in Part A, BOUND ROUTED in Parts B and C."""
+    if not ok_r(r):
+        return False
+    if ARM[key]['part'] == 'A':
+        return bool(r['discovered'])
+    return tsr.outcome(r) == 'BOUND ROUTED'
+--- 8ba99bb:explore_common.py l.245 routed
+def routed(r):
+    return bool(r and r.get('ok') and (r['end'].get('margin', 0.0) >= ROUTED_MARGIN))
+--- 8ba99bb:explore_common.py l.241 discovered
+def discovered(r):
+    return bool(bound(r) and r['val_cos'] < DISC_COS)
+
+routed_end (reports6) == routed_star_end (explore_f_reports) as ast, name aside: False
+routed_end == G's routed_star, name aside: False
+blob test_router_reliability.py: main line 8929c2d857 / F 8929c2d857 identical
+blob test_router_discovery.py: main line 00b6803366 / F 00b6803366 identical
+blob test_multilayer_binding.py: main line a16a1eb221 / F a16a1eb221 identical
+blob test_router_layout.py: main line 5d9cd84ed2 / F 5d9cd84ed2 identical
+blob test_binding_onset.py: main line 3179ec974e / F 3179ec974e identical
+blob test_instrument_v2.py: main line 2de6bdfb51 / F 2de6bdfb51 identical
+blob test_channel_binding.py: main line 0877781a42 / F 0877781a42 identical
+explore_f_s89_tasks_child.py: mentions fail_class_v2 / outcome_v2: False; ec.fail_class: True; one_to_one / stream_acc: False
+explore_f_reports6.py: mentions fail_class_v2 / outcome_v2: False; ec.fail_class: False; one_to_one / stream_acc: False
+explore_f_s89_tasks.py: mentions fail_class_v2 / outcome_v2: False; ec.fail_class: False; one_to_one / stream_acc: False
+
+==============================================================================================================
+C  The seeds 2800-2839
+==============================================================================================================
+branch tips:
+  origin/claude/bdh-growth-hebbian-inference-w90069 (7c4ceb8): 63 json/jsonl/log files; hits: none
+  origin/claude/bdh-repo-curl-obgdqk (5b82707): 63 json/jsonl/log files; hits: none
+  origin/claude/explore-F (0378b3a): 242 json/jsonl/log files; hits: {'explore_out/F/s89.log': ['seed 2800', 'seed 2801']}
+  origin/claude/explore-G (7ab98c1): 242 json/jsonl/log files; hits: none
+  origin/claude/explore-H (7820b12): 210 json/jsonl/log files; hits: none
+  origin/claude/explore-I (8d2e89f): 54 json/jsonl/log files; hits: none
+  origin/claude/outside-ideas (419368a): 210 json/jsonl/log files; hits: none
+  origin/claude/relaxed-edison-he00cc (3c2fb70): 56 json/jsonl/log files; hits: none
+  origin/claude/replicate-R (31c39fc): 9 json/jsonl/log files; hits: none
+  origin/claude/rev10-draft (f342d1d): 63 json/jsonl/log files; hits: none
+  origin/claude/rev9-draft (010a085): 44 json/jsonl/log files; hits: none
+  origin/claude/review-V (480a2de): 43 json/jsonl/log files; hits: none
+  origin/feature/per-channel-plasticity (4af9d50): 0 json/jsonl/log files; hits: none
+history: 4547 distinct json/jsonl/log blobs reachable from 13 remote branches; paths with a hit: {'explore_out/F/s89.log': ['seed 2800', 'seed 2801']}
+main line 7c4ceb8: every literal range() in 38 test_*.py files covers 910 integers; with attempt seeds s + 1000 j (j < 5): 3270; intersection with 2800-2839: none (bases that would reach it: 800-839, 1800-1839: none)
+prompts: blocks named for round 6: ["Seed blocks: F 2800-2839, G 2840-2899, H 2900-2959. Each session checks every branch and the main line's seed list"]
+
+==============================================================================================================
+D  The reference records the CHECKs read
+==============================================================================================================
+BASELINE|2700|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz
+  first held by 464f7e4 (2026-10-12 23:13:33 +0000 explore_out/G: S87 progress (EXPLORATORY, not a result))
+  curve through 2400 [[1200, 0.30615234375, 2.3695068359375], [2400, 0.322265625, 2.017455816268921]]; grad steps ['1', '10', '100']; stats steps <= 2400 [0, 1200, 2400]; identical at origin/claude/explore-G's tip: True
+S70_DELTA|330|ff908bdbc0b2|Intel(R) Xeon(R) Processor @ 2.10GHz
+  first held by 61ba46e (2026-10-09 22:00:51 +0000 explore_out/F: progress (EXPLORATORY, not a result))
+  curve through 2400 [[1200, 0.4306640625, 2.2808918952941895], [2400, 0.498046875, 1.5674972534179688]]; grad steps ['1', '10', '100']; stats steps <= 2400 [0, 1200, 2400]; identical at origin/claude/explore-F's tip: True
+child l.51 reads G's record from "origin/claude/explore-G", "e46799a", "explore_out/G/s87_results.json" -> the record is read from the moving tip G_REF; the module from G_SHA
+child l.255 reads S70's record with ec.load_store('F/rh_lite'): the working tree's file, no commit
+
+==============================================================================================================
+E  The generators (numpy replica of explore_f_tasks at 50dc8e4: lite, pool, allpool)
+==============================================================================================================
+lite     CTX 2 types 0.1135-0.1138; KEY 4 types 0.1021-0.1025; VAL 16 types 0.0223-0.0232; largest-ratio cut {'C': 2, 'K': 4}; half-mass cut {'C': 2, 'K': 3}
+pool     CTX 2 types 0.1133-0.1139; VAL 16 types 0.0222-0.0231; KEY 32 types 0.0121-0.0135; largest-ratio cut {'C': 2}; half-mass cut {'C': 2, 'V': 12}
+allpool  VAL 16 types 0.0224-0.0231; CTX 16 types 0.0138-0.0147; KEY 32 types 0.0122-0.0135; largest-ratio cut {'V': 16}; half-mass cut {'C': 10, 'V': 16}
+  (F's docstring l.16-25: lite CTX 0.114, KEY 0.102, VAL 0.023; pool KEY 0.013; allpool CTX 0.014, KEY 0.013; the cuts:
+   pool LR = 2 CTX, half-mass 2 CTX + 12 VAL; allpool LR = 16 VAL, half-mass 16 VAL + 10 CTX — the replica agrees
+   up to sampling where the half-mass cut falls inside a tied class)
+
+Repeats within a sequence (input tokens, 22 positions; types occurring more than once):
+  lite     per sequence: repeated positions CTX 5.00 of 5, KEY 9.00 of 9, VAL 2.63 of 8; in the body (20 positions) CTX 4.00, KEY 8.00, VAL 2.63; P(some value type twice in the body) 0.843; non-key repeated positions per sequence: mean 7.63, min 5; sequences where the repeated positions are exactly the key positions: 0.0000
+  pool     per sequence: repeated positions CTX 5.00 of 5, KEY 9.00 of 9, VAL 2.63 of 8; in the body (20 positions) CTX 4.00, KEY 8.00, VAL 2.63; P(some value type twice in the body) 0.840; non-key repeated positions per sequence: mean 7.63, min 5; sequences where the repeated positions are exactly the key positions: 0.0000
+  allpool  per sequence: repeated positions CTX 5.00 of 5, KEY 9.00 of 9, VAL 2.65 of 8; in the body (20 positions) CTX 4.00, KEY 8.00, VAL 2.65; P(some value type twice in the body) 0.844; non-key repeated positions per sequence: mean 7.65, min 5; sequences where the repeated positions are exactly the key positions: 0.0000
+
+Context distance (KEY position minus its block's CTX position) and the LOCAL3 window (t-2..t):
+  pool: 1: 0.500, 3: 0.333, 5: 0.167; keys whose CTX is inside a width-3 window: 0.500 (the same on lite and allpool: the layout is lite's)
+  distance between a key's two body occurrences: min 3, median 8, max 17
+
+Phase 0's no-memory models: a Bayes upper bound on held-out accuracy at the query (input position 21):
+  lite     NOMEM (last 4 tokens)       : P(target KEY and VAL inside the reach) 0.129; bound 0.187 (rule: stop if > 0.6)
+  lite     NOMEM_SELF (last 10 tokens) : P(target KEY and VAL inside the reach) 0.372; bound 0.414 (rule: stop if > 0.6)
+  pool     NOMEM (last 4 tokens)       : P(target KEY and VAL inside the reach) 0.123; bound 0.181 (rule: stop if > 0.6)
+  pool     NOMEM_SELF (last 10 tokens) : P(target KEY and VAL inside the reach) 0.374; bound 0.416 (rule: stop if > 0.6)
+  allpool  NOMEM (last 4 tokens)       : P(target KEY and VAL inside the reach) 0.129; bound 0.187 (rule: stop if > 0.6)
+  allpool  NOMEM_SELF (last 10 tokens) : P(target KEY and VAL inside the reach) 0.383; bound 0.424 (rule: stop if > 0.6)
+
+ALLPOOL's contexts: no fixed CTX type -> stream map
+  two distinct contexts from 16 types: a fixed map of types to 2 channels separates them in at most 8*8/C(16,2) = 0.5333 of sequences (balanced map); collision 0.4667
+  replica, map = type < 8: separated 0.5259
+  A gate that routes every separated sequence perfectly, channel = map(CTX type of the block), measured as
+  pool_routing_stats / role_cosines measure it (pooled over sequences, stream = allpool's first-appearance index):
+    pool    : margin 1.000; eta^2 by stream at KEY 1.0000; VAL cos between the streams' mean gates 0.0000 -> ROUTED*@end True, DISCOVERED-if-bound True
+    allpool : margin 1.000; eta^2 by stream at KEY 0.0000; VAL cos between the streams' mean gates 1.0000 -> ROUTED*@end False, DISCOVERED-if-bound False
+  Positional residue of the first-appearance index (allpool) vs the CTX id (pool): eta^2 by stream at KEY of the
+  best position-only gate p(t) = P(stream label 0 | t):
+    pool    : P(label 0 | position) at positions 0-5: [0.499, 0.499, 0.499, 0.501, 0.501, 0.501]; eta^2 0.0000
+    allpool : P(label 0 | position) at positions 0-5: [1.0, 1.0, 1.0, 0.777, 0.777, 0.553]; eta^2 0.2492
+
+==============================================================================================================
+F  Operating characteristics: 'within 1 pair of the labelled ceiling' and 'survives'
+==============================================================================================================
+P(within 1 pair) = P((ceiling only) - (learned only) <= 1), G's definition (explore_g_s87 l.27):
+ n   ceiling learned | independent | min..max over every pairing (q = P(both) from max(0,pc+pl-1) to min(pc,pl))
+ 20  0.90    0.90    |   0.792     | 0.778 .. 1.000
+ 20  0.90    0.80    |   0.413     | 0.392 .. 0.418
+ 20  0.90    0.70    |   0.152     | 0.069 .. 0.175
+ 20  0.90    0.50    |   0.007     | 0.001 .. 0.017
+ 20  1.00    0.90    |   0.392     | 0.392 .. 0.392
+ 20  1.00    0.80    |   0.069     | 0.069 .. 0.069
+ 20  1.00    0.70    |   0.008     | 0.008 .. 0.008
+ 20  1.00    0.50    |   0.000     | 0.000 .. 0.000
+ 10  0.90    0.90    |   0.878     | 0.865 .. 1.000
+ 10  0.90    0.80    |   0.632     | 0.620 .. 0.736
+ 10  0.90    0.70    |   0.387     | 0.376 .. 0.394
+ 10  0.90    0.50    |   0.088     | 0.046 .. 0.119
+ 10  1.00    0.90    |   0.736     | 0.736 .. 0.736
+ 10  1.00    0.80    |   0.376     | 0.376 .. 0.376
+ 10  1.00    0.70    |   0.149     | 0.149 .. 0.149
+ 10  1.00    0.50    |   0.011     | 0.011 .. 0.011
+
+G's 'the frequency (or repeat) hinge survives' = discovered against BASELINE (p < 0.05) AND within 1 pair of
+REG3_KEYHINGE; 20 seeds; BASELINE rate pb (S87 on lite: BASELINE 0/20 ROUTED-BOUND; REG3 2/20):
+ pb   ceiling learned | independent | min..max over pairing
+ 0.0  0.90    0.90    |   0.792     | 0.778 .. 1.000
+ 0.0  0.90    0.80    |   0.413     | 0.392 .. 0.418
+ 0.0  0.90    0.70    |   0.152     | 0.069 .. 0.175
+ 0.0  0.90    0.50    |   0.007     | 0.001 .. 0.017
+ 0.0  1.00    0.90    |   0.392     | 0.392 .. 0.392
+ 0.0  1.00    0.80    |   0.069     | 0.069 .. 0.069
+ 0.0  1.00    0.70    |   0.008     | 0.008 .. 0.008
+ 0.0  1.00    0.50    |   0.000     | 0.000 .. 0.000
+ 0.1  0.90    0.90    |   0.792     | 0.778 .. 1.000
+ 0.1  0.90    0.80    |   0.413     | 0.392 .. 0.418
+ 0.1  0.90    0.70    |   0.152     | 0.069 .. 0.175
+ 0.1  0.90    0.50    |   0.007     | 0.001 .. 0.017
+ 0.1  1.00    0.90    |   0.392     | 0.392 .. 0.392
+ 0.1  1.00    0.80    |   0.069     | 0.069 .. 0.069
+ 0.1  1.00    0.70    |   0.008     | 0.008 .. 0.008
+ 0.1  1.00    0.50    |   0.000     | 0.000 .. 0.000
+
+H's 'the all-position (repeat) trigger survives' = within 1 pair of BASE AND beats NOSPLIT by >= 4 vs 0
+(one-sided p <= 0.0625); 10 seeds; NOSPLIT rate pb:
+ pb   ceiling learned | independent | min..max over pairing
+ 0.0  0.90    0.90    |   0.878     | 0.865 .. 1.000
+ 0.0  0.90    0.80    |   0.632     | 0.620 .. 0.736
+ 0.0  0.90    0.70    |   0.387     | 0.376 .. 0.394
+ 0.0  0.90    0.50    |   0.088     | 0.046 .. 0.119
+ 0.0  1.00    0.90    |   0.736     | 0.736 .. 0.736
+ 0.0  1.00    0.80    |   0.376     | 0.376 .. 0.376
+ 0.0  1.00    0.70    |   0.149     | 0.149 .. 0.149
+ 0.0  1.00    0.50    |   0.011     | 0.011 .. 0.011
+ 0.3  0.90    0.90    |   0.789     | 0.781 .. 0.858
+ 0.3  0.90    0.80    |   0.511     | 0.506 .. 0.558
+ 0.3  0.90    0.70    |   0.278     | 0.264 .. 0.286
+ 0.3  0.90    0.50    |   0.047     | 0.028 .. 0.062
+ 0.3  1.00    0.90    |   0.694     | 0.694 .. 0.694
+ 0.3  1.00    0.80    |   0.348     | 0.348 .. 0.348
+ 0.3  1.00    0.70    |   0.137     | 0.137 .. 0.137
+ 0.3  1.00    0.50    |   0.010     | 0.010 .. 0.010
+
+The complementary rule 'the ceiling beats it by >= 4 vs 0' (G: 'needs frequent keys'), 20 seeds, independent:
+  ceiling 0.90 learned 0.90: P(beats by >= 4 vs 0) 0.022; P(within 1 pair) 0.792; P(neither: 'no reading applies') >= 0.186
+  ceiling 0.90 learned 0.80: P(beats by >= 4 vs 0) 0.161; P(within 1 pair) 0.413; P(neither: 'no reading applies') >= 0.426
+  ceiling 0.90 learned 0.70: P(beats by >= 4 vs 0) 0.409; P(within 1 pair) 0.152; P(neither: 'no reading applies') >= 0.439
+  ceiling 0.90 learned 0.50: P(beats by >= 4 vs 0) 0.860; P(within 1 pair) 0.007; P(neither: 'no reading applies') >= 0.133
+  ceiling 1.00 learned 0.90: P(beats by >= 4 vs 0) 0.133; P(within 1 pair) 0.392; P(neither: 'no reading applies') >= 0.475
+  ceiling 1.00 learned 0.80: P(beats by >= 4 vs 0) 0.589; P(within 1 pair) 0.069; P(neither: 'no reading applies') >= 0.342
+  ceiling 1.00 learned 0.70: P(beats by >= 4 vs 0) 0.893; P(within 1 pair) 0.008; P(neither: 'no reading applies') >= 0.099
+  ceiling 1.00 learned 0.50: P(beats by >= 4 vs 0) 0.999; P(within 1 pair) 0.000; P(neither: 'no reading applies') >= 0.001
+
+done
