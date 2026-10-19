@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build README.md from the technical report's tex and the hand-written parts in parts/.
 
-    python3 tools/readme/build_readme.py [multichannel_hebbian_report_v9.tex]
+    python3 tools/readme/build_readme.py [multichannel_hebbian_report_v10.tex]
 
 Stages: tex_to_md.py (pandoc, references resolved) -> md_cleanup.py (inline math, headings, tables) -> this file,
 which assembles header + Summary + Status + the report's sections + the repository layout + the appendices + the
@@ -14,7 +14,7 @@ import os, re, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-TEX = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'multichannel_hebbian_report_v9.tex')
+TEX = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'multichannel_hebbian_report_v10.tex')
 W = os.path.join(HERE, 'work')
 P = os.path.join(HERE, 'parts')
 
@@ -26,8 +26,10 @@ def part(name):
 
 st2 = open(os.path.join(W, 'stage2.md'), encoding='utf-8').read()
 lines = st2.split('\n')
-# the Revision paragraphs come first in the body; the Revision 9 one is the second bold paragraph
-rev9 = [l for l in lines[:12] if re.match(r'^\*\*Revision.9', l)][0]
+# the Revision paragraphs come first in the body: Revision 9's and Revision 10's
+revs = [l for l in lines[:14] if re.match(r'^\*\*Revision.(9|10)', l)]
+assert len(revs) == 2, revs
+rev_paras = '\n\n'.join(revs)
 # Table 1 block: from '**Table 1.**' to the end of its table
 i = [k for k, l in enumerate(lines) if l.startswith('**Table 1.**')][0]
 j = i + 1
@@ -39,7 +41,7 @@ k = body.index('## Provenance')
 body_main = body[:k].rstrip() + '\n'
 appendix = body[k:].rstrip() + '\n'
 
-status = part('status.md').replace('REVISION9_PARAGRAPH', rev9).replace('TABLE1', table1).rstrip() + '\n'
+status = part('status.md').replace('REVISION_PARAGRAPHS', rev_paras).replace('TABLE1', table1).rstrip() + '\n'
 summary = part('summary.md').rstrip() + '\n'
 repo = part('repo_layout.md').rstrip() + '\n'
 refs = part('references.md')

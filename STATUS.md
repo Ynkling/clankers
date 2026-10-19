@@ -1,9 +1,11 @@
-# Project status — paused on 14 October 2026; updated 19 October
+# Project status — 19 October 2026 (resumed; paused 14–19 October)
 
 This file is the entry point for anyone picking the project up, including its author after a break. It says what the
-project is, what it found, what is pre-registered and what is not, where every thread stood when work paused, and how
-to resume. The technical report (Revision 9, `multichannel_hebbian_report_v9.pdf`) is the refereed account; the README
-follows it; this file covers what the report does not yet.
+project is, what it found, what is pre-registered and what is not, where every thread stands, and how to resume. The
+technical report (Revision 10, `multichannel_hebbian_report_v10.pdf`, 19 October) is the current account; the README
+follows it; this file covers what the report does not. The project paused on 14 October and resumed on 19 October with
+Revision 10, which records everything listed here as "not yet in the report" on 14 October; the 1660 server left the
+project the same day.
 
 ## 1. What this is
 
@@ -26,7 +28,7 @@ person orchestrating Claude Code sessions in named roles, on two CPU machines an
 |---|---|
 | `test_window_gate` | A width-3 *window gate*, slow memory for the first 2400 updates and a plateau-triggered *channel split* bind eight streams, each stream on its own set of channels, in **38/40** runs, against 0/40 for the recurrent-gate recipe (38 vs 0 discordant pairs) and 15/40 without the split (23 vs 0). No stream labels, no restarts, no hinge; the split reads the task's key positions. |
 | `test_split_copy` | The split's row copy, not its optimizer reset, is the active part: copy with reset 18/20 against reset alone 6/20 (12 vs 0, *p* = 0.00024); the reset alone is within the bound of no trigger (6/20 against 8/20). One delta-rule channel binds 0/20 where the recipe binds 18/20. |
-| `test_delta_recipe` | Complete on both machines on 13 October (not yet in the report). Pooled over 40 pairs: the delta-rule write with a fixed write strength binds eight streams as often as the Hebbian write (35/40 against 35/40, *d* = 0; the pre-fixed label "delta not shown worse by more than 2 pairs"), it needs no split to do so (no trigger 38/40; the split's claim NOT SHOWN, NO ROOM), and the Hebbian write needs the split (35/40 against 17/40, 19 vs 1, *p* = 2×10⁻⁵). Readings: "delta: no room; Hebbian: helps". |
+| `test_delta_recipe` | Complete on both machines on 13 October (Revision 10, §11). Pooled over 40 pairs: the delta-rule write with a fixed write strength binds eight streams as often as the Hebbian write (35/40 against 35/40, *d* = 0; the pre-fixed label "delta not shown worse by more than 2 pairs"), it needs no split to do so (no trigger 38/40; the split's claim NOT SHOWN, NO ROOM), and the Hebbian write needs the split (35/40 against 17/40, 19 vs 1, *p* = 2×10⁻⁵). Readings: "delta: no room; Hebbian: helps". |
 
 **Independently checked:**
 
@@ -53,8 +55,9 @@ source at two sources and nothing routes at four on the one screen run, which it
 | place | what it holds | state at the pause |
 |---|---|---|
 | `claude/bdh-repo-curl-obgdqk` (default) | the merged main line | equal to the main line after PR #26 |
-| `claude/bdh-growth-hebbian-inference-w90069` (the main line) | the tests (`test_*.py`), their specifications (`specs/`), the records (`results/`), the report, the referee's files, this file | Revision 9 merged; `test_delta_recipe` complete on both machines |
+| `claude/bdh-growth-hebbian-inference-w90069` (the main line) | the tests (`test_*.py`), their specifications (`specs/`), the records (`results/`), the report, the referee's files, this file | Revision 10 merged (19 October); `test_delta_recipe` complete on both machines |
 | `claude/rev9-draft` | the seven versions of Revision 9's draft that the referee checked | merged into the main line; kept because the report cites its commits |
+| `claude/rev10-draft` | the three versions of Revision 10's draft and the two passes of its check (`docs/review_2026-10/rev10/`) | merged into the main line |
 | `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged at 00290a8; its last items were the reviews of the three spec drafts below |
 | `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 21 complete (`419368a`, 15 October): the *D* = 128 oracle is not a usable validity check at 40,800; `explore_out/spec_draft_keyload.md` carries a NOT READY FOR V status section with five unscreened options |
 | `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–8) | S88 complete, report 8 at `a199d5e` (14 October): the learned write strength "no reading applies"; the horizon screen "untested" |
@@ -67,10 +70,13 @@ source at two sources and nothing routes at four on the one screen run, which it
 
 ## 4. Open threads, and the next step of each
 
-1. **Revision 10 of the report.** Not drafted. It folds in: `test_delta_recipe` pooled; the GPU run of the headline;
-   R's Phase 5; G's S87; H's round 5; E's batch 20; S75 closed and S75b's state; the referee's reviews of the spec
-   drafts. The referee checks the L half and pooled block of `test_delta_recipe` first (as it checked X's,
-   `docs/review_2026-10/rev9/check_delta_recipe_X.md`), then the draft, pass by pass, until "ready to merge".
+1. **Revision 10 of the report: done** (19 October, `claude/rev10-draft`, three versions). It records `test_delta_recipe`
+   pooled as primary, the GPU run of the headline, R's Phase 5, F's S88, G's S87, H's round 5, E's batches 20–21, S75
+   closed and S75b's state, and the referee's round-6 checks and spec reviews; no claim of Revision 9 changes. Its
+   draft was checked in two passes by a session that had not written it, every number recomputed from the records
+   (`docs/review_2026-10/rev10/`): every number of every claim reproduced; the statements that did not were corrected.
+   Referee V has not seen it, nor the fifth round's screens (V closed on 13 October); a V pass over Revision 10 is the
+   first thing to ask of a restarted referee session.
 2. **The register test** (the next pre-registered test; the project's open question, a distant cue discovered
    label-free). G's draft specification exists; the referee's review (`docs/review_2026-10/spec_review_register_draft.md`)
    lists what must change (a named outcome function with a CHECK against the recorded verdicts, the validity rule's
