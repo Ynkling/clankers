@@ -631,3 +631,23 @@ Descriptive summary:
   order), not lost far keys. The fixed decay drops from 9/10 to 4/10 at 2x, the routed gate from 6/10 to 5/10. But the
   routed gate starts lower, and the screen is untested by its own rule.
 - Learned-β runs hit denormal arithmetic as β collapses: up to 15 h per run, against 1.2-3.2 h with β fixed.
+
+### Session F, round 6: S89-F, the lite task without marked keys (`explore_out/F/report_9.md`; task module `explore_f_tasks.py` at 50dc8e4)
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| S89 phase 0: no memory, 2800-2801 (NOMEM: conv on the embeddings, zero read; NOMEM_SELF: conv into the memory, own-V read) | held-out acc at 24000 (stop if > 0.6) | NOMEM 0.17 on every task; NOMEM_SELF lite 0.41 / 0.37, -pool 0.40 / 0.40, -allpool 0.38 / 0.37 | neither task stopped |
+| S89 pilots, RandHeaderTask-pool (keys 4 of 32), perfect gate, SLOW (2800-2801) | BOUND | delta 2/2 (3600, 2400); Hebbian 0/2 at 24000 (0.62, 0.48) and 0/2 at 48000 (0.72, 0.51) | **untested** |
+| S89 pilots, RandHeaderTask-allpool (keys 4 of 32, CTX 2 of 16) | BOUND | delta 2/2 (3600, 3600); Hebbian 0/2 at 24000 (0.33, 0.50) and 0/2 at 48000 (0.32, 0.48) | **untested** |
+| S89 baselines (2802-2811) | — | not run: no task read valid | — |
+| post hoc: Hebbian perfect gate, lite SLOW / -pool Adam / -allpool Adam (2800-2801, 24000) | BOUND | lite 2/2 (2400, 2400); -pool 0/2 (0.32, 0.33); -allpool 0/2 (0.31, 0.31) | none (descriptive) |
+
+Descriptive summary:
+- Neither pool task is valid this round, so G and H have no task from it. The delta perfect gate binds both at 2400-3600.
+  The Hebbian perfect gate binds neither at 24000 or 48000, with routing perfect (margin 1.00, η² 1.00).
+- Post hoc, the key pool is the cause, not SLOW. The Hebbian perfect gate binds lite under SLOW (2400), and stays at
+  about 0.32 on both pool tasks under S70's one-Adam oracle recipe.
+- The frequency cuts on S87's sample:
+  - -pool: the largest-ratio cut selects only the 2 CTX types; the half-mass cut adds 12 value types.
+  - -allpool: both cuts select the 16 value types first; no type is above 1/8.
+- About 0.4 is reachable without memory on all three tasks, lite included, by a model that sees the last 10 tokens.

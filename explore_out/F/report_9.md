@@ -63,8 +63,8 @@ Full tables are in `s89_tasks_tables.md`; the decision file is `s89_decision.jso
     stream's pairs, so the failure is inside a channel: the channel does not store and retrieve its own 4 pairs.
   - The curves sit at 0.29-0.34, then some step to about 0.48-0.50. POOL 2800 alone climbs on, to 0.72 at 32400, and
     holds 0.69-0.72 to 48000.
-  - The accuracy is the same whether or not the queried pair was its key's last write. For example, POOL 2800 at 24000
-    reads 0.65 vs 0.59.
+  - Whether or not the queried pair was its key's last write, accuracy differs by at most 0.06 (POOL 2800 at 24000:
+    0.65 vs 0.59).
 - **The delta perfect gate binds 8/8, at 2400-3600**, on the same seeds, batches and recipe.
 - On lite, S70's Hebbian perfect gate bound 3/3 (1200, 1200, 8400) under one Adam at 1e-3.
 - The pilots differ from S70's oracle in two ways: the key pool (4 of 32 key types per sequence, not 4 fixed) and SLOW.
@@ -72,7 +72,29 @@ Full tables are in `s89_tasks_tables.md`; the decision file is `s89_decision.jso
 
 ## Post-hoc diagnostic (written and committed at 4639d16 after the readings came in; changes no reading)
 
-DIAG_PLACEHOLDER
+The question: does SLOW or the key pool stop the Hebbian perfect gate? Three arms, seeds 2800-2801, 24000 updates, the
+S89 models unchanged (`explore_f_s89_diag.py`):
+
+| arm | task | recipe | bound (Wilson 95%; band) | 2800 | 2801 |
+|---|---|---|---|---|---|
+| D_HEBB_LITE_SLOW | lite | SLOW | 2/2 [0.34, 1.00] RELIABLE | bound @2400 | bound @2400 |
+| D_HEBB_POOL_ADAM | -pool | one Adam at 1e-3 (S70's oracle) | 0/2 [0.00, 0.66] NEVER | unbound 0.32 | unbound 0.33 |
+| D_HEBB_ALLPOOL_ADAM | -allpool | one Adam at 1e-3 | 0/2 [0.00, 0.66] NEVER | unbound 0.31 | unbound 0.31 |
+
+- **SLOW is not what stops it.** On lite the Hebbian perfect gate binds at 2400 under SLOW. S70's Adam oracle bound at
+  1200, 1200 and 8400.
+- **The key pool is.** Under S70's own Adam the Hebbian perfect gate stays at 0.29-0.34 for all 24000 updates on both pool
+  tasks.
+  - Routing is perfect throughout (end margin 1.00, η² 1.00).
+  - These runs never reach the step to about 0.5 that SLOW gave on 3 of 4 runs at 24000 (all but ALLPOOL 2800). Here
+    SLOW is the better recipe, not the stricter one.
+- So both tasks read untested because of how the Hebbian channel handles 4 keys drawn from 32 types. The recipe is not
+  the cause.
+  - This screen does not separate which part of the channel fails: the key code over 32 types, crosstalk in a sum with
+    no erase, or the query's match.
+  - The delta channel binds the same task at 2400-3600.
+- **Runs and CHECKs:** 6/6 runs ok, 0.68 h of run time, 19:18-19:31 UTC. explore_f_delta_checks passed 26/26 before the
+  runs. The diagnostic adds no CHECK of its own; it reuses S89's models, whose CHECKs passed.
 
 ## Design decisions (stated in the docstrings before any run)
 
@@ -92,7 +114,7 @@ DIAG_PLACEHOLDER
   - Both reaches are CHECKed with randomised conv weights, since CausalConv starts at the identity. The rule stops a task
     if either form exceeds 0.6.
 - **The pilots used SLOW, as the round's prompt states S70's recipe.** S70's own oracle used one Adam at 1e-3; the
-  docstring calls SLOW the stricter pilot.
+  docstring calls SLOW the stricter pilot. The diagnostic shows the opposite on the pool tasks.
   - The perfect gate has no parameters, so under SLOW every parameter is at 1e-4 for updates 1-2400 and 1e-3 after.
   - The 48000 arms are fresh runs on the same seeds. SLOW does not depend on the budget, so their curves equal the 24000
     runs' bit for bit through 24000 (verified). The extra 24000 updates are a continuation in effect.
@@ -139,10 +161,11 @@ DIAG_PLACEHOLDER
 
 ## Anything unexpected
 
-- **The Hebbian perfect gate fails on both pool tasks while the delta perfect gate binds.** Routing is perfect, so this
-  is a capacity or interference difference inside a channel. Renaming lite's 4 fixed keys to 4 of 32 is enough to cause
-  it, at least under SLOW. The validity rule asks both memories to bind, so it is the Hebbian half that leaves both tasks
-  untested.
+- **The Hebbian perfect gate fails on both pool tasks while the delta perfect gate binds.** Routing is perfect, so the
+  difference is inside a channel.
+  - Renaming lite's 4 fixed keys to 4 of 32 is enough to cause it. Per the diagnostic this holds under both recipes, and
+    SLOW binds lite.
+  - The validity rule asks both memories to bind, so it is the Hebbian half that leaves both tasks untested.
 - **On ALLPOOL the largest-ratio cut selects the values, not nothing.** No role is frequent, but the values are still the
   commonest types.
 - **About 0.4 without memory, lite included.** A model that sees the last 10 tokens reaches 0.37-0.41 on all three
