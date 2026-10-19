@@ -76,7 +76,7 @@ Out §6 checks:
 
 **No record uses 2840-2899.** The only mentions are the round-6 prompt and G's own docstring.
 
-The tips were the main line `7c4ceb8`, explore-F `40ea56e` (`0378b3a` at the first pass), explore-G `7ab98c1`, explore-H `0dd88bf`, and the others as listed in out §6.
+The tips at the final pass were the main line `ed9ca2b`, explore-F `8a24e4a`, explore-G `7ab98c1`, explore-H `42d86ae`, and the others as listed in out §6. The history scan covered 4,623 blobs, 2.44 GB.
 
 Two non-issues:
 - The CHECK runs use seed 2842 (child:253). That is an arm seed, but the runs are deterministic, so this is harmless.
@@ -129,7 +129,7 @@ n = 20, pK = 0.9, pB = 0 (pB = 0.1 changes "discovered" only at pA = 0.5: 0.79 i
 | 0.7 | 1.000 | 0.15 / 0.07 | 0.41 / 0.59 | 0.44 / 0.34 |
 | 0.5 | 0.994 | 0.007 / 0.001 | 0.86 / 0.98 | 0.13 / 0.015 |
 
-At pK = 0.85, P(survives) is 0.89 / 1.00, 0.58 / 0.74, 0.28 / 0.18 and 0.02 / 0.00 for the four rates. At n = 10 (pK 0.9, pB 0), P(survives) is 0.88, 0.63-0.74, 0.38-0.39 and 0.05-0.09, and "discovered" falls to 0.62 at 0.5.
+At pK = 0.85, P(survives) is 0.89 / 1.00, 0.58 / 0.74, 0.28 / 0.18 and 0.02 / 0.00 for the four rates. At n = 10 (pK 0.9, pB 0), P(survives) is 0.88-1.00, 0.63-0.74, 0.38-0.39 and 0.05-0.09, and "discovered" falls to 0.62 at 0.5.
 
 **What the rule can say.** With BASELINE near 0, "discovered" is certain for any arm that binds 5 or more of 20, so it adds nothing. The rule rests entirely on "within 1 pair". That separates "at the ceiling" from "half the ceiling":
 - an arm at 0.5 survives less than 1% of the time;

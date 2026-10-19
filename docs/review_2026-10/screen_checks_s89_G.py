@@ -451,8 +451,10 @@ for l in objs:
     parts = l.split(" ", 1)
     if len(parts) == 2 and parts[1].endswith((".json", ".jsonl", ".log", ".txt")):
         paths[parts[0]].add(parts[1])
-proc = subprocess.Popen(["git", "cat-file", "--batch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-proc.stdin.write("".join(f"{h}\n" for h in paths).encode()); proc.stdin.close()
+import tempfile
+_tf = tempfile.TemporaryFile()
+_tf.write("".join(f"{h}\n" for h in paths).encode()); _tf.seek(0)
+proc = subprocess.Popen(["git", "cat-file", "--batch"], stdin=_tf, stdout=subprocess.PIPE)
 hist, nbytes = defaultdict(set), 0
 pat_log = re.compile(rb"seed[ =:]+(28[4-9]\d)\b")
 for _ in paths:
