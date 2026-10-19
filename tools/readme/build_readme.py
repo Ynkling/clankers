@@ -27,8 +27,8 @@ def part(name):
 st2 = open(os.path.join(W, 'stage2.md'), encoding='utf-8').read()
 lines = st2.split('\n')
 # the Revision paragraphs come first in the body: Revision 9's and Revision 10's
-revs = [l for l in lines[:14] if re.match(r'^\*\*Revision.(9|10)', l)]
-assert len(revs) == 2, revs
+revs = [l for l in lines[:16] if re.match(r'^\*\*Revision.(9|10)', l)]
+assert len(revs) == 3, revs
 rev_paras = '\n\n'.join(revs)
 # Table 1 block: from '**Table 1.**' to the end of its table
 i = [k for k, l in enumerate(lines) if l.startswith('**Table 1.**')][0]
