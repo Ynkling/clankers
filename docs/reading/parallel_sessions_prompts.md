@@ -1091,3 +1091,171 @@ Three things, in order.
  on the 1660 after the window_gate run, or on the 3070 if that is free first; say in the stage-1
  record which.
 ```
+
+## Round 6 (19 October, after Revision 10): the recipe without marked keys — F, G, H and V
+
+The question. Two parts of the recipe read the task's key structure: the split's trigger reads key *positions*, and
+the hinge that lets the register be discovered at a distance reads key *identities*. Revision 10 records the
+label-free substitutes found so far: a trigger that reads every body position keeps binding within one pair (H, S86 +
+S87a, 24/30 against 26/30), and a hinge built from a frequency table of token ids discovers 17/20 (G, S87), two pairs
+short of the key hinge. Both were screened on tasks where keys are a small, frequent vocabulary class. This round asks
+whether they survive when they are not: the same tasks with keys (and then contexts) drawn from large pools, so that no
+token type is frequent by role and the layout is the two-document associative-recall layout (MQAR with contexts) at
+the project's size. Nothing here is a main-line test; every run is EXPLORATORY, readings fixed in the docstring before
+any run, on the sessions' own CPUs. If the devices hold, X writes the specification; if they do not, the project has
+learned where the label-free recipe stops, in a week and not after a trainer.
+
+Seed blocks: F 2800-2839, G 2840-2899, H 2900-2959. Each session checks every branch and the main line's seed list
+before its first run, as before. Order: F's task module first (G and H vendor it at F's commit, as G vendored
+explore_f_tasks.py in S82); G and H reproduce their own references and write their arms against the lite task while
+they wait. The laptop's GPU is reserved for S75b; nothing in this round runs there. Session E is idle until the user
+decides the key-load draft's options (STATUS.md §4 item 4).
+
+---
+## Session F — round 6 (the tasks without marked keys; seeds 2800-2839; branch claude/explore-F)
+
+```
+Read first: STATUS.md on the main line; Revision 10 §12 (distant cues) and §20; your report 8; G's report 7
+(S87) on claude/explore-G, whose premise ("the keys and values are frequent and the context tokens rare") your
+RandHeaderTask-lite contradicted: on it the two context types are the most frequent (0.114 each), the four keys
+next (0.102), the values rare (0.023), and G's largest-ratio cut selected all six frequent types.
+Build, in explore_f_tasks.py (a new class each; the existing classes byte-identical, with a CHECK that
+RandHeaderTask-lite's batches at seed 2700 equal G's S87 record's first batch):
+ (1) RandHeaderTask-pool: S70's lite layout (S = 2, 4 keys per stream in 2 blocks of 1-3 pairs, blocks in random
+ order, one CTX per block, one query, L = 23) with the 4 keys of each sequence drawn without replacement from a
+ pool of K_pool key types (K_pool = 32) and the values from a pool of 16, as now; the 2 CTX types as now. Print the
+ per-type frequency table over 4096 sequences with the generator G used (torch.Generator(87_000)), and what a
+ largest-ratio cut and a half-mass cut each select: the expectation, to be confirmed or not, is that both now
+ select only the two CTX types.
+ (2) RandHeaderTask-allpool: the same with the 2 CTX tokens of each sequence drawn from a pool of 16 CTX types.
+ Nothing is then frequent by role; the only structure left is positional (CTX first in its block) and relational
+ (a key repeated across the two blocks). Print the same table and cuts. This is the two-document associative-recall
+ layout (MQAR with a context per document) at our vocabulary size; say so in the docstring and say what MQAR
+ proper adds (many documents, queries interleaved, no context token) that this does not.
+ (3) For each new task, a positional-solvability check (Revision 10 §11 records that the fixed header layout was positionally
+ solvable, which cost a round): a model with no memory at all (the embedding stack and the convolution, no
+ channels) on 2 seeds; print its held-out accuracy at the
+ end. If either task is solvable above 0.6 without memory, say so first and stop that task.
+Validity pilots, 2 seeds each (2800-2801), Hebbian and delta (beta 1, L2 keys): the perfect gate on -pool and on
+ -allpool at S70's recipe (24000, SLOW, evaluation every 1200, bound at 0.95 held). Print the transitions. If the
+ perfect gate does not bind both seeds of a task within 24000, raise the budget once to 48000 and say so; if it
+ still does not, that task is UNTESTED for this round and G and H run the other only.
+Baselines on the valid tasks, seeds 2802-2811 (10, paired across arms): BASELINE (LOCAL3 + SLOW, Hebbian, k = 2,
+ no conv — S70's arm), one Hebbian channel, one delta channel. Outcomes ROUTED-BOUND and BOUND as in S70/S87.
+ No reading on the baselines; they are the references G and H will pair against on their own seeds, so record
+ them with the full CHECK chain and commit the module before any baseline runs (the commit hash is what G and H
+ vendor).
+Readings (fixed now, on the pilots): "the task is valid" per task if the perfect gate binds 2/2 on Hebbian and on
+ delta; "needs the longer budget" if only at 48000; "untested" otherwise. Descriptive: which cut selects what.
+CHECKs: lite batches reproduce G's S87 first batch; each new task's sequences have no token type at frequency
+ above 1/8 (-allpool) or no key type above a value's frequency (-pool), printed; every key appears in both blocks
+ of its sequence; the query's answer is determined (one value per (CTX, key)); the S70 reproduction through 2400.
+Deliverables: explore_f_tasks.py (the two classes), explore_f_s89_tasks.py (the pilots and baselines, docstring
+ with readings before any run), explore_out/F/report_9.md, README section; push the module commit first and tell
+ the user its hash so G and H can start.
+```
+
+## Session G — round 6 (S89: the frequency hinge without frequent keys; seeds 2840-2899; branch claude/explore-G)
+
+```
+Read first: STATUS.md; Revision 10 §12 and the referee's spec_review_register_draft.md (its fixes are still
+owed on your draft and come after this screen); your report 7. The question: S87's frequency hinge discovered
+17/20 on a task where the cut it uses selects the keys and the contexts. Does it do anything on a task where
+keys are not a frequent class?
+Vendor F's explore_f_tasks.py at the commit F names (byte-identical, with the CHECK that it is), as you vendored it
+ in S82. Tasks: RandHeaderTask-pool and -allpool, each only if F's pilots read "the task is valid" (or "needs the
+ longer budget", at that budget). Model and recipe as S87: Hebbian, k = 2, no conv, 24000, SLOW, REG3 at all
+ three layers; the perfect gate for validity on 2840-2841 per task (yours, not F's: your code path).
+Arms on seeds 2842-2861 (20, paired), per task:
+ BASELINE (LOCAL3 + SLOW), REG3 (no hinge), REG3_KEYHINGE (the key term with the true key positions and
+ identities, which still exist in the generator: the labelled ceiling, as in S87), REG3_FREQHINGE exactly as in
+ S87 (the cut recomputed on the new task's sample; print what it selects — the expectation on -pool is the two
+ CTX types only, on -allpool nothing or the positional residue, and if the cut selects nothing the arm is REG3
+ bit for bit, which the CHECK asserts and the report says), and one new arm that reads the task the way a
+ language model could:
+ REG3_REPEATHINGE: the key term applied at the positions of token types that occur more than once in the
+ sequence (a within-sequence statistic, no corpus table, no labels; on these layouts that is the keys, which
+ repeat across the two blocks, and nothing else — print how far it coincides with the key positions, as a count).
+ Every hinge on updates 1-2400 only, with the switch that makes it REG3 bit for bit when off.
+Readings (fixed now; ROUTED-BOUND; exact one-sided McNemar; "discovered" if p < 0.05 against BASELINE):
+ per task, "the frequency hinge survives" if REG3_FREQHINGE is discovered and within 1 pair of REG3_KEYHINGE;
+ "the frequency hinge needs frequent keys" if REG3_KEYHINGE beats it by >= 4 vs 0; "the repeat hinge replaces
+ the key hinge" if REG3_REPEATHINGE is discovered and within 1 pair of REG3_KEYHINGE; "clamps" for any arm at
+ BASELINE + 1 pair or fewer with the gate's commitment at 2400 below BASELINE's; "the labelled hinge itself
+ fails here" if REG3_KEYHINGE is not discovered (then no other reading on that task, and say what that means for
+ the register spec); "no reading applies" otherwise. Across tasks (descriptive, not a reading): the drop of each
+ arm from -pool to -allpool on the same seed numbers.
+Delta (beta 1, L2 keys; seeds 2862-2871): the least-reading arm that is discovered on Hebbian memory, on each
+ valid task, against BASELINE_D and REG3_D; descriptive, as in S87.
+CHECKs: the vendored task file; each term with its switch off equals REG3 bit for bit through 2400; the frequency
+ and repeat statistics are computed from token ids only (assert no label tensor is passed); each term's gradient
+ reaches W_g (and A) only; S87's REG3_FREQHINGE 2700 reproduces bit for bit through 2400 under the current code;
+ the perfect gate 2/2 per task before any learned arm. Budget: at S87's rate about 5 h per task on 4 workers.
+Deliverables: explore_g_s89.py (docstring with readings before any run), explore_out/G/report_8.md, README
+ section. Then, and only then, the register spec's revision per the referee's review, as a separate commit.
+```
+
+## Session H — round 6 (S89: the split without marked key positions, at eight streams; seeds 2900-2959; branch claude/explore-H)
+
+```
+Read first: STATUS.md; Revision 10 §6 and §13; your report 9. S86 and S87a found that a trigger reading the
+gate's mass at every body position keeps binding within one pair of the key-position rule (24/30 against 26/30)
+on the grouped layout, where keys are a marked class and the all-position mass is dominated by them anyway.
+The question: does the all-position trigger, with the exact-copy split, still bind eight streams when keys are not
+a frequent class and the key-position rule has nothing to read?
+Task: the grouped layout of test_window_gate at S = 8, P = 4, k = 16, conv, 43200, with the keys of each sequence
+ drawn without replacement from a pool of 32 key types (the -pool construction F builds for the lite task; use
+ F's generator if F's module exposes a grouped-layout variant, else build the pool draw into your copy of the
+ main line's task with a CHECK that at pool size 4 it equals the main line's batches bit for bit at one seed).
+ The perfect gate for validity on 2900-2901 (ceil8_D8 as in S87a). Arms on 2902-2911 (10, paired):
+ BASE (the main line's recipe, the key-position trigger, which still reads the true key positions from the
+ generator: the labelled ceiling), ALLMASS (your S87a arm), NOSPLIT (the recipe without a trigger), and
+ REPEATMASS (the trigger's mass read at positions of token types that occur more than once in the sequence —
+ the same within-sequence statistic G uses for its hinge; on this layout, the keys; print the overlap with the
+ key positions as a count).
+Readings (fixed now; BOUND ROUTED; exact one-sided McNemar): "the all-position trigger survives" if ALLMASS is
+ within 1 pair of BASE and beats NOSPLIT by >= 4 vs 0; "the trigger needs key positions" if BASE beats ALLMASS by
+ >= 4 vs 0; the same two for REPEATMASS; "the split is not needed here" if NOSPLIT is within 1 pair of BASE (then
+ the trigger readings are moot, say so); "the labelled recipe itself fails here" if BASE binds fewer than 7/10
+ (then no other reading); "no reading applies" otherwise. Print per run the splits, the targets' labels under the
+ key-position labels (which exist in the generator) and the map before each firing, as in S87a.
+CHECKs: pool size 4 reproduces the main line's test_window_gate WIN3_SPLIT_D8 seed 540 record (Part C, X 540-559)
+ through 4800 bit for bit on your CPU (or printed, not asserted, if the CPU differs, as the specs provide); the exact copy is
+ H's copy_nonoise_op byte for byte; the perfect gate 2/2 before any learned arm; the statistics read token ids
+ only. Budget: about 1 h per run on your CPU, 42 runs, two days on 4 workers; start the perfect gate and BASE
+ first and push after every saved run.
+Deliverables: explore_h_s89.py (docstring with readings before any run), explore_out/H/report_10.md, README
+ section. Your two-stream spec draft's revision per the referee's review waits until this screen is read.
+```
+
+## Session V — round 6 (branch claude/review-V; docs/review_2026-10/)
+
+```
+Four tasks, in order; nothing outside docs/review_2026-10/; nothing trained.
+1. Revision 10 (the main line's multichannel_hebbian_report_v10.tex and .pdf at 585b666 or later). It was
+ checked in two passes by a session that was not you (docs/review_2026-10/rev10/first_pass.md,
+ second_pass.md, with its recompute_*.py); you have not seen the fifth round's screens either. Do what you did
+ for Revision 9: every count, pair, p-value, interval, band and reading in the text added since Revision 9
+ (git diff c918ff7 -- the tex, or rev10/diff) against the records — test_delta_recipe pooled (yours at
+ check_delta_recipe_L.md stands; confirm the draft quotes it), I's GPU run, R's Phase 5, F's S88 (claude/explore-F
+ a199d5e: report_8.md, write_results.json, horizon_results.json), G's S87 (claude/explore-G e46799a:
+ report_7.md), H's report 9 (claude/explore-H 347bd25), E's batches 20-21 (claude/outside-ideas 419368a:
+ explore_out/README.md, batch21.log, oracle_d128_results.json), S75's tenth seed (claude/explore-I report_2.md).
+ Then audit the other session's two passes themselves: what they checked, what they missed, whether their
+ recomputations agree with yours. rev10/referee_pass.md: "stands", or the list of what must change, and a
+ verdict on whether the two non-referee passes were an adequate substitute for yours.
+2. The three round-6 screen files as soon as each is pushed and before its first learned-arm run (the sessions
+ will name the commit): explore_f_s89_tasks.py (claude/explore-F), explore_g_s89.py (claude/explore-G),
+ explore_h_s89.py (claude/explore-H). For each: do the readings give every outcome exactly one name; is the
+ outcome a named function the main line already has; are the seeds free on every branch; do the CHECKs tie the
+ new code to a recorded run; is the "survives" rule (within 1 pair of the labelled ceiling, 20 or 10 seeds)
+ powered to say anything, and what would it read at plausible true rates; does anything in the design read a
+ label it claims not to (the generator's key positions are available to the ceiling arms only — check the
+ statistics' call paths). screen_review_s89_{F,G,H}.md, each within a day of the push, because the sessions
+ wait for nothing but will take a fix before their learned arms start.
+3. If G pushes the register spec's revision after S89: review it against your spec_review_register_draft.md
+ item by item (RESOLVED / PARTLY / NOT), spec_review_register_v2.md.
+4. explore_out/spec_draft_keyload.md's status section (claude/outside-ideas 419368a): the five options E lists
+ are the user's decision; say for each what a referee would require before it ran, in one paragraph each,
+ keyload_options_review.md.
+```
