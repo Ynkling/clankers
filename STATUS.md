@@ -1,4 +1,4 @@
-# Project status — paused on 14 October 2026
+# Project status — paused on 14 October 2026; updated 19 October
 
 This file is the entry point for anyone picking the project up, including its author after a break. It says what the
 project is, what it found, what is pre-registered and what is not, where every thread stood when work paused, and how
@@ -56,8 +56,8 @@ source at two sources and nothing routes at four on the one screen run, which it
 | `claude/bdh-growth-hebbian-inference-w90069` (the main line) | the tests (`test_*.py`), their specifications (`specs/`), the records (`results/`), the report, the referee's files, this file | Revision 9 merged; `test_delta_recipe` complete on both machines |
 | `claude/rev9-draft` | the seven versions of Revision 9's draft that the referee checked | merged into the main line; kept because the report cites its commits |
 | `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged at 00290a8; its last items were the reviews of the three spec drafts below |
-| `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 20 complete; `explore_out/spec_draft_keyload.md` written; batch 21 (the key-load test's validity screen, S69) still running at 18:12 UTC on 14 October: 13 of 20 runs saved (`4fedf9c`), records in `explore_out/oracle_d128_results.json`, pushed after every run; its SUMMARY and reading come at the end of `explore_out/batch21.log` |
-| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–7) | session closed on 14 October with S88 half done: S88a (the write strength) complete at `401d25a` (`explore_out/F/write_results.json`, `write_tables.md`); S88b (the horizon) stopped after 6 of its 44 runs (`horizon_results.json` at `99482c5`); no report 8 |
+| `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 21 complete (`419368a`, 15 October): the *D* = 128 oracle is not a usable validity check at 40,800; `explore_out/spec_draft_keyload.md` carries a NOT READY FOR V status section with five unscreened options |
+| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–8) | S88 complete, report 8 at `a199d5e` (14 October): the learned write strength "no reading applies"; the horizon screen "untested" |
 | `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–7) | S87 complete; `explore_out/G/spec_draft_register.md` awaits revision after the referee's review |
 | `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams (reports 1–9) | round 5 complete; `explore_out/H/spec_draft_two_keyterm.md` awaits revision after the referee's review |
 | `claude/explore-I` | session I: the dense-loss task (S74, S75), the GPU package (`explore_gpu/`), the GPU run of `test_window_gate` (report 3), S75b (`explore_out/I/s75b_spec_draft.md`, `explore_gpu/s75b.py`) | S75 closed; S75b's driver final (3cef609, mutation pass 8d2e89f), CPU CHECKs pass, the cards' CUDA CHECKs passed on the driver of 13 October and must be rerun on the final one; the pilot was not run |
@@ -81,33 +81,32 @@ source at two sources and nothing routes at four on the one screen run, which it
    (`spec_review_two_keyterm_draft.md`); it needs more seeds, a harder configuration or a different primary claim before
    adoption. H's dose screen found the drafted constants robust.
 4. **The key-load test** (sixteen keys at *D* = 128 against *D* = 32). E's draft (`explore_out/spec_draft_keyload.md`,
-   budget 40,800 by its rule) is unreviewed; its validity rule was at risk because the *D* = 128 oracle on the one seed
-   tried never bound, so E ran the validity screen first (batch 21, S69: the perfect gate at *D* = 128, sixteen keys,
-   seeds 270–279, the recorded single-Adam recipe against SLOW, 40,800 updates; readings fixed before any run). State at
-   the pause: the single-Adam arm is done at **4 of 10** bound (271, 273, 274, 278; three more ended at 0.91–0.92, just
-   under the 0.95 bar) — "unreliable" by the pre-fixed rule, so two validity seeds would both bind with probability
-   about 0.13; the SLOW arm stands at 0 of 3 (270–272 ended near 0.35; 271 had bound at 12,000 under single Adam)
-   with seven seeds running or queued. The spec's reading now rests on SLOW: 5 or more of its remaining seven bind →
-   the draft falls back to one validity seed at *D* = 128 (VALID_N = 1) on SLOW; fewer → the draft has no validity
-   check at 40,800 and does not go to the referee as written. Whoever resumes reads the SUMMARY at the end of
-   `explore_out/batch21.log` (or finishes the batch from its checkpoints if the container died) before touching the
-   draft.
+   budget 40,800 by its rule) relied on the *D* = 128 oracle as its validity check, so E screened that first (batch 21,
+   S69: the perfect gate at *D* = 128, sixteen keys, seeds 270–279, the recorded single-Adam recipe against SLOW,
+   40,800 updates; readings fixed before any run; complete 15 October). The oracle bound **4/10** under the recorded
+   recipe (271, 273, 274, 278; three more ended at 0.91–0.92, under the 0.95 bar; three stuck near 0.30) and **0/10**
+   under SLOW (every seed 0.33–0.36). Pre-registered reading: **"no *D* = 128 validity check at 40,800"** — the draft
+   does not go to the referee as written. E's status section in the draft lists five unscreened options (a longer
+   budget for the oracle only; the *P* = 8 oracle as the validity check; one validity seed; claims conditional on the
+   learned arms alone; drop *D* = 128 until it has a reliable oracle). None is adopted; the choice is the user's.
 5. **S75b** (the dense loss at four sources on a configuration where the perfect gate can reach its bar). Approved spec
    with a mechanical pilot rule; what remains is in `explore_gpu/README.md` (d): rerun the CUDA CHECK and the benchmark
-   on each card with the final driver, run the pilot (two perfect-gate runs, about three hours), and stage 2 on both
-   cards (about a day and a half) only if the pilot record says PROCEED. The referee's review of the draft
-   (`spec_review_s75b_draft.md`) has points to take before the pilot.
-6. **F's S88**, half done when its session closed (readings fixed before the first run, `40087cb`; EXPLORATORY,
-   not a result). **S88a**, the write strength (34 runs, 160 h, seeds 2400–2409, the delta recipe with the exact-copy
-   split at eight streams): the fixed write strength binds and routes 10/10, a learned per-token strength 7/10 (0 vs 3
-   discordant pairs) and the learned strength on the slow schedule 3/10 (0 vs 7, *p* = 0.0078); the pre-fixed reading
-   is "no reading applies" (the better learned arm is 3 pairs behind the fixed one — more than the 1 pair that "keeps the
-   partition" allowed, fewer than the 4 that "costs it" needed). Printed, not a reading: every learned run drives its
-   write strength to about 0 by update 4800 and it never diverges by stream (0/20), so the learned arms are mostly
-   writing nothing. Tables in `explore_out/F/write_tables.md`. **S88b**, the horizon (one delta channel on the lite
-   task at 1× and 2× cue-to-key distance, fixed decay against the learned forget gate; 44 runs planned): 6 ROUTED_2X
-   runs recorded (4 bound) before the session closed; no reading can be taken from a single arm. To finish it, a new
-   session on `claude/explore-F` runs `explore_f_horizon.py` (resumes from the cached records) and writes report 8.
+   with the final driver, run the pilot (two perfect-gate runs, about three hours), and stage 2 only if the pilot record
+   says PROCEED. The spec was written for two cards; since 19 October only the laptop's RTX 3070 is available (the
+   server left the project), so stage 2 would take about three days on one card and cannot share the laptop with a
+   main-line test. The referee's review of the draft (`spec_review_s75b_draft.md`) has points to take before the
+   pilot.
+6. **F's S88**, complete (report 8 at `a199d5e`; 78 runs on a Xeon @ 2.80 GHz; readings fixed before the first run,
+   `40087cb`; EXPLORATORY, not a result). **S88a**, the write strength (the delta recipe with the exact-copy split at
+   eight streams, seeds 2400–2409): the fixed write strength binds and routes 10/10, a learned per-token strength 7/10
+   (0 vs 3 discordant pairs) and the learned strength on the slow schedule 3/10 (0 vs 7, *p* = 0.0078); reading **"no
+   reading applies"** (the better learned arm is 3 pairs behind — more than the 1 that "keeps the partition" allowed,
+   fewer than the 4 that "costs it" needed). Printed, not a reading: the learned strength collapses to about 0 within
+   ~1200 updates of its learning rate reaching 1e-3, in every run, and never diverges by stream; it keeps writing only
+   at layer-1 VAL positions. **S88b**, the horizon (one delta channel on the lite task at 1× and 2× cue-to-key
+   distance, seeds 2420–2429): fixed decay 9/10 and the learned forget gate 6/10 at 1×, 4/10 against 5/10 at 2×;
+   reading **"untested"** (the gate's 6/10 at 1× is under the 8/10 the rule required); every failure is a stream
+   confusion at 0.5, flat across distance. Both screens are closed; nothing follows from them.
 7. **Round 6 of screens**, proposed in `docs/reading/plan_2026-10-13.md` §4E, none started.
 
 ## 5. How to resume
@@ -130,7 +129,10 @@ segment of a screen opens by reproducing a recorded run bit for bit. The referee
 | X (a cloud container) | the session's own | the main line | the session's |
 | the laptop (i7-12650H, 15 GB; RTX 3070 Laptop GPU) | `~/Documents/clankers` | the default branch, pulled before each test | system Python with torch 2.14.1 (CPU); main-line tests run here with `--machine L` |
 | the laptop, GPU work | `~/Documents/clankers-gpu` | `claude/explore-I` | `source ~/venv-gpu/bin/activate` (torch 2.14.0+cu130) |
-| the server (Ryzen 5 3600, 35 GB; GTX 1660 SUPER) | `~/jellyfin/clankers` (single-branch) | `claude/explore-I` | `source .venv/bin/activate` in the clone (torch 2.14.0+cu130) |
+
+The server (Ryzen 5 3600; GTX 1660 SUPER) left the project on 19 October for work reasons. Its finished runs — the
+GPU replication of `test_window_gate` (I, report 3) and S75's arms — stay on `claude/explore-I`; nothing else ran
+there.
 
 Long runs go through `longrun.py` (`start`, `watch --resume`, `status`; a stopped run resumes from its records with
 `start --again`); the README's "Repository layout and how to run the tests" has the commands. Two lessons from the
