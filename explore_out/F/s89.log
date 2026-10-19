@@ -174,3 +174,36 @@ EXPLORATORY, NOT A RESULT — Session F s89 (F/s89_tasks)
   CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.80GHz (recorded on Intel(R) Xeon(R) Processor @ 2.10GHz) (69 s): ok
   ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
   (explore_f_delta_checks: 77 s, all passed)
+  CHECK F/s89_tasks: explore_f_tasks.py's first 13771 bytes (everything before the round-6 section) equal a199d5e's file: ok
+  CHECK F/s89_tasks: POOL: shape: L 23 (lite 23), vocab 50; batch (4096, 23): ok
+  CHECK F/s89_tasks: POOL: the batch is lite's batch with the identities renamed: roles at the same positions (True), the same value ids (True), a one-to-one key map per sequence (True): ok
+  CHECK F/s89_tasks: POOL: each sequence's 4 key types are distinct and from the pool of 32 (True); every key occurs exactly 2 times, once under each stream, i.e. in one block of each stream (True); its 2 values are distinct (True): ok
+  CHECK F/s89_tasks: POOL: the query's (stream, key) occurs exactly once in the body (True) and its target is that pair's value (True); the query stream from make_batch equals stream_labels at the query (True): ok
+  CHECK F/s89_tasks: POOL: 4 CTX tokens in each body, each followed by a key, position 0 a CTX: ok
+  CHECK F/s89_tasks: POOL: pool: stream_labels equal BindTask's (CTX id) and perfect_gate equals perfect_gate_general(tokens, (0, 1)): ok
+  CHECK F/s89_tasks: POOL: pool: no key type above any value type's frequency (max KEY 0.0138 < min VAL 0.0220): ok
+  CHECK F/s89_tasks: ALLPOOL: shape: L 23 (lite 23), vocab 64; batch (4096, 23): ok
+  CHECK F/s89_tasks: ALLPOOL: the batch is lite's batch with the identities renamed: roles at the same positions (True), the same value ids (True), a one-to-one key map per sequence (True): ok
+  CHECK F/s89_tasks: ALLPOOL: each sequence's 4 key types are distinct and from the pool of 32 (True); every key occurs exactly 2 times, once under each stream, i.e. in one block of each stream (True); its 2 values are distinct (True): ok
+  CHECK F/s89_tasks: ALLPOOL: the query's (stream, key) occurs exactly once in the body (True) and its target is that pair's value (True); the query stream from make_batch equals stream_labels at the query (True): ok
+  CHECK F/s89_tasks: ALLPOOL: 4 CTX tokens in each body, each followed by a key, position 0 a CTX: ok
+  CHECK F/s89_tasks: ALLPOOL: allpool: each sequence's 2 CTX types are distinct (True); the stream index is by first appearance (stream 0 at position 0: True); the perfect gate is its one-hot (True): ok
+  CHECK F/s89_tasks: ALLPOOL: allpool: no token type above 1/8 (max 0.0236; CTX 0.0151, KEY 0.0138, VAL 0.0236): ok
+  CHECK F/s89_tasks: LITE frequencies (S87's sample): CTX 2 types 0.1136-0.1137; KEY 4 types 0.1017-0.1027; VAL 16 types 0.0220-0.0236; largest-ratio cut 6 types ['CTX', 'KEY']; half-mass cut 5 types {'CTX': 2, 'KEY': 3}: ok
+  CHECK F/s89_tasks: POOL frequencies (S87's sample): CTX 2 types 0.1136-0.1137; VAL 16 types 0.0220-0.0236; KEY 32 types 0.0120-0.0138; largest-ratio cut 2 types ['CTX']; half-mass cut 14 types {'CTX': 2, 'VAL': 12}: ok
+  CHECK F/s89_tasks: ALLPOOL frequencies (S87's sample): VAL 16 types 0.0220-0.0236; CTX 16 types 0.0128-0.0151; KEY 32 types 0.0120-0.0138; largest-ratio cut 16 types ['VAL']; half-mass cut 26 types {'CTX': 10, 'VAL': 16}: ok
+  CHECK F/s89_tasks: LITE's table equals G's published S87 table ([(0, 0.1137), (1, 0.1136), (3, 0.1027), (4, 0.1026), (5, 0.1022), (2, 0.1017)]) and its cut G's set {0, 1, 2, 3, 4, 5} ([0, 1, 2, 3, 4, 5]): ok
+  CHECK F/s89_tasks: the first training batch at seed 2700 (onset_run's generator, seed + 10000, batch 32) from this module equals the one from G's vendored explore_f_tasks.py at e46799a: ok
+  CHECK F/s89_tasks: S70's own path (S70_HEBB = G's BASELINE) on seed 2700, on this CPU (Intel(R) Xeon(R) Processor @ 2.80GHz), reproduces G's S87 BASELINE|2700|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit: curve [[1200, 0.30615234375, 2.3695068359375], [2400, 0.322265625, 2.017455816268921]] vs [[1200, 0.30615234375, 2.3695068359375], [2400, 0.322265625, 2.017455816268921]]; gradient norms at updates ['1', '10', '100'] (functions of the first batch) True: ok
+  CHECK F/s89_tasks: S70 reproduction on this CPU (Intel(R) Xeon(R) Processor @ 2.80GHz): S70_DELTA|330|ff908bdbc0b2|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 bit for bit with S70's own path: curve [[1200, 0.4306640625, 2.2808918952941895], [2400, 0.498046875, 1.5674972534179688]] vs [[1200, 0.4306640625, 2.2808918952941895], [2400, 0.498046875, 1.5674972534179688]]; statistics True: ok
+  CHECK F/s89_tasks: POOL perfect gate on HEBB: one-hot with k = 2, equal to task.perfect_gate (True): ok
+  CHECK F/s89_tasks: POOL perfect gate on DELTA: one-hot with k = 2, equal to task.perfect_gate (True); the delta memory receives the k = 2 gate (True): ok
+  CHECK F/s89_tasks: ALLPOOL perfect gate on HEBB: one-hot with k = 2, equal to task.perfect_gate (True); logits equal the built-in perfect gate over the 16 CTX types bit for bit (True): ok
+  CHECK F/s89_tasks: ALLPOOL perfect gate on DELTA: one-hot with k = 2, equal to task.perfect_gate (True); the delta memory receives the k = 2 gate (True): ok
+  CHECK F/s89_tasks: NOMEM on POOL (conv 'in'): the query position's logits ignore a token 4 back (True) and see one 3 back (True); the read is zero (True); k 1: ok
+  CHECK F/s89_tasks: NOMEM on ALLPOOL (conv 'in'): the query position's logits ignore a token 4 back (True) and see one 3 back (True); the read is zero (True); k 1: ok
+  CHECK F/s89_tasks: NOMEM_SELF on POOL (conv 'layer'): the query position's logits ignore a token 10 back (True) and see one 9 back (True); the read is the own V (True); k 1: ok
+  CHECK F/s89_tasks: NOMEM_SELF on ALLPOOL (conv 'layer'): the query position's logits ignore a token 10 back (True) and see one 9 back (True); the read is the own V (True); k 1: ok
+  CHECK F/s89_tasks: BASELINE_POOL: groups ['W_in', 'W_g', 'gate_conv.conv_w'] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s89_tasks: SINGLE_DELTA_ALLPOOL: groups [] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s89_tasks: O_DELTA_ALLPOOL: groups [] / 5 rest parameters; lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
