@@ -551,7 +551,11 @@ row(S, tex(268, "Every failure at either length is a stream confusion at $0.5$, 
     "MATCH", f"'at 0.5' holds per run; per distance {rng(ub_dist)} (no trend with distance)." " The last clause is an interpretation of an untested screen")
 r8 = sorted(p for p in git("ls-tree", "-r", "--name-only", F, FD).split() if re.search(r"report_\d+\.md$", p))
 row(S, tex(268, "its branch holds eight reports"), "the two screens close F's programme; its branch holds eight reports",
-    f"{len(r8)} reports at {F}; the branch head is {short('origin/claude/explore-F')}", ok_if(len(r8) == 8 and short("origin/claude/explore-F") == F))
+    f"{len(r8)} reports at {F}; the draft {M} at {ctime(M)}; F's commits after a199d5e: "
+    + "; ".join(git("log", "--format=%h %cI %s", f"{F}..origin/claude/explore-F").strip().split("\n")),
+    "MATCH" if short("origin/claude/explore-F") == F else "PARTIAL",
+    "true when written; since then (after the draft) F opened round 6, S89, with readings fixed before any run: 'close the programme' is "
+    "now stale; 'eight reports' still holds")
 row(S, tex(377, "collapses to about zero everywhere but the first layer's value positions and binds $7/10$ against the fixed one's $10/10$"),
     "'A learned write strength, screened afterwards, collapses to about zero everywhere but the first layer's value positions and binds 7/10 against 10/10 (no reading applies)'",
     f"counts {cnt['DELTA_LEARNED']}/10 vs {cnt['DELTA_FIXED']}/10; end medians >= 0.5 outside layer-1 VAL in {len(l23) + len(ctx_hi)} run-layers", "PARTIAL",
