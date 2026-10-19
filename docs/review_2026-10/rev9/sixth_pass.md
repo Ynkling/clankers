@@ -174,3 +174,7 @@ All are dated in `fifth_pass.md` and `resolution_R_E5.md`.
 - **WIDE_SLOW 839.** It has not landed.
 - **Re-running session code.** S81's, S83's and S86's CHECKs, and I's summary, were read, not re-run.
 - **Anything after `125809e`.**
+
+**Correction (13 October).** §3 lists R's `550a736` as "Phase 5 protocol (`phase5.py`, U-50–U-70), no records", and `check_R_v6.md` (:11, row 8) says the same.
+- **What it leaves out.** The commit also changes `replicate.py` (+60 −15: delta memory, the reset operation, the three arms, the Phase 5 job list) and `test_replicate.py` (+95). No number changes.
+- **"No records" was true of what had been pushed.** A replay of the run's `wall_s` puts Phase 5's start no later than 22:49:48, so it was already running at 23:14 (`check_R_phase5.md`).
