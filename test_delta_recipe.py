@@ -100,7 +100,8 @@ through longrun.py; runs began at 05:27 after the verification. Intel(R) Xeon(R)
 2.14.0+cu130, 4 workers x 1 thread, one start (two restarts of the agent's worker did not touch it), nothing cut. 84/84
 runs, none failed; 29.2 h wall clock (projection 45.3 h worst case). Amendment 2 (55dac50, report rules only) was
 committed during the run; the figures below are its report, regenerated with --report (2225f00) from the same results
-file. Its claims, bands and checks equal the in-run report's line for line: CHECK 174 dropped no pair.
+file. Its claims, bands and CHECKs 171 and 174 equal the in-run report's (six lines differ: the claims header, the D1
+interval's name and the probe-blind lines, all report-rule changes of Amendment 2): CHECK 174 dropped no pair.
 - Verification: every inherited and own CHECK passed.
   - CHECK 130 (Muon, X's 2.80GHz file) printed, not asserted.
   - 158: identical through the first split at 4800, different from 6000; printed, the record is from 2.80GHz.
@@ -126,12 +127,15 @@ file. Its claims, bands and checks equal the in-run report's line for line: CHEC
   - CHECK 171 PASS (80 records); CHECK 174 PASS (40 pairs).
 
 RESULT (L): test commit a581027, run at 8ae660d (a581027's test with Amendment 2's report rules, 55dac50 and 2225f00) on 12th Gen
-Intel(R) Core(TM) i7-12650H, torch 2.14.1, 1 thread per worker. Two starts through longrun.py, both at the top of
-results/L/delta_recipe_L.log (L's times are local, UTC-6): the first on 2026-10-12 at 10:04 on 6 workers passed every
-CHECK and printed its projection, and the laptop went down out of memory (a GPU job beside it) before any run was
-recorded; the second at 13:14 on 5 workers found no cached record (CHECKs 144, 157 and 170: "a first start"), so every
-run below is the second start's; runs from 15:10 after the verification, 84/84, none failed, nothing cut, 1125.8 min of
-runs on five workers (the projection said 32.6 h), exit 0 (results/L/longrun/delta_recipe_L.exit; its json beside it).
+Intel(R) Core(TM) i7-12650H, 1 thread per worker. Two starts through longrun.py, both at the top of
+results/L/delta_recipe_L.log (L's times are local, UTC-6): the first on 2026-10-12 at 10:04 (torch 2.14.0+cu130, 6
+workers) passed every CHECK and was lost during the projection's timing (the log holds the PROJECTION heading and no
+run line; the system log shows a reboot, which the author attributes to the OOM killer with a GPU job beside it); the
+second at 13:14 (torch 2.14.1, 5 workers) found no cached record (CHECKs 144, 157 and 170: "a first start"), so every
+run below is the second start's. Its verification ended at 15:10 (meta.started), the projection took about 19 min and
+the runs began after it; 84/84, none failed, nothing cut, about 1106.8 min of runs on five workers (1125.8 min
+including the projection; the projection said 32.6 h), exit 0 (results/L/longrun/delta_recipe_L.exit; its json
+beside it). The pooled result therefore spans two torch builds (X 2.14.0+cu130, L 2.14.1).
 The run was started without --also, so its own report says "POOLED (PRIMARY): not computed here"; the pooled block
 below is the report regenerated with --report --also results/X/delta_recipe_results.json from the same two results
 files (results/L/delta_recipe_L_report.log), which either machine's file produces identically.
