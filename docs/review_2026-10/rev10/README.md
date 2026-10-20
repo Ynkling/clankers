@@ -1,7 +1,10 @@
 # Revision 10: the checks of its draft
 
-Two passes over the Revision 10 draft by a session that did not write it, on 19 October 2026 (the referee session V had
-closed on 13 October; these passes follow its method, with every number recomputed from the records):
+Two passes over the Revision 10 draft by a checking agent run from the author's own session on 19 October 2026 (git shows
+the same session for the draft and the passes; the agent had no view of the drafting but its independence cannot be shown).
+They follow referee V's method where they recomputed (`test_delta_recipe`, the GPU run, H's screens) and read the other
+screens' reports. V's own pass over the merged revision, `referee_pass.md`, and its check of Revision 10.1,
+`revision_10_1_check.md`, with `check_rev10_*` and `audit_passes.md`, are the referee's files in this directory:
 
 - `first_pass.md`: the first version (`ea3afef`), 123 rows, 91 match, 17 partial, 11 disagree (seven distinct errors,
   all statements, none a number of a claim), 4 not record-checkable; fourteen items to change.

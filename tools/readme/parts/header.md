@@ -1,6 +1,6 @@
 # Multi-Channel Hebbian Plasticity in Multilayer BDH
 
-> **Status (19 October 2026).** Revision 10.1 is the current refereed report; [STATUS.md](STATUS.md) says where every thread stands and how to resume.
+> **Status (19 October 2026).** Revision 10.2 is the current report, passed by the referee before its merge; [STATUS.md](STATUS.md) says where every thread stands and how to resume.
 
 **Solves context-conditional binding by partitioning memory.** A window gate, slow memory and a targeted channel split find an eight-way partition without labels or restarts, on two machines with disjoint seeds; an independent clean-room replication agrees, and a referee has recomputed every number from the records.
 
