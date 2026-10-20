@@ -1,0 +1,269 @@
+§0 REFS (after git fetch)
+  origin/claude/explore-G: da152fe4 2026-10-20 22:11:39 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+  origin/claude/explore-F: 53578896 2026-10-20 22:04:32 +0000 report_9 addendum: correct the conv candidate's wording (EXPLORATORY, not a result)
+  origin/claude/explore-H: cf67855d 2026-10-20 22:00:07 +0000 explore_out/H: S89c CHECKs passed; runs started (EXPLORATORY, not a result)
+  explore-G commits after db14e9b9: da152fe4 2026-10-20 22:11:39 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+  S89 files at the explore-G tip: ['explore_g_s89.py', 'explore_g_s89_child.py', 'explore_out/G/s89.log']
+  explore_out/G/s89.log: 20 lines; git line: ['cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git db14e9b | python 3.13.16 | torch threads 1']; mentions 'S89 validity': False; 'runs queued': False; any learned arm key (pool./allpool.): False; last line: REG3_FREQHINGE_D: THE FREQUENCY HINGE SURVIVES (discovered yes (arm only 10, BASELINE only 0, p 0.000977); vs KH: KH only 0, arm only 0, p(K
+  s89_results.json / s89_validity.json / checks_s89_*.json at the tip: none
+
+§1 VENDORED explore_f_tasks.py
+  003a370e                   blob ffe249bb644423479e869cff11d2d723ac35450b  35605 bytes
+  db14e9b9                   blob e24d5e10815eb1234d1947aa6b74b128d2696882  49923 bytes
+  origin/claude/explore-G    blob e24d5e10815eb1234d1947aa6b74b128d2696882  49923 bytes
+  b0c6332                    blob e24d5e10815eb1234d1947aa6b74b128d2696882  49923 bytes
+  50dc8e4                    blob ffe249bb644423479e869cff11d2d723ac35450b  35605 bytes
+  a199d5e                    blob de4746371dfa63b05630a644c4fe0b2bdce29e32  14101 bytes
+  origin/claude/explore-F    blob e24d5e10815eb1234d1947aa6b74b128d2696882  49923 bytes
+  G db14e9b9 == F b0c6332: True; == F's tip: True; G 003a370e == F 50dc8e4: True
+  b0c6332 starts with 50dc8e4's 35605 bytes: True; with a199d5e's 14101 bytes: True
+  child constants (child:90-92): F_BLOB e24d5e10815e, PREFIXES [('50dc8e4', 'ffe249bb6444', '35605'), ('a199d5e', 'de4746371dfa', '14101')]
+    50dc8e4: rev-parse ffe249bb6444 (constant ffe249bb6444), length 35605 (constant 35605)
+    a199d5e: rev-parse de4746371dfa (constant de4746371dfa), length 14101 (constant 14101)
+  the hash CHECK (child:528-532) passes when F's commit is absent from the clone (hf None) on the constant alone: True
+
+§2 CODE PATHS (ast of db14e9b9)
+  parent: 445 lines; defs ['_arms', '_fake', '_load', 'arm_name', 'check_readings', 'clamps', 'commit', 'inv_view', 'main', 'med_commit', 'readings', 'recorded', 'report', 'run_checks']
+    arm_name (s89:196-210) calls ['hp.beats', 'hp.paired']
+    clamps (s89:213-216) calls ['hp.paired']
+    readings (s89:219-252) calls ['arm_name', 'clamps', 'hp.beats', 'hp.paired', 'rb']
+    report (s89:329-396) calls ['gc.cnt', 'gc.fisher_greater', 'gc.runs', 'hp.bound', 'hp.count_table', 'hp.diagnostics', 'hp.paired', 'hp.per_run', 'inv_view', 'rb', 'readings']
+    check_readings (s89:276-325) calls ['readings']
+    inv_view (s89:156-160) calls []
+    recorded (s89:256-266) calls ['gc.load']
+  rb = hp.routed_bound (s89:[180]); hp.not_worse_1 used: False
+  lite-vocabulary functions in the child, by line(enclosing function): on the pool path?
+    'rc.stats_fn(': ['344(stats_fn89)']
+    'ft.body_positions(': ['112(key_pos_ids)', '117(body_pos)']
+    'dc.key_eta(': ['608(checks_static)']
+    'gc.stream_acc(': ['627(checks_static)']
+    'ft.write_order_acc(': ['629(checks_static)']
+    'rc.acc_by_cell(': ['628(checks_static)']
+    'rc.layer_stats(': ['625(checks_static)']
+    'rc.probe_rh(': []
+    'rc.roles(': ['122(roles89)', '631(checks_static)']
+    'perfect_gate_general(': ['30(module)', '243(forward)', '647(checks_static)']
+    '- task.S': ['113(key_pos_ids)', '134(query)']
+    'x < S': []
+    'ft.rand_header': []
+  run() (child:467-496) passes stats_fn89 to run_one: True; post-run: ['stream_acc89', 'probe_rh89', 'acc_by_cell89', 'write_order_acc89']
+  STATS_POOL: ['STATS_POOL = ft.pool_stats_inv(c2.ROUTE_AT)']
+    _assert_tokens (child:148-151): task attributes ['task.L', 'task.vocab']; calls ['tokens.dim', 'tokens.max', 'tokens.min']
+    repeat_mask (child:154-159): task attributes []; calls ['cnt.gather', 'tokens.dim', 'tokens.max']
+    frequent (child:165-176): task attributes []; calls ['_assert_tokens', 'ft.freq_sample', 's87.freq_types', 'task_of']
+    hinge_mask (child:179-186): task attributes []; calls ['(tokens.unsqueeze(-1) == sel).any', 'KeyError', '_assert_tokens', 'frequent', 'repeat_mask', 'task_of', 'tokens.unsqueeze']
+    term_value (child:189-196): task attributes []; calls ['g18.eta2_pool', 'hinge_mask', 'key_eta89', 'mask.any', 'task_of', 'tokens.max']
+    key_eta89 (child:137-144): task attributes []; calls ['g.gather', 'g18.eta2_pool', 'key_pos_ids', 'kpos.unsqueeze', 'kpos.unsqueeze(-1).expand', 'out.append']
+    key_pos_ids (child:107-113): task attributes ['task.P', 'task.S', 'task.body_positions', 'task.k_pool', 'task.key_index', 'task.key_index(x).gather']; calls ['ft.body_positions', 'is_pool', 'task.body_positions', 'task.key_index', 'task.key_index(x).gather', 'x.gather']
+    ft.freq_sample (F b0c6332:[464]): return task.make_batch(n, torch.Generator().manual_seed(seed))[0][:, :-1]
+    Term89.forward (child:200-233) calls term_value(self.t_kind, live, tokens, self.t_task): True; the tokens argument is the forward's input; training gate: ['training = self.training and torch.is_grad_enabled() and st["count"]']
+
+§3 READINGS: explore_g_s89.readings() exec'd from db14e9b9 on every count vector of the 8 per-seed patterns
+  explore_g_rhl_parent constants at db14e9b9: ['ROUTE_MARGIN, ROUTE_ETA = 0.9, 0.9', 'DISC_COS = 0.5']
+  P4 = 0.0625 (= mcnemar(4, 0) 0.0625); NAMES {'FQ': ('the frequency hinge survives', 'the frequency hinge is weaker than the key hinge', 'the frequency hinge needs frequent keys', 'the frequency hinge does nothing here'), 'RP': ('the repeat hinge replaces the key hinge', 'the repeat hinge is weaker than the key hinge', 'the repeat hinge needs key identities', 'the repeat hinge does nothing here')}; allpool FQ 'needs' -> 'the frequency hinge needs the key positions'
+  n = 10: 19448 count vectors; readings() vs the docstring's rules written independently: 0 disagreements (FQ on pool, RP on pool, FQ on allpool); every vector got exactly one name (asserted)
+    FQ names: fails here 10158; does not need 8156; the frequency hinge does nothing here 419; the frequency hinge needs frequent keys 417; the frequency hinge survives 256; the frequency hinge is weaker than the key hinge 42
+  n = 20: 888030 count vectors; readings() vs the docstring's rules written independently: 0 disagreements (FQ on pool, RP on pool, FQ on allpool); every vector got exactly one name (asserted)
+    FQ names: fails here 689539; does not need 77946; the frequency hinge needs frequent keys 50715; the frequency hinge survives 30980; the frequency hinge does nothing here 28187; the frequency hinge is weaker than the key hinge 10663
+  invalid -> 'UNTESTED (the perfect gate did not bind 2/2)'; a missing KH seed -> "UNTESTED (runs that did not complete: {'REG3_KEYHINGE_D': [1"; a missing REG3_D (descriptive) seed -> "UNTESTED (runs that did not complete: {'REG3_D': [19]})"
+  clamps on an arm 2/20 with commitment 0.1 vs BASELINE 1/20 at 0.5: True (arm only 1, BASELINE only 0; commitment at 2400 0.1000 vs BASELINE 0.5000) -- an accompaniment, printed with any of the four names
+
+§4 S87's RECORDS RE-LABELLED (explore_g_s89.check_readings' inputs, from explore_out/G/s87_results.json at db14e9b9)
+  store meta sha f205db31dfed, cpu Intel(R) Xeon(R) Processor @ 2.10GHz; last commit touching it: 57c25c05 2026-10-13
+  Hebbian 2700-2719: counts: BASELINE 0/20, REG3_KEYHINGE 20/20, REG3_FREQHINGE 17/20 | REG3_KEYHINGE vs BASELINE: KH only 20, BASELINE only 0, p 9.54e-07 | first: the labelled hinge is discovered; per-arm names below | REG3_FREQHINGE: THE FREQUENCY HINGE IS WEAKER THAN THE KEY HINGE (discovered yes (arm only 17, BASELINE only 0, p 7.63e-06); vs KH: KH only 3, arm only 0, p(KH >) 0.125, n 20); clamps: does not apply (arm only 17, BASELINE only 0; commitment at 2400 0.5913 vs BASELINE 0.8734)
+    per-seed (KH, FQ, B) ROUTED-BOUND patterns {(True, False, False): 3, (True, True, False): 17}; FQ's failures are KH successes (nested): True
+  delta 2720-2729: counts: BASELINE_D 0/10, REG3_D 0/10, REG3_KEYHINGE_D 10/10, REG3_FREQHINGE_D 10/10 | REG3_KEYHINGE vs BASELINE: KH only 10, BASELINE only 0, p 0.000977 | REG3_KEYHINGE vs REG3 (descriptive: the hinge's contribution): KH only 10, REG3 only 0, p 0.000977 | first: the labelled hinge is discovered; per-arm names below | REG3_FREQHINGE_D: THE FREQUENCY HINGE SURVIVES (discovered yes (arm only 10, BASELINE only 0, p 0.000977); vs KH: KH only 0, arm only 0, p(KH >) 1, n 10); clamps: does not apply (arm only 10, BASELINE only 0; commitment at 2400 0.9365 vs BASELINE 0.8063)
+    per-seed (KH, FQ, B) ROUTED-BOUND patterns {(True, True, False): 10}; FQ's failures are KH successes (nested): True
+  checks_repro record REG3_FREQHINGE_D|2720: 1 hit(s) under the prefix (child:504-507 asserts 1); recorded on Intel(R) Xeon(R) Processor @ 2.10GHz; curve through 2400 [[1200, 0.2958984375], [2400, 0.72705078125]]; transition 3600
+  checks_repro record REG3_KEYHINGE_D|2720: 1 hit(s) under the prefix (child:504-507 asserts 1); recorded on Intel(R) Xeon(R) Processor @ 2.10GHz; curve through 2400 [[1200, 0.30322265625], [2400, 0.9541015625]]; transition 2400
+  checks_repro record BASELINE_D|2720: 1 hit(s) under the prefix (child:504-507 asserts 1); recorded on Intel(R) Xeon(R) Processor @ 2.10GHz; curve through 2400 [[1200, 0.455078125], [2400, 0.48046875]]; transition None
+  checks_repro record REG3_D|2720: 1 hit(s) under the prefix (child:504-507 asserts 1); recorded on Intel(R) Xeon(R) Processor @ 2.10GHz; curve through 2400 [[1200, 0.451171875], [2400, 0.47119140625]]; transition None
+  checks_repro record REG3_FREQHINGE|2700: 1 hit(s) under the prefix (child:504-507 asserts 1); recorded on Intel(R) Xeon(R) Processor @ 2.10GHz; curve through 2400 [[1200, 0.22412109375], [2400, 0.2255859375]]; transition None
+  checks_repro record REG3_KEYHINGE|2700: 1 hit(s) under the prefix (child:504-507 asserts 1); recorded on Intel(R) Xeon(R) Processor @ 2.10GHz; curve through 2400 [[1200, 0.21826171875], [2400, 0.22705078125]]; transition 3600
+  checks_repro record BASELINE|2700: 1 hit(s) under the prefix (child:504-507 asserts 1); recorded on Intel(R) Xeon(R) Processor @ 2.10GHz; curve through 2400 [[1200, 0.30615234375], [2400, 0.322265625]]; transition None
+
+§5 OPERATING CHARACTERISTICS at n = 20 (exact multinomial over the 8 per-seed patterns, names from §3's run of the parent's readings(); 'indep.' = B, KH, A independent; 'nested' = KH and A comonotone (one uniform per seed), B independent)
+    pB    pK    pA coupling |  noneed   fails    SURV  weaker   needs nothing
+   0.0   1.0   1.0  indep. |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0   1.0  0.95  indep. |   0.000   0.000   0.736   0.248   0.016   0.000   (sum 1.000000)
+   0.0   1.0   0.9  indep. |   0.000   0.000   0.392   0.475   0.133   0.000   (sum 1.000000)
+   0.0   1.0   0.8  indep. |   0.000   0.000   0.069   0.342   0.589   0.000   (sum 1.000000)
+   0.0   1.0   0.7  indep. |   0.000   0.000   0.008   0.099   0.893   0.000   (sum 1.000000)
+   0.0   1.0   0.5  indep. |   0.000   0.000   0.000   0.001   0.999   0.000   (sum 1.000000)
+   0.0   1.0   0.2  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.0   1.0   0.0  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1   1.0   1.0  indep. |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1   1.0  0.95  indep. |   0.000   0.000   0.736   0.248   0.016   0.000   (sum 1.000000)
+   0.1   1.0   0.9  indep. |   0.000   0.000   0.392   0.475   0.133   0.000   (sum 1.000000)
+   0.1   1.0   0.8  indep. |   0.000   0.000   0.069   0.342   0.589   0.000   (sum 1.000000)
+   0.1   1.0   0.7  indep. |   0.000   0.000   0.008   0.099   0.893   0.000   (sum 1.000000)
+   0.1   1.0   0.5  indep. |   0.000   0.000   0.000   0.001   0.999   0.000   (sum 1.000000)
+   0.1   1.0   0.2  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1   1.0   0.0  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.3   1.0   1.0  indep. |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.3   1.0  0.95  indep. |   0.000   0.000   0.736   0.247   0.016   0.001   (sum 1.000000)
+   0.3   1.0   0.9  indep. |   0.000   0.000   0.392   0.472   0.133   0.003   (sum 1.000000)
+   0.3   1.0   0.8  indep. |   0.000   0.000   0.069   0.339   0.589   0.003   (sum 1.000000)
+   0.3   1.0   0.7  indep. |   0.000   0.000   0.008   0.099   0.893   0.001   (sum 1.000000)
+   0.3   1.0   0.5  indep. |   0.000   0.000   0.000   0.001   0.999   0.000   (sum 1.000000)
+   0.3   1.0   0.2  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.3   1.0   0.0  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.0  0.95   1.0  indep. |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0  0.95   1.0  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0  0.95  0.95  indep. |   0.000   0.000   0.874   0.120   0.006   0.000   (sum 1.000000)
+   0.0  0.95  0.95  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0  0.95   0.9  indep. |   0.000   0.000   0.632   0.312   0.055   0.000   (sum 1.000000)
+   0.0  0.95   0.9  nested |   0.000   0.000   0.736   0.248   0.016   0.000   (sum 1.000000)
+   0.0  0.95   0.8  indep. |   0.000   0.000   0.231   0.453   0.316   0.000   (sum 1.000000)
+   0.0  0.95   0.8  nested |   0.000   0.000   0.176   0.472   0.352   0.000   (sum 1.000000)
+   0.0  0.95   0.7  indep. |   0.000   0.000   0.058   0.311   0.631   0.000   (sum 1.000000)
+   0.0  0.95   0.7  nested |   0.000   0.000   0.024   0.201   0.775   0.000   (sum 1.000000)
+   0.0  0.95   0.5  indep. |   0.000   0.000   0.001   0.043   0.956   0.000   (sum 1.000000)
+   0.0  0.95   0.5  nested |   0.000   0.000   0.000   0.005   0.995   0.000   (sum 1.000000)
+   0.0  0.95   0.2  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.0  0.95   0.2  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.0  0.95   0.0  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.0  0.95   0.0  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1  0.95   1.0  indep. |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1  0.95   1.0  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1  0.95  0.95  indep. |   0.000   0.000   0.874   0.120   0.006   0.000   (sum 1.000000)
+   0.1  0.95  0.95  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1  0.95   0.9  indep. |   0.000   0.000   0.632   0.312   0.055   0.000   (sum 1.000000)
+   0.1  0.95   0.9  nested |   0.000   0.000   0.736   0.248   0.016   0.000   (sum 1.000000)
+   0.1  0.95   0.8  indep. |   0.000   0.000   0.231   0.453   0.316   0.000   (sum 1.000000)
+   0.1  0.95   0.8  nested |   0.000   0.000   0.176   0.472   0.352   0.000   (sum 1.000000)
+   0.1  0.95   0.7  indep. |   0.000   0.000   0.058   0.311   0.631   0.000   (sum 1.000000)
+   0.1  0.95   0.7  nested |   0.000   0.000   0.024   0.201   0.775   0.000   (sum 1.000000)
+   0.1  0.95   0.5  indep. |   0.000   0.000   0.001   0.043   0.956   0.000   (sum 1.000000)
+   0.1  0.95   0.5  nested |   0.000   0.000   0.000   0.005   0.995   0.000   (sum 1.000000)
+   0.1  0.95   0.2  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1  0.95   0.2  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1  0.95   0.0  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1  0.95   0.0  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.3  0.95   1.0  indep. |   0.000   0.002   0.998   0.000   0.000   0.000   (sum 1.000000)
+   0.3  0.95   1.0  nested |   0.000   0.002   0.998   0.000   0.000   0.000   (sum 1.000000)
+   0.3  0.95  0.95  indep. |   0.000   0.002   0.871   0.119   0.006   0.001   (sum 1.000000)
+   0.3  0.95  0.95  nested |   0.000   0.002   0.998   0.000   0.000   0.000   (sum 1.000000)
+   0.3  0.95   0.9  indep. |   0.000   0.002   0.629   0.306   0.055   0.007   (sum 1.000000)
+   0.3  0.95   0.9  nested |   0.000   0.002   0.732   0.241   0.016   0.009   (sum 1.000000)
+   0.3  0.95   0.8  indep. |   0.000   0.002   0.228   0.427   0.316   0.027   (sum 1.000000)
+   0.3  0.95   0.8  nested |   0.000   0.002   0.174   0.452   0.352   0.020   (sum 1.000000)
+   0.3  0.95   0.7  indep. |   0.000   0.002   0.056   0.274   0.631   0.037   (sum 1.000000)
+   0.3  0.95   0.7  nested |   0.000   0.002   0.024   0.190   0.773   0.011   (sum 1.000000)
+   0.3  0.95   0.5  indep. |   0.000   0.002   0.001   0.029   0.954   0.014   (sum 1.000000)
+   0.3  0.95   0.5  nested |   0.000   0.002   0.000   0.004   0.993   0.000   (sum 1.000000)
+   0.3  0.95   0.2  indep. |   0.000   0.002   0.000   0.000   0.998   0.000   (sum 1.000000)
+   0.3  0.95   0.2  nested |   0.000   0.002   0.000   0.000   0.998   0.000   (sum 1.000000)
+   0.3  0.95   0.0  indep. |   0.000   0.002   0.000   0.000   0.998   0.000   (sum 1.000000)
+   0.3  0.95   0.0  nested |   0.000   0.002   0.000   0.000   0.998   0.000   (sum 1.000000)
+   0.0   0.9   1.0  indep. |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0   0.9   1.0  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0   0.9  0.95  indep. |   0.000   0.000   0.942   0.055   0.002   0.000   (sum 1.000000)
+   0.0   0.9  0.95  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0   0.9   0.9  indep. |   0.000   0.000   0.792   0.186   0.022   0.000   (sum 1.000000)
+   0.0   0.9   0.9  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.0   0.9   0.8  indep. |   0.000   0.000   0.413   0.426   0.161   0.000   (sum 1.000000)
+   0.0   0.9   0.8  nested |   0.000   0.000   0.392   0.475   0.133   0.000   (sum 1.000000)
+   0.0   0.9   0.7  indep. |   0.000   0.000   0.152   0.439   0.409   0.000   (sum 1.000000)
+   0.0   0.9   0.7  nested |   0.000   0.000   0.069   0.342   0.589   0.000   (sum 1.000000)
+   0.0   0.9   0.5  indep. |   0.000   0.000   0.007   0.133   0.860   0.000   (sum 1.000000)
+   0.0   0.9   0.5  nested |   0.000   0.000   0.001   0.015   0.984   0.000   (sum 1.000000)
+   0.0   0.9   0.2  indep. |   0.000   0.000   0.000   0.001   0.999   0.000   (sum 1.000000)
+   0.0   0.9   0.2  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.0   0.9   0.0  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.0   0.9   0.0  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1   0.9   1.0  indep. |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1   0.9   1.0  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1   0.9  0.95  indep. |   0.000   0.000   0.942   0.055   0.002   0.000   (sum 1.000000)
+   0.1   0.9  0.95  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1   0.9   0.9  indep. |   0.000   0.000   0.792   0.186   0.022   0.000   (sum 1.000000)
+   0.1   0.9   0.9  nested |   0.000   0.000   1.000   0.000   0.000   0.000   (sum 1.000000)
+   0.1   0.9   0.8  indep. |   0.000   0.000   0.413   0.425   0.161   0.000   (sum 1.000000)
+   0.1   0.9   0.8  nested |   0.000   0.000   0.392   0.475   0.133   0.000   (sum 1.000000)
+   0.1   0.9   0.7  indep. |   0.000   0.000   0.152   0.438   0.409   0.001   (sum 1.000000)
+   0.1   0.9   0.7  nested |   0.000   0.000   0.069   0.342   0.589   0.000   (sum 1.000000)
+   0.1   0.9   0.5  indep. |   0.000   0.000   0.007   0.129   0.860   0.004   (sum 1.000000)
+   0.1   0.9   0.5  nested |   0.000   0.000   0.001   0.015   0.984   0.000   (sum 1.000000)
+   0.1   0.9   0.2  indep. |   0.000   0.000   0.000   0.000   0.999   0.000   (sum 1.000000)
+   0.1   0.9   0.2  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1   0.9   0.0  indep. |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.1   0.9   0.0  nested |   0.000   0.000   0.000   0.000   1.000   0.000   (sum 1.000000)
+   0.3   0.9   1.0  indep. |   0.000   0.013   0.987   0.000   0.000   0.000   (sum 1.000000)
+   0.3   0.9   1.0  nested |   0.000   0.013   0.987   0.000   0.000   0.000   (sum 1.000000)
+   0.3   0.9  0.95  indep. |   0.000   0.013   0.929   0.055   0.002   0.001   (sum 1.000000)
+   0.3   0.9  0.95  nested |   0.000   0.013   0.987   0.000   0.000   0.000   (sum 1.000000)
+   0.3   0.9   0.9  indep. |   0.000   0.013   0.777   0.180   0.022   0.008   (sum 1.000000)
+   0.3   0.9   0.9  nested |   0.000   0.013   0.987   0.000   0.000   0.000   (sum 1.000000)
+   0.3   0.9   0.8  indep. |   0.000   0.013   0.399   0.382   0.161   0.045   (sum 1.000000)
+   0.3   0.9   0.8  nested |   0.000   0.013   0.380   0.429   0.132   0.046   (sum 1.000000)
+   0.3   0.9   0.7  indep. |   0.000   0.013   0.142   0.349   0.408   0.087   (sum 1.000000)
+   0.3   0.9   0.7  nested |   0.000   0.013   0.066   0.298   0.583   0.041   (sum 1.000000)
+   0.3   0.9   0.5  indep. |   0.000   0.013   0.006   0.069   0.853   0.059   (sum 1.000000)
+   0.3   0.9   0.5  nested |   0.000   0.013   0.000   0.012   0.972   0.003   (sum 1.000000)
+   0.3   0.9   0.2  indep. |   0.000   0.013   0.000   0.000   0.987   0.000   (sum 1.000000)
+   0.3   0.9   0.2  nested |   0.000   0.013   0.000   0.000   0.987   0.000   (sum 1.000000)
+   0.3   0.9   0.0  indep. |   0.000   0.013   0.000   0.000   0.987   0.000   (sum 1.000000)
+   0.3   0.9   0.0  nested |   0.000   0.013   0.000   0.000   0.987   0.000   (sum 1.000000)
+  validity gate (ORACLE_D 2/2 on 2840-2841): P(valid) = p^2: p 1.0 -> 1.000, 0.95 -> 0.902, 0.9 -> 0.810, 0.8 -> 0.640
+  'task does not need the hinge' needs BASELINE_D >= 16/20: P at pB 0.3 5.55e-06, pB 0.6 0.051, pB 0.8 0.630
+
+§6 HINGES ON A SAMPLE (numpy replica of RandHeaderTask(P=4, nb=2, lmin=1, lmax=3).make_batch and F's _relabel; 4096 sequences; distribution as F's, draws not torch's)
+  lite: largest-ratio cut 6 types {'CTX': 2, 'KEY': 4} (ratio 4.35)
+    key term: per sequence 8.00 positions (CTX 0.00, KEY 8.00, VAL 0.00); of the key term's 8: 8.00 (min 8, max 8); exactly the key term's 8 in 4096 of 4096 sequences
+    frequency hinge: per sequence 14.00 positions (CTX 5.00, KEY 9.00, VAL 0.00); of the key term's 8: 8.00 (min 8, max 8); exactly the key term's 8 in 0 of 4096 sequences
+    repeat hinge: per sequence 16.67 positions (CTX 5.00, KEY 9.00, VAL 2.67); of the key term's 8: 8.00 (min 8, max 8); exactly the key term's 8 in 0 of 4096 sequences
+  pool: largest-ratio cut 2 types {'CTX': 2} (ratio 4.83)
+    key term: per sequence 8.00 positions (CTX 0.00, KEY 8.00, VAL 0.00); of the key term's 8: 8.00 (min 8, max 8); exactly the key term's 8 in 4096 of 4096 sequences
+    frequency hinge: per sequence 5.00 positions (CTX 5.00, KEY 0.00, VAL 0.00); of the key term's 8: 0.00 (min 0, max 0); exactly the key term's 8 in 0 of 4096 sequences
+    repeat hinge: per sequence 16.67 positions (CTX 5.00, KEY 9.00, VAL 2.67); of the key term's 8: 8.00 (min 8, max 8); exactly the key term's 8 in 0 of 4096 sequences
+    repeat mask identical to lite's at every position: True
+  allpool: largest-ratio cut 16 types {'VAL': 16} (ratio 1.45)
+    key term: per sequence 8.00 positions (CTX 0.00, KEY 8.00, VAL 0.00); of the key term's 8: 8.00 (min 8, max 8); exactly the key term's 8 in 4096 of 4096 sequences
+    frequency hinge: per sequence 8.00 positions (CTX 0.00, KEY 0.00, VAL 8.00); of the key term's 8: 0.00 (min 0, max 0); exactly the key term's 8 in 0 of 4096 sequences
+    repeat hinge: per sequence 16.67 positions (CTX 5.00, KEY 9.00, VAL 2.67); of the key term's 8: 8.00 (min 8, max 8); exactly the key term's 8 in 0 of 4096 sequences
+    repeat mask identical to lite's at every position: True
+  eta^2 the hinge computes (explore_b18_gates.eta2_pool over a 32-sequence training batch, grouped by the hinge's ids; mean over 128 batches) for (a) a perfectly routed gate (one-hot of the stream index at every position) and (b) a label-free random gate (iid uniform channel-0 probability); TAU 0.2, so the hinge's value is relu(eta^2 - 0.2):
+    lite: key: perfect gate 0.000 (hinge 0.000), random gate 0.012, groups 4.0 over 256 positions; freq: perfect gate 0.358 (hinge 0.158), random gate 0.010, groups 6.0 over 448 positions; repeat: perfect gate 0.329 (hinge 0.129), random gate 0.038, groups 20.9 over 534 positions
+    pool: key: perfect gate 0.000 (hinge 0.000), random gate 0.120, groups 31.6 over 256 positions; freq: perfect gate 1.000 (hinge 0.800), random gate 0.005, groups 2.0 over 160 positions; repeat: perfect gate 0.334 (hinge 0.134), random gate 0.088, groups 48.5 over 534 positions
+    allpool: key: perfect gate 0.000 (hinge 0.000), random gate 0.117, groups 31.7 over 256 positions; freq: perfect gate 0.063 (hinge 0.000), random gate 0.057, groups 16.0 over 256 positions; repeat: perfect gate 0.112 (hinge 0.000), random gate 0.120, groups 62.4 over 534 positions
+
+§7 THE ALLPOOL OUTCOME (numpy replicas of F's eta2_rows / inv_from_gate and pool_routing_stats' margin; F's pool_outcome exec'd from b0c6332; G's inv_view and hp.routed_bound exec'd from db14e9b9)
+  relative perfect gate: within-sequence eta^2 1.0000, VAL cos 0.0000; pooled eta^2 1.0000; margin 1.0000
+  perfect, channels swapped in a random half of the sequences: within-sequence eta^2 1.0000, VAL cos 0.0000; pooled eta^2 0.0000; margin 1.0000
+  type-ordered (lower CTX type -> channel 0): within-sequence eta^2 1.0000, VAL cos 0.0000; pooled eta^2 0.0007; margin 1.0000
+  balanced type-level map (types 0-7 -> ch 0): within-sequence eta^2 0.5249, VAL cos 0.4751; pooled eta^2 0.0003; margin 0.5249
+  random soft gate: within-sequence eta^2 0.1446, VAL cos 0.9304; pooled eta^2 0.0000; margin -0.0019
+  the same random gate, channels swapped per sequence: within-sequence eta^2 0.1446, VAL cos 0.9304; pooled eta^2 0.0000; margin -0.0019
+  the balanced map separates 0.5249 of these 2048 sequences (F's cap 64/120 = 0.5333)
+  routed_bound(rec), routed_bound(inv_view(rec)) == F's pool_outcome(rec, False / True): 152/160 grid records agree (boundaries 0.9 included); raised: {"TypeError ('>' not supported between instances of 'NoneType' and 'float')": 8}
+  DISCOVERED on an allpool record (bound, pooled val_cos 0.9, val_cos_inv 0.0): hp.discovered-style (bound and r['val_cos'] < 0.5) on inv_view(rec) False; F's pool_outcome(rec, True)['discovered'] True -> inv_view keeps the pooled val_cos
+
+§8 SEEDS 2840-2899 (G's block; S89 uses 2840-2861)
+  origin/claude/bdh-growth-hebbian-inference-w90069 @ ed9ca2b6: 63 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/bdh-repo-curl-obgdqk @ 264e2274: 63 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/explore-F @ 53578896: 255 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/explore-G @ da152fe4: 243 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/explore-H @ cf67855d: 214 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/explore-I @ 8d2e89fa: 54 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/outside-ideas @ 419368a4: 210 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/relaxed-edison-he00cc @ 3c2fb705: 56 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/replicate-R @ 31c39fce: 9 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/rev10-draft @ 33e00363: 63 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/rev9-draft @ 010a085a: 44 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/review-V @ cde483b6: 43 json/jsonl/log files; seeds in 2840-2899: none
+  origin/feature/per-channel-plasticity @ 4af9d503: 0 json/jsonl/log files; seeds in 2840-2899: none
+  history: 4766 distinct json/jsonl/log/txt blobs (2.58 GB) reachable from 13 remote branches; seeds 2840-2899 found in: {'explore_out/G/s89.log': [2840, 2841, 2842], 'explore_out/G/s89_results.json': [2840, 2841, 2842, 2843, 2844, 2845, 2846, 2847, 2848, 2849, 2850, 2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861]}
+
+§9 RECORDS ON THE ROUND-6 TASKS (explore-F) that a CHECK could name
+  explore_out/F/s89_tasks_results.json (first commit 40ea56eb): {'NOMEM_ALLPOOL': 2, 'NOMEM_LITE': 2, 'NOMEM_POOL': 2, 'NOMEM_SELF_ALLPOOL': 2, 'NOMEM_SELF_LITE': 2, 'NOMEM_SELF_POOL': 2, 'O_DELTA_ALLPOOL_48K': 2, 'O_DELTA_ALLPOOL': 2, 'O_DELTA_POOL_48K': 2, 'O_DELTA_POOL': 2, 'O_HEBB_ALLPOOL_48K': 2, 'O_HEBB_ALLPOOL': 2, 'O_HEBB_POOL_48K': 2, 'O_HEBB_POOL': 2}
+    O_DELTA_ALLPOOL_48K|2800: transition 3600, acc 0.994
+    O_DELTA_ALLPOOL_48K|2801: transition 3600, acc 0.993
+    O_DELTA_ALLPOOL|2800: transition 3600, acc 0.994
+    O_DELTA_ALLPOOL|2801: transition 3600, acc 0.993
+    O_DELTA_POOL_48K|2800: transition 3600, acc 0.987
+    O_DELTA_POOL_48K|2801: transition 2400, acc 0.988
+    O_DELTA_POOL|2800: transition 3600, acc 0.987
+    O_DELTA_POOL|2801: transition 2400, acc 0.988
+  explore_out/F/s89_diag_results.json (first commit ebe5bcb0): {'D_HEBB_ALLPOOL_ADAM': 2, 'D_HEBB_LITE_SLOW': 2, 'D_HEBB_POOL_ADAM': 2}
+  explore_out/F/s89_post_results.json (first commit 530240cf): {'O_HEBB_CONV_ALLPOOL': 2, 'O_HEBB_CONV_POOL': 2, 'O_TYPE_HEBB_ALLPOOL': 2}
+  F's delta perfect gate converts with explore_f_delta_fast.to_delta_fast (F child:[144]); G's ORACLE_D with explore_delta_mem.to_delta (G child:[271]); F's fast form is CHECKed equal to the parallel form to 1e-5 relative in float32, not bit for bit (explore_f_delta_fast docstring)
