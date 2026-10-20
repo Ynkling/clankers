@@ -71,6 +71,20 @@ log = show(LOG, "explore_out/H/s89_oracle.log")
 say(f"  s89_oracle.log at {LOG}: {len(log.splitlines())} lines; lines with 'CHECK': "
     f"{sum('CHECK' in ln for ln in log.splitlines())}; with 'ORACLE': {sum('ORACLE' in ln for ln in log.splitlines())}; "
     f"last line: {log.splitlines()[-1].strip()[:110]}")
+HT = git("rev-parse", "--short", "origin/claude/explore-H").decode().strip()
+if HT != LOG[:len(HT)]:
+    lh = show(HT, "explore_out/H/s89_oracle.log").splitlines()
+    say(f"  s89_oracle.log at the head {HT}: {len(lh)} lines; CHECK lines {sum('CHECK H/s89' in ln for ln in lh)} "
+        f"(ok {sum('CHECK H/s89' in ln and ln.rstrip().endswith(': ok') for ln in lh)}); "
+        f"'all CHECKs of H/s89 passed' {any('all CHECKs of H/s89 passed' in ln for ln in lh)}; run lines:")
+    for ln in lh:
+        if ln.strip().startswith(("start", "done", "saved")) or "runs queued" in ln or "printed" in ln:
+            say("    " + ln.strip()[:240])
+    try:
+        st = json.loads(show(HT, "explore_out/H/s89_results.json"))
+        say(f"  explore_out/H/s89_results.json at {HT}: stored runs {sorted(st['runs'])}")
+    except subprocess.CalledProcessError:
+        pass
 s89files = []
 for b in heads:
     for p in git("ls-tree", "-r", "--name-only", b).decode().split():
@@ -539,7 +553,8 @@ say(f"  F's explore_f_tasks.py at {F6} ({git('log', '-1', '--format=%cI', F6).de
 say(f"  'grouped' in a pool class of F's module: "
     f"{[c for c in cls if 'Pool' in c]} subclass RandHeaderTask (S70's lite layout, S = 2); "
     f"H's tree has explore_f_tasks.py: {'explore_f_tasks.py' in git('ls-tree', '--name-only', H).decode().split()}")
-say(f"  explore_h_s89.py cites F at: {re.findall(r'F.s module has no grouped-layout pool variant at (\\w+)', SRC89)}")
+FCITE = re.findall(r"F.s\s+module\s+has\s+no\s+grouped-layout\s+pool\s+variant\s+at\s+(\w+)", SRC89)
+say(f"  explore_h_s89.py cites F at: {FCITE}")
 st86 = json.loads(show(H, "explore_out/H/allmass_results.json"))["runs"]
 
 

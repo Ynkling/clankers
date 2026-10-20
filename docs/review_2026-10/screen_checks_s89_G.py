@@ -351,7 +351,7 @@ say(f"  S87's record (lite; BASELINE 0/20, KH 20/20, FREQ 17/20 nested): KH vs B
 say(f"  smallest wins: discovered (p < 0.05) needs b - c >= 5 at c = 0 ({p_mc(5, 0):.4f}), (7, 1) {p_mc(7, 1):.4f}, "
     f"(8, 2) {p_mc(8, 2):.4f}; 'beats by >= 4 vs 0' (p <= {P4}): (4, 0) {p_mc(4, 0):.4f}, (5, 1) {p_mc(5, 1):.4f}, "
     f"(6, 1) {p_mc(6, 1):.4f}, (7, 2) {p_mc(7, 2):.4f}")
-for nb in (0, 3, 6, 10, 15):
+for nb in (0, 3, 6, 10, 15, 16):
     say(f"  BASELINE at {nb}/20 (independent of KH; KH 20/20): KH's best case vs BASE {20 - nb}/0 p {p_mc(20 - nb, 0):.3g} "
         f"-> 'the labelled hinge itself fails here' {'certain' if p_mc(20 - nb, 0) >= 0.05 else 'avoidable'}")
 
@@ -451,8 +451,10 @@ for l in objs:
     parts = l.split(" ", 1)
     if len(parts) == 2 and parts[1].endswith((".json", ".jsonl", ".log", ".txt")):
         paths[parts[0]].add(parts[1])
-proc = subprocess.Popen(["git", "cat-file", "--batch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-proc.stdin.write("".join(f"{h}\n" for h in paths).encode()); proc.stdin.close()
+import tempfile
+_tf = tempfile.TemporaryFile()
+_tf.write("".join(f"{h}\n" for h in paths).encode()); _tf.seek(0)
+proc = subprocess.Popen(["git", "cat-file", "--batch"], stdin=_tf, stdout=subprocess.PIPE)
 hist, nbytes = defaultdict(set), 0
 pat_log = re.compile(rb"seed[ =:]+(28[4-9]\d)\b")
 for _ in paths:

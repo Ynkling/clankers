@@ -1,48 +1,70 @@
 == 0. State
-  origin/claude/bdh-growth-hebbian-inference-w90069 at 7c4ceb8 2026-10-19T17:28:15+00:00
-  origin/claude/bdh-repo-curl-obgdqk at 5b82707 2026-10-19T10:15:45-06:00
-  origin/claude/explore-F at 0378b3a 2026-10-19T18:05:38+00:00
+  origin/claude/bdh-growth-hebbian-inference-w90069 at ed9ca2b 2026-10-19T18:33:46+00:00
+  origin/claude/bdh-repo-curl-obgdqk at 264e227 2026-10-19T12:33:50-06:00
+  origin/claude/explore-F at 979e10d 2026-10-19T18:36:52+00:00
   origin/claude/explore-G at 7ab98c1 2026-10-19T17:54:12+00:00
-  origin/claude/explore-H at 0dd88bf 2026-10-19T18:16:29+00:00
+  origin/claude/explore-H at 42d86ae 2026-10-19T18:32:42+00:00
   origin/claude/explore-I at 8d2e89f 2026-10-14T04:52:59+00:00
   origin/claude/outside-ideas at 419368a 2026-10-15T03:40:12+00:00
   origin/claude/relaxed-edison-he00cc at 3c2fb70 2026-10-06T05:21:37+00:00
   origin/claude/replicate-R at 31c39fc 2026-10-13T18:41:38+00:00
-  origin/claude/rev10-draft at f342d1d 2026-10-19T16:15:23+00:00
+  origin/claude/rev10-draft at 846d0c8 2026-10-19T18:33:26+00:00
   origin/claude/rev9-draft at 010a085 2026-10-13T01:22:12+00:00
-  origin/claude/review-V at 480a2de 2026-10-19T18:07:54+00:00
+  origin/claude/review-V at 9fda38e 2026-10-19T18:26:44+00:00
   origin/feature/per-channel-plasticity at 4af9d50 2026-06-30T08:59:20-06:00
-  explore-H head: 0dd88bf explore_out/H: S89 CHECKs passed; the perfect gate running (EXPLORATORY, not a result)
+  explore-H head: 42d86ae explore_out/H: H/s89 ORACLE|2901 saved (EXPLORATORY, not a result)
   s89_oracle.log at 7820b12: 9 lines; lines with 'CHECK': 0; with 'ORACLE': 0; last line: X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
-  files named *s89* on the heads: [('explore-F', 'explore_f_s89_tasks.py'), ('explore-F', 'explore_f_s89_tasks_child.py'), ('explore-F', 'explore_out/F/checks_s89_20261019_180221.json'), ('explore-F', 'explore_out/F/run_s89.sh'), ('explore-F', 'explore_out/F/s89.log'), ('explore-F', 'explore_out/F/s89_runtime.json'), ('explore-G', 'explore_g_s89.py'), ('explore-G', 'explore_g_s89_child.py'), ('explore-H', 'explore_h_s89.py'), ('explore-H', 'explore_h_s89_child.py'), ('explore-H', 'explore_out/H/s89_oracle.log'), ('explore-H', 'explore_out/H/s89_results.json')]
+  s89_oracle.log at the head 42d86ae: 31 lines; CHECK lines 14 (ok 14); 'all CHECKs of H/s89 passed' True; run lines:
+    (printed) REPEATMASS's probe (64 sequences): 6005 of 6272 input positions repeat; key positions in it 2048 of 2048; not key positions 3957 (CTX 2048, VAL 1781 of 2048, query CTX 64, query KEY 64)
+    (printed, not asserted: CPU Intel(R) Xeon(R) Processor @ 2.80GHz vs this Intel(R) Xeon(R) Processor @ 2.10GHz) pool 4 with the main line's split op reproduces X's WIN3_SPLIT_D8|540 through 4800: curve True ([[1200, 0.0625], [2400, 0.0664062
+    2 runs queued on 4 workers (1 torch thread each)
+    start    0.0 min  H/s89            ORACLE                   seed 2900  (projected worst case 720 min)
+    start    0.0 min  H/s89            ORACLE                   seed 2901  (projected worst case 720 min)
+  explore_out/H/s89_results.json at 42d86ae: stored runs ['ORACLE|2901|6e0a80a55be3|Intel(R) Xeon(R) Processor @ 2.10GHz']
+  files named *s89* on the heads: [('bdh-growth-hebbian-inference-w90069', 'docs/review_2026-10/screen_checks_s89_F.py'), ('bdh-growth-hebbian-inference-w90069', 'docs/review_2026-10/screen_checks_s89_F_out.txt'), ('bdh-growth-hebbian-inference-w90069', 'docs/review_2026-10/screen_checks_s89_G.py'), ('bdh-growth-hebbian-inference-w90069', 'docs/review_2026-10/screen_checks_s89_H.py'), ('bdh-growth-hebbian-inference-w90069', 'docs/review_2026-10/screen_checks_s89_H_out.txt'), ('bdh-growth-hebbian-inference-w90069', 'docs/review_2026-10/screen_review_s89_F.md'), ('bdh-repo-curl-obgdqk', 'docs/review_2026-10/screen_checks_s89_F.py'), ('bdh-repo-curl-obgdqk', 'docs/review_2026-10/screen_checks_s89_F_out.txt'), ('bdh-repo-curl-obgdqk', 'docs/review_2026-10/screen_checks_s89_G.py'), ('bdh-repo-curl-obgdqk', 'docs/review_2026-10/screen_checks_s89_H.py'), ('bdh-repo-curl-obgdqk', 'docs/review_2026-10/screen_checks_s89_H_out.txt'), ('bdh-repo-curl-obgdqk', 'docs/review_2026-10/screen_review_s89_F.md'), ('explore-F', 'explore_f_s89_tasks.py'), ('explore-F', 'explore_f_s89_tasks_child.py'), ('explore-F', 'explore_out/F/checks_s89_20261019_180221.json'), ('explore-F', 'explore_out/F/checks_s89_20261019_183002.json'), ('explore-F', 'explore_out/F/run_s89.sh'), ('explore-F', 'explore_out/F/s89.log'), ('explore-F', 'explore_out/F/s89_decision.json'), ('explore-F', 'explore_out/F/s89_runtime.json'), ('explore-F', 'explore_out/F/s89_tasks_results.json'), ('explore-F', 'explore_out/F/s89_tasks_tables.md'), ('explore-G', 'explore_g_s89.py'), ('explore-G', 'explore_g_s89_child.py'), ('explore-H', 'explore_h_s89.py'), ('explore-H', 'explore_h_s89_child.py'), ('explore-H', 'explore_out/H/s89_oracle.log'), ('explore-H', 'explore_out/H/s89_results.json'), ('rev10-draft', 'docs/review_2026-10/screen_checks_s89_F.py'), ('rev10-draft', 'docs/review_2026-10/screen_checks_s89_F_out.txt'), ('rev10-draft', 'docs/review_2026-10/screen_checks_s89_G.py'), ('rev10-draft', 'docs/review_2026-10/screen_checks_s89_H.py'), ('rev10-draft', 'docs/review_2026-10/screen_checks_s89_H_out.txt'), ('rev10-draft', 'docs/review_2026-10/screen_review_s89_F.md'), ('review-V', 'docs/review_2026-10/screen_checks_s89_F.py'), ('review-V', 'docs/review_2026-10/screen_checks_s89_F_out.txt'), ('review-V', 'docs/review_2026-10/screen_checks_s89_G.py'), ('review-V', 'docs/review_2026-10/screen_checks_s89_H.py'), ('review-V', 'docs/review_2026-10/screen_checks_s89_H_out.txt'), ('review-V', 'docs/review_2026-10/screen_review_s89_F.md')]
   S89 store (explore_out/H/s89_results.json) on explore-H: present; checks.json has H/s89: False
 
 == 1. Seeds 2900-2959
-  heads: 336 distinct JSON/JSONL blobs (1058 branch-paths); 31832 seed values read; unparsed: none
-  heads: records using a seed in 2900-2959: 2
-    [('explore-H', 'explore_out/H/s89_results.json')]: [('seeds list', 'ORACLE', 2900), ('seeds list', 'ORACLE', 2901)]
+  heads: 339 distinct JSON/JSONL blobs (1061 branch-paths); 31860 seed values read; unparsed: none
+  heads: records using a seed in 2900-2959: 4
+    [('explore-H', 'explore_out/H/s89_results.json')]: [('key', 'ORACLE', 2901), ('seed field', 'ORACLE|2901|6e0a80a55be3|Intel(R) Xeon(R) Processor @ 2.10GHz', 2901), ('seeds list', 'ORACLE', 2900), ('seeds list', 'ORACLE', 2901)]
   heads: integer dict keys in 2900-2959 (parents; update steps, not seeds): none
-  history (every ref, every commit): 2284 distinct JSON/JSONL blobs; 319768 seed values read; unparsed: 0
-  history: blobs with a record using a seed in 2900-2959: 1
+  history (every ref, every commit): 2291 distinct JSON/JSONL blobs; 319838 seed values read; unparsed: 0
+  history: blobs with a record using a seed in 2900-2959: 2
+    explore_out/H/s89_results.json: [('key', 'ORACLE', 2901), ('seed field', 'ORACLE|2901|6e0a80a55be3|Intel(R) Xeon(R) Processor @ 2.10GHz', 2901), ('seeds list', 'ORACLE', 2900), ('seeds list', 'ORACLE', 2901)]
     explore_out/H/s89_results.json: [('seeds list', 'ORACLE', 2900), ('seeds list', 'ORACLE', 2901)]
   text mentions of a number 2900-2959 on the heads (*.py *.md *.tex *.txt *.log; branch, path, lines):
     bdh-growth-hebbian-inference-w90069 docs/reading/parallel_sessions_prompts.md [1108, 1198, 1210]
     bdh-growth-hebbian-inference-w90069 docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+    bdh-growth-hebbian-inference-w90069 docs/review_2026-10/screen_checks_s89_F_out.txt [103]
+    bdh-growth-hebbian-inference-w90069 docs/review_2026-10/screen_checks_s89_H.py [9, 61, 85, 164, 166, 177, 189, 311] ...
+    bdh-growth-hebbian-inference-w90069 docs/review_2026-10/screen_checks_s89_H_out.txt [20, 22, 23, 24, 26, 27, 28]
     bdh-growth-hebbian-inference-w90069 results/L/delta_recipe_L.log [2556]
+    bdh-repo-curl-obgdqk docs/reading/parallel_sessions_prompts.md [1108, 1198, 1210]
     bdh-repo-curl-obgdqk docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+    bdh-repo-curl-obgdqk docs/review_2026-10/screen_checks_s89_F_out.txt [103]
+    bdh-repo-curl-obgdqk docs/review_2026-10/screen_checks_s89_H.py [9, 61, 85, 164, 166, 177, 189, 311] ...
+    bdh-repo-curl-obgdqk docs/review_2026-10/screen_checks_s89_H_out.txt [20, 22, 23, 24, 26, 27, 28]
     bdh-repo-curl-obgdqk results/L/delta_recipe_L.log [2556]
     explore-F explore_out/batch2.log [220, 364, 468]
     explore-G explore_out/batch2.log [220, 364, 468]
     explore-H explore_h_s89.py [5, 6, 30, 32, 37, 65, 93, 96] ...
     explore-H explore_h_s89_child.py [261, 319]
-    explore-H explore_out/H/s89_oracle.log [12, 23, 24, 25, 28, 29]
+    explore-H explore_out/H/s89_oracle.log [12, 23, 24, 25, 28, 29, 30]
     explore-H explore_out/batch2.log [220, 364, 468]
     outside-ideas explore_out/batch2.log [220, 364, 468]
     replicate-R records/phase4.log [19]
     replicate-R records/phase5.log [40, 51]
+    rev10-draft docs/reading/parallel_sessions_prompts.md [1108, 1198, 1210]
     rev10-draft docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+    rev10-draft docs/review_2026-10/screen_checks_s89_F_out.txt [103]
+    rev10-draft docs/review_2026-10/screen_checks_s89_H.py [9, 61, 85, 164, 166, 177, 189, 311] ...
+    rev10-draft docs/review_2026-10/screen_checks_s89_H_out.txt [20, 22, 23, 24, 26, 27, 28]
     rev10-draft results/L/delta_recipe_L.log [2556]
     review-V docs/review_2026-10/rev9/check_delta_recipe_X_v6.md [254]
+    review-V docs/review_2026-10/screen_checks_s89_F_out.txt [103]
+    review-V docs/review_2026-10/screen_checks_s89_H.py [9, 61, 85, 164, 166, 177, 189, 311] ...
+    review-V docs/review_2026-10/screen_checks_s89_H_out.txt [20, 22, 23, 24, 26, 27, 28]
 
 == 2. The readings: explore_h_s89.report() at d4a9a7d on every distinct outcome statistic (10 seeds, 4 arms)
   3268760 compositions of 10 seeds into 16 patterns; 1261260 distinct sufficient statistics (BASE count; b, c of NOSPLIT/BASE, ALLMASS/BASE, ALLMASS/NOSPLIT, REPEATMASS/BASE, REPEATMASS/NOSPLIT)
@@ -180,7 +202,7 @@
 == 7. Other
   F's explore_f_tasks.py at 50dc8e4 (2026-10-19T17:54:31+00:00): classes ['RandHeaderTask', 'RandHeaderTaskPool', 'RandHeaderTaskAllPool']; H's commit d4a9a7d at 2026-10-19T17:54:28+00:00
   'grouped' in a pool class of F's module: ['RandHeaderTaskPool', 'RandHeaderTaskAllPool'] subclass RandHeaderTask (S70's lite layout, S = 2); H's tree has explore_f_tasks.py: False
-  explore_h_s89.py cites F at: []
+  explore_h_s89.py cites F at: ['a199d5e']
   S86 + S87a BASE vs ALLMASS on the same seeds (BASE, ALLMASS bound routed): {(True, True): 23, (False, False): 3, (True, False): 3, (False, True): 1}
   S86 + S87a firings and firings on a one-to-one map: {('BASE', 'fired'): 61, ('BASE', 'one-to-one before'): 1, ('ALLMASS', 'fired'): 63, ('ALLMASS', 'one-to-one before'): 0}
   S86 + S87a run time, ALLMASS: median 35 min (range 18-85), 30 runs
