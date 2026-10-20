@@ -640,3 +640,7 @@ targets (27-28 of 30). That is S79's cap-of-one failure at a cap of three. On th
 selects 96% of positions (stream tokens and most values repeat too), and REPEATMASS chose the all-position pair at 28 of
 30 firings; 8 of its 10 runs are bit-identical to ALLMASS's. The screen does not answer its question; the budget, the
 cap and S84's guard are the untested candidates. Report: explore_out/H/report_10.md (per run: s89_runs.md).
+Referee V's screen review (screen_review_s89_H.md, "fix first", text and report path only) was read after the runs; its
+fixes are applied to explore_h_s89.py's docstring and report path. The screen is restated as rare key types on a layout
+whose key positions are still fixed at 3j+1, with that caveat printed with every reading; REPEATMASS is printed beside
+ALLMASS, not as a second finding; the rule's operating characteristics are printed. No run or reading changed.

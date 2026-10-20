@@ -19,12 +19,37 @@ are printed only: ALLMASS and REPEATMASS 3/10, NOSPLIT 0/10; ALLMASS vs NOSPLIT 
   the same CPU model with the same code SHA. No saved run changed.
 - No run failed.
 
+**Referee V's review.** V reviewed the screen at d4a9a7d (claude/review-V 3c772c3 / dcd549d,
+docs/review_2026-10/screen_review_s89_H.md: "fix first", text and the report path only) before the learned arms ran. I
+read it after they had finished. Fixes 1-6, and the text of 7 and 8, are now in explore_h_s89.py's docstring and
+report():
+- (1) the screen restated as rare key types on a layout with fixed key positions, with the caveat printed with every
+  reading;
+- (2) REPEATMASS printed beside ALLMASS, not as a second finding;
+- (3) a moot reading carries no name;
+- (4) the rule's operating characteristics;
+- (5) one-to-one-before and op_ok with each trigger arm;
+- (6) the main-line record read at 628eb7c.
+
+That file is not in the child's code SHA, so no run, CHECK or record changed. The reading is the same under the fixed
+text, and fix 3's case does not arise.
+
 **What happened (descriptive).**
-- **The pool task is slower for every arm, the perfect gate included.** The perfect gate bound at 10800 and 16800,
-  against 2400 and 8400 on the main line's task (S87a's oracle seeds 2600-2601; medians 13800 against 5400).
-  - The four runs that bound routed (BASE 2910; ALLMASS and REPEATMASS 2904, 2908, 2909) bound at 36000-40800.
-  - On the main line's task the same recipe bound at 9600-30000, median 18000 (S87a BASE).
-  - Three of the four bound within 2400-6000 updates of the 43200 budget.
+- **The nine BASE failures are slow climbs cut off by the budget, not stalls.**
+  - The perfect gate on the pool task climbs from the start: 0.21-0.41 at 1200, 0.71-0.77 at 4800, 0.90-0.91 by
+    8400-9600. Its formal binds at 10800 and 16800 come after a stretch at 0.90-0.96.
+  - The learned BASE runs stay near chance far longer: held-out accuracy first reaches 0.3 at 12000-22800 and 0.5 at
+    14400-26400.
+  - The nine failures end at 0.60-0.85 with 2-6 streams below 0.9, two streams sharing a channel in seven and three
+    in two.
+  - In seven of the nine the last evaluation (43200) is the curve's maximum: they were still rising when the budget
+    ended.
+  - The one BASE bind (2910) reached 0.8 at 21600 and bound at 36000.
+- **ALLMASS on the same seeds (all 10 runs saved).**
+  - 3/10 bound routed (2904, 2908, 2909, at 37200-40800). BASE bound none of these three.
+  - ALLMASS failed on BASE's bind 2910: held-out accuracy 0.45 at the end, every stream below 0.9.
+  - Its seven failures end at 0.45-0.84, the same shape as BASE's.
+  - Both arms first fire at 4800 on every seed.
 - **The trigger spent its cap before the merges formed.**
   - Every triggered run fired at 4800, in the flat start; 17 of each arm's 30 firings came at probe accuracy < 0.2.
   - Every run had used all 3 splits by 14400-36000.
@@ -51,16 +76,13 @@ are printed only: ALLMASS and REPEATMASS 3/10, NOSPLIT 0/10; ALLMASS vs NOSPLIT 
   - Key types fell to frequency 0.010 each, below the values (0.020) and stream tokens (0.042); at pool size 4 they are
     0.084.
   - Within a sequence nothing changed: each key still fills one group of 8 adjacent triples at the positions 3j+1.
-  - So the slowdown comes from the key identities varying across sequences (32 keys to bind across sequences instead of
-    4), not from the layout.
+  - On our reading, the slowdown comes from the key identities varying across sequences (32 key types to learn instead
+    of 4), not from the layout.
 
 **Reading for the round (exploratory).** On this task the screen cannot say whether the all-position trigger survives:
 the labelled recipe it is measured against does not bind at the main line's budget and cap. The perfect gate's later
 binding (about 2.5x by the medians) and the late transitions point to the budget and the cap, not the trigger's target, as what fails first.
-Neither was varied here. Options, none screened:
-- a longer budget for every arm;
-- S84's guard (no split while the probe reads < 0.5, which keeps the cap for the merges);
-- a larger cap (S79's cap of six bound 9/10 on the main line's task).
-
-The two-stream spec draft's revision was to wait until this screen is read; it has been read, and the revision is not
-started (it is the next item if wanted).
+Neither was varied here. S89c, next, varies two of them on the Hebbian recipe: the first eligible check at 12000 instead
+of 4800 (BASE_LATE) and a cap of 6 instead of 3 (BASE_CAP6), against a BASE rerun on seeds 2924-2933. S89b (delta
+memory, seeds 2912-2923) follows. The two-stream spec draft's revision waits until this screen is read, which is now
+done, but it is not started: the user's order puts S89c and S89b first.

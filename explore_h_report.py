@@ -480,9 +480,15 @@ def s89_section(L):
         x, y = k.split(" vs ")
         L.append(f"- {k}: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {x} only {c['b']}, {y} only {c['c']}; p({x}>{y}) {c['p']:.3g}, "
                  f"p({y}>{x}) {c['p_rev']:.3g}")
-    L.append("\n**Readings (fixed in explore_h_s89's docstring before any run):**\n")
+    L.append("\n**Readings (fixed in explore_h_s89's docstring before any run; printed with Referee V's fixes, applied after the "
+             "runs to the text and report path only):**\n")
     for k, v in res["readings"].items():
         L.append(f"- {k}: **{v}**")
+    L.append(f"\n*Caveat, with every reading:* {res['caveat']}\n")
+    L.append("Per trigger arm (V's fix 5): " + "; ".join(res["trigger_lines"].values()) + ".")
+    if res.get("repeat_note"):
+        L.append(f"\n{res['repeat_note']}: not a second finding (V's fix 2); its runs are ALLMASS's bit for bit on 8 of 10 seeds.")
+    L.append(f"\n*The rule's {res['oc']}*")
     ov = res["overlap"]
     if ov:
         L.append(f"\nREPEATMASS's repeat set on its 64-sequence probe: {ov['repeat']} of {ov['positions']} input positions; key "
