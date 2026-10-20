@@ -1,16 +1,32 @@
 #!/usr/bin/env python3
-"""check_rev10_HE.py -- Referee V on Revision 10 (585b666:multichannel_hebbian_report_v10.tex, cited tex10:NNN):
-Session H's round 5 (S87a, S87c, the one-to-one recount; claude/explore-H at 347bd25) and Session E's batches 20 and 21
-(claude/outside-ideas at 419368a), recomputed from the records, with the order of readings and records.
+"""check_rev10_HE_v101.py -- Referee V's check_rev10_HE re-run against Revision 10.1 (846d0c8:multichannel_hebbian_report_v10.tex,
+596 lines, cited tex101:NNN). The original, check_rev10_HE.py, read Revision 10 (585b666, 591 lines, tex10:NNN). Scope as
+the original: Session H's round 5 (S87a, S87c, the one-to-one recount; claude/explore-H at 347bd25) and Session E's
+batches 20 and 21 (claude/outside-ideas at 419368a), recomputed from the records, with the order of readings and records;
+plus every line on them that 846d0c8 changed or added (rows marked new).
 
-    python3 docs/review_2026-10/rev10/check_rev10_HE.py
+    python3 docs/review_2026-10/rev10/check_rev10_HE_v101.py
+
+What changed against the original:
+  * The tex is read at 846d0c8. Every row is anchored on its tex10 line at 585b666 (as the original asserted) and on the
+    line it became at 846d0c8 (difflib's line map; asserted). A fragment 846d0c8 rewrote is re-anchored on its new
+    wording (new_frag) and judged against it; a sentence it deleted is reported REMOVED, with a new row for its
+    replacement.
+  * Branches are pinned to what the original read (its run, 19 Oct before 18:01:47 UTC, from the reflog of this clone's
+    remote-tracking refs): explore-H 347bd25, outside-ideas 419368a, the main line 7c4ceb8 (the prompts file), and the 13
+    remote branches the seed grep covers (BRANCH_PINS).
+  * Every record recomputation is kept as it was. Each row carries the original's status (check_rev10_HE.md at 86c6aa8,
+    rows H1-H16 and E1-E22; given per row as old=, the counts asserted) and the status against 846d0c8.
 
 Stdlib plus docs/review_2026-10/rlib.py. Reads git objects only (git show / git log / git grep); trains nothing, runs no
 session code, writes nothing (prints). Every draft number is located in the draft by building its text from the
 recomputed value; no draft number is an input. Rows end in a table: MATCH / PARTIAL / DISAGREE / NOT RECORD-CHECKABLE.
 """
+import datetime
+import difflib
 import hashlib
 import json
+import re
 import math
 import os
 import subprocess
@@ -28,14 +44,22 @@ E = "419368a"            # claude/outside-ideas, batch 21 complete
 E20_READ, E20_RUN = "4acf915", "0fa79a3"
 E21_READ = "b93b73c"
 E19 = "e3f5809"          # S67's store (batch 19)
-MAINL = "origin/claude/bdh-growth-hebbian-inference-w90069"
+MAINL = "7c4ceb8"          # origin/claude/bdh-growth-hebbian-inference-w90069 as the original read it
 REV10 = "585b666"
+V101 = "846d0c8"
+# the 13 remote branches at the original's run (reflog, 19 Oct 18:01:40 UTC)
+BRANCH_PINS = {"origin/claude/bdh-growth-hebbian-inference-w90069": "7c4ceb8", "origin/claude/bdh-repo-curl-obgdqk": "5b82707",
+               "origin/claude/explore-F": "a199d5e", "origin/claude/explore-G": "e46799a", "origin/claude/explore-H": "347bd25",
+               "origin/claude/explore-I": "8d2e89f", "origin/claude/outside-ideas": "419368a", "origin/claude/relaxed-edison-he00cc": "3c2fb70",
+               "origin/claude/replicate-R": "31c39fc", "origin/claude/rev10-draft": "f342d1d", "origin/claude/rev9-draft": "010a085",
+               "origin/claude/review-V": "6ab7649", "origin/feature/per-channel-plasticity": "4af9d50"}
 TEXP = "multichannel_hebbian_report_v10.tex"
 ROWS = []
 
 
 def git(*a):
-    return subprocess.check_output(("git", "-C", rlib.ROOT) + a).decode()
+    # core.abbrev=7: %h and --short print 7 hex digits however large the object store grows
+    return subprocess.check_output(("git", "-C", rlib.ROOT, "-c", "core.abbrev=7") + a).decode()
 
 
 def show(ref, path):
@@ -69,17 +93,28 @@ def say(s=""):
     print(s)
 
 
-TEX = show(REV10, TEXP).split("\n")
+OLD = show(REV10, TEXP).split("\n")
+TEX = show(V101, TEXP).split("\n")
+_ops = difflib.SequenceMatcher(None, OLD, TEX, autojunk=False).get_opcodes()
+LMAP = {i1 + k + 1: j1 + k + 1 for op, i1, i2, j1, j2 in _ops if op in ("equal", "replace") and i2 - i1 == j2 - j1 for k in range(i2 - i1)}
+LMAP.update({44: 44, 536: 541, 537: 542, 538: 543})     # the two unequal blocks: 44 -> 44-46, 536-538 -> 540-543
+CHANGED = {i + 1 for op, i1, i2, _, _ in _ops if op != "equal" for i in range(i1, i2)}
 
 
 def tl(n):
-    return TEX[n - 1]
+    return OLD[n - 1]
 
 
 def find(n, frag):
-    """Assert the fragment occurs on tex10 line n (the draft's wording); returns it."""
+    """Assert the fragment occurs on tex10 line n (the draft's wording at 585b666); returns it."""
     if frag not in tl(n):
         raise SystemExit(f"anchor not found on tex10:{n}: {frag!r}")
+    return frag
+
+
+def find101(n, frag):
+    if frag not in TEX[n - 1]:
+        raise SystemExit(f"anchor not found on tex101:{n}: {frag!r}")
     return frag
 
 
@@ -87,10 +122,45 @@ def num(n):
     return f"{n:,}".replace(",", "{,}")
 
 
-def row(line, item, frag, rec, status, note=""):
+# the original's statuses, row by row in its order (check_rev10_HE.md: H8 H9 H10 H4 H11 H12 H13 H7 H14 H5 H1 H2 H3 H15 H6 H16,
+# E8 E5 E9 E10 E11 E12 E13 E14 E15 E16 E2 E17 E1 E18 E19 E3 E20 E21 E7 E22 E6 E6 E4)
+_M, _P, _D, _N = "MATCH", "PARTIAL", "DISAGREE", "NOT RECORD-CHECKABLE"
+OLDSEQ = [_M, _M, _M, _P, _M, _M, _M, _N, _M, _P, _D, _D, _D, _M, _P, _M,
+          _M, _P, _M, _M, _M, _M, _M, _M, _M, _M, _P, _M, _P, _M, _M, _P, _M, _M, _N, _M, _P, _P, _P]
+assert (len(OLDSEQ), OLDSEQ.count(_M), OLDSEQ.count(_P), OLDSEQ.count(_D), OLDSEQ.count(_N)) == (39, 24, 10, 3, 2)
+N_ORIG = [0]
+
+
+def row(line, item, frag, rec, status, note="", new_frag=None, new_line=None, removed=None, is_new=False):
+    """line/frag: the original's tex10 anchor (asserted at 585b666). new_frag: its 846d0c8 wording, asserted on new_line (default:
+    the line tex10:line became). removed: (tex101 line, fragment) of the replacement when 846d0c8 deleted the sentence.
+    is_new: a row new here; then line/frag are tex101's."""
+    assert status in ("MATCH", "PARTIAL", "DISAGREE", "NOT RECORD-CHECKABLE", "REMOVED")
+    old = None
+    if not is_new:
+        old = OLDSEQ[N_ORIG[0]]
+        N_ORIG[0] += 1
+    if old is None:                                   # new row: anchored on 846d0c8 only
+        find101(line, frag)
+        ROWS.append((f"tex101:{line}", item, frag, rec, status, note, "\u2014", f"new: {status}"))
+        return
     if frag is not None:
         find(line, frag)
-    ROWS.append((line, item, frag, rec, status, note))
+    if removed is not None:
+        assert all(frag not in t for t in TEX), frag
+        find101(*removed)
+        ROWS.append((f"tex10:{line} REMOVED (replaced at tex101:{removed[0]})", item, frag, rec, status, note, old, f"{old} \u2192 REMOVED"))
+        return
+    n = new_line or LMAP[line]
+    f = frag if new_frag is None else new_frag
+    if f is not None:
+        find101(n, f)
+    delta = f"{old} (unchanged)" if old == status else f"{old} \u2192 {status}"
+    if new_frag is not None:
+        delta += f"; re-anchored (tex10:{line} rewritten)"
+    elif line in CHANGED:
+        delta += f"; line changed elsewhere (tex10:{line}), fragment intact"
+    ROWS.append((f"tex101:{n}", item, f, rec, status, note, old, delta))
 
 
 def mc1(b, c):
@@ -101,8 +171,8 @@ def mc1(b, c):
 say("=" * 110)
 say("SESSION H, ROUND 5 (claude/explore-H at 347bd25)")
 say("=" * 110)
-hh = git("rev-parse", "--short", "origin/claude/explore-H").strip()
-say(f"branch head now: {hh} (== {H}: {hh == H})")
+hh = BRANCH_PINS["origin/claude/explore-H"]
+say(f"branch head as the original read it (pinned): {hh} (== {H}: {hh == H})")
 
 # ── H0. order ──
 say("\n== H0. Readings before records")
@@ -182,7 +252,7 @@ say(f"  ORDER VERDICT (readings committed before any record; no run module chang
 # seeds
 say("\n== H0b. Seeds 2600-2659")
 hits = set()
-for b in [x.strip() for x in git("branch", "-r").split("\n") if x.strip() and "HEAD" not in x]:
+for b in BRANCH_PINS.values():
     try:
         o = git("grep", "-l", "-E", r'\|26[0-5][0-9]\||"seed": 26[0-5][0-9][,}]', b, "--", "explore_out", "results", "specs")
     except subprocess.CalledProcessError:
@@ -276,7 +346,7 @@ def recount(ref):
 
 
 RC = {}
-for ref in ("0282955", "0754d61", REV10):
+for ref in ("0282955", "0754d61", REV10, V101):
     RC[ref] = recount(ref)
     say(f"  at {ref}: {RC[ref][1]}")
     for k, v in RC[ref][0].items():
@@ -321,8 +391,8 @@ say(f"  power: P(a variant reads within 1 pair | its true rate p, KEYHINGE at 10
 say("\n" + "=" * 110)
 say("SESSION E, BATCHES 20 AND 21 (claude/outside-ideas at 419368a)")
 say("=" * 110)
-eh = git("rev-parse", "--short", "origin/claude/outside-ideas").strip()
-say(f"branch head now: {eh} (== {E}: {eh == E})")
+eh = BRANCH_PINS["origin/claude/outside-ideas"]
+say(f"branch head as the original read it (pinned): {eh} (== {E}: {eh == E})")
 say("\n== E0. Readings before records")
 for f in ("explore_continue.py", "explore_continue_child.py", "explore_batch20.py", "explore_oracle_d128.py", "explore_oracle_child.py", "explore_batch21.py"):
     say(f"  {f}: {hist(E, f)}")
@@ -492,16 +562,20 @@ say(f"  rev10/ scripts on main: {[x for x in git('ls-tree', '--name-only', REV10
 # ══ ROWS ══════════════════════════════════════════════════════════════════════════════════════════════════════════
 M, P, Dg, N = "MATCH", "PARTIAL", "DISAGREE", "NOT RECORD-CHECKABLE"
 # H rows
-row(44, "H: fifth round includes H's S87; 'the fifth round's screens have not been refereed'", "H's S87, I's last S75 arm",
-    f"S87a/S87c/recount at {H}; V's branch had no S87 check before Rev 10 (check_H_v6: 0 records)", M)
+row(44, "H: fifth round includes H's S87; after the merge the referee checked the fifth round's screens (rev10/referee_pass.md)", "H's S87, I's last S75 arm",
+    f"S87a/S87c/recount at {H}; V's branch had no S87 check before Rev 10 (check_H_v6: 0 records); at {V101} check_rev10_HE.md and referee_pass.md in rev10/: "
+    f"{all(x in git('ls-tree', '--name-only', V101, 'docs/review_2026-10/rev10/') for x in ('check_rev10_HE.md', 'referee_pass.md'))}", M,
+    "the original row was MATCH for 'not refereed' (true at 585b666); 846d0c8 records the referee's check, which exists",
+    new_frag="and, after the merge, of the whole revision and of the fifth round's screens (\\texttt{rev10/referee\\_pass.md}")
 f67 = f"twenty new seeds (${kA}/20$ against ${kB}/20$; ${pA}/30$ against ${pB}/30$ over two screens)"
 row(67, "H index: all-position trigger", f67, f"S87a {kA}/20 vs {kB}/20; pooled {pA}/30 vs {pB}/30", M)
 row(67, "H index: no main-line firing on a one-to-one map", "no main-line firing had a one-to-one map before it",
     f"0 of {RC[REV10][1]['fired']} at {REV10}", M if RC[REV10][1]["one"] == 0 else Dg)
-row(67, "H index: 'the key term's constants are robust'", "the key term's constants are robust",
-    f"S87c 'robust' {robust}; every arm {dk}; drafted arm at the ceiling (10/10)", P,
-    f"the reading is as printed, but the index gives no scope: the drafted arm was at 10/10, so the screen could show only a worse variant "
-    f"(H's report 9 and its own dated spec note say so); a variant at a true 0.8 reads within one pair {PR[0.8]:.0%} of the time, at 0.9 {PR[0.9]:.0%}")
+row(67, "H index: 'the key term's constants are robust on a ceiling screen'", "the key term's constants are robust",
+    f"S87c 'robust' {robust}; every arm {dk}; drafted arm at the ceiling (10/10)", M if robust and dk["KEYHINGE"] == 10 else Dg,
+    f"846d0c8 adds the scope the original row asked for (the drafted arm was at 10/10, so the screen could show only a worse variant; a "
+    f"variant at a true 0.8 reads within one pair {PR[0.8]:.0%} of the time, at 0.9 {PR[0.9]:.0%})",
+    new_frag="the key term's constants are robust on a ceiling screen")
 f217a = (f"bound ${kA}/20$ against the key-position rule's ${kB}/20$ (S87a, seeds 2600--2619; {aon} vs {bon}), ${pA}/30$ against ${pB}/30$ pooled with S86")
 row(217, "S87a counts, pairs, pooled", f217a, f"ALLMASS {kA}/20, BASE {kB}/20, {aon} vs {bon}; pooled {pA}/30 vs {pB}/30 ({pa} vs {pb}); ORACLE 2/2 {orc} VALID", M)
 f217b = f"all {FI['ALLMASS']['n']} of its firings on a target the key-position labels name and {FI['ALLMASS']['all']} on one the all-position labels name"
@@ -517,26 +591,48 @@ f217c = f"none of the {RC[REV10][1]['fired']} firings in the {RC[REV10][1]['runs
 row(217, "one-to-one guard: 'would have changed nothing'", f217c,
     f"WIN3_SPLIT_D8 with checks: {RC[REV10][1]['runs']} runs (all {RC[REV10][1]['runs_all']}), {RC[REV10][1]['fired']} firings, one-to-one before {RC[REV10][1]['one']}; "
     f"H's recount (a) 0/107 at 0282955, (b) 0/126 at 0754d61 reproduce", M)
-row(217, "S87c counts and readings", "all discovered $10/10$ at two streams (S87c; ``robust'', and the drafted constants stand)",
-    f"{dk}; ORACLE {dor} VALID; V only/K only {dcmp}; robust {robust}; amendment {amend or 'none'}", P,
-    f"counts and readings MATCH; 'closed three small questions' overstates S87c: at the ceiling it could detect only a worse variant "
-    f"(power above), which H states and the draft omits; LAM3's median transition is later ({rlib.med(sorted(rlib.transition(D['LAM3'][s]['curve']) for s in DS))} vs "
-    f"{rlib.med(sorted(rlib.transition(D['KEYHINGE'][s]['curve']) for s in DS))}), descriptive")
-row(358, "stale: 'screened once, session H's S86'", "a trigger that reads all positions was screened once, session~H's S86, $8/10$ against $9/10$",
-    f"screened twice: S86 and S87a ({kA}/20 vs {kB}/20; pooled {pA}/30 vs {pB}/30), which tex10:67 and tex10:217 report", Dg, "unchanged line, false since this revision folds S87a in")
-row(464, "stale: 'screened once (session H's S86)'", "a trigger that reads all positions was screened once (session~H's S86)",
-    "as above", Dg, "unchanged line; the same paragraph still gives only S86's 8/10 against 9/10 and its one mistarget in 21")
-row(486, "stale next step: 'screened once (S86)'", "a trigger on all positions was screened once (S86) and kept binding within one pair",
-    "as above; S87a also kept it on 20 new seeds", Dg, "unchanged line")
+row(217, "S87c counts and readings, with the ceiling and its power", "all discovered $10/10$ at two streams (S87c; ``robust'', and the drafted constants stand)",
+    f"{dk}; ORACLE {dor} VALID; V only/K only {dcmp}; robust {robust}; amendment {amend or 'none'}; P(reads 'robust' | true 0.8, KEYHINGE 10/10) {PR[0.8]:.3f}",
+    M if robust and round(PR[0.8] * 100) == 38 else Dg,
+    f"counts and readings MATCH; 846d0c8 now states the ceiling and the power ('a variant at a true rate of 0.8 still reads robust 38% of the "
+    f"time'), the caveat the original row found missing; LAM3's median transition is later ({rlib.med(sorted(rlib.transition(D['LAM3'][s]['curve']) for s in DS))} vs "
+    f"{rlib.med(sorted(rlib.transition(D['KEYHINGE'][s]['curve']) for s in DS))}), descriptive",
+    new_frag="all discovered $10/10$ at two streams (S87c; ``robust'', and the drafted constants stand; the drafted arm was at the ceiling, so the screen could only have shown a worse variant, and a variant at a true rate of $0.8$ still reads ``robust'' $" + f"{round(PR[0.8] * 100)}" + "\\%$ of the time)")
+# S86's ALLMASS firings and mistargets (all-position pair not a labelled target), with the run's outcome
+f86 = [(s_, c) for s_ in S86S for c in B6["ALLMASS"][s_].get("checks") or [] if c.get("fired")]
+mt86 = [(s_, c["step"], rlib.bound_routed(B6["ALLMASS"][s_])) for s_, c in f86 if not c["all_ok"]]
+f87 = [(s_, c) for s_ in SEEDS for c in A["ALLMASS"][s_].get("checks") or [] if c.get("fired")]
+mt87 = [(s_, c["step"], rlib.bound_routed(A["ALLMASS"][s_])) for s_, c in f87 if not c["all_ok"]]
+cost = sum(1 for *_, b in mt86 + mt87 if not b)
+say(f"  ALLMASS mistargets: S86 {mt86} of {len(f86)} firings; S87a {mt87} of {len(f87)}; runs that did not bind routed after one: {cost}")
+row(358, "'screened twice, session H's S86 and S87a, 24/30 against 26/30'", "a trigger that reads all positions was screened once, session~H's S86, $8/10$ against $9/10$",
+    f"screened twice: S86 ({k6A}/10 vs {k6B}/10) and S87a ({kA}/20 vs {kB}/20); pooled {pA}/30 vs {pB}/30", M if (pA, pB) == (24, 26) else Dg,
+    "846d0c8 takes the referee's fix. The paragraph's heading now reads 'what Revision 9 did with it', while this item reports S87a, which "
+    "came after Revision 9: the item is the request's current state",
+    new_frag="a trigger that reads all positions was screened twice, session~H's S86 and S87a, $" + f"{pA}/30$ against ${pB}/30$")
+row(464, "'screened twice (S86 and S87a): within one pair on each screen ...; of its three mistargets in 63 firings two cost their run'",
+    "a trigger that reads all positions was screened once (session~H's S86)",
+    f"S86: ALLMASS only {a6}, BASE only {b6}; S87a: {aon} vs {bon}; pooled {pA}/30 vs {pB}/30; firings {len(f86)} + {len(f87)} = {len(f86) + len(f87)}; "
+    f"mistargets {len(mt86)} + {len(mt87)} (seed, step, run bound routed): S86 {mt86}, S87a {mt87}; runs lost after a mistarget {cost}",
+    M if (len(f86) + len(f87), len(mt86) + len(mt87), cost) == (63, 3, 2) and b6 - a6 <= 1 and bon - aon <= 1 else Dg,
+    "846d0c8 takes the referee's fix and recounts the mistargets over both screens; 'within one pair on each screen' holds for S86 and "
+    "S87a (the pooled 1 vs 3 is two pairs, and is given as a count, not as a screen)",
+    new_frag="a trigger that reads all positions was screened twice (session~H's S86 and S87a): it keeps binding within one pair of the key-position rule on each screen ($8/10$ against $9/10$; $16/20$ against $17/20$; $24/30$ against $26/30$ pooled), and of its three mistargets in 63 firings two cost their run")
+row(486, "'screened twice (S86, S87a) and kept binding within one pair on each'", "a trigger on all positions was screened once (S86) and kept binding within one pair",
+    f"S86 BASE only - ALLMASS only = {b6 - a6}; S87a {bon - aon}", M if b6 - a6 <= 1 and bon - aon <= 1 else Dg, "846d0c8 takes the referee's fix",
+    new_frag="a trigger on all positions was screened twice (S86, S87a) and kept binding within one pair on each")
 r464 = RC[REV10][0]
 f464 = (f"at {r464['window_gate X']['all']}~\\@?") if False else None
 f464 = (f"at {RC[REV10][1]['all']} ({r464['window_gate X']['all']} of {r464['window_gate X']['fired']}, {r464['window_gate L']['all']} of {r464['window_gate L']['fired']}, "
         f"{r464['split_copy X']['all']} of {r464['split_copy X']['fired']} and {r464['split_copy L']['all']} of {r464['split_copy L']['fired']}), the key-position pair at all {RC[REV10][1]['key']}; "
         f"the two pairs coincide at {RC[REV10][1]['same']}")
 row(464, "main line's counterfactual labels (recheck)", f464, f"labels recomputed from map_before == flags: all {RC[REV10][1]['all'] == RC[REV10][1]['all_flag']}, key {RC[REV10][1]['key'] == RC[REV10][1]['key_flag']}", M)
-row(536, "provenance (tab:batches), H's row", "the one-to-one recount over the main line's 126 firings (\\texttt{5b5deec}, round 5) & \\texttt{5b5deec} & 318; 300; 82; 62; 52; 82; 32",
-    f"S87a 42 + S87c 42 runs, report 9 at {H}: absent from the row", P,
-    "the draft uses S87a/S87c (tex10:67, 217) but the row cites neither, nor report 9 (347bd25); its commit column (5b5deec) is not H's last report and its run counts omit 84")
+row(536, "provenance (tab:batches), H's row: S87a, S87c and the recount (report 9, 347bd25), commit 347bd25, runs ...; 84",
+    "the one-to-one recount over the main line's 126 firings (\\texttt{5b5deec}, round 5) & \\texttt{5b5deec} & 318; 300; 82; 62; 52; 82; 32",
+    f"S87a {len(st_am['runs'])} + S87c {len(st_do['runs'])} runs, report 9 at {H} (explore_out/H/report_9.md there: "
+    f"{'explore_out/H/report_9.md' in git('ls-tree', '-r', '--name-only', H, 'explore_out/H/')})",
+    M if len(st_am["runs"]) + len(st_do["runs"]) == 84 else Dg, "846d0c8 adds S87a and S87c, report 9's commit and the 84 runs",
+    new_frag="S87a the all-position trigger on 20 more seeds, S87c the key term's dose, and the one-to-one recount over the main line's 126 firings (report 9, \\texttt{347bd25}) & \\texttt{347bd25} & 318; 300; 82; 62; 52; 82; 32; 84\\\\")
 row(44, "screen-number collision G's S87 / H's S87", "G's S87, H's S87", "both sessions numbered round 5 'S87' (G 2700-2729; H S87a/S87c)", M,
     "the draft disambiguates by session and by suffix (S87a, S87c); noted only")
 
@@ -558,8 +654,11 @@ dNr = [round(round(OUT[("C_P16_N256", s)]["a86"], 2) - round(OUT[("C_P16_N256", 
 say(f"  changes from endpoints rounded to 2 decimals (README's way): D128 {dDr}; N256 {dNr}")
 f245c = (f"the $D = 128$ one-to-one runs creeping by ${min(dDr):.2f}$--${max(dDr):.2f}$ over the second 43{{,}}200 updates and the $N = 256$ ones moving by "
          f"${min(dNr):.2f}$ to $+{max(dNr):.2f}$ without binding")
-row(245, "S68 accuracy changes", f245c, f"unrounded: D128 {[round(x, 3) for x in dD]}; N256 {[round(x, 3) for x in dN]}", M,
-    f"the ranges are differences of endpoints rounded to two decimals (as E's README); unrounded the N256 low end is {min(dN):+.3f} (seed 274), the D128 range {min(dD):+.3f} to {max(dD):+.3f}")
+f245c101 = (f"the $D = 128$ one-to-one runs creeping by ${round(min(dD), 2):.2f}$--${round(max(dD), 2):.2f}$ over the second 43{{,}}200 updates and the $N = 256$ ones moving by "
+            f"${round(min(dN), 2):.2f}$ to $+{round(max(dN), 2):.2f}$ without binding")
+row(245, "S68 accuracy changes (unrounded differences, rounded once)", f245c, f"unrounded: D128 {[round(x, 3) for x in dD]}; N256 {[round(x, 3) for x in dN]}", M,
+    f"846d0c8 now rounds the unrounded differences once: N256 {min(dN):+.4f} -> {round(min(dN), 2):+.2f} (seed 274), as the referee's pass noted; the "
+    f"D128 range {min(dD):+.3f} to {max(dD):+.3f} reads 0.02-0.10 either way", new_frag=f245c101)
 row(245, "S68 D128 oracle on 270", "the $D = 128$ perfect gate on the seed it had failed (270) was still unbound at 86{,}400",
     f"bound {rlib.bound(orc270)}; acc {at(orc270, 86400)[1]:.3f} at 86,400; S67 oracle D128: 271 at 12000, 270 unbound", M if not rlib.bound(orc270) else Dg)
 f245d = f"gave {num(budget)} (the latest transition of any bound sixteen-key run, {num(max(trs))}, plus 2400), and printed beside it ``86{{,}}400 is not enough''"
@@ -568,24 +667,37 @@ row(245, "budget rule", f245d, f"BR P=16 learned transitions {trs} -> {budget}; 
 row(245, "key-load draft rested on a 1-of-2 oracle", "rested on an oracle that had bound one of its two seeds (three runs, the failed seed having been continued)",
     f"S67 ORC_P16_D128 {[(s, rlib.transition(r['curve'])) for s, r in sorted(C67['ORC_P16_D128'].items())]}; S68 continued 270 (unbound)", M)
 row(245, "S69 order and design", "(S69, seeds 270--279, 40{,}800 updates, readings fixed before any run)",
-    f"readings {E21_READ} {ctime(E21_READ)}; first record {E_FR['explore_out/oracle_d128_results.json'][1]}; docstring unchanged {d21}", M if E21_ORDER else Dg)
+    f"readings {E21_READ} {ctime(E21_READ)}; first record {E_FR['explore_out/oracle_d128_results.json'][1]}; docstring unchanged {d21}", M if E21_ORDER else Dg,
+    new_frag="S69, not F's; seeds 270--279, 40{,}800 updates, readings fixed before any run)")
 f245e = (f"binds ${nA}/10$ under the recorded single-Adam recipe (three more seeds ended at ${min(unA[s] for s in close):.2f}$--${max(unA[s] for s in close):.2f}$, under the $0.95$ bar, "
          f"and three stuck near $0.30$) and ${nS}/10$ under SLOW (every seed at ${min(fin['ORC_S_D128'].values()):.2f}$--${max(fin['ORC_S_D128'].values()):.2f}$")
 row(245, "S69 counts", f245e, f"A bound {sorted(s for s in bA if bA[s])} at {trA}; close {close}, stuck {stuck} ({[round(unA[s], 3) for s in stuck]}); S {nS}/10", M)
-row(245, "S69: 'the slow start only delays'", "with the routing given and no gate to protect, the slow start only delays",
-    f"no SLOW run went past 40,800; SLOW ended below single Adam on the 7 seeds that bound or came close and above it on the 3 stuck ones "
-    f"({({s: round(fin['ORC_S_D128'][s] - fin['ORC_A_D128'][s], 2) for s in stuck})})", P,
-    "an unmarked interpretation: the records show SLOW at 0.33-0.36 everywhere at 40,800, not a delay; E's README reads it 'did not help ... it hurt'")
+lower = {s_: fin["ORC_S_D128"][s_] < fin["ORC_A_D128"][s_] for s_ in S67S if bA[s_] or s_ in close}
+row(245, "S69: 'the slow start hurt: no SLOW run bound and SLOW ended lower on every seed that bound or came close under the other recipe'",
+    "with the routing given and no gate to protect, the slow start only delays",
+    f"SLOW bound {nS}/10; SLOW final below single Adam's on the {len(lower)} seeds that bound or came close: {sum(lower.values())} of {len(lower)}; above it on "
+    f"the 3 stuck ones ({({s: round(fin['ORC_S_D128'][s] - fin['ORC_A_D128'][s], 2) for s in stuck})})",
+    M if nS == 0 and all(lower.values()) and len(lower) == 7 else Dg,
+    "846d0c8 replaces the interpretation with what the records show, as E's README reads it ('it hurt')",
+    new_frag="the slow start hurt: no SLOW run bound and SLOW ended lower on every seed that bound or came close under the other recipe")
 row(245, "S69 pre-registered reading", "The pre-registered reading is ``no $D = 128$ validity check at 40{,}800''", f"rule 4 of the docstring: b_A {nA}, b_S {nS} -> '{spec}'", M)
-row(245, "S69: 'two validity seeds would both bind with probability about 0.13'", "two validity seeds would both bind with probability about $0.13$",
-    f"b(b-1)/90 = {both2:.3f} (two of these ten seeds, without replacement); the draft's validity seeds are fresh (660-661, 1660-1661): 0.4^2 = 0.16 per machine, {0.4 ** 4:.3f} on both", P,
-    "the number is E's printed figure, but as a statement about the draft's validity seeds it uses the wrong model (V's keyload_options_review.md item 1, after Rev 10, says the same)")
+row(245, "S69: 'two validity seeds drawn from these ten ... about 0.13 (two fresh seeds on one machine about 0.16 at that rate, on both machines 0.03)'",
+    "two validity seeds would both bind with probability about $0.13$",
+    f"b(b-1)/90 = {both2:.3f} (two of these ten seeds, without replacement); fresh seeds at {nA}/10: {(nA / 10) ** 2:.2f} per machine, {(nA / 10) ** 4:.4f} on both",
+    M if (round(both2, 2), round((nA / 10) ** 2, 2), round((nA / 10) ** 4, 2)) == (0.13, 0.16, 0.03) else Dg,
+    "846d0c8 states both models, as the referee's pass and keyload_options_review.md item 1 asked",
+    new_frag="two validity seeds drawn from these ten would both bind with probability about $0.13$ (two fresh seeds on one machine about $0.16$ at that rate, on both machines $0.03$)")
 row(245, "status note: five ways forward", "Session~E's status note lists five ways forward, none screened and none adopted",
     f"spec_draft_keyload.md at {E}: 'NOT READY FOR V'; {len(opts)} options; 'None is screened and none is adopted here'", M if len(opts) == 5 else Dg)
 row(245, "E's verdict on the lead", "is ``inconclusive, weaker than handed back''", "README Batch 20 verdicts: 'Verdict on the batch-19 lead ... inconclusive, weaker than handed back'; 4 vs 0, two-sided p "
     f"{rlib.mcnemar2(4, 0)}", M)
-row(245, "batch 21 named S69", "batch~21 screened that first (S69,", "tex10:256 and tab:batches use S69 for session F's Hebbian-decay screen; E numbered its batch-20/21 screens S68/S69, both F's numbers", P,
-    "two different screens under one name in the same report; the draft does not qualify E's (e.g. 'E's S69')")
+s68_in = [n_ for n_, l in enumerate(TEX, 1) if "S68" in l]
+row(245, "batch 21 named 'E's S69, not F's'", "batch~21 screened that first (S69,",
+    f"tex101:258 and tab:batches use S69 for session F's Hebbian-decay screen; E numbered its batch-20/21 screens S68/S69, both F's numbers; "
+    f"lines of tex101 naming S68: {s68_in}", M,
+    "846d0c8 qualifies E's S69 at its one use in the text. E's S68 is named only in the provenance table (tex101:540), whose rows are "
+    "labelled by session, beside F's S68 (tex101:542)",
+    new_frag="batch~21 screened that first (E's S69, not F's;")
 row(366, "key-load draft: after the reviews; not reviewed", "Session~E's key-load draft was committed after those reviews and then failed its own validity screen",
     "draft first committed f5d3893 2026-10-13T02:54:10; V's spec reviews 3f7d84b 2026-10-12T22:50:37 and 723827b 2026-10-12T23:00:53; V's keyload_options_review.md is 11a78ee "
     "2026-10-19T17:51:52, after Rev 10 (16:15:41)", M)
@@ -596,24 +708,73 @@ row(499, "key-load test needs revision; cross-reference", "the key-load test a v
     "the finding is E's (batch 21), not a referee review; tex10:366 says so")
 row(495, "'the fifth round's screens have been recomputed there' (rev10/)", "the fifth round's screens have been recomputed there",
     "main's docs/review_2026-10/rev10/: recompute_H.py covers S87a, S87c and the recount (its committed output holds an IndexError traceback, then a rerun); "
-    "no script recomputes E's batches 20-21: first_pass/second_pass rows cite E's README, two cite the JSON stores", P,
-    "true for H; for E the numbers were read from E's README rather than recomputed (this check now recomputes them: all reproduce)")
-row(44, "'every number recomputed from the records' (rev10/)", "every number recomputed from the records",
-    "as tex10:495: no rev10/ script recomputes E's batches 20-21", P, "the same claim as tex10:495; true for H (recompute_H.py), not for E")
-row(535, "provenance (tab:batches): E", "19 (E) & S64 width, S65 depth, S66 eight streams, S67 capacity",
-    f"no row for batch 20 (19 runs, {E20_RUN}/f5d3893) or batch 21 (20 runs, {E}); their results are used at tex10:64, 245, 455", P)
+    "no script recomputes E's batches 20-21: first_pass/second_pass rows cite E's README, two cite the JSON stores", "REMOVED",
+    "was PARTIAL (true for H, not for E). 846d0c8 deletes the sentence; its replacement is the new tex101:499 row below",
+    removed=(499, "and after the merge it checked the rest, the fifth round's screens included"))
+row(44, "'which recomputed test_delta_recipe, the GPU run and H's screens and read the other screens' reports' (rev10/)", "every number recomputed from the records",
+    f"585b666 rev10/ scripts: {[x for x in git('ls-tree', '--name-only', REV10, 'docs/review_2026-10/rev10/').split() if x.endswith('.py')]}; none for E's batches 20-21",
+    M, "846d0c8 says what the checking agent recomputed (H among them) and that it read the other screens' reports (E's README among them)",
+    new_frag="which recomputed \\texttt{test\\_delta\\_recipe}, the GPU run and H's screens and read the other screens' reports")
+st20_runs = sum(1 for r in st20["runs"].values() if not r.get("dry") and r.get("ok"))
+st21_runs = sum(1 for r in st21["runs"].values() if not r.get("dry") and r.get("ok"))
+c20 = git("log", "-1", "--format=%s", "f5d3893")
+row(535, "provenance (tab:batches): E, batches 20-21 (S68 readings 4acf915, complete f5d3893; S69 readings b93b73c, complete 419368a), commit 419368a, 19; 20",
+    "19 (E) & S64 width, S65 depth, S66 eight streams, S67 capacity",
+    f"batch 20: readings {E20_READ}, {st20_runs} runs, f5d3893 '{c20[:40]}'; batch 21: readings {E21_READ}, {st21_runs} runs, complete at {E} (last store commit "
+    f"{hist(E, 'explore_out/oracle_d128_results.json')[0][0]})",
+    M if (st20_runs, st21_runs) == (19, 20) and c20.startswith("Batch 20 complete") else Dg,
+    "846d0c8 adds the row (tex101:540). E's S68 and S69 sit in the same table as F's S68 and S69 (tex101:542), each under its session's label",
+    new_frag="20--21 (E) & S68 the sixteen-key runs continued to 86{,}400 (readings \\texttt{4acf915}; complete \\texttt{f5d3893}); S69 the $D = 128$ oracle's validity (readings \\texttt{b93b73c}; complete \\texttt{419368a}) & \\texttt{419368a} & 19; 20",
+    new_line=540)
+
+assert N_ORIG[0] == 39 and RC[V101][1] == RC[REV10][1]
+
+# ── Revision 10.1 (846d0c8): text on H's round 5 and E's batches it added (rows new here) ──
+r9d = git("log", "-1", "--format=%h %cI", "9bfa85a").split()
+b19 = git("log", "-1", "--format=%h %cI %s", E19).split(" ", 2)
+row(247, "'The batch completed after Revision 9's first draft (186 of 186 runs)'", "The batch completed after Revision~9's first draft (186 of 186 runs)",
+    f"batch 19 complete at {b19[0]} {b19[1]} ('{b19[2][:45]}'); Revision 9's first draft 9bfa85a {r9d[1]}", M if b19[1] > r9d[1] and "186/186" in b19[2] else Dg,
+    "846d0c8 names the revision ('this revision's' in tex10:245 meant Revision 9's)", is_new=True)
+row(370, "10.1's account: 'screened once' on three lines after S87a", "``screened once'' for the all-position trigger on three lines after S87a screened it again",
+    "tex10:358, 464, 486 -> tex101:360, 468, 490, rows above", M, is_new=True)
+row(370, "10.1's account: provenance rows for E and H", "and provenance rows for E, F, G and H that stopped before the fifth round",
+    "tex101:540 (E, batches 20-21) and tex101:541 (H, report 9), rows above", M, is_new=True)
+row(370, "10.1's list of loose items taken (H and E)", "the dose screen's ceiling; the key-load validity probabilities for fresh seeds; ``the slow start hurt''; E's S69 distinguished from F's",
+    "tex101:69 and 219 (ceiling), 247 (0.16/0.03; 'hurt'; E's S69), rows above", M, is_new=True)
+row(499, "conclusion: after the merge the referee checked the fifth round's screens (H's and E's here), the numbers right",
+    "and after the merge it checked the rest, the fifth round's screens included, with the same outcome",
+    f"check_rev10_HE at {V101}: {'check_rev10_HE.md' in git('ls-tree', '--name-only', V101, 'docs/review_2026-10/rev10/')}; every count, pair, p and reading "
+    "of S87a, S87c, the recount and batches 20-21 reproduces (sections H1-E2)", M, "replaces the removed tex10:495 sentence", is_new=True)
+
+# ── pinned branches: commits after each pin up to 846d0c8's commit time ──
+T101 = int(git("show", "-s", "--format=%ct", V101).strip())
+say("\n" + "=" * 110)
+say("PINNED BRANCHES: commits after each pin up to 846d0c8's commit time (2026-10-19 18:33:26 UTC)")
+say("=" * 110)
+for br, pin in BRANCH_PINS.items():
+    lst = [l.split(" ", 2) for l in git("log", "--first-parent", "--format=%h %ct %s", f"{pin}..{br}").split("\n") if l.strip()]
+    mv = [(h, datetime.datetime.fromtimestamp(int(t), datetime.timezone.utc).strftime("%H:%M:%S"), m_[:60]) for h, t, m_ in lst if int(t) <= T101]
+    say(f"  {br.split('/', 1)[1]} pinned {pin}: {len(mv)} commit(s) by 18:33:26 UTC {mv[::-1]}; {sum(1 for h, t, m_ in lst if int(t) > T101)} after")
 
 # ── print rows ──
 say("\n" + "=" * 110)
 say("ROWS")
 say("=" * 110)
 from collections import Counter  # noqa: E402
+K = (Dg, P, N, M, "REMOVED")
 cnt = Counter(r[4] for r in ROWS)
-for st in (Dg, P, N, M):
-    for r in ROWS:
-        if r[4] == st:
-            say(f"[{r[4]}] tex10:{r[0]} | {r[1]} | draft: {r[2]!s:.160} | records: {r[3]} | {r[5]}")
-say(f"\nrows {len(ROWS)}: {dict(cnt)}")
+cnt_old = Counter(r[6] for r in ROWS if r[6] != "\u2014")
+cnt_same = Counter(r[4] for r in ROWS if r[6] != "\u2014")
+say("| # | where | item | draft | records | status | v585b666 \u2192 v846d0c8 | note |")
+say("|---|---|---|---|---|---|---|---|")
+cell = lambda x: str(x).replace("|", "\\|").replace("\n", " ")  # noqa: E731
+for i, r in enumerate(ROWS, 1):
+    say(f"| {i} | {cell(r[0])} | {cell(r[1])} | {cell(r[2])} | {cell(r[3])} | **{r[4]}** | {cell(r[7])} | {cell(r[5])} |")
+assert [cnt_old[k] for k in (M, P, Dg, N)] == [24, 10, 3, 2]
+say(f"\nrows (original, 585b666) {sum(cnt_old.values())}: " + ", ".join(f"{k} {cnt_old[k]}" for k in K[:4]))
+say(f"rows (the same {sum(cnt_old.values())} against 846d0c8): " + ", ".join(f"{k} {cnt_same[k]}" for k in K))
+say(f"rows (846d0c8, all {len(ROWS)}): " + ", ".join(f"{k} {cnt[k]}" for k in K))
+say("status changes: " + "; ".join(f"row {i}: {r[7]}" for i, r in enumerate(ROWS, 1) if r[6] != "\u2014" and r[6] != r[4]))
 say(f"order: H readings before records {H_ORDER}; E batch 20 {E20_ORDER}; E batch 21 {E21_ORDER}; H seeds only in H's S87 stores {H_SEEDS}; "
     f"code SHAs recomputed H {H_SHA_OK}, E b20 {sha20 == st20['meta']['code_shas'][0]}, b21 {sha21 == st21['meta']['code_shas'][0]}")
 say(f"rlib ties: {len(rlib.TIES)}")

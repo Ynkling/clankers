@@ -186,3 +186,21 @@ No number in `check_rev10_A/FG/HE.md` was found wrong. Every value this check re
 - **The PDF beyond its text.** Figures, table layout and typesetting were not compared; pdftotext order breaks in tables.
 - **README.md beyond pattern searches.** Its other rebuilt sections were not audited line by line.
 - **Nothing was re-run.** Every count comes from the committed records, with the referee's `rlib`. S75b's hours are the spec's own estimates.
+
+## The Revision 10 checks re-run against 10.1 (`check_rev10_*_v101`)
+
+All 228 original rows are re-anchored on both texts. Every record recomputation gives the same numbers as against `585b666`.
+
+| check | against `585b666` | the same rows against `846d0c8` | all rows against `846d0c8` (D / P / NRC / M) |
+|---|---|---|---|
+| A | 82: 1 / 5 / 4 / 72 | 0 / 2 / 2 / 78 | 104: 4 / 7 / 2 / 91 |
+| FG | 107: 6 / 15 / 3 / 83 | 2 / 10 / 3 / 91, 1 removed | 112: 2 / 10 / 3 / 96, 1 removed |
+| HE | 39: 3 / 10 / 2 / 24 | 0 / 1 / 2 / 35, 1 removed | 44: 0 / 1 / 2 / 40, 1 removed |
+
+**The DISAGREEs against `846d0c8`.**
+- **tex101:447**, the referee reading every draft before it is merged.
+- **tex101:544–545**, I's and R's provenance rows.
+- **STATUS.md:76**, not the tex.
+- **FG's two are in the sessions' own reports**, not the draft: F's `report_8.md`:138 and G's `report_7.md`:20.
+
+These agree with this file's residuals above. The re-run grades tex101:485 PARTIAL (2.26–2.39 days against "about two and a half") where this file grades it PARTLY.

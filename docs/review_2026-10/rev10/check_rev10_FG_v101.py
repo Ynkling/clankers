@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
-"""check_rev10_FG.py — Referee V: Session F's S88 (report 8) and Session G's S87 (report 7) against their records,
-and every statement Revision 10 makes about them.
+"""check_rev10_FG_v101.py — Referee V: check_rev10_FG re-run against Revision 10.1 (main line 846d0c8,
+multichannel_hebbian_report_v10.tex, 596 lines, cited tex101:NNN). The original, check_rev10_FG.py, read Revision 10
+(585b666, 591 lines, tex10:NNN). Scope as the original: Session F's S88 (report 8) and Session G's S87 (report 7)
+against their records, and every statement the revision makes about them; plus every line on them that 846d0c8 changed
+or added (the sections F-tex101-new and G-tex101-new).
+
+What changed against the original:
+  * The tex is read at 846d0c8. Every tex row is anchored on its tex10 line at 585b666 (as the original asserted) and on
+    the line it became at 846d0c8 (difflib's line map; asserted). A fragment 846d0c8 rewrote is re-anchored on its new
+    wording and judged against it; a sentence 846d0c8 deleted is reported REMOVED with the row that checks its
+    replacement.
+  * Branches are pinned to what the original read (its run, 19 Oct 18:03:29-18:06:06 UTC, from the reflog of this
+    clone's remote-tracking refs): explore-F 698a20f, and the 13 remote branches the seed scans cover (BRANCH_PINS).
+  * Every record recomputation is kept as it was. Each row carries the original's status (read from check_rev10_FG.md
+    at b09ce24, matched by section, tex10 location and statement) and the status against 846d0c8.
 
 Read-only. Every input is a git object (`git show <ref>:<path>`, `git log`, `git ls-tree`); nothing is run but this file
 (no training, no session code). Python stdlib + docs/review_2026-10/rlib.py. Prints markdown tables to stdout.
@@ -20,6 +33,8 @@ Outcomes:
         the L3 VAL map is not one-to-one. 'beats' = one-sided exact McNemar p < 0.05 (rlib.mcnemar1).
 """
 import collections
+import datetime
+import difflib
 import hashlib
 import json
 import os
@@ -35,12 +50,22 @@ from rlib import (load, runs, transition, bound, outcome_k, fail_class, mcnemar1
 F, F_READ = "a199d5e", "40087cb"
 G, G_SPEC, G_START = "e46799a", "3c89f87", "02b3eed"
 M, TEXF = "585b666", "multichannel_hebbian_report_v10.tex"
+V101 = "846d0c8"
+F_TIP = "698a20f"            # origin/claude/explore-F as the original read it
+# the 13 remote branches at the original's run (reflog, 19 Oct 18:05:30 UTC)
+BRANCH_PINS = {"origin/claude/bdh-growth-hebbian-inference-w90069": "7c4ceb8", "origin/claude/bdh-repo-curl-obgdqk": "5b82707",
+               "origin/claude/explore-F": "698a20f", "origin/claude/explore-G": "7ab98c1", "origin/claude/explore-H": "7820b12",
+               "origin/claude/explore-I": "8d2e89f", "origin/claude/outside-ideas": "419368a", "origin/claude/relaxed-edison-he00cc": "3c2fb70",
+               "origin/claude/replicate-R": "31c39fc", "origin/claude/rev10-draft": "f342d1d", "origin/claude/rev9-draft": "010a085",
+               "origin/claude/review-V": "dc27968", "origin/feature/per-channel-plasticity": "4af9d50"}
+ORIG_MD = ("b09ce24", "docs/review_2026-10/rev10/check_rev10_FG.md")
 MAIN9C = "9c5939ef8ca8db079c87beb489b7c603169c9c57"
 FD, GD = "explore_out/F/", "explore_out/G/"
 
 
 def git(*a):
-    return subprocess.check_output(("git", "-C", ROOT) + a).decode()
+    # core.abbrev=7: %h and --short print 7 hex digits however large the object store grows
+    return subprocess.check_output(("git", "-C", ROOT, "-c", "core.abbrev=7") + a).decode()
 
 
 def show(ref, path):
@@ -68,13 +93,39 @@ def wil(k, n):
     return f"[{lo:.2f}, {hi:.2f}] {band(k, n)}"
 
 
-TEX = show(M, TEXF).split("\n")
+OLD = show(M, TEXF).split("\n")
+TEX = show(V101, TEXF).split("\n")
+_ops = difflib.SequenceMatcher(None, OLD, TEX, autojunk=False).get_opcodes()
+LMAP = {i1 + k + 1: j1 + k + 1 for op, i1, i2, j1, j2 in _ops if op in ("equal", "replace") and i2 - i1 == j2 - j1 for k in range(i2 - i1)}
+LMAP.update({44: 44, 536: 541, 537: 542, 538: 543})     # the two unequal blocks: 44 -> 44-46, 536-538 -> 540-543
+CHANGED = {i + 1 for op, i1, i2, _, _ in _ops if op != "equal" for i in range(i1, i2)}
+PENDING = []
 
 
-def tex(n, frag):
-    """Assert that a fragment of the draft is on tex10 line n (1-based)."""
+def tex(n, frag, new=None):
+    """Assert a fragment of the draft on tex10 line n (585b666), and it (or `new`, its 846d0c8 wording) on the line it
+    became at 846d0c8; return 'tex101:N'."""
+    assert frag in OLD[n - 1], (n, frag)
+    m = LMAP[n]
+    f = frag if new is None else new
+    assert f in TEX[m - 1], (n, m, f)
+    PENDING.append((n, m, new is not None))
+    return f"tex101:{m}"
+
+
+def removed(n, frag, repl_n, repl_frag):
+    """A sentence of tex10:n that 846d0c8 deleted; its replacement asserted on tex101:repl_n."""
+    assert frag in OLD[n - 1] and all(frag not in t for t in TEX), (n, frag)
+    assert repl_frag in TEX[repl_n - 1], (repl_n, repl_frag)
+    PENDING.append((n, None, "removed"))
+    return f"tex10:{n} REMOVED (replaced at tex101:{repl_n})"
+
+
+def new(n, frag):
+    """Text 846d0c8 added or rewrote, on tex101:n."""
     assert frag in TEX[n - 1], (n, frag)
-    return f"tex10:{n}"
+    PENDING.append((None, n, True))
+    return f"tex101:{n}"
 
 
 def rep(ref, path, n, frag):
@@ -86,9 +137,57 @@ def rep(ref, path, n, frag):
 SECTIONS = collections.OrderedDict()
 
 
-def row(sec, where, statement, recomputed, status, note=""):
-    assert status in ("MATCH", "PARTIAL", "DISAGREE", "NOT RECORD-CHECKABLE"), status
-    SECTIONS.setdefault(sec, []).append((where, statement, recomputed, status, note))
+def _old_rows():
+    md, out, sec = show(*ORIG_MD), {}, None
+    for l in md.split("\n"):
+        m = re.match(r"^### (\S+): ", l)
+        if m:
+            sec = m.group(1)
+            continue
+        m = re.match(r"^\| (.*?) \| (.*?) \| (.*) \| \*\*(MATCH|PARTIAL|DISAGREE|NOT RECORD-CHECKABLE)\*\* \| ", l)
+        if m and sec:
+            out[(sec, m.group(1), m.group(2))] = (m.group(4), m.group(3))
+    return out
+
+
+OLDROWS = _old_rows()
+SEEN = set()
+RECDIFF = []
+
+
+def cell(x):
+    return str(x).replace("|", "\\|").replace("\n", " ")
+
+
+def row(sec, where, statement, recomputed, status, note="", is_new=False):
+    """sec: the original's section (tex10 sections keep their names); statement may be (original's, 846d0c8's)."""
+    assert status in ("MATCH", "PARTIAL", "DISAGREE", "NOT RECORD-CHECKABLE", "REMOVED"), status
+    anchors = list(PENDING)
+    PENDING.clear()
+    st_old = statement
+    if isinstance(statement, tuple):
+        st_old, statement = statement
+    if is_new:
+        ost, delta = "\u2014", f"new: {status}"
+    else:
+        old_where = f"tex10:{anchors[0][0]}" if anchors and anchors[0][0] is not None else where
+        key = (sec, cell(old_where), cell(st_old))
+        assert key in OLDROWS, key
+        SEEN.add(key)
+        ost, orec = OLDROWS[key]
+        if orec != cell(recomputed):
+            RECDIFF.append((sec, old_where))
+        if any(a[2] == "removed" for a in anchors):
+            delta = f"{ost} \u2192 REMOVED"
+        else:
+            delta = f"{ost} (unchanged)" if ost == status else f"{ost} \u2192 {status}"
+            ch = [f"tex10:{a[0]}" for a in anchors if a[0] is not None and a[2] is True]
+            tch = [f"tex10:{a[0]}" for a in anchors if a[0] is not None and a[2] is False and a[0] in CHANGED]
+            if ch:
+                delta += "; re-anchored (" + ", ".join(ch) + " rewritten)"
+            elif tch:
+                delta += "; line changed elsewhere (" + ", ".join(tch) + "), fragment intact"
+    SECTIONS.setdefault(sec[:-5] + "tex101" if sec.endswith("-tex10") else sec, []).append((where, statement, recomputed, status, note, ost, delta))
 
 
 def ok_if(cond):
@@ -124,9 +223,9 @@ def scan(o, lo, hi, acc):
 
 
 BLOBS = {}
-BRANCHES = [x.strip() for x in git("branch", "-r").split("\n") if x.strip() and "->" not in x]
+BRANCHES = list(BRANCH_PINS)
 for b in BRANCHES:
-    for line in git("ls-tree", "-r", b, "--", "results", "explore_out", "records").split("\n"):
+    for line in git("ls-tree", "-r", BRANCH_PINS[b], "--", "results", "explore_out", "records").split("\n"):
         if line.strip() and line.endswith(".json"):
             meta, path = line.split("\t", 1)
             BLOBS.setdefault(meta.split()[2], []).append((b, path))
@@ -503,30 +602,39 @@ row(S, tex(266, "fixed $\\mathbf{10/10}$; learned $7/10$ (0 vs 3, $p = 0.125$); 
     "'0 vs 3' is written learned-first; the p is P(FIXED > learned)")
 row(S, tex(266, "Neither pre-fixed reading applies"), "neither reading applies; 'keeps' needed the better arm within one pair (three behind); 'costs' needed both >= 4 behind with none ahead (the slow one is, the other is not)",
     f"keeps {keeps} (c - b = {pr[best][1] - pr[best][0]}); costs {costs} (SLOW c 7 b 0; LEARNED c 3 b 0)", ok_if(not keeps and not costs))
-row(S, tex(266, "within about 1200 updates of its learning rate reaching $10^{-3}$ (by 3600 in the first arm, 3600--8400 in the slow one"),
-    "'in every learned run beta falls from 1 to below 0.1 in every layer within about 1200 updates of its learning rate reaching 1e-3 (by 3600 in the first arm, 3600-8400 in the slow one ...)'",
+row(S, tex(266, "within about 1200 updates of its learning rate reaching $10^{-3}$ (by 3600 in the first arm, 3600--8400 in the slow one",
+          new="falls from 1 to below $0.1$ in every layer's median, by 3600 in the first arm (whose rate is $10^{-3}$ from the start) and 1200--6000 updates after the switch in the slow one"),
+    ("'in every learned run beta falls from 1 to below 0.1 in every layer within about 1200 updates of its learning rate reaching 1e-3 (by 3600 in the first arm, 3600-8400 in the slow one ...)'",
+     "'in every learned run beta falls from 1 to below 0.1 in every layer's median, by 3600 in the first arm (whose rate is 1e-3 from the start) and 1200-6000 updates after the switch in the slow one'"),
     f"first evaluation with every layer's median < 0.1: DELTA_LEARNED {sorted(fb['DELTA_LEARNED'].values())} with the lr at 1e-3 from update 1 "
     f"(3600 updates after it, not 1200; at 2400 a layer median is still up to {max(L['median'] for r in WA['DELTA_LEARNED'].values() for L in bt(r)[2400]):.2f}); SLOW {fbs} (switch at 2400: +{sorted(x - 2400 for x in fbs)}); the perfect gate {sorted(fb['O_DELTA_LEARNED'].values())}",
-    "DISAGREE", "the parentheses contradict the clause: the first arm's rate is 1e-3 from update 1 and it collapses by 3600; the slow arm "
-    f"takes 1200-6000 updates after its switch (within 1200 on {sum(x - 2400 <= 1200 for x in fbs)} of 10). 'in every learned run' "
-    f"would also take in the learned perfect gate, which takes {sorted(fb['O_DELTA_LEARNED'].values())}. Exact: 'below 0.1 in every layer by update 3600 in the first arm "
-    "(rate 1e-3 throughout) and 1200-6000 updates after the slow arm's switch to 1e-3'. The other session's first pass (6.3) passed this as F's description")
+    "MATCH" if (max(fb["DELTA_LEARNED"].values()) == 3600 and (fbs[0] - 2400, fbs[-1] - 2400) == (1200, 6000)
+                and all(v is not None for d in fb.values() for v in d.values())) else "DISAGREE",
+    "846d0c8 takes the referee's wording: by 3600 in the first arm (all ten at 3600) and 1200-6000 updates after the slow arm's switch. "
+    f"'In every learned run' also holds for the learned perfect gate, which falls below 0.1 at {sorted(fb['O_DELTA_LEARNED'].values())}; the "
+    "sentence gives no time for it")
 row(S, tex(266, "holds it at $0.6$--$1.0$ while its rate is $10^{-4}$"), "the slow arm holds beta at 0.6-1.0 while its rate is 1e-4",
     f"SLOW medians at 1200 and 2400: {rng(slow_hold)}", "MATCH")
 hi_eta = [(L["eta_key_by_stream"], max(L["key_by_stream"]) - min(L["key_by_stream"]), L["median"], i)
           for a in LRN for r in WA[a].values() for st in bt(r).values() for i, L in enumerate(st) if L["eta_key_by_stream"] >= 0.5]
-row(S, tex(266, "never diverges by stream"), "beta never diverges by stream", f"'DIVERGES' (eta^2 at KEY >= 0.5 in a layer) at the end {divN}; at any evaluation "
+row(S, tex(266, "never diverges by stream", new="at the end it does not diverge by stream in any run"),
+    ("beta never diverges by stream", "beta at the end does not diverge by stream in any run"), f"'DIVERGES' (eta^2 at KEY >= 0.5 in a layer) at the end {divN}; at any evaluation "
     f"{div_any} runs (max eta^2 {eta_max:.2f}; {len(hi_eta)} run-evaluations, all at layer {sorted({i + 1 for *_, i in hi_eta})}, per-stream spread "
     f"<= {max(x[1] for x in hi_eta):.3f} with the layer median <= {max(x[2] for x in hi_eta):.2f})",
-    "MATCH" if all(v == 0 for v in div_any.values()) else "PARTIAL",
-    "by the screen's own definition (at the end) 0 of 22; at earlier evaluations layer 1's eta^2 at KEY passes 0.5 in 10 runs, but as a "
-    "stream-structured share of a beta already near 0 (the 8 stream medians within 0.013). Exact: 'does not diverge by stream (at the end; "
-    "earlier the stream share of a near-zero beta is at most 0.013)'")
-row(S, tex(266, "stays of order 1 only at the first layer's value positions"), "beta stays of order 1 only at the first layer's value positions",
-    f"end medians >= 0.5 outside layer-1 VAL: VAL at layers 2-3 in {len(l23)} run-layers {l23}; CTX {ctx_hi}", "PARTIAL",
-    "report 8 says KEY and CTX are about 0 everywhere and VAL of order 1 at layer 1; it says nothing of layers 2-3 VAL, where the median "
-    f"is >= 0.5 in {len(l23)} run-layers (up to {max(x[3] for x in l23)}). 'Only' is the draft's; exact: 'about 0 at key and context positions (one run's layer-3 CTX at 0.72), "
-    "of order 1 at the first layer's value positions in most runs'")
+    "MATCH" if all(v == 0 for v in divN.values()) else "DISAGREE",
+    "846d0c8 scopes it to the end, the screen's own definition: 0 of 22 runs there. (At earlier evaluations layer 1's eta^2 at KEY passes "
+    "0.5 in 10 runs, as the stream share of a beta already near 0; the sentence no longer claims those)")
+l23_scr = [x for x in l23 if x[0] != "O_DELTA_LEARNED"]
+key_hi = [(a, s_, i + 1) for a in LRN for s_, e in end[a].items() for i, L in enumerate(e) if L["by_role"]["key"] >= 0.5]
+row(S, tex(266, "stays of order 1 only at the first layer's value positions",
+           new="where it stays of order 1 it is mostly at value positions (the first layer's in 13 of 20 runs, a later layer's in 8 run-layers, and the context position in one)"),
+    ("beta stays of order 1 only at the first layer's value positions",
+     "where beta stays of order 1 (end median >= 0.5) it is mostly at value positions: layer 1's in 13 of 20 runs, a later layer's in 8 run-layers, the context position in one"),
+    f"end medians >= 0.5: layer-1 VAL in {sum(v >= 0.5 for v in l1v20)}/20 screen runs (+{sum(v >= 0.5 for (a, _), v in l1v.items() if a == 'O_DELTA_LEARNED')}/2 perfect-gate); "
+    f"VAL at layers 2-3 in {len(l23)} run-layers {l23} ({len(l23_scr)} of them screen runs); CTX {ctx_hi}; KEY {key_hi}",
+    "MATCH" if (sum(v >= 0.5 for v in l1v20), len(l23), len(ctx_hi), len(key_hi)) == (13, 8, 1, 0) else "PARTIAL",
+    "846d0c8 states the exceptions the original row listed. Its '13 of 20' counts the screen runs and its '8 run-layers' all 22 learned "
+    f"runs; the 8 are {'all screen runs' if len(l23_scr) == len(l23) else 'not all screen runs'}")
 row(S, tex(266, "a $\\beta$ near zero both erases and writes almost nothing"), "with the tied write, a beta near zero both erases and writes almost nothing",
     "explore_f_write.py:24-35 (beta scales the tied write and the erase)", "NOT RECORD-CHECKABLE", "a property of the rule, not a record")
 row(S, tex(266, "bound at 21{,}600 and 30{,}000 where $\\beta = 1$ binds at 1200"), "the learned-beta perfect gate bound at 21600 and 30000 where beta = 1 binds at 1200",
@@ -550,36 +658,57 @@ row(S, tex(268, "Every failure at either length is a stream confusion at $0.5$, 
     f"unbound end acc {rng(ub_acc, 3)}; by distance {rng(ub_dist, 3)}; correct + other stream's value (not-last queries) {rng(conf, 3)}",
     "MATCH", f"'at 0.5' holds per run; per distance {rng(ub_dist)} (no trend with distance)." " The last clause is an interpretation of an untested screen")
 r8 = sorted(p for p in git("ls-tree", "-r", "--name-only", F, FD).split() if re.search(r"report_\d+\.md$", p))
-row(S, tex(268, "its branch holds eight reports"), "the two screens close F's programme; its branch holds eight reports",
-    f"{len(r8)} reports at {F}; the draft {M} at {ctime(M)}; F's commits after a199d5e: "
-    + "; ".join(git("log", "--format=%h %cI %s", f"{F}..origin/claude/explore-F").strip().split("\n")),
-    "MATCH" if short("origin/claude/explore-F") == F else "PARTIAL",
-    "true when written; since then (after the draft) F opened round 6, S89, with readings fixed before any run: 'close the programme' is "
-    "now stale; 'eight reports' still holds")
-row(S, tex(377, "collapses to about zero everywhere but the first layer's value positions and binds $7/10$ against the fixed one's $10/10$"),
-    "'A learned write strength, screened afterwards, collapses to about zero everywhere but the first layer's value positions and binds 7/10 against 10/10 (no reading applies)'",
-    f"counts {cnt['DELTA_LEARNED']}/10 vs {cnt['DELTA_FIXED']}/10; end medians >= 0.5 outside layer-1 VAL in {len(l23) + len(ctx_hi)} run-layers", "PARTIAL",
-    "the counts and 'no reading applies' are right; 'everywhere but' has the exceptions of the tex10:266 row (layers 2-3 VAL, one CTX). The other session's second pass (row 25) passed it")
+T101 = int(git("show", "-s", "--format=%ct", V101).strip())
+F_AT101 = next(h for h, t in (l.split() for l in git("log", "--first-parent", "--format=%h %ct", "origin/claude/explore-F").split("\n") if l.strip()) if int(t) <= T101)
+r8_101 = sorted(p for p in git("ls-tree", "-r", "--name-only", F_AT101, FD).split() if re.search(r"report_\d+\.md$", p))
+prompts = show(V101, "docs/reading/parallel_sessions_prompts.md")
+f_rounds = re.findall(r"^## Session F — (round \d+) \((S\d+)", prompts, re.M)
+row(S, tex(268, "its branch holds eight reports", new="The two screens closed session~F's fourth round; its branch holds eight reports"),
+    ("the two screens close F's programme; its branch holds eight reports", "the two screens closed session F's fourth round; its branch holds eight reports"),
+    f"{len(r8)} reports at {F}; the draft {M} at {ctime(M)}; F's commits after a199d5e (to the pin {F_TIP}): "
+    + "; ".join(git("log", "--format=%h %cI %s", f"{F}..{F_TIP}").strip().split("\n"))
+    + f"; F at 846d0c8's commit time: {F_AT101}, {len(r8_101)} reports; the prompts file's F headings {f_rounds}; tex101:44 lists F's S88 in "
+    f"'the exploratory sessions' fifth round' {'fifth round (E' in TEX[43]}",
+    "PARTIAL",
+    "'closed' and 'eight reports' hold (F's round 6, S89, began at 8ba99bb, 18:02, and holds no report by 18:33). 'Fourth round' is F's "
+    "fourth round of screens (S53-S59, S68-S70, S80-S81, S88; F had no round 4), but the report numbers rounds project-wide: tex101:44, 46 and "
+    "370 call S88 part of the fifth round, as the prompts file ('Session F — round 5 (S88') and F's own 'round 6' commits do. Exact: "
+    "'closed session F's fifth round' or 'F's part of the fifth round'")
+row(S, tex(377, "collapses to about zero everywhere but the first layer's value positions and binds $7/10$ against the fixed one's $10/10$",
+          new="collapses to about zero except at some value positions and binds $7/10$ against the fixed one's $10/10$"),
+    ("'A learned write strength, screened afterwards, collapses to about zero everywhere but the first layer's value positions and binds 7/10 against 10/10 (no reading applies)'",
+     "'A learned write strength, screened afterwards, collapses to about zero except at some value positions and binds 7/10 against the fixed one's 10/10 (no reading applies)'"),
+    f"counts {cnt['DELTA_LEARNED']}/10 vs {cnt['DELTA_FIXED']}/10; end medians >= 0.5 outside VAL: CTX {ctx_hi}, KEY {key_hi}", "PARTIAL" if ctx_hi else "MATCH",
+    "the counts, 'no reading applies' and the value-position exceptions are right; the one context-position exception (DELTA_LEARNED 2403, "
+    "layer 3, 0.72), which tex101:268 now states, is left out of this summary. Minor")
 row(S, tex(495, "a learned write strength collapses on a screen"), "conclusion: 'a learned write strength collapses on a screen'",
     f"the all-position median falls below 0.1 in every layer in every learned run (first at {min(x for v in fb.values() for x in v.values())}-{max(x for v in fb.values() for x in v.values())})", "MATCH", "scoped 'on a screen'")
-row(S, tex(487, "its reading on the horizon itself read ``it does not''"), "limits, memory horizon: 'a learned forget gate raises one delta channel's binding ... its reading on the horizon itself read \"it does not\"'",
-    "S88b (the direct horizon screen) is untested by its rule and not mentioned here", "PARTIAL",
-    "not wrong, but not updated: the limit should add that S88b, the direct screen, was untested (ROUTED 6/10 at 1x) and that its failures at "
-    "twice the distance are stream confusions at 0.5")
-row(S, tex(44, "F's S88"), "Revision 10 paragraph: 'the fifth round (... F's S88 ...)'; 'the fifth round's screens have not been refereed'",
-    "true until this check (V's branch had no S88 file)", "MATCH")
-row(S, tex(495, "the fifth round's screens have been recomputed there and not yet refereed by session~V"),
+row(S, tex(487, "its reading on the horizon itself read ``it does not''", new="its reading on the horizon itself read ``it does not'' and the direct horizon screen (S88b) is untested by its rule, with its failures stream confusions at $0.5$ rather than faded memory"),
+    ("limits, memory horizon: 'a learned forget gate raises one delta channel's binding ... its reading on the horizon itself read \"it does not\"'",
+     "limits, memory horizon: ... and the direct horizon screen (S88b) is untested by its rule, its failures stream confusions at 0.5 rather than faded memory"),
+    f"S88b untested {untested} (ROUTED {nB['ROUTED_1X']}/10 at 1x); unbound end acc {rng(ub_acc, 3)}, by distance {rng(ub_dist, 3)}; correct + other stream's value {rng(conf, 3)}",
+    ok_if(untested), "846d0c8 adds S88b as the referee's pass asked; 'rather than faded memory' is the reading of a flat profile across distance, as at tex101:270")
+row(S, tex(44, "F's S88", new="and, after the merge, of the whole revision and of the fifth round's screens (\\texttt{rev10/referee\\_pass.md}"),
+    ("Revision 10 paragraph: 'the fifth round (... F's S88 ...)'; 'the fifth round's screens have not been refereed'",
+     "Revision 10 paragraph: 'the fifth round (... F's S88 ...)'; the referee checked the fifth round's screens after the merge (rev10/referee_pass.md)"),
+    f"at {V101}: check_rev10_FG.md and referee_pass.md in docs/review_2026-10/rev10/: "
+    f"{all(x in git('ls-tree', '--name-only', V101, 'docs/review_2026-10/rev10/') for x in ('check_rev10_FG.md', 'referee_pass.md'))}", "MATCH",
+    "the original row was MATCH for 'not refereed' (true at 585b666); 846d0c8 records the referee's check, which exists")
+row(S, removed(495, "the fifth round's screens have been recomputed there and not yet refereed by session~V", 499,
+                "and after the merge it checked the rest, the fifth round's screens included, with the same outcome"),
     "conclusion: 'the fifth round's screens have been recomputed there (docs/review_2026-10/rev10/) and not yet refereed by session V'",
     f"rev10/ at {M}: {sorted(p.split('/')[-1] for p in git('ls-tree', '-r', '--name-only', M, 'docs/review_2026-10/rev10/').split())}; "
     "no script recomputes S88 or S87; first_pass.md sections 6-7 cite record counts, several rows only 'report 8' / 'report 7'",
-    "PARTIAL", "the counts were read from the records; the beta and gate descriptions were taken from the reports (first_pass 6.3, 7.6 'MATCH (as F's description)')")
-prov = next(i for i, l in enumerate(TEX, 1) if l.startswith("F & S53, S54, S59"))
-row(S, tex(prov, "S81 the trigger on delta (report 7, \\texttt{d5851b1}) & \\texttt{d5851b1} & 322; 102; 30; 40; 48; 42"),
-    "provenance table, F row: screens to S81, commit d5851b1, runs 322; 102; 30; 40; 48; 42",
-    f"report 8 at {F} ({ctime(F)}): S88a {sum(len(a) for a in WA.values())} + S88b {sum(len(a) for a in HA.values())} = 78 runs; "
-    "the row has no S88 entry and its commit column is report 7's", "DISAGREE",
-    "the caption says the commit column is 'the last report's'; F's last report is a199d5e. Exact: add 'S88a write strength, S88b horizon "
-    "(report 8, a199d5e)', commit a199d5e, runs '; 78'")
+    "REMOVED", "was PARTIAL: the counts were read from the records; the beta and gate descriptions were taken from the reports (first_pass 6.3, "
+    "7.6 'MATCH (as F's description)'). 846d0c8 deletes the sentence; its replacement is checked in F-tex101-new")
+prov = next(i for i, l in enumerate(OLD, 1) if l.startswith("F & S53, S54, S59"))
+row(S, tex(prov, "S81 the trigger on delta (report 7, \\texttt{d5851b1}) & \\texttt{d5851b1} & 322; 102; 30; 40; 48; 42",
+           new="S81 the trigger on delta (report 7, \\texttt{d5851b1}); S88a the write strength, S88b the horizon (report 8, \\texttt{a199d5e}; readings \\texttt{40087cb}) & \\texttt{a199d5e} & 322; 102; 30; 40; 48; 42; 78\\\\"),
+    ("provenance table, F row: screens to S81, commit d5851b1, runs 322; 102; 30; 40; 48; 42",
+     "provenance table, F row: ... S88a, S88b (report 8, a199d5e; readings 40087cb), commit a199d5e, runs ...; 78"),
+    f"report 8 at {F} ({ctime(F)}): S88a {sum(len(a) for a in WA.values())} + S88b {sum(len(a) for a in HA.values())} = 78 runs; readings {F_READ} (F-order)",
+    ok_if(sum(len(a) for a in WA.values()) + sum(len(a) for a in HA.values()) == 78),
+    "846d0c8 adds the S88 entry, its commit and its 78 runs")
 
 # ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 # SESSION G, S87
@@ -851,13 +980,17 @@ row(S, tex(283, "discovered $\\mathbf{17/20}$ (17 vs 0 against the baseline, $p 
 row(S, tex(283, "two pairs short of the pre-fixed rule for ``replaces the key hinge'' (the key hinge alone on 3 seeds, the frequency hinge alone on none) and with the key term not shown needed over it (3 vs 0, $p = 0.125$)"),
     "two pairs short of 'replaces' (3 vs 0); the key term not shown needed over it (3 vs 0, p = 0.125)",
     f"KH vs FREQ {kh['REG3_FREQHINGE']}; the rule for 'still needed' is p <= p(4 vs 0) = {P4} against every new arm", "MATCH")
-row(S, tex(283, "a penalty on the gate's own distance from uniform at every position, which reads nothing"),
-    "SELFKL: 'a penalty on the gate's own distance from uniform at every position, which reads nothing'",
+sk_src = show(G, "explore_g_s87_child.py")
+row(S, tex(283, "a penalty on the gate's own distance from uniform at every position, which reads nothing",
+           new="a penalty on each position's gate's distance from the sequence's own mean gate, which reads nothing"),
+    ("SELFKL: 'a penalty on the gate's own distance from uniform at every position, which reads nothing'",
+     "SELFKL: 'a penalty on each position's gate's distance from the sequence's own mean gate, which reads nothing'"),
     "explore_g_s87_child.py:33-35 and :116-122: KL(g_t || gbar), gbar the sequence's own mean gate over its body positions (t < body_len = 20 "
-    "of the 22 input positions); no uniform distribution enters", "DISAGREE",
-    "it is the distance from the sequence's mean gate, not from uniform (that was S83's POS and FLAT). Exact: 'a penalty on the gate's "
-    "distance from its own mean over the sequence's body positions'. The table row (tex10:322, 'a self-distance penalty') is right. "
-    "The other session's first pass (7.6) passed it")
+    f"of the 22 input positions); no uniform distribution enters (term_value 'selfkl': gb = g[:, :RHL.body_len], m = gb.mean(1) "
+    f"{'gb = g[:, :RHL.body_len]' in sk_src and 'm = gb.mean(1, keepdim=True)' in sk_src})",
+    "MATCH" if "gb = g[:, :RHL.body_len]" in sk_src and "m = gb.mean(1, keepdim=True)" in sk_src else "DISAGREE",
+    "846d0c8 takes the referee's wording. 'Each position' means each of the 20 body positions (the query block's two are outside the term), "
+    "as 'the sequence's own mean gate' is their mean")
 row(S, tex(283, "bound $0/20$ and clamped the gate (its commitment $0.0001$ against the baseline's $0.873$ at 2400, the pre-fixed ``clamps'')"),
     "SELFKL bound 0/20 and clamped the gate (0.0001 vs 0.873, the pre-fixed 'clamps')",
     f"ROUTED-BOUND {sum(rbd(r) for r in sk.values())}/20, BOUND {sum(gbound(r) for r in sk.values())}/20; commitment {CM['REG3_SELFKL']:.4f} vs "
@@ -877,27 +1010,74 @@ row(S, tex(322, "$17/20$ / $0/20$ / $3/20$ & $10/10$ / --- / ---"), "Table 6 row
     f"{sum(rbd(r) for r in GA['REG3_FREQHINGE'].values())}/20 / {sum(rbd(r) for r in sk.values())}/20 / {sum(rbd(r) for r in tp.values())}/20; "
     f"FREQ_D {sum(rbd(r) for r in GA['REG3_FREQHINGE_D'].values())}/10; no SELFKL_D / TEMP_D records "
     f"({not any(a in GA for a in ('REG3_SELFKL_D', 'REG3_TEMP_D'))})", "MATCH", "caption tex10:328: 'S82, S83 and S87', ROUTED-BOUND")
-row(S, tex(485, "The hinge reads key identities"), "limits, item 1: 'The hinge reads key identities; a dense loss may change the race without it'",
-    "S87: a hinge on a token-frequency table, reading no labels, 17/20 (two pairs short of replacing the key hinge)", "PARTIAL",
-    "not wrong, but not updated: the obstacle 'discovery without task structure' now has S87's partial answer, with its caveat (on this task the "
-    "frequent tokens are the CTX and key types)")
-provg = next(i for i, l in enumerate(TEX, 1) if l.startswith("G & S55 probe"))
-row(S, tex(provg, "S83 the hinge's inputs, the control and the window (report 6, \\texttt{076005d}; spec \\texttt{b2f9907}) & \\texttt{076005d} & 22; 139; 50; 150; 136; 82"),
-    "provenance table, G row: screens to S83, commit 076005d, runs to 82",
-    f"report 7 at {G} ({ctime(G)}), spec 3c89f87: S87 {len(allG)} runs; the row has no S87 entry and its commit column is report 6's", "DISAGREE",
-    "Exact: add 'S87 label-free hinges (report 7, e46799a; spec 3c89f87)', commit e46799a, runs '; 142'")
+row(S, tex(485, "The hinge reads key identities", new="The hinge reads key identities, and the one label-free hinge found so far, on a frequency table of token ids, discovers $17/20$ on a task where that table selects the keys and the contexts (S87)"),
+    ("limits, item 1: 'The hinge reads key identities; a dense loss may change the race without it'",
+     "limits, item 1: 'The hinge reads key identities, and the one label-free hinge found so far, on a frequency table of token ids, discovers 17/20 on a task where that table selects the keys and the contexts (S87)'"),
+    f"S87: FREQHINGE {sum(rbd(r) for r in GA['REG3_FREQHINGE'].values())}/20 ROUTED-BOUND; the table's frequent types {sorted(FR[0]['types'])} = CTX 0-1 and KEY 2-5; "
+    f"SELFKL {sum(rbd(r) for r in sk.values())}/20 and TEMP {sum(rbd(r) for r in tp.values())}/20 read no labels either and did not discover",
+    ok_if(sorted(FR[0]["types"]) == [0, 1, 2, 3, 4, 5] and sum(rbd(r) for r in GA["REG3_FREQHINGE"].values()) == 17),
+    "846d0c8 adds S87's answer with its caveat ('on a task where that table selects the keys and the contexts'), as the pass asked; "
+    "'the one label-free hinge found so far' means the one that discovers")
+provg = next(i for i, l in enumerate(OLD, 1) if l.startswith("G & S55 probe"))
+row(S, tex(provg, "S83 the hinge's inputs, the control and the window (report 6, \\texttt{076005d}; spec \\texttt{b2f9907}) & \\texttt{076005d} & 22; 139; 50; 150; 136; 82",
+           new="S87 hinges that read no task labels (report 7, \\texttt{e46799a}; spec \\texttt{3c89f87}) & \\texttt{e46799a} & 22; 139; 50; 150; 136; 82; 142\\\\"),
+    ("provenance table, G row: screens to S83, commit 076005d, runs to 82",
+     "provenance table, G row: ... S87 (report 7, e46799a; spec 3c89f87), commit e46799a, runs ...; 142"),
+    f"report 7 at {G} ({ctime(G)}), spec {G_SPEC}: S87 {len(allG)} runs", ok_if(len(allG) == 142),
+    "846d0c8 adds the S87 entry, its commit, spec and 142 runs. 'Hinges' takes in TEMP, a temperature schedule rather than a hinge; a label")
 row(S, tex(495, "is found on every seed of a screen when a hinge keeps the gate off key identity"), "conclusion on distant cues (S87 not mentioned)",
     "no statement on S87", "MATCH", "nothing to check; the omission is the limits row's")
 
 # ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
-total = collections.Counter()
+# REVISION 10.1 (846d0c8): text on S88 and S87 it added
+# ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+S = "F-tex101-new"
+row(S, new(370, "the timing of the learned write strength's collapse, stated as 1200 updates where the records give 3600 in one arm and 1200--6000 in the other"),
+    "10.1's account of the corrected S88a statement: stated as 1200 updates; the records give 3600 in one arm and 1200-6000 in the other",
+    f"DELTA_LEARNED all-layer median < 0.1 first at {sorted(set(fb['DELTA_LEARNED'].values()))}; SLOW +{sorted(x - 2400 for x in fbs)} after the switch",
+    ok_if(set(fb["DELTA_LEARNED"].values()) == {3600} and (fbs[0] - 2400, fbs[-1] - 2400) == (1200, 6000)), is_new=True)
+row(S, new(370, "the limits list updated for S87 and S88b"), "10.1: the limits list updated for S87 and S88b",
+    "tex101:489 (S87) and tex101:491 (S88b), rows above", "MATCH", is_new=True)
+row(S, new(370, "and provenance rows for E, F, G and H that stopped before the fifth round"), "10.1's account of the provenance rows (F's and G's here)",
+    f"tex101:542 now ends at S88 (a199d5e, 78 runs) and tex101:543 at S87 (e46799a, 142 runs): rows above", "MATCH", is_new=True)
+row(S, new(499, "and after the merge it checked the rest, the fifth round's screens included, with the same outcome (the numbers right, nine statements false"),
+    "conclusion: after the merge the referee checked the fifth round's screens (S88, S87 here): numbers right, statements false",
+    f"check_rev10_FG at {V101}: {'check_rev10_FG.md' in git('ls-tree', '--name-only', V101, 'docs/review_2026-10/rev10/')}; its counts and readings reproduce "
+    "(sections F-report8, G-report7); its S88/S87 false statements were referee_pass §1.6 (beta's timing), §1.7 (SELFKL), §1.8 (F, G rows)",
+    "MATCH", "replaces the removed tex10:495 sentence", is_new=True)
+S = "G-tex101-new"
+row(S, new(370, "the self-distance penalty described as a distance from uniform (it is from the sequence's own mean gate)"),
+    "10.1's account of the corrected S87 statement", "explore_g_s87_child.py term_value 'selfkl' (row above)",
+    ok_if("m = gb.mean(1, keepdim=True)" in sk_src), is_new=True)
+
+# ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# pinned branches: commits after each pin up to 846d0c8's commit time
+# ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+print("## Pinned branches: commits after each pin, up to 846d0c8's commit time (2026-10-19 18:33:26 UTC)\n")
+for br, pin in BRANCH_PINS.items():
+    lst = [l.split(" ", 2) for l in git("log", "--first-parent", "--format=%h %ct %s", f"{pin}..{br}").split("\n") if l.strip()]
+    mv = [(h, datetime.datetime.fromtimestamp(int(t), datetime.timezone.utc).strftime("%H:%M:%S"), m[:60]) for h, t, m in lst if int(t) <= T101]
+    print(f"- {br.split('/', 1)[1]} pinned {pin}: {len(mv)} commit(s) by 18:33:26 UTC {mv[::-1]}; {sum(1 for h, t, m in lst if int(t) > T101)} after")
+print(f"\nF at 846d0c8's commit time: {F_AT101}, reports {len(r8_101)}; RECOMPUTED TEXT DIFFERS FROM THE ORIGINAL'S: {RECDIFF}")
+missing = [k for k in OLDROWS if k not in SEEN]
+assert not missing, missing
+
+# ══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+K = ("DISAGREE", "PARTIAL", "NOT RECORD-CHECKABLE", "MATCH", "REMOVED")
+total, total_old, total_same = collections.Counter(), collections.Counter(), collections.Counter()
 for sec, rows_ in SECTIONS.items():
     c = collections.Counter(r[3] for r in rows_)
     total.update(c)
-    print(f"\n### {sec}: {len(rows_)} rows — " + ", ".join(f"{k} {c.get(k, 0)}" for k in ("DISAGREE", "PARTIAL", "NOT RECORD-CHECKABLE", "MATCH")) + "\n")
-    print("| where | statement | recomputed | status | note |\n|---|---|---|---|---|")
-    order_ = {"DISAGREE": 0, "PARTIAL": 1, "NOT RECORD-CHECKABLE": 2, "MATCH": 3}
-    for w, s_, r_, st_, n_ in sorted(rows_, key=lambda x: order_[x[3]]):
-        cell = lambda x: str(x).replace("|", "\\|").replace("\n", " ")
-        print(f"| {cell(w)} | {cell(s_)} | {cell(r_)} | **{st_}** | {cell(n_)} |")
-print(f"\nTOTAL {sum(total.values())} rows: " + ", ".join(f"{k} {total.get(k, 0)}" for k in ("DISAGREE", "PARTIAL", "NOT RECORD-CHECKABLE", "MATCH")))
+    total_old.update(r[5] for r in rows_ if r[5] != "\u2014")
+    total_same.update(r[3] for r in rows_ if r[5] != "\u2014")
+    print(f"\n### {sec}: {len(rows_)} rows — " + ", ".join(f"{k} {c.get(k, 0)}" for k in K if k != "REMOVED" or c.get(k)) + "\n")
+    print("| where | statement | recomputed | status | v585b666 \u2192 v846d0c8 | note |\n|---|---|---|---|---|---|")
+    order_ = {"DISAGREE": 0, "PARTIAL": 1, "NOT RECORD-CHECKABLE": 2, "MATCH": 3, "REMOVED": 4}
+    for w, s_, r_, st_, n_, ost, dl in sorted(rows_, key=lambda x: order_[x[3]]):
+        print(f"| {cell(w)} | {cell(s_)} | {cell(r_)} | **{st_}** | {cell(dl)} | {cell(n_)} |")
+assert [total_old[k] for k in K[:4]] == [6, 15, 3, 83], total_old
+n_old = sum(total_old.values())
+print(f"\nTOTAL (original, 585b666) {n_old} rows: " + ", ".join(f"{k} {total_old.get(k, 0)}" for k in K[:4]))
+print(f"TOTAL (the same {n_old} rows against 846d0c8): " + ", ".join(f"{k} {total_same.get(k, 0)}" for k in K))
+print(f"TOTAL (846d0c8, all {sum(total.values())} rows): " + ", ".join(f"{k} {total.get(k, 0)}" for k in K))
+print("STATUS CHANGES: " + "; ".join(f"{r[0]}: {r[6]}" for rows_ in SECTIONS.values() for r in rows_ if r[5] != "\u2014" and r[5] != r[3]))
