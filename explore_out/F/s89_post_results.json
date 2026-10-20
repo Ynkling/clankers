@@ -1,0 +1,288 @@
+{
+ "meta": {},
+ "runs": {
+  "O_HEBB_CONV_POOL|2800|267d08456c38|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.9833984375,
+   "arm": "O_HEBB_CONV_POOL",
+   "attempts": 1,
+   "code_sha": "267d08456c382675e556884f7221ae2870eb03a5",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.29931640625,
+     2.596442937850952
+    ],
+    [
+     2400,
+     0.32470703125,
+     2.1872777938842773
+    ],
+    [
+     3600,
+     0.841796875,
+     0.5058180093765259
+    ],
+    [
+     4800,
+     0.95751953125,
+     0.14457042515277863
+    ],
+    [
+     6000,
+     0.966796875,
+     0.09970797598361969
+    ],
+    [
+     7200,
+     0.9833984375,
+     0.05028575286269188
+    ]
+   ],
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999873676645104,
+    "eta_key_by_half": 0.0007476806640625,
+    "eta_key_by_index": 0.00323486328125,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_key_by_stream_inv": 1.0,
+    "eta_val_by_half": 0.0007476806640625,
+    "eta_val_by_index": 0.00323486328125,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.028086602687835693,
+    "key_sep": 0.013232164084911346,
+    "margin": 1.0,
+    "sep": 1.0,
+    "seq_routed_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv": 0.0
+   },
+   "gate": "perfect",
+   "git": "b036d91",
+   "grad": {
+    "1": [
+     0.0,
+     2.478521396639261,
+     0.05480702358182882
+    ],
+    "10": [
+     0.0,
+     2.342516650890827,
+     0.053024491783149906
+    ],
+    "100": [
+     0.0,
+     1.7585011214235629,
+     0.022460857163161197
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.0,
+   "kind": "ORACLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "outcome_inv": {
+    "bound": true,
+    "discovered": true,
+    "eta_key_by_stream": 1.0,
+    "form": "within-sequence",
+    "margin": 1.0,
+    "routed_bound": true,
+    "routed_end": true,
+    "val_cos": 0.0
+   },
+   "outcome_pooled": {
+    "bound": true,
+    "discovered": true,
+    "eta_key_by_stream": 1.0,
+    "form": "pooled",
+    "margin": 1.0,
+    "routed_bound": true,
+    "routed_end": true,
+    "val_cos": 0.0
+   },
+   "params": 27904,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 129.80368494987488,
+   "secs_wall": 133.06022930145264,
+   "seed": 2800,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999873676645104,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.028086602687835693,
+     "key_sep": 0.013232164084911346,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999873676645104,
+     "eta_key_by_half": 0.0007476806640625,
+     "eta_key_by_index": 0.00323486328125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.0007476806640625,
+     "eta_val_by_index": 0.00323486328125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.028086602687835693,
+     "key_sep": 0.013232164084911346,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999873676645104,
+     "eta_key_by_half": 0.0007476806640625,
+     "eta_key_by_index": 0.00323486328125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.0007476806640625,
+     "eta_val_by_index": 0.00323486328125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.028086602687835693,
+     "key_sep": 0.013232164084911346,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999873676645104,
+     "eta_key_by_half": 0.0007476806640625,
+     "eta_key_by_index": 0.00323486328125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.0007476806640625,
+     "eta_val_by_index": 0.00323486328125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.028086602687835693,
+     "key_sep": 0.013232164084911346,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999873676645104,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.028086602687835693,
+     "key_sep": 0.013232164084911346,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999873676645104,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.028086602687835693,
+     "key_sep": 0.013232164084911346,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 6000,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999873676645104,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.028086602687835693,
+     "key_sep": 0.013232164084911346,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 7200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    }
+   ],
+   "stopped_at": 7200,
+   "task": "POOL",
+   "torch": "2.14.0+cu130",
+   "transition": 4800,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 0.9833984375,
+    "acc_by_stream": [
+     0.9792079329490662,
+     0.9874759316444397
+    ],
+    "acc_last": 0.9874030947685242,
+    "acc_notlast": 0.9793307185173035,
+    "lastval_notlast": 0.0009842519648373127,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  }
+ }
+}
