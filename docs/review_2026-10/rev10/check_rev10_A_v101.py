@@ -115,6 +115,9 @@ def N(frag, n):
     return f"tex101:{n}"
 
 
+REMOVED = object()
+
+
 def also(*pairs):
     """Extra lines a row cites: each (tex10 line, fragment[, 846d0c8 wording]) asserted on both; returns ', N, ...'."""
     out = []
@@ -122,6 +125,11 @@ def also(*pairs):
         line, frag = p[0], p[1]
         assert frag in OLD[line - 1], f"extra fragment not on tex10:{line}: {frag!r}"
         n = LMAP[line]
+        if len(p) > 2 and p[2] is REMOVED:
+            assert all(frag not in t for t in tex), f"fragment of tex10:{line} still in tex101: {frag!r}"
+            PENDING.append((line, None, True))
+            out.append(f"tex10:{line} (sentence removed in 846d0c8)")
+            continue
         f = p[2] if len(p) > 2 else frag
         assert f in tex[n - 1], f"extra fragment not on tex101:{n}: {f!r}"
         PENDING.append((line, n, len(p) > 2))
@@ -479,7 +487,7 @@ bstr = "; ".join(f"{a} {b} [{lo:.3f}, {hi:.3f}]" for a, (b, (lo, hi)) in bands.i
 row(L("Bands: DELTA\\_SLOW RELIABLE $[0.835, 0.986]$; DELTA\\_SPLIT and HEBB\\_SPLIT MAJORITY $[0.739, 0.945]$; HEBB\\_SLOW MINORITY $[0.285, 0.578]$", ln),
     "bands", "records; rlib.wilson/band", bstr,
     "MATCH" if bstr == "HEBB_SPLIT MAJORITY [0.739, 0.945]; HEBB_SLOW MINORITY [0.285, 0.578]; DELTA_SPLIT MAJORITY [0.739, 0.945]; DELTA_SLOW RELIABLE [0.835, 0.986]" else "DISAGREE")
-row(L("The two machines mirrored each other on D1 (X $d = -3$, L $d = +3$)", ln) + ", 457",
+row(L("The two machines mirrored each other on D1 (X $d = -3$, L $d = +3$)", ln) + also((457, "three-pair")),
     "X d = -3, L d = +3", "records", f"X {dX:+d}, L {dL:+d}", "MATCH" if (dX, dL) == (-3, 3) else "DISAGREE")
 row(L("every Hebbian firing on a labelled target (80 of 80 over both machines), the delta firings on 26 of 63; the probe alone blocked 5 Hebbian and 14 delta checks", ln),
     "firings 80 of 80 Hebbian, 26 of 63 delta; probe alone 5 and 14", "records (checks[])",
@@ -503,15 +511,16 @@ date_marks = re.findall(r"^\+.*(?:19 October|2026-10-19|10-19|corrected)", c76, 
 row(L("Each is corrected where it stands, with the date.", 424, new="Each is corrected where it stands (\\texttt{76851eb})."),
     "the two statements (L's RESULT block; results/README.md's commit) each corrected where it stands, with the date",
     "76851eb (19 Oct 15:40 UTC) diff", f"both corrected in place at 76851eb; date or 'corrected' markers in the added lines: "
-    f"{len(date_marks)}", "PARTIAL",
-    "both are corrected where they stand (RESULT (L) now 'lost during the projection's timing'; README row now 8ae660d); neither "
-    "corrected text carries a date or a correction mark: the only date is 76851eb's commit time")
+    f"{len(date_marks)}; files 76851eb changes: {git('show', '--name-only', '--format=', '76851eb').split()}", "MATCH",
+    "846d0c8 cites the commit instead of claiming a date: both are corrected where they stand at 76851eb (RESULT (L) now 'lost "
+    "during the projection's timing'; README row now 8ae660d)")
 row(L("on L (\\texttt{test\\_delta\\_recipe}'s first start, to a reboot that the author attributes to the OOM killer, with a GPU job beside it)", 426),
     "L's first start lost to a reboot the author attributes to the OOM killer, with a GPU job beside it", "RESULT (L) at 585b666; L log",
     f"RESULT (L) says so: {'OOM killer' in TST and 'GPU job beside it' in TST}; boot ids {boots}", "MATCH",
     "attributed to the author, as the record supports (check_delta_recipe_L.md: the cause is in no record)")
-row(L("Revision~10 two", 431) + ", 455, 457", "Revision 10 added two lessons", "tex10 lessons section",
-    f"new lesson paragraphs in the diff: {sum(1 for i in (455, 457) if tex[i - 1].startswith(chr(92) + 'paragraph'))} (tex10:455, 457)",
+row(L("Revision~10 two", 431) + also((455, "\\paragraph{"), (457, "\\paragraph{Pool before reading the machines.}")), "Revision 10 added two lessons", "tex10 lessons section",
+    f"new lesson paragraphs in the diff: {sum(1 for i in (455, 457) if OLD[i - 1].startswith(chr(92) + 'paragraph'))} (tex10:455, 457 = "
+    f"tex101:{LMAP[455]}, {LMAP[457]}: {sum(1 for i in (455, 457) if tex[LMAP[i] - 1].startswith(chr(92) + 'paragraph'))})",
     "MATCH")
 row(L("\\texttt{b03d353} (L and pooled; L's docstring corrected after the referee's check, \\texttt{76851eb})", 519),
     "provenance: b03d353 (L and pooled), docstring corrected 76851eb; L file recorded at 8ae660d; pooled block regenerated with --report --also; 84; 84",
@@ -566,14 +575,14 @@ say(f"  seeds {sorted(gr['WIN3_SPLIT_D8'])[0]}-{sorted(gr['WIN3_SPLIT_D8'])[-1]}
     f"{G['meta'].get('torch')}; record key SHAs {gsha}")
 rep3 = show("3d7e68e", "explore_out/I/report_3.md")
 ln = 181
-row(L("on twenty fresh seeds (2540--2559", ln) + ", 522", "seeds 2540-2559, fresh", "records; check_I_report3.md (fresh on every branch)",
+row(L("on twenty fresh seeds (2540--2559", ln) + also((522, "seeds 2540--2559")), "seeds 2540-2559, fresh", "records; check_I_report3.md (fresh on every branch)",
     f"seeds {min(GS)}-{max(GS)} in the records", "MATCH", "freshness: check_I_report3.md / round6_A3 §3")
 row(L("a note fixing the seeds, the arms and the rule that nothing would be read as a claim was committed before any run", ln),
     "the pre-run note (seeds, arms, no claim) committed before any run; records carry its code hash", "git; records; check_I_report3.md §1",
     f"note 30807ec {hm('30807ec')}; records' code_sha {gsha}; first commit with the records 148c161 {hm('148c161')}; meta.started "
     f"{G['meta']['started']} (machine clock)", "MATCH", "check_I_report3: the SHA's code first exists at 30807ec, so no record can precede the note")
 row(L("The perfect gate bound $2/2$", ln), "perfect gate 2/2", "records", f"CEIL_C {gceil}/2", "MATCH" if gceil == 2 else "DISAGREE")
-row(L("the recipe $\\mathbf{19/20}$, without the split $6/20$, the recurrent-gate recipe $0/20$", ln) + ", 37, 68, 495",
+row(L("the recipe $\\mathbf{19/20}$, without the split $6/20$, the recurrent-gate recipe $0/20$", ln) + also((37, "the recipe $19/20$, without the split $6/20$, the recurrent gate $0/20$"), (68, "$19/20$, $6/20$, $0/20$ (descriptions)"), (495, "The headline arms bind $19/20$, $6/20$ and $0/20$ on a GPU")),
     "19/20, 6/20, 0/20", "records; test_window_gate.success (main line, blob = 30807ec = 148c161) and rlib",
     f"{gc}", "MATCH" if gc == {"WIN3_SPLIT_D8": 19, "WIN3_SLOW_D8": 6, "HINGE_D8": 0} else "DISAGREE")
 pv = [gp[k][2] for k in gp]
@@ -595,7 +604,7 @@ row(L("PyTorch 2.14.0+cu130, seeds 2540--2559) is on \\texttt{claude/explore-I} 
     "MATCH" if gtorch == ["2.14.0+cu130"] else "PARTIAL")
 s75b1660 = "explore_gpu/s75b_checks_cuda_NVIDIA_GeForce_GTX_1660_SUPER_output.txt"
 c1660 = git("log", "--format=%h", I_BR, "--", s75b1660).split()[-1]
-row(L("The card belonged to the user's server, which left the project after this run and S75b's CUDA CHECKs", ln) + ", 44",
+row(L("The card belonged to the user's server, which left the project after this run and S75b's CUDA CHECKs", ln) + also((44, "which left the project on 19 October")),
     "the server (1660) left the project on 19 October, after this run and S75b's CUDA CHECKs; the remaining GPU is the 3070",
     "STATUS.md at 585b666; git", f"GPU run 148c161 {hm('148c161')}; S75b CUDA CHECK on the 1660 {c1660} {hm(c1660)}; STATUS.md: "
     f"'left the project on 19 October' {'left the project on 19 October' in show(V10, 'STATUS.md')}", "NOT RECORD-CHECKABLE",
@@ -664,7 +673,7 @@ row(L("R was given \\texttt{specs/test\\_split\\_copy.md} and the test's docstri
     "replicate_report.md:172 (31c39fc)", f"'from its specification and docstring at `ffb0771` only' in R's report: "
     f"{'from its specification and docstring at `ffb0771` only' in rr}", "MATCH")
 wf = lambda n: f"[{W5[n][0]:.3f}, {W5[n][1]:.3f}]"
-row(L("The copy with its reset bound routed $\\mathbf{18/20}$ (Wilson $[0.699, 0.972]$), the reset alone $9/20$ ($[0.258, 0.658]$), one delta channel $0/20$ ($[0, 0.161]$); the perfect gates $2/2$", ln) + ", 37, 69, 472, 495",
+row(L("The copy with its reset bound routed $\\mathbf{18/20}$ (Wilson $[0.699, 0.972]$), the reset alone $9/20$ ($[0.258, 0.658]$), one delta channel $0/20$ ($[0, 0.161]$); the perfect gates $2/2$", ln) + also((37, "($18/20$, $9/20$, $0/20$)"), (69, "$18/20$, $9/20$, $0/20$, each ``consistent''"), (472, "Its fifth phase reproduces \\texttt{test\\_split\\_copy}'s three counts"), (495, "reproduced the split test's three counts on fresh seeds")),
     "18/20 [0.699, 0.972], 9/20 [0.258, 0.658], 0/20 [0, 0.161]; perfect gates 2/2", "R's records with R's functions (ast)",
     f"COPY {C5['COPY']} {wf('COPY')}; RESET {C5['RESET']} {wf('RESET')}; DELTA1 {C5['DELTA1']} {wf('DELTA1')}; oracles {orc}",
     "MATCH" if (C5 == {"COPY": 18, "RESET": 9, "DELTA1": 0} and wf("COPY") == "[0.699, 0.972]" and wf("RESET") == "[0.258, 0.658]"
@@ -674,13 +683,13 @@ row(L("the copy against the reset 9 vs 0 ($p = 0.002$) and against one delta cha
     f"{pr5[('COPY', 'RESET')][:2]} p {pr5[('COPY', 'RESET')][2]:.3g}; {pr5[('COPY', 'DELTA1')][:2]} p {pr5[('COPY', 'DELTA1')][2]:.2g}; "
     f"main line {mlpair}", "MATCH" if pr5[('COPY', 'RESET')][:2] == (9, 0) and pr5[('COPY', 'DELTA1')][:2] == (18, 0)
     and mlpair == {"RESET": (12, 0), "DELTA1": (18, 0)} else "DISAGREE")
-row(L("all three do ($18/20$, $6/20$ and $0/20$ there)", ln) + ", 37, 69", "each arm inside the main line's pooled interval (18/20, 6/20, 0/20)",
+row(L("all three do ($18/20$, $6/20$ and $0/20$ there)", ln) + also((37, "each inside the main line's interval"), (69, "each ``consistent''")), "each arm inside the main line's pooled interval (18/20, 6/20, 0/20)",
     "main line records (rlib); Wilson", f"main line {ml}; consistent ranges and verdicts {cons}",
     "MATCH" if ml == {"COPY": 18, "RESET": 6, "DELTA1": 0} and all(v[2] for v in cons.values()) else "DISAGREE")
 row(L("the copy arm reads ``consistent'' with probability $0.61$ at a true rate of $0.70$ and $0.64$ at $0.95$", ln),
     "P(consistent) 0.61 at 0.70, 0.64 at 0.95", "binomial over the consistent range", f"range {cons['COPY'][:2]}: {pc[0.70]:.3f}, {pc[0.95]:.3f}",
     "MATCH" if (round(pc[0.70], 2), round(pc[0.95], 2)) == (0.61, 0.64) else "DISAGREE")
-row(L("``from the written specification alone'' holds for the delta arm only", ln) + ", 37, 44, 69, 472, 495",
+row(L("``from the written specification alone'' holds for the delta arm only", ln) + also((37, "its delta arm from the specification alone"), (44, "its delta arm from the specification alone"), (69, "(the delta arm from the specification alone)"), (472, "the delta arm from the specification alone and the other two with its earlier recipe"), (495, "its delta arm from the specification alone")),
     "'from the specification alone' for the delta arm only; the other two are R's Phase 4 recipe", "check_R_phase5.md row 35; round6_A3 §2",
     "the referee's PARTIAL, quoted as its qualification", "MATCH")
 row(L("Every number reproduces from R's records with R's outcome functions and with the main line's, which agree", ln),
@@ -818,7 +827,7 @@ say(f"  mutants caught {mcaught}; CPU CHECK code SHA {cpu_sha} ('ALL CHECKS PASS
 row(L("the last with a mutation pass of 48 variants of the failure rules, all caught by its CHECKs", ln),
     "mutation pass: 48 variants, all caught", "explore_gpu/s75b_mutants_cpu_output.txt (8d2e89f)", f"caught {mcaught[0]}/{mcaught[1]}",
     "MATCH" if mcaught == ("48", "48") else "DISAGREE")
-row(L("its final driver checked on the CPU (the cards' CUDA CHECKs were run on an earlier driver and are to be rerun)", ln) + ", 500",
+row(L("its final driver checked on the CPU (the cards' CUDA CHECKs were run on an earlier driver and are to be rerun)", ln) + also((500, "its final driver checked on the CPU; the CUDA CHECKs to rerun on the final driver")),
     "final driver checked on the CPU; the cards' CUDA CHECKs on an earlier driver", "s75b_checks_*_output.txt",
     f"CPU (a4ab996): SHA {cpu_sha}, all pass {'ALL CHECKS PASSED' in cpu}; CUDA 1660 / 3070: {cuda}",
     "MATCH" if cpu_sha == "ee04da11a164" and set(cuda.values()) == {"0759062126f5"} else "DISAGREE")
@@ -910,7 +919,7 @@ row(L("Session~E's key-load draft was committed after those reviews", 366), "E's
     "git", f"reviews 3f7d84b {hm('3f7d84b')} and 723827b {hm('723827b')}; draft {e_draft} {hm(e_draft)}; a key-load review on review-V "
     f"at {V_AT} (its last commit before {V10}): {any('keyload' in p for p in git('ls-tree', '-r', '--name-only', V_AT, 'docs/review_2026-10/').split())}",
     "MATCH", "V's keyload_options_review.md (11a78ee, 19 Oct 17:51 UTC) postdates the merge; it reviews E's five options, not the draft")
-row(L("its reviews of three of the four specifications the sessions drafted (three main-line tests and one exploratory screen)", 44) + ", 366",
+row(L("its reviews of three of the four specifications the sessions drafted (three main-line tests and one exploratory screen)", 44) + also((366, "It reviewed three of the four specifications the sessions drafted")),
     "V reviewed three of four drafted specifications (G, H main-line; S75b exploratory); E's not", "review-V files",
     "spec_review_register_draft.md, spec_review_two_keyterm_draft.md, spec_review_s75b_draft.md; none for E's", "MATCH")
 row(L("the three drafted specifications are not ready", 70), "index, V's row: 'the three drafted specifications are not ready'",
