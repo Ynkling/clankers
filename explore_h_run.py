@@ -10,7 +10,7 @@ failed CHECK stops the invocation before any screen run. Only Adam runs are used
 container's CPU is bit for bit; records from other CPUs are compared by counts only.
 
 Run:  python explore_h_run.py SCREEN [SCREEN ...] [--workers 4] [--report-only]
-      SCREEN: collapse (S58) | eight (S58b) | stability (S60) | copy2x2 (S61) | query (S62) | hardness (S63) | two (S78) | constants (S79) | guard (S84) | two_b (S85) | allmass (S86) | allmass2 (S87a) | dose (S87c) | s89 (S89)
+      SCREEN: collapse (S58) | eight (S58b) | stability (S60) | copy2x2 (S61) | query (S62) | hardness (S63) | two (S78) | constants (S79) | guard (S84) | two_b (S85) | allmass (S86) | allmass2 (S87a) | dose (S87c) | s89 (S89) | s89c (S89c) | s89b (S89b)
       --push-each: commit explore_out/H and push after every saved run (S89 onward)
 """
 
@@ -34,7 +34,8 @@ MODS = {"collapse": "explore_h_collapse", "eight": "explore_h_eight", "stability
         "two": "explore_h_two", "constants": "explore_h_constants",
         "guard": "explore_h_guard", "two_b": "explore_h_two_b",
         "allmass": "explore_h_allmass",
-        "allmass2": "explore_h_allmass2", "dose": "explore_h_dose", "s89": "explore_h_s89"}
+        "allmass2": "explore_h_allmass2", "dose": "explore_h_dose", "s89": "explore_h_s89",
+        "s89c": "explore_h_s89c", "s89b": "explore_h_s89b"}
 OUT = os.path.join(ec.OUT_DIR, "H")
 CHECKS = os.path.join(OUT, "checks.json")
 
