@@ -608,3 +608,229 @@ def check_pool_task(task, B=4096, seed=7):
         rows.append((f"pool: no key type above any value type's frequency (max KEY {br['KEY']['max']:.4f} < min VAL "
                      f"{br['VAL']['min']:.4f})", br["KEY"]["max"] < br["VAL"]["min"]))
     return rows
+
+
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Round 6, revision of 20 October (referee V's review of S89-F, claude/review-V 3ae815b, fixes 1 and 2). APPENDED ONLY:
+# everything above is byte-identical to 50dc8e4, the commit G and H vendored first, so both classes and every helper
+# above behave exactly as there.
+#
+# SWAP-INVARIANT ROUTING STATISTICS (fix 1). On RandHeaderTask-allpool the stream index is a per-sequence convention
+#   (first appearance). The pooled statistics, eta^2 by stream at KEY (pool_routing_stats) and VAL cos (gate_stats_k's,
+#   from test_multilayer_binding.role_cosines), pool positions across sequences under that index, so they measure the
+#   labelling as well as the routing: a gate that separates the two streams of every sequence but puts the first block's
+#   context on channel 0 in only half of them scores eta^2 ~0 and VAL cos ~1 (check_inv_stats). The within-sequence
+#   forms (pool_routing_stats_inv):
+#     eta_key_by_stream_inv   eta^2 of the read gate's channel-0 probability over the sequence's S·P body KEY positions,
+#                             grouped by stream (test_router_layout.eta2 on each sequence alone: 0 where the sequence's
+#                             values are constant), averaged over the probe's sequences;
+#     val_cos_inv             the cosine between the two streams' mean read gates (k-vectors) over the sequence's S·P body
+#                             VAL positions (role_masks' 'val' of the probe input), per sequence, averaged over the probe;
+#     seq_routed_frac         the fraction of probe sequences whose eta^2 alone exceeds ROUTED_ETA (descriptive).
+#   Both are invariant to any permutation of the channels within a sequence (eta^2 of p is invariant to p -> 1 - p; a
+#   common permutation of two vectors' coordinates leaves their cosine unchanged), so neither reads the labelling.
+#   pool_stats_inv(route_at): pool_stats(route_at) plus the three fields at every evaluation (one more noise-free
+#   forward on the probe; no generator is drawn, so training is unchanged).
+#   pool_outcome(rec, invariant): ROUTED*@end (end margin >= 0.9 and eta^2 by stream at KEY > 0.9; S70 / S87's
+#   exploratory definition, not a main-line outcome), ROUTED-BOUND (bound and ROUTED*@end) and DISCOVERED (bound and end
+#   VAL cos < test_router_reliability.DISC_COS = 0.5), from the pooled fields (invariant False: eta_key_by_stream,
+#   rec["val_cos"]) or the within-sequence ones (True: eta_key_by_stream_inv, end val_cos_inv). On ALLPOOL the readings use
+#   the within-sequence fields; on POOL both are recorded and printed (they agree for a gate that is the same function of
+#   the CTX type in every sequence; check_inv_stats). The margin is already within-sequence (the query's read gate
+#   against its target's and distractor's write gates) and serves both.
+# THE ROUTING CAP ON ALLPOOL (fix 2). No fixed map from CTX type to channel separates a sequence's two contexts in more
+#   than 64/120 = 0.533 of sequences: with the 16 types split a / 16 - a over two channels, a sequence's 2 distinct types
+#   (one of C(16, 2) = 120 unordered pairs, uniform) fall on different channels in a·(16 - a) pairs, at most 8·8 = 64.
+#   A gate that reads token identity (LOCAL3, the register gates) can route the remaining sequences only by comparing
+#   the contexts within the sequence. task.perfect_gate is handed that comparison (the index by first appearance), so a
+#   valid perfect gate on ALLPOOL says the memory can use a relative routing, not that a gate under test can express
+#   one; a null on ALLPOOL does not separate "keys are not frequent" from "contexts have no fixed identity".
+#   type_level_gate(task, tokens, ch_of_type): the type-level perfect gate, the one-hot of ch_of_type[the latched CTX
+#   type] (uniform 1/k before the first CTX token). BALANCED_MAP: CTX types 0-7 -> channel 0, 8-15 -> channel 1 (a
+#   balanced map, at the cap). On POOL, with ch_of_type = (0, 1), it is task.perfect_gate.
+# check_inv_stats(task): the synthetic-gate CHECK (no model): the relative perfect gate; the same with the channels
+#   swapped in a random half of the sequences; a gate that sends each sequence's lower CTX type to channel 0 (a
+#   context-type gate that separates every sequence, whichever channel the first block's context takes); on ALLPOOL the
+#   balanced type-level gate. The within-sequence forms score eta^2 1 and cos 0 on the first three on both tasks; on
+#   ALLPOOL the pooled forms score ~0 and ~1 on the swapped and the type-ordered gates; the balanced type-level gate's
+#   within-sequence eta^2 equals the probe's fraction of separated sequences exactly; the vectorised per-sequence eta^2
+#   equals test_router_layout.eta2 applied to each sequence alone.
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+ROUTED_MARGIN, ROUTED_ETA = 0.9, 0.9
+BALANCED_MAP = tuple(int(t >= N_CTX_POOL // 2) for t in range(N_CTX_POOL))
+
+
+def eta2_rows(x, lab):
+    """test_router_layout.eta2 on each row of x (B, n) grouped by lab (B, n): (B,) float64; 0 where a row is constant."""
+    x = x.double()
+    mu = x.mean(1)
+    tot = ((x - mu[:, None]) ** 2).sum(1)
+    between = torch.zeros_like(tot)
+    for g in lab.unique().tolist():
+        m = (lab == g).double()
+        cnt = m.sum(1)
+        mg = (x * m).sum(1) / cnt.clamp(min=1)
+        between = between + torch.where(cnt > 0, cnt * (mg - mu) ** 2, torch.zeros_like(cnt))
+    return torch.where(tot > 0, between / torch.where(tot > 0, tot, torch.ones_like(tot)), torch.zeros_like(tot))
+
+
+def _positions(task, x):
+    return task.body_positions(x) if hasattr(task, "body_positions") else body_positions(task, x)
+
+
+def inv_from_gate(task, pinp, gr):
+    """The within-sequence forms from a read gate gr (B, T, k) on the probe input pinp (module comment above)."""
+    import torch.nn.functional as F
+    kpos, vpos = _positions(task, pinp)
+    lab = task.stream_labels(pinp)
+    eta = eta2_rows(gr[..., 0].gather(1, kpos), lab.gather(1, kpos))
+    k = gr.shape[-1]
+    gv = gr.gather(1, vpos.unsqueeze(-1).expand(-1, -1, k))
+    lv = lab.gather(1, vpos)
+    means = []
+    for s in range(task.S):
+        m = (lv == s).to(gv.dtype).unsqueeze(-1)
+        means.append((gv * m).sum(1) / m.sum(1).clamp(min=1))
+    cos = F.cosine_similarity(means[0], means[1], dim=-1)
+    return dict(eta_key_by_stream_inv=eta.mean().item(), val_cos_inv=cos.double().mean().item(),
+                seq_routed_frac=(eta > ROUTED_ETA).double().mean().item())
+
+
+@torch.no_grad()
+def pool_routing_stats_inv(model, task, probe):
+    """The within-sequence forms on the probe (module comment above), noise-free and in eval mode."""
+    assert task.S == 2, "the within-sequence forms are written for S = 2"
+    was = model.training
+    model.eval()
+    try:
+        pinp = probe[0]
+        gr = model(pinp, TAU_END)[2]
+    finally:
+        model.train(was)
+    return inv_from_gate(task, pinp, gr)
+
+
+def pool_stats_inv(route_at):
+    """pool_stats(route_at) plus the within-sequence forms at every evaluation."""
+    base = pool_stats(route_at)
+
+    @torch.no_grad()
+    def stats(model, task, probe, step):
+        out = base(model, task, probe, step)
+        out.update(pool_routing_stats_inv(model, task, probe))
+        return out
+    return stats
+
+
+def pool_outcome(rec, invariant):
+    """ROUTED*@end, ROUTED-BOUND and DISCOVERED from a run_one record (module comment above). None fields read False."""
+    from test_router_reliability import DISC_COS
+    rec = rec or {}
+    e = rec.get("end") or {}
+    bound = rec.get("transition") is not None
+    eta = e.get("eta_key_by_stream_inv" if invariant else "eta_key_by_stream")
+    vc = e.get("val_cos_inv") if invariant else rec.get("val_cos")
+    mg = e.get("margin")
+    routed = mg is not None and eta is not None and mg >= ROUTED_MARGIN and eta > ROUTED_ETA
+    return dict(form="within-sequence" if invariant else "pooled", bound=bound, routed_end=bool(routed),
+                routed_bound=bool(bound and routed), discovered=bool(bound and vc is not None and vc < DISC_COS),
+                margin=mg, eta_key_by_stream=eta, val_cos=vc)
+
+
+def type_level_gate(task, tokens, ch_of_type=BALANCED_MAP, dtype=torch.float32):
+    """The type-level perfect gate: one-hot of ch_of_type[the latched CTX type]; uniform 1/k before the first CTX."""
+    B, T = tokens.shape
+    idx = torch.arange(T).expand(B, T)
+    last = torch.where(task.ctx_mask(tokens), idx, torch.full_like(idx, -1)).cummax(dim=1).values
+    cur = tokens.gather(1, last.clamp(min=0))
+    cmap = torch.tensor(ch_of_type, dtype=torch.long)
+    assert len(ch_of_type) == task.n_ctx
+    k = int(cmap.max()) + 1
+    oh = torch.nn.functional.one_hot(cmap[cur.clamp(0, task.n_ctx - 1)], k).to(dtype)
+    return torch.where((last >= 0).unsqueeze(-1), oh, torch.full_like(oh, 1.0 / k))
+
+
+class _GateStub(torch.nn.Module):
+    """A model stand-in whose read and write gates are gate_fn(tokens): for the statistics' CHECKs only."""
+
+    def __init__(self, gate_fn):
+        super().__init__()
+        self.gate_fn = gate_fn
+
+    def forward(self, tokens, tau=None, track_sat=False):
+        g = self.gate_fn(tokens)
+        return None, None, g, g
+
+
+def check_inv_stats(task, seed=2800):
+    """[(name, ok)]: the synthetic-gate CHECK (module comment above), on test_multilayer_binding.probe_batch(task, seed)."""
+    from test_multilayer_binding import probe_batch
+    probe = probe_batch(task, seed)
+    pinp = probe[0]
+    B = pinp.shape[0]
+    allpool = isinstance(task, RandHeaderTaskAllPool)
+    rel = lambda x: task.perfect_gate(x)
+    flip = torch.rand(B, generator=torch.Generator().manual_seed(seed + 1)) < 0.5
+
+    def swapped(x):
+        g = task.perfect_gate(x)
+        return torch.where(flip[:x.shape[0], None, None], g.flip(-1), g)
+
+    def type_ordered(x):
+        isc = task.ctx_mask(x)
+        lo = torch.where(isc, x, torch.full_like(x, 10 ** 6)).min(1).values
+        # channel 0 for the sequence's lower CTX type, channel 1 for the other
+        idx = torch.arange(x.shape[1]).expand_as(x)
+        last = torch.where(isc, idx, torch.full_like(idx, -1)).cummax(dim=1).values
+        cur = x.gather(1, last.clamp(min=0))
+        oh = torch.nn.functional.one_hot((cur != lo[:, None]).long(), 2).float()
+        return torch.where((last >= 0).unsqueeze(-1), oh, torch.full_like(oh, 0.5))
+
+    gates = dict(relative=rel, swapped=swapped, type_ordered=type_ordered)
+    if allpool:
+        gates["type_balanced"] = lambda x: type_level_gate(task, x, BALANCED_MAP)
+    pooled_fn = pool_stats(("end",))
+    rows, res = [], {}
+    for nm, fn in gates.items():
+        stub = _GateStub(fn)
+        po = pooled_fn(stub, task, probe, "end")
+        iv = pool_routing_stats_inv(stub, task, probe)
+        res[nm] = (po, iv)
+    for nm in ("relative", "swapped", "type_ordered"):
+        po, iv = res[nm]
+        ok = abs(iv["eta_key_by_stream_inv"] - 1) < 1e-9 and abs(iv["val_cos_inv"]) < 1e-6 and abs(po["margin"] - 1) < 1e-6
+        rows.append((f"{task.key}: synthetic gate '{nm}': within-sequence eta^2 {iv['eta_key_by_stream_inv']:.6f} (1), VAL cos "
+                     f"{iv['val_cos_inv']:.6f} (0), margin {po['margin']:.6f} (1); pooled eta^2 {po['eta_key_by_stream']:.4f}, "
+                     f"VAL cos {po['val_cos']:.4f}", ok))
+    po, _ = res["relative"]
+    rows.append((f"{task.key}: the relative perfect gate's pooled forms are eta^2 1 and VAL cos 0 ({po['eta_key_by_stream']:.6f}, "
+                 f"{po['val_cos']:.6f})", abs(po["eta_key_by_stream"] - 1) < 1e-9 and abs(po["val_cos"]) < 1e-6))
+    for nm in ("swapped", "type_ordered"):
+        po, _ = res[nm]
+        if allpool or nm == "swapped":
+            ok = po["eta_key_by_stream"] < 0.05 and po["val_cos"] > 0.95
+            rows.append((f"{task.key}: gate '{nm}' (separates every sequence): the pooled forms read the labelling, eta^2 "
+                         f"{po['eta_key_by_stream']:.4f} (~0) and VAL cos {po['val_cos']:.4f} (~1)", ok))
+        else:
+            ok = abs(po["eta_key_by_stream"] - 1) < 1e-9 and abs(po["val_cos"]) < 1e-6
+            rows.append((f"{task.key}: gate '{nm}' is the fixed CTX -> channel map here: the pooled forms agree with the "
+                         f"within-sequence ones (eta^2 {po['eta_key_by_stream']:.6f}, VAL cos {po['val_cos']:.6f})", ok))
+    if allpool:
+        po, iv = res["type_balanced"]
+        cm = torch.tensor(BALANCED_MAP)
+        isc = task.ctx_mask(pinp)
+        sep = torch.tensor([len(set(cm[pinp[b][isc[b]]].tolist())) == 2 for b in range(B)]).double().mean().item()
+        ok = abs(iv["eta_key_by_stream_inv"] - sep) < 1e-9 and abs(iv["val_cos_inv"] - (1 - sep)) < 1e-6
+        rows.append((f"{task.key}: the balanced type-level gate separates {sep:.4f} of the probe's {B} sequences (cap 64/120 = "
+                     f"0.5333): within-sequence eta^2 {iv['eta_key_by_stream_inv']:.4f} equals it, VAL cos "
+                     f"{iv['val_cos_inv']:.4f} equals 1 minus it; pooled eta^2 {po['eta_key_by_stream']:.4f}, VAL cos "
+                     f"{po['val_cos']:.4f}, margin {po['margin']:.4f}", ok))
+    g = torch.rand(64, pinp.shape[1], 2, generator=torch.Generator().manual_seed(seed + 2)).softmax(-1)
+    kpos, _ = _positions(task, pinp[:64])
+    lab = task.stream_labels(pinp[:64]).gather(1, kpos)
+    v = eta2_rows(g[..., 0].gather(1, kpos), lab)
+    ref = torch.tensor([eta2(g[b, :, 0].gather(0, kpos[b]), lab[b]) for b in range(64)], dtype=torch.float64)
+    d = (v - ref).abs().max().item()
+    rows.append((f"{task.key}: the vectorised per-sequence eta^2 equals test_router_layout.eta2 on each sequence alone (max "
+                 f"|diff| {d:.1e} on 64 sequences, a random gate)", d < 1e-12))
+    return rows
