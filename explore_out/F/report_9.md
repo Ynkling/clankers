@@ -171,3 +171,117 @@ S89 models unchanged (`explore_f_s89_diag.py`):
 - **About 0.4 without memory, lite included.** A model that sees the last 10 tokens reaches 0.37-0.41 on all three
   tasks. The renaming does not change positional solvability: a pair inside the conv's reach can be answered without
   memory. This is below the 0.6 stop. It also means any accuracy near 0.4 on these tasks is not evidence of memory use.
+
+---
+
+# Addendum (20 October): referee V's fixes and the follow-up pilots
+
+Referee V reviewed S89-F at 8ba99bb (`docs/review_2026-10/screen_review_s89_F.md`, claude/review-V 3ae815b) and gave the
+verdict "fix first". The pilots and the diagnostic stand as run, and **no reading above changes**. The S89 records stay
+under code SHA ea9728c636c6, and S89's queue is closed.
+
+**This container is a Xeon @ 2.10GHz again.** The 2.80GHz S89 records reproduce bit for bit here: two pilots through 2400,
+by the revised path. So every run below is on 2.10GHz, and the comparisons with the S89 pilots are for reference only,
+not pairs.
+
+## Counts first: the follow-up pilots (seeds 2800 / 2801; Hebbian, k = 2, SLOW, 24000)
+
+| arm | bound (Wilson 95%; band) | 2800 | 2801 | the S89 pilot on the same seeds (no conv, relative gate) |
+|---|---|---|---|---|
+| O_HEBB_CONV_POOL (perfect gate + conv 'layer') | 2/2 [0.34, 1.00] RELIABLE | bound @4800 | bound @13200 | unbound 0.62 / 0.48 |
+| O_HEBB_CONV_ALLPOOL (perfect gate + conv 'layer') | 1/2 [0.09, 0.91] MAJORITY | bound @6000 | unbound 0.87 | unbound 0.33 / 0.50 |
+| conv pilots together | **3/4** [0.30, 0.95] MAJORITY | | | 0/4 |
+| O_TYPE_HEBB_ALLPOOL (type-level perfect gate, no conv) | 0/2 [0.00, 0.66] NEVER | unbound 0.28 | unbound 0.28 | (relative gate: 0.33 / 0.50) |
+
+**READING (post hoc; hypothesis and readings committed at 3dd5b74 before the runs): "partly"** (3/4 bind). "Restores"
+needed 4/4 and "it does not" 2 or fewer.
+
+**The conv pilots (descriptive).**
+- Every conv run routes perfectly: end margin 1.00, η² by stream 1.00 in both forms, VAL cos 0.00 in both forms.
+- The three bound runs reach 0.96-0.99, against 0.32-0.72 without the conv at 24000 and 48000.
+- The unbound run, ALLPOOL 2801, rises 0.67 → 0.78 by 7200, holds about 0.77 to 20400, then climbs to 0.87 at 24000. It
+  was still rising when the budget ended.
+- Accuracy is the same whether or not the queried pair was its key's last write (0.86 / 0.87 on ALLPOOL 2801).
+- **The convolution is the only difference** from the S89 pilot. It starts as a no-op: at initialisation the conv model's
+  logits equal the S89 pilot's bit for bit, its shared parameters are equal, and the conv weights are its only extra
+  parameter (CHECKed).
+- So adding the trainable convolution on the memory's input turns a Hebbian channel that cannot use 4 keys out of 32 into
+  one that binds on 3 of 4 seeds.
+  - This fits the hypothesis: H's Hebbian perfect gate with the conv bound the eight-stream grouped layout with the same
+    pool 2/2. The delta memory binds these tasks without the conv (S89: 2400-3600).
+  - Why the conv helps is not separated here. One candidate is that a key's write vector can carry its own value (KEY,
+    VAL adjacent within 4 tokens), which a Hebbian outer product of single-token codes cannot.
+
+**The type-level gate (fix 2's fifth pilot; descriptive).**
+- Both runs stay at 0.25-0.28 for all 24000 updates, below the relative gate's 0.33 / 0.50 on the same seeds.
+- Within each sequence the statistics do what the cap predicts:
+  - η² by stream 0.51 / 0.49, equal to the fraction of probe sequences the balanced map separates (0.51 / 0.49);
+  - margin 0.51 / 0.49;
+  - VAL cos 0.49 / 0.51.
+- Pooled, they read η² 0.00 / 0.01 and VAL cos 1.00 / 0.99. Those are the labelling, not the routing.
+- As stated before the run, a Hebbian channel without the conv is unbound under the relative gate too. So this pilot
+  cannot separate the 0.533 cap from the memory. A type-level gate with the conv, or on delta, would; it was not run.
+
+## The three fixes taken (in the review's order)
+
+1. **Routing statistics invariant to a per-sequence channel swap** (`explore_f_tasks.py`, appended).
+   - `pool_routing_stats_inv` / `pool_stats_inv` record η² by stream at KEY and the VAL cosine within each sequence,
+     averaged over the probe (`eta_key_by_stream_inv`, `val_cos_inv`, `seq_routed_frac`), beside the pooled forms.
+   - `pool_outcome(rec, invariant)` reads ROUTED*@end, ROUTED-BOUND and DISCOVERED from either form. On ALLPOOL the
+     within-sequence form is read; POOL records and prints both.
+   - The synthetic-gate CHECK passes on both tasks:
+     - the relative gate, the same gate with the channels swapped in a random half of sequences, and a gate that sends
+       each sequence's lower CTX type to channel 0 all score within-sequence η² 1 and cos 0;
+     - on ALLPOOL the last two score pooled η² 0.0000 / 0.0015 and VAL cos 1.000 / 0.997;
+     - the balanced type-level gate's within-sequence η² equals the probe's separated fraction exactly (0.5117 on 256
+       sequences);
+     - the vectorised per-sequence η² equals `test_router_layout.eta2` on each sequence (max |diff| 0).
+   - The S89 pilots' gates are relative, so for them the two forms coincide (1.00 / 0.00 at 2400, CHECKed).
+2. **ALLPOOL's routing cap is stated** in the S89 docstring and the module.
+   - No fixed context-type → channel map separates more than 64/120 = 0.533 of sequences.
+   - So a valid relative perfect gate on ALLPOOL says the memory can use a relative routing, not that a gate under test
+     can express one.
+   - The type-level perfect gate ran as the fifth pilot (above).
+3. **The screen's own path is tied to a recorded run, and the references are read at commits.**
+   - `explore_f_s89_tasks_child.run` on BASELINE_LITE, seed 2700, reproduces G's S87 `BASELINE|2700` (read at e46799a,
+     not the branch tip) bit for bit through 2400. That covers the curve, the gradient norms at updates 1, 10 and 100,
+     and all 19 statistic fields this path records at 0, 1200 and 2400. G's record also holds `beta` and `layers`, G's
+     own additions, which this path does not compute.
+   - S70's record is read at 61ba46e.
+   - The revised path also reproduces O_HEBB_POOL|2800 and O_HEBB_ALLPOOL|2800 (read at 52e2ea7) bit for bit through
+     2400.
+   - The docstring now says the gradient norms at 10 and 100 are functions of the first 10 and 100 batches.
+
+**Not taken:** the review's fixes 4-10 concern phase 2 (the baselines' role, failed records, label-free gates, v2
+classes, lite-id statistics) or G's and H's arms. Phase 2 did not run.
+
+**The module for G and H is `explore_f_tasks.py` at b0c6332** (`b0c6332b766b833df83826e36a3b8c2d9b58e583`).
+- It is append-only: its first 34603 bytes are 50dc8e4's file (CHECKed), so both classes are unchanged.
+- The new helpers are `pool_stats_inv`, `pool_outcome`, `type_level_gate` / `BALANCED_MAP` and `check_inv_stats`.
+
+## CHECKs, disclosure, runtime
+
+- **CHECKs, asserted at the queue's start, all passed:**
+  - explore_f_delta_checks 26/26;
+  - S89-F's 52 CHECKs: tasks, g87, s70, models, inv;
+  - the follow-up child's 6:
+    - the type gate is BALANCED_MAP's one-hot, with the S89 pilot's parameters;
+    - the conv arms are the S89 pilot plus a conv at the identity: equal logits at init, the conv the only extra
+      parameter;
+    - groups and lrs at updates 1, 2400 and 2401, with the conv in the rest group.
+- **Before the commits** I ran each CHECK part once by hand: S89's five parts and the follow-up child's. No pilot arm was
+  trained outside those CHECKs before the runs.
+- **The queue started on a dirty tree** (git 3dd5b74+dirty). The uncommitted files were the queue script and the
+  keepalive, with no code; both were committed at 4c8a343. The later `+dirty` tags in the log are progress files.
+- **Runtime:** 0.50 h of run time, 21:47-22:02 UTC on 20 October, CHECKs included. Code SHA 267d08456c38. Tables:
+  `s89_post_tables.md`.
+
+## What this leaves (descriptive)
+
+- No Hebbian configuration is valid under S89's rule, whose pilots had no convolution, so the baselines stay unrun.
+- With the convolution, the Hebbian perfect gate binds -pool 2/2 and -allpool 1/2 in 24000; the unbound run reached
+  0.87 and was still rising.
+- **Whether a conv configuration should be this round's valid Hebbian one is the user's decision.** If so:
+  - it would need a validity reading of its own, fixed before runs;
+  - -allpool would likely need a longer budget;
+  - the ALLPOOL cap still applies to any learned gate that reads context identity.

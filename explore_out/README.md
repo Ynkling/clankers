@@ -651,3 +651,23 @@ Descriptive summary:
   - -pool: the largest-ratio cut selects only the 2 CTX types; the half-mass cut adds 12 value types.
   - -allpool: both cuts select the 16 value types first; no type is above 1/8.
 - About 0.4 is reachable without memory on all three tasks, lite included, by a model that sees the last 10 tokens.
+
+### Session F, round 6 addendum: referee V's fixes and the follow-up pilots (`explore_out/F/report_9.md`, addendum; module `explore_f_tasks.py` at b0c6332)
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| post hoc: Hebbian perfect gate + conv 'layer' (the main line's), -pool and -allpool, SLOW, 24000 (2800-2801) | BOUND | -pool 2/2 (4800, 13200); -allpool 1/2 (6000; 2801 unbound 0.87, still rising); 3/4 together, against 0/4 without the conv | **partly** (4/4 restores, 3/4 partly, ≤ 2 does not) |
+| fix 2: type-level perfect gate (balanced map), Hebbian, -allpool (2800-2801) | BOUND | 0/2 (0.28, 0.28); within-sequence η² 0.51 / 0.49 = the separated fraction; pooled 0.00 / 0.01 | none (descriptive) |
+
+Descriptive summary:
+- Referee V's fixes 1-3 are taken, and no S89 reading changes.
+  1. Routing statistics within each sequence (swap-invariant) on -allpool, with a synthetic-gate CHECK.
+  2. -allpool's 0.533 cap on any fixed context-type → channel map, stated.
+  3. The screen's own path reproduces G's S87 `BASELINE|2700` bit for bit (read at e46799a), statistics included.
+- G and H vendor `explore_f_tasks.py` at b0c6332. It is append-only; 50dc8e4's classes are unchanged.
+- A trainable convolution on the memory's input lets the Hebbian channel use pooled keys on 3 of 4 seeds. It starts as a
+  no-op, so it is the only difference from the S89 pilot. This is consistent with H's conv oracle on the grouped
+  layout. Without it, the Hebbian perfect gate is 0/4.
+- The type-level gate's statistics behave as the cap predicts. It cannot separate the cap from the memory on a Hebbian
+  channel without the conv.
+- The baselines stay unrun. Whether a conv configuration becomes the round's valid Hebbian one is the user's decision.

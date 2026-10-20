@@ -185,11 +185,15 @@ def timing(arm, steps):
 
 PARTS = ("tasks", "g87", "s70", "models", "inv")
 RECORDED_SHA = "ea9728c636c6"          # every S89 record; the revision changes the code SHA, not these records
+RECORDED_CPU = "Intel(R) Xeon(R) Processor @ 2.80GHz"     # every S89 record (the revised path reproduces two, CHECK "inv")
 
 
 def pin():
-    """Read S89's records under RECORDED_SHA (the revised code has another SHA; S89's queue is closed)."""
+    """Read S89's records under RECORDED_SHA on RECORDED_CPU (the revised code has another SHA, and the container may be on
+    another CPU; S89's queue is closed)."""
     c16.STATE["shas"][NAME] = RECORDED_SHA
+    if RECORDED_CPU not in c16.STATE.setdefault("other_cpus", []):
+        c16.STATE["other_cpus"].append(RECORDED_CPU)
 
 
 def check():
