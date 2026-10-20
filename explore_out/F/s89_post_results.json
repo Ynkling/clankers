@@ -304,6 +304,569 @@
     "n_notlast": 1906
    }
   },
+  "O_HEBB_CONV_ALLPOOL|2801|267d08456c38|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.8720703125,
+   "arm": "O_HEBB_CONV_ALLPOOL",
+   "attempts": 1,
+   "code_sha": "267d08456c382675e556884f7221ae2870eb03a5",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.27099609375,
+     2.67083477973938
+    ],
+    [
+     2400,
+     0.31298828125,
+     2.265213966369629
+    ],
+    [
+     3600,
+     0.6240234375,
+     0.818816602230072
+    ],
+    [
+     4800,
+     0.6689453125,
+     0.6620717644691467
+    ],
+    [
+     6000,
+     0.68408203125,
+     0.5741285085678101
+    ],
+    [
+     7200,
+     0.7265625,
+     0.5291785001754761
+    ],
+    [
+     8400,
+     0.7412109375,
+     0.4767499268054962
+    ],
+    [
+     9600,
+     0.76171875,
+     0.42849355936050415
+    ],
+    [
+     10800,
+     0.759765625,
+     0.43012869358062744
+    ],
+    [
+     12000,
+     0.767578125,
+     0.40629586577415466
+    ],
+    [
+     13200,
+     0.7734375,
+     0.4011989235877991
+    ],
+    [
+     14400,
+     0.775390625,
+     0.3896230161190033
+    ],
+    [
+     15600,
+     0.7744140625,
+     0.3778998553752899
+    ],
+    [
+     16800,
+     0.78173828125,
+     0.3828233778476715
+    ],
+    [
+     18000,
+     0.77294921875,
+     0.38614925742149353
+    ],
+    [
+     19200,
+     0.7705078125,
+     0.3729621171951294
+    ],
+    [
+     20400,
+     0.79541015625,
+     0.35363516211509705
+    ],
+    [
+     21600,
+     0.8525390625,
+     0.2807338535785675
+    ],
+    [
+     22800,
+     0.86083984375,
+     0.2515486478805542
+    ],
+    [
+     24000,
+     0.8720703125,
+     0.23855900764465332
+    ]
+   ],
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 1.999981884079344,
+    "eta_key_by_half": 0.1948394775390625,
+    "eta_key_by_index": 0.29034423828125,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_key_by_stream_inv": 1.0,
+    "eta_val_by_half": 0.1948394775390625,
+    "eta_val_by_index": 0.29034423828125,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.22583848237991333,
+    "key_sep": 0.16451272616783777,
+    "margin": 1.0,
+    "sep": 1.0,
+    "seq_routed_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv": 0.0
+   },
+   "gate": "perfect",
+   "git": "209a271",
+   "grad": {
+    "1": [
+     0.0,
+     2.6077076730292776,
+     0.06360665342163266
+    ],
+    "10": [
+     0.0,
+     2.365034187848052,
+     0.05091093541549146
+    ],
+    "100": [
+     0.0,
+     1.6157678509613986,
+     0.023193577715197356
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.0,
+   "kind": "ORACLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "outcome_inv": {
+    "bound": false,
+    "discovered": false,
+    "eta_key_by_stream": 1.0,
+    "form": "within-sequence",
+    "margin": 1.0,
+    "routed_bound": false,
+    "routed_end": true,
+    "val_cos": 0.0
+   },
+   "outcome_pooled": {
+    "bound": false,
+    "discovered": false,
+    "eta_key_by_stream": 1.0,
+    "form": "pooled",
+    "margin": 1.0,
+    "routed_bound": false,
+    "routed_end": true,
+    "val_cos": 0.0
+   },
+   "params": 28800,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 433.8639724254608,
+   "secs_wall": 437.1543288230896,
+   "seed": 2801,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_half": 0.1948394775390625,
+     "eta_key_by_index": 0.29034423828125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.1948394775390625,
+     "eta_val_by_index": 0.29034423828125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_half": 0.1948394775390625,
+     "eta_key_by_index": 0.29034423828125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.1948394775390625,
+     "eta_val_by_index": 0.29034423828125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_half": 0.1948394775390625,
+     "eta_key_by_index": 0.29034423828125,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.1948394775390625,
+     "eta_val_by_index": 0.29034423828125,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 6000,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 7200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 8400,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 9600,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 10800,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 12000,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 13200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 14400,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 15600,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 16800,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 18000,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 19200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 20400,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 21600,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 22800,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 1.999981884079344,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.22583848237991333,
+     "key_sep": 0.16451272616783777,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 24000,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "ALLPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 0.8720703125,
+    "acc_by_stream": [
+     0.8496240377426147,
+     0.8620689511299133
+    ],
+    "acc_last": 0.8591549396514893,
+    "acc_notlast": 0.8730325102806091,
+    "lastval_notlast": 0.4548793137073517,
+    "n": 2048,
+    "n_last": 142,
+    "n_notlast": 1906
+   }
+  },
   "O_HEBB_CONV_POOL|2800|267d08456c38|Intel(R) Xeon(R) Processor @ 2.10GHz": {
    "acc": 0.9833984375,
    "arm": "O_HEBB_CONV_POOL",
