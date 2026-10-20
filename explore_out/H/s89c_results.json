@@ -1,0 +1,76 @@
+{
+ "meta": {
+  "arms": {
+   "BASE": {
+    "iters": 43200,
+    "label": "BASE, key pool 32",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger BASE",
+    "seeds": [
+     2924,
+     2925,
+     2926,
+     2927,
+     2928,
+     2929,
+     2930,
+     2931,
+     2932,
+     2933
+    ]
+   },
+   "BASE_CAP6": {
+    "iters": 43200,
+    "label": "BASE_CAP6, key pool 32",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger BASE_CAP6",
+    "seeds": [
+     2924,
+     2925,
+     2926,
+     2927,
+     2928,
+     2929,
+     2930,
+     2931,
+     2932,
+     2933
+    ]
+   },
+   "BASE_LATE": {
+    "iters": 43200,
+    "label": "BASE_LATE, key pool 32",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW + exact-copy trigger BASE_LATE",
+    "seeds": [
+     2924,
+     2925,
+     2926,
+     2927,
+     2928,
+     2929,
+     2930,
+     2931,
+     2932,
+     2933
+    ]
+   }
+  },
+  "code_shas": [
+   "4dda5635891098de0bc5a9e9808685d42be9e9f8"
+  ],
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "c81398c",
+   "python": "3.13.16",
+   "started": "2026-10-20 21:42:42",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  }
+ },
+ "runs": {}
+}
