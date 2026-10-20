@@ -209,8 +209,9 @@ needed 4/4 and "it does not" 2 or fewer.
   one that binds on 3 of 4 seeds.
   - This fits the hypothesis: H's Hebbian perfect gate with the conv bound the eight-stream grouped layout with the same
     pool 2/2. The delta memory binds these tasks without the conv (S89: 2400-3600).
-  - Why the conv helps is not separated here. One candidate is that a key's write vector can carry its own value (KEY,
-    VAL adjacent within 4 tokens), which a Hebbian outer product of single-token codes cannot.
+  - Why the conv helps is not separated here. One candidate is the short-convolution account from associative recall (H3,
+    Based): with the conv, the write at a VAL position carries its KEY one token back in the same layer. So the
+    key-value association needs no earlier layer to copy the key forward.
 
 **The type-level gate (fix 2's fifth pilot; descriptive).**
 - Both runs stay at 0.25-0.28 for all 24000 updates, below the relative gate's 0.33 / 0.50 on the same seeds.
