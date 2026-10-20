@@ -20,6 +20,20 @@ ARMS
         gate on the task's vocabulary), s43c.groups + the switch; statistics explore_f_tasks.pool_stats(ROUTE_AT).
   SINGLE_HEBB_<T>, SINGLE_DELTA_<T>   test_short_conv's arm B (k = 1) on the task's vocabulary, Hebbian or delta (beta 1,
         L2 keys), SLOW (the gate group empty).
+
+REVISION (20 October, after referee V's review of 8ba99bb at claude/review-V 3ae815b; fixes 1 and 3). The pilots and the
+diagnostic stand as run under code SHA ea9728c636c6; this revision changes what later runs record and what the CHECKs
+tie, not those records (CHECKed: the revised path reproduces two recorded pilots bit for bit through 2400).
+  Statistics: STATS_POOL is explore_f_tasks.pool_stats_inv (pool_stats plus the within-sequence forms
+    eta_key_by_stream_inv, val_cos_inv, seq_routed_frac at every evaluation); run() adds outcome_pooled and
+    outcome_inv (explore_f_tasks.pool_outcome) to records on the pool tasks.
+  CHECKs added: part "g87" runs this module's own run() on BASELINE_LITE, seed 2700, through 2400 against G's S87
+    record read at e46799a (G_REF is the commit, not the branch tip): the curve, the gradient norms at updates 1, 10
+    and 100 (functions of the first 1, 10 and 100 batches) and every statistic this path records at 0, 1200 and 2400;
+    part "s70" reads S70's record at 61ba46e (not the working tree); part "inv": explore_f_tasks.check_inv_stats on
+    POOL and ALLPOOL, and this module's run() on O_HEBB_POOL|2800 and O_HEBB_ALLPOOL|2800 through 2400 against the S89
+    records at 52e2ea7 (curve and every recorded statistic bit for bit; the new fields printed); part "tasks": the
+    revised explore_f_tasks.py starts with 50dc8e4's file byte for byte (the revision is appended).
 """
 
 import json
@@ -47,9 +61,12 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 LR, LR_WARM, WARM = s43c.LR, s43c.LR_WARM, s43c.WARM
 TASKS = {"LITE": ft.RandHeaderTask(P=4, nb=2, lmin=1, lmax=3), "POOL": ft.RandHeaderTaskPool(),
          "ALLPOOL": ft.RandHeaderTaskAllPool()}
-STATS_POOL = ft.pool_stats(c2.ROUTE_AT)
-G_REF, G_SHA, G_FILE = "origin/claude/explore-G", "e46799a", "explore_out/G/s87_results.json"
-F_OLD = "a199d5e"
+STATS_POOL = ft.pool_stats_inv(c2.ROUTE_AT)
+G_SHA = "e46799a"
+G_REF, G_FILE = G_SHA, "explore_out/G/s87_results.json"
+S70_REF, S70_FILE = "61ba46e", "explore_out/F/rh_lite_results.json"
+S89_REF, S89_FILE, S89_SHA = "52e2ea7", "explore_out/F/s89_tasks_results.json", "ea9728c636c6"
+F_OLD, F_POOL = "a199d5e", "50dc8e4"
 
 
 # ── Models ───────────────────────────────────────────────────────────────────
@@ -159,6 +176,9 @@ def run(p):
             rec["fail"] = None if rec["transition"] is not None else ec.fail_class(rec)
         if sp["kind"] in ("BASELINE", "SINGLE", "ORACLE"):
             rec["write_order"] = ft.write_order_acc(m, task, tbo.eval_batch(task))
+        if sp["kind"] in ("BASELINE", "ORACLE") and sp["task"] != "LITE":
+            rec["outcome_pooled"] = ft.pool_outcome(rec, invariant=False)
+            rec["outcome_inv"] = ft.pool_outcome(rec, invariant=True)
     return json.loads(json.dumps(rec, default=float))
 
 
@@ -213,6 +233,9 @@ def checks(p):
         new = open(os.path.join(HERE, "explore_f_tasks.py")).read()
         rows.append((f"explore_f_tasks.py's first {len(old)} bytes (everything before the round-6 section) equal {F_OLD}'s file",
                      new.startswith(old)))
+        v1 = _git("show", f"{F_POOL}:explore_f_tasks.py")
+        rows.append((f"explore_f_tasks.py's first {len(v1)} bytes equal {F_POOL}'s file (the round-6 classes as G and H vendored "
+                     f"them; the revision is appended after them, {len(new) - len(v1)} bytes)", new.startswith(v1)))
         for t in ("POOL", "ALLPOOL"):
             for nm, v in ft.check_pool_task(TASKS[t]):
                 rows.append((f"{t}: {nm}", v))
@@ -246,19 +269,53 @@ def checks(p):
         gk = [k for k in ref["grad"] if int(k) <= 2400]
         gr_ok = all(r["grad"].get(k) == ref["grad"][k] for k in gk)
         rows.append((f"S70's own path (S70_HEBB = G's BASELINE) on seed 2700, on this CPU ({cpu}), reproduces G's S87 {key} "
-                     f"through 2400 bit for bit: curve {r['curve']} vs {want}; gradient norms at updates {gk} (functions of the "
-                     f"first batch) {gr_ok}", r["curve"] == want and gr_ok))
+                     f"at {G_REF} through 2400 bit for bit: curve {r['curve']} vs {want}; gradient norms at updates {gk} "
+                     f"(functions of the first 1, 10 and 100 batches) {gr_ok}", r["curve"] == want and gr_ok))
+        # this screen's own path (referee V's fix 3)
+        r = run(dict(arm="BASELINE_LITE", seed=2700, iters=2400))
+        gr_ok = all(r["grad"].get(k) == ref["grad"][k] for k in gk)
+        steps = (0, 1200, 2400)
+        mine = {s["step"]: s for s in r["stats"] if s["step"] in steps}
+        theirs = {s["step"]: s for s in ref["stats"] if s["step"] in steps}
+        st_ok, extra = set(mine) == set(steps) == set(theirs), set()
+        for t in steps:
+            for f, v in mine.get(t, {}).items():
+                st_ok &= f in theirs.get(t, {}) and theirs[t][f] == v
+            extra |= set(theirs.get(t, {})) - set(mine.get(t, {}))
+        nf = sorted({f for t in steps for f in mine.get(t, {})})
+        rows.append((f"this screen's own path (explore_f_s89_tasks_child.run, BASELINE_LITE) on seed 2700, on this CPU ({cpu}), "
+                     f"reproduces G's S87 {key} at {G_REF} through 2400 bit for bit: curve {r['curve']} vs {want}; gradient "
+                     f"norms at updates {gk} {gr_ok}; every statistic this path records at {list(steps)} ({len(nf)} fields: "
+                     f"{', '.join(nf)}) equal {st_ok} (G's record also holds {sorted(extra)}, G's own additions, not "
+                     f"computed on this path)", r["curve"] == want and gr_ok and st_ok))
         return [[n, bool(v)] for n, v in rows]
     if part == "s70":
         import explore_f_followup_child as fu
         key = "S70_DELTA|330|ff908bdbc0b2|Intel(R) Xeon(R) Processor @ 2.10GHz"
-        ref = ec.load_store("F/rh_lite")["runs"][key]
+        ref = json.loads(_git("show", f"{S70_REF}:{S70_FILE}"))["runs"][key]
         r = fu.run(dict(arm="S70_DELTA", seed=330, iters=2400))
         want = [c for c in ref["curve"] if c[0] <= 2400]
         sn = [s for s in r["stats"] if s["step"] != "end" and s["step"] <= 2400]
         so = [s for s in ref["stats"] if s["step"] != "end" and s["step"] <= 2400]
-        rows.append((f"S70 reproduction on this CPU ({cpu}): {key} through 2400 bit for bit with S70's own path: curve "
+        rows.append((f"S70 reproduction on this CPU ({cpu}): {key} (read at {S70_REF}) through 2400 bit for bit with S70's own path: curve "
                      f"{r['curve']} vs {want}; statistics {sn == so}", r["curve"] == want and sn == so))
+        return [[n, bool(v)] for n, v in rows]
+    if part == "inv":
+        for t in ("POOL", "ALLPOOL"):
+            rows.extend(ft.check_inv_stats(TASKS[t]))
+        d = json.loads(_git("show", f"{S89_REF}:{S89_FILE}"))
+        for arm in ("O_HEBB_POOL", "O_HEBB_ALLPOOL"):
+            key = [k for k in d["runs"] if k.startswith(f"{arm}|2800|{S89_SHA}|")][0]
+            ref = d["runs"][key]
+            r = run(dict(arm=arm, seed=2800, iters=2400))
+            want = [c for c in ref["curve"] if c[0] <= 2400]
+            so = [s for s in ref["stats"] if s["step"] != "end" and s["step"] <= 2400]
+            sn = [s for s in r["stats"] if s["step"] != "end" and s["step"] <= 2400]
+            st_ok = len(so) == len(sn) and all(all(b.get(f) == v for f, v in a.items()) for a, b in zip(so, sn))
+            new = {f: round(v, 4) for f, v in sn[-1].items() if f.endswith("_inv") or f == "seq_routed_frac"}
+            rows.append((f"the revised path reproduces the S89 record {key} (read at {S89_REF}) through 2400 bit for bit on this "
+                         f"CPU ({cpu}): curve {r['curve']} vs {want}; every recorded statistic at {[s['step'] for s in so]} "
+                         f"equal {st_ok}; added at 2400: {new}", r["curve"] == want and st_ok))
         return [[n, bool(v)] for n, v in rows]
     # part == "models"
     from test_instrument_v2 import perfect_gate_general

@@ -2,6 +2,9 @@
 """
 explore_f_reports6.py — EXPLORATORY, not a result. Report tables of Session F's round-6 screen (explore_f_s89_tasks), with the
 rules and readings exactly as its docstring fixes them. Writes explore_out/F/s89_tasks_tables.md.
+Revision (20 October): S89's records are read under explore_f_s89_tasks.RECORDED_SHA; the baselines' ROUTED*@end and
+DISCOVERED are explore_f_tasks.pool_outcome's (within-sequence on ALLPOOL, both forms on POOL). report_s89_post writes
+explore_out/F/s89_post_tables.md for explore_f_s89_post (the type-level gate and the conv pilots).
 """
 import os
 import sys
@@ -16,9 +19,9 @@ from explore_f_reports3 import _write
 from explore_f_reports4 import _trs
 
 
-def routed_end(r):
-    e = (r or {}).get("end") or {}
-    return bool(e.get("margin", 0) >= 0.9 and e.get("eta_key_by_stream", 0) > 0.9)
+def routed_end(r, invariant=False):
+    import explore_f_tasks as ft
+    return ft.pool_outcome(r, invariant)["routed_end"]
 
 
 def report_s89():
@@ -26,6 +29,7 @@ def report_s89():
     import explore_f_tasks as ft
     if s.NAME not in c16.STATE["shas"]:
         fc.setup([s])
+    s.pin()
     d = s.decision()
     R = {arm: fc.runs(s, arm) for arm in s.ARMS}
     L = []
@@ -85,8 +89,9 @@ def report_s89():
             rs = R[arm]
             n = len(rs)
             nb = sum(bound(r) for r in rs.values())
-            rb = sum(bound(r) and routed_end(r) for r in rs.values()) if a == "BASELINE" else None
-            dc = sum(bool(r.get("discovered")) for r in rs.values()) if a == "BASELINE" else None
+            inv = t == "ALLPOOL"
+            rb = sum(ft.pool_outcome(r, inv)["routed_bound"] for r in rs.values()) if a == "BASELINE" else None
+            dc = sum(ft.pool_outcome(r, inv)["discovered"] for r in rs.values()) if a == "BASELINE" else None
             ub = ", ".join(f"{sd} {r['acc']:.2f}" + (f" {r.get('fail')}" if r.get("fail") else "")
                            for sd, r in sorted(rs.items()) if not bound(r)) or "none"
             P(f"| {t} | {a} | {n}/10 | {fc.count_str(nb, n)} | {fc.count_str(rb, n) if rb is not None else '--'} | "
@@ -103,4 +108,55 @@ def report_s89():
     P(f"\n{s.NAME}: {meta['n']} runs ok (failed records {meta['failed']}), {meta['hours']:.2f} h of run time; CPU {meta['cpus']}; "
       f"code SHA {c16.STATE['shas'][s.NAME][:12]}; decision {d}")
     out["md"] = _write("s89_tasks", L)
+    return out
+
+
+def report_s89_post():
+    import explore_f_s89_post as s
+    if s.NAME not in c16.STATE["shas"]:
+        fc.setup([s])
+    R = {arm: fc.runs(s, arm) for arm in s.ARMS}
+    st = fc.load(s)
+    failed = {}
+    for arm in s.ARMS:
+        for sd in s.SEEDS:
+            r = st["runs"].get(c16.key(arm, sd, c16.STATE["shas"][s.NAME], c16.STATE["batch_cpu"]))
+            if sd not in R[arm] and r is not None and r.get("attempts", 1) >= c16.MAX_ATTEMPTS:
+                failed[(arm, sd)] = r.get("error")
+    L = []
+    P = L.append
+    P("### S89-F follow-up pilots (explore_f_s89_post; seeds 2800-2801; Hebbian, k = 2, SLOW, 24000)\n")
+    P("Per run: transition or final accuracy; end margin; η² by stream at KEY pooled / within-sequence; VAL cos pooled / "
+      "within-sequence; fraction of probe sequences with η²_seq > 0.9; accuracy when the queried pair was / was not its key's "
+      "last write.\n")
+    P("| arm | seed | outcome | margin | η² KEY (pooled / within) | VAL cos (pooled / within) | sequences routed | last / not last |")
+    P("|---|---|---|---|---|---|---|---|")
+    for arm in s.ARMS:
+        for sd in s.SEEDS:
+            r = R[arm].get(sd)
+            if r is None:
+                P(f"| {arm} | {sd} | {'FAILED ' + str(failed[(arm, sd)]) if (arm, sd) in failed else 'missing'} | | | | | |")
+                continue
+            e = r.get("end") or {}
+            w = r.get("write_order") or {}
+            oc = f"bound @{r['transition']}" if bound(r) else f"unbound {r['acc']:.3f}"
+            P(f"| {arm} | {sd} | {oc} | {fmt(e.get('margin'))} | {fmt(e.get('eta_key_by_stream'))} / "
+              f"{fmt(e.get('eta_key_by_stream_inv'))} | {fmt(r.get('val_cos'))} / {fmt(e.get('val_cos_inv'))} | "
+              f"{fmt(e.get('seq_routed_frac'))} | {fmt(w.get('acc_last'))} / {fmt(w.get('acc_notlast'))} |")
+    nb = sum(bound(r) for a in s.CONV_ARMS for r in R[a].values())
+    nf = sum(1 for (a, _) in failed if a in s.CONV_ARMS)
+    n = sum(len(R[a]) for a in s.CONV_ARMS)
+    rd = s.reading(nb, nf, n)
+    P(f"\nCurves (held-out accuracy every 2400):\n")
+    for arm in s.ARMS:
+        for sd, r in sorted(R[arm].items()):
+            P(f"- {arm}|{sd}: " + " ".join(f"{c[1]:.2f}" for c in r["curve"][1::2]))
+    P(f"\nConv pilots: {fc.count_str(nb, len(s.CONV_ARMS) * len(s.SEEDS))} bound "
+      f"({', '.join(f'{a} ' + str(sum(bound(r) for r in R[a].values())) + '/' + str(len(s.SEEDS)) for a in s.CONV_ARMS)}"
+      f"{'; failed after retries ' + str(nf) if nf else ''}).")
+    P(f"\nREADING (fixed before the runs): **{rd}**")
+    meta = store_meta(s)
+    P(f"\n{s.NAME}: {meta['n']} runs ok (failed records {meta['failed']}), {meta['hours']:.2f} h of run time; CPU {meta['cpus']}; "
+      f"code SHA {c16.STATE['shas'][s.NAME][:12]}")
+    out = dict(reading=rd, n_bound=nb, md=_write("s89_post", L))
     return out

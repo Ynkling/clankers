@@ -5,6 +5,19 @@ task module is explore_f_tasks.py at 50dc8e4 (RandHeaderTaskPool, RandHeaderTask
 vendor). This screen checks the two new tasks for positional solvability, pilots their perfect gates for validity, and
 records the baselines G and H will pair against on their own seeds.
 
+REVISION (20 October, after the runs; referee V's review of 8ba99bb at claude/review-V 3ae815b, verdict "fix first"). The
+readings, the rules and the phases are unchanged, and the pilots and the post-hoc diagnostic stand as run: all S89 records
+are under code SHA ea9728c636c6 (RECORDED_SHA; this module reads them there, and its queue is closed: phase 2 never ran,
+since both tasks read "untested"). Taken from the review's last section, in order:
+  (1) the routing statistics on ALLPOOL invariant to a per-sequence channel swap (OUTCOMES below; explore_f_tasks'
+      appended pool_stats_inv / pool_outcome, with the synthetic-gate CHECK);
+  (2) ALLPOOL's routing cap stated (TASKS below) and the type-level perfect gate run as a fifth pilot on 2800-2801,
+      descriptive (explore_f_s89_post's O_TYPE_HEBB_ALLPOOL);
+  (3) a CHECK tying this screen's own child path to a recorded run, and G's reference read at a commit (CHECKS below).
+  The review's other fixes concern phase 2 (the baselines' role, failed records, label-free gates, v2 classes, lite-id
+  statistics), which did not run; they are not taken here. Wording corrected: the gradient norms at updates 10 and 100
+  are functions of the first 10 and 100 batches, not of the first batch.
+
 CPU: an Intel Xeon @ 2.80GHz (Session F's screens before S88 ran on a Xeon @ 2.10GHz, whose records reproduce bit for bit
 here). Every run of this screen is on this CPU. 1 torch thread per run; Session F's harness (explore_f_common).
 
@@ -23,6 +36,14 @@ numbers were computed before this docstring was written and are printed again by
            type); the half-mass cut 16 VAL + 10 CTX types. Nothing is frequent BY ROLE in the sense of the CTX/KEY roles;
            the values remain the commonest types (8 value tokens per sequence over 16 types). The two-document
            associative-recall layout (MQAR with a context per document) at our vocabulary size; see explore_f_tasks.
+  ALLPOOL'S ROUTING CAP (stated in the revision; referee V): no fixed map from context type to channel separates a
+           sequence's two contexts in more than 64/120 = 0.533 of sequences (16 types split a / 16 - a over two
+           channels: a·(16 - a) of the C(16, 2) = 120 pairs, at most 64). A gate that reads token identity (LOCAL3, the
+           register gates) can route the rest only by comparing the contexts within the sequence. The perfect gate is
+           handed that comparison (task.perfect_gate, the index by first appearance). So "the task is valid" would mean
+           the memory can use a relative routing, not that the arms under test can express one, and a null on ALLPOOL
+           does not separate "keys are not frequent" from "contexts have no fixed identity". The type-level perfect gate
+           (a fixed balanced map, explore_f_tasks.BALANCED_MAP) is printed as a fifth pilot (explore_f_s89_post).
   Both: every key occurs twice, once under each of the sequence's two contexts (one block of each stream), with two
   distinct values; the query names a (context, key) pair answered by exactly one body pair. On ALLPOOL the stream index
   is by first appearance (stream 0 = the first block's context) and the perfect gate is task.perfect_gate.
@@ -62,17 +83,32 @@ PHASE 2, BASELINES (seeds 2802-2811, 10, paired across arms; each task read "val
                  updates 1-2400, 1e-3 after).
     SINGLE_HEBB  one Hebbian channel (test_short_conv's arm B on the task's vocabulary, k = 1, no conv), SLOW.
     SINGLE_DELTA one delta channel (the same, delta β = 1, L2 keys), SLOW.
-  OUTCOMES (as S70 / S87): BOUND (a transition); for BASELINE also ROUTED*@end (end margin >= 0.9 and η² by stream at KEY
-  positions > 0.9, from explore_f_tasks.pool_routing_stats) and ROUTED-BOUND = BOUND and ROUTED*@end; DISCOVERED (bound and
-  end VAL cos < 0.5); failure classes of unbound BASELINE runs under v1 and v2. Wilson 95% and bands with every count;
-  median transitions.
+  OUTCOMES (as S70 / S87; ROUTED*@end and ROUTED-BOUND are the branches' exploratory definitions, not a main-line
+  outcome; revised, referee V's fix 1): BOUND (a transition); for BASELINE also ROUTED*@end (end margin >= 0.9 and η² by
+  stream at KEY positions > 0.9), ROUTED-BOUND = BOUND and ROUTED*@end, and DISCOVERED (bound and end VAL cos < 0.5).
+    - On ALLPOOL, where the stream index is a per-sequence convention, both statistics are computed within each sequence
+      and averaged over the probe: η²_seq at the 8 key positions, and the cosine between the two streams' mean VAL read
+      gates per sequence. explore_f_tasks.pool_routing_stats_inv records them as eta_key_by_stream_inv and val_cos_inv,
+      and ROUTED*@end and DISCOVERED read these fields there (explore_f_tasks.pool_outcome(rec, invariant=True)).
+    - On POOL both forms are recorded and printed; they agree for a fixed CTX -> channel map.
+    - CHECK: on synthetic gates, a context-type gate that separates the streams in a sequence scores η²_seq = 1 and
+      cos_seq = 0 whichever channel the first block's context takes, and the pooled forms score 0 and 1 on ALLPOOL
+      (explore_f_tasks.check_inv_stats).
+  Failure classes of unbound BASELINE runs under v1 and v2. Wilson 95% and bands with every count; median transitions.
 CHECKS (asserted before any run; explore_f_delta_checks (26) at the start of every segment; then the child's):
   - RandHeaderTask-lite's batches at seed 2700 equal G's S87 record's first batch: G's S87 records hold no tokens, so
     (i) the first training batch at seed 2700 (onset_run's generator, seed + 10000) from this module equals the one from
     the copy G vendored (explore_f_tasks.py at claude/explore-G e46799a), and (ii) S70's own path (S70_HEBB = G's BASELINE)
     on seed 2700 reproduces G's S87 BASELINE|2700 record bit for bit through 2400: the curve and the gradient norms at
-    updates 1, 10 and 100, which are functions of the first batch.
-  - The S70 reproduction: S70_DELTA|330 (explore_out/F/rh_lite_results.json) through 2400 bit for bit.
+    updates 1, 10 and 100 (functions of the first 1, 10 and 100 batches).
+  - (Revision, referee V's fix 3) This screen's own path: explore_f_s89_tasks_child.run(dict(arm="BASELINE_LITE",
+    seed=2700, iters=2400)) reproduces G's S87 BASELINE|2700|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz, read at
+    e46799a (G_REF = G_SHA; the record is identical there and was first held by 464f7e4), bit for bit through 2400: the
+    curve, the gradient norms at updates 1, 10 and 100, and every statistic this path records at 0, 1200 and 2400 (G's
+    record also holds G's own additions, beta and layers, which this path does not compute; listed).
+  - (Revision) The revised path (statistics pool_stats_inv) reproduces the S89 records O_HEBB_POOL|2800 and
+    O_HEBB_ALLPOOL|2800 (read at 52e2ea7) bit for bit through 2400: the curve and every recorded statistic.
+  - The S70 reproduction: S70_DELTA|330 (explore_out/F/rh_lite_results.json, read at 61ba46e) through 2400 bit for bit.
   - explore_f_tasks.py up to the round-6 section is byte-identical to a199d5e's file; check_pool_task on both tasks:
     lite's batch relabelled; the key types distinct and from the pool; every key in one block of each stream, with two
     distinct values; the query answered by exactly one pair (the answer is determined); one CTX per block; the stream
@@ -147,7 +183,13 @@ def timing(arm, steps):
     return child("timing", dict(arm=arm, steps=steps))
 
 
-PARTS = ("tasks", "g87", "s70", "models")
+PARTS = ("tasks", "g87", "s70", "models", "inv")
+RECORDED_SHA = "ea9728c636c6"          # every S89 record; the revision changes the code SHA, not these records
+
+
+def pin():
+    """Read S89's records under RECORDED_SHA (the revised code has another SHA; S89's queue is closed)."""
+    c16.STATE["shas"][NAME] = RECORDED_SHA
 
 
 def check():
@@ -178,6 +220,7 @@ def decide():
     """Apply the phase rules to the stored runs and update the decision file (never revises a recorded phase)."""
     me = sys.modules[__name__]
     fc.setup([me])
+    pin()
     d = decision()
     runs = lambda arm: fc.runs(me, arm) if arm in ARMS else {}
     if "phase0" not in d:
@@ -230,5 +273,11 @@ if __name__ == "__main__":
     import explore_f_s89_tasks as me
     if len(sys.argv) > 1 and sys.argv[1] == "--decide":
         decide()
+    elif len(sys.argv) > 1 and sys.argv[1] == "--check":
+        fc.setup([me])
+        assert check(), "an S89 CHECK failed"
     else:
-        fc.drive("s89", [me], sys.argv[1:])
+        # the queue is closed (revision): S89's pilots stand as run under RECORDED_SHA; the report reads them there
+        fc.setup([me])
+        pin()
+        report()
