@@ -36,9 +36,9 @@
 
 | | rows | MATCH | PARTIAL | DISAGREE | NOT RECORD-CHECKABLE |
 |---|---|---|---|---|---|
-| Report 9 | 62 | 50 | 6 | 0 | 6 |
+| Report 9 | 62 | 52 | 6 | 0 | 4 |
 | README section | 10 | 9 | 1 | 0 | 0 |
-| **Total** | **72** | **59** | **7** | **0** | **6** |
+| **Total** | **72** | **61** | **7** | **0** | **4** |
 
 ## 1. Report 9, statement by statement
 
@@ -112,7 +112,7 @@
 | 39 | Under Adam it "stays at 0.29–0.34 for all 24000 updates on both pool tasks"; routing perfect throughout (margin 1.00, η² 1.00) | curves, stats | curve ranges 0.290–0.334, 0.298–0.338, 0.292–0.333, 0.301–0.335; margin and η² 1.0 at every evaluation | MATCH | |
 | 40 | Adam "never reaches the step to about 0.5 that SLOW gave on 3 of 4 runs at 24000 (all but ALLPOOL 2800)" | curves | SLOW 24K maxima: POOL 0.623 / 0.508, ALLPOOL 0.331 / 0.498. Adam maxima ≤ 0.338 | MATCH | |
 | 41 | "SLOW is not what stops it … The key pool is." "So both tasks read untested because of how the Hebbian channel handles 4 keys drawn from 32 types. The recipe is not the cause." | diag docstring; records | Numbers as rows 36–40 | **PARTIAL** | The numbers match. The wording draws a causal conclusion from a post-hoc diagnostic with 2 seeds per cell, whose own docstring says "Descriptive … No reading" (explore_f_s89_diag.py l.12). The section header does say "post-hoc" and "changes no reading". |
-| 42 | "6/6 runs ok, 0.68 h of run time, 19:18–19:31 UTC. explore_f_delta_checks passed 26/26 before the runs. The diagnostic adds no CHECK of its own" | records, s89diag.log | 6/6 ok, attempts 1; log 19:18:25–19:31:26; 26 ok. Run time: **0.689 h** by `secs_wall`, which is what `store_meta` uses for the 4.05 h figure; 0.684 h by `secs` | **PARTIAL** | The run time is 0.69 h on the basis the report uses elsewhere. The diagnostic child's `checks()` returns one hard-coded True (explore_f_s89_diag_child.py l.37–38). No S89 CHECK covered the perfect gate on LITE under SLOW, or the Adam path without param groups. |
+| 42 | "6/6 runs ok, 0.68 h of run time, 19:18–19:31 UTC. explore_f_delta_checks passed 26/26 before the runs. The diagnostic adds no CHECK of its own" | records, s89diag.log | 6/6 ok, attempts 1; log 19:18:25–19:31:26; 26 ok. Run time: **0.689 h** by `secs_wall`, which is what `store_meta` uses for the 4.05 h figure; 0.684 h by `secs` | **PARTIAL** | The run time is 0.69 h on the basis the report uses elsewhere. The diagnostic child's `checks()` returns one hard-coded True (explore_f_s89_diag_child.py l.36–37). No S89 CHECK covered the perfect gate on LITE under SLOW, or the Adam path without param groups. |
 
 ### Design decisions
 

@@ -437,12 +437,16 @@ row(L("L (seeds 1580--1599, 84 runs, about 18.4 h of runs on five workers of the
     "L records and log", f"{len(storeL['runs'])} records; runs only {runs_only:.1f} min = {runs_only / 60:.2f} h (1125.8 min "
     f"after verification includes the ~19 min projection); workers {storeL['meta']['workers']}; torch L {storeL['meta']['torch']}, "
     f"X {storeX['meta']['torch']}", "MATCH", "X's build is 2.14.0+cu130; 'about 18.4' is 18.45 h rounded down")
-row(L("a first start on 12 October was lost before any run to a reboot during the projection's timing, with a GPU job beside it", ln),
+TST101 = show(V101, "test_delta_recipe.py")
+row(L("a first start on 12 October was lost before any run to a reboot during the projection's timing, with a GPU job beside it", ln,
+      new="a first start on 12 October was lost before any run to a reboot during the projection's timing, which the author attributes to a GPU job running beside it"),
     "first start lost before any run to a reboot during the projection's timing, with a GPU job beside it",
     "L log headers; check_delta_recipe_L.md", f"headers {[h[34:70] for h in hdr]}; boot ids {boots}; first start: "
-    f"PROJECTION heading only, {sum(1 for l in p1 if run_re.match(l))} run lines", "NOT RECORD-CHECKABLE",
-    "the reboot (new boot id), the timing and 'before any run' are recorded; 'with a GPU job beside it' is the author's account "
-    "(in no record; tex10:426 attributes it, this line states it as fact)")
+    f"PROJECTION heading only, {sum(1 for l in p1 if run_re.match(l))} run lines; RESULT (L) at {V101}: 'the author attributes to the "
+    f"OOM killer with a GPU job beside it' {'which the author attributes to the OOM killer with a GPU job beside it' in TST101.replace(chr(10), ' ')}",
+    "MATCH",
+    "846d0c8 attributes the cause to the author, as tex101:430 does and as RESULT (L) states (the reboot by the OOM killer, with a GPU "
+    "job beside it); the reboot (new boot id), the timing and 'before any run' are recorded")
 row(L("every perfect gate bound $2/2$ on each machine, every CHECK passed, and CHECK 174 dropped no pair on either", ln),
     "perfect gates 2/2 on each machine; every CHECK passed; CHECK 174 dropped no pair", "records; logs",
     f"CEIL (HEBB, DELTA) {valid}; 'ALL VERIFICATION CHECKS PASSED' X {chk['X'][0]}x, L {chk['L'][0]}x, failing lines "
@@ -496,7 +500,7 @@ row(L("and found all of them to reproduce (\\texttt{docs/review\\_2026-10/check\
 # 424 / 426 / 519 / 522
 c76 = git("show", "76851eb", "--", "test_delta_recipe.py", "results/README.md")
 date_marks = re.findall(r"^\+.*(?:19 October|2026-10-19|10-19|corrected)", c76, re.M)
-row(L("Each is corrected where it stands, with the date.", 424),
+row(L("Each is corrected where it stands, with the date.", 424, new="Each is corrected where it stands (\\texttt{76851eb})."),
     "the two statements (L's RESULT block; results/README.md's commit) each corrected where it stands, with the date",
     "76851eb (19 Oct 15:40 UTC) diff", f"both corrected in place at 76851eb; date or 'corrected' markers in the added lines: "
     f"{len(date_marks)}", "PARTIAL",
