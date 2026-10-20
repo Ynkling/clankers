@@ -1,11 +1,15 @@
 §0 REFS (after git fetch)
-  origin/claude/explore-G: da152fe4 2026-10-20 22:11:39 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+  origin/claude/explore-G: 67f3897c 2026-10-20 22:21:43 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
   origin/claude/explore-F: 53578896 2026-10-20 22:04:32 +0000 report_9 addendum: correct the conv candidate's wording (EXPLORATORY, not a result)
   origin/claude/explore-H: cf67855d 2026-10-20 22:00:07 +0000 explore_out/H: S89c CHECKs passed; runs started (EXPLORATORY, not a result)
-  explore-G commits after db14e9b9: da152fe4 2026-10-20 22:11:39 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
-  S89 files at the explore-G tip: ['explore_g_s89.py', 'explore_g_s89_child.py', 'explore_out/G/s89.log']
-  explore_out/G/s89.log: 20 lines; git line: ['cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git db14e9b | python 3.13.16 | torch threads 1']; mentions 'S89 validity': False; 'runs queued': False; any learned arm key (pool./allpool.): False; last line: REG3_FREQHINGE_D: THE FREQUENCY HINGE SURVIVES (discovered yes (arm only 10, BASELINE only 0, p 0.000977); vs KH: KH only 0, arm only 0, p(K
-  s89_results.json / s89_validity.json / checks_s89_*.json at the tip: none
+  explore-G commits after db14e9b9: 67f3897c 2026-10-20 22:21:43 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+eb4d3fa4 2026-10-20 22:20:21 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+6bddedc5 2026-10-20 22:19:56 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+0bd95b21 2026-10-20 22:16:41 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+da152fe4 2026-10-20 22:11:39 +0000 explore_out/G: S89 progress (EXPLORATORY, not a result)
+  S89 files at the explore-G tip: ['explore_g_s89.py', 'explore_g_s89_child.py', 'explore_out/G/checks_s89_20261020_221446.json', 'explore_out/G/s89.log', 'explore_out/G/s89_results.json', 'explore_out/G/s89_validity.json']
+  explore_out/G/s89.log: 138 lines; git line: ['cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git db14e9b | python 3.13.16 | torch threads 1']; mentions 'S89 validity': True; 'runs queued': True; any learned arm key (pool./allpool.): False; last line: [  3/200]    4.2 min  pool.REG3_KEYHINGE_D seed 2842  acc 0.990 trans  6000 ROUTED-BOUND
+  s89_results.json / s89_validity.json / checks_s89_*.json at the tip: ['explore_out/G/checks_s89_20261020_221446.json', 'explore_out/G/s89_results.json', 'explore_out/G/s89_validity.json']
 
 §1 VENDORED explore_f_tasks.py
   003a370e                   blob ffe249bb644423479e869cff11d2d723ac35450b  35605 bytes
@@ -242,7 +246,7 @@
   origin/claude/bdh-growth-hebbian-inference-w90069 @ ed9ca2b6: 63 json/jsonl/log files; seeds in 2840-2899: none
   origin/claude/bdh-repo-curl-obgdqk @ 264e2274: 63 json/jsonl/log files; seeds in 2840-2899: none
   origin/claude/explore-F @ 53578896: 255 json/jsonl/log files; seeds in 2840-2899: none
-  origin/claude/explore-G @ da152fe4: 243 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/explore-G @ 67f3897c: 246 json/jsonl/log files; seeds in 2840-2899: {'explore_out/G/s89.log': [2840, 2841, 2842], 'explore_out/G/s89_results.json': [2840, 2841, 2842, 2843, 2844, 2845, 2846, 2847, 2848, 2849, 2850, 2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861]}
   origin/claude/explore-H @ cf67855d: 214 json/jsonl/log files; seeds in 2840-2899: none
   origin/claude/explore-I @ 8d2e89fa: 54 json/jsonl/log files; seeds in 2840-2899: none
   origin/claude/outside-ideas @ 419368a4: 210 json/jsonl/log files; seeds in 2840-2899: none
@@ -250,9 +254,9 @@
   origin/claude/replicate-R @ 31c39fce: 9 json/jsonl/log files; seeds in 2840-2899: none
   origin/claude/rev10-draft @ 33e00363: 63 json/jsonl/log files; seeds in 2840-2899: none
   origin/claude/rev9-draft @ 010a085a: 44 json/jsonl/log files; seeds in 2840-2899: none
-  origin/claude/review-V @ cde483b6: 43 json/jsonl/log files; seeds in 2840-2899: none
+  origin/claude/review-V @ 43cea898: 43 json/jsonl/log files; seeds in 2840-2899: none
   origin/feature/per-channel-plasticity @ 4af9d503: 0 json/jsonl/log files; seeds in 2840-2899: none
-  history: 4766 distinct json/jsonl/log/txt blobs (2.58 GB) reachable from 13 remote branches; seeds 2840-2899 found in: {'explore_out/G/s89.log': [2840, 2841, 2842], 'explore_out/G/s89_results.json': [2840, 2841, 2842, 2843, 2844, 2845, 2846, 2847, 2848, 2849, 2850, 2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861]}
+  history: 4771 distinct json/jsonl/log/txt blobs (2.58 GB) reachable from 13 remote branches; seeds 2840-2899 found in: {'explore_out/G/s89.log': [2840, 2841, 2842], 'explore_out/G/s89_results.json': [2840, 2841, 2842, 2843, 2844, 2845, 2846, 2847, 2848, 2849, 2850, 2851, 2852, 2853, 2854, 2855, 2856, 2857, 2858, 2859, 2860, 2861]}
 
 §9 RECORDS ON THE ROUND-6 TASKS (explore-F) that a CHECK could name
   explore_out/F/s89_tasks_results.json (first commit 40ea56eb): {'NOMEM_ALLPOOL': 2, 'NOMEM_LITE': 2, 'NOMEM_POOL': 2, 'NOMEM_SELF_ALLPOOL': 2, 'NOMEM_SELF_LITE': 2, 'NOMEM_SELF_POOL': 2, 'O_DELTA_ALLPOOL_48K': 2, 'O_DELTA_ALLPOOL': 2, 'O_DELTA_POOL_48K': 2, 'O_DELTA_POOL': 2, 'O_HEBB_ALLPOOL_48K': 2, 'O_HEBB_ALLPOOL': 2, 'O_HEBB_POOL_48K': 2, 'O_HEBB_POOL': 2}
