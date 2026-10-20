@@ -624,3 +624,19 @@ and the runs diverged from there. S87c was at the ceiling, so it could only have
 median transition (6600 against 4800), and WIN1200 matched KEYHINGE run for run. In this session's own eight-stream runs,
 2 of 498 firings had a one-to-one map before the fire, both on S86 seed 2334; neither changed the map. Report:
 explore_out/H/report_9.md.
+
+### Session H round 6 (S89: the split at eight streams with keys drawn from a pool of 32; seeds 2900-2911)
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S89 s89 (test_window_gate Part C's task with each sequence's 4 keys drawn from 32 key types; S=8, k=16, conv, 43200, Hebbian, exact copy; 10 paired seeds 2902-2911) | BOUND ROUTED: BASE (key positions) 1, ALLMASS 3, REPEATMASS 3, NOSPLIT 0; oracle 2/2 (at 10800 and 16800) | the labelled recipe itself fails here (BASE 1/10); no other reading |
+
+The pool task (explore_h_s89_child.PoolTask) equals the main line's batches bit for bit at pool size 4. At pool size 32
+the key types fall to frequency 0.010, below the values, and the layout within a sequence is unchanged. Every arm binds
+later than on the main line's task: the perfect gate at 10800-16800 (2400-8400 there), the four bound learned runs at
+36000-40800. Every triggered run fired in the flat start at 4800 and had used its cap of 3 by 14400-36000. The rule then
+wanted to fire at 29-31 later checks per arm, each blocked by the cap, and the runs merged with their splits on labelled
+targets (27-28 of 30). That is S79's cap-of-one failure at a cap of three. On the grouped layout the repeat statistic
+selects 96% of positions (stream tokens and most values repeat too), and REPEATMASS chose the all-position pair at 28 of
+30 firings; 8 of its 10 runs are bit-identical to ALLMASS's. The screen does not answer its question; the budget, the
+cap and S84's guard are the untested candidates. Report: explore_out/H/report_10.md (per run: s89_runs.md).
