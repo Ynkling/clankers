@@ -7,8 +7,8 @@ process on this branch's own modules, 1 torch thread. It imports S82's (explore_
 (explore_g_s87_child) and S71-S73's (explore_g_rhl_child) children unchanged; every arm is built and trained on the task
 named in the payload.
 
-TASKS (explore_f_tasks.py vendored byte for byte from claude/explore-F at 50dc8e4, blob ffe249bb..., asserted by the
-CHECKs): "lite" (F's RandHeaderTask(P=4, nb=2, lmin=1, lmax=3), S70's; the CHECKs and the reproductions of S87's records),
+TASKS (explore_f_tasks.py vendored byte for byte from claude/explore-F at b0c6332, blob e24d5e10..., F's revision after
+Referee V's S89-F review, appended only to 50dc8e4's ffe249bb...; both asserted by the CHECKs): "lite" (F's RandHeaderTask(P=4, nb=2, lmin=1, lmax=3), S70's; the CHECKs and the reproductions of S87's records),
 "pool" (RandHeaderTaskPool(): lite's batch with each sequence's 4 keys renamed to 4 of 32 types; vocabulary 50) and
 "allpool" (RandHeaderTaskAllPool(): also the 2 CTX tokens renamed to 2 of 16 types; vocabulary 64; stream index by first
 appearance).
@@ -19,8 +19,11 @@ TASK-AWARE CODE (new here; on lite each equals the lite function it replaces, CH
                             (on lite: explore_g_devices_child.key_eta).
   roles, the query          CTX / KEY / VAL from task.role_masks (lite: token ranges); the query's stream is
                             task.stream_labels at qpos (the stream index; lite: the CTX token before it).
-  statistics                lite: explore_g_rhl_child.stats_fn unchanged; round-6 tasks: explore_f_tasks.pool_stats(ROUTE_AT)
-                            (gate_stats_k + pool_routing_stats) + beta^R by role + layer_stats89 (explore_g_rhl_child.
+  statistics                lite: explore_g_rhl_child.stats_fn unchanged; round-6 tasks: explore_f_tasks.pool_stats_inv(
+                            ROUTE_AT) (gate_stats_k + pool_routing_stats, + the within-sequence eta^2 by stream at KEY,
+                            VAL cos and fraction of sequences routed at every evaluation: on allpool the stream index is a
+                            per-sequence convention and the pooled forms read it) + beta^R by role + layer_stats89
+                            (pooled per-layer statistics; descriptive on allpool) (explore_g_rhl_child.
                             layer_stats with the positions, ids and query above). After the run: stream_acc89, probe_rh89,
                             acc_by_cell89, write_order_acc89 (the lite functions with the stream index and the task's roles).
   the perfect gate          TaskPerfectBDH: test_channel_binding's 'ceiling' model whose gate is task.perfect_gate on the
@@ -84,11 +87,12 @@ from test_router_reliability import run_one
 HERE = os.path.dirname(os.path.abspath(__file__))
 LAM, TAU, WINDOW = dc.LAM, dc.TAU, 2400
 LOG_AT = (1, 300, 600, 1200, 2400)
-F_COMMIT, F_BLOB = "50dc8e4", "ffe249bb644423479e869cff11d2d723ac35450b"
-PREFIX_COMMIT, PREFIX_BLOB, PREFIX_LEN = "a199d5e", "de4746371dfa63b05630a644c4fe0b2bdce29e32", 14101
+F_COMMIT, F_BLOB = "b0c6332", "e24d5e10815eb1234d1947aa6b74b128d2696882"
+PREFIXES = (("50dc8e4", "ffe249bb644423479e869cff11d2d723ac35450b", 35605),     # F's round-6 module, G's first vendoring
+            ("a199d5e", "de4746371dfa63b05630a644c4fe0b2bdce29e32", 14101))     # the lite module vendored before
 TASKS = {"lite": rc.RHL, "pool": ft.RandHeaderTaskPool(), "allpool": ft.RandHeaderTaskAllPool()}
 POOLED = ("pool", "allpool")
-STATS_POOL = ft.pool_stats(c2.ROUTE_AT)
+STATS_POOL = ft.pool_stats_inv(c2.ROUTE_AT)
 
 
 def task_of(name):
@@ -527,13 +531,29 @@ def checks_static(p):
                  f"git rev-parse {F_COMMIT}:explore_f_tasks.py {hf[:12] if hf else 'not in this clone'}",
                  h == F_BLOB and (hf is None or hf == F_BLOB)))
     data = open(path, "rb").read()
-    pre = subprocess.check_output(["git", "-C", HERE, "cat-file", "blob", PREFIX_BLOB])
-    rows.append((f"its first {PREFIX_LEN} bytes equal {PREFIX_COMMIT}'s blob {PREFIX_BLOB[:12]} (the lite module vendored "
-                 f"before; F appended only): {len(pre)} bytes, prefix equal {data[:PREFIX_LEN] == pre}",
-                 len(pre) == PREFIX_LEN and data[:PREFIX_LEN] == pre))
+    for pc, pb, pl in PREFIXES:
+        pre = subprocess.check_output(["git", "-C", HERE, "cat-file", "blob", pb])
+        rows.append((f"its first {pl} bytes equal {pc}'s blob {pb[:12]} (F appended only): {len(pre)} bytes, prefix equal "
+                     f"{data[:pl] == pre}", len(pre) == pl and data[:pl] == pre))
     for tname in POOLED:
         for nm, v in ft.check_pool_task(task_of(tname)):
             rows.append((f"{tname} (F's check_pool_task): {nm}", v))
+        for nm, v in ft.check_inv_stats(task_of(tname)):
+            rows.append((f"{tname} (F's check_inv_stats): {nm}", v))
+    # the outcome: explore_g_rhl_parent.routed_bound on the pooled record (pool) and on the within-sequence view
+    # (allpool, explore_g_s89.inv_view) equals F's pool_outcome(rec, invariant) on a grid of records
+    import itertools
+    import explore_g_rhl_parent as hp
+    import explore_g_s89 as par
+    agree = n_ = 0
+    for tr, mg, e, ei in itertools.product((None, 1200), (0.5, 0.9, 1.0), (0.0, 0.9, 0.95), (0.0, 0.9, 0.95)):
+        rec = dict(transition=tr, val_cos=0.1, end=dict(margin=mg, eta_key_by_stream=e, eta_key_by_stream_inv=ei,
+                                                        val_cos_inv=0.1))
+        agree += (hp.routed_bound(rec) == ft.pool_outcome(rec, False)["routed_bound"]
+                  and hp.routed_bound(par.inv_view(rec)) == ft.pool_outcome(rec, True)["routed_bound"])
+        n_ += 1
+    rows.append((f"ROUTED-BOUND: explore_g_rhl_parent.routed_bound on the record (pooled) and on inv_view(record) "
+                 f"(within-sequence) equals F's pool_outcome(rec, False / True) on {agree}/{n_} grid records", agree == n_))
     lite = task_of("lite")
     rows.append((f"tasks: lite {lite.key} vocab {lite.vocab}; pool {TASKS['pool'].key} vocab {TASKS['pool'].vocab}; allpool "
                  f"{TASKS['allpool'].key} vocab {TASKS['allpool'].vocab}; L 23, qpos [21] on all three",
@@ -641,9 +661,11 @@ def checks_static(p):
         t = task_of(tname)
         m = make_model("ORACLE_D", 2840, tname)
         st = stats_fn89(m, t, probe_batch(t, 2840), "end")
-        rows.append((f"{tname}: the untrained perfect gate reads ROUTED*: eta_key_by_stream {st['eta_key_by_stream']:.4f}, "
+        inv = f", within-sequence {st['eta_key_by_stream_inv']:.4f}" if is_pool(t) else ""
+        rows.append((f"{tname}: the untrained perfect gate reads ROUTED*: eta_key_by_stream {st['eta_key_by_stream']:.4f}{inv}, "
                      f"margin {st['margin']:.4f}, eta_val_by_stream {st['eta_val_by_stream']:.4f}",
-                     st["eta_key_by_stream"] > 0.999 and st["margin"] >= 0.9))
+                     st["eta_key_by_stream"] > 0.999 and st["margin"] >= 0.9
+                     and (not is_pool(t) or st["eta_key_by_stream_inv"] > 0.999)))
     return rows
 
 
@@ -701,7 +723,8 @@ def checks_on(p):
     for arm in ("ORACLE_D", "BASELINE_D", "REG3_D", "REG3_KEYHINGE_D", "REG3_FREQHINGE_D", "REG3_REPEATHINGE_D"):
         r = run(dict(arm=arm, seed=2842, task=tname, iters=20, eval_every=10))
         e = r.get("end", {})
-        need = ("margin", "eta_key_by_stream", "eta_key_by_key", "spread", "layers") + (() if arm == "ORACLE_D" else ("beta",))
+        need = ("margin", "eta_key_by_stream", "eta_key_by_stream_inv", "val_cos_inv", "eta_key_by_key", "spread",
+                "layers") + (() if arm == "ORACLE_D" else ("beta",))
         fired = r.get("term", {}).get("fired")
         rows.append([f"{tname}: {arm} runs 20 updates end to end (ok {r.get('ok')}; end statistics "
                      f"{sorted(k for k in need if k in e)}; stream_acc {r.get('stream_acc')}; cells {len(r.get('acc_by_cell', {}))}; "

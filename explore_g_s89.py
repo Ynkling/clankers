@@ -13,12 +13,22 @@ renamed to 4 of 32 types) and RandHeaderTask-allpool (the 2 CTX tokens also rena
 WHY DELTA. F's pilots (claude/explore-F report_9.md, 52e2ea7; Intel Xeon @ 2.80GHz, counts only here): the Hebbian perfect
 gate binds neither pool task at 24000 or 48000, under SLOW or S70's Adam (0/2 each), while the delta perfect gate (beta 1,
 L2 keys) binds both 2/2 at 2400-3600. Both tasks read "untested" for Hebbian and valid for delta. So every arm here is
-on delta memory; NO HEBBIAN LEARNED ARM RUNS (F's convolution pilot, the only route to a valid Hebbian configuration named
-in the plan, is not published when this is committed).
+on delta memory. NO HEBBIAN LEARNED ARM RUNS: F's convolution pilot (explore_f_s89_post at 3dd5b74, results 73035d3; the
+Hebbian perfect gate + conv 'layer', seeds 2800-2801) bound POOL 2/2 and ALLPOOL 1/2, which F's own pre-fixed rule reads
+"partly" (4/4 "restores"). That is a Hebbian configuration valid on POOL only, and with a convolution this branch's
+register models do not have (RegBDH's layer loop has no conv path; building and CHECKing one is a separate screen). It
+is not run here; the report says so.
 
-TASKS: explore_f_tasks.py vendored byte for byte from claude/explore-F at 50dc8e4 (blob ffe249bb644423479e869cff11d2d723ac35450b,
-asserted, and its first 14,101 bytes equal a199d5e's lite module, asserted): "pool" = ft.RandHeaderTaskPool(), "allpool" =
+TASKS: explore_f_tasks.py vendored byte for byte from claude/explore-F at b0c6332 (blob e24d5e10815eb1234d1947aa6b74b128d2696882,
+the later hash F named after its own fixes, published before any S89 run; asserted; its first 35,605 bytes equal 50dc8e4's
+blob ffe249bb... and its first 14,101 a199d5e's lite module, both asserted): "pool" = ft.RandHeaderTaskPool(), "allpool" =
 ft.RandHeaderTaskAllPool() (vocabularies 50 and 64; L 23, qpos 21, as lite). Lite enters only through S87's records.
+THE ROUTING CAP ON ALLPOOL (F's b0c6332 comment, CHECKed by ft.check_inv_stats): no fixed map from CTX type to channel
+separates a sequence's two contexts in more than 64/120 = 0.533 of sequences; a gate reading token identity routes the
+rest only by comparing the two contexts within the sequence (the register can carry the first one). task.perfect_gate is
+handed that comparison. So a valid perfect gate on ALLPOOL says the memory can use a relative routing, not that a gate
+under test can express one, and on ALLPOOL any null ("fails here", "does nothing") does not separate "keys are not
+frequent" from "contexts have no fixed identity". The report states this beside every ALLPOOL reading.
 MODEL, RECIPE, HINGES, TASK-AWARE STATISTICS, RECORDS: explore_g_s89_child (S87's model: k = 2, no conv, 24000 updates,
 REG3 at all three layers, delta memory beta 1 / L2 keys / tied write / decay 0.95; SLOW for every arm, the perfect gate
 included; every hinge LAM 1.0 x mean over layers of relu(eta2 by its ids at its positions - 0.2), updates 1-2400 only, with
@@ -44,8 +54,11 @@ ARMS per task, seeds 2842-2861 (20, paired across arms and across the two tasks)
   Seeds 2862-2899 are not used.
 LITE COMPARISON (descriptive, counts only, other seeds): S87's delta references on 2720-2729, read from s87_results.json.
 OUTCOME: ROUTED-BOUND = explore_g_rhl_parent.routed_bound (BOUND and F's ROUTED*@end: end margin >= 0.9 and end eta^2 by
-stream at KEY > 0.9, on the round-6 tasks from explore_f_tasks.pool_routing_stats); paired, beats and not_worse_1 from
-explore_g_rhl_parent (imported, not re-implemented). Exact one-sided McNemar on seed pairs (b = the first arm only);
+stream at KEY > 0.9). On POOL the pooled eta^2 (explore_f_tasks.pool_routing_stats); on ALLPOOL the within-sequence eta^2
+(pool_routing_stats_inv: the pooled one reads the first-appearance labelling, ~0 for a gate that separates every sequence
+but not with the same channel for the first context), applied as routed_bound(inv_view(record)); CHECKed equal to F's
+pool_outcome(rec, invariant) on a grid; the other form printed beside it. The margin is within-sequence in both. paired,
+beats and not_worse_1 from explore_g_rhl_parent (imported, not re-implemented). Exact one-sided McNemar on seed pairs (b = the first arm only);
 "discovered" = beats BASELINE_D with p < 0.05 (this is the word's meaning in S82-S89; explore_common.discovered's
 "bound and VAL cos < 0.5" is printed beside it as DISCOVERED, as before); "p <= 0.0625" = at least as strong as 4 vs 0.
 READINGS (fixed now; per task; computed by readings() below; n = the paired seeds):
@@ -77,8 +90,8 @@ OPERATING CHARACTERISTICS (V's screen_checks_s89_G_out.txt §5, exact): at 20 pa
 ALSO REPORTED: the hinges' selected positions per role and the frequency cuts; firings and values; beta^R by role and step;
 the margin per layer; the contingency tables; the probe; the plateaus by (stream, block, pair); the commitment by step.
 CHECKS (asserted before any run; explore_g_s89_child unless stated): X's arm A bit for bit (explore_common.repro_check);
-  - the vendored module: its blob equals F's at 50dc8e4; its first 14,101 bytes equal a199d5e's; F's check_pool_task on
-    both tasks;
+  - the vendored module: its blob equals F's at b0c6332; its first 35,605 bytes equal 50dc8e4's and 14,101 a199d5e's; F's
+    check_pool_task and check_inv_stats on both tasks; routed_bound (pooled / inv_view) = F's pool_outcome on a grid;
   - token ids only: frequent() equals F's largest_ratio_cut on ft.freq_sample(task) and raises when handed
     stream_labels(x), the key ids, a float tensor, a narrower tensor or another sample; one parameter each; repeat_mask by
     hand; the repeat positions identical on the three tasks; what each hinge selects per role (pool: CTX only; allpool:
@@ -138,6 +151,13 @@ S87_DELTA = dict(B=("BASELINE_D", tuple(range(2720, 2730))), R=("REG3_D", tuple(
                  KH=("REG3_KEYHINGE_D", tuple(range(2720, 2730))), FQ=("REG3_FREQHINGE_D", tuple(range(2720, 2730))))
 S87_HEBB = dict(B=("BASELINE", tuple(range(2700, 2720))), KH=("REG3_KEYHINGE", tuple(range(2700, 2720))),
                 FQ=("REG3_FREQHINGE", tuple(range(2700, 2720))))
+
+
+def inv_view(r):
+    """The record with eta^2 by stream at KEY replaced by its within-sequence form (ALLPOOL's outcome); the pooled one kept."""
+    e = dict(r["end"], eta_key_by_stream=r["end"].get("eta_key_by_stream_inv"),
+             eta_key_by_stream_pooled=r["end"].get("eta_key_by_stream"))
+    return dict(r, end=e)
 
 
 def _load(p):
@@ -309,6 +329,13 @@ def check_readings():
 def report():
     me = sys.modules[__name__]
     R = {a: gc.runs(me, a) for a in ARMS}
+    other = {}
+    for a in list(R):
+        other[a] = sum(rb(inv_view(r) if a.startswith("pool.") else r) for r in R[a].values())
+        if a.startswith("allpool."):
+            R[a] = {s: inv_view(r) for s, r in R[a].items()}
+    print("OUTCOME FORM: pool pooled eta^2, allpool within-sequence eta^2. ROUTED-BOUND under the other form "
+          "(pool within-sequence, allpool pooled), descriptive: " + ", ".join(f"{a} {k}/{len(R[a])}" for a, k in other.items()))
     v = _load(VALID) or {}
     order = [a for t in TASK_NAMES for a in [f"{t}.ORACLE_D"] + [f"{t}.{k}" for k in LEARNED] if a in ARMS]
     print(hp.count_table(R, order))
@@ -321,6 +348,9 @@ def report():
         valid = bool(v.get(t, {}).get("valid"))
         RR = {k: R[f"{t}.{a}"] for k, a in ROLE.items() if f"{t}.{a}" in R}
         out[t] = readings(RR, S20, t, valid=valid, valid_note=note) if valid else dict(validity=note, first="UNTESTED")
+        if t == "allpool":
+            out[t]["caveat"] = ("the routing cap: a fixed CTX-type map separates at most 0.533 of sequences; a null here does "
+                                "not separate 'keys are not frequent' from 'contexts have no fixed identity'")
         out[t]["commitment at 2400 (median spread)"] = ", ".join(f"{a} {med_commit(R[f'{t}.{a}']):.4f}" for a in LEARNED
                                                                  if R.get(f"{t}.{a}"))
     across = {}
