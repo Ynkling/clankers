@@ -453,6 +453,63 @@ def s87_section(L):
     return [m1, m2]
 
 
+def s89_section(L):
+    import explore_h_s89 as m
+    setup([m])
+    res, got = m.report()
+    A = res["arms"]
+    L.append("## S89 explore_h_s89 — S=8, P=4, k=16, conv, 43200, Hebbian, exact copy; keys drawn from a pool of 32; "
+             "seeds 2902-2911 paired\n")
+    L.append("| arm | BOUND ROUTED | band | Wilson 95% | failures v1 | failures v2 | transition median (all) | splits | own pair ok | "
+             "key-pair ok | all-pair ok | repeat-pair ok | splits at probe < 0.2 |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for a in m.LEARNED:
+        x = A[a]
+        tr = f"{fmt_t(x['trans_med'])} ({', '.join(str(t) for t in x['trans'])})" if x["trans"] else "--"
+        if a in m.TRIGGERED:
+            extra = (f"{x['ops']} | {x['op_ok']}/{x['ops']} | {x['key_ok']}/{x['ops']} | {x['all_ok']}/{x['ops']} | "
+                     f"{x['rep_ok']}/{x['ops']} | {x['flat']}")
+        else:
+            extra = "-- | -- | -- | -- | -- | --"
+        L.append(f"| {a} | {x['br']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | {cls_str(x['v1'])} | {cls_str(x['v2'])} | "
+                 f"{tr} | {extra} |")
+    o = res["oracle"]
+    L.append(f"\nORACLE (ceil8_D8 + conv on the pool task, seeds 2900-2901; run first, gating the learned arms): bound "
+             f"{o['bound']}/{o['n']}, transitions {o['transitions']} → {'VALID' if o['valid'] else 'UNTESTED'}.\n")
+    for k, c in res["cmp"].items():
+        x, y = k.split(" vs ")
+        L.append(f"- {k}: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {x} only {c['b']}, {y} only {c['c']}; p({x}>{y}) {c['p']:.3g}, "
+                 f"p({y}>{x}) {c['p_rev']:.3g}")
+    L.append("\n**Readings (fixed in explore_h_s89's docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    ov = res["overlap"]
+    if ov:
+        L.append(f"\nREPEATMASS's repeat set on its 64-sequence probe: {ov['repeat']} of {ov['positions']} input positions; key "
+                 f"positions in it {ov['key_in_repeat']} of {ov['key_positions']}; not key positions {ov['repeat_not_key']} (CTX "
+                 f"{ov['repeat_ctx']} of {ov['all_ctx']}, VAL {ov['repeat_val']} of {ov['all_val']}, the query's CTX and KEY "
+                 f"{ov['repeat_q_ctx'] + ov['repeat_q_key']}).")
+    L.append("\nPairs at the firings (descriptive): " + "; ".join(
+        f"{a}: key = all {A[a]['same_key_all']}/{A[a]['ops']}, key = repeat {A[a]['same_key_rep']}/{A[a]['ops']}, all = repeat "
+        f"{A[a]['same_all_rep']}/{A[a]['ops']}, map one-to-one before {A[a]['one_to_one_before']}" for a in m.TRIGGERED)
+        + ". v1/v2 differences: " + ("; ".join(f"{a} {A[a]['v1v2_differ']}" for a in A if A[a]['v1v2_differ']) or "none")
+        + ". Per run: explore_out/H/s89_runs.md.")
+    rows = ["# S89 per run (EXPLORATORY, not a result)\n",
+            "Each firing: update, probe accuracy, the pair copied (c* -> c0) and whether it is a labelled target (op_ok), the "
+            "key-position, all-position and repeat pairs with their labels, and the stream -> channel map before it.\n",
+            "| arm | seed | outcome | transition | firings |", "|---|---|---|---|---|"]
+    for a in m.LEARNED:
+        for s, r in sorted(got[a].items()):
+            f = [c for c in r.get("checks") or [] if c.get("fired")]
+            fs = "<br>".join(f"{c['step']} ({c['acc']:.2f}): {c['op_cs']}->{c['op_c0']} {'ok' if c['op_ok'] else 'NOT ok'}; key "
+                             f"{c['key_cs']}->{c['key_c0']} {c['key_ok']}, all {c['all_cs']}->{c['all_c0']} {c['all_ok']}, rep "
+                             f"{c['rep_cs']}->{c['rep_c0']} {c['rep_ok']}; map {c['map_before']}" for c in f) or "--"
+            rows.append(f"| {a} | {s} | {r.get('outcome')} | {r.get('transition')} | {fs} |")
+    with open(os.path.join(OUT, "s89_runs.md"), "w") as fh:
+        fh.write("\n".join(rows) + "\n")
+    return m
+
+
 def write(n, body, notes):
     p = os.path.join(OUT, f"report_{n}.md")
     with open(p, "w") as f:
@@ -464,7 +521,7 @@ def write(n, body, notes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9))
+    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
     ap.add_argument("--notes", default=None)
     args = ap.parse_args()
     notes = open(args.notes).read() if args.notes else ""
@@ -482,6 +539,12 @@ def main():
             c = checks_line(m.NAME)
             L.append(f"\n**{m.NAME}:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}; CHECKs "
                      + (f"all passed ({c['time']}, git {c['git']})" if c else "NOT RECORDED"))
+    elif args.batch == 10:
+        m = s89_section(L)
+        nr, h, cpus, shas = runtime(m)
+        c = checks_line(m.NAME)
+        L.append(f"\n**Runtime:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}. **CHECKs:** "
+                 + (f"all passed ({c['time']}, git {c['git']}, {c['minutes']:.1f} min)" if c else "NOT RECORDED"))
     elif args.batch in (4, 5, 6, 7, 8):
         m = {4: s78_section, 5: s79_section, 6: s84_section, 7: s85_section, 8: s86_section}[args.batch](L)
         nr, h, cpus, shas = runtime(m)
