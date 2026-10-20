@@ -160,9 +160,12 @@ def row(where, stmt, source, recomputed, status, note=""):
     PENDING.clear()
     reanch = [f"tex10:{a}" for a, b, ch in anchors if a is not None and ch]
     touched = [f"tex10:{a}" for a, b, ch in anchors if a is not None and a in CHANGED and not ch]
+    stmt_old = stmt
+    if isinstance(stmt, tuple):          # (the original's statement, the statement as 846d0c8 words it)
+        stmt_old, stmt = stmt
     if i < NEW_FROM:
         ostmt, ost = OLDROWS[i]
-        assert ostmt == str(stmt).replace("|", "\\|").replace("\n", " "), (i, ostmt, stmt)
+        assert ostmt == str(stmt_old).replace("|", "\\|").replace("\n", " "), (i, ostmt, stmt_old)
         delta = f"{ost} (unchanged)" if ost == status else f"{ost} \u2192 {status}"
         if reanch:
             delta += "; re-anchored (" + ", ".join(reanch) + " rewritten)"
@@ -607,7 +610,8 @@ c1660 = git("log", "--format=%h", I_BR, "--", s75b1660).split()[-1]
 row(L("The card belonged to the user's server, which left the project after this run and S75b's CUDA CHECKs", ln) + also((44, "which left the project on 19 October")),
     "the server (1660) left the project on 19 October, after this run and S75b's CUDA CHECKs; the remaining GPU is the 3070",
     "STATUS.md at 585b666; git", f"GPU run 148c161 {hm('148c161')}; S75b CUDA CHECK on the 1660 {c1660} {hm(c1660)}; STATUS.md: "
-    f"'left the project on 19 October' {'left the project on 19 October' in show(V10, 'STATUS.md')}", "NOT RECORD-CHECKABLE",
+    f"'left the project on 19 October' {'left the project on 19 October' in show(V10, 'STATUS.md')} (at {V101}: "
+    f"{'left the project on 19 October' in show(V101, 'STATUS.md')})", "NOT RECORD-CHECKABLE",
     "the order of the card's last jobs is recorded; the server's leaving is the author's statement (STATUS.md), consistent")
 
 # ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
@@ -777,14 +781,13 @@ row(L("$0.530$--$0.536$ against $0.529$--$0.536$", ln), "WIDE_SLOW 0.530-0.536 a
 row(L("$\\eta^2$ below $0.001$ at every evaluation, no one-to-one map at any", ln), "WIDE_SLOW eta^2 < 0.001 at every evaluation, no one-to-one map at any (ten seeds)",
     "records", f"eta max {eta_wl:.5f} (839: {info['WIDE_SLOW']['eta_max']:.5f}); one-to-one {oto_wl} of {nev_wl} evaluations",
     "MATCH" if eta_wl < 0.001 and oto_wl == 0 else "DISAGREE")
-row(L("all but one of the 29 (a register run, at $0.29$) had lost it by 3600", ln),
+row(L("all but one of the 29 (a register run, at $0.29$) had lost it by 3600", ln, new="all but one of the 30 (a register run, at $0.29$) had lost it by 3600"),
     "all but one of the 29 gated runs had lost the source by 3600; the residual held it at 1200 in every gated run (0.35-0.61)",
     "records (probe L2/L3/final at 3600; L2 at 1200)", f"gated runs now {n_gated} (WIDE_SPLIT 10, REG3 10, WIDE_SLOW 10); above 0.27 at "
     f"3600: {above}; L2 at 1200 over all {n_gated}: {min(p1200):.4f}-{max(p1200):.4f} (839 slow {info['WIDE_SLOW']['p1200']:.4f}, "
-    f"at 3600 {info['WIDE_SLOW']['p3600']:.4f})", "DISAGREE",
-    "the count is stale: with seed 839 there are 30 gated runs, and 839 also held the source at 1200 and lost it by 3600, so "
-    "'all but one of the 30'; the 0.35-0.61 range and the single exception (REG3 839, 0.29) are unchanged. 'Nine seeds' was "
-    "updated to 'all ten' in the same paragraph, this count was not")
+    f"at 3600 {info['WIDE_SLOW']['p3600']:.4f})", "MATCH" if n_gated == 30 and len(above) == 1 and above[0][:2] == ("REG3", 839) else "DISAGREE",
+    "846d0c8 takes the count: 'all but one of the 30'. With seed 839 there are 30 gated runs, 839 held the source at 1200 and lost "
+    "it by 3600, and the single exception (REG3 839, 0.29) and the 0.35-0.61 range are unchanged")
 row(L("$\\eta^2$ by source was below $0.003$ at every evaluation of every gate layer in all twenty runs", ln),
     "eta^2 < 0.003 and no one-to-one map in the twenty registered learned runs (unchanged by 839)", "records",
     f"max {eta20:.5f}; one-to-one {oto20}", "MATCH" if eta20 < 0.003 and oto20 == 0 else "DISAGREE")
@@ -837,10 +840,14 @@ row(L("the referee found its provenance claim to hold by the commit graph, two d
     "'Four outcomes are not covered'", "MATCH")
 row(L("and its pilot not run", ln), "S75b's pilot not run", "explore-I tree", f"S75b record files other than the 3070 benchmark: {pilot_files}",
     "MATCH" if not pilot_files else "DISAGREE")
-row(L("about three days for the second stage", ln), "on the 3070 alone, about three days for the second stage",
+row(L("about three days for the second stage", ln, new="about two and a half days for the second stage by the specification's own run times"),
+    "on the 3070 alone, about three days for the second stage",
     "s75b_spec_draft.md 'Cost'; STATUS.md", f"the spec's per-run 3070 hours sum to {h3070[0]:.0f}-{h3070[1]:.0f} h "
-    f"({h3070[0] / 24:.1f}-{h3070[1] / 24:.1f} days) for stage 2's 42 runs; 'three days' appears only in STATUS.md", "NOT RECORD-CHECKABLE",
-    "an estimate in STATUS.md; the spec's own table gives about 2.3-2.4 days, so 'about three' is a round-up")
+    f"({h3070[0] / 24:.2f}-{h3070[1] / 24:.2f} days) for stage 2's 42 runs; to the nearest half day both ends are "
+    f"{round(h3070[0] / 12) / 2:g} and {round(h3070[1] / 12) / 2:g}", "MATCH" if round(h3070[0] / 12) / 2 == round(h3070[1] / 12) / 2 == 2.5 else "PARTIAL",
+    "846d0c8 states the figure from the specification's own table ('about two and a half days ... by the specification's own run "
+    "times'), which makes it record-checkable: 54.3-57.3 h, 2.26-2.39 days, two and a half to the nearest half day (the merge commit's "
+    "'54-57 h' is the exact form)")
 row(L("Session~I corrected its pre-run note on 12 October: the note (committed at 00:46 UTC)", ln),
     "note committed 00:46 UTC; corrected in report 2 on 12 October; note not edited; no learned-arm record in git until b649751 at 13:53 UTC",
     "git", f"5bc6c2e {hm('5bc6c2e')}; report 2's correction 03bffdf {hm('03bffdf')} ({r2corr}); note commits {note_hist}; "
@@ -922,33 +929,56 @@ row(L("Session~E's key-load draft was committed after those reviews", 366), "E's
 row(L("its reviews of three of the four specifications the sessions drafted (three main-line tests and one exploratory screen)", 44) + also((366, "It reviewed three of the four specifications the sessions drafted")),
     "V reviewed three of four drafted specifications (G, H main-line; S75b exploratory); E's not", "review-V files",
     "spec_review_register_draft.md, spec_review_two_keyterm_draft.md, spec_review_s75b_draft.md; none for E's", "MATCH")
-row(L("the three drafted specifications are not ready", 70), "index, V's row: 'the three drafted specifications are not ready'",
-    "tex10:44, 366, 499; review-V files", "V reviewed G, H and S75b; tex10:499 defines 'the three drafted' as G, H and E", "PARTIAL",
-    "credited to V in its row, but the three V judged are G, H and S75b, while the three main-line drafts (tex10:499) include E's, which V "
-    "never reviewed (E's own screen found it not ready). Say 'the three specifications it reviewed'")
-row(L("the referee's checks of the first three of these (\\texttt{docs/review\\_2026-10/round6\\_A3.md}; the fifth round's screens have not been refereed", 44),
-    "V's checks cover delta L/pooled, the GPU run and R's Phase 5; the fifth round's screens are not refereed", "round6_A3.md; review-V tip",
-    f"round6_A3 covers exactly those three (+ Amendment 2); V's last commit before this check {git('log', '-1', '--format=%h %cI', V_BR).strip()}", "MATCH")
+row(L("the three drafted specifications are not ready", 70, new="the three specifications it reviewed are not ready"),
+    ("index, V's row: 'the three drafted specifications are not ready'", "index, V's row: 'the three specifications it reviewed are not ready'"),
+    "tex101:44, 368, 503; review-V files", "V reviewed G, H and S75b (spec_review_register_draft, spec_review_two_keyterm_draft, spec_review_s75b_draft); "
+    "tex101:503 defines 'the three drafted' as G, H and E", "MATCH",
+    "846d0c8 takes the referee's wording: the three are now the ones V reviewed, none of them ready")
+RP101 = show(V101, "docs/review_2026-10/rev10/referee_pass.md")
+row(L("the referee's checks of the first three of these (\\texttt{docs/review\\_2026-10/round6\\_A3.md}; the fifth round's screens have not been refereed", 44,
+      new="the referee's checks of the first three of these before the draft (\\texttt{docs/review\\_2026-10/round6\\_A3.md}) and, after the merge, of the whole revision and of the fifth round's screens (\\texttt{rev10/referee\\_pass.md}"),
+    ("V's checks cover delta L/pooled, the GPU run and R's Phase 5; the fifth round's screens are not refereed",
+     "V's checks: delta L/pooled, the GPU run and R's Phase 5 before the draft (round6_A3); after the merge the whole revision and the fifth round's screens (rev10/referee_pass.md)"),
+    "round6_A3.md; review-V at its pin; 846d0c8:docs/review_2026-10/rev10/",
+    f"round6_A3 covers exactly those three (+ Amendment 2), committed 0e70640 {hm('0e70640')}, before the first draft ea3afef {hm('ea3afef')}; "
+    f"V's last commit before the original check {git('log', '-1', '--format=%h %cI', V_BR).strip()}; at {V101}: referee_pass.md present, its scope "
+    f"'The text added since Revision 9' {'The text added since Revision 9' in RP101}, checks A/FG/HE present "
+    f"{all(git('cat-file', '-t', V101 + ':docs/review_2026-10/rev10/check_rev10_' + x + '.md').strip() == 'blob' for x in ('A', 'FG', 'HE'))}",
+    "MATCH" if ctime("0e70640") < ctime("ea3afef") else "DISAGREE",
+    "the original row was MATCH for 'not refereed'; 846d0c8 records the referee's pass after the merge, which exists at the path cited")
 rev10_files = [p for p in git("ls-tree", "-r", "--name-only", V10, "docs/review_2026-10/rev10/").split()]
 fp = show(V10, "docs/review_2026-10/rev10/first_pass.md")
 sp = show(V10, "docs/review_2026-10/rev10/second_pass.md")
-row(L("this revision's own additions were checked in two passes by a session that did not write them, every number recomputed from the records", 44) + ", 495",
-    "two passes by a session that did not write them, in docs/review_2026-10/rev10/", "585b666:docs/review_2026-10/rev10/",
+sess = {c: re.findall(r"Claude-Session: \\S+/(session_\\w+)", git("log", "-1", "--format=%B", c)) for c in ("ea3afef", "6e75f69", "d2b7abd")}
+pass_first = {f: git("log", "--format=%h", "--diff-filter=A", "f342d1d", "--", "docs/review_2026-10/rev10/" + f).split() for f in ("first_pass.md", "second_pass.md")}
+rec_scripts = sorted(p.split("/")[-1] for p in rev10_files if p.endswith(".py"))
+row(L("this revision's own additions were checked in two passes by a session that did not write them, every number recomputed from the records", 44,
+      new="the draft itself had been checked in two passes by a separate checking agent run from the author's own session, whose files git cannot order before the third version and which recomputed \\texttt{test\\_delta\\_recipe}, the GPU run and H's screens and read the other screens' reports")
+    + also((495, "This revision's additions were checked against the records, in two passes, by a session that did not write them", REMOVED)),
+    ("two passes by a session that did not write them, in docs/review_2026-10/rev10/",
+     "two passes by a separate checking agent run from the author's own session; git cannot order its files before the third version; it recomputed delta, the GPU run and H's screens and read the other screens' reports"),
+    "585b666:docs/review_2026-10/rev10/; git trailers",
     f"files {[p.split('/')[-1] for p in rev10_files]}; first pass of ea3afef (123 rows), second of 6e75f69's 19 changed lines (31 rows); "
-    f"the merged text is d2b7abd (third version, {hm('d2b7abd')}), 4 tex lines (44, 481, 495, 500) changed after the second pass", "PARTIAL",
-    "two passes exist and are committed; the second covered only the lines changed since the first and the third version's changes "
-    "(the second pass's three items) were not passed; 'every number recomputed' rests on the first pass. Not by V (README: V had closed on "
-    "13 October). Note also that this V check writes into the same directory, so the citation will then cover both")
-row(L("A referee recomputed the numbers of Revisions~8 and~9 and of this revision's additions from the records and found them to reproduce", 495),
-    "a referee recomputed the numbers of Rev 8, Rev 9 and this revision's additions and found them to reproduce",
-    "round6_A3.md; rev10/README.md", "V recomputed three of this revision's additions (delta L/pooled, GPU run, R Phase 5); the fifth round's screens and "
-    "S75's 839 were recomputed only by the unnamed checking session, which the same paragraph distinguishes from 'session V'", "PARTIAL",
-    "'A referee' with 'this revision's additions' reads as V covering all additions; the paragraph's last sentence says the screens are "
-    "not refereed by V. Say 'the referee recomputed ... the main-line and replication additions'")
+    f"the merged text is d2b7abd (third version, {hm('d2b7abd')}), 4 tex lines (44, 481, 495, 500) changed after the second pass; "
+    f"Claude-Session of the three drafts {sess}; the pass files first in {pass_first}; recompute scripts {rec_scripts}",
+    "MATCH" if (len({x for v in sess.values() for x in v}) == 1 and pass_first["first_pass.md"] == pass_first["second_pass.md"] == ["d2b7abd"]
+                and rec_scripts == ["recompute_H.py", "recompute_delta.py", "recompute_gpu.py"]) else "DISAGREE",
+    "846d0c8 states what git shows: the same Claude-Session trailer on every draft commit and on the commit that adds the pass files "
+    "(d2b7abd, the third version), and scripts for test_delta_recipe, the GPU run and H only. tex10:495's sentence ('by a session that "
+    "did not write them') is gone")
+row(L("A referee recomputed the numbers of Revisions~8 and~9 and of this revision's additions from the records and found them to reproduce", 495,
+      new="of this revision's additions it had checked \\texttt{test\\_delta\\_recipe}'s L half and pooled block, the GPU run and R's Phase~5 before the draft, and after the merge it checked the rest, the fifth round's screens included, with the same outcome (the numbers right, nine statements false, corrected in Revision~10.1"),
+    ("a referee recomputed the numbers of Rev 8, Rev 9 and this revision's additions and found them to reproduce",
+     "the referee recomputed Rev 8 and 9; of Rev 10's additions it checked delta L/pooled, the GPU run and R's Phase 5 before the draft, the rest (the fifth round's screens included) after the merge: numbers right, nine statements false"),
+    "round6_A3.md; rev10/referee_pass.md, check_rev10_A/FG/HE", f"before the draft: round6_A3 (0e70640, {hm('0e70640')}) covers delta L/pooled, the GPU run and "
+    f"R's Phase 5; after the merge: check_rev10_A (S75's 839, S75b, history), _FG (S88, S87), _HE (H's round 5, E's batches 20-21), "
+    f"referee_pass.md: 'Nine statements, in sixteen places' {'Nine statements, in sixteen places' in RP101}; 'Every number of every "
+    f"pre-registered claim reproduces' {'Every number of every pre-registered claim reproduces' in RP101}", "MATCH",
+    "846d0c8 names what each check covered, as the referee's pass asked (its section 1.1)")
 st = show(V10, "STATUS.md")
 row(L("which left the project on 19 October; the remaining GPU is the laptop's RTX~3070", 44), "the 1660 server left on 19 October; the remaining GPU is the 3070",
     "STATUS.md (585b666)", f"STATUS: 'The server (Ryzen 5 3600; GTX 1660 SUPER) left the project on 19 October' "
-    f"{'left the project on 19 October' in st}", "NOT RECORD-CHECKABLE", "the author's statement, consistent with STATUS.md")
+    f"{'left the project on 19 October' in st}; at {V101} {'left the project on 19 October' in show(V101, 'STATUS.md')}", "NOT RECORD-CHECKABLE", "the author's statement, consistent with STATUS.md")
 row(L("No claim of Revision~9 changes.", 44), "no claim of Revision 9 changes", "c918ff7 vs 585b666 tex",
     "Rev 9 stated test_delta_recipe's per-machine X result (secondary) and left the pooled labels to L; Rev 10 adds the pooled claims; no Rev 9 "
     "claim's count or reading is altered", "MATCH")

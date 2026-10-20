@@ -301,6 +301,15 @@ say(f"  2c250bd's referee_pass.md: 'Eleven statements' {'Eleven statements' in r
     f"{git('rev-parse', '480a2de:docs/review_2026-10/rev10/referee_pass.md') == git('rev-parse', NEW + ':docs/review_2026-10/rev10/referee_pass.md')}")
 say(f"  0e70640 adds round6_A3.md: {'docs/review_2026-10/round6_A3.md' in git('show', '--stat', '--format=', '--name-only', '0e70640')}")
 say(f"  f5d3893 subject names batch 20 complete: {'Batch 20 complete' in git('log', '-1', '--format=%s', 'f5d3893')}")
+say("  rows no item of referee_pass.md covers (I and R):")
+p5 = [l for l in show("31c39fc", "records/phase5.jsonl").split("\n") if l.strip()]
+say(f"    I row tex101:544 cites 559b942 and 'pilot; 41'; S75 store at 559b942 {len(st75_559['runs'])} runs, at 4371824 {len(st75['runs'])}; "
+    f"report_2.md commits after 559b942 before 846d0c8: {git('log', '--format=%h %cI', '559b942..origin/claude/explore-I', f'--before={NEWTIME}', '--', 'explore_out/I/report_2.md').split()}")
+say(f"    R row tex101:545: '{T101[544][-40:]}'; R's Phase 5 report 31c39fc ({ctime('31c39fc')}) cited anywhere in tex101: "
+    f"{'31c39fc' in WHOLE101}; records/phase5.jsonl lines at 31c39fc {len(p5)}")
+say("  merge timing of 10.1 (tex101:447 'The referee now reads ... every draft before it is merged'): "
+    f"846d0c8 {NEWTIME}; ed9ca2b6 {ctime('ed9ca2b6')}; 264e227 {ctime(MERGE)}; "
+    f"sentence present in tex101:447: {'every draft before it is merged' in T101[446]}")
 
 # ══ 5. PDF ════════════════════════════════════════════════════════════════════════════════════════════════════════
 say("\n" + "=" * 110)
