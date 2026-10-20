@@ -1,0 +1,20 @@
+====================================================================================================
+EXPLORATORY, NOT A RESULT — Session G S89
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git db14e9b | python 3.13.16 | torch threads 1
+====================================================================================================
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (45s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+  S87's records re-labelled as one task (Hebbian 2700-2719):
+      validity: S87's validity: ORACLE_ALL 2/2 (Hebbian; S87 ran no delta perfect gate)
+      counts: BASELINE 0/20, REG3_KEYHINGE 20/20, REG3_FREQHINGE 17/20
+      REG3_KEYHINGE vs BASELINE: KH only 20, BASELINE only 0, p 9.54e-07
+      first: the labelled hinge is discovered; per-arm names below
+      REG3_FREQHINGE: THE FREQUENCY HINGE IS WEAKER THAN THE KEY HINGE (discovered yes (arm only 17, BASELINE only 0, p 7.63e-06); vs KH: KH only 3, arm only 0, p(KH >) 0.125, n 20); clamps: does not apply (arm only 17, BASELINE only 0; commitment at 2400 0.5913 vs BASELINE 0.8734)
+  S87's records re-labelled as one task (delta 2720-2729):
+      validity: S87's validity: ORACLE_ALL 2/2 (Hebbian; S87 ran no delta perfect gate)
+      counts: BASELINE_D 0/10, REG3_D 0/10, REG3_KEYHINGE_D 10/10, REG3_FREQHINGE_D 10/10
+      REG3_KEYHINGE vs BASELINE: KH only 10, BASELINE only 0, p 0.000977
+      REG3_KEYHINGE vs REG3 (descriptive: the hinge's contribution): KH only 10, REG3 only 0, p 0.000977
+      first: the labelled hinge is discovered; per-arm names below
+      REG3_FREQHINGE_D: THE FREQUENCY HINGE SURVIVES (discovered yes (arm only 10, BASELINE only 0, p 0.000977); vs KH: KH only 0, arm only 0, p(KH >) 1, n 10); clamps: does not apply (arm only 10, BASELINE only 0; commitment at 2400 0.9365 vs BASELINE 0.8063)
