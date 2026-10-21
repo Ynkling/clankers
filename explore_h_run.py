@@ -73,9 +73,10 @@ def push_after(line_fn):
     a time (flock), retrying the push with backoff."""
     def wrapped(j, rec):
         msg = f"explore_out/H: {j['name']} {j['arm']}|{j['seed']} saved (EXPLORATORY, not a result)"
+        # No pull: only this session pushes to claude/explore-H, and a pull with autostash rewrites the working tree's
+        # files (the running driver's log among them), so the driver's open log handle would write to an unlinked copy.
         cmd = (f"cd {HERE} && git add explore_out/H && git commit -q -m '{msg}' -m '{TRAILER}'; "
-               f"for i in 2 4 8 16; do git -c rebase.autoStash=true pull -q --rebase origin claude/explore-H && "
-               f"git push -q -u origin claude/explore-H && break; sleep $i; done")
+               f"for i in 2 4 8 16; do git push -q -u origin claude/explore-H && break; sleep $i; done")
         subprocess.Popen(["flock", PUSH_LOCK, "bash", "-c", cmd], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return line_fn(j, rec)
     return wrapped
