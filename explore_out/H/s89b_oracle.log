@@ -4,3 +4,21 @@ EXPLORATORY, NOT A RESULT — session H: H/s89b
 ====================================================================================================
   code SHA H/s89b: 9cb518b59c14 over 54 modules (10 served from main at 9c5939e): bdh bdh_recurrent explore_aux_gate explore_b16_gates explore_b16_main explore_b18_gates explore_common explore_common2 explore_delta_mem explore_f_delta_fast explore_h_allmass_child explore_h_collapse_child explore_h_constants_child explore_h_copy2x2_child explore_h_eight_child explore_h_fail_class_v2 explore_h_guard_child explore_h_ops explore_h_s89_child explore_h_s89b_child explore_main9c explore_muon_k16_child explore_muon_recipe explore_muon_scale_child explore_slow_hinge explore_slow_mem explore_slow_pos explore_split_child explore_split_target_child explore_stream_knobs_child explore_window_d8_child test_binding_capacity test_binding_onset test_binding_recipe test_channel_binding test_conv_lr test_curriculum_confirm test_instrument_v2 test_interference test_load_curriculum test_multilayer_binding test_p_scaling test_readout_path test_router_confirm test_router_curriculum test_router_discovery test_router_layout test_router_reliability test_scale_axes test_short_conv test_slow_start test_stream_channels test_stream_curriculum test_stream_recipe
   CPU Intel(R) Xeon(R) Processor @ 2.10GHz; git f3b18e9; torch 2.14.0+cu130
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (44s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+<a581027:explore_f_delta_fast.py>:175: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  CHECK H/s89b: the delta modules are served from the main line at a581027 (blob sha1 {'explore_delta_mem': '499afb7d95b1', 'explore_f_delta_fast': '1ffd0aa73ce2'}); explore_delta_mem equals F's 9a6c2bf byte for byte (499afb7d95b1); both equal the main line's head ed9ca2b: ok
+  CHECK H/s89b: explore_f_delta_fast.fast_checks() (F's unit checks of the fused form): 2 rows, all pass: ok
+  CHECK H/s89b: to_delta_fast on the pool-32 LOCAL3 model adds no parameter and changes none (10 parameters); the memory becomes FastDeltaMemory (impl fast, beta 1.0): ok
+  CHECK H/s89b: the perfect gate's arm (ceil8_D8) against test_window_gate's CEIL_C (SC8_ceil, curriculum off), which test_delta_recipe's CEIL_DELTA uses: they differ only in ['key', 'label']: ok
+  CHECK H/s89b: pool 4: DELTA_SPLIT|583 equals X's DELTA_SPLIT|583 (Intel(R) Xeon(R) Processor @ 2.10GHz; 8ae660d) bit for bit through 7200 (curve True: [[1200, 0.05908203125], [2400, 0.06640625], [3600, 0.0615234375], [4800, 0.09228515625], [6000, 0.17431640625], [7200, 0.60205078125]]; statistics True; gradient norms True; trigger rows True; fired at [4800], the record [4800]): ok
+  CHECK H/s89b: pool 4: DELTA_NOSPLIT|583 equals X's DELTA_SLOW|583 bit for bit through 4800 (curve True, statistics True, gradient norms True): ok
+  CHECK H/s89b: pool 4: ORACLE_DELTA|580 equals X's CEIL_DELTA|580 through 2400 (curve [[1200, 0.845703125], [2400, 1.0]]: True; statistics True; gradient norms True): ok
+  CHECK H/s89b: pool 32: DELTA_SPLIT|2959 with the threshold at 0 equals DELTA_NOSPLIT|2959 bit for bit through 4800 (curve [[1200, 0.0537109375], [2400, 0.0595703125], [3600, 0.06787109375], [4800, 0.0546875]]; statistics; checks at [2400, 4800], none fired): ok
+  CHECK H/s89b: pool 32: DELTA_ALLMASS|2959 with the threshold at 0 equals DELTA_NOSPLIT|2959 bit for bit through 4800 (curve [[1200, 0.0537109375], [2400, 0.0595703125], [3600, 0.06787109375], [4800, 0.0546875]]; statistics; checks at [2400, 4800], none fired): ok
+  all CHECKs of H/s89b passed (38.9 min)
+  2 runs queued on 4 workers (1 torch thread each)
+  start    0.0 min  H/s89b           ORACLE_DELTA             seed 2912  (projected worst case 720 min)
+  start    0.0 min  H/s89b           ORACLE_DELTA             seed 2913  (projected worst case 720 min)
