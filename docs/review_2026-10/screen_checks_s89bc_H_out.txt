@@ -1,0 +1,199 @@
+== 0. State
+  explore-H head cf67855d; commits after 13fe6100:
+    2a98deff 2026-10-20T21:38:45+00:00 S89: Referee V's fixes 1-6 (and the text of 7-8) to the docstring and report path; report 10 for the Hebbian half (
+    c81398ca 2026-10-20T21:41:43+00:00 S89c: the trigger's schedule on the 32-key pool task (first check at 12000; cap 6) against a BASE rerun; readings f
+    bccb7cbd 2026-10-20T21:46:05+00:00 S89b: the split on delta memory with keys from a pool of 32; readings fixed before any run, with Referee V's fixes 
+    555d6816 2026-10-20T21:46:32+00:00 explore_out/H: S89c CHECK log in progress (EXPLORATORY, not a result)
+    cf67855d 2026-10-20T22:00:07+00:00 explore_out/H: S89c CHECKs passed; runs started (EXPLORATORY, not a result)
+  review-V ee5217bc 2026-10-19T18:40:23+00:00 Referee V: screen_review_s89_H.md (explore_h_s89 at d4a9a7d): fix first (text and report path only; the ORACLE runs
+  review-V adecd3db 2026-10-20T21:46:08+00:00 Referee V: H's report 10 (check_H_report10): every number reproduces, one miscount ('four runs' for 7 runs on 4 see
+  review-V 3c772c39 2026-10-19T18:40:36+00:00 Referee V: interim: S89 G screen review in progress
+  review-V dcd549d6 2026-10-19T18:47:40+00:00 Referee V: screen_review_s89_G.md (explore_g_s89 at 7ab98c1): fix first — the vendored task module is F's a199d5e n
+  files changed per commit:
+    2a98deff: ['explore_h_report.py', 'explore_h_s89.py', 'explore_out/H/report_10.md', 'explore_out/H/report_10_notes.md', 'explore_out/README.md']
+    c81398ca: ['explore_h_oc.py', 'explore_h_run.py', 'explore_h_s89c.py', 'explore_h_s89c_child.py']
+    bccb7cbd: ['explore_h_s89b.py', 'explore_h_s89b_child.py']
+    555d6816: ['explore_out/H/s89c.log']
+    cf67855d: ['explore_out/H/checks.json', 'explore_out/H/s89c.log', 'explore_out/H/s89c_results.json']
+  s89c.log at the head: 20 lines; CHECK rows 5 (ok 5); last: start    0.0 min  H/s89c           BASE                     seed 2927  (projected worst case 720 min)
+  s89c_results.json at the head: runs stored 0; code_shas ['4dda5635891098de0bc5a9e9808685d42be9e9f8']; started 2026-10-20 21:42:42 (git c81398c)
+  checks.json: H/s89c {'sha': '4dda5635891098de0bc5a9e9808685d42be9e9f8', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'git': '555d681+dirty', 'time': '2026-10-20 21:59:18 UTC', 'minutes': 15.78293450276057}; H/s89b present: False
+  files named *s89b* on any head: [('origin/claude/explore-H', 'explore_h_s89b.py'), ('origin/claude/explore-H', 'explore_h_s89b_child.py')]
+
+== 1. 2a98deff: S89's fixes
+  explore_out/H/s89_results.json: blob at 13fe6100 a6069dc5ff, at 2a98deff a6069dc5ff, at head a6069dc5ff
+  explore_out/H/s89.log: blob at 13fe6100 8bd26518ac, at 2a98deff 8bd26518ac, at head 8bd26518ac
+  explore_out/H/s89_oracle.log: blob at 13fe6100 19961784f2, at 2a98deff 19961784f2, at head 19961784f2
+  explore_out/H/s89_runs.md: blob at 13fe6100 01ab36603f, at 2a98deff 01ab36603f, at head 01ab36603f
+  checks.json H/s89 entry equal at 13fe6100 and head: True
+  S89's code SHA covers 51 modules; 46 are files on the branch; changed between 13fe6100 and the head: none; explore_h_s89 / explore_h_report in the list: False / False
+  'four' (runs) in explore_out/H/report_10.md at 13fe6100: ['55: - The four runs that bound routed (BASE 2910; ALLMASS and REPEATMASS 2904, 2908, 2909) bound at 36000-40800.', '57: - Three of the four bound within 2400-6000 updates of the 43200 budget.']
+  'four' (runs) in explore_out/H/report_10.md at origin/claud: none
+  'four' (runs) in explore_out/H/report_10_notes.md at 13fe6100: ['25: - The four runs that bound routed (BASE 2910; ALLMASS and REPEATMASS 2904, 2908, 2909) bound at 36000-40800.', '27: - Three of the four bound within 2400-6000 updates of the 43200 budget.']
+  'four' (runs) in explore_out/H/report_10_notes.md at origin/claud: none
+  'four' (runs) in explore_out/README.md at 13fe6100: ["636: later than on the main line's task: the perfect gate at 10800-16800 (2400-8400 there), the four bound learned runs at"]
+  'four' (runs) in explore_out/README.md at origin/claud: ["636: later than on the main line's task: the perfect gate at 10800-16800 (2400-8400 there), the four bound learned runs at"]
+  fix1 s89:3-5: lines [3, 63, 136]
+  fix1 CAVEAT: lines [60]
+  fix2: lines [28]
+  fix3: lines [53]
+  fix4: lines [65]
+  fix5: lines [75]
+  fix6 MAINREF: lines [132]
+  fix7: lines [11]
+  fix8: lines [88]
+  REVISION: lines [90]
+  cites 3c772c3: lines [90]
+  628eb7c has results/X/window_gate_results.json with WIN3_SPLIT_D8|540: True
+  F's explore_f_tasks.py at 52e2ea7: classes ['RandHeaderTask', 'RandHeaderTaskPool', 'RandHeaderTaskAllPool']
+  ... at F's head 53578896: classes ['RandHeaderTask', 'RandHeaderTaskPool', 'RandHeaderTaskAllPool', '_GateStub']
+  report() at 2a98deff on S89's 42 stored records: readings {'S89': 'the labelled recipe itself fails here (BASE 1/10); no other reading'}
+    trigger_lines ['BASE: 30 firings, 1 with a one-to-one map before the fire, 27 labelled ok (op_ok)', 'ALLMASS: 30 firings, 1 with a one-to-one map before the fire, 28 labelled ok (op_ok)', 'REPEATMASS: 30 firings, 1 with a one-to-one map before the fire, 28 labelled ok (op_ok)']
+    repeat_note REPEATMASS (repeat set = 95.7% of input positions; same pair as ALLMASS at 28 of 30 firings)
+  report() at 2a98deff on synthetic outcomes: 6767 compositions of 10 seeds into 16 patterns (one per pattern of the rules' predicates, 1772, plus 5000 random) x (no firings / one firing per triggered run): 13534 calls; moot 1244, of which a trigger reading carries a name: 0; non-moot trigger readings with exactly one name: 6012; defects: none
+  example moot print: {'split': 'the split is not needed here (BASE only 1, NOSPLIT only 0; p(BASE>NOSPLIT) 0.5)', 'ALLMASS': 'ALLMASS: moot (the split is not needed here); BASE only 2, ALLMASS only 2 (p(BASE>ALLMASS) 0.688); ALLMASS only 2 vs NOSPLIT only 1 (p(ALLMASS>NOSPLIT) 0.5)', 'REPEATMASS': 'REPEATMASS: as ALLMASS (same pair at every firing): REPEATMASS: moot (the split is not needed here); BASE only 2, REPEATMASS only 2 (p(BASE>REPEATMASS) 0.688); REPEATMASS only 2 vs NOSPLIT only 1 (p(REPEATMASS>NOSPLIT) 0.5)'}
+  report 10 (2a98deff) 'What happened', recomputed:
+    ORACLE held-out at 1200 [0.407, 0.206], 4800 [0.766, 0.713], 8400 [0.863, 0.904], 9600 [0.908, 0.939]; transitions [16800, 10800]
+    BASE: failures 9; final held-out 0.595-0.852 (curve end 0.595-0.852); streams < 0.9 per failure [2, 2, 2, 4, 4, 4, 5, 5, 6]; classes {'MERGED (2 share)': 7, 'MERGED (3 share)': 2}; last evaluation = curve max in 4; first >= 0.5 at [14400, 18000, 19200, 20400, 20400, 21600, 22800, 24000, 25200, 26400]; bound [(2910, 36000)]
+    ALLMASS: failures 7; final held-out 0.454-0.841 (curve end 0.454-0.841); streams < 0.9 per failure [2, 2, 2, 4, 4, 5, 8]; classes {'MERGED (2 share)': 6, 'MERGED (3 share)': 1}; last evaluation = curve max in 3; first >= 0.5 at [-1, 14400, 18000, 18000, 18000, 18000, 20400, 20400, 24000, 24000]; bound [(2904, 40800), (2908, 37200), (2909, 40800)]
+    BASE 2910 first >= 0.8 at 21600; ALLMASS 2910 MERGED (2 share), end 0.454, streams < 0.9 8/8
+
+== 2. S89c (explore_h_s89c.py at c81398ca; identical at the head: True, child True)
+  19448 compositions of 10 seeds into the 8 per-seed patterns of ('BASE', 'BASE_LATE', 'BASE_CAP6')
+  report() names: {'no reading applies': 15708, 'the channel is the limit': 1467, 'the schedule was the limit': 2273}; disagreements with rule_s89c or the referee's reading: 0 []
+  'the channel is the limit' by BASE's own count (count: compositions): {np.int16(0): 30, np.int16(1): 84, np.int16(2): 141, np.int16(3): 181, np.int16(4): 197, np.int16(5): 201, np.int16(6): 197, np.int16(7): 181, np.int16(8): 141, np.int16(9): 84, np.int16(10): 30}; with BASE >= 4: 1031, with BASE >= 7: 436
+  9 of 10 seeds stored: {'S89c': 'INCOMPLETE, no reading'}; valid True (hard-coded)
+  printed by explore_h_run.py at the end: readings, complete, valid only ([150]); explore_h_report.py has an s89c / s89b section: False
+  S89's BASE|2902 first committed at ('7939dd4c', '2026-10-19T19:39:32+00:00 explore_out/H: H/s89 BASE|2902 saved (EXPLORATORY, not a result)'); identical at the head: True; key BASE|2902|6e0a80a55be3|Intel(R) Xeon(R) Processor @ 2.10GHz
+  S89's NOSPLIT|2902 first committed at a8816cec; identical at the head: True
+  s89.store_run (what the CHECK reads):
+    def store_run(name, arm, seed):
+        for k, r in ec.load_store(name)["runs"].items():
+            a, s = k.split("|")[:2]
+            if a == arm and int(s) == seed and r.get("ok"):
+                return r
+        return None
+    
+  child checks() seed (mechanics on S48's harness, pool 4): ['2924']
+  S89 BASE: held-out acc at 9600 [0.102, 0.133, 0.209, 0.144, 0.146, 0.16, 0.106, 0.13, 0.081, 0.087]; at 12000 [0.133, 0.25, 0.421, 0.204, 0.205, 0.237, 0.109, 0.159, 0.127, 0.108]; first >= 0.3 at [12000, 13200, 13200, 14400, 15600, 16800, 18000, 18000, 21600, 22800]
+  S89 NOSPLIT: held-out acc at 9600 [0.16, 0.156, 0.111, 0.093, 0.129, 0.17, 0.131, 0.135, 0.099, 0.094]; at 12000 [0.225, 0.207, 0.208, 0.123, 0.15, 0.23, 0.176, 0.151, 0.103, 0.166]; first >= 0.3 at [-1, 13200, 14400, 14400, 15600, 15600, 15600, 16800, 19200, 32400]
+  S89 NOSPLIT (= BASE_LATE through 12000 by the CHECK's construction): held-out rise 9600 -> 12000 < 0.02 on 2/10 seeds (held-out curve, not the 64-sequence probe)
+  S89 BASE firings: 30; before 12000 15; at probe < 0.2 17; probe at the 12000 check per seed [0.203, 0.328, 0.406, 0.188, 0.234, 0.25, 0.062, 0.109, 0.125, 0.109]
+  report_10 text added in 2a98deff (21:38:45, 3 min before c81398ca): ['- The learned BASE runs stay near chance far longer: held-out accuracy first reaches 0.3 at 12000-22800 and 0.5 at']
+
+== 3. S89b (explore_h_s89b.py at bccb7cbd; identical at the head: True)
+  ORACLE_DELTA 2/2: report() names {'the split is not needed here': 1668, 'no reading applies': 2514, 'needs key positions': 751, 'survives': 283, 'the labelled recipe itself fails here': 14232}
+  ORACLE_DELTA 1/2: report() names {'UNTESTED': 19448}
+  ORACLE_DELTA 1 stored: report() names {'INCOMPLETE': 19448}
+  ORACLE_DELTA 0/2: report() names {'UNTESTED': 19448}
+  disagreements (ORACLE 2/2) with rule_s89b or the referee's reading: 0 []
+  s89c_schedule with (LATE only, BASE only; CAP6 only, BASE only) = (4, 0, 4, 0): (True, {'first': 12000, 'source': 'S89c BASE_LATE'})
+  s89c_schedule with (LATE only, BASE only; CAP6 only, BASE only) = (4, 0, 5, 0): (True, {'cap': 6, 'source': 'S89c BASE_CAP6'})
+  s89c_schedule with (LATE only, BASE only; CAP6 only, BASE only) = (6, 0, 4, 0): (True, {'first': 12000, 'source': 'S89c BASE_LATE'})
+  s89c_schedule with (LATE only, BASE only; CAP6 only, BASE only) = (4, 1, 5, 0): (True, {'cap': 6, 'source': 'S89c BASE_CAP6'})
+  s89c_schedule with (LATE only, BASE only; CAP6 only, BASE only) = (3, 0, 3, 0): (True, {})
+  8ae660d DELTA_SPLIT|583: cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 13200; fired [4800, 12000]; memory delta; trigger_op copy
+  8ae660d DELTA_SLOW|583: cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 13200; fired []; memory delta; trigger_op None
+  8ae660d CEIL_DELTA|580: cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 2400; fired []; memory delta; trigger_op None
+  8ae660d: Record test_delta_recipe on X: D2 0 vs 0 (DELTA_SLOW 19/20), D4 SHOWN 10 vs 1, D1 d = -3
+  S89b CHECK seed 2959 / ORACLE seeds (2912, 2913) / learned 2914-2923
+  'Referee V' in explore_h_s89b.py at lines [7, 43, 48, 53, 64]
+
+== 4. Seeds 2912-2959 (S89b 2912-2923, S89c 2924-2933, CHECK 2959)
+  13 heads, 348 distinct JSON/JSONL blobs; blobs with 2912-2959: 1
+    [('explore-H', 'explore_out/H/s89c_results.json')]: [('seeds', 'BASE', 2924), ('seeds', 'BASE', 2925), ('seeds', 'BASE', 2926), ('seeds', 'BASE', 2927)] ... (30 hits; seeds [2924, 2925, 2926, 2927, 2928, 2929, 2930, 2931, 2932, 2933])
+  history: 2356 distinct JSON/JSONL blobs; with 2912-2959: 1
+    explore_out/H/s89c_results.json: seeds [2924, 2925, 2926, 2927, 2928, 2929, 2930, 2931, 2932, 2933]; kinds ['seeds']
+  text mentions of 2912-2959 on the heads (path: branches):
+    docs/reading/parallel_sessions_prompts.md: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'rev10-draft']
+    docs/review_2026-10/check_H_report10.md: ['rev10-draft', 'review-V']
+    docs/review_2026-10/check_H_report10.py: ['rev10-draft', 'review-V']
+    docs/review_2026-10/rev10/check_rev10_FG_v101.md: ['review-V']
+    docs/review_2026-10/rev10/check_rev10_HE_v101.md: ['review-V']
+    docs/review_2026-10/screen_checks_s89_F_out.txt: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'rev10-draft', 'review-V']
+    docs/review_2026-10/screen_checks_s89_G_out.txt: ['rev10-draft', 'review-V']
+    docs/review_2026-10/screen_checks_s89_H.py: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'rev10-draft', 'review-V']
+    docs/review_2026-10/screen_checks_s89_H_out.txt: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'rev10-draft', 'review-V']
+    docs/review_2026-10/screen_review_s89_H.md: ['rev10-draft', 'review-V']
+    explore_h_s89.py: ['explore-H']
+    explore_h_s89b.py: ['explore-H']
+    explore_h_s89b_child.py: ['explore-H']
+    explore_h_s89c.py: ['explore-H']
+    explore_h_s89c_child.py: ['explore-H']
+    explore_out/F/eight_results.json: ['explore-F']
+    explore_out/F/probe_results.json: ['explore-F']
+    explore_out/F/trigger_results.json: ['explore-F']
+    explore_out/G/s71_layers_results.json: ['explore-G']
+    explore_out/G/s72_register3_results.json: ['explore-G']
+    explore_out/G/s73_register3_delta_results.json: ['explore-G']
+    explore_out/G/s82_devices_results.json: ['explore-G']
+    explore_out/G/s87_results.json: ['explore-G']
+    explore_out/H/eight_results.json: ['explore-H']
+    explore_out/H/report_10.md: ['explore-H']
+    explore_out/H/report_10_notes.md: ['explore-H']
+    explore_out/H/s89_results.json: ['explore-H']
+    explore_out/H/s89c.log: ['explore-H']
+    explore_out/H/s89c_results.json: ['explore-H']
+    explore_out/I/s74_pilot_results.json: ['explore-I']
+    explore_out/batch2.log: ['explore-F', 'explore-G', 'explore-H', 'outside-ideas']
+    explore_out/capacity_results.json: ['outside-ideas']
+    explore_out/far_tok_check_results.json: ['explore-F', 'explore-G', 'explore-H', 'outside-ideas']
+    explore_out/gate_cap_results.json: ['explore-F', 'explore-G', 'explore-H', 'outside-ideas']
+    explore_out/gate_prev_results.json: ['explore-F', 'explore-G', 'explore-H', 'outside-ideas']
+    explore_out/hinge_window_results.json: ['explore-F', 'explore-G', 'explore-H', 'outside-ideas']
+    records/phase4.log: ['replicate-R']
+    records/phase5.log: ['replicate-R']
+    results/L/delta_recipe_L.log: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'rev10-draft']
+    results/L/delta_recipe_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'rev10-draft']
+    results/L/early_recipe_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'relaxed-edison-he00cc'] ...
+    results/L/muon_recipe_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'rev10-draft'] ...
+    results/L/recipe_scope_results.json: ['relaxed-edison-he00cc']
+    results/L/stream_curriculum_results.json: ['relaxed-edison-he00cc']
+    results/L/window_gate_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'rev10-draft'] ...
+    results/X/early_recipe_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'relaxed-edison-he00cc'] ...
+    results/X/muon_recipe_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'rev10-draft'] ...
+    results/X/recipe_scope_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'relaxed-edison-he00cc'] ...
+    results/X/split_copy_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'rev10-draft', 'rev9-draft']
+    results/X/stream_curriculum_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'relaxed-edison-he00cc'] ...
+    results/X/window_gate_results.json: ['bdh-growth-hebbian-inference-w90069', 'bdh-repo-curl-obgdqk', 'explore-I', 'rev10-draft'] ...
+    video/data/hinge_firings.json: ['relaxed-edison-he00cc']
+
+== 5. Operating characteristics (the referee's own enumeration; V's model: with probability rho one shared U ~ U(0,1) decides every arm, else independent)
+ S89c (BASE, BASE_LATE, BASE_CAP6); rho 0 / 0.5 / 1
+  BASE 0.1, both new 0.1: the schedule was the limit 0.01/0.00/0.00; the channel is the limit 0.97/0.98/0.99; no reading applies 0.02/0.02/0.01
+  BASE 0.1, both new 0.2: the schedule was the limit 0.09/0.05/0.01; the channel is the limit 0.77/0.81/0.88; no reading applies 0.13/0.14/0.11
+  BASE 0.1, both new 0.3: the schedule was the limit 0.27/0.23/0.12; the channel is the limit 0.42/0.50/0.65; no reading applies 0.31/0.27/0.23
+  BASE 0.1, both new 0.5: the schedule was the limit 0.64/0.69/0.62; the channel is the limit 0.03/0.07/0.17; no reading applies 0.33/0.23/0.21
+  BASE 0.1, both new 0.7: the schedule was the limit 0.87/0.93/0.95; the channel is the limit 0.00/0.00/0.01; no reading applies 0.13/0.07/0.04
+  BASE 0.2, both new 0.1: the schedule was the limit 0.00/0.00/0.00; the channel is the limit 0.97/0.98/0.99; no reading applies 0.02/0.02/0.01
+  BASE 0.2, both new 0.2: the schedule was the limit 0.03/0.01/0.00; the channel is the limit 0.77/0.81/0.88; no reading applies 0.19/0.19/0.12
+  BASE 0.2, both new 0.3: the schedule was the limit 0.12/0.08/0.01; the channel is the limit 0.42/0.50/0.65; no reading applies 0.46/0.42/0.34
+  BASE 0.2, both new 0.5: the schedule was the limit 0.38/0.45/0.35; the channel is the limit 0.03/0.07/0.17; no reading applies 0.59/0.47/0.48
+  BASE 0.2, both new 0.7: the schedule was the limit 0.70/0.81/0.83; the channel is the limit 0.00/0.00/0.01; no reading applies 0.30/0.19/0.16
+  BASE 0.3, both new 0.1: the schedule was the limit 0.00/0.00/0.00; the channel is the limit 0.97/0.98/0.99; no reading applies 0.02/0.02/0.01
+  BASE 0.3, both new 0.2: the schedule was the limit 0.01/0.00/0.00; the channel is the limit 0.77/0.81/0.88; no reading applies 0.22/0.19/0.12
+  BASE 0.3, both new 0.3: the schedule was the limit 0.05/0.01/0.00; the channel is the limit 0.42/0.50/0.65; no reading applies 0.53/0.48/0.35
+  BASE 0.3, both new 0.5: the schedule was the limit 0.21/0.24/0.12; the channel is the limit 0.03/0.07/0.17; no reading applies 0.76/0.68/0.71
+  BASE 0.3, both new 0.7: the schedule was the limit 0.52/0.65/0.62; the channel is the limit 0.00/0.00/0.01; no reading applies 0.48/0.35/0.37
+  BASE 0.1, one new 0.3, other 0.1: the schedule was the limit 0.16/0.15/0.12; the channel is the limit 0.64/0.65/0.65; no reading applies 0.20/0.21/0.23
+  BASE 0.1, one new 0.5, other 0.1: the schedule was the limit 0.47/0.55/0.62; the channel is the limit 0.17/0.17/0.17; no reading applies 0.36/0.28/0.21
+  BASE 0.1, one new 0.7, other 0.1: the schedule was the limit 0.72/0.83/0.95; the channel is the limit 0.01/0.01/0.01; no reading applies 0.27/0.16/0.04
+  BASE 0.5, both new 0.5: the schedule was the limit 0.05/0.02/0.00; the channel is the limit 0.03/0.07/0.17; no reading applies 0.92/0.91/0.83
+  BASE 0.8, both new 0.8: the schedule was the limit 0.03/0.01/0.00; the channel is the limit 0.00/0.00/0.00; no reading applies 0.97/0.99/1.00
+  BASE 0.8, both new 0.3: the schedule was the limit 0.00/0.00/0.00; the channel is the limit 0.42/0.50/0.65; no reading applies 0.58/0.50/0.35
+ P(BASE rerun >= 4/10) at a true 0.1 / 0.2 / 0.3: 0.013 / 0.121 / 0.350
+ S89 BASE 1/10: Wilson 0.02-0.40
+ S89b gate: P(DELTA_SPLIT >= 7/10) at a true rate p: 0.1 0.000; 0.2 0.001; 0.3 0.011; 0.4 0.055; 0.5 0.172; 0.6 0.382; 0.7 0.650; 0.8 0.879; 0.9 0.987; 0.95 0.999
+ S89b (DELTA_SPLIT, DELTA_NOSPLIT, DELTA_ALLMASS); rho 0 / 0.5 / 1
+  SPLIT 0.9, NOSPLIT 0.9, ALLMASS 0.9: the labelled recipe itself fails here 0.01/0.01/0.01; the split is not needed here 0.87/0.94/0.99; survives 0.00/0.00/0.00; needs key positions 0.00/0.00/0.00; no reading applies 0.12/0.05/0.00
+  SPLIT 0.9, NOSPLIT 0.9, ALLMASS 0.5: the labelled recipe itself fails here 0.01/0.01/0.01; the split is not needed here 0.87/0.94/0.99; survives 0.00/0.00/0.00; needs key positions 0.09/0.04/0.00; no reading applies 0.04/0.01/0.00
+  SPLIT 0.95, NOSPLIT 0.95, ALLMASS 0.9: the labelled recipe itself fails here 0.00/0.00/0.00; the split is not needed here 0.94/0.98/1.00; survives 0.00/0.00/0.00; needs key positions 0.00/0.00/0.00; no reading applies 0.05/0.02/0.00
+  SPLIT 0.9, NOSPLIT 0.5, ALLMASS 0.9: the labelled recipe itself fails here 0.01/0.01/0.01; the split is not needed here 0.08/0.06/0.04; survives 0.44/0.53/0.61; needs key positions 0.00/0.00/0.00; no reading applies 0.46/0.39/0.33
+  SPLIT 0.9, NOSPLIT 0.5, ALLMASS 0.7: the labelled recipe itself fails here 0.01/0.01/0.01; the split is not needed here 0.08/0.06/0.04; survives 0.10/0.11/0.07; needs key positions 0.15/0.15/0.12; no reading applies 0.66/0.67/0.75
+  SPLIT 0.9, NOSPLIT 0.5, ALLMASS 0.5: the labelled recipe itself fails here 0.01/0.01/0.01; the split is not needed here 0.08/0.06/0.04; survives 0.01/0.00/0.00; needs key positions 0.45/0.54/0.61; no reading applies 0.45/0.38/0.33
+  SPLIT 0.7, NOSPLIT 0.7, ALLMASS 0.7: the labelled recipe itself fails here 0.35/0.35/0.35; the split is not needed here 0.43/0.52/0.65; survives 0.01/0.00/0.00; needs key positions 0.02/0.00/0.00; no reading applies 0.19/0.12/0.00
+  SPLIT 0.7, NOSPLIT 0.3, ALLMASS 0.7: the labelled recipe itself fails here 0.35/0.35/0.35; the split is not needed here 0.02/0.02/0.01; survives 0.19/0.31/0.49; needs key positions 0.02/0.01/0.00; no reading applies 0.42/0.32/0.15
+  SPLIT 0.5, NOSPLIT 0.5, ALLMASS 0.5: the labelled recipe itself fails here 0.83/0.83/0.83; the split is not needed here 0.05/0.10/0.17; survives 0.00/0.00/0.00; needs key positions 0.01/0.01/0.00; no reading applies 0.10/0.06/0.00
+  SPLIT 0.5, NOSPLIT 0.2, ALLMASS 0.5: the labelled recipe itself fails here 0.83/0.83/0.83; the split is not needed here 0.00/0.00/0.00; survives 0.02/0.06/0.13; needs key positions 0.02/0.01/0.00; no reading applies 0.13/0.10/0.04
+  SPLIT 0.3, NOSPLIT 0.3, ALLMASS 0.3: the labelled recipe itself fails here 0.99/0.99/0.99; the split is not needed here 0.00/0.00/0.01; survives 0.00/0.00/0.00; needs key positions 0.00/0.00/0.00; no reading applies 0.01/0.01/0.00
+  SPLIT 0.1, NOSPLIT 0.1, ALLMASS 0.1: the labelled recipe itself fails here 1.00/1.00/1.00; the split is not needed here 0.00/0.00/0.00; survives 0.00/0.00/0.00; needs key positions 0.00/0.00/0.00; no reading applies 0.00/0.00/0.00

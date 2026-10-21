@@ -1,0 +1,196 @@
+§1 VENDORED explore_f_tasks.py
+  7ab98c1                  blob de4746371dfa63b05630a644c4fe0b2bdce29e32  14101 bytes
+  50dc8e4                  blob ffe249bb644423479e869cff11d2d723ac35450b  35605 bytes
+  a199d5e                  blob de4746371dfa63b05630a644c4fe0b2bdce29e32  14101 bytes
+  origin/claude/explore-F  blob ffe249bb644423479e869cff11d2d723ac35450b  35605 bytes
+  G's copy == F's 50dc8e4: False;  G's copy == a199d5e: True;  G's copy is a byte prefix of F's 50dc8e4 file: True (14101 of 35605 bytes); F's tip == 50dc8e4: True
+  'class RandHeaderTaskPool': in G's copy False; in F's 50dc8e4 at line [306]
+  'class RandHeaderTaskAllPool': in G's copy False; in F's 50dc8e4 at line [378]
+  'def largest_ratio_cut': in G's copy False; in F's 50dc8e4 at line [478]
+  'def pool_stats': in G's copy False; in F's 50dc8e4 at line [450]
+
+§2 THE SCREEN'S CODE (ast)
+  explore_g_s89.py: 65 lines; top-level statements ['Expr'] (a docstring and nothing else: no ARMS, seeds, queue, validity gate, reading or report code)
+  explore_g_s89_child.py: 302 lines; defs ['Term89', 'checks', 'forward', 'frequent', 'hinge_mask', 'lg', 'make_model', 'oracle_check', 'repeat_mask', 'run', 's87_record', 'selected', 'task_of', 'term_value']
+  TASKS (child:[54]): TASKS = {"lite": rc.RHL}                    # the round-6 tasks are added when F's module is vendored
+  checks() mentions the vendored blob / F's commit / a hash: False
+  repeat_mask (child:62-67): attributes read ['cnt.gather', 'tokens.dim', 'tokens.dtype', 'tokens.max', 'tokens.shape']; calls ['cnt.gather', 'int', 'isinstance', 'tokens.dim', 'tokens.max', 'torch.ones_like', 'torch.zeros', 'torch.zeros(tokens.shape[0], V, dtype=torch.long).scatter_add_']
+  frequent (child:73-77): attributes read ['s87.FREQ_SAMPLE', 's87.FREQ_SEED', 's87.freq_types', 't.make_batch']; calls ['s87.freq_types', 't.make_batch', 'task_of', 'torch.Generator', 'torch.Generator().manual_seed']
+  hinge_mask (child:80-86): attributes read ['(tokens.unsqueeze(-1) == sel).any', 'tokens.unsqueeze']; calls ['(tokens.unsqueeze(-1) == sel).any', 'KeyError', 'frequent', 'repeat_mask', 'tokens.unsqueeze', 'torch.tensor']
+  term_value (child:89-96): attributes read ['dc.key_eta', 'g18.eta2_pool', 'mask.any', 'tokens.max']; calls ['F.relu', 'bool', 'dc.key_eta', 'g18.eta2_pool', 'hinge_mask', 'int', 'len', 'mask.any', 'task_of', 'tokens.max', 'torch.stack', 'torch.zeros']
+  selected (child:165-180): attributes read ['(m & is_ctx).sum', '(m & is_ctx).sum(1).float', '(m & is_ctx).sum(1).float().mean', '(m & is_key).sum', '(m & is_key).sum(1).float', '(m & is_key).sum(1).float().mean', '(m & km).sum', '(m & km).sum(1).float', '(m & km).sum(1).float().mean', '(m & ~is_ctx & ~is_key).sum', '(m & ~is_ctx & ~is_key).sum(1).float', '(m & ~is_ctx & ~is_key).sum(1).float().mean', 'ft.body_positions', 'km.scatter_', 'km.sum', 'km.sum(1).float', 'km.sum(1).float().mean', 'm.sum', 'm.sum(1).float', 'm.sum(1).float().mean', 's87.FREQ_SAMPLE', 's87.FREQ_SEED', 't.P', 't.S', 't.make_batch']; calls ['(m & is_ctx).sum', '(m & is_ctx).sum(1).float', '(m & is_ctx).sum(1).float().mean', '(m & is_key).sum', '(m & is_key).sum(1).float', '(m & is_key).sum(1).float().mean', '(m & km).sum', '(m & km).sum(1).float', '(m & km).sum(1).float().mean', '(m & ~is_ctx & ~is_key).sum', '(m & ~is_ctx & ~is_key).sum(1).float', '(m & ~is_ctx & ~is_key).sum(1).float().mean', 'dict', 'float', 'frequent', 'ft.body_positions', 'hinge_mask', 'km.scatter_', 'km.sum', 'km.sum(1).float', 'km.sum(1).float().mean', 'm.sum', 'm.sum(1).float', 'm.sum(1).float().mean', 't.make_batch', 'task_of', 'torch.Generator', 'torch.Generator().manual_seed', 'torch.zeros_like']
+  ast diff Term87.forward (S87, explore_g_s87_child.py:127-162) -> Term89.forward (child:100-133):
+    @@ -8 +7,0 @@
+    -    self.t_T = TEMP if self.t_kind == 'temp' and on else 1.0
+    @@ -11,2 +10,2 @@
+    -    if training and on and (self.t_kind != 'temp'):
+    -        inner = prev if prev is not None else lambda level, h, v, Rprev: Term87.layer_gate(self, level, h, v, Rprev)
+    +    if training and on:
+    +        inner = prev if prev is not None else lambda level, h, v, Rprev: rc.Reg3BDH.layer_gate(self, level, h, v, Rprev)
+    @@ -27 +26 @@
+    -        st['weights'][str(u)] = self.t_T if self.t_kind == 'temp' else 1.0 if on else 0.0
+    +        st['weights'][str(u)] = 1.0 if on else 0.0
+    @@ -30 +29 @@
+    -    v = term_value(self.t_kind, live, tokens)
+    +    v = term_value(self.t_kind, live, tokens, self.t_task)
+    @@ -35,2 +34 @@
+    -    lam = LAM if self.t_kind == 'freq' else LAM_S
+    -    return (aux._Inject.apply(out[0], lam * v.mean()),) + tuple(out[1:])
+    +    return (aux._Inject.apply(out[0], LAM * v.mean()),) + tuple(out[1:])
+  S89 imports S87's freq_types / FREQ_SAMPLE / FREQ_SEED (child:76) and S82's key_eta (child:91): True; repeat_mask and the hinge mask are new (child:62-67, 80-86)
+  ROUTED-BOUND as a named function in G's committed code: explore_g_rhl_parent.routed_bound at line [52], outcome() at [61], paired/beats/not_worse_1 at [72, 79, 84]; S87's parent uses it (explore_g_s87.py: [100, 176]); S89 imports it: False
+  main line 7c4ceb8: 'def routed_bound' in a .py outside docs/review: none
+  name clash: explore_common.discovered (line [241]) = bound and val_cos < 0.5; explore_g_rhl_parent.discovered (line [48]) the same; S89's 'discovered' (explore_g_s89.py:40) = beats BASELINE p < 0.05
+  lite-vocabulary code on the S89 run path (reads token ids S..S+P-1 as keys, or the module-level body_positions):
+    explore_f_tasks.py (module) body_positions: 'def body_positions' at [95]; 'is_key = (body >= S) & (body < S + P)' at [99]
+    explore_g_devices_child.key_eta: 'def key_eta' at [121]; 'kid = tokens.gather(1, kpos) - task.S' at [124]; 'eta2_pool(gk, kid, task.P)' at [128]
+    explore_g_rhl_child STATS_F / layer_stats / probe_rh / acc_by_cell / roles: 'STATS_F = ft.rand_header_stats' at [87]; 'kpos, vpos = ft.body_positions(task, pinp)' at [218]; 'kpos, vpos = ft.body_positions(task, x)' at [286]; 'elif S <= tok < S + task.P:' at [326]; 'KEY=(x >= S) & (x < S + P) & body' at [190]
+    explore_g_common.stream_acc: 'qs = data[:, task.qpos[0] - 1]' at [287]
+    explore_g_s89_child.selected: 'kpos, _ = ft.body_positions(t, x)' at [170]; 'is_ctx, is_key = x < S, (x >= S) & (x < S + t.P)' at [174]
+    explore_g_rhl_child ORACLE_ALL: 'CEIL = ' at [84]; 'm = build(task, CEIL, ARCH, seed)' at [149]
+
+§3 FREQUENCY CUT AND REPEAT MASK ON A SAMPLE (numpy re-implementation of RandHeaderTask(P=4, nb=2, lmin=1, lmax=3).make_batch and F's _relabel; 4096 sequences; distribution as F's, draws not torch's)
+  lite: CTX 2 types 0.1134-0.1138, KEY 4 types 0.1021-0.1025, VAL 16 types 0.0219-0.0235
+    largest-ratio cut: 6 types {'CTX': 2, 'KEY': 4}; half-mass cut {'CTX': 2, 'KEY': 3}   [F's s89.log: LRC 6 types [CTX, KEY]; half-mass 5 {CTX 2, KEY 3}]
+    frequency hinge: per sequence 14.00 positions (CTX 5.00, KEY 9.00, VAL 0.00); of the key term's 8 positions 8.00 (min 8, max 8); key-term share of the selected 0.571
+    repeat hinge: per sequence 16.67 positions (CTX 5.00, KEY 9.00, VAL 2.67); of the key term's 8 positions 8.00 (min 8, max 8); key-term share of the selected 0.480
+  pool: CTX 2 types 0.1134-0.1138, VAL 16 types 0.0219-0.0235, KEY 32 types 0.0119-0.0139
+    largest-ratio cut: 2 types {'CTX': 2}; half-mass cut {'CTX': 2, 'VAL': 12}   [F's s89.log: LRC 2 types [CTX]; half-mass 14 {CTX 2, VAL 12}; KEY 0.0120-0.0138, VAL 0.0220-0.0236]
+    frequency hinge: per sequence 5.00 positions (CTX 5.00, KEY 0.00, VAL 0.00); of the key term's 8 positions 0.00 (min 0, max 0); key-term share of the selected 0.000
+    repeat hinge: per sequence 16.67 positions (CTX 5.00, KEY 9.00, VAL 2.67); of the key term's 8 positions 8.00 (min 8, max 8); key-term share of the selected 0.480
+    repeat mask identical to lite's at every position of every sequence: True
+    module-level ft.body_positions(task, x) (explore_f_tasks.py:95-103): its assert (8 tokens in S..S+P-1 per body) holds in 0 of 4096 sequences -> P(a 32-sequence batch passes) = 0; dc.key_eta's key ids tokens - S reach 31 against one_hot(.., task.P = 4)
+    selected()'s role masks (child:174) on this vocabulary: 'ctx' = true CTX 5.00 of 5 per sequence; 'key' = true KEY 1.13 of 9, true CTX 0.00
+  allpool: VAL 16 types 0.0219-0.0235, CTX 16 types 0.0131-0.0152, KEY 32 types 0.0120-0.0136
+    largest-ratio cut: 16 types {'VAL': 16}; half-mass cut {'VAL': 16, 'CTX': 10}   [F's s89.log: LRC 16 types [VAL]; half-mass 26 {CTX 10, VAL 16}; VAL 0.0220-0.0236, CTX 0.0128-0.0151, KEY 0.0120-0.0138]
+    frequency hinge: per sequence 8.00 positions (CTX 0.00, KEY 0.00, VAL 8.00); of the key term's 8 positions 0.00 (min 0, max 0); key-term share of the selected 0.000
+    repeat hinge: per sequence 16.67 positions (CTX 5.00, KEY 9.00, VAL 2.67); of the key term's 8 positions 8.00 (min 8, max 8); key-term share of the selected 0.480
+    repeat mask identical to lite's at every position of every sequence: True
+    module-level ft.body_positions(task, x) (explore_f_tasks.py:95-103): its assert (8 tokens in S..S+P-1 per body) holds in 0 of 4096 sequences -> P(a 32-sequence batch passes) = 0; dc.key_eta's key ids tokens - S reach 45 against one_hot(.., task.P = 4)
+    selected()'s role masks (child:174) on this vocabulary: 'ctx' = true CTX 0.65 of 5 per sequence; 'key' = true KEY 0.00 of 9, true CTX 1.22
+  analytic per-type frequencies (22 input tokens: 5 CTX, 9 KEY, 8 VAL): pool CTX 0.1136, VAL 0.0227, KEY 0.0128; allpool CTX 0.0142 (G's docstring: 0.028), VAL 0.0227, KEY 0.0128; allpool ratios VAL/CTX 1.60, CTX/KEY 1.11 -> the cut falls after the 16 VAL types
+
+§4 READINGS (explore_g_s89.py:39-52, implemented here from the prose: G committed no reading code)
+  n 20, arm freq, commitment below BASELINE's False: 888030 outcome classes (counts of the 8 per-seed patterns); 'fails here' 767485; survives/replaces 30980; needs 50715; clamps 0; NO NAME for this arm (KH discovered) 38850; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 0}
+  n 20, arm freq, commitment below BASELINE's True: 888030 outcome classes (counts of the 8 per-seed patterns); 'fails here' 767485; survives/replaces 30980; needs 50715; clamps 34649; NO NAME for this arm (KH discovered) 36598; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 32397}
+  n 20, arm repeat, commitment below BASELINE's False: 888030 outcome classes (counts of the 8 per-seed patterns); 'fails here' 767485; survives/replaces 30980; needs 0; clamps 0; NO NAME for this arm (KH discovered) 89565; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 0}
+  n 20, arm repeat, commitment below BASELINE's True: 888030 outcome classes (counts of the 8 per-seed patterns); 'fails here' 767485; survives/replaces 30980; needs 0; clamps 34649; NO NAME for this arm (KH discovered) 54916; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 0}
+  n 10, arm freq, commitment below BASELINE's False: 19448 outcome classes (counts of the 8 per-seed patterns); 'fails here' 18314; survives/replaces 256; needs 417; clamps 0; NO NAME for this arm (KH discovered) 461; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 0}
+  n 10, arm freq, commitment below BASELINE's True: 19448 outcome classes (counts of the 8 per-seed patterns); 'fails here' 18314; survives/replaces 256; needs 417; clamps 342; NO NAME for this arm (KH discovered) 429; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 310}
+  n 10, arm repeat, commitment below BASELINE's False: 19448 outcome classes (counts of the 8 per-seed patterns); 'fails here' 18314; survives/replaces 256; needs 0; clamps 0; NO NAME for this arm (KH discovered) 878; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 0}
+  n 10, arm repeat, commitment below BASELINE's True: 19448 outcome classes (counts of the 8 per-seed patterns); 'fails here' 18314; survives/replaces 256; needs 0; clamps 342; NO NAME for this arm (KH discovered) 536; overlaps {'survives & needs': 0, 'survives & clamps': 0, 'needs & clamps': 0}
+  freq, n 20, unnamed classes by (discovered?, KH only - arm only): {('discovered', 'KH-arm >= 2'): 10663, ('not discovered', 'KH-arm >= 2'): 24518, ('not discovered', 'within 1'): 3669}
+  S87's record (lite; BASELINE 0/20, KH 20/20, FREQ 17/20 nested): KH vs BASE 20/0 p 9.5e-07; FREQ vs BASE 17/0 p 7.6e-06; KH vs FREQ 3/0 p 0.125 > 0.0625: survives no (3 > 1), needs no -> under S89's rules FREQ has no name, and 'no reading applies' is suppressed whenever any other arm's reading applies
+  smallest wins: discovered (p < 0.05) needs b - c >= 5 at c = 0 (0.0312), (7, 1) 0.0352, (8, 2) 0.0547; 'beats by >= 4 vs 0' (p <= 0.0625): (4, 0) 0.0625, (5, 1) 0.1094, (6, 1) 0.0625, (7, 2) 0.0898
+  BASELINE at 0/20 (independent of KH; KH 20/20): KH's best case vs BASE 20/0 p 9.54e-07 -> 'the labelled hinge itself fails here' avoidable
+  BASELINE at 3/20 (independent of KH; KH 20/20): KH's best case vs BASE 17/0 p 7.63e-06 -> 'the labelled hinge itself fails here' avoidable
+  BASELINE at 6/20 (independent of KH; KH 20/20): KH's best case vs BASE 14/0 p 6.1e-05 -> 'the labelled hinge itself fails here' avoidable
+  BASELINE at 10/20 (independent of KH; KH 20/20): KH's best case vs BASE 10/0 p 0.000977 -> 'the labelled hinge itself fails here' avoidable
+  BASELINE at 15/20 (independent of KH; KH 20/20): KH's best case vs BASE 5/0 p 0.0312 -> 'the labelled hinge itself fails here' avoidable
+  BASELINE at 16/20 (independent of KH; KH 20/20): KH's best case vs BASE 4/0 p 0.0625 -> 'the labelled hinge itself fails here' certain
+
+§5 OPERATING CHARACTERISTICS (exact: multinomial over the 8 per-seed patterns; 'independent' = BASE, KH, ARM independent per seed; 'paired' = KH and ARM comonotone on one uniform per seed (ARM's successes nested in KH's or vice versa), BASE independent)
+   n   pB   pK   pA    coupling | P(KH fails) P(A discovered) P(survives) P(needs) P(unnamed)
+  20  0.0  0.9  0.9 independent | 0.000       1.000           0.792       0.022    0.186   (sum 1.000000)
+  20  0.0  0.9  0.9      paired | 0.000       1.000           1.000       0.000    0.000   (sum 1.000000)
+  20  0.0  0.9  0.8 independent | 0.000       1.000           0.413       0.161    0.426   (sum 1.000000)
+  20  0.0  0.9  0.8      paired | 0.000       1.000           0.392       0.133    0.475   (sum 1.000000)
+  20  0.0  0.9  0.7 independent | 0.000       1.000           0.152       0.409    0.439   (sum 1.000000)
+  20  0.0  0.9  0.7      paired | 0.000       1.000           0.069       0.589    0.342   (sum 1.000000)
+  20  0.0  0.9  0.5 independent | 0.000       0.994           0.007       0.860    0.133   (sum 1.000000)
+  20  0.0  0.9  0.5      paired | 0.000       0.994           0.001       0.984    0.015   (sum 1.000000)
+  20  0.0 0.85  0.9 independent | 0.000       1.000           0.889       0.008    0.103   (sum 1.000000)
+  20  0.0 0.85  0.9      paired | 0.000       1.000           1.000       0.000    0.000   (sum 1.000000)
+  20  0.0 0.85  0.8 independent | 0.000       1.000           0.584       0.078    0.338   (sum 1.000000)
+  20  0.0 0.85  0.8      paired | 0.000       1.000           0.736       0.016    0.248   (sum 1.000000)
+  20  0.0 0.85  0.7 independent | 0.000       1.000           0.281       0.247    0.473   (sum 1.000000)
+  20  0.0 0.85  0.7      paired | 0.000       1.000           0.176       0.352    0.472   (sum 1.000000)
+  20  0.0 0.85  0.5 independent | 0.000       0.994           0.024       0.725    0.251   (sum 1.000000)
+  20  0.0 0.85  0.5      paired | 0.000       0.994           0.002       0.956    0.042   (sum 1.000000)
+  20  0.1  0.9  0.9 independent | 0.000       1.000           0.792       0.022    0.186   (sum 1.000000)
+  20  0.1  0.9  0.9      paired | 0.000       1.000           1.000       0.000    0.000   (sum 1.000000)
+  20  0.1  0.9  0.8 independent | 0.000       0.999           0.413       0.161    0.426   (sum 1.000000)
+  20  0.1  0.9  0.8      paired | 0.000       0.999           0.392       0.133    0.475   (sum 1.000000)
+  20  0.1  0.9  0.7 independent | 0.000       0.987           0.152       0.409    0.439   (sum 1.000000)
+  20  0.1  0.9  0.7      paired | 0.000       0.987           0.069       0.589    0.342   (sum 1.000000)
+  20  0.1  0.9  0.5 independent | 0.000       0.794           0.007       0.860    0.133   (sum 1.000000)
+  20  0.1  0.9  0.5      paired | 0.000       0.794           0.001       0.984    0.015   (sum 1.000000)
+  20  0.1 0.85  0.9 independent | 0.000       1.000           0.889       0.008    0.103   (sum 1.000000)
+  20  0.1 0.85  0.9      paired | 0.000       1.000           1.000       0.000    0.000   (sum 1.000000)
+  20  0.1 0.85  0.8 independent | 0.000       0.999           0.584       0.078    0.338   (sum 1.000000)
+  20  0.1 0.85  0.8      paired | 0.000       0.999           0.735       0.016    0.248   (sum 1.000000)
+  20  0.1 0.85  0.7 independent | 0.000       0.987           0.280       0.247    0.473   (sum 1.000000)
+  20  0.1 0.85  0.7      paired | 0.000       0.987           0.175       0.352    0.472   (sum 1.000000)
+  20  0.1 0.85  0.5 independent | 0.000       0.794           0.024       0.725    0.251   (sum 1.000000)
+  20  0.1 0.85  0.5      paired | 0.000       0.794           0.002       0.955    0.042   (sum 1.000000)
+  10  0.0  0.9  0.9 independent | 0.000       1.000           0.878       0.005    0.117   (sum 1.000000)
+  10  0.0  0.9  0.9      paired | 0.000       1.000           1.000       0.000    0.000   (sum 1.000000)
+  10  0.0  0.9  0.8 independent | 0.000       0.994           0.632       0.050    0.318   (sum 1.000000)
+  10  0.0  0.9  0.8      paired | 0.000       0.994           0.735       0.013    0.252   (sum 1.000000)
+  10  0.0  0.9  0.7 independent | 0.000       0.953           0.387       0.165    0.448   (sum 1.000000)
+  10  0.0  0.9  0.7      paired | 0.000       0.953           0.375       0.121    0.504   (sum 1.000000)
+  10  0.0  0.9  0.5 independent | 0.000       0.623           0.088       0.533    0.379   (sum 1.000000)
+  10  0.0  0.9  0.5      paired | 0.000       0.623           0.046       0.618    0.336   (sum 1.000000)
+  10  0.0 0.85  0.9 independent | 0.001       1.000           0.919       0.003    0.077   (sum 1.000000)
+  10  0.0 0.85  0.9      paired | 0.001       1.000           0.999       0.000    0.000   (sum 1.000000)
+  10  0.0 0.85  0.8 independent | 0.001       0.994           0.726       0.031    0.241   (sum 1.000000)
+  10  0.0 0.85  0.8      paired | 0.001       0.994           0.911       0.001    0.087   (sum 1.000000)
+  10  0.0 0.85  0.7 independent | 0.001       0.953           0.498       0.110    0.390   (sum 1.000000)
+  10  0.0 0.85  0.7      paired | 0.001       0.953           0.540       0.050    0.409   (sum 1.000000)
+  10  0.0 0.85  0.5 independent | 0.001       0.623           0.148       0.413    0.438   (sum 1.000000)
+  10  0.0 0.85  0.5      paired | 0.001       0.623           0.083       0.486    0.429   (sum 1.000000)
+  10  0.1  0.9  0.9 independent | 0.027       0.973           0.844       0.005    0.123   (sum 1.000000)
+  10  0.1  0.9  0.9      paired | 0.027       0.973           0.973       0.000    0.000   (sum 1.000000)
+  10  0.1  0.9  0.8 independent | 0.027       0.889           0.593       0.050    0.329   (sum 1.000000)
+  10  0.1  0.9  0.8      paired | 0.027       0.889           0.691       0.013    0.269   (sum 1.000000)
+  10  0.1  0.9  0.7 independent | 0.027       0.744           0.351       0.165    0.457   (sum 1.000000)
+  10  0.1  0.9  0.7      paired | 0.027       0.744           0.344       0.119    0.510   (sum 1.000000)
+  10  0.1  0.9  0.5 independent | 0.027       0.354           0.071       0.528    0.373   (sum 1.000000)
+  10  0.1  0.9  0.5      paired | 0.027       0.354           0.040       0.606    0.327   (sum 1.000000)
+  10  0.1 0.85  0.9 independent | 0.062       0.973           0.851       0.003    0.084   (sum 1.000000)
+  10  0.1 0.85  0.9      paired | 0.062       0.973           0.938       0.000    0.000   (sum 1.000000)
+  10  0.1 0.85  0.8 independent | 0.062       0.889           0.651       0.031    0.257   (sum 1.000000)
+  10  0.1 0.85  0.8      paired | 0.062       0.889           0.828       0.001    0.110   (sum 1.000000)
+  10  0.1 0.85  0.7 independent | 0.062       0.744           0.424       0.109    0.405   (sum 1.000000)
+  10  0.1 0.85  0.7      paired | 0.062       0.744           0.469       0.049    0.421   (sum 1.000000)
+  10  0.1 0.85  0.5 independent | 0.062       0.354           0.108       0.407    0.424   (sum 1.000000)
+  10  0.1 0.85  0.5      paired | 0.062       0.354           0.066       0.468    0.405   (sum 1.000000)
+  (pB = 0.1 rows: BASELINE independent of both arms. 'unnamed' = KH discovered and none of survives / needs / clamps; clamps is 0 at these rates.)
+
+§6 SEEDS 2840-2899 (G's block; S89 uses 2840-2871)
+  origin/claude/bdh-growth-hebbian-inference-w90069 @ ed9ca2b: 55 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/bdh-repo-curl-obgdqk @ 264e227: 55 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/explore-F @ 8a24e4a: 193 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/explore-G @ 7ab98c1: 187 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/explore-H @ 42d86ae: 157 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/explore-I @ 8d2e89f: 54 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/outside-ideas @ 419368a: 161 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/relaxed-edison-he00cc @ 3c2fb70: 53 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/replicate-R @ 31c39fc: 4 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/rev10-draft @ 846d0c8: 55 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/rev9-draft @ 010a085: 44 json/jsonl files; seeds in 2840-2899: none
+  origin/claude/review-V @ 3c772c3: 43 json/jsonl files; seeds in 2840-2899: none
+  origin/feature/per-channel-plasticity @ 4af9d50: 0 json/jsonl files; seeds in 2840-2899: none
+  history: 4623 distinct json/jsonl/log/txt blobs (2.44 GB) reachable from 13 remote branches; seeds 2840-2899 found in: none
+  sources (.py/.md/.sh at every tip) naming 28xx seed ranges: 34 lines
+    docs/reading/parallel_sessions_prompts.md:1108:Seed blocks: F 2800-2839, G 2840-2899, H 2900-2959. Each session checks every branch and the main line's seed list
+    docs/reading/parallel_sessions_prompts.md:1158:## Session G — round 6 (S89: the frequency hinge without frequent keys; seeds 2840-2899; branch claude/explore-G)
+    docs/reading/parallel_sessions_prompts.md:1168: three layers; the perfect gate for validity on 2840-2841 per task (yours, not F's: your code path).
+    docs/reading/parallel_sessions_prompts.md:1169:Arms on seeds 2842-2861 (20, paired), per task:
+    docs/reading/parallel_sessions_prompts.md:1188:Delta (beta 1, L2 keys; seeds 2862-2871): the least-reading arm that is discovered on Hebbian memory, on each
+    docs/review_2026-10/screen_checks_s89_G.py:400:say("\n§6 SEEDS 2840-2899 (G's block; S89 uses 2840-2871)")
+    docs/review_2026-10/screen_checks_s89_G.py:445:    say(f"  {br} @ {tip}: {len(files)} json/jsonl files; seeds in 2840-2899: {hits or 'none'}")
+    docs/review_2026-10/screen_checks_s89_G.py:469:    f"branches; seeds 2840-2899 found in: {dict((k, sorted(v)) for k, v in hist.items()) or 'none'}")
+    docs/review_2026-10/screen_review_s89_G.md:190:1. **Commit the parent's run and reading code before any S89 run**, in `explore_g_s89.py` after the docstring. Use S87's `explore_g_s87.py` structure: `A
+    docs/review_2026-10/screen_review_s89_G.md:19:- **The seeds are free.** 2840-2899 appear in no JSON/JSONL record at any of the 13 remote branch tips, nor in any JSON/JSONL/log/txt blob in the history 
+    docs/review_2026-10/screen_review_s89_G.md:77:**No record uses 2840-2899.** The only mentions are the round-6 prompt and G's own docstring.
+    docs/review_2026-10/screen_review_s89_H.md:118:**Neighbouring blocks.** F 2800-2839 and G 2840-2899 are disjoint.
+    explore_g_s89.py:32:ARMS per valid task, seeds 2842-2861 (20, paired): BASELINE (LOCAL3 + SLOW), REG3, REG3_KEYHINGE, REG3_FREQHINGE,
+    explore_g_s89.py:33:  REG3_REPEATHINGE; the perfect gate (ORACLE_ALL, this branch's code path) on 2840-2841, run and required to bind 2/2
+    explore_g_s89.py:35:DELTA (beta 1, L2 keys; seeds 2862-2871), per valid task: the least-reading arm discovered on Hebbian memory, in the order
+
+§7 THE RECORD THE REPRODUCTION CHECK NAMES (child:218-234)
+  key ['REG3_FREQHINGE|2700|f205db31dfed|Intel(R) Xeon(R) Processor @ 2.10GHz']; store sha f205db31dfed, provenance git 3919ac1+dirty, cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  curve through 2400 [[1200, 0.22412109375, 2.5706093311309814], [2400, 0.2255859375, 2.3939805030822754]]; stats steps through 2400 [0, 1200, 2400]; transition None
+  s87_record() builds the key with ec.cpu_model() (child:221): on any CPU other than 'Intel(R) Xeon(R) Processor @ 2.10GHz' the CHECK raises KeyError instead of printing; other S87 records on 2700 usable as references: ['BASELINE', 'ORACLE_ALL', 'REG3_FREQHINGE', 'REG3_KEYHINGE', 'REG3_SELFKL', 'REG3_TEMP']
+  committed in: 57c25c0 2026-10-13 explore_out/G: S87 progress (EXPLORATORY, not a result)

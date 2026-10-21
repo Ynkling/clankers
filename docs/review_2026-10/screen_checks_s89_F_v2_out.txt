@@ -1,0 +1,188 @@
+
+================================================================================================================
+A  The module change: b0c6332's explore_f_tasks.py against 50dc8e4's (byte prefix)
+================================================================================================================
+  50dc8e4 file: 35605 bytes = 34603 characters; b0c6332 file: 49923 bytes = 48457 characters
+  b0c6332's first 35605 bytes equal 50dc8e4's file: True; appended 14318 bytes = 13854 characters, 226 lines
+  (F's CHECK label prints len(str): 'first 34603 bytes' and 'appended 13854 bytes' are characters)
+  blobs: 50dc8e4 ffe249bb64, b0c6332 e24d5e1081
+  explore_f_tasks.py at 3dd5b74: blob e24d5e1081
+  explore_f_tasks.py at 4c8a343: blob e24d5e1081
+  explore_f_tasks.py at 73035d3: blob e24d5e1081
+  explore_f_tasks.py at 2279ca1: blob e24d5e1081
+  explore_f_tasks.py at 5357889: blob e24d5e1081
+  appended top-level defs: ['eta2_rows', '_positions', 'inv_from_gate', 'pool_routing_stats_inv', 'pool_stats_inv', 'pool_outcome', 'type_level_gate', '_GateStub', 'check_inv_stats']; appended names that redefine an old one: []; appended assignments ['BALANCED_MAP'], of which rebind an old name: []
+  G's tip holds the b0c6332 blob: e24d5e1081 ; H's tip has explore_f_tasks.py: False
+
+================================================================================================================
+B  The swap-invariant statistics on synthetic gates (numpy replica of b0c6332 l.663-710, pool_routing_stats l.414-447,
+   role_cosines; generators of 50dc8e4, as screen_checks_s89_F.py §E)
+================================================================================================================
+
+  POOL (20000 sequences, numpy replica; stream index = CTX id)
+  gate                                                        margin eta pool  eta inv cos pool  cos inv seq>0.9  ROUTED pooled/inv  DISC-if-bound pooled/inv
+  relative (task.perfect_gate)                                1.0000   1.0000   1.0000   0.0000   0.0000  1.0000    True/True          True/True  
+  relative, channels swapped in a random half                 1.0000   0.0000   1.0000   0.9999   0.0000  1.0000   False/True         False/True  
+  type-ordered (lower CTX id -> ch 0)                         1.0000   1.0000   1.0000   0.0000   0.0000  1.0000    True/True          True/True  
+  type-level, balanced map (BALANCED_MAP)                     1.0000   1.0000   1.0000   0.0000   0.0000  1.0000    True/True          True/True  
+  type-level soft map (0.8 / 0.2)                             0.3600   1.0000   1.0000   0.4706   0.4706  1.0000   False/False         True/True  
+  BLIND uniform 0.5                                           0.0000   0.0000   0.0000   1.0000   1.0000  0.0000   False/False        False/False 
+  BLIND position half (t < 10 -> ch 0)                       -0.0042   0.0000   0.4441   1.0000   0.5260  0.3330   False/False        False/False 
+  BLIND block parity (# CTX seen mod 2)                      -0.0037   0.0000   0.3921   0.9999   0.5745  0.3358   False/False        False/False 
+  BLIND latest key-type parity                                0.0000   0.0000   0.0000   1.0000   1.0000  0.0000   False/False        False/False 
+  BLIND one channel per sequence, random                      0.0000   0.0000   0.0000   1.0000   1.0000  0.0000   False/False        False/False 
+  BLIND iid random one-hot per position                       0.0108   0.0000   0.1436   1.0000   0.8293  0.0078   False/False        False/False 
+  BLIND best position-only soft gate P(label 0 | t)           0.0000   0.0000   0.2229   1.0000   1.0000  0.0000   False/False        False/False 
+  relative in 85% of sequences, uniform elsewhere             0.8491   0.8492   0.8491   0.1621   0.1508  0.8491   False/False         True/True  
+  relative in 90% of sequences, uniform elsewhere             0.9009   0.9009   0.9009   0.1040   0.0991  0.9009    True/True          True/True  
+  relative in 95% of sequences, uniform elsewhere             0.9499   0.9500   0.9499   0.0513   0.0500  0.9499    True/True          True/True  
+  relative 0.8/0.2 + iid N(0, 0.10) per position              0.3572   0.9027   0.9238   0.4735   0.4764  0.7517   False/False         True/True  
+  relative 0.8/0.2 + iid N(0, 0.20) per position              0.3205   0.7289   0.7688   0.5133   0.5196  0.1709   False/False        False/False 
+  relative 0.8/0.2 + iid N(0, 0.30) per position              0.2583   0.5397   0.5996   0.5876   0.5898  0.0702   False/False        False/False 
+  relative one-hot with a |N(0, 0.05)| leak per position      0.8465   0.9957   0.9967   0.0830   0.0834  1.0000   False/False         True/True  
+  relative one-hot with a |N(0, 0.15)| leak per position      0.5788   0.9469   0.9575   0.2672   0.2711  0.9411   False/False         True/True  
+  relative 0.8/0.2 + a per-sequence offset U(-0.25, 0.25)     0.3540   0.8159   1.0000   0.4772   0.5191  1.0000   False/False         True/False 
+
+  ALLPOOL (20000 sequences, numpy replica; stream index = first appearance)
+  gate                                                        margin eta pool  eta inv cos pool  cos inv seq>0.9  ROUTED pooled/inv  DISC-if-bound pooled/inv
+  relative (task.perfect_gate)                                1.0000   1.0000   1.0000   0.0000   0.0000  1.0000    True/True          True/True  
+  relative, channels swapped in a random half                 1.0000   0.0000   1.0000   1.0000   0.0000  1.0000   False/True         False/True  
+  type-ordered (lower CTX id -> ch 0)                         1.0000   0.0000   1.0000   1.0000   0.0000  1.0000   False/True         False/True  
+  type-level, balanced map (BALANCED_MAP)                     0.5356   0.0000   0.5356   1.0000   0.4644  0.5356   False/False        False/True  
+  type-level soft map (0.8 / 0.2)                             0.1928   0.0000   0.5356   1.0000   0.7164  0.5356   False/False        False/False 
+  BLIND uniform 0.5                                           0.0000   0.0000   0.0000   1.0000   1.0000  0.0000   False/False        False/False 
+  BLIND position half (t < 10 -> ch 0)                        0.0042   0.1679   0.4482   0.7133   0.5212  0.3373   False/False        False/False 
+  BLIND block parity (# CTX seen mod 2)                      -0.0039   0.1077   0.3873   0.8055   0.5789  0.3303   False/False        False/False 
+  BLIND latest key-type parity                                0.0000   0.0000   0.0000   1.0000   1.0000  0.0000   False/False        False/False 
+  BLIND one channel per sequence, random                      0.0000   0.0000   0.0000   1.0000   1.0000  0.0000   False/False        False/False 
+  BLIND iid random one-hot per position                       0.0032   0.0000   0.1410   1.0000   0.8294  0.0081   False/False        False/False 
+  BLIND best position-only soft gate P(label 0 | t)           0.0000   0.2531   0.3491   0.8715   0.8577  0.0000   False/False        False/False 
+  relative in 85% of sequences, uniform elsewhere             0.8509   0.8509   0.8509   0.1601   0.1491  0.8509   False/False         True/True  
+  relative in 90% of sequences, uniform elsewhere             0.8983   0.8983   0.8983   0.1068   0.1016  0.8983   False/False         True/True  
+  relative in 95% of sequences, uniform elsewhere             0.9496   0.9495   0.9496   0.0517   0.0504  0.9496    True/True          True/True  
+  relative 0.8/0.2 + iid N(0, 0.10) per position              0.3578   0.9027   0.9237   0.4740   0.4769  0.7520   False/False         True/True  
+  relative 0.8/0.2 + iid N(0, 0.20) per position              0.3229   0.7285   0.7689   0.5128   0.5191  0.1701   False/False        False/False 
+  relative 0.8/0.2 + iid N(0, 0.30) per position              0.2610   0.5359   0.5964   0.5859   0.5883  0.0706   False/False        False/False 
+  relative one-hot with a |N(0, 0.05)| leak per position      0.8464   0.9957   0.9968   0.0830   0.0834  1.0000   False/False         True/True  
+  relative one-hot with a |N(0, 0.15)| leak per position      0.5763   0.9466   0.9571   0.2674   0.2713  0.9407   False/False         True/True  
+  relative 0.8/0.2 + a per-sequence offset U(-0.25, 0.25)     0.3544   0.8173   1.0000   0.4772   0.5187  1.0000   False/False         True/False 
+
+  Within-sequence eta^2 on 8 points (4 per stream) under the null (a gate independent of the stream): mean
+  0.1429 (theory (g-1)/(n-1) = 1/7 = 0.1429); P(eta^2_seq > 0.9) 0.00112
+  Positive small-sample bias: a gate with the same signal-to-noise everywhere reads higher within-sequence than pooled
+  (rows 'relative 0.8/0.2 + iid N(0, sd)' above); the per-sequence offset row reads lower pooled.
+
+  ALLPOOL's cap: max over all 2^16 maps of 16 CTX types to 2 channels of the fraction of the C(16,2) pairs separated
+  max a(16-a)/120 = 0.5333 (64/120 = 0.5333); replica, BALANCED_MAP separates 0.5356; F's probe 256 (seed 2800) 0.5117 = 131/256, record 2801 0.4922 = 126/256; binomial sd at 256: 0.0312
+  (z of 131/256: -0.69, of 126/256: -1.32)
+
+================================================================================================================
+C  pool_outcome (b0c6332) and reading (explore_f_s89_post at 3dd5b74), exec'd by ast
+================================================================================================================
+  DISC_COS (test_router_discovery at 3dd5b74) = 0.5; ROUTED_MARGIN, ROUTED_ETA = 0.9, 0.9
+  None guard: pool_outcome({}) -> {'form': 'within-sequence', 'bound': False, 'routed_end': False, 'routed_bound': False, 'discovered': False, 'margin': None, 'eta_key_by_stream': None, 'val_cos': None} ; end with margin None -> False
+  reading(n_bound, n_failed, n_ok) over every complete case (n_ok + n_failed = 4):
+    0 bound, 0 failed -> it does not; 1 bound, 0 failed -> it does not; 2 bound, 0 failed -> it does not; 3 bound, 0 failed -> partly; 4 bound, 0 failed -> the convolution restores the Hebbian oracle on pooled keys
+    0 bound, 1 failed -> it does not; 1 bound, 1 failed -> it does not; 2 bound, 1 failed -> it does not; 3 bound, 1 failed -> partly
+    0 bound, 2 failed -> it does not; 1 bound, 2 failed -> it does not; 2 bound, 2 failed -> it does not
+    0 bound, 3 failed -> it does not; 1 bound, 3 failed -> it does not
+    0 bound, 4 failed -> it does not
+  incomplete: INCOMPLETE, no reading
+
+  Operating characteristic of the 4-run reading (each run binds independently with probability p):
+  p=0.95: restores 0.815, partly 0.171, does not 0.014  p=0.90: restores 0.656, partly 0.292, does not 0.052  p=0.75: restores 0.316, partly 0.422, does not 0.262  p=0.50: restores 0.062, partly 0.250, does not 0.688
+
+================================================================================================================
+D  The follow-up records (s89_post_results.json at 73035d3) against the addendum, the README and the tables
+================================================================================================================
+  meta: code_sha {'267d08456c38'} cpu {'Intel(R) Xeon(R) Processor @ 2.10GHz'} torch {'2.14.0+cu130'} git ['209a271', '530240c', '530240c+dirty', 'b036d91', 'e929827', 'e929827+dirty'] attempts {1} ok {True}
+  run time: sum secs_wall 1783 s = 0.495 h; sum secs 0.490 h
+  O_TYPE_HEBB_ALLPOOL|2800: transition record None recomputed None; final acc 0.2783; stopped_at 24000; margin 0.5117; eta pooled 0.0001 inv 0.5117; VAL cos pooled 0.9997 inv 0.4883; seq routed 0.5117; last/not-last 0.3239/0.2749; outcome_pooled == pool_outcome True, outcome_inv == True; curve min/max from 2400 0.2397/0.2808, first eval 0.2207
+      margin = eta_inv = seq_routed = 1 - val_cos_inv exactly: True (131.0/256); key_sep 0.0, key_part 1.0 (lite ids = CTX types 2-5 here)
+  O_TYPE_HEBB_ALLPOOL|2801: transition record None recomputed None; final acc 0.2749; stopped_at 24000; margin 0.4922; eta pooled 0.0061 inv 0.4922; VAL cos pooled 0.9879 inv 0.5078; seq routed 0.4922; last/not-last 0.3028/0.2728; outcome_pooled == pool_outcome True, outcome_inv == True; curve min/max from 2400 0.2588/0.2910, first eval 0.2168
+      margin = eta_inv = seq_routed = 1 - val_cos_inv exactly: True (126.0/256); key_sep 0.0, key_part 1.0 (lite ids = CTX types 2-5 here)
+  O_HEBB_CONV_POOL|2800: transition record 4800 recomputed 4800; final acc 0.9834; stopped_at 7200; margin 1.0000; eta pooled 1.0000 inv 1.0000; VAL cos pooled 0.0000 inv 0.0000; seq routed 1.0000; last/not-last 0.9874/0.9793; outcome_pooled == pool_outcome True, outcome_inv == True; curve min/max from 2400 0.3247/0.9834, first eval 0.2993
+  O_HEBB_CONV_POOL|2801: transition record 13200 recomputed 13200; final acc 0.9624; stopped_at 15600; margin 1.0000; eta pooled 1.0000 inv 1.0000; VAL cos pooled 0.0000 inv 0.0000; seq routed 1.0000; last/not-last 0.9632/0.9616; outcome_pooled == pool_outcome True, outcome_inv == True; curve min/max from 2400 0.3228/0.9624, first eval 0.3057
+  O_HEBB_CONV_ALLPOOL|2800: transition record 6000 recomputed 6000; final acc 0.9878; stopped_at 8400; margin 1.0000; eta pooled 1.0000 inv 1.0000; VAL cos pooled 0.0000 inv 0.0000; seq routed 1.0000; last/not-last 0.9930/0.9874; outcome_pooled == pool_outcome True, outcome_inv == True; curve min/max from 2400 0.3193/0.9902, first eval 0.2871
+  O_HEBB_CONV_ALLPOOL|2801: transition record None recomputed None; final acc 0.8721; stopped_at 24000; margin 1.0000; eta pooled 1.0000 inv 1.0000; VAL cos pooled 0.0000 inv 0.0000; seq routed 1.0000; last/not-last 0.8592/0.8730; outcome_pooled == pool_outcome True, outcome_inv == True; curve min/max from 2400 0.3130/0.8721, first eval 0.2710
+  conv pilots bound: 3/4; Wilson (0.30064184258240184, 0.9544127391902995); band MAJORITY; reading -> 'partly'
+  O_HEBB_CONV_POOL: 2/2 Wilson (0.34, 1.0) band RELIABLE
+  O_HEBB_CONV_ALLPOOL: 1/2 Wilson (0.09, 0.91) band MAJORITY
+  O_TYPE_HEBB_ALLPOOL: 0/2 Wilson (0.0, 0.66) band NEVER
+  O_HEBB_CONV_ALLPOOL|2801 curve: [(1200, 0.271), (2400, 0.313), (3600, 0.624), (4800, 0.669), (6000, 0.684), (7200, 0.727), (8400, 0.741), (9600, 0.762), (10800, 0.76), (12000, 0.768), (13200, 0.773), (14400, 0.775), (15600, 0.774), (16800, 0.782), (18000, 0.773), (19200, 0.771), (20400, 0.795), (21600, 0.853), (22800, 0.861), (24000, 0.872)]
+  every 2400 (tables): 0.31 0.67 0.73 0.76 0.77 0.78 0.78 0.77 0.85 0.87
+  max 9600..20400: 0.79541015625 min: 0.759765625
+  O_TYPE_HEBB_ALLPOOL|2800 curve range all evaluations 0.2207-0.2808; final 0.2783 -> 2 decimals 0.28
+  O_TYPE_HEBB_ALLPOOL|2801 curve range all evaluations 0.2168-0.2910; final 0.2749 -> 2 decimals 0.27
+  S89 pilots for reference (52e2ea7):
+    O_HEBB_POOL|2800: transition None acc 0.6226
+    O_HEBB_POOL|2801: transition None acc 0.4824
+    O_HEBB_ALLPOOL|2800: transition None acc 0.3306
+    O_HEBB_ALLPOOL|2801: transition None acc 0.4976
+    O_HEBB_POOL_48K|2800: transition None acc 0.7173
+    O_HEBB_POOL_48K|2801: transition None acc 0.5146
+    O_HEBB_ALLPOOL_48K|2800: transition None acc 0.3193
+    O_HEBB_ALLPOOL_48K|2801: transition None acc 0.4756
+    O_DELTA_POOL|2800: transition 3600 acc 0.9868
+    O_DELTA_POOL|2801: transition 2400 acc 0.9883
+    O_DELTA_ALLPOOL|2800: transition 3600 acc 0.9941
+    O_DELTA_ALLPOOL|2801: transition 3600 acc 0.9932
+  three bound conv runs final acc [0.9834, 0.9624, 0.9878]
+  conv vs the S89 pilot on the same 4 (task, seed): conv only 3, pilot only 0 -> exact one-sided sign test p = 0.125 (rlib.mcnemar1 0.125); unpaired Fisher 3/4 vs 0/4 one-sided 0.071 (and across CPUs: 2.10 vs 2.80 GHz)
+  s89_post_tables.md: 'READING' line: ['READING (fixed before the runs): **partly**']
+  H at 1b5dfedd: ORACLE|2900: transition 16800 iters 43200 sched one Adam 1e-3 k 16 pool 32 conv taps recorded True
+  H at 1b5dfedd: ORACLE|2901: transition 10800 iters 43200 sched one Adam 1e-3 k 16 pool 32 conv taps recorded True
+
+================================================================================================================
+E  Order, code SHA, files
+================================================================================================================
+   b0c6332b 2026-10-20 21:47:22 +0000 explore_f_tasks: swap-invariant routing statistics and the type-level gate for the pool tasks (referee V, S89-F fix
+   3dd5b746 2026-10-20 21:47:35 +0000 Session F S89-F revision (referee V fixes 1-3) and the follow-up pilots (explore_f_s89_post): readings fixed before
+   4c8a343d 2026-10-20 21:48:12 +0000 explore_out/F: S89-F follow-up queue script and log (EXPLORATORY, not a result)
+   b036d914 2026-10-20 21:50:41 +0000 explore_out/F: S89-F follow-up progress (EXPLORATORY, not a result)
+   530240cf 2026-10-20 21:52:53 +0000 explore_out/F: S89-F follow-up progress (EXPLORATORY, not a result)
+   e929827c 2026-10-20 21:55:21 +0000 explore_out/F: S89-F follow-up progress (EXPLORATORY, not a result)
+   209a2713 2026-10-20 21:57:02 +0000 explore_out/F: S89-F follow-up progress (EXPLORATORY, not a result)
+   73035d37 2026-10-20 22:02:28 +0000 explore_out/F: S89-F follow-up pilots (EXPLORATORY, not a result)
+   2279ca1f 2026-10-20 22:04:19 +0000 Session F round 6 addendum: referee V's fixes and the follow-up pilots (conv pilot reads 'partly', 3/4); report_9 a
+   53578896 2026-10-20 22:04:32 +0000 report_9 addendum: correct the conv candidate's wording (EXPLORATORY, not a result)
+  27-module code SHA at 3dd5b74: 267d08456c382675  MATCH (records 267d08456c382675)
+  27-module code SHA at b036d91: 267d08456c382675  MATCH (records 267d08456c382675)
+  27-module code SHA at 530240c: 267d08456c382675  MATCH (records 267d08456c382675)
+  27-module code SHA at e929827: 267d08456c382675  MATCH (records 267d08456c382675)
+  27-module code SHA at 209a271: 267d08456c382675  MATCH (records 267d08456c382675)
+  27-module code SHA at 73035d3: 267d08456c382675  MATCH (records 267d08456c382675)
+  27-module code SHA at 5357889: 267d08456c382675  MATCH (records 267d08456c382675)
+  explore_f_tasks.py             blob changes over 3dd5b74..5357889: [('3dd5b74', 'e24d5e1081')]
+  explore_f_s89_tasks.py         blob changes over 3dd5b74..5357889: [('3dd5b74', 'a2e9875147'), ('2279ca1', '75fced8a4e')]
+  explore_f_s89_tasks_child.py   blob changes over 3dd5b74..5357889: [('3dd5b74', '2a014b8184')]
+  explore_f_s89_post.py          blob changes over 3dd5b74..5357889: [('3dd5b74', '2e12241cca')]
+  explore_f_s89_post_child.py    blob changes over 3dd5b74..5357889: [('3dd5b74', '408656168f')]
+  explore_f_reports6.py          blob changes over 3dd5b74..5357889: [('3dd5b74', '25fb4b4d9e')]
+  explore_f_common.py            blob changes over 3dd5b74..5357889: [('3dd5b74', '01539f9ad4')]
+  explore_common16.py            blob changes over 3dd5b74..5357889: [('3dd5b74', 'd1b3b9bda8')]
+  log start: ['=== S89 post start Tue Oct 20 21:47:47 UTC 2026', '  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 3dd5b74+dirty | python 3.11.17 | torch threads 1 | started 2026-10-20 21:47:48']
+  timings measured (runtime json): 2026-10-20 21:50:29
+  CHECK lines: s89_tasks 52 s89_post 6 FAIL 0 ; delta checks: ['ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)']
+  records at 530240c (2026-10-20 21:52:53 +0000): ['O_HEBB_CONV_POOL|2800']
+  records at e929827 (2026-10-20 21:55:21 +0000): ['O_HEBB_CONV_ALLPOOL|2800', 'O_HEBB_CONV_POOL|2800', 'O_HEBB_CONV_POOL|2801']
+  records at 209a271 (2026-10-20 21:57:02 +0000): ['O_HEBB_CONV_ALLPOOL|2800', 'O_HEBB_CONV_POOL|2800', 'O_HEBB_CONV_POOL|2801', 'O_TYPE_HEBB_ALLPOOL|2800', 'O_TYPE_HEBB_ALLPOOL|2801']
+  records at 73035d3 (2026-10-20 22:02:28 +0000): ['O_HEBB_CONV_ALLPOOL|2800', 'O_HEBB_CONV_ALLPOOL|2801', 'O_HEBB_CONV_POOL|2800', 'O_HEBB_CONV_POOL|2801', 'O_TYPE_HEBB_ALLPOOL|2800', 'O_TYPE_HEBB_ALLPOOL|2801']
+  first appearance of 'O_HEBB_CONV' in any commit (git log --all -S): ['3dd5b746 2026-10-20 21:47:35 +0000']
+
+================================================================================================================
+F  Seeds 2800-2839 on every remote tip (json / jsonl / log), outside explore_out/F
+================================================================================================================
+  origin/claude/bdh-growth-hebbian-inference-w90069    files with a hit: 0; outside explore_out/F: []
+  origin/claude/bdh-repo-curl-obgdqk                   files with a hit: 0; outside explore_out/F: []
+  origin/claude/explore-F                              files with a hit: 6; outside explore_out/F: []
+  origin/claude/explore-G                              files with a hit: 0; outside explore_out/F: []
+  origin/claude/explore-H                              files with a hit: 0; outside explore_out/F: []
+  origin/claude/explore-I                              files with a hit: 0; outside explore_out/F: []
+  origin/claude/outside-ideas                          files with a hit: 0; outside explore_out/F: []
+  origin/claude/relaxed-edison-he00cc                  files with a hit: 0; outside explore_out/F: []
+  origin/claude/replicate-R                            files with a hit: 0; outside explore_out/F: []
+  origin/claude/rev10-draft                            files with a hit: 0; outside explore_out/F: []
+  origin/claude/rev9-draft                             files with a hit: 0; outside explore_out/F: []
+  origin/claude/review-V                               files with a hit: 0; outside explore_out/F: []
+  origin/feature/per-channel-plasticity                files with a hit: 0; outside explore_out/F: []
