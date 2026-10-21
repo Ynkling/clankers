@@ -60,9 +60,9 @@ source at two sources and nothing routes at four on the one screen run, which it
 | `claude/rev10-draft` | the three versions of Revision 10's draft and the two passes of its check (`docs/review_2026-10/rev10/`) | merged into the main line |
 | `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged at 00290a8; its last items were the reviews of the three spec drafts below |
 | `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 21 complete (`419368a`, 15 October): the *D* = 128 oracle is not a usable validity check at 40,800; `explore_out/spec_draft_keyload.md` carries a NOT READY FOR V status section with five unscreened options |
-| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–8) | S88 complete, report 8 at `a199d5e` (14 October): the learned write strength "no reading applies"; the horizon screen "untested" |
-| `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–7) | S87 complete; `explore_out/G/spec_draft_register.md` awaits revision after the referee's review |
-| `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams (reports 1–9) | round 5 complete; `explore_out/H/spec_draft_two_keyterm.md` awaits revision after the referee's review |
+| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta; the pool tasks (reports 1–9) | round 6 complete: report 9 (S89-F, both pool tasks untested for Hebbian memory, valid for delta; the convolution restores the Hebbian oracle); the task module G and H vendor is `explore_f_tasks.py` at `b0c6332` |
+| `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–8) | S89 complete on delta memory (report 8; the repeat hinge 20/20 on POOL); S89H (Hebbian + conv) and S90 (the repeat hinge on lite Hebbian) next; `spec_draft_register.md` revision 1 ready for adoption after text fixes and the label-free-arm decision |
+| `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams, the split on pooled keys (reports 1–11) | round 6 complete: reports 10–11 (the recipe 1/10 at 32 key types; the schedule not the limit; the delta version untested); `spec_draft_two_keyterm.md` still awaits revision |
 | `claude/explore-I` | session I: the dense-loss task (S74, S75), the GPU package (`explore_gpu/`), the GPU run of `test_window_gate` (report 3), S75b (`explore_out/I/s75b_spec_draft.md`, `explore_gpu/s75b.py`) | S75 closed; S75b's driver final (3cef609, mutation pass 8d2e89f), CPU CHECKs pass, the cards' CUDA CHECKs passed on the driver of 13 October and must be rerun on the final one; the pilot was not run |
 | `claude/replicate-R` | session R: the clean-room replication, Phases 2–5, `UNSTATED.md`, `replicate_report.md` | Phase 5 complete |
 | `docs/reading/parallel_sessions_prompts.md` | every prompt each session was given, round by round | round 5 is the last |
@@ -117,7 +117,39 @@ source at two sources and nothing routes at four on the one screen run, which it
    distance, seeds 2420–2429): fixed decay 9/10 and the learned forget gate 6/10 at 1×, 4/10 against 5/10 at 2×;
    reading **"untested"** (the gate's 6/10 at 1× is under the 8/10 the rule required); every failure is a stream
    confusion at 0.5, flat across distance. Both screens are closed; nothing follows from them.
-7. **Round 6 of screens**, proposed in `docs/reading/plan_2026-10-13.md` §4E, none started.
+7. **Round 6 of screens** (19–21 October; prompts in `docs/reading/parallel_sessions_prompts.md`, "Round 6"): the recipe
+   without marked keys — the lite task and the eight-stream grouped layout with keys (and then contexts) drawn from
+   pools, so that no token type is frequent by role. All EXPLORATORY; every screen's readings fixed before its first
+   record and reviewed by the referee before its learned arms ran (`docs/review_2026-10/screen_review_s89_*.md`); every
+   report checked by the referee (`check_F_report9.md`, `check_H_report10.md`, `check_H_report11.md`,
+   `check_G_report8.md`). What it found, in the sessions' pre-fixed readings:
+   - **F (report 9, S89-F):** the two tasks (`explore_f_tasks.py` at `b0c6332`: RandHeaderTask-pool, keys from 32 types;
+     -allpool, contexts from 16 types too, which is the two-document recall layout at our size). With routing given, a
+     **Hebbian channel binds neither task** (the perfect gate 0/2 at 24,000 and 48,000, under SLOW and under single Adam)
+     while a **delta channel binds both at 2400–3600**; a post-hoc pilot found the short convolution restores the Hebbian
+     oracle ("partly": POOL 2/2, ALLPOOL 1/2 at 24,000, 2/2 at 48,000).
+   - **H (reports 10–11, S89/S89b/S89c):** on the grouped layout at eight streams with the 32-key pool, the main line's
+     recipe binds **1/10** where it binds 38/40 at four keys ("the labelled recipe itself fails here"; the all-position
+     trigger 3/10, no split 0/10, the Hebbian perfect gate 2/2 but late). Neither a later first check nor a cap of six
+     helps (S89c: 1/10 and 2/10 against a 2/10 rerun; the printed name "the channel is the limit" is to be quoted with
+     the referee's wording, `check_H_report11.md` §D: the screen varied the trigger's schedule only and did not test the
+     budget or the channel). The delta version is UNTESTED: its perfect gate bound 1/2 within 43,200. Every arm of every
+     memory was still rising at the budget.
+   - **G (report 8, S89 on delta memory):** on POOL the key hinge and a **repeat hinge** (the key term applied at token
+     types that occur more than once in the sequence: no labels, no corpus table) both discover **20/20**, the register
+     alone 16/20, the frequency hinge 7/20 ("needs frequent keys": there it can only penalise the stream at the context
+     positions, and hurts). The reading "the repeat hinge replaces the key hinge" is the rule's mechanical output, but
+     neither hinge beats the hingeless register at *p* < 0.05 there (4 vs 0), so the screen that decides is S90, the
+     repeat hinge on lite Hebbian memory where S87 has the key hinge 20/20 against the register's 2/20. On ALLPOOL every
+     learned arm is 0/20 ("the labelled hinge itself fails here"): a gate that reads token identity can route at most
+     0.533 of sequences by a fixed context→channel map, and no run learned the relative routing the perfect gate is
+     handed. G's Hebbian-conv half (S89H) is running; G's register spec revision 1 is "ready for X's adoption after text
+     fixes" (`spec_review_register_v2.md`), with one decision outstanding: which label-free hinge is its arm (S90 decides).
+   - **The next problem**, named by the ALLPOOL null: contexts without fixed identity, where routing must compare the
+     current context with what the sequence has already shown. No device for it has been screened.
+8. **Round 7** (to be written after S90 and S89H): H's budget/pool-size oracle screen on the grouped layout (both perfect
+   gates at 86,400; pools of 8 and 16); G's relative-routing device for ALLPOOL; the register spec adopted into `specs/`
+   with the label-free arm S90 names; Revision 11 after the referee's checks of the round.
 
 ## 5. How to resume
 
