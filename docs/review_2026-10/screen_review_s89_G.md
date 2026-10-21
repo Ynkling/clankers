@@ -234,3 +234,5 @@ At pK = 0.85, P(survives) is 0.89 / 1.00, 0.58 / 0.74, 0.28 / 0.18 and 0.02 / 0.
     > "At 20 paired seeds with BASELINE ~0 and KH ~0.9, 'survives' fires with probability ~0.8-1.0 for an arm at the ceiling, ~0.4 at 0.8, 0.07-0.15 at 0.7, < 0.01 at 0.5 (V's screen_checks_s89_G_out.txt §5): it separates the ceiling from half of it, not from 0.8."
 
 Commit reviewed: `claude/explore-G` `7ab98c1` (vendored module compared with `claude/explore-F` `50dc8e4`; prompt at main line `7c4ceb8`). The checks are in `screen_checks_s89_G.py`, with output in `screen_checks_s89_G_out.txt`.
+
+**Correction (20 October).** Fix 9 offered to "state REG3's role", allowing it to be read as descriptive. It should not have. On delta memory the register can bind the pool task with no hinge: `pool.REG3_D|2842` was ROUTED-BOUND at 3600. Every hinge arm must therefore also be read against REG3_D, or an inert hinge reads "survives". See `screen_review_s89_G_v2.md` fix 1.

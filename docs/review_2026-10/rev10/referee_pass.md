@@ -215,3 +215,6 @@ Found by `revision_10_1_check.md`.
 4. **tex10:443, "the referee now reads … every draft before it is merged", was never flagged.** It was already false for Revision 10, which was merged without a referee pass.
 
 No number in `check_rev10_A`, `check_rev10_FG` or `check_rev10_HE` is wrong.
+5. **§2's carried-over list wrongly includes tex10:42.** That line sits in the Revision 9 paragraph, where "this revision's" is right. (`check_rev10_A_v101`.)
+6. **`check_rev10_HE.md` says explore-H at `347bd25` was "still the branch head".** It was not. The local ref had not been fetched since 13 October, and the remote already had `d4a9a7d` (17:54:28) and `7820b12`, so that check's seed scan read stale F, G and H trees. No result changes.
+7. **`check_rev10_A/FG/HE.py` are not reproducible as committed.** They compare 7-digit `%h` hashes with literals, and this clone now abbreviates to 8; they also read branch tips rather than commits. The `_v101` scripts pin every ref and force 7-digit hashes.

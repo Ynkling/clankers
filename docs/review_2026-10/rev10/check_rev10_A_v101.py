@@ -62,7 +62,9 @@ ROWS = []
 
 
 def git(*a):
-    return subprocess.check_output(("git", "-C", ROOT) + a).decode()
+    # core.abbrev=7: %h and --short then print 7 hex digits however large the object store grows (the original's 7-digit
+    # comparisons, e.g. note_hist == ["5bc6c2e"], depend on it)
+    return subprocess.check_output(("git", "-C", ROOT, "-c", "core.abbrev=7") + a).decode()
 
 
 def show(ref, path):
@@ -142,14 +144,15 @@ def _old_rows():
     body = md[md.index("## All rows"):]
     out = {}
     for ln_ in body.split("\n"):
-        m = re.match(r"^\| (\d+) \| (.*?) \| (.*?) \| (.*) \| (?:\*\*)?(MATCH|PARTIAL|DISAGREE|NOT RECORD-CHECKABLE)(?:\*\*)? \| ", ln_)
+        m = re.match(r"^\| (\d+) \| (.*?) \| (.*?) \| (.*?) \| (.*) \| (?:\*\*)?(MATCH|PARTIAL|DISAGREE|NOT RECORD-CHECKABLE)(?:\*\*)? \| ", ln_)
         if m:
-            out[int(m.group(1))] = (m.group(3), m.group(5))
+            out[int(m.group(1))] = (m.group(3), m.group(6), m.group(5))
     return out
 
 
 OLDROWS = _old_rows()
 assert len(OLDROWS) == 82, len(OLDROWS)
+RECDIFF = []           # rows whose 'recomputed' text differs from the original's
 NEW_FROM = 83          # rows from here on are new (text 846d0c8 changed or added)
 
 
@@ -164,7 +167,9 @@ def row(where, stmt, source, recomputed, status, note=""):
     if isinstance(stmt, tuple):          # (the original's statement, the statement as 846d0c8 words it)
         stmt_old, stmt = stmt
     if i < NEW_FROM:
-        ostmt, ost = OLDROWS[i]
+        ostmt, ost, orec = OLDROWS[i]
+        if orec != str(recomputed).replace("|", "\\|").replace("\n", " "):
+            RECDIFF.append(i)
         assert ostmt == str(stmt_old).replace("|", "\\|").replace("\n", " "), (i, ostmt, stmt_old)
         delta = f"{ost} (unchanged)" if ost == status else f"{ost} \u2192 {status}"
         if reanch:
@@ -798,6 +803,7 @@ row(L("the window gate with and without the split and the register gate route $0
 row("explore-I:explore_out/I/report_2.md (d552c6c)", "report 2 table row: WIDE_SLOW 830-839, 0/10 [0.00, 0.28] NEVER, 0.534 (0.530-0.536)",
     "records; Wilson", f"row present {r2_839}; Wilson 0/10 [{w10[0]:.2f}, {w10[1]:.2f}]; median SET {statistics.median(wl):.3f}",
     "MATCH" if r2_839 and f"{w10[1]:.2f}" == "0.28" and f"{statistics.median(wl):.3f}" == "0.534" else "DISAGREE")
+assert "SET differs by at most 0.003 (median absolute difference 0.0006)" in r2      # the row's anchor in report 2
 row("explore_out/I/report_2.md section 6 (d552c6c)", "paired with WIDE_SPLIT: neither ROUTED on any of the 10 shared seeds; SET differs by at most 0.003 (median 0.0006)",
     "records", f"pairs {pair_r}; max {max(abs(v) for v in diffs.values()):.5f} (831), median {statistics.median(abs(v) for v in diffs.values()):.5f}",
     "PARTIAL", "as check_S75_v6 row 89 found for nine seeds: 831's 0.00325 exceeds 0.003 unrounded; 839 adds -0.00048 and leaves the median at 0.0006. Not quoted in tex10")
@@ -844,10 +850,10 @@ row(L("about three days for the second stage", ln, new="about two and a half day
     "on the 3070 alone, about three days for the second stage",
     "s75b_spec_draft.md 'Cost'; STATUS.md", f"the spec's per-run 3070 hours sum to {h3070[0]:.0f}-{h3070[1]:.0f} h "
     f"({h3070[0] / 24:.2f}-{h3070[1] / 24:.2f} days) for stage 2's 42 runs; to the nearest half day both ends are "
-    f"{round(h3070[0] / 12) / 2:g} and {round(h3070[1] / 12) / 2:g}", "MATCH" if round(h3070[0] / 12) / 2 == round(h3070[1] / 12) / 2 == 2.5 else "PARTIAL",
+    f"{round(h3070[0] / 12) / 2:g} and {round(h3070[1] / 12) / 2:g}", "PARTIAL" if h3070[1] / 24 < 2.45 else "MATCH",
     "846d0c8 states the figure from the specification's own table ('about two and a half days ... by the specification's own run "
-    "times'), which makes it record-checkable: 54.3-57.3 h, 2.26-2.39 days, two and a half to the nearest half day (the merge commit's "
-    "'54-57 h' is the exact form)")
+    "times'), which makes it record-checkable: 54.3-57.3 h, 2.26-2.39 days. 'Two and a half' is high (it is the figure only at half-day "
+    "resolution); the referee's pass gave 2.3-2.4 days and the merge commit itself '54-57 h'. Minor")
 row(L("Session~I corrected its pre-run note on 12 October: the note (committed at 00:46 UTC)", ln),
     "note committed 00:46 UTC; corrected in report 2 on 12 October; note not edited; no learned-arm record in git until b649751 at 13:53 UTC",
     "git", f"5bc6c2e {hm('5bc6c2e')}; report 2's correction 03bffdf {hm('03bffdf')} ({r2corr}); note commits {note_hist}; "
@@ -949,7 +955,7 @@ row(L("the referee's checks of the first three of these (\\texttt{docs/review\\_
 rev10_files = [p for p in git("ls-tree", "-r", "--name-only", V10, "docs/review_2026-10/rev10/").split()]
 fp = show(V10, "docs/review_2026-10/rev10/first_pass.md")
 sp = show(V10, "docs/review_2026-10/rev10/second_pass.md")
-sess = {c: re.findall(r"Claude-Session: \\S+/(session_\\w+)", git("log", "-1", "--format=%B", c)) for c in ("ea3afef", "6e75f69", "d2b7abd")}
+sess = {c: re.findall(r"Claude-Session: \S+/(session_\w+)", git("log", "-1", "--format=%B", c)) for c in ("ea3afef", "6e75f69", "d2b7abd")}
 pass_first = {f: git("log", "--format=%h", "--diff-filter=A", "f342d1d", "--", "docs/review_2026-10/rev10/" + f).split() for f in ("first_pass.md", "second_pass.md")}
 rec_scripts = sorted(p.split("/")[-1] for p in rev10_files if p.endswith(".py"))
 row(L("this revision's own additions were checked in two passes by a session that did not write them, every number recomputed from the records", 44,
@@ -1005,12 +1011,12 @@ assert RP101 == RP480
 sec1 = RP101[RP101.index("## 1. False statements"):RP101.index("## 2. Loose")]
 places = {}
 for k, head in re.findall(r"^\*\*(\d)\. (.*)$", sec1, re.M):
-    m = re.match(r"tex10:([\d, and]+?)[:,]? ", head)
+    m = re.match(r"tex10:((?:\d+(?:, | and )?)+)", head)
     places[int(k)] = [int(x) for x in re.findall(r"\d+", m.group(1))] if m else None
 places[8] = [int(x) for x in re.findall(r"^\| tex10:(\d+) \|", sec1, re.M)]
 n_places = sum(len(v) for v in places.values())
 fixed = {k: [ln_ for ln_ in v if ln_ in CHANGED] for k, v in places.items()}
-e_row = tex[LMAP[535]] .startswith("20--21 (E) & S68")      # the line after tex10:535's row: the new E row
+e_row = tex[LMAP[535] + 1 - 1].startswith("20--21 (E) & S68")   # tex101:540, the line after tex10:535's row (539): the new E row
 say(f"  referee_pass §1: {len(places)} statements, places {places} = {n_places}; tex10 lines among them that 846d0c8 changed: "
     f"{ {k: v for k, v in fixed.items()} }; E's batches 20-21 row inserted after tex10:535: {e_row}")
 counts_orig = {"A": re.search(r"\*\*(\d+) rows: MATCH", show(*ORIG_MD)).group(1),
@@ -1059,14 +1065,13 @@ merge101 = git("log", "--first-parent", "--format=%h %cI %s", "-1", "ed9ca2b").s
 v_between = git("log", "--format=%h %cI", f"--since={ctime('846d0c8').isoformat()}", "--until=" + ctime("ed9ca2b").isoformat(), "dcd549d6").strip()
 say(f"  10.1's merge: {merge101[:60]}; review-V commits between 846d0c8 and that merge: {v_between or 'none'}")
 
-row(N("Revision~10.1}", 27), "title page: 'Revision 10.1'", "846d0c8: CITATION.cff, STATUS.md, README.md",
+row(N("Revision 10.1}", 27), "title page: 'Revision 10.1'", "846d0c8: CITATION.cff, STATUS.md, README.md",
     f"CITATION 'Revision 10.1' {'Revision 10.1' in show(V101, 'CITATION.cff')}; STATUS {'Revision 10.1' in show(V101, 'STATUS.md')}; README "
     f"{'Revision 10.1' in show(V101, 'README.md')}", "MATCH")
 row(N("Revision~10 was merged after two passes by a separate checking agent", 46), "10.1 paragraph: Revision 10 was merged after two passes by a separate checking agent",
     "git", f"first_pass.md and second_pass.md first in {pass_first}; merged at 585b666 {hm('585b666')}", "MATCH",
     "true as worded; the third version (d2b7abd) was not passed (row 75)")
-row(N("found every number of every claim to reproduce and nine statements, in sixteen places, false against the records or git", 46) + also((0, "", None)) if False else
-    N("found every number of every claim to reproduce and nine statements, in sixteen places, false against the records or git", 46),
+row(N("found every number of every claim to reproduce and nine statements, in sixteen places, false against the records or git", 46),
     "10.1 paragraph: every number reproduces; nine statements false in sixteen places", "rev10/referee_pass.md (480a2de = 846d0c8)",
     f"§1 headings: {len(places)} statements over {n_places} places {places}", "MATCH" if (len(places), n_places) == (9, 16) else "DISAGREE")
 row(N("an account of who had checked what, a run count and a sentence made stale by the fifth round's screens, two descriptions of screens, and four provenance rows that stopped before the fifth round", 46),
@@ -1090,7 +1095,7 @@ row(N("What it asked for, and what Revision~9 did with it.", 360) + ", " + N("Wh
     + N("The batch completed after Revision~9's first draft", 247)[7:],
     "carried-over referents named as Revision 9's", "git; the paragraphs' content",
     f"Revision 9's first draft 9bfa85a ({first_draft[:30]}); revision_9_check.md checks 9bfa85a; the checks listed at tex101:546 are on review-V; "
-    f"tex101:42 still 'this revision's first draft' inside the Revision 9 paragraph (taken: {taken['tex10:42 ' + chr(39) + 'this revision' + chr(39) + 's first draft' + chr(39) + ' (in the Revision 9 paragraph)']})",
+    f"tex101:42 still 'this revision's first draft' inside the Revision 9 paragraph (taken: {taken[LOOSE[14][0]]})",
     "MATCH", "each now names Revision 9; tex101:42 needs no change (its paragraph is Revision 9's). tex101:247's timing is checked in check_rev10_HE_v101")
 row(N("(\\texttt{rev10/referee\\_pass.md}, with \\texttt{check\\_rev10\\_A}, \\texttt{\\_FG} and \\texttt{\\_HE}, 228 rows)", 370),
     "the referee's pass: referee_pass.md with check_rev10_A, _FG and _HE, 228 rows", "the three checks' .md as committed",
@@ -1126,7 +1131,8 @@ row(N("and to Revision~10, whose draft a separate checking agent had passed twic
     f"'the provenance rows' {'Not checked: the provenance rows' in RP101}", "MATCH", "the referee's own findings, quoted; a judgment, as the pass marks it")
 row(N("The referee now reads every main-line specification before its first run and every draft before it is merged", 447),
     "'the referee now reads ... every draft before it is merged'", "git",
-    f"Revision 10: drafts ea3afef/6e75f69/d2b7abd, merged 585b666 {hm('585b666')}; the referee's first file on it 8bc4ebd {hm('8bc4ebd')}, its pass "
+    f"Revision 10: drafts ea3afef/6e75f69/d2b7abd, merged 585b666 {hm('585b666')} (its STATUS.md: 'Referee V has not seen it' "
+    f"{'Referee V has not seen it' in show(V10, 'STATUS.md')}); the referee's first file on it b2ed452 {hm('b2ed452')}, its pass "
     f"2c250bd {hm('2c250bd')}; Revision 10.1: 846d0c8 {hm('846d0c8')}, merged {merge101[:7]} {hm('ed9ca2b')}, review-V commits in between: {v_between or 'none'}",
     "DISAGREE",
     "carried over from Revision 10 (tex10:443), and now beside the paragraph's own account of Revision 10, whose draft was merged before the "
@@ -1151,13 +1157,58 @@ row(f"STATUS.md:{st_ln} ({V101})", "STATUS.md: Revision 10's draft 'checked in t
     "not the tex: the two statements the referee's pass found false (its §1.2-1.3) and tex101:44 now corrects are still in STATUS.md, which "
     "846d0c8 updated (lines 75-80) without them")
 
+# the list of the nine in tex101:370, against referee_pass §1
+l370 = tex[369]
+items370 = [("1.1 the referee had checked the additions", "that the referee had checked this revision's additions"),
+            ("1.2 every number recomputed by the agent", "that every number had been recomputed by the checking agent"),
+            ("1.3 the agent's independence", "that the agent's independence from the author is shown"),
+            ("1.4 29 gated runs", "a count of 29 gated S75 runs"), ("1.5 'screened once'", "``screened once''"),
+            ("1.6 beta's timing", "the timing of the learned write strength's collapse"), ("1.7 SELFKL", "the self-distance penalty described"),
+            ("1.8 provenance rows", "and provenance rows for E, F, G and H"), ("1.9 V's index row ('the three drafted specifications')", "three drafted")]
+in370 = {k: f in l370 for k, f in items370}
+sec_v = RP101[RP101.index("**What must change.**"):RP101.index("- **About fifteen loose")]
+row(N("and nine statements false in sixteen places, none a number of a claim:", 370),
+    "10.1's list of the nine false statements", "referee_pass §1 (and its verdict list)",
+    f"items named at tex101:370: {sum(in370.values())} of 9; missing {[k for k, v in in370.items() if not v]}; referee_pass's own verdict list "
+    f"cites §1.9: {'§1.9' in sec_v}",
+    "PARTIAL" if sum(in370.values()) == 8 else ("MATCH" if all(in370.values()) else "DISAGREE"),
+    "'nine' introduces a list of eight: §1.9, V's index row ('the three drafted specifications are not ready', tex10:70, corrected at "
+    "tex101:72) is missing. The referee's own verdict list in referee_pass.md (lines 32-37) omits it the same way, and 10.1 follows it. "
+    "tex101:46's 'an account of who had checked what' covers it")
+# provenance rows for I and R (unchanged lines, in this check's scope; the original did not check them)
+st75_559 = json.loads(show("559b942", RES75))
+p5_n = len(p5)
+row(L("S75 at four sources on that card (records \\texttt{86652b1}, \\texttt{b649751}, \\texttt{4c3984a}; pre-run note \\texttt{5bc6c2e}; report 2, \\texttt{03bffdf}, \\texttt{559b942}) & \\texttt{559b942} & pilot; 41", 539),
+    "provenance, I's row: S75 records to 4c3984a, report 2 at 03bffdf and 559b942, commit 559b942, runs 'pilot; 41' (unchanged since tex10:539)",
+    "S75 records; report 2's history on explore-I", f"S75 records: {len(st75_559['runs'])} at 559b942, {len(st75['runs'])} at 4371824 (seed 839, "
+    f"{hm('4371824')}); report 2 commits {git('log', '--format=%h', I_BR, '--', 'explore_out/I/report_2.md').split()[::-1]}",
+    "DISAGREE" if len(st75["runs"]) != 41 else "MATCH",
+    "missed by the original check and by the referee's pass: the row stops before seed 839 (record 4371824, report 2's table row at "
+    "d552c6c), which tex101:68 and 485 use. Exact: add '4371824' to the records and report 2's later commits (d552c6c; last edit 403538b), runs 'pilot; 42'")
+row(L("Phase 4, the 40-seed count (rule \\texttt{464be8d}; report \\texttt{1f8be04}) & \\texttt{1f8be04} & 42; 20; 42", 540),
+    "provenance, R's row: Phases 2-4, commit 1f8be04, runs '42; 20; 42' (unchanged since tex10:540)",
+    "R's branch", f"Phase 5: protocol 550a736, records {p5_n} in records/phase5.jsonl, report 31c39fc ({hm('31c39fc')}); Phase 5 cited elsewhere in "
+    f"the table: {any('31c39fc' in l or '550a736' in l for l in tex[536:552])}", "DISAGREE",
+    "missed by the original check and by the referee's pass: R's Phase 5 is one of this revision's three main additions (tex101:44, 349) "
+    "and the row stops at Phase 4. Exact: add 'Phase 5, test_split_copy on fresh seeds (protocol 550a736; report 31c39fc)', commit 31c39fc, "
+    f"runs '; {p5_n}'")
+row(L("This revision's first draft repeated the failure in kind: the referee's check of it found nine statements false", 404),
+    "limits/lessons: 'This revision's first draft repeated the failure in kind: the referee's check of it found nine statements false'",
+    "revision_9_check.md", f"the draft meant is Revision 9's (9bfa85a): section A 'False when committed' {len(r9a)} rows", "PARTIAL",
+    "a carried-over referent that neither the referee's pass (its §2 list) nor 846d0c8 caught: in Revision 10.1 'this revision' is 10.1. "
+    "Exact: 'Revision 9's first draft'")
+st_ln2 = next(i for i, l in enumerate(st101, 1) if "about three days" in l)
+row(f"STATUS.md:{st_ln2} ({V101})", "STATUS.md: S75b's stage 2 'would take about three days on one card'", "STATUS.md at 846d0c8; s75b_spec_draft.md",
+    f"'{st101[st_ln2 - 1].strip()[:80]}'; the spec's run times {h3070[0]:.1f}-{h3070[1]:.1f} h; tex101:485 now 'about two and a half days'", "PARTIAL",
+    "not the tex: STATUS.md keeps the figure tex101:485 replaced. Minor")
+
 say("\n" + "=" * 100)
 say("8. Pinned branches: commits after each pin up to 846d0c8's commit time (2026-10-19 18:33:26 UTC)")
 say("=" * 100)
 T101 = int(git("show", "-s", "--format=%ct", V101).strip())
 MOVED = {}
 for br, pin in PIN.items():
-    lst = [l.split(" ", 2) for l in git("log", "--format=%h %ct %s", f"{pin}..{br}").split("\n") if l.strip()]
+    lst = [l.split(" ", 2) for l in git("log", "--first-parent", "--format=%h %ct %s", f"{pin}..{br}").split("\n") if l.strip()]
     mv = [(h, dt.datetime.fromtimestamp(int(t), dt.timezone.utc).strftime("%H:%M:%S"), m[:70]) for h, t, m in lst if int(t) <= T101]
     later = sum(1 for h, t, m in lst if int(t) > T101)
     MOVED[br] = mv
@@ -1182,4 +1233,5 @@ print(f"\nCOUNTS (original, 585b666): {NEW_FROM - 1} rows: " + ", ".join(f"{k} {
 print(f"COUNTS (the same {NEW_FROM - 1} rows against 846d0c8): " + ", ".join(f"{k} {cnt82[k]}" for k in K))
 print(f"COUNTS (846d0c8, all {len(ROWS)} rows): " + ", ".join(f"{k} {cnt[k]}" for k in K))
 print("STATUS CHANGES: " + "; ".join(f"row {i}: {r[7]}" for i, r in enumerate(ROWS, 1) if i < NEW_FROM and r[6] != r[4]))
+print(f"RECOMPUTED TEXT DIFFERS FROM THE ORIGINAL'S (rows 1-{NEW_FROM - 1}): {RECDIFF}")
 print("RE-ANCHORED: " + "; ".join(f"row {i}" for i, r in enumerate(ROWS, 1) if "re-anchored" in r[7]))
