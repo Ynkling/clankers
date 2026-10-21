@@ -644,3 +644,22 @@ Referee V's screen review (screen_review_s89_H.md, "fix first", text and report 
 fixes are applied to explore_h_s89.py's docstring and report path. The screen is restated as rare key types on a layout
 whose key positions are still fixed at 3j+1, with that caveat printed with every reading; REPEATMASS is printed beside
 ALLMASS, not as a second finding; the rule's operating characteristics are printed. No run or reading changed.
+
+### Session H round 6, continued (S89c: the trigger's schedule; S89b: delta memory; seeds 2912-2933)
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S89c s89c (S89's 32-key pool task, Hebbian; first check at 12000 or cap 6, against a BASE rerun; 10 paired seeds 2924-2933) | BOUND ROUTED: BASE 2, BASE_LATE 1, BASE_CAP6 2 (validity: S89's perfect gate 2/2) | the channel is the limit |
+| S89b s89b (the same task on delta memory, beta 1, L2 keys: DELTA_SPLIT / DELTA_NOSPLIT / DELTA_ALLMASS on 2914-2923) | the delta perfect gate bound 1/2 (2913 at 24000; 2912 at 0.875 with a one-to-one map); no learned arm ran | UNTESTED |
+
+A later first check does not reach past the flat start: the probe still read 0.09-0.38 at 12000. A cap of six adds
+splits at 24000-40800 that do not convert the merges. About half the failures are still rising at 43200. Both perfect
+gates bind late on the pool task (Hebbian 10800 and 16800; delta 24000 and not by 43200; at pool size 4, 2400-8400 and
+1200-2400). On our reading, the budget and the key vocabulary, not the trigger, are what this task tests first.
+Incidents:
+- S89c's log lost its last seven run lines to a git autostash during the per-run push. Every run is in the store, and
+  the summary was regenerated. The driver no longer pulls.
+- S89b's gate code misread S89c as incomplete. This had no effect, since the perfect gate failed first, and it is fixed
+  with a dated note.
+
+Report: explore_out/H/report_11.md (per run: s89c_runs.md).

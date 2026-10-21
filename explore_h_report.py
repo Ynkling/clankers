@@ -556,6 +556,31 @@ def s89c_section(L):
     return m
 
 
+def s89b_section(L):
+    import explore_h_s89b as m
+    setup([m])
+    res, got = m.report()
+    o = res["oracle"]
+    L.append("## S89b explore_h_s89b — the split on delta memory (beta 1, L2 keys) on the 32-key pool task (S=8, k=16, conv, "
+             "43200); the delta perfect gate on 2912-2913, learned arms on 2914-2923\n")
+    L.append("| run | outcome | transition | held-out accuracy at 1200 / 12000 / 24000 / end | streams at the end | runtime |")
+    L.append("|---|---|---|---|---|---|")
+    for s, r in sorted(got["ORACLE_DELTA"].items()):
+        cv = {c[0]: c[1] for c in r["curve"]}
+        sa = r["end"].get("stream_acc") or []
+        L.append(f"| ORACLE_DELTA {s} | {r.get('outcome')} | {r.get('transition')} | "
+                 f"{' / '.join(f'{cv[t]:.2f}' if t in cv else '--' for t in (1200, 12000, 24000))} / {r['acc']:.3f} | "
+                 f"{min(sa):.2f}-{max(sa):.2f}, map {r['end'].get('ch_map')} | {r.get('secs_wall', 0) / 60:.0f} min |")
+    L.append(f"\nValidity: ORACLE_DELTA bound {o['bound']}/{o['n']} ({o['transitions']}) → "
+             f"{'VALID' if o['valid'] else 'UNTESTED'}. Learned-arm runs: "
+             f"{sum(len(got[a]) for a in m.LEARNED)} (queued only after the perfect gate binds both seeds).\n")
+    L.append("**Reading (fixed in explore_h_s89b's docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    L.append(f"\n*Caveat, with every reading:* {res['caveat']}")
+    return m
+
+
 def write(n, body, notes):
     p = os.path.join(OUT, f"report_{n}.md")
     with open(p, "w") as f:
@@ -567,7 +592,7 @@ def write(n, body, notes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
     ap.add_argument("--notes", default=None)
     args = ap.parse_args()
     notes = open(args.notes).read() if args.notes else ""
@@ -585,6 +610,15 @@ def main():
             c = checks_line(m.NAME)
             L.append(f"\n**{m.NAME}:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}; CHECKs "
                      + (f"all passed ({c['time']}, git {c['git']})" if c else "NOT RECORDED"))
+    elif args.batch == 11:
+        mods = [s89c_section(L)]
+        L.append("")
+        mods.append(s89b_section(L))
+        for m in mods:
+            nr, h, cpus, shas = runtime(m)
+            c = checks_line(m.NAME)
+            L.append(f"\n**{m.NAME}:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}; CHECKs "
+                     + (f"all passed ({c['time']}, git {c['git']}, {c['minutes']:.1f} min)" if c else "NOT RECORDED"))
     elif args.batch == 10:
         m = s89_section(L)
         nr, h, cpus, shas = runtime(m)

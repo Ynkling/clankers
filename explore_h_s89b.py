@@ -76,6 +76,10 @@ checks (the pool task, the exact copy, token-ids-only statistics, the trigger) p
 6e0a80a55be3, which this child imports unchanged.
 STAGES: H_S89B_STAGE=oracle runs ORACLE_DELTA only. Any other value queues the learned arms only after ORACLE_DELTA bound
 2/2 and S89c is complete.
+CORRECTION (21 October 2026, after the validity stage; no learned arm had run): s89c_schedule() read S89c as incomplete,
+because the harness starts STATE["batch_cpu"] at None and setdefault left it there, so no S89c run was found. It would
+have kept the learned arms unqueued (never run on a wrong schedule). ORACLE_DELTA bound 1/2, so the screen is UNTESTED
+by its own rule and no learned arm runs either way. The lookup now sets the CPU.
 """
 
 import json
@@ -138,9 +142,11 @@ def s89c_schedule():
     st = ec.load_store(s89c.NAME)
     if not st["meta"].get("code_shas"):
         return False, {}
-    c16.STATE.setdefault("shas", {})[s89c.NAME] = st["meta"]["code_shas"][-1]
-    c16.STATE.setdefault("batch_cpu", ec.cpu_model())
-    c16.STATE.setdefault("other_cpus", [])
+    if not isinstance(c16.STATE.get("shas"), dict):
+        c16.STATE["shas"] = {}
+    c16.STATE["shas"][s89c.NAME] = st["meta"]["code_shas"][-1]
+    c16.STATE["batch_cpu"] = c16.STATE.get("batch_cpu") or ec.cpu_model()      # the harness starts it at None
+    c16.STATE["other_cpus"] = c16.STATE.get("other_cpus") or []
     res, _ = s89c.report()
     if not res["complete"]:
         return False, {}
