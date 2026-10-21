@@ -516,6 +516,46 @@ def s89_section(L):
     return m
 
 
+def s89c_section(L):
+    import explore_h_s89c as m
+    setup([m])
+    res, got = m.report()
+    A = res["arms"]
+    L.append("## S89c explore_h_s89c — the trigger's schedule on the 32-key pool task (S=8, k=16, conv, 43200, Hebbian, exact "
+             "copy); seeds 2924-2933 paired\n")
+    L.append("| arm | BOUND ROUTED | band | Wilson 95% | failures v1 | failures v2 | transitions | splits | own pair ok | at probe < 0.2 "
+             "| map 1:1 before | cap-blocked checks | last firing per run | held-out accuracy at the end |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+    for a in m.ARM_NAMES:
+        x = A[a]
+        L.append(f"| {a} | {x['br']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | {cls_str(x['v1'])} | {cls_str(x['v2'])} | "
+                 f"{', '.join(str(t) for t in x['trans']) or '--'} | {x['ops']} | {x['op_ok']}/{x['ops']} | {x['flat']} | "
+                 f"{x['one_to_one_before']} | {x['capped']} | {', '.join(str(t) for t in x['last_fire'])} | "
+                 f"{', '.join(str(v) for v in x['acc_end'])} |")
+    L.append("\nValidity: S89's perfect gate on the same task and code path, 2/2 (at 16800 and 10800).\n")
+    for k, c in res["cmp"].items():
+        x, y = k.split(" vs ")
+        L.append(f"- {k}: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {x} only {c['b']}, {y} only {c['c']}; p({x}>{y}) {c['p']:.3g}, "
+                 f"p({y}>{x}) {c['p_rev']:.3g}")
+    L.append("\n**Reading (fixed in explore_h_s89c's docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    L.append(f"\n*Caveat, with every reading:* {res['caveat']}\n")
+    L.append(f"*The rule's {res['oc']}*")
+    rows = ["# S89c per run (EXPLORATORY, not a result)\n", "Each firing: update (probe accuracy) c* -> c0, labelled ok or not. Then the "
+            "probe accuracy at every check.\n", "| arm | seed | outcome | transition | firings | probe at the checks |",
+            "|---|---|---|---|---|---|"]
+    for a in m.ARM_NAMES:
+        for s, r in sorted(got[a].items()):
+            f = [c for c in r.get("checks") or [] if c.get("fired")]
+            fs = "<br>".join(f"{c['step']} ({c['acc']:.2f}) {c['op_cs']}->{c['op_c0']} {'ok' if c['op_ok'] else 'NOT ok'}" for c in f)
+            pr = ", ".join(f"{c['step'] // 1200 * 1.2:g}k {c['acc']:.2f}" for c in r.get("checks") or [])
+            rows.append(f"| {a} | {s} | {r.get('outcome')} | {r.get('transition')} | {fs or '--'} | {pr} |")
+    with open(os.path.join(OUT, "s89c_runs.md"), "w") as fh:
+        fh.write("\n".join(rows) + "\n")
+    return m
+
+
 def write(n, body, notes):
     p = os.path.join(OUT, f"report_{n}.md")
     with open(p, "w") as f:
