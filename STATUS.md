@@ -2,7 +2,7 @@
 
 This file is the entry point for anyone picking the project up, including its author after a break. It says what the
 project is, what it found, what is pre-registered and what is not, where every thread stands, and how to resume. The
-technical report (Revision 10.1, `multichannel_hebbian_report_v10.pdf`, 19 October) is the current account; the README
+technical report (Revision 10.2, `multichannel_hebbian_report_v10.pdf`, 20 October) is the current account; the README
 follows it; this file covers what the report does not. The project paused on 14 October and resumed on 19 October with
 Revision 10, which records everything listed here as "not yet in the report" on 14 October; the 1660 server left the
 project the same day.
@@ -73,11 +73,14 @@ source at two sources and nothing routes at four on the one screen run, which it
 1. **Revision 10 of the report: done** (19 October, `claude/rev10-draft`, three versions). It records `test_delta_recipe`
    pooled as primary, the GPU run of the headline, R's Phase 5, F's S88, G's S87, H's round 5, E's batches 20–21, S75
    closed and S75b's state, and the referee's round-6 checks and spec reviews; no claim of Revision 9 changes. Its
-   draft was checked in two passes by a session that had not written it, every number recomputed from the records
-   (`docs/review_2026-10/rev10/`): every number of every claim reproduced; the statements that did not were corrected.
-   Referee V then passed the merged revision and the fifth round's screens (`rev10/referee_pass.md`): every number holds;
-   nine statements false, corrected in **Revision 10.1** the same day, with V's loose items; V's judgement that the
-   checking agent's passes were not a substitute for a referee pass is recorded in the report (§15, §17).
+   draft was checked in two passes by a checking agent run from the author's own session (git cannot show their
+   independence; `docs/review_2026-10/rev10/first_pass.md`, `second_pass.md`), which recomputed `test_delta_recipe`, the
+   GPU run and H's screens and read the other screens' reports. Referee V then passed the merged revision and the fifth
+   round's screens (`rev10/referee_pass.md`): every number of every pre-registered claim holds; nine statements false,
+   corrected in **Revision 10.1** the same day — itself merged before V read it; V's check (`rev10/revision_10_1_check.md`)
+   found the nine corrected and a dozen residues, taken in **Revision 10.2**, the first revision since 9 passed by the
+   referee before its merge. V's judgement that the checking agent's passes were not a substitute for a referee pass is
+   recorded in the report (§15, §17).
 2. **The register test** (the next pre-registered test; the project's open question, a distant cue discovered
    label-free). G's draft specification exists; the referee's review (`docs/review_2026-10/spec_review_register_draft.md`)
    lists what must change (a named outcome function with a CHECK against the recorded verdicts, the validity rule's
@@ -100,7 +103,7 @@ source at two sources and nothing routes at four on the one screen run, which it
    with a mechanical pilot rule; what remains is in `explore_gpu/README.md` (d): rerun the CUDA CHECK and the benchmark
    with the final driver, run the pilot (two perfect-gate runs, about three hours), and stage 2 only if the pilot record
    says PROCEED. The spec was written for two cards; since 19 October only the laptop's RTX 3070 is available (the
-   server left the project), so stage 2 would take about three days on one card and cannot share the laptop with a
+   server left the project), so stage 2 would take 54–57 hours on one card by the specification's run times and cannot share the laptop with a
    main-line test. The referee's review of the draft (`spec_review_s75b_draft.md`) has points to take before the
    pilot.
 6. **F's S88**, complete (report 8 at `a199d5e`; 78 runs on a Xeon @ 2.80 GHz; readings fixed before the first run,

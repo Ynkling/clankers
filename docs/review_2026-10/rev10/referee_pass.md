@@ -201,3 +201,20 @@ These do not bear on the draft:
 - **The re-runs.** The bit-for-bit CHECKs and reproductions of S87, S87a/c, S88 and batches 20–21 were read from their files and logs, not re-run.
 - **What is in no record.** The server's departure (`STATUS.md` only); the author of the passes beyond what git shows; and the S88a seed-7 smoke run (disclosed, not stored).
 - **Anything after `585b666`.** That includes the main line's round-6 prompts (`7c4ceb8`), which change no tex.
+
+## Corrections (20 October, after Revision 10.1)
+
+Found by `revision_10_1_check.md`.
+1. **The verdict's list of the nine statements (lines 32–37) names eight.** It omits §1.9, V's index row. The draft's 10.1 copied the list with the same omission (tex101:46, 370).
+2. **§2's carried-over referents undercount.**
+   - The tex list misses tex10:404 ("This revision's …") and the heading at tex10:358.
+   - The README count is wrong: it has five lines with "this revision's first draft", plus :493 and :546, not four. `audit_passes.md`:15 and :88 have the same omission.
+3. **§1.8 missed two stale provenance rows.**
+   - I's row cites `559b942` and 41 runs, but S75 has had 42 runs since `4371824` (seed 839), and report 2 was updated later.
+   - R's row stops at Phase 4 (`1f8be04`); Phase 5 (`31c39fc`, 64 records) is cited nowhere. `check_rev10_A` missed them too.
+4. **tex10:443, "the referee now reads … every draft before it is merged", was never flagged.** It was already false for Revision 10, which was merged without a referee pass.
+
+No number in `check_rev10_A`, `check_rev10_FG` or `check_rev10_HE` is wrong.
+5. **§2's carried-over list wrongly includes tex10:42.** That line sits in the Revision 9 paragraph, where "this revision's" is right. (`check_rev10_A_v101`.)
+6. **`check_rev10_HE.md` says explore-H at `347bd25` was "still the branch head".** It was not. The local ref had not been fetched since 13 October, and the remote already had `d4a9a7d` (17:54:28) and `7820b12`, so that check's seed scan read stale F, G and H trees. No result changes.
+7. **`check_rev10_A/FG/HE.py` are not reproducible as committed.** They compare 7-digit `%h` hashes with literals, and this clone now abbreviates to 8; they also read branch tips rather than commits. The `_v101` scripts pin every ref and force 7-digit hashes.
