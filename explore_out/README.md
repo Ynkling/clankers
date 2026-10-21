@@ -709,3 +709,25 @@ Branch `claude/explore-G`. EXPLORATORY, not a result. RandHeaderTask-lite, Hebbi
 On this task the frequent token types are both CTX types and all four keys; the context tokens are the most frequent,
 against the premise that they are rare. So FREQHINGE reads the key term's 8 positions plus the 5 CTX and the query's key.
 Handed back: FREQHINGE as a label-free variant for the main-line spec draft, with that caveat. Not: SELFKL, TEMP.
+
+## Session G — S89 (the frequency and repeat hinges where keys are not frequent; delta memory)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. F's RandHeaderTask-pool and -allpool (b0c6332), delta memory
+(beta 1, L2), k = 2, 24000, SLOW, the REG3 model; seeds 2842-2861 (perfect gate 2840-2841: 2/2 on both tasks). Spec and
+readings committed at 003a370 / db14e9b before any run, after Referee V's "fix first". 204/204 runs ok. Report
+`G/report_8.md`.
+
+| arm | POOL ROUTED-BOUND | ALLPOOL ROUTED-BOUND | reading |
+|---|---|---|---|
+| BASELINE_D | 0/20 | 0/20 | – |
+| REG3_D (descriptive) | 16/20 | 0/20 | – |
+| REG3_KEYHINGE_D | 20/20 | 0/20 | POOL: discovered (20 / 0); ALLPOOL: "the labelled hinge itself fails here" |
+| REG3_FREQHINGE_D (CTX hinge on POOL, value hinge on ALLPOOL) | 7/20 | 0/20 | POOL: "needs frequent keys" (KH only 13 / 0) |
+| REG3_REPEATHINGE_D | 20/20 | 0/20 | POOL: "replaces the key hinge" (0 / 0) |
+
+On POOL the register gate alone already routes 16/20 (lite: 0/10), so either hinge adds 4 pairs (p 0.0625). The
+frequency hinge, which selects only the CTX tokens there, lowers it to 7/20. On ALLPOOL every arm key-splits or stops at
+the type-level routing cap (0.48-0.54 of sequences routed; the cap of a fixed CTX-type map is 0.533), so its null does
+not separate "keys are not frequent" from "contexts have no fixed identity". Handed back: the repeat hinge as the
+label-free candidate, with the caveat that POOL's margin over no hinge is 4 pairs; on lite it was not run. No Hebbian
+learned arm ran (F's conv pilot "partly"; no conv path in the register models).

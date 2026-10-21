@@ -2,26 +2,34 @@
  "readings": {
   "pool": {
    "validity": "ORACLE_D (delta perfect gate, SLOW) on 2840-2841 bound 2/2: 2840 bound @2400, 2841 bound @2400",
-   "first": "UNTESTED (runs that did not complete: {'BASELINE_D': [2859, 2860, 2861], 'REG3_D': [2858, 2859, 2860, 2861], 'REG3_KEYHINGE_D': [2858, 2859, 2860, 2861], 'REG3_FREQHINGE_D': [2858, 2859, 2860, 2861], 'REG3_REPEATHINGE_D': [2858, 2859, 2860, 2861]})",
-   "commitment at 2400 (median spread)": "BASELINE_D 0.8260, REG3_D 0.9328, REG3_KEYHINGE_D 0.0786, REG3_FREQHINGE_D 0.1103, REG3_REPEATHINGE_D 0.0975"
+   "counts": "BASELINE_D 0/20, REG3_D 16/20, REG3_KEYHINGE_D 20/20, REG3_FREQHINGE_D 7/20, REG3_REPEATHINGE_D 20/20",
+   "REG3_KEYHINGE vs BASELINE": "KH only 20, BASELINE only 0, p 9.54e-07",
+   "REG3_KEYHINGE vs REG3 (descriptive: the hinge's contribution)": "KH only 4, REG3 only 0, p 0.0625",
+   "first": "the labelled hinge is discovered; per-arm names below",
+   "REG3_FREQHINGE_D": "THE FREQUENCY HINGE NEEDS FREQUENT KEYS (discovered yes (arm only 7, BASELINE only 0, p 0.00781); vs KH: KH only 13, arm only 0, p(KH >) 0.000122, n 20); clamps: does not apply (arm only 7, BASELINE only 0; commitment at 2400 0.0828 vs BASELINE 0.8353)",
+   "REG3_REPEATHINGE_D": "THE REPEAT HINGE REPLACES THE KEY HINGE (discovered yes (arm only 20, BASELINE only 0, p 9.54e-07); vs KH: KH only 0, arm only 0, p(KH >) 1, n 20); clamps: does not apply (arm only 20, BASELINE only 0; commitment at 2400 0.1034 vs BASELINE 0.8353)",
+   "commitment at 2400 (median spread)": "BASELINE_D 0.8353, REG3_D 0.9328, REG3_KEYHINGE_D 0.0786, REG3_FREQHINGE_D 0.0828, REG3_REPEATHINGE_D 0.1034"
   },
   "allpool": {
    "validity": "ORACLE_D (delta perfect gate, SLOW) on 2840-2841 bound 2/2: 2840 bound @3600, 2841 bound @3600",
-   "first": "UNTESTED (runs that did not complete: {'BASELINE_D': [2858, 2859, 2860, 2861], 'REG3_D': [2858, 2859, 2860, 2861], 'REG3_KEYHINGE_D': [2858, 2859, 2860, 2861], 'REG3_FREQHINGE_D': [2857, 2858, 2859, 2860, 2861], 'REG3_REPEATHINGE_D': [2857, 2858, 2859, 2860, 2861]})",
+   "counts": "BASELINE_D 0/20, REG3_D 0/20, REG3_KEYHINGE_D 0/20, REG3_FREQHINGE_D 0/20, REG3_REPEATHINGE_D 0/20",
+   "REG3_KEYHINGE vs BASELINE": "KH only 0, BASELINE only 0, p 1",
+   "REG3_KEYHINGE vs REG3 (descriptive: the hinge's contribution)": "KH only 0, REG3 only 0, p 1",
+   "first": "the labelled hinge itself fails here",
    "caveat": "the routing cap: a fixed CTX-type map separates at most 0.533 of sequences; a null here does not separate 'keys are not frequent' from 'contexts have no fixed identity'",
-   "commitment at 2400 (median spread)": "BASELINE_D 0.9344, REG3_D 0.2823, REG3_KEYHINGE_D 0.1073, REG3_FREQHINGE_D 0.0677, REG3_REPEATHINGE_D 0.1118"
+   "commitment at 2400 (median spread)": "BASELINE_D 0.9344, REG3_D 0.2823, REG3_KEYHINGE_D 0.1062, REG3_FREQHINGE_D 0.0655, REG3_REPEATHINGE_D 0.1075"
   }
  },
  "across": {
-  "BASELINE_D": "pool 0/17, allpool 0/16; pool only 0, allpool only 0, p(pool >) 1, n 16",
-  "REG3_D": "pool 13/16, allpool 0/16; pool only 13, allpool only 0, p(pool >) 0.000122, n 16",
-  "REG3_KEYHINGE_D": "pool 16/16, allpool 0/16; pool only 16, allpool only 0, p(pool >) 1.53e-05, n 16",
-  "REG3_REPEATHINGE_D": "pool 16/16, allpool 0/15; pool only 15, allpool only 0, p(pool >) 3.05e-05, n 15"
+  "BASELINE_D": "pool 0/20, allpool 0/20; pool only 0, allpool only 0, p(pool >) 1, n 20",
+  "REG3_D": "pool 16/20, allpool 0/20; pool only 16, allpool only 0, p(pool >) 1.53e-05, n 20",
+  "REG3_KEYHINGE_D": "pool 20/20, allpool 0/20; pool only 20, allpool only 0, p(pool >) 9.54e-07, n 20",
+  "REG3_REPEATHINGE_D": "pool 20/20, allpool 0/20; pool only 20, allpool only 0, p(pool >) 9.54e-07, n 20"
  },
  "lite": {
-  "BASELINE_D": "lite (S87, 2720-2729) 0/10 [0.00, 0.28] NEVER; pool 0/17 [0.00, 0.18] NEVER (Fisher p(lite >) 1); allpool 0/16 [0.00, 0.19] NEVER (Fisher p(lite >) 1)",
-  "REG3_D": "lite (S87, 2720-2729) 0/10 [0.00, 0.28] NEVER; pool 13/16 [0.57, 0.93] MAJORITY (Fisher p(lite >) 1); allpool 0/16 [0.00, 0.19] NEVER (Fisher p(lite >) 1)",
-  "REG3_KEYHINGE_D": "lite (S87, 2720-2729) 10/10 [0.72, 1.00] RELIABLE; pool 16/16 [0.81, 1.00] RELIABLE (Fisher p(lite >) 1); allpool 0/16 [0.00, 0.19] NEVER (Fisher p(lite >) 1.88e-07)",
-  "REG3_FREQHINGE_D": "lite (S87, 2720-2729) 10/10 [0.72, 1.00] RELIABLE; pool 5/16 [0.14, 0.56] MINORITY (Fisher p(lite >) 0.000565); allpool 0/15 [0.00, 0.20] NEVER (Fisher p(lite >) 3.06e-07)"
+  "BASELINE_D": "lite (S87, 2720-2729) 0/10 [0.00, 0.28] NEVER; pool 0/20 [0.00, 0.16] NEVER (Fisher p(lite >) 1); allpool 0/20 [0.00, 0.16] NEVER (Fisher p(lite >) 1)",
+  "REG3_D": "lite (S87, 2720-2729) 0/10 [0.00, 0.28] NEVER; pool 16/20 [0.58, 0.92] MAJORITY (Fisher p(lite >) 1); allpool 0/20 [0.00, 0.16] NEVER (Fisher p(lite >) 1)",
+  "REG3_KEYHINGE_D": "lite (S87, 2720-2729) 10/10 [0.72, 1.00] RELIABLE; pool 20/20 [0.84, 1.00] RELIABLE (Fisher p(lite >) 1); allpool 0/20 [0.00, 0.16] NEVER (Fisher p(lite >) 3.33e-08)",
+  "REG3_FREQHINGE_D": "lite (S87, 2720-2729) 10/10 [0.72, 1.00] RELIABLE; pool 7/20 [0.18, 0.57] MINORITY (Fisher p(lite >) 0.000647); allpool 0/20 [0.00, 0.16] NEVER (Fisher p(lite >) 3.33e-08)"
  }
 }
