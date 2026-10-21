@@ -286,3 +286,43 @@ classes, lite-id statistics) or G's and H's arms. Phase 2 did not run.
   - it would need a validity reading of its own, fixed before runs;
   - -allpool would likely need a longer budget;
   - the ALLPOOL cap still applies to any learned gate that reads context identity.
+
+## The ALLPOOL fallback at 48000 (21 October)
+
+**The user's decision:** the conv configuration (Hebbian, k = 2, the main line's conv 'layer' in the memory's input,
+SLOW) is this round's valid Hebbian configuration on POOL, where O_HEBB_CONV_POOL bound 2/2 at 24000. On ALLPOOL, S89's
+own fallback applies: O_HEBB_CONV_ALLPOOL, unchanged, at 48000 on 2800-2801. The reading was committed at 2b2d5a4,
+before the 2 runs.
+
+| arm | bound (Wilson 95%; band) | 2800 | 2801 |
+|---|---|---|---|
+| O_HEBB_CONV_ALLPOOL_48K | **2/2** [0.34, 1.00] RELIABLE | bound @6000 (final 0.988) | bound @28800 (final 0.972) |
+
+**READING: "ALLPOOL: the conv configuration needs the longer budget"** (2/2 at 48000).
+
+So in this round's terms:
+- **POOL is valid** with the conv configuration at 24000.
+- **ALLPOOL needs 48000.**
+- This supersedes the addendum's last section, which left the choice open.
+
+**Descriptive:**
+- Seed 2801 continues the 24000 run's climb: 0.87 at 24000, 0.91 at 25200, 0.94 at 27600, 0.953 at 28800, 0.97 at
+  30000-31200 (early stop).
+- Both runs route perfectly at the end: margin 1.00, η² by stream 1.00 in both forms, VAL cos 0.00 in both forms.
+- Accuracy is the same whether or not the queried pair was its key's last write (2801: 0.95 / 0.97).
+- **Bit for bit across budgets and CPUs:** each 48000 run equals its 24000 run through the latter's end, in the curve and
+  every statistic.
+  - That covers the whole 2800 run (both stop at 8400) and 2801 through 24000.
+  - The 24000 runs were on the 2.10GHz Xeon and these on the 2.80GHz one.
+- The routing cap still applies to any learned gate that reads context identity on ALLPOOL; the perfect gate here is the
+  relative one.
+
+**CHECKs, asserted before the runs, all passed:**
+- explore_f_delta_checks 26/26;
+- S89-F's 52 and the follow-up child's 6, as before;
+- one new: the 2.10GHz record O_HEBB_CONV_ALLPOOL|2801 reproduces bit for bit through 2400 on this 2.80GHz CPU (curve and
+  statistics at 0, 1200 and 2400). Only then were the 2.10GHz records accepted as this batch's, so none of the 6
+  recorded runs re-ran (2 queued).
+
+The child is unchanged (code SHA 267d08456c38). Run time was 0.27 h, 03:28-03:46 UTC on 21 October, CHECKs included.
+Nothing else ran.
