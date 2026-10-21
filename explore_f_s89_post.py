@@ -52,6 +52,21 @@ CHECKS (asserted before any run): explore_f_delta_checks (26) at the start of th
   the pilot's, and at initialisation (CausalConv starts at the identity) the logits equal the pilot's bit for bit, so
   each conv arm is its S89 pilot plus a convolution that starts as a no-op; groups and lrs at
   updates 1, 2400, 2401 through the real path (the conv in the rest group).
+
+ROUND-6 FALLBACK ON ALLPOOL (added 21 October, after the readings above came in; the conv pilot read "partly", 3/4). The
+  user's decision: the conv configuration (Hebbian, k = 2, the main line's conv 'layer' in the memory's input, SLOW) is this
+  round's valid Hebbian configuration on POOL (O_HEBB_CONV_POOL 2/2 at 24000). On ALLPOOL (1/2 at 24000) S89's own fallback
+  applies, as S89-F's rule ran it for the S89 pilots:
+    O_HEBB_CONV_ALLPOOL_48K   O_HEBB_CONV_ALLPOOL unchanged (the same child arm, the same code SHA 267d08456c38) at 48000
+                              updates, seeds 2800-2801 (2 runs). SLOW does not depend on the budget, so a run equals the
+                              24000 run through the 24000 run's end (the 2800 run stops early, after its bind, as at 24000).
+  READING (fixed now, before the 2 runs): "ALLPOOL: the conv configuration needs the longer budget" if both bind (2/2) at
+  48000; "ALLPOOL: untested" otherwise (then G and H run POOL only). A failed run is retried by the harness (3 attempts);
+  still failed, it counts as not bound.
+  CPU: this container is a Xeon @ 2.80GHz again; the 24000 conv runs ran on a Xeon @ 2.10GHz. CHECK (asserted before the
+  runs): O_HEBB_CONV_ALLPOOL|2801 (the 2.10GHz record) through 2400 reproduces bit for bit on this CPU (curve and every
+  recorded statistic); only then does the harness accept the 2.10GHz records as this batch's (explore_common16.cpus_for),
+  so the 6 recorded runs are not re-queued. No other run: nothing else is queued.
 """
 import os
 import sys
@@ -71,19 +86,50 @@ ARMS = {"O_TYPE_HEBB_ALLPOOL": dict(opt="adam", lr=LR, iters=24000, seeds=SEEDS,
         "O_HEBB_CONV_POOL": dict(opt="adam", lr=LR, iters=24000, seeds=SEEDS, sched="SLOW (rest 1e-4 to 2400)",
                                  label="perfect gate + conv 'layer', hebb, pool"),
         "O_HEBB_CONV_ALLPOOL": dict(opt="adam", lr=LR, iters=24000, seeds=SEEDS, sched="SLOW (rest 1e-4 to 2400)",
-                                    label="perfect gate + conv 'layer', hebb, allpool")}
+                                    label="perfect gate + conv 'layer', hebb, allpool"),
+        "O_HEBB_CONV_ALLPOOL_48K": dict(opt="adam", lr=LR, iters=48000, seeds=SEEDS, sched="SLOW (rest 1e-4 to 2400)",
+                                        label="perfect gate + conv 'layer', hebb, allpool, 48000 (fallback)")}
+OLD_CPU = "Intel(R) Xeon(R) Processor @ 2.10GHz"          # the 24000 runs
 
 
 def child(func, payload):
     return c16.run_child(CHILD, func, payload, main=MAIN)
 
 
+def child_arm(arm):
+    """The child's arm: the 48000 fallback is O_HEBB_CONV_ALLPOOL with a longer budget."""
+    return arm[:-4] if arm.endswith("_48K") else arm
+
+
 def run_job(arm, seed):
-    return child("run", dict(arm=arm, seed=seed, iters=ARMS[arm]["iters"]))
+    return child("run", dict(arm=child_arm(arm), seed=seed, iters=ARMS[arm]["iters"]))
 
 
 def timing(arm, steps):
-    return child("timing", dict(arm=arm, steps=steps))
+    return child("timing", dict(arm=child_arm(arm), steps=steps))
+
+
+def repro_old_cpu():
+    """CHECK: the 2.10GHz record O_HEBB_CONV_ALLPOOL|2801 through 2400 on this CPU, bit for bit; if it holds, accept the
+    2.10GHz records as this batch's."""
+    import explore_common as ec
+    cpu = ec.cpu_model()
+    st = fc.load(sys.modules[__name__])
+    key = c16.key("O_HEBB_CONV_ALLPOOL", 2801, c16.STATE["shas"][NAME], OLD_CPU)
+    ref = st["runs"].get(key)
+    if cpu == OLD_CPU:
+        return True, f"this CPU is the records' ({cpu}); nothing to reproduce"
+    if ref is None:
+        return False, f"{key} not found"
+    r = child("run", dict(arm="O_HEBB_CONV_ALLPOOL", seed=2801, iters=2400))
+    want = [c for c in ref["curve"] if c[0] <= 2400]
+    so = [x for x in ref["stats"] if x["step"] != "end" and x["step"] <= 2400]
+    sn = [x for x in r["stats"] if x["step"] != "end" and x["step"] <= 2400]
+    ok = r["curve"] == want and so == sn
+    if ok and OLD_CPU not in c16.STATE["other_cpus"]:
+        c16.STATE["other_cpus"].append(OLD_CPU)
+    return ok, (f"{key} through 2400 reproduces bit for bit on this CPU ({cpu}): curve {r['curve']} vs {want}; statistics "
+                f"at {[x['step'] for x in so]} equal {so == sn}; the 2.10GHz records are accepted as this batch's: {ok}")
 
 
 def check():
@@ -92,7 +138,9 @@ def check():
     for nm, v in child("checks", {}):
         print(f"  CHECK {NAME}: {nm}: {'ok' if v else 'FAIL'}", flush=True)
         ok &= bool(v)
-    return ok
+    v, nm = repro_old_cpu()
+    print(f"  CHECK {NAME}: {nm}: {'ok' if v else 'FAIL'}", flush=True)
+    return ok and v
 
 
 def line(arm, r):
@@ -109,6 +157,13 @@ def reading(n_bound, n_failed, n):
         return "INCOMPLETE, no reading"
     return ("the convolution restores the Hebbian oracle on pooled keys" if n_bound == 4 else "partly" if n_bound == 3
             else "it does not")
+
+
+def reading_48k(n_bound, n_failed, n):
+    """The fallback's reading on O_HEBB_CONV_ALLPOOL_48K (2 runs)."""
+    if n + n_failed < len(SEEDS):
+        return "INCOMPLETE, no reading"
+    return "ALLPOOL: the conv configuration needs the longer budget" if n_bound == 2 else "ALLPOOL: untested"
 
 
 def report():

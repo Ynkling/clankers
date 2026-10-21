@@ -115,6 +115,8 @@ def report_s89_post():
     import explore_f_s89_post as s
     if s.NAME not in c16.STATE["shas"]:
         fc.setup([s])
+    if s.OLD_CPU not in c16.STATE["other_cpus"]:
+        c16.STATE["other_cpus"].append(s.OLD_CPU)          # the 24000 runs (reproduced on this CPU: repro_old_cpu)
     R = {arm: fc.runs(s, arm) for arm in s.ARMS}
     st = fc.load(s)
     failed = {}
@@ -155,8 +157,18 @@ def report_s89_post():
       f"({', '.join(f'{a} ' + str(sum(bound(r) for r in R[a].values())) + '/' + str(len(s.SEEDS)) for a in s.CONV_ARMS)}"
       f"{'; failed after retries ' + str(nf) if nf else ''}).")
     P(f"\nREADING (fixed before the runs): **{rd}**")
+    out48 = None
+    if "O_HEBB_CONV_ALLPOOL_48K" in s.ARMS:
+        a48 = "O_HEBB_CONV_ALLPOOL_48K"
+        nb48 = sum(bound(r) for r in R[a48].values())
+        nf48 = sum(1 for (a, _) in failed if a == a48)
+        out48 = s.reading_48k(nb48, nf48, len(R[a48]))
+        P(f"\nFallback on ALLPOOL (O_HEBB_CONV_ALLPOOL at 48000; the conv configuration is the round's valid Hebbian "
+          f"configuration on POOL): {fc.count_str(nb48, len(s.SEEDS))} bound"
+          f"{'; failed after retries ' + str(nf48) if nf48 else ''}.")
+        P(f"\nREADING (fixed before the 2 runs): **{out48}**")
     meta = store_meta(s)
     P(f"\n{s.NAME}: {meta['n']} runs ok (failed records {meta['failed']}), {meta['hours']:.2f} h of run time; CPU {meta['cpus']}; "
       f"code SHA {c16.STATE['shas'][s.NAME][:12]}")
-    out = dict(reading=rd, n_bound=nb, md=_write("s89_post", L))
+    out = dict(reading=rd, n_bound=nb, reading_48k=out48, md=_write("s89_post", L))
     return out
