@@ -234,3 +234,7 @@ EXPLORATORY, NOT A RESULT — Session F s89post (F/s89_post)
   CHECK F/s89_post: O_HEBB_CONV_ALLPOOL: the gate is task.perfect_gate (True); conv 'layer', K 4; parameters beyond the S89 pilot's: ['short_conv.conv_w'], the shared ones equal the S89 pilot's at seed 2800 (True); at initialisation (the conv at the identity) the logits equal the S89 pilot's bit for bit (True): ok
   CHECK F/s89_post: O_HEBB_CONV_ALLPOOL: groups [] / 6 rest parameters (the conv in the rest group: True); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
   CHECK F/s89_post: O_HEBB_CONV_ALLPOOL|2801|267d08456c38|Intel(R) Xeon(R) Processor @ 2.10GHz through 2400 reproduces bit for bit on this CPU (Intel(R) Xeon(R) Processor @ 2.80GHz): curve [[1200, 0.27099609375, 2.67083477973938], [2400, 0.31298828125, 2.265213966369629]] vs [[1200, 0.27099609375, 2.67083477973938], [2400, 0.31298828125, 2.265213966369629]]; statistics at [0, 1200, 2400] equal True; the 2.10GHz records are accepted as this batch's: True: ok
+  timings measured (14 s): F/s89_post:O_TYPE_HEBB_ALLPOOL 19.3 ms/step, F/s89_post:O_HEBB_CONV_POOL 23.1 ms/step, F/s89_post:O_HEBB_CONV_ALLPOOL 23.9 ms/step, F/s89_post:O_HEBB_CONV_ALLPOOL_48K 23.9 ms/step
+  2 runs queued; projected worst case 0.68 h of runs, makespan 0.34 h on 4 workers
+  start    0.0 min  F/s89_post       O_HEBB_CONV_ALLPOOL_48K  seed 2800  (projected worst case 20 min)
+  start    0.0 min  F/s89_post       O_HEBB_CONV_ALLPOOL_48K  seed 2801  (projected worst case 20 min)
