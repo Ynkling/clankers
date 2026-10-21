@@ -10,6 +10,8 @@ Per run: transition or final accuracy; end margin; η² by stream at KEY pooled 
 | O_HEBB_CONV_POOL | 2801 | bound @13200 | 1.00 | 1.00 / 1.00 | 0.00 / 0.00 | 1.00 | 0.96 / 0.96 |
 | O_HEBB_CONV_ALLPOOL | 2800 | bound @6000 | 1.00 | 1.00 / 1.00 | 0.00 / 0.00 | 1.00 | 0.99 / 0.99 |
 | O_HEBB_CONV_ALLPOOL | 2801 | unbound 0.872 | 1.00 | 1.00 / 1.00 | 0.00 / 0.00 | 1.00 | 0.86 / 0.87 |
+| O_HEBB_CONV_ALLPOOL_48K | 2800 | bound @6000 | 1.00 | 1.00 / 1.00 | 0.00 / 0.00 | 1.00 | 0.99 / 0.99 |
+| O_HEBB_CONV_ALLPOOL_48K | 2801 | bound @28800 | 1.00 | 1.00 / 1.00 | 0.00 / 0.00 | 1.00 | 0.95 / 0.97 |
 
 Curves (held-out accuracy every 2400):
 
@@ -19,9 +21,15 @@ Curves (held-out accuracy every 2400):
 - O_HEBB_CONV_POOL|2801: 0.32 0.71 0.78 0.89 0.94 0.96
 - O_HEBB_CONV_ALLPOOL|2800: 0.32 0.93 0.99
 - O_HEBB_CONV_ALLPOOL|2801: 0.31 0.67 0.73 0.76 0.77 0.78 0.78 0.77 0.85 0.87
+- O_HEBB_CONV_ALLPOOL_48K|2800: 0.32 0.93 0.99
+- O_HEBB_CONV_ALLPOOL_48K|2801: 0.31 0.67 0.73 0.76 0.77 0.78 0.78 0.77 0.85 0.87 0.92 0.95 0.97
 
 Conv pilots: 3/4 [0.30, 0.95] MAJORITY bound (O_HEBB_CONV_POOL 2/2, O_HEBB_CONV_ALLPOOL 1/2).
 
 READING (fixed before the runs): **partly**
 
-F/s89_post: 6 runs ok (failed records 0), 0.50 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.10GHz']; code SHA 267d08456c38
+Fallback on ALLPOOL (O_HEBB_CONV_ALLPOOL at 48000; the conv configuration is the round's valid Hebbian configuration on POOL): 2/2 [0.34, 1.00] RELIABLE bound.
+
+READING (fixed before the 2 runs): **ALLPOOL: the conv configuration needs the longer budget**
+
+F/s89_post: 8 runs ok (failed records 0), 0.76 h of run time; CPU ['Intel(R) Xeon(R) Processor @ 2.10GHz', 'Intel(R) Xeon(R) Processor @ 2.80GHz']; code SHA 267d08456c38
