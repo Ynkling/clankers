@@ -148,3 +148,48 @@ def report_s90():
     P(f"\n{s.NAME}: {meta['n']} runs ok (failed records {meta['failed']}), {meta['hours']:.2f} h of run time; CPUs {meta['cpus']}; "
       f"code SHA {c16.STATE['shas'][s.NAME][:12]}; decision {d}")
     return dict(rd=rd, screen=scr, md=_write("s90_ctx", L))
+
+
+def report_s90_k16():
+    """explore_f_s90_k16: the type-level perfect gate at k = 16, beside the per-sequence gate (k = 2). Writes
+    explore_out/F/s90_k16_tables.md."""
+    import explore_common as ec
+    import explore_f_s90_k16 as s
+    if s.NAME not in c16.STATE["shas"]:
+        fc.setup([s])
+    _accept_store_cpus(s)
+    R = {arm: fc.runs(s, arm) for arm in s.ARMS}
+    st = fc.load(s)
+    failed = [k for k, r in st["runs"].items() if not r.get("ok") and r.get("attempts", 1) >= c16.MAX_ATTEMPTS]
+    L = []
+    P = L.append
+    P("### The type-level perfect gate at k = 16 (explore_f_s90_k16; seed 3060; SLOW)\n")
+    P("| task | memory | budget | k = 16 type-level gate (3060) | end margin / separated | per-sequence gate, k = 2 (2/2) |")
+    P("|---|---|---|---|---|---|")
+    nb = 0
+    for arm in s.ARMS:
+        r = R[arm].get(3060)
+        _, t = arm.split("_")[1], arm.split("_")[2]
+        cell = (f"bound @{r['transition']} (final {r['acc']:.3f})" if bound(r) else f"unbound {r['acc']:.3f}") if r else "--"
+        nb += bound(r)
+        e = (r or {}).get("end") or {}
+        store, a2, seeds, sha = s.PER_SEQ[arm]
+        d2 = ec.load_store(store)["runs"]
+        cells = []
+        for sd in seeds:
+            k2 = [k for k in d2 if k.startswith(f"{a2}|{sd}|{sha}|") and d2[k].get("ok")]
+            r2 = d2[k2[0]] if k2 else None
+            cells.append(f"{sd} " + (f"@{r2['transition']}" if bound(r2) else (f"unbound {r2['acc']:.2f}" if r2 else "--")))
+        P(f"| {t} | {arm.split('_')[1]} | {s.ARMS[arm]['iters']} | {cell} | {fmt(e.get('margin'))} / "
+          f"{fmt(e.get('seq_separated_frac'))} | {a2}: {'; '.join(cells)} |")
+    P("\nCurves (held-out accuracy every 2400):\n")
+    for arm in s.ARMS:
+        for sd, r in sorted(R[arm].items()):
+            P(f"- {arm}|{sd}: " + " ".join(f"{c[1]:.2f}" for c in r["curve"][1::2]))
+    n = sum(len(v) for v in R.values())
+    rd = s.reading(nb, len(failed), n)
+    P(f"\nREADING (fixed before the runs): **{rd}**")
+    meta = store_meta(s)
+    P(f"\n{s.NAME}: {meta['n']} runs ok (failed records {meta['failed']}), {meta['hours']:.2f} h of run time; CPUs {meta['cpus']}; "
+      f"code SHA {c16.STATE['shas'][s.NAME][:12]}")
+    return dict(reading=rd, md=_write("s90_k16", L))

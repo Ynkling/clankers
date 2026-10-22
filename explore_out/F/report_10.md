@@ -173,3 +173,84 @@ way.**
   - -ctxpool is valid on both memories at 24000. -allpool, by contrast, needs 48000 on Hebbian + conv.
   - On -ctxpool a single delta channel binds without any gate, so on delta the partition is not needed at D = 2. It is
     needed at D ≥ 3 (0/10 at both).
+
+---
+
+# Addendum (23 October): referee V's screen review, and phase 2 ran without its hold
+
+Referee V reviewed S90-F at 73749e8 (`docs/review_2026-10/screen_review_s90_F.md`, claude/review-V ecbaf77). The review
+was committed at 05:52:28 UTC on 22 October, while phase 1 was running. **It asked for phase 2 to be held** (its fix 1:
+gate the single-channel arms on a file committed by hand after review) and noted that the queue would start them at
+about 06:37 UTC.
+
+**Phase 2 ran anyway: the queue had no stop.**
+- The stage that queued it ("phase1b") began at 06:07:39 UTC. Its CHECKs and timings ran to 06:11:08.
+- The 60 single-channel runs ran from about 06:11 to 08:22 UTC on 22 October. The stage's commit is d1072a4, at
+  08:22:01.
+- I did not fetch claude/review-V during the run, so I saw the review only on 23 October, after the screen had finished.
+- Nothing was changed after the fact. The code, the readings and the records are those committed at 73749e8, and every
+  figure in this report comes from runs made before the review was read.
+- **The screen's runs were therefore not reviewed before they started**, which the round's prompt requires. The reading
+  stands as computed, but under that exception.
+
+## Finding 1: the lite reference ran on a different schedule
+
+**The comparison in question.** This report's descriptive section says: "On lite's header layout one delta channel bound
+8/10 (Revision 10 §11). -ctxpool's 10/10 is no worse once the contexts lose their identity."
+
+**The schedules:**
+- **The 8/10 is S53:** one delta channel on the header layout, P = 4, seeds 300-309. It ran under **one Adam at 1e-3 on
+  every parameter throughout** (explore_f_delta_controls' docstring).
+- **F's own single-delta reference on this lite layout is S88b FIXED_1X, 9/10** (seeds 2420-2429). It ran under the same
+  one Adam at 1e-3 throughout, with the parallel delta form (`explore_delta_mem.to_delta`).
+- **S90's single channels ran under SLOW:** every parameter at 1e-4 for updates 1-2400, then 1e-3, with
+  `explore_f_delta_fast`.
+
+So lite → -ctxpool changes the contexts' identity and the schedule together. From S53's 8/10 the layout changes too
+(header → the randomised header).
+
+**Does the comparison survive?**
+- **The reading does not depend on it.** "One channel binds without a context identity" is a count on -ctxpool alone
+  (10/10 ≥ 7/10). It survives unchanged.
+- **The comparative sentence does not survive as written.** "No worse once the contexts lose their identity" attributes
+  the counts to the contexts, and no one-variable comparison was run. It is withdrawn as a comparison. What stands is the
+  counts side by side:
+  - a SLOW delta channel binds -ctxpool 10/10;
+  - an Adam delta channel bound this lite layout 9/10 (S88b) and the header layout 8/10 (S53).
+- The only thing the schedule difference cannot overturn is the direction. V cites E's S69: SLOW lowered binding where
+  nothing gates. -ctxpool's count is at the ceiling under SLOW. So nothing here suggests the context pool costs a
+  delta channel binding at D = 2.
+- The review's concern was that a ≤ 3/10 could not be attributed to the context pool. That case did not arise; the
+  lite-SLOW control (its fix 2) did not run.
+
+## Finding 2: DISCOVERED passes at the cap and worsens with D
+
+**The finding.** On -ctxpool and -docs, the within-sequence VAL cosine (`val_cos_inv_k`) is below 0.5 for a fixed
+type-level map at the cap. At D ≥ 3 it is below 0.5 even for a position-only gate. So a DISCOVERED-style rule on it
+passes without separation. At D ≥ 3, `sep_key_inv` and the margin also reach 0.66-0.80 without separating. Only
+`seq_separated_frac` measures separation there.
+
+**My readings use BOUND only:** the six task × memory readings, and the screen reading on the single delta channel's
+transitions.
+
+**Does any stated number use DISCOVERED?**
+- **No number in this report or the README section uses DISCOVERED.** `rec["discovered"]` (pooled VAL cos, run_one) is
+  stored in every record and read nowhere.
+- **One table prints the within-sequence VAL cosine.** It is the type-level gate's "VAL cos (within)" column in
+  `s90_ctx_tables.md`: 0.47 / 0.27 / 0.20 at D = 2 / 3 / 4.
+  - These are exactly the values V's finding predicts at the cap.
+  - Read as DISCOVERED (< 0.5), all three would pass, while the gate separates only 0.53 / 0.32 / 0.14 of sequences.
+  - They are printed, not read. They should not be read as discovery.
+- **The same table's margin and `sep_key_inv`** (0.53 / 0.73 / 0.80) are not separation statistics at D ≥ 3 either.
+- **Every separation figure in this report uses `seq_separated_frac`.** That includes the type-level gate's "separated
+  0.53 / 0.32 / 0.14" and the perfect-gate pilots' "every probe sequence separated". The perfect-gate pilots' "margin
+  1.00" is true but adds nothing to it at D ≥ 3.
+
+## The cap table
+
+The cap table (k = D / 2D / 16) is what G's S91b now reads against: at k = 16 a fixed type → channel map separates every
+sequence. The next section adds the type-level perfect gate at k = 16, S91b's ceiling. The -docs tasks at k = 16 are a
+later round.
+
+**For G, the module is `explore_f_tasks.py` at 9017b82**, blob `cfe3fe276f7c…`. Its first 49,923 bytes (48,457
+characters; V's fix 9) are b0c6332's file.
