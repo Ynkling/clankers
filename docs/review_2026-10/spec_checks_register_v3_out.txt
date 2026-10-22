@@ -43,7 +43,7 @@
   scanned origin/claude/replicate-R at 31c39fce (2026-10-13T18:41:38+00:00)
   scanned origin/claude/rev10-draft at 9933cc37 (2026-10-21T03:31:55+00:00)
   scanned origin/claude/rev9-draft at 010a085a (2026-10-13T01:22:12+00:00)
-  scanned origin/claude/review-V at db562c4e (2026-10-22T05:52:39+00:00)
+  scanned origin/claude/review-V at 773fa0d4 (2026-10-22T17:06:47+00:00)
   scanned origin/feature/per-channel-plasticity at 4af9d503 (2026-06-30T08:59:20-06:00)
   13 heads; 381 distinct JSON/JSONL blobs (1103 branch-paths); 39846 seed values read; unparsed: none
   records using a seed of X 600-619 / L 1600-1619: 0
@@ -183,3 +183,7 @@
   exact per position: 1 - (1 - 2/16)^3 = 0.3301; x 8 = 2.641 (independence approximation)
   draft: 5 CTX + 9 KEY + 2.63 VAL = 16.63 (draft '16.6'); frequency 8 + 1 + 5 = 14; G's CHECK rows: 16.63 = CTX 4 + KEY 8 + VAL 2.63 + QUERY 2; frequency 14.00 = CTX 4 + KEY 8 + QUERY 2
   so the repeat set = the frequency set (on every sequence) + the chance-repeated VALs, grouped by the same token id
+
+== 9. float32: is the mean of three identical values the value? (RESGATE's term is a mean over 3 layers, LOCAL3_KEYHINGE's over one gate)
+  sequential float32 sum then /3: differs from x on 16633/100000 uniform draws (0.166)
+  and at initialisation relu(eta2_key - 0.2) is 0 whenever eta2_key < 0.2, so 0 = 0 passes whatever the gates

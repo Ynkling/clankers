@@ -18,6 +18,7 @@ spec_review_register_v2.md on revision 1 at c98648e6).
 6. McNemar power per claim at the screens' rates (S82, S83, S87, S89, S89H, S90); C4's table; Holm over four.
 7. Readings: C1-C4 (16 combinations), R (9 machine states) as revision 2 words them.
 8. The repeat / frequency sets on lite (stdlib simulation of make_batch's value draw) against the draft's counts.
+9. float32: the mean of three identical values (the A_r = 0 CHECK's 'key term bit for bit').
 """
 import collections
 import datetime
@@ -487,6 +488,25 @@ say(f"  exact per position: 1 - (1 - 2/16)^3 = {1 - (1 - 2 / 16) ** 3:.4f}; x 8 
 say(f"  draft: 5 CTX + 9 KEY + 2.63 VAL = {5 + 9 + 2.63:.2f} (draft '16.6'); frequency 8 + 1 + 5 = 14; G's CHECK rows: "
     "16.63 = CTX 4 + KEY 8 + VAL 2.63 + QUERY 2; frequency 14.00 = CTX 4 + KEY 8 + QUERY 2")
 say("  so the repeat set = the frequency set (on every sequence) + the chance-repeated VALs, grouped by the same token id")
+
+# ══ 9. the A_r = 0 CHECK's "key term bit for bit" (r2 l.278-279) ═══════════════
+say("\n== 9. float32: is the mean of three identical values the value? (RESGATE's term is a mean over 3 layers, "
+    "LOCAL3_KEYHINGE's over one gate)")
+import struct  # noqa: E402
+
+
+def f32(v):
+    return struct.unpack("f", struct.pack("f", v))[0]
+
+
+rng = random.Random(0)
+NB = 100000
+bad = 0
+for _ in range(NB):
+    x = f32(rng.random())
+    bad += f32(f32(f32(x + x) + x) / 3) != x
+say(f"  sequential float32 sum then /3: differs from x on {bad}/{NB} uniform draws ({bad / NB:.3f})")
+say("  and at initialisation relu(eta2_key - 0.2) is 0 whenever eta2_key < 0.2, so 0 = 0 passes whatever the gates")
 
 with open(os.path.join(HERE, "spec_checks_register_v3_out.txt"), "w") as fh:
     fh.write("\n".join(out) + "\n")

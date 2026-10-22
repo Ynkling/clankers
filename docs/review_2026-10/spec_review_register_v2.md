@@ -291,3 +291,7 @@ The "both" column is r1 l.162-163's "0.04, 0.16, 0.46 and 0.85" (correct). The i
 - Fix 1 is a decision, not an edit. Without (A) or (B) in writing, X would adopt a test that the main line's STATUS.md describes as answering a question the test cannot answer.
 - Fixes 2-13 are text.
 - Nothing needs a run, and nothing in fixes 1-10 of the first review needs re-doing.
+
+**Corrections (22 October, `spec_review_register_v3.md`).**
+- **The rate-claim names don't give every state exactly one name.** This review's fix 10 text, read literally, gives 5 of the 9 machine states two names. They are exactly-one only if UNTESTED takes precedence, and that should have been stated.
+- **Fix 4's CHECK clause can't do its job.** "its key term equal … bit for bit" either passes trivially (the term is 0 at initialisation) or fails spuriously (float32 means). It should compare each layer's η²_key bit for bit, and the term to 1e-6 relative, with τ lowered so the term is active.

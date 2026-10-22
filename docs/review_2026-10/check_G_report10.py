@@ -367,3 +367,29 @@ for h in heads:
             if m:
                 hits[(h, f)] = len(m)
 print(f"  {len(heads)} remote heads; stores holding a 2960-2991 seed (other than G's s91): {hits or 'none'}")
+
+H("6. 'the repeat hinge's runs that bind look like the key hinge's': the same diagnostics on S87's KH and FQ")
+for k in ("KH", "FQ", "RP"):
+    bys = {st_: statistics.median([S89.commit(r, st_) for r in R[k].values() if S89.commit(r, st_) is not None])
+           for st_ in (1200, 2400) if any(S89.commit(r, st_) is not None for r in R[k].values())}
+    bound_only = {s: r for s, r in R[k].items() if rb(r)}
+    bys_b = {st_: statistics.median([S89.commit(r, st_) for r in bound_only.values() if S89.commit(r, st_) is not None])
+             for st_ in (1200, 2400)}
+    print(f"  {S90.LABEL[k]}: commitment by step (all runs) {bys}; (ROUTED-BOUND runs only) {bys_b}")
+    dg = hp.diagnostics({S90.LABEL[k]: R[k]}, [S90.LABEL[k]]).splitlines()
+    for l in dg:
+        if "contingency L1" in l or "write rate" in l:
+            print("    " + l.strip()[:200])
+    dgb = hp.diagnostics({S90.LABEL[k]: bound_only}, [S90.LABEL[k]]).splitlines()
+    for l in dgb:
+        if "write rate" in l:
+            print("    (bound only) " + l.strip()[:200])
+
+H("7. S91 per-run lines for the bound and the above-0.4 runs (G's per_run lines from the log)")
+for l in show(TIP, "explore_out/G/s91.log").splitlines():
+    if l.startswith("  allpool.") and ("BOUND" in l or " 2990:" in l) and "_D " in l:
+        print("  " + l.strip()[:200])
+for a in ("NOVELTY", "REG3_REPEATHINGE"):
+    for s, r in sorted(D[a].items()):
+        if r["end"]["seq_routed_frac"] > 0.3 or r["type_map"] > 0.5:
+            print(f"  {a}|{s}: seq_routed_frac {r['end']['seq_routed_frac']:.4f} type_map {r['type_map']:.3f} transition {r['transition']}")
