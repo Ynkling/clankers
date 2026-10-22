@@ -1,0 +1,129 @@
+== 0. Pins
+   23dccf24                                             23dccf24 2026-10-22T05:05:11+00:00 S90: the oracles at key pools 4/8/16/32 and 86400 updates, then the recipe at P*; readings fixed before any run (EX
+   117ded72                                             117ded72 2026-10-22T05:05:38+00:00 explore_out/H: S90 CHECK log in progress (EXPLORATORY, not a result)
+   origin/claude/explore-H                              117ded72 2026-10-22T05:05:38+00:00 explore_out/H: S90 CHECK log in progress (EXPLORATORY, not a result)
+   origin/claude/bdh-growth-hebbian-inference-w90069    5e51a294 2026-10-22T03:38:40+00:00 Round-7 prompts (22 October): G's S90, the register spec's revision 2 with the repeat hinge as its label-free arm, 
+   origin/claude/explore-G                              82d37ae0 2026-10-22T05:18:59+00:00 explore_out/G: S90 progress (EXPLORATORY, not a result)
+   origin/claude/explore-F                              7770114e 2026-10-22T05:17:20+00:00 explore_out/F: S90 progress (EXPLORATORY, not a result)
+   files changed 23dccf24: ['explore_h_run.py       |   5 +-', ' explore_h_s90.py       | 322 +++++++++++++++++++++++++++++++++++++++++++++++++', ' explore_h_s90_child.py | 105 ++++++++++++++++', ' 3 files changed, 430 insertions(+), 2 deletions(-)']
+   files changed 117ded72: ['explore_out/H/s90_phase1.log | 7 +++++++', ' 1 file changed, 7 insertions(+)']
+   commits on origin/claude/explore-H after 117ded72: 0
+   s90_phase1.log at the head: 7 lines; CHECK rows: 0; 'passed': 0; runs saved: 0
+   === start 2026-10-22 05:05:13 UTC ===
+   ====================================================================================================
+   EXPLORATORY, NOT A RESULT — session H: H/s90
+     cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 23dccf2 | python 3.13.16 | torch threads 1
+   checks.json at the head has H/s90: False
+   s90_results.json at the head: False
+
+== 1. The screen's name: 'S90' / 'S92' on every head
+   origin/claude/bdh-growth-hebbian-inference-w90069: 14 lines in 2 files (3 with S92): ['STATUS.md', 'docs/reading/parallel_sessions_prompts.md']
+   origin/claude/explore-F: 9 lines in 6 files (0 with S92): ['explore_f_reports7.py', 'explore_f_s90_ctx.py', 'explore_f_s90_ctx_child.py', 'explore_f_tasks.py', 'explore_out/F/report_9.md', 'explore_out/F/run_s90.sh']
+   origin/claude/explore-G: 10 lines in 2 files (0 with S92): ['explore_g_s90.py', 'explore_g_s90_child.py']
+   origin/claude/explore-H: 7 lines in 3 files (0 with S92): ['explore_h_run.py', 'explore_h_s90.py', 'explore_h_s90_child.py']
+   prompts:1280: ## Session G — round 7 (S90, then the register spec's revision 2, then S91: a gate that compares; branch claude/explore-
+   prompts:1316: ## Session H — round 7 (S92: the budget and the pool on the grouped layout; seeds 3020-3059; branch claude/explore-H)
+   prompts:1339: ## Session F — round 7 (the which-document task, and delta on it; seeds 3060-3099; branch claude/explore-F)
+   prompts:1363: ## Session V — round 7 (branch claude/review-V; docs/review_2026-10/)
+   explore_h_s90.py:3 explore_h_s90.py — EXPLORATORY, not a result. Session H, round 6, screen S90: the pool size and the budget, th
+
+== 2. Seeds 3020-3059 (H's block) on every head and in history
+   13 heads, 369 distinct JSON/JSONL blobs; blobs with a 3020-3059 key / seed / seeds entry: 0
+   history: 2558 distinct JSON/JSONL blobs; with 3020-3059: 0
+   text mentions of 3020-3059 in .py/.md/.sh on the heads (path: branches):
+     docs/reading/parallel_sessions_prompts.md: ['bdh-growth-hebbian-inference-w90069']
+     explore_h_s90.py: ['explore-H']
+   G's explore_g_s90.py seeds mentioned: ['2700', '2701', '2719', '2720']
+   F's explore_f_s90_ctx.py seeds mentioned: ['3060', '3061', '3062', '3071', '3072']
+
+== 3. Phase 1: cell_reading / phase1 / report exec'd from explore_h_s90.py at 23dccf24
+   cell_reading on all 625 patterns of 4 seeds (5 transition classes): {'reliable': 16, 'needs the longer budget': 240, 'the oracle is the limit': 369}; disagreements with the prompt's text 0; 3 seeds stored -> None
+   (a) >= 0.95 at 42000 and 43200, 0.94 from 44400 on: 86400 run transition None -> H 'by 43200' False; the same curve cut at 43200 42000; a 43200-budget run 42000
+   (a') as (a), then >= 0.95 from 50400 on: 86400 run transition 50400 -> H 'by 43200' False; the same curve cut at 43200 42000; a 43200-budget run 42000
+   (b) >= 0.95 from 43200 on: 86400 run transition 43200 -> H 'by 43200' True; the same curve cut at 43200 43200; a 43200-budget run 43200
+   (c) >= 0.95 from 40800 on: 86400 run transition 40800 -> H 'by 43200' True; the same curve cut at 43200 40800; a 43200-budget run 40800
+   phase1() over all 6561 combinations of the 8 cell readings: P* {16: 1620, 32: 2916, 4: 500, 8: 900, None: 625}
+     P* > 4 with a smaller pool failing on some memory (non-monotone): 4460; P* > 4 with pool 4 itself failing: 3020; budgets named {(('DELTA', 43200), ('HEBB', 43200)): 1484, (('DELTA', 86400), ('HEBB', 43200)): 1484, (('DELTA', 43200), ('HEBB', 86400)): 1484, (('DELTA', 86400), ('HEBB', 86400)): 1484}
+     example: P* 32 with {'HEBB_P4': 'reliable', 'HEBB_P8': 'reliable', 'HEBB_P16': 'reliable', 'HEBB_P32': 'reliable', 'DELTA_P4': 'reliable', 'DELTA_P8': 'reliable', 'DELTA_P16': 'the oracle is the limit', 'DELTA_P32': 'reliable'}
+     one cell with 1 of 4 records: complete False, P* None
+   report(), every cell 'the oracle is the limit' (pool 4 too): {'phase 1 HEBB': 'pool 4: the oracle is the limit; pool 8: the oracle is the limit; pool 16: the oracle is the limit; pool 32: the oracle is the limit', 'phase 1 DELTA': 'pool 4: the oracle is the limit; pool 8: the oracle is the limit; pool 16: the oracle is the limit; pool 32: the oracle is the limit', 'S90': 'no pool above 4 has a reliable oracle (P* = None); phase 2 does not run'}; complete True
+   report(), pool 4 reliable, 8/16/32 limit: {'phase 1 HEBB': 'pool 4: reliable; pool 8: the oracle is the limit; pool 16: the oracle is the limit; pool 32: the oracle is the limit', 'phase 1 DELTA': 'pool 4: reliable; pool 8: the oracle is the limit; pool 16: the oracle is the limit; pool 32: the oracle is the limit', 'S90': 'no pool above 4 has a reliable oracle (P* = 4); phase 2 does not run'}; complete True
+   report(), all reliable (P* 32), no phase-2 record: {'phase 1 HEBB': 'pool 4: reliable; pool 8: reliable; pool 16: reliable; pool 32: reliable', 'phase 1 DELTA': 'pool 4: reliable; pool 8: reliable; pool 16: reliable; pool 32: reliable', 'P*': "P* = 32; budgets {'HEBB': 43200, 'DELTA': 43200}", 'S90': 'INCOMPLETE (phase 2), no reading'}; complete False
+
+== 4. Phase 2: report() at P* = 16 (Hebbian reliable, delta needs the longer budget) on every composition of 10 seeds into the 8 per-seed patterns of (BASE, DELTA_SPLIT, DELTA_NOSPLIT)
+   19448 compositions; disagreements with the docstring's rules 0
+     D no reading applies: 9016
+     D the recipe carries to P*: 5216
+     D the recipe does not carry to P*: 5216
+     H no reading applies: 9016
+     H the recipe carries to P*: 5216
+     H the recipe does not carry to P*: 5216
+     S the split is needed on delta: 6098
+     S the split is not needed on delta at P*: 13350
+   'the split is not needed' printed with DELTA_SPLIT <= 3/10 and DELTA_NOSPLIT <= 3/10 (moot): 1304; printed with DELTA_NOSPLIT ahead by >= 2 pairs (outside a two-sided 'within 1 pair'): 6098
+   example, all 30 runs unbound: {'phase 1 HEBB': 'pool 4: reliable; pool 8: reliable; pool 16: reliable; pool 32: the oracle is the limit', 'phase 1 DELTA': 'pool 4: reliable; pool 8: reliable; pool 16: needs the longer budget; pool 32: the oracle is the limit', 'P*': "P* = 16; budgets {'HEBB': 43200, 'DELTA': 86400}", 'Hebbian (BASE)': 'the recipe does not carry to P* (BASE 0/10 at pool 16, budget 43200)', 'delta (DELTA_SPLIT)': 'the recipe does not carry to P* (DELTA_SPLIT 0/10 at pool 16, budget 86400)', 'delta split': 'the split is not needed on delta at P* (DELTA_SPLIT only 0, DELTA_NOSPLIT only 0; p(SPLIT>NOSPLIT) 1)'}
+   example, BASE 9 of 10 stored: {'phase 1 HEBB': 'pool 4: reliable; pool 8: reliable; pool 16: reliable; pool 32: the oracle is the limit', 'phase 1 DELTA': 'pool 4: reliable; pool 8: reliable; pool 16: needs the longer budget; pool 32: the oracle is the limit', 'P*': "P* = 16; budgets {'HEBB': 43200, 'DELTA': 86400}", 'S90': 'INCOMPLETE (phase 2), no reading'}
+
+== 5. Operating characteristics (the referee's own; V's model: with probability rho one shared U ~ U(0,1) decides every arm, else independent)
+   P(>= 7/10): 0.2: 0.001, 0.3: 0.011, 0.5: 0.172, 0.6: 0.382, 0.7: 0.650, 0.8: 0.879, 0.9: 0.987
+   P(<= 3/10): 0.2: 0.879, 0.3: 0.650, 0.5: 0.172, 0.6: 0.055, 0.7: 0.011, 0.8: 0.001, 0.9: 0.000
+   P(4/4) = q^4: 0.99: 0.961, 0.95: 0.815, 0.9: 0.656, 0.8: 0.410, 0.7: 0.240, 0.5: 0.062
+   P(both memories 4/4 at a pool) = (q_h q_d)^4 at q_h = q_d: 0.99: 0.923, 0.95: 0.663, 0.9: 0.430, 0.8: 0.168
+   P(a cell reads 'the oracle is the limit' | q) = 1 - q^4 (one failure in four): 0.99: 0.039, 0.95: 0.185, 0.9: 0.344, 0.8: 0.590
+   Wilson 95% of 3/4: 0.30-0.95; of 4/4: 0.51-1.00
+   P* distribution, q 0.95 at every pool: {4: 0.025, 8: 0.075, 16: 0.223, 32: 0.663, None: 0.013}
+   P* distribution, q 0.9 at every pool: {4: 0.08, 8: 0.14, 16: 0.245, 32: 0.43, None: 0.105}
+   P* distribution, q 1.0 / 0.95 / 0.9 / 0.7 at 4 / 8 / 16 / 32: {4: 0.181, 8: 0.356, 16: 0.406, 32: 0.058, None: 0.0}
+   P* distribution, q 1.0 / 0.9 / 0.7 / 0.5: {4: 0.535, 8: 0.404, 16: 0.057, 32: 0.004, None: 0.0}
+   SPLIT 0.9 / NOSPLIT 0.9: 'not needed' (H's one-sided rule) 0.88/0.95/1.00; of which moot (both <= 3/10) 0.00/0.00/0.00; two-sided |c-b| <= 1 0.76/0.90/1.00
+   SPLIT 0.9 / NOSPLIT 0.7: 'not needed' (H's one-sided rule) 0.39/0.38/0.38; of which moot (both <= 3/10) 0.00/0.00/0.00; two-sided |c-b| <= 1 0.37/0.37/0.38
+   SPLIT 0.9 / NOSPLIT 0.5: 'not needed' (H's one-sided rule) 0.09/0.07/0.05; of which moot (both <= 3/10) 0.00/0.00/0.00; two-sided |c-b| <= 1 0.09/0.07/0.05
+   SPLIT 0.7 / NOSPLIT 0.7: 'not needed' (H's one-sided rule) 0.77/0.86/1.00; of which moot (both <= 3/10) 0.00/0.00/0.01; two-sided |c-b| <= 1 0.54/0.72/1.00
+   SPLIT 0.7 / NOSPLIT 0.4: 'not needed' (H's one-sided rule) 0.24/0.20/0.15; of which moot (both <= 3/10) 0.00/0.01/0.01; two-sided |c-b| <= 1 0.22/0.20/0.15
+   SPLIT 0.3 / NOSPLIT 0.3: 'not needed' (H's one-sided rule) 0.77/0.86/1.00; of which moot (both <= 3/10) 0.38/0.47/0.65; two-sided |c-b| <= 1 0.54/0.72/1.00
+   SPLIT 0.1 / NOSPLIT 0.1: 'not needed' (H's one-sided rule) 0.88/0.95/1.00; of which moot (both <= 3/10) 0.86/0.93/0.99; two-sided |c-b| <= 1 0.76/0.90/1.00
+   SPLIT 0.5 / NOSPLIT 0.9: 'not needed' (H's one-sided rule) 1.00/1.00/1.00; of which moot (both <= 3/10) 0.00/0.00/0.00; two-sided |c-b| <= 1 0.09/0.07/0.05
+
+== 6. The main line's outcome and the delta recipe, by ast
+   test_router_layout.py ['MARGIN_PARTIAL', 'ETA_SPLIT', 'fail_class']: equal at the main head and 9c5939e: True
+   test_scale_axes.py ['fail_class_k']: equal at the main head and 9c5939e: True
+   test_stream_channels.py ['shared_max', 'merged']: equal at the main head and 9c5939e: True
+   test_stream_recipe.py ['ROUTED_ACC', 'routed', 'outcome', 'wilson']: equal at the main head and 9c5939e: True
+   test_binding_onset.py ['BIND_PASS', 'STOP_AFTER', 'transition']: equal at the main head and 9c5939e: True
+   test_delta_recipe.py ['with_delta', 'copy_op', 'BETA']: equal at the main head and a581027: {with_delta: True, copy_op: True, BETA: True}
+   explore_b16_main.finish sets outcome = tsr.outcome(rec): True
+
+== 7. The CHECK targets: records, CPUs, first commits
+   WIN3_SPLIT_D8|540 at 628eb7c: cpu Intel(R) Xeon(R) Processor @ 2.80GHz; transition 20400; fired [4800, 12000, 19200]; identical at the main head: True
+   ORACLE|2900: key ORACLE|2900|6e0a80a55be3|Intel(R) Xeon(R) Processor @ 2.10GHz; cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 16800; fired []; first committed 4324d2eb 2026-10-19T18:39:40+00:00; identical then and at 23dccf24: True
+   ORACLE_DELTA|2913: key ORACLE_DELTA|2913|9cb518b59c14|Intel(R) Xeon(R) Processor @ 2.10GHz; cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 24000; fired []; first committed d0095a8c 2026-10-21T08:21:30+00:00; identical then and at 23dccf24: True
+   BASE|2902: key BASE|2902|6e0a80a55be3|Intel(R) Xeon(R) Processor @ 2.10GHz; cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition None; fired [4800, 12000, 28800]; first committed 7939dd4c 2026-10-19T19:39:32+00:00; identical then and at 23dccf24: True
+   X DELTA_SPLIT|583 at 8ae660d: cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 13200; fired [4800, 12000]
+   X DELTA_SLOW|583 at 8ae660d: cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 13200; fired []
+   X CEIL_DELTA|580 at 8ae660d: cpu Intel(R) Xeon(R) Processor @ 2.10GHz; transition 2400; fired []
+   explore_h_s89_child.py: changed between 4360cafa and 23dccf24: no
+   explore_h_s89b_child.py: changed between 4360cafa and 23dccf24: no
+   explore_h_ops.py: changed between 4360cafa and 23dccf24: no
+   explore_b16_main.py: changed between 4360cafa and 23dccf24: no
+   explore_common16.py: changed between 4360cafa and 23dccf24: no
+   explore_h_s89_child's pool-4 CHECK (PoolTask(4) = TASK48 bit for bit) is in S89's checks(), not in S90's check(): True / False
+   H's own pool-4 perfect-gate records (S87a, allmass2_results.json): [('ORACLE', '2600', 'Intel(R) Xeon(R) Processor @ 2.10GHz', 2400), ('ORACLE', '2601', 'Intel(R) Xeon(R) Processor @ 2.10GHz', 8400)]
+
+== 8. The budget: payload() exec'd
+   payload(HEBB_P4, seed) = {'arm': 'ORACLE_HEBB', 'seed': 3024, 'iters': 86400, 'K': 4}
+   payload(DELTA_P32, seed) = {'arm': 'ORACLE_DELTA', 'seed': 3024, 'iters': 86400, 'K': 32}
+   payload(BASE, seed) = {'arm': 'BASE', 'seed': 3024, 'iters': 43200, 'K': 16}
+   payload(DELTA_SPLIT, seed) = {'arm': 'DELTA_SPLIT', 'seed': 3024, 'iters': 86400, 'K': 16}
+   payload(DELTA_NOSPLIT, seed) = {'arm': 'DELTA_NOSPLIT', 'seed': 3024, 'iters': 86400, 'K': 16}
+   child: 'total = p.get("total", p["iters"])' True; b16.path(..., p["iters"], ...) 2 calls; trigger last 'total - 2400' 3
+   explore_muon_scale_child.path: sched total=iters: True
+   explore_common16._job calls mod.run_job(arm, seed): True; run_pool uses the fork context: True
+
+== 9. What the driver prints
+   explore_h_run.py:152: print(f"  {m.NAME}: readings {res['readings']}; complete {res['complete']}; valid {res['valid']}", flush=True)
+   explore_h_report.py mentions s90: False; CAVEAT / OC strings inside the readings dict: False
+
+== 10. Push after every saved run; no pull
+   'pull' in explore_h_run.py code lines: []
+   --push-each is opt-in (store_true): True; push output discarded: True
+   commits on origin/claude/explore-H since 23dccf24 whose subject says 'saved': 0
