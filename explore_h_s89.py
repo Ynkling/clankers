@@ -87,7 +87,7 @@ is from a Xeon @ 2.80GHz): the main line's X record WIN3_SPLIT_D8|540 through 48
 the trigger rows at 2400 and 4800); the record is read at the main-line commit that recorded it, 628eb7c (Referee V's fix
 6); it printed True on curve, statistics, gradient norms and trigger rows through 4800 at 0dd88bf (fix 8).
 STAGES: H_S89_STAGE=oracle runs ORACLE only; any other value queues the learned arms only after ORACLE bound 2/2.
-REVISION (20 October 2026, after every run): Referee V's screen review (claude/review-V, 3c772c3 / dcd549d,
+REVISION (20 October 2026, after every run): Referee V's screen review (claude/review-V ee5217b (pushed 18:40:23 UTC on 19 October, within the 58 s in which the learned arms were launched; correction adecd3db;
 docs/review_2026-10/screen_review_s89_H.md, "fix first", text and the report path only) was written before the learned
 arms ran and read after they had finished. Its fixes 1-6 (and the text of 7 and 8) are applied to this docstring and to
 report(); this file is not in the child's code SHA, so no run, CHECK or record changes. The reading rules are unchanged

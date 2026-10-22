@@ -586,18 +586,20 @@ def s90_section(L):
     setup([m])
     res, got = m.report()
     P = res["phase1"]
-    L.append("## S90 explore_h_s90 — the oracles at key pools 4 / 8 / 16 / 32 and 86400 updates, then the recipe at P* "
-             "(S=8, P=4, k=16, conv)\n")
+    L.append("## S92 (explore_h_s90; the round-7 prompt's name, the key s90 kept) — the oracles at key pools 4 / 8 / 16 / 32 "
+             "and 86400 updates, then the recipe at P* (S=8, P=4, k=16, conv)\n")
     L.append("### Phase 1: the perfect gates (seeds 3020-3023 per cell; budget 86400, early stop)\n")
-    L.append("| memory | pool | transitions (3020-3023) | held-out accuracy at the end | reading |")
-    L.append("|---|---|---|---|---|")
+    L.append("| memory | pool | transitions (3020-3023) | bound by 43200 (cut curve) | bound by 86400 | held-out accuracy at the end "
+             "| reading |")
+    L.append("|---|---|---|---|---|---|---|")
     for mem in m.MEMS:
         for k in m.POOLS:
             c = P[f"{mem}_P{k}"]
             tr = ", ".join(str(c["trans"].get(s)) for s in m.P1_SEEDS)
             ae = ", ".join(f"{c['acc_end'].get(s, float('nan')):.3f}" for s in m.P1_SEEDS)
-            L.append(f"| {mem} | {k} | {tr} | {ae} | {c['reading']} |")
-    L.append(f"\n**P* = {res['pstar']}**; budgets {res['budget']}.\n")
+            L.append(f"| {mem} | {k} | {tr} | {c['k43']}/4 | {c['k86']}/4 | {ae} | {c['reading']} |")
+    L.append(f"\n**P* = {res['pstar']}**; budgets {res['budget']}. Runs where the 43200 reading by the cut curve differs from "
+             f"the run's own transition: {res['readings'].get('phase 1, 43200 by the cut curve vs the run' + chr(39) + 's transition')}.\n")
     if res["arms"]:
         A = res["arms"]
         L.append(f"### Phase 2: the recipe at pool {res['pstar']} (seeds 3024-3033, paired)\n")
