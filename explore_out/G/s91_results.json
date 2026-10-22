@@ -1,0 +1,2463 @@
+{
+ "meta": {
+  "arms": {
+   "allpool.ORACLE_D": {
+    "iters": 24000,
+    "prio": 2,
+    "seeds": [
+     2960,
+     2961
+    ]
+   },
+   "allpool.PERFECT_H": {
+    "iters": 48000,
+    "prio": 2,
+    "seeds": [
+     2960,
+     2961
+    ]
+   }
+  },
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "provenance": {
+   "banner": "EXPLORATORY, not a result",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "git": "4870a65+dirty",
+   "python": "3.13.16",
+   "started": "2026-10-22 06:14:02",
+   "threads": 1,
+   "torch": "2.14.0+cu130"
+  },
+  "sha": "b06281c9500abae0ed34c9f990dba6562497c600",
+  "sha_rows": [
+   [
+    "bdh",
+    "53419a6a324b173f5d45fb11855036014e557192",
+    "branch"
+   ],
+   [
+    "bdh_recurrent",
+    "fa0c6dda59a04af086d5136c2c01f292e909449f",
+    "branch"
+   ],
+   [
+    "explore_aux_gate",
+    "ad2d2a0d34eab43bbd98149eeef0b4ef18b62975",
+    "branch"
+   ],
+   [
+    "explore_b16_gates",
+    "78d793876f7f94e6470e7324ee685092477d4818",
+    "branch"
+   ],
+   [
+    "explore_b18_gates",
+    "7aaba9d4413c0de322f8219d1e16ea726b47c853",
+    "branch"
+   ],
+   [
+    "explore_common",
+    "be7b46f6a743b37b04f5f3a64a3f8f4ad5500cdb",
+    "branch"
+   ],
+   [
+    "explore_common2",
+    "1141737f36f63980c5840705408c1bf5cc0a920d",
+    "branch"
+   ],
+   [
+    "explore_delta_mem",
+    "499afb7d95b117890c44f7196f22275719bb3b03",
+    "branch"
+   ],
+   [
+    "explore_f_tasks",
+    "4cc65c9621c88ca1df082c82660baf23a2227ef4",
+    "branch"
+   ],
+   [
+    "explore_far_cue",
+    "e97ee2f71037de8631f450a7f79abdae76c892c1",
+    "branch"
+   ],
+   [
+    "explore_g_common",
+    "5b9b558f14cf6d73981811218bb2b6a334521f93",
+    "branch"
+   ],
+   [
+    "explore_g_devices_child",
+    "9af50ee2a267fde377a0e2d2e5e01f90335a73e9",
+    "branch"
+   ],
+   [
+    "explore_g_latch_child",
+    "b09fd70f77ebd9e800ba425dafa1c67f95323ea6",
+    "branch"
+   ],
+   [
+    "explore_g_register_child",
+    "1decfb31365e3a56143626e7a4fa825993ad9040",
+    "branch"
+   ],
+   [
+    "explore_g_regmodel",
+    "9155ffa8c4d6645f83d2ddfb3b5e22bd22fb5ad3",
+    "branch"
+   ],
+   [
+    "explore_g_rhl_child",
+    "f12d4f552b1afd9d3d1ae81319bf69dc153cee82",
+    "branch"
+   ],
+   [
+    "explore_g_s87_child",
+    "115e850596faf8d1f138e8ee2d0d9e5e3d48fe77",
+    "branch"
+   ],
+   [
+    "explore_g_s89_child",
+    "cfd0103ff44dc7b93d3c7bb42492163e7fc68064",
+    "branch"
+   ],
+   [
+    "explore_g_s89h_child",
+    "1e61ebfc96c60f05cd40ae9b0f96119c73e76951",
+    "branch"
+   ],
+   [
+    "explore_g_s91_child",
+    "87cb80de3f6b56b36ab266aca89f2862cc29592f",
+    "branch"
+   ],
+   [
+    "explore_local_gate",
+    "2fcad39c3cb1e466f336d074436d4c6130c36a02",
+    "branch"
+   ],
+   [
+    "explore_window_recipe_child",
+    "616dabddbde2a28c0fb9df1df84f04fdbbe6960a",
+    "branch"
+   ],
+   [
+    "test_binding_capacity",
+    "da7f41cf6b05242b513498ae393fbea5da2fd2f6",
+    "branch"
+   ],
+   [
+    "test_binding_onset",
+    "8ddecefcc6fadbfeb21b3f8c9e6ad9341aa88bc5",
+    "branch"
+   ],
+   [
+    "test_binding_recipe",
+    "15fb947fcd81775f9af9be50cc4201433ac39186",
+    "branch"
+   ],
+   [
+    "test_channel_binding",
+    "8b0d04e45b9f5ba53d49e07479a6f3ab484b34d8",
+    "branch"
+   ],
+   [
+    "test_instrument_v2",
+    "dcc5175d4e121040675b432d652cecb83027e27f",
+    "branch"
+   ],
+   [
+    "test_interference",
+    "9a6820ae475a28fc7e2333877832488abf208207",
+    "branch"
+   ],
+   [
+    "test_multilayer_binding",
+    "0d3bb2d33a7b8997d01c9ff80f7d2f06ed2ba865",
+    "branch"
+   ],
+   [
+    "test_readout_path",
+    "755775e4a1ee46a1bac83c8cab4f266744b49625",
+    "branch"
+   ],
+   [
+    "test_router_confirm",
+    "8964ea8a6778a8b04a31c40c1fd86878559d2d60",
+    "branch"
+   ],
+   [
+    "test_router_curriculum",
+    "373f5df333059267d2ea91bd04d928d23f109740",
+    "branch"
+   ],
+   [
+    "test_router_discovery",
+    "5892bc74efecf3d2f4a112b6408d1357ef259b27",
+    "branch"
+   ],
+   [
+    "test_router_layout",
+    "97a74528d7f7383d2b4a6638a27d1725acbd7853",
+    "branch"
+   ],
+   [
+    "test_router_reliability",
+    "9b7f734343fb1549b677fb67fced462d335b0735",
+    "branch"
+   ],
+   [
+    "test_short_conv",
+    "b4cd10557eb4acaa391bb9232150a68ca3d48d03",
+    "branch"
+   ]
+  ]
+ },
+ "runs": {
+  "allpool.ORACLE_D|2960|b06281c9500a|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.994140625,
+   "acc_by_cell": {
+    "0|0|0": {
+     "acc": 0.9811320754716981,
+     "n": 265
+    },
+    "0|0|1": {
+     "acc": 0.9826589595375722,
+     "n": 173
+    },
+    "0|0|2": {
+     "acc": 1.0,
+     "n": 80
+    },
+    "0|1|0": {
+     "acc": 0.9919028340080972,
+     "n": 247
+    },
+    "0|1|1": {
+     "acc": 1.0,
+     "n": 161
+    },
+    "0|1|2": {
+     "acc": 1.0,
+     "n": 83
+    },
+    "1|0|0": {
+     "acc": 1.0,
+     "n": 268
+    },
+    "1|0|1": {
+     "acc": 0.9882352941176471,
+     "n": 170
+    },
+    "1|0|2": {
+     "acc": 1.0,
+     "n": 85
+    },
+    "1|1|0": {
+     "acc": 1.0,
+     "n": 253
+    },
+    "1|1|1": {
+     "acc": 1.0,
+     "n": 180
+    },
+    "1|1|2": {
+     "acc": 1.0,
+     "n": 83
+    }
+   },
+   "arm": "allpool.ORACLE_D",
+   "attempt": 1,
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.2763671875,
+     2.7613589763641357
+    ],
+    [
+     2400,
+     0.8505859375,
+     1.5575048923492432
+    ],
+    [
+     3600,
+     0.9814453125,
+     0.10583792626857758
+    ],
+    [
+     4800,
+     0.994140625,
+     0.029269494116306305
+    ],
+    [
+     6000,
+     0.994140625,
+     0.02579217404127121
+    ]
+   ],
+   "discovered": true,
+   "end": {
+    "beta": null,
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999753276385541,
+    "eta_key_by_half": 0.1812896728515625,
+    "eta_key_by_index": 0.2679595947265625,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_key_by_stream_inv": 1.0,
+    "eta_val_by_half": 0.1812896728515625,
+    "eta_val_by_index": 0.2679595947265625,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.16307568550109863,
+    "key_sep": 0.12442073225975037,
+    "layers": {
+     "L1": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.1812896728515625,
+      "eta_key_by_index": 0.2679595947265625,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.1812896728515625,
+      "eta_val_by_index": 0.2679595947265625,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L2": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.1812896728515625,
+      "eta_key_by_index": 0.2679595947265625,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.1812896728515625,
+      "eta_val_by_index": 0.2679595947265625,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L3": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.1812896728515625,
+      "eta_key_by_index": 0.2679595947265625,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.1812896728515625,
+      "eta_val_by_index": 0.2679595947265625,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     }
+    },
+    "margin": 1.0,
+    "sep": 1.0,
+    "seq_routed_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv": 0.0
+   },
+   "grad": {
+    "1": [
+     0.0,
+     2.4745346094171174,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.6492196337586766,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.5775298658270327,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.0,
+   "new_params": {},
+   "ok": true,
+   "params": 28672,
+   "probe": {
+    "L2|K": {
+     "acc": 0.5015625,
+     "k": 1605,
+     "n": 3200,
+     "train_acc": 0.518046875,
+     "wilson": [
+      0.4842469842146229,
+      0.5188742687212278
+     ]
+    },
+    "L2|V": {
+     "acc": 0.52125,
+     "k": 1668,
+     "n": 3200,
+     "train_acc": 0.532265625,
+     "wilson": [
+      0.5039264180325967,
+      0.5385226218949702
+     ]
+    },
+    "L3|K": {
+     "acc": 0.5046875,
+     "k": 1615,
+     "n": 3200,
+     "train_acc": 0.513203125,
+     "wilson": [
+      0.48736891267344945,
+      0.521994846134102
+     ]
+    },
+    "L3|V": {
+     "acc": 0.5084375,
+     "k": 1627,
+     "n": 3200,
+     "train_acc": 0.525390625,
+     "wilson": [
+      0.4911161186312835,
+      0.5257386472223092
+     ]
+    },
+    "final|K": {
+     "acc": 0.5090625,
+     "k": 1629,
+     "n": 3200,
+     "train_acc": 0.51359375,
+     "wilson": [
+      0.4917407475600378,
+      0.526362519467895
+     ]
+    },
+    "final|V": {
+     "acc": 0.50125,
+     "k": 1604,
+     "n": 3200,
+     "train_acc": 0.51890625,
+     "wilson": [
+      0.48393482852312353,
+      0.5185621738255568
+     ]
+    }
+   },
+   "recipe": "slow",
+   "secs": 121.87574243545532,
+   "secs_wall": 129.30386114120483,
+   "seed": 2960,
+   "sha": "b06281c9500a",
+   "stats": [
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999753276385541,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.16307568550109863,
+     "key_sep": 0.12442073225975037,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999753276385541,
+     "eta_key_by_half": 0.1812896728515625,
+     "eta_key_by_index": 0.2679595947265625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.1812896728515625,
+     "eta_val_by_index": 0.2679595947265625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.16307568550109863,
+     "key_sep": 0.12442073225975037,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999753276385541,
+     "eta_key_by_half": 0.1812896728515625,
+     "eta_key_by_index": 0.2679595947265625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.1812896728515625,
+     "eta_val_by_index": 0.2679595947265625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.16307568550109863,
+     "key_sep": 0.12442073225975037,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999753276385541,
+     "eta_key_by_half": 0.1812896728515625,
+     "eta_key_by_index": 0.2679595947265625,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.1812896728515625,
+     "eta_val_by_index": 0.2679595947265625,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.16307568550109863,
+     "key_sep": 0.12442073225975037,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999753276385541,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.16307568550109863,
+     "key_sep": 0.12442073225975037,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.1812896728515625,
+       "eta_key_by_index": 0.2679595947265625,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.1812896728515625,
+       "eta_val_by_index": 0.2679595947265625,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999753276385541,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.16307568550109863,
+     "key_sep": 0.12442073225975037,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 6000,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    }
+   ],
+   "stopped_at": 6000,
+   "stream_acc": [
+    0.9900891780853271,
+    0.9980750679969788
+   ],
+   "task": "allpool",
+   "transition": 3600,
+   "type_map": 0.023322882770092375,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 0.994140625,
+    "acc_by_stream": [
+     0.9900891780853271,
+     0.9980750679969788
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 0.9881889820098877,
+    "lastval_notlast": 0.0009842519648373127,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "allpool.ORACLE_D|2961|b06281c9500a|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.9912109375,
+   "acc_by_cell": {
+    "0|0|0": {
+     "acc": 0.9886792452830189,
+     "n": 265
+    },
+    "0|0|1": {
+     "acc": 0.9710982658959537,
+     "n": 173
+    },
+    "0|0|2": {
+     "acc": 0.975,
+     "n": 80
+    },
+    "0|1|0": {
+     "acc": 1.0,
+     "n": 247
+    },
+    "0|1|1": {
+     "acc": 0.9937888198757764,
+     "n": 161
+    },
+    "0|1|2": {
+     "acc": 1.0,
+     "n": 83
+    },
+    "1|0|0": {
+     "acc": 1.0,
+     "n": 268
+    },
+    "1|0|1": {
+     "acc": 0.9941176470588236,
+     "n": 170
+    },
+    "1|0|2": {
+     "acc": 1.0,
+     "n": 85
+    },
+    "1|1|0": {
+     "acc": 0.9920948616600791,
+     "n": 253
+    },
+    "1|1|1": {
+     "acc": 0.9833333333333333,
+     "n": 180
+    },
+    "1|1|2": {
+     "acc": 0.9879518072289156,
+     "n": 83
+    }
+   },
+   "arm": "allpool.ORACLE_D",
+   "attempt": 1,
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.287109375,
+     2.756838083267212
+    ],
+    [
+     2400,
+     0.88623046875,
+     1.410066843032837
+    ],
+    [
+     3600,
+     0.97509765625,
+     0.11673110723495483
+    ],
+    [
+     4800,
+     0.9814453125,
+     0.0793231651186943
+    ],
+    [
+     6000,
+     0.9912109375,
+     0.04618813097476959
+    ]
+   ],
+   "discovered": true,
+   "end": {
+    "beta": null,
+    "ctx_cos": 0.0,
+    "eff_ch": 1.9999592346477413,
+    "eta_key_by_half": 0.16983413696289062,
+    "eta_key_by_index": 0.269287109375,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_key_by_stream_inv": 1.0,
+    "eta_val_by_half": 0.16983413696289062,
+    "eta_val_by_index": 0.269287109375,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 2,
+    "key_cos": 0.0,
+    "key_part": 0.13721054792404175,
+    "key_sep": 0.1010695497194926,
+    "layers": {
+     "L1": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.16983413696289062,
+      "eta_key_by_index": 0.269287109375,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.16983413696289062,
+      "eta_val_by_index": 0.269287109375,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L2": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.16983413696289062,
+      "eta_key_by_index": 0.269287109375,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.16983413696289062,
+      "eta_val_by_index": 0.269287109375,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     },
+     "L3": {
+      "ch_map_key": [
+       0,
+       1
+      ],
+      "ch_map_val": [
+       0,
+       1
+      ],
+      "eta_key_by_half": 0.16983413696289062,
+      "eta_key_by_index": 0.269287109375,
+      "eta_key_by_key": 0.0,
+      "eta_key_by_stream": 1.0,
+      "eta_val_by_half": 0.16983413696289062,
+      "eta_val_by_index": 0.269287109375,
+      "eta_val_by_key": 0.0,
+      "eta_val_by_stream": 1.0,
+      "margin": 1.0,
+      "one_to_one_key": true,
+      "one_to_one_val": true,
+      "table": {
+       "CTX": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "KEY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "QUERY": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ],
+       "VAL": [
+        [
+         1.0,
+         0.0
+        ],
+        [
+         0.0,
+         1.0
+        ]
+       ]
+      }
+     }
+    },
+    "margin": 1.0,
+    "sep": 1.0,
+    "seq_routed_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv": 0.0
+   },
+   "grad": {
+    "1": [
+     0.0,
+     3.4661684310180276,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.584435940338813,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.6471136752617404,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 2,
+   "key_cos": 0.0,
+   "new_params": {},
+   "ok": true,
+   "params": 28672,
+   "probe": {
+    "L2|K": {
+     "acc": 0.513125,
+     "k": 1642,
+     "n": 3200,
+     "train_acc": 0.511796875,
+     "wilson": [
+      0.4958014946315857,
+      0.5304170300295588
+     ]
+    },
+    "L2|V": {
+     "acc": 0.5015625,
+     "k": 1605,
+     "n": 3200,
+     "train_acc": 0.531640625,
+     "wilson": [
+      0.4842469842146229,
+      0.5188742687212278
+     ]
+    },
+    "L3|K": {
+     "acc": 0.508125,
+     "k": 1626,
+     "n": 3200,
+     "train_acc": 0.513359375,
+     "wilson": [
+      0.49080381430393827,
+      0.5254267009624846
+     ]
+    },
+    "L3|V": {
+     "acc": 0.506875,
+     "k": 1622,
+     "n": 3200,
+     "train_acc": 0.524375,
+     "wilson": [
+      0.489554664569969,
+      0.5241788483477733
+     ]
+    },
+    "final|K": {
+     "acc": 0.5071875,
+     "k": 1623,
+     "n": 3200,
+     "train_acc": 0.514921875,
+     "wilson": [
+      0.4898669418675371,
+      0.5244908216373753
+     ]
+    },
+    "final|V": {
+     "acc": 0.501875,
+     "k": 1606,
+     "n": 3200,
+     "train_acc": 0.51984375,
+     "wilson": [
+      0.4845591466612866,
+      0.519186356861734
+     ]
+    }
+   },
+   "recipe": "slow",
+   "secs": 123.92854762077332,
+   "secs_wall": 131.07109379768372,
+   "seed": 2961,
+   "sha": "b06281c9500a",
+   "stats": [
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999592346477413,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.13721054792404175,
+     "key_sep": 0.1010695497194926,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999592346477413,
+     "eta_key_by_half": 0.16983413696289062,
+     "eta_key_by_index": 0.269287109375,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.16983413696289062,
+     "eta_val_by_index": 0.269287109375,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.13721054792404175,
+     "key_sep": 0.1010695497194926,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999592346477413,
+     "eta_key_by_half": 0.16983413696289062,
+     "eta_key_by_index": 0.269287109375,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.16983413696289062,
+     "eta_val_by_index": 0.269287109375,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.13721054792404175,
+     "key_sep": 0.1010695497194926,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999592346477413,
+     "eta_key_by_half": 0.16983413696289062,
+     "eta_key_by_index": 0.269287109375,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_key_by_stream_inv": 1.0,
+     "eta_val_by_half": 0.16983413696289062,
+     "eta_val_by_index": 0.269287109375,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.13721054792404175,
+     "key_sep": 0.1010695497194926,
+     "margin": 1.0,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999592346477413,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.13721054792404175,
+     "key_sep": 0.1010695497194926,
+     "layers": {
+      "L1": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L2": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      },
+      "L3": {
+       "ch_map_key": [
+        0,
+        1
+       ],
+       "ch_map_val": [
+        0,
+        1
+       ],
+       "eta_key_by_half": 0.16983413696289062,
+       "eta_key_by_index": 0.269287109375,
+       "eta_key_by_key": 0.0,
+       "eta_key_by_stream": 1.0,
+       "eta_val_by_half": 0.16983413696289062,
+       "eta_val_by_index": 0.269287109375,
+       "eta_val_by_key": 0.0,
+       "eta_val_by_stream": 1.0,
+       "margin": 1.0,
+       "one_to_one_key": true,
+       "one_to_one_val": true,
+       "table": {
+        "CTX": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "KEY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "QUERY": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ],
+        "VAL": [
+         [
+          1.0,
+          0.0
+         ],
+         [
+          0.0,
+          1.0
+         ]
+        ]
+       }
+      }
+     },
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    },
+    {
+     "beta": null,
+     "ctx_cos": 0.0,
+     "eff_ch": 1.9999592346477413,
+     "eta_key_by_stream_inv": 1.0,
+     "k": 2,
+     "key_cos": 0.0,
+     "key_part": 0.13721054792404175,
+     "key_sep": 0.1010695497194926,
+     "sep": 1.0,
+     "seq_routed_frac": 1.0,
+     "spread": 1.0,
+     "step": 6000,
+     "val_cos": 0.0,
+     "val_cos_inv": 0.0
+    }
+   ],
+   "stopped_at": 6000,
+   "stream_acc": [
+    0.9890981316566467,
+    0.993262767791748
+   ],
+   "task": "allpool",
+   "transition": 3600,
+   "type_map": 0.05065243837541831,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 0.9912109375,
+    "acc_by_stream": [
+     0.9890981316566467,
+     0.993262767791748
+    ],
+    "acc_last": 0.9951550364494324,
+    "acc_notlast": 0.9872047305107117,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  }
+ }
+}
