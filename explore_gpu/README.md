@@ -167,11 +167,14 @@ of post-approval changes, none of them blind).
    - Usability is per arm: an arm runs on a card if its latest benchmark finished, passed that arm's cases, and its
      host-memory rule gave workers. The pilot needs only ORACLE's case.
 
-       python -m explore_gpu.s75b --bench --device cuda --host-ram-gb 15.2 --beside test_delta_recipe   # laptop
-       python -m explore_gpu.s75b --bench --device cuda --host-ram-gb <server RAM> --beside none        # server
+       python -m explore_gpu.s75b --bench --device cuda --host-ram-gb 35 --beside none     # server (GTX 1660 SUPER)
+       python -m explore_gpu.s75b --bench --device cuda --host-ram-gb 15.2 --beside none   # laptop (RTX 3070)
 
-3. **The pilot**, on one card: the 1660 after the window_gate run, or the 3070 if that is free first. The other card
-   waits until the stage-1 record is pushed.
+   On the laptop, if a main-line test will run beside S75b, start it first and pass a string from its command line
+   instead of `none` (for example `--beside test_delta_recipe`).
+
+3. **The pilot**, on one card: the 1660 (the plan of 22 October; the 3070 only if the 1660 cannot run it). The other
+   card waits until the stage-1 record is pushed.
    - As soon as it starts, commit and push the results file and the stage-1 record, which is marked running. The
      other card's stages then refuse while the pilot runs.
    - When it ends, commit and push the stage-1 record (`.json` / `.md`) and every results file, whatever the decision.
@@ -179,6 +182,8 @@ of post-approval changes, none of them blind).
    - A run below 0.9, or a diverged run, is a final STOP.
    - Any other failure stops the invocation. Re-invoke the same command, on either card: it reruns the same seed.
    - Two invocations with failures halt the seed. Then you decide: add `--retry-halted` to clear it, or fix the code.
+   - After it ends, the trigger replay on the pilot's curves is a description that decides nothing (spec Appendix C):
+     `python -m explore_gpu.s75b_triggers --replay`.
 
        python -m explore_gpu.s75b --stage 1 --device cuda
 
@@ -200,7 +205,8 @@ of post-approval changes, none of them blind).
        python -m explore_gpu.s75b --stage 2 --device cuda --machine 3070      # REG3, WIDE_SPLIT_G
 
 5. **The report**, once both cards' results files are pulled: `python -m explore_gpu.s75b --report`, which writes
-   `s75b_summary.md`.
+   `s75b_summary.md`. Beside it, as descriptions: `python -m explore_gpu.s75b_triggers --replay` (now with ORACLE
+   850–851) and `--counts` (WIDE_SPLIT_G's checks).
 
 **Runtime estimate for S75 at S = 4** (`runtime_estimate.md`; method and assumptions in `profile_s75.py`). It is a CPU
 profile of one update per arm (FLOPs, bytes, kernel launches, live tensor memory) put through a roofline model of each
@@ -223,7 +229,8 @@ GPU time).
 - `device.py`, `batched.py`, `run.py`: the runner.
 - `s75_s4.py`, `mainline.py`, `s75b.py`: (b), (c) and (d); `s75b_checks.py` and `s75b_checks_cpu_output.*`: (d)'s
   CHECKs and this container's outputs; `s75b_mutants.py` and `s75b_mutants_cpu_output.txt`: the mutation pass on (d)'s
-  rules.
+  rules; `s75b_rates.py` and `s75b_triggers.py`: descriptions for the spec's Appendix C (the proceed rule's rates; the
+  trigger replay and counts), outside the driver's code SHA.
 - `checks.py` and `checks_cpu_output.*`: the CHECKs and this container's outputs.
 - `calibrate_judge.py` and its output: the lock-step criterion at the CUDA lengths.
 - `profile_s75.py`, `runtime_estimate.md`, `profile_s75.json`: the estimate.

@@ -46,7 +46,10 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
     seed.
 - **S75b draft spec (s75b_spec_draft.md, for the user).** The design commit 1e31409 was built on a tree without S75's
   learned arms; that it was blind is the author's statement. Every change after the merge 142f47e (ee97443, 114cd08
-  and the driver's) is not blind by git: Appendix B.
+  and the driver's) is not blind by git: Appendix B. Appendix C (22 October) takes Referee V's review item by item:
+  each of the four uncovered outcomes has one name, the two-rule cases and the guard's half-test are stated, the 2400
+  check is in the text, and the two post-merge design changes are labelled disclosed, not blind by git. No constant and
+  no code changes.
   - Configuration B: S = 4, NB = 32, M = 352, L = 1536, bound 0.963.
   - A 2-seed ORACLE pilot with proceed and stop rules fixed in advance.
   - SPLIT_THR set from the pilot, and the split guarded against one-to-one maps.
