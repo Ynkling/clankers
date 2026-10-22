@@ -10,8 +10,9 @@ RandHeaderTask-lite without a conv, where S87 has the key hinge 20/20, BASELINE 
 SETTING (S87's exactly): RandHeaderTask-lite (explore_g_rhl_child.RHL), Hebbian memory (decay 0.95), k = 2, no conv, 24000
 updates, SLOW, the REG3 model; seeds 2700-2719 (S87's, as the prompt of 21 October says). Evaluation every 1200, early stop
 after 3 evaluations >= 0.95.
-ARMS AND PAIRING. This CPU reproduces S87's records bit for bit (S89's CHECKs: REG3_KEYHINGE|2700, REG3_FREQHINGE|2700,
-BASELINE|2700 through S89's run(); asserted again here), so S90 pairs with S87's records: BASELINE, REG3_KEYHINGE and
+ARMS AND PAIRING. This CPU reproduces S87's records bit for bit THROUGH 2400 (curve and stats; explore_g_s87_child.trunc) on
+REG3_KEYHINGE|2700, REG3_FREQHINGE|2700 and BASELINE|2700 through S89's run() (asserted again here); the full records are
+not compared. So S90 pairs with S87's records: BASELINE, REG3_KEYHINGE and
 REG3_FREQHINGE are S87's (explore_out/G/s87_results.json, read by a CPU-tolerant prefix lookup), not rerun. S87 ran no
 hingeless REG3 on these seeds, so REG3 runs here (it is needed for reading 2b). New runs (explore_g_s89_child.run on the
 lite task, the path that reproduced S87's records):
@@ -21,8 +22,9 @@ lite task, the path that reproduced S87's records):
                          by token id; it receives the token ids only) (20 runs).
   VALIDITY: S87's ORACLE_ALL 2/2 on 2700-2701 stands (and S71's 10/10); ORACLE_ALL|2700 reproduces through 2400 (CHECK).
 THE REPEAT SET ON LITE (CHECKed counts, 4096 sequences): 16.63 positions per sequence = 5 CTX (4 block headers + the
-  query's) + 9 KEY (8 body keys + the query's) + 2.63 VAL (values repeated by chance across keys). It contains all 8 of the
-  key term's positions, and there its grouping (token id) is the key term's (key id = token - S) one to one. It reads no
+  query's) + 9 KEY (8 body keys + the query's) + 2.63 VAL (values repeated by chance across keys). On lite the repeat set is S87's frequency set (14
+  positions: 4 + 1 CTX, 8 + 1 KEY) plus 2.63 chance-repeated VAL positions per sequence, with the same token-id grouping.
+  It contains all 8 of the key term's positions, and there its grouping (token id) is the key term's (key id = token - S) one to one. It reads no
   label (no stream, no role, no key index) and no corpus statistic (no frequency table): only which token types repeat
   within the sequence. Beyond the key term it also groups the CTX positions by CTX id (= the stream on lite, as S87's
   frequency hinge did) and the chance value repeats.
@@ -32,7 +34,8 @@ OUTCOME: ROUTED-BOUND = explore_g_rhl_parent.routed_bound (pooled eta^2; lite's 
 READINGS (fixed now; computed by explore_g_s89h.readings, the function S89H committed at d5d48ee, imported; n = 20). No
   relay text with S90's own reading names reached this session; the readings are S89H's, applied to lite, with the round-7
   prompt's name "the repeat hinge falls short" defined below:
-  0. UNTESTED      a run of REG3_REPEATHINGE did not complete (3 attempts); a missing REG3 seed does not void (2b on the rest).
+  0. UNTESTED      a run of REG3_REPEATHINGE did not complete (3 attempts); a missing REG3 seed does not void the names (2b
+                   on the rest), but fewer than 18 completed REG3 seeds void the spec decision (ADDED 22 October, below).
   1. "the task does not need the hinge"        BASELINE >= n - 4 (S87: 0/20; it cannot fire).
   2. "the labelled hinge itself fails here"    REG3_KEYHINGE not discovered (S87: 20 / 0; it cannot fire).
   2b. "the register does not need the hinge here"   REG3_KEYHINGE does not beat REG3 (p >= 0.05); the names in 3 are then
@@ -46,19 +49,36 @@ READINGS (fixed now; computed by explore_g_s89h.readings, the function S89H comm
      register does not need the hinge here either)" (REPEAT "replaces", 2b applies) / "does not hold" (another name) /
      "cannot be asked here" (0, 1 or 2).
   FOR THE SPEC (fixed now): the register spec's label-free arm is the repeat hinge if THE QUESTION reads "holds, and the hinge
-     is needed here". Every other outcome reads "the repeat hinge falls short" for the spec, which then carries the key
-     hinge as its only hinge arm and says why a label-free arm is not in it.
+     is needed here". "Does not hold" and "holds (descriptive ...)" read "the repeat hinge falls short": the spec then
+     carries the key hinge as its only hinge arm and says why a label-free arm is not in it. "Cannot be asked here"
+     (UNTESTED) gives no spec decision (corrected 22 October, see below; the b57c186 text read it as "falls short").
 OPERATING CHARACTERISTICS (V's v2 §2.10): at a ceiling of 20/20, "replaces" (within 1 pair) fires with probability 1.0 /
   0.74 / 0.39 / 0.07 for an arm at 1.0 / 0.95 / 0.9 / 0.8; an arm at 0.9 reads "is weaker" about half the time. So "falls
-  short" here can mean a true rate as high as 0.9.
+  short" here can mean a true rate as high as 0.9. At S87's FREQ rate on these seeds (0.85) "replaces" fires with
+  probability 0.18. With KH 20/20 and BASELINE 0/20 every decisive test is marginal: the spec's arm is the repeat hinge
+  iff REPEAT >= 19/20 and REG3 <= 15/20 (V's screen_review_s90_G.md §1a).
 ALSO REPORTED: the term's firings and values; the commitment by step; beta^R by role and step; the margin per layer; the
   contingency tables; the probe; the plateaus; S87's SELFKL and TEMP are not re-read.
 CHECKS (asserted before any run): X's arm A bit for bit; S87's REG3_KEYHINGE|2700, REG3_FREQHINGE|2700, BASELINE|2700 through
   S89's run() on lite and ORACLE_ALL|2700 through S87's own path, bit for bit through 2400 (the pairing condition); the
   repeat set's counts on lite and the key term inside it (grouping one to one); REG3_REPEATHINGE with its switch off equals
-  REG3|2700 through 2400 bit for bit; its term's gradient reaches the gate only; S89's static CHECKs (token ids only: the
+  REG3|2700 through 2400 bit for bit; its term's gradient reaches the register gate's parameters and the token
+  embedding (embed.weight), not the encoder, decoder or lm_head; S89's static CHECKs (token ids only: the
   repeat statistic receives the token ids only); readings() hand cases (S89H's check_readings).
 RUNTIME: 40 runs, 2-9 min each: about 1.5 h on 4 workers.
+DATING. The readings' application to lite, the spec bar and the pairing branch were chosen on 22 October 05:03 UTC (b57c186),
+  after S89H's records (03:07) and report 9 (03:12); the readings function is S89H's, fixed at d5d48ee (21 October 22:01),
+  before any S89H record. No S90 record existed then. The relayed readings of 21 October did not reach this session.
+CORRECTIONS (22 October, after all 40 S90 records, on Referee V's screen_review_s90_G.md, e20c4e7; parent only, so the code
+  SHA and the records stand):
+  - spec_decision: UNTESTED ("cannot be asked here") gives no spec decision, instead of "falls short" (V's fix 1);
+  - report(): fewer than 18 completed REG3 seeds set the question to "cannot be asked here" for the spec (V's fix 2);
+  - report(): REPEAT against S87's FREQ is printed (descriptive; V's fix 3);
+  - the pairing claim says "through 2400" (fix 4); and lite.REG3_KEYHINGE is rerun on 2700-2719 as a descriptive control,
+    printed with its count and its full-record equality with S87's (curve, transition, stopped_at, end); it changes no
+    reading (fix 4, optional);
+  - the gradient sentence, the operating characteristics and this dating paragraph (fixes 5-7).
+  On the complete store none of these changes a printed name or the spec decision ("falls short").
 
 Run:  python explore_g_s90.py [--report-only]
 """
@@ -82,7 +102,8 @@ import explore_g_s89h as s89h
 NAME = "s90"
 CHILD = "explore_g_s89_child"
 S20 = tuple(range(2700, 2720))
-ARMS = {"lite.REG3": dict(iters=24000, seeds=S20, prio=1), "lite.REG3_REPEATHINGE": dict(iters=24000, seeds=S20, prio=1)}
+ARMS = {"lite.REG3": dict(iters=24000, seeds=S20, prio=1), "lite.REG3_REPEATHINGE": dict(iters=24000, seeds=S20, prio=1),
+        "lite.REG3_KEYHINGE": dict(iters=24000, seeds=S20, prio=0)}        # descriptive control, added 22 October (V's fix 4)
 LABEL = dict(B="BASELINE (S87)", R="REG3 (S90)", KH="REG3_KEYHINGE (S87)", FQ="REG3_FREQHINGE (S87)", RP="REG3_REPEATHINGE (S90)")
 line = hp.line
 rb = hp.routed_bound
@@ -97,8 +118,11 @@ def records():
 
 
 def spec_decision(rd):
-    return ("the spec's label-free arm is the repeat hinge" if rd["question"] == s89h.Q[0] else
-            "the repeat hinge falls short: the spec carries the key hinge only")
+    if rd["question"] == s89h.Q[0]:
+        return "the spec's label-free arm is the repeat hinge"
+    if rd["question"] == s89h.Q[3]:
+        return "UNTESTED: no spec decision (S90 could not be asked); the spec waits"
+    return "the repeat hinge falls short: the spec carries the key hinge only"
 
 
 def report():
@@ -108,6 +132,20 @@ def report():
     o = s89p.recorded("s87", "ORACLE_ALL", (2700, 2701))
     rd = s89h.readings(R, S20, "lite", valid=True, label=LABEL,
                        valid_note=f"S87's ORACLE_ALL {sum(hp.bound(r) for r in o.values())}/{len(o)} on 2700-2701 (and S71's 10/10)")
+    if len(R["R"]) < 18:
+        rd["question"] = s89h.Q[3]
+        rd["first"] += f"; UNTESTED for the spec: REG3 completed on {len(R['R'])}/20 seeds (< 18)"
+    b, c, p, n = hp.paired(R["RP"], R["FQ"], rb)
+    rd["REPEAT vs S87's FREQ (descriptive)"] = (
+        f"on lite the repeat set = the frequency set + 2.63 chance-repeated VAL positions per sequence, same token-id "
+        f"grouping: REPEAT only {b}, FREQ only {c}, p(REPEAT >) {p:.3g}, p(FREQ >) {hp.paired(R['FQ'], R['RP'], rb)[2]:.3g}, n {n}")
+    kh = gc.runs(sys.modules[__name__], "lite.REG3_KEYHINGE")
+    if kh:
+        same = sum(all(kh[s].get(f) == R["KH"][s].get(f) for f in ("curve", "transition", "stopped_at", "end"))
+                   for s in kh if s in R["KH"])
+        rd["REG3_KEYHINGE rerun (descriptive control)"] = (f"{sum(rb(r) for r in kh.values())}/{len(kh)} ROUTED-BOUND; full "
+                                                         f"record (curve, transition, stopped_at, end) equal to S87's on "
+                                                         f"{same}/{len(kh)} seeds")
     rd["FOR THE SPEC"] = spec_decision(rd)
     rd["commitment at 2400 (median spread)"] = ", ".join(f"{LABEL[k]} {s89p.med_commit(R[k]):.4f}" for k in order)
     print("\nREADINGS:\n" + "\n".join(f"  {k}: {v}" for k, v in rd.items()))
