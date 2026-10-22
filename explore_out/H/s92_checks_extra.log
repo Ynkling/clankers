@@ -1,1 +1,5 @@
 === 2026-10-22 17:02:29 UTC: Referee V's fix 8 (screen_review_s92_H.md), run by hand after phase 2's first record (BASE|3026, 16:36:45 UTC); this CPU:  Intel(R) Xeon(R) Processor @ 2.10GHz ===
+  CHECK H/s90 (added after phase 2 started): DELTA_NOSPLIT|583 (K 4) = X's DELTA_SLOW|583 (8ae660d) bit for bit through 4800 (Intel(R) Xeon(R) Processor @ 2.10GHz): curve [[1200, 0.05908203125], [2400, 0.06640625], [3600, 0.0615234375], [4800, 0.09228515625]] True; statistics True; gradient norms True: ok
+  CHECK H/s90 (added after phase 2 started): ORACLE_HEBB|2600 (K 4) = S87a's ORACLE|2600 bit for bit through 2400 (Intel(R) Xeon(R) Processor @ 2.10GHz): curve [[1200, 0.6005859375], [2400, 0.9951171875]] True; statistics True; gradient norms True: ok
+  CHECK H/s90 (added after phase 2 started): ORACLE_DELTA|580 (K 4) = X's CEIL_DELTA|580 (8ae660d) bit for bit through 2400 (Intel(R) Xeon(R) Processor @ 2.10GHz): curve [[1200, 0.845703125], [2400, 1.0]] True; statistics True; gradient norms True: ok
+  all passed: True
