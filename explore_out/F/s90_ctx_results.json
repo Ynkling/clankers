@@ -3432,6 +3432,862 @@
    "torch": "2.14.0+cu130",
    "transition": null,
    "val_cos": NaN
+  },
+  "O_DELTA_DOCS3|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "O_DELTA_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     1.0,
+     1.2098084688186646
+    ],
+    [
+     2400,
+     1.0,
+     0.2678315043449402
+    ],
+    [
+     3600,
+     1.0,
+     0.009992344304919243
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 2.9999975561081778,
+    "eta_key_by_half": 0.1044387817382812,
+    "eta_key_by_index": 0.31392669677734375,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 0.9999999999999999,
+    "eta_val_by_half": 0.1044387817382812,
+    "eta_val_by_index": 0.31392669677734375,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 0.9999999999999999,
+    "k": 3,
+    "key_cos": 0.0,
+    "key_sep": NaN,
+    "margin": 1.0,
+    "sep": 1.0,
+    "sep_key_inv": 1.0,
+    "seq_separated_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv_k": 0.0
+   },
+   "git": "b20642a+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.6129363421128855,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.4289377411095074,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.5562205208433728,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 3,
+   "key_cos": 0.0,
+   "kind": "ORACLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 105.75054407119751,
+   "secs_wall": 109.36384177207947,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.9999975561081778,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.9999975561081778,
+     "eta_key_by_half": 0.1044387817382812,
+     "eta_key_by_index": 0.31392669677734375,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 0.9999999999999999,
+     "eta_val_by_half": 0.1044387817382812,
+     "eta_val_by_index": 0.31392669677734375,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 0.9999999999999999,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.9999975561081778,
+     "eta_key_by_half": 0.1044387817382812,
+     "eta_key_by_index": 0.31392669677734375,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 0.9999999999999999,
+     "eta_val_by_half": 0.1044387817382812,
+     "eta_val_by_index": 0.31392669677734375,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 0.9999999999999999,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.9999975561081778,
+     "eta_key_by_half": 0.1044387817382812,
+     "eta_key_by_index": 0.31392669677734375,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 0.9999999999999999,
+     "eta_val_by_half": 0.1044387817382812,
+     "eta_val_by_index": 0.31392669677734375,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 0.9999999999999999,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": 1200,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "O_DELTA_DOCS3|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "O_DELTA_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.916015625,
+     1.5197924375534058
+    ],
+    [
+     2400,
+     1.0,
+     0.3436095416545868
+    ],
+    [
+     3600,
+     1.0,
+     0.011214615777134895
+    ],
+    [
+     4800,
+     1.0,
+     0.0038596440572291613
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 2.999934971934953,
+    "eta_key_by_half": 0.085723876953125,
+    "eta_key_by_index": 0.2992324829101563,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.085723876953125,
+    "eta_val_by_index": 0.2992324829101563,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 3,
+    "key_cos": 0.0,
+    "key_sep": NaN,
+    "margin": 1.0,
+    "sep": 1.0,
+    "sep_key_inv": 1.0,
+    "seq_separated_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv_k": 0.0
+   },
+   "git": "b20642a+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.7618882533262807,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.606789272877009,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.324204458874131,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 3,
+   "key_cos": 0.0,
+   "kind": "ORACLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 137.06888484954834,
+   "secs_wall": 140.73164105415344,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.999934971934953,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.999934971934953,
+     "eta_key_by_half": 0.085723876953125,
+     "eta_key_by_index": 0.2992324829101563,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.085723876953125,
+     "eta_val_by_index": 0.2992324829101563,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.999934971934953,
+     "eta_key_by_half": 0.085723876953125,
+     "eta_key_by_index": 0.2992324829101563,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.085723876953125,
+     "eta_val_by_index": 0.2992324829101563,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.999934971934953,
+     "eta_key_by_half": 0.085723876953125,
+     "eta_key_by_index": 0.2992324829101563,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.085723876953125,
+     "eta_val_by_index": 0.2992324829101563,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 2.999934971934953,
+     "k": 3,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    }
+   ],
+   "stopped_at": 4800,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": 2400,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "O_DELTA_DOCS4|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "O_DELTA_DOCS4",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     1.0,
+     1.3713456392288208
+    ],
+    [
+     2400,
+     1.0,
+     0.3048199713230133
+    ],
+    [
+     3600,
+     1.0,
+     0.010683698579668999
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 3.999997631052145,
+    "eta_key_by_half": 0.0892957051595052,
+    "eta_key_by_index": 0.3391825358072917,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0892957051595052,
+    "eta_val_by_index": 0.3391825358072917,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 4,
+    "key_cos": 0.0,
+    "key_sep": NaN,
+    "margin": 1.0,
+    "sep": 1.0,
+    "sep_key_inv": 1.0,
+    "seq_separated_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv_k": 0.0
+   },
+   "git": "b20642a",
+   "grad": {
+    "1": [
+     0.0,
+     2.3579667416953867,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.3977266432446167,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.6543889340994544,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 4,
+   "key_cos": 0.0,
+   "kind": "ORACLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 151.61618876457214,
+   "secs_wall": 156.09096264839172,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999997631052145,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999997631052145,
+     "eta_key_by_half": 0.0892957051595052,
+     "eta_key_by_index": 0.3391825358072917,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0892957051595052,
+     "eta_val_by_index": 0.3391825358072917,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999997631052145,
+     "eta_key_by_half": 0.0892957051595052,
+     "eta_key_by_index": 0.3391825358072917,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0892957051595052,
+     "eta_val_by_index": 0.3391825358072917,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.999997631052145,
+     "eta_key_by_half": 0.0892957051595052,
+     "eta_key_by_index": 0.3391825358072917,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0892957051595052,
+     "eta_val_by_index": 0.3391825358072917,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    }
+   ],
+   "stopped_at": 3600,
+   "task": "DOCS4",
+   "torch": "2.14.0+cu130",
+   "transition": 1200,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 520,
+    "n_notlast": 1528
+   }
+  },
+  "O_DELTA_DOCS4|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 1.0,
+   "arm": "O_DELTA_DOCS4",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": 0.0,
+   "curve": [
+    [
+     1200,
+     0.939453125,
+     1.6344866752624512
+    ],
+    [
+     2400,
+     1.0,
+     0.37113338708877563
+    ],
+    [
+     3600,
+     1.0,
+     0.011634688824415207
+    ],
+    [
+     4800,
+     1.0,
+     0.003912875894457102
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": true,
+   "dry": false,
+   "end": {
+    "ctx_cos": 0.0,
+    "eff_ch": 3.99996472944303,
+    "eta_key_by_half": 0.0666821797688802,
+    "eta_key_by_index": 0.3247782389322917,
+    "eta_key_by_key": 0.0,
+    "eta_key_by_stream": 1.0,
+    "eta_val_by_half": 0.0666821797688802,
+    "eta_val_by_index": 0.3247782389322917,
+    "eta_val_by_key": 0.0,
+    "eta_val_by_stream": 1.0,
+    "k": 4,
+    "key_cos": 0.0,
+    "key_sep": NaN,
+    "margin": 1.0,
+    "sep": 1.0,
+    "sep_key_inv": 1.0,
+    "seq_separated_frac": 1.0,
+    "spread": 1.0,
+    "step": "end",
+    "val_cos": 0.0,
+    "val_cos_inv_k": 0.0
+   },
+   "git": "b20642a+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.988494785632977,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.479034658064323,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.733145905487944,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 4,
+   "key_cos": 0.0,
+   "kind": "ORACLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 198.7363829612732,
+   "secs_wall": 203.1389684677124,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.99996472944303,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 0,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.99996472944303,
+     "eta_key_by_half": 0.0666821797688802,
+     "eta_key_by_index": 0.3247782389322917,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0666821797688802,
+     "eta_val_by_index": 0.3247782389322917,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 1200,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.99996472944303,
+     "eta_key_by_half": 0.0666821797688802,
+     "eta_key_by_index": 0.3247782389322917,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0666821797688802,
+     "eta_val_by_index": 0.3247782389322917,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 2400,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.99996472944303,
+     "eta_key_by_half": 0.0666821797688802,
+     "eta_key_by_index": 0.3247782389322917,
+     "eta_key_by_key": 0.0,
+     "eta_key_by_stream": 1.0,
+     "eta_val_by_half": 0.0666821797688802,
+     "eta_val_by_index": 0.3247782389322917,
+     "eta_val_by_key": 0.0,
+     "eta_val_by_stream": 1.0,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "margin": 1.0,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 3600,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    },
+    {
+     "ctx_cos": 0.0,
+     "eff_ch": 3.99996472944303,
+     "k": 4,
+     "key_cos": 0.0,
+     "key_sep": NaN,
+     "sep": 1.0,
+     "sep_key_inv": 1.0,
+     "seq_separated_frac": 1.0,
+     "spread": 1.0,
+     "step": 4800,
+     "val_cos": 0.0,
+     "val_cos_inv_k": 0.0
+    }
+   ],
+   "stopped_at": 4800,
+   "task": "DOCS4",
+   "torch": "2.14.0+cu130",
+   "transition": 2400,
+   "val_cos": 0.0,
+   "write_order": {
+    "acc": 1.0,
+    "acc_by_stream": [
+     1.0,
+     1.0,
+     1.0,
+     1.0
+    ],
+    "acc_last": 1.0,
+    "acc_notlast": 1.0,
+    "lastval_notlast": 0.0,
+    "n": 2048,
+    "n_last": 520,
+    "n_notlast": 1528
+   }
   }
  }
 }
