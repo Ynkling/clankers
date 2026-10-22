@@ -1370,3 +1370,22 @@ item, with the label-free-arm decision's date checked against the S89/S89H/S90 r
 which X adopts into specs/ on your "ready"; G's S91 file before its learned arms. One file each, as before. Nothing
 outside docs/review_2026-10/; nothing trained.
 ```
+
+## Session I — round 7 (22 October; S75b with both cards back; branch claude/explore-I)
+
+```
+The 1660 server is back in the project (22 October) and the two-card plan for S75b applies again. Before the pilot:
+1. Take Referee V's review of the spec (docs/review_2026-10/spec_review_s75b_draft.md on the main line) item by item
+ into a dated appendix of explore_out/I/s75b_spec_draft.md: the four pilot outcomes its rules did not name (each gets
+ exactly one name), the two cases where two rules fire, the guard described as "the same test ROUTED uses" (it uses
+ half of it), l.119's check schedule, and the two post-merge design changes labelled as disclosed and not blind. No
+ constant changes; if a fix would change one, stop and say so. If your fourth-review fixes (3cef609) already took an
+ item, say so with the line. Nothing in the code SHA changes unless a rule's text forces it; if it does, say that the
+ CUDA CHECKs and benchmarks must be rerun on the new commit, and bump the code-change note.
+2. State the exact commands for the user, per card, in order, from explore_gpu/README.md (d): the CUDA CHECK and the
+ benchmark on each card (server RAM 35 GB, --beside none; laptop 15.2, --beside none unless a main-line test runs),
+ the pilot on the 1660, stage 2 on both. The user runs them; you read each pushed output as it lands (the CHECK and
+ benchmark outputs, then the stage-1 record) and say PROCEED or STOP by the record before the user starts stage 2.
+3. The pre-run note for S75b, committed before the pilot: what has been seen (S75's learned-arm records, the CUDA
+ CHECK and benchmark outputs), and that no learned-arm constant was chosen from them.
+```

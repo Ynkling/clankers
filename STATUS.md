@@ -5,7 +5,7 @@ project is, what it found, what is pre-registered and what is not, where every t
 technical report (Revision 10.2, `multichannel_hebbian_report_v10.pdf`, 20 October) is the current account; the README
 follows it; this file covers what the report does not. The project paused on 14 October and resumed on 19 October with
 Revision 10, which records everything listed here as "not yet in the report" on 14 October; the 1660 server left the
-project the same day.
+project the same day and returned on 22 October.
 
 ## 1. What this is
 
@@ -100,12 +100,12 @@ source at two sources and nothing routes at four on the one screen run, which it
    budget for the oracle only; the *P* = 8 oracle as the validity check; one validity seed; claims conditional on the
    learned arms alone; drop *D* = 128 until it has a reliable oracle). None is adopted; the choice is the user's.
 5. **S75b** (the dense loss at four sources on a configuration where the perfect gate can reach its bar). Approved spec
-   with a mechanical pilot rule; what remains is in `explore_gpu/README.md` (d): rerun the CUDA CHECK and the benchmark
-   with the final driver, run the pilot (two perfect-gate runs, about three hours), and stage 2 only if the pilot record
-   says PROCEED. The spec was written for two cards; since 19 October only the laptop's RTX 3070 is available (the
-   server left the project), so stage 2 would take 54–57 hours on one card by the specification's run times and cannot share the laptop with a
-   main-line test. The referee's review of the draft (`spec_review_s75b_draft.md`) has points to take before the
-   pilot.
+   with a mechanical pilot rule; the steps are in `explore_gpu/README.md` (d) on `claude/explore-I`: the CUDA CHECK and
+   the benchmark on each card with the final driver (`3cef609`), the pilot (two perfect-gate runs, about three hours, on
+   one card), and stage 2 on both cards (about a day and a half) only if the pilot record says PROCEED. **The 1660
+   server returned to the project on 22 October**, so the two-card plan applies again. Session I is restarted to take
+   the referee's review points (`spec_review_s75b_draft.md`) into a dated appendix before the pilot; the CUDA CHECKs and
+   benchmarks can run on both cards meanwhile.
 6. **F's S88**, complete (report 8 at `a199d5e`; 78 runs on a Xeon @ 2.80 GHz; readings fixed before the first run,
    `40087cb`; EXPLORATORY, not a result). **S88a**, the write strength (the delta recipe with the exact-copy split at
    eight streams, seeds 2400–2409): the fixed write strength binds and routes 10/10, a learned per-token strength 7/10
@@ -178,10 +178,11 @@ segment of a screen opens by reproducing a recorded run bit for bit. The referee
 | X (a cloud container) | the session's own | the main line | the session's |
 | the laptop (i7-12650H, 15 GB; RTX 3070 Laptop GPU) | `~/Documents/clankers` | the default branch, pulled before each test | system Python with torch 2.14.1 (CPU); main-line tests run here with `--machine L` |
 | the laptop, GPU work | `~/Documents/clankers-gpu` | `claude/explore-I` | `source ~/venv-gpu/bin/activate` (torch 2.14.0+cu130) |
+| the server (Ryzen 5 3600, 35 GB; GTX 1660 SUPER) | `~/jellyfin/clankers` (single-branch) | `claude/explore-I` | `source .venv/bin/activate` in the clone (torch 2.14.0+cu130) |
 
-The server (Ryzen 5 3600; GTX 1660 SUPER) left the project on 19 October for work reasons. Its finished runs — the
-GPU replication of `test_window_gate` (I, report 3) and S75's arms — stay on `claude/explore-I`; nothing else ran
-there.
+The server (Ryzen 5 3600; GTX 1660 SUPER) left the project on 19 October for work reasons and returned on 22 October;
+its row is below. Its finished runs — the GPU replication of `test_window_gate` (I, report 3) and S75's arms — are on
+`claude/explore-I`.
 
 Long runs go through `longrun.py` (`start`, `watch --resume`, `status`; a stopped run resumes from its records with
 `start --again`); the README's "Repository layout and how to run the tests" has the commands. Two lessons from the
