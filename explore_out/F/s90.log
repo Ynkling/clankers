@@ -389,3 +389,57 @@ EXPLORATORY, NOT A RESULT — Session F s90 (F/s90_ctx)
   [  4]    5.7 min  F/s90_ctx        O_DELTA_DOCS3            seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git b20642a+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  2400  margin 1.00 sep 1.00
   start    5.7 min  F/s90_ctx        TL_DELTA_DOCS3           seed 3061  (projected worst case 12 min)
+  [  5]    8.1 min  F/s90_ctx        TL_DELTA_DOCS4           seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81, code 809fde1f5168, attempt 1: acc 0.966  trans  9600  margin 0.81 sep 0.13
+  start    8.1 min  F/s90_ctx        TL_HEBBCONV_DOCS4        seed 3060  (projected worst case 11 min)
+  [  6]    8.9 min  F/s90_ctx        TL_DELTA_DOCS4           seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.960  trans 10800  margin 0.80 sep 0.14
+  start    8.9 min  F/s90_ctx        TL_HEBBCONV_DOCS4        seed 3061  (projected worst case 11 min)
+  [  7]    9.6 min  F/s90_ctx        TL_DELTA_DOCS3           seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.961  trans  8400  margin 0.75 sep 0.38
+  start    9.6 min  F/s90_ctx        O_HEBBCONV_DOCS4         seed 3060  (projected worst case 10 min)
+  [  8]   11.0 min  F/s90_ctx        TL_DELTA_DOCS3           seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.968  trans  8400  margin 0.71 sep 0.26
+  start   11.0 min  F/s90_ctx        O_HEBBCONV_DOCS4         seed 3061  (projected worst case 10 min)
+  [  9]   12.3 min  F/s90_ctx        O_HEBBCONV_DOCS4         seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  3600  margin 1.00 sep 1.00
+  start   12.3 min  F/s90_ctx        TL_HEBBCONV_DOCS3        seed 3060  (projected worst case 9 min)
+  [ 10]   13.6 min  F/s90_ctx        O_HEBBCONV_DOCS4         seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  3600  margin 1.00 sep 1.00
+  start   13.6 min  F/s90_ctx        TL_HEBBCONV_DOCS3        seed 3061  (projected worst case 9 min)
+  [ 11]   18.5 min  F/s90_ctx        TL_HEBBCONV_DOCS4        seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.813  trans  None  margin 0.81 sep 0.13
+  start   18.5 min  F/s90_ctx        O_HEBBCONV_DOCS3         seed 3060  (projected worst case 9 min)
+  [ 12]   19.3 min  F/s90_ctx        TL_HEBBCONV_DOCS4        seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.726  trans  None  margin 0.80 sep 0.14
+  start   19.3 min  F/s90_ctx        O_HEBBCONV_DOCS3         seed 3061  (projected worst case 9 min)
+  [ 13]   20.2 min  F/s90_ctx        TL_HEBBCONV_DOCS3        seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.733  trans  None  margin 0.75 sep 0.38
+  start   20.2 min  F/s90_ctx        TL_DELTA_CTXPOOL         seed 3060  (projected worst case 8 min)
+  [ 14]   20.5 min  F/s90_ctx        O_HEBBCONV_DOCS3         seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  3600  margin 1.00 sep 1.00
+  start   20.5 min  F/s90_ctx        TL_DELTA_CTXPOOL         seed 3061  (projected worst case 8 min)
+  [ 15]   21.3 min  F/s90_ctx        O_HEBBCONV_DOCS3         seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  3600  margin 1.00 sep 1.00
+  start   21.3 min  F/s90_ctx        O_DELTA_CTXPOOL          seed 3060  (projected worst case 8 min)
+  [ 16]   21.6 min  F/s90_ctx        TL_HEBBCONV_DOCS3        seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.725  trans  None  margin 0.71 sep 0.26
+  start   21.6 min  F/s90_ctx        O_DELTA_CTXPOOL          seed 3061  (projected worst case 8 min)
+  [ 17]   22.5 min  F/s90_ctx        O_DELTA_CTXPOOL          seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  1200  margin 1.00 sep 1.00
+  start   22.5 min  F/s90_ctx        O_HEBBCONV_CTXPOOL       seed 3060  (projected worst case 6 min)
+  [ 18]   23.2 min  F/s90_ctx        O_DELTA_CTXPOOL          seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  2400  margin 1.00 sep 1.00
+  start   23.2 min  F/s90_ctx        O_HEBBCONV_CTXPOOL       seed 3061  (projected worst case 6 min)
+  [ 19]   23.8 min  F/s90_ctx        O_HEBBCONV_CTXPOOL       seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  2400  margin 1.00 sep 1.00
+  start   23.8 min  F/s90_ctx        TL_HEBBCONV_CTXPOOL      seed 3060  (projected worst case 6 min)
+  [ 20]   24.2 min  F/s90_ctx        TL_DELTA_CTXPOOL         seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.984  trans  9600  margin 0.55 sep 0.55
+  start   24.2 min  F/s90_ctx        TL_HEBBCONV_CTXPOOL      seed 3061  (projected worst case 6 min)
+  [ 21]   24.9 min  F/s90_ctx        TL_DELTA_CTXPOOL         seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.997  trans 10800  margin 0.52 sep 0.52
+  [ 22]   25.0 min  F/s90_ctx        O_HEBBCONV_CTXPOOL       seed 3061  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 1.000  trans  4800  margin 1.00 sep 1.00
+  [ 23]   29.7 min  F/s90_ctx        TL_HEBBCONV_CTXPOOL      seed 3060  lr 0.001  (SLOW (rest 1e-4 to 2400))
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git bc70d81+dirty, code 809fde1f5168, attempt 1: acc 0.769  trans  None  margin 0.55 sep 0.55
