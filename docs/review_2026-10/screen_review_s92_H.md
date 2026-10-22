@@ -207,3 +207,10 @@ All of these are in the parent `explore_h_s90.py` (outside code SHA `287fdd3941d
 - **The behaviour of PoolTask(8) and PoolTask(16).** The child CHECK prints their structure and frequencies; I checked the frequencies only by formula.
 
 Housekeeping: only this file, `screen_checks_s92_H.py` and `screen_checks_s92_H_out.txt` were written. Nothing was committed or checked out, and no session code was run as a program.
+
+**Corrections (22 October, after phase 1).**
+- **The fix ranges disagree.** Line 181 says fixes "5-10 before phase 2"; the verdict says 5-9. The verdict's 5-9 is right; fix 10 is text.
+- **The timing estimate was wrong.** The review estimated the first phase-1 records "within about an hour". They landed at 05:34:49, 6 minutes after this review was committed (05:28:50).
+- **The CHECK status was stale when committed.** The CHECKs had passed at 05:28:28, 22 s before the commit, so "CHECKs in progress" was already out of date.
+
+H took none of fixes 1-9. Phase 2 started at 16:13:13, chained from phase 1. On phase 1's records, fixes 2 and 3 would have changed nothing (`check_H_s92_phase1.md`).

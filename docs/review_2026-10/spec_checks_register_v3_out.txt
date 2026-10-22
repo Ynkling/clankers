@@ -1,0 +1,185 @@
+== 0. Dates (commit times, UTC)
+  S89 records (s89_results.json): first 2026-10-20T22:16:41+00:00 0bd95b21, last 2026-10-21T09:46:54+00:00 8e9e3187, 88 commits; report 8 2026-10-21T09:46:54+00:00 8e9e3187 Session G report 8 (S89, delta: POOL key hinge 20/20, repeat hinge 20/20 "replaces the key hinge", frequency hinge 
+  S89H records (s89h_results.json): first 2026-10-21T22:11:55+00:00 d877f157, last 2026-10-22T03:12:24+00:00 996e38b7, 58 commits
+  report 9: 2026-10-22T03:12:24+00:00 996e38b7 Session G report 9 (S89H, Hebbian + conv: POOL repeat hinge 19/20 "replaces the key hinge", key hinge 18/20, freque
+  round-7 prompt: 2026-10-22T03:38:40+00:00 5e51a294 Round-7 prompts (22 October): G's S90, the register spec's revision 2 with the repeat hinge as its label-free arm, 
+  S90 parent/child: 2026-10-22T05:03:55+00:00 b57c1867 Session G S90 (round 7): the repeat hinge on S87's exact lite setting (Hebbian, k = 2, no conv, 24000, SLOW, REG3; 
+  S90 records (s90_results.json): first 2026-10-22T05:08:29+00:00 00348e77, last 2026-10-22T05:57:34+00:00 2c1913b2, 11 commits
+  S90 CHECK file: 2026-10-22T05:08:29+00:00 00348e77
+  S90 done: 2026-10-22T05:57:34+00:00 2c1913b2 Session G S90 done: on lite Hebbian the repeat hinge is 17/20 against the key hinge's 20/20 (3 vs 0, p 0.125): "is 
+  revision 2: 2026-10-22T05:58:45+00:00 6fc55b17 Session G: register spec draft, revision 2 per Referee V's spec_review_register_v2.md fixes 1-13; label-free-arm de
+  revision 2 - S90 done = 71 s
+  S91 parent: 2026-10-22T06:06:19+00:00 60b1932a Session G S91 (round 7): a gate that compares the current context with the register's content on ALLPOOL — MATCHGAT
+  G's head now: 2026-10-22T08:26:53+00:00 cbca3e36 Session G report 10 (S90: the repeat hinge falls short on lite Hebbian, 17/20 vs 20/20; S91: Hebbian half UNTESTED,
+  V's check_G_report9.md first on claude/review-V: ['2026-10-22T05:14:13+00:00', 'a141e92b']
+  V's screen_review_s90_G.md first on claude/review-V: ['2026-10-22T05:25:37+00:00', 'e20c4e7a']
+  V's spec_review_register_v2.md first on claude/review-V: ['2026-10-21T22:04:49+00:00', 'b2169dc0']
+  V's spec_checks_register_v2_out.txt first on claude/review-V: ['2026-10-21T22:02:45+00:00', '9df6e788']
+  .py files changed b57c1867..2c1913b2: none
+  explore_g_s90.py blob at b57c1867 341c4ff345, at 6fc55b17 341c4ff345, at the head 341c4ff345
+
+   S90's spec decision as the records came in (per progress commit; the rule: the repeat hinge iff REPEAT >= 19/20 and REG3 <= 15/20, V's screen review §1a):
+    00348e77 05:08:29: REPEAT 0/0 (fails []), REG3 0/0 
+    5c04a858 05:13:57: REPEAT 1/1 (fails []), REG3 0/0 
+    82d37ae0 05:18:59: REPEAT 3/4 (fails [2700]), REG3 0/3 
+    afe7a1e6 05:24:02: REPEAT 5/6 (fails [2700]), REG3 0/4 
+    a437e2d6 05:29:04: REPEAT 7/8 (fails [2700]), REG3 1/8 
+    3e8eb95c 05:34:06: REPEAT 9/10 (fails [2700]), REG3 1/9 
+    48833db5 05:39:09: REPEAT 12/13 (fails [2700]), REG3 2/12 
+    9e0641ab 05:44:11: REPEAT 13/14 (fails [2700]), REG3 2/13 
+    1bd9c956 05:49:13: REPEAT 15/17 (fails [2700, 2713]), REG3 3/16 FIXED: falls short
+    4549d8ae 05:54:15: REPEAT 16/18 (fails [2700, 2713]), REG3 3/17 FIXED: falls short
+    2c1913b2 05:57:34: REPEAT 17/20 (fails [2700, 2713, 2717]), REG3 4/20 FIXED: falls short
+
+== 1. Seeds: every JSON / JSONL blob on every remote branch head (today)
+  scanned origin/claude/bdh-growth-hebbian-inference-w90069 at 77221b8a (2026-10-22T16:58:31+00:00)
+  scanned origin/claude/bdh-repo-curl-obgdqk at 5ddf8a11 (2026-10-20T21:32:03-06:00)
+  scanned origin/claude/explore-F at d9783bb1 (2026-10-22T08:30:00+00:00)
+  scanned origin/claude/explore-G at cbca3e36 (2026-10-22T08:26:53+00:00)
+  scanned origin/claude/explore-H at 617b62f3 (2026-10-22T16:42:37+00:00)
+  scanned origin/claude/explore-I at 8d2e89fa (2026-10-14T04:52:59+00:00)
+  scanned origin/claude/outside-ideas at 419368a4 (2026-10-15T03:40:12+00:00)
+  scanned origin/claude/relaxed-edison-he00cc at 3c2fb705 (2026-10-06T05:21:37+00:00)
+  scanned origin/claude/replicate-R at 31c39fce (2026-10-13T18:41:38+00:00)
+  scanned origin/claude/rev10-draft at 9933cc37 (2026-10-21T03:31:55+00:00)
+  scanned origin/claude/rev9-draft at 010a085a (2026-10-13T01:22:12+00:00)
+  scanned origin/claude/review-V at db562c4e (2026-10-22T05:52:39+00:00)
+  scanned origin/feature/per-channel-plasticity at 4af9d503 (2026-06-30T08:59:20-06:00)
+  13 heads; 381 distinct JSON/JSONL blobs (1103 branch-paths); 39846 seed values read; unparsed: none
+  records using a seed of X 600-619 / L 1600-1619: 0
+  integer dict keys in the block (their parents): {600: ['1.2e-07', '1e-06', 'by_step', 'dense', 'diag', 'early_evals', 'eta_at', 'exp_avg_sq'], 1600: ['1.2e-07', '1e-06', 'by_step', 'dense', 'mem', 'rho', 'spec']}
+  G's screens' seeds in use in 2700-2729: 2700..2729 (30 values); overlap with the block: none
+  G's screens' seeds in use in 2840-2861: 2840..2861 (22 values); overlap with the block: none
+  G's screens' seeds in use in 2960-2991: 2960..2991 (12 values); overlap with the block: none
+
+== 2. Files
+  files changed by 6fc55b17: ['explore_out/G/spec_draft_register.md']
+  diff c98648e6 -> 6fc55b17, the draft: 1 file changed, 109 insertions(+), 29 deletions(-)
+  the draft at the head origin/claude/explore-G equals 6fc55b17's: True
+  076005d8: explore_g_rhl_parent.py blob 0e1b03ad69; lines {'ROUTE_MARGIN, ROUTE_ETA =': 35, 'def bound(': 39, 'def routed_star(': 43, 'def routed_bound(': 52}; length 198
+  6fc55b17: explore_g_rhl_parent.py blob 0e1b03ad69; lines {'ROUTE_MARGIN, ROUTE_ETA =': 35, 'def bound(': 39, 'def routed_star(': 43, 'def routed_bound(': 52}; length 198
+  origin/claude/explore-G: explore_g_rhl_parent.py blob 0e1b03ad69; lines {'ROUTE_MARGIN, ROUTE_ETA =': 35, 'def bound(': 39, 'def routed_star(': 43, 'def routed_bound(': 52}; length 198
+  explore_f_tasks.py at 9a6c2bf: blob de4746371d, 14101 bytes; 9a6c2bf's (14101 bytes) is its prefix: True; names defined twice: none
+  explore_f_tasks.py at 076005d8: blob de4746371d, 14101 bytes; 9a6c2bf's (14101 bytes) is its prefix: True; names defined twice: none
+  explore_f_tasks.py at c98648e6: blob e24d5e1081, 49923 bytes; 9a6c2bf's (14101 bytes) is its prefix: True; names defined twice: none
+  explore_f_tasks.py at 6fc55b17: blob e24d5e1081, 49923 bytes; 9a6c2bf's (14101 bytes) is its prefix: True; names defined twice: none
+  explore_f_tasks.py at origin/claude/explore-G: blob e24d5e1081, 49923 bytes; 9a6c2bf's (14101 bytes) is its prefix: True; names defined twice: none
+  explore_g_rhl_child.py at 076005d8, 'def make_reg3': [(137, 'def make_reg3(task, seed, mem, reg=True, gated=(1, 2, 3), inp="window", cls=Reg3BDH):')]
+  explore_g_devices_child.py at 076005d8, 'def make_model': [(151, 'def make_model(arm, seed, task=RHL, lam=LAM, tau=TAU, win=False):')]
+  explore_g_rhl_child.py at 076005d8, 'RESGATE': [(30, 'RESGATE_ONLY_D Reg3BDH without the register (reg = False) at all three layers, SG, SLOW.'), (102, '"RESGATE_ONLY_D": ("reg3", "delta", dict(reg=False)),'), (525, 'rn = make_model("RESGATE_ONLY_D", 700)'), (526, 'rows.append(("RESGATE_ONLY_D: no register, the residual gate at all three layers",')]
+  explore_g_devices_child.py:151-159 at 076005d:
+    151| def make_model(arm, seed, task=RHL, lam=LAM, tau=TAU, win=False):
+    152|     kind, mem = ARMS[arm]
+    153|     if kind == "rc":
+    154|         return rc.make_model(mem, seed, task)
+    155|     m = rc.make_model("REG3_D" if mem == "delta" else "REG3", seed, task)
+    156|     if kind == "keyhinge":
+    157|         m.__class__ = KeyHingeBDH
+    158|         m.kh = dict(n=0, fired=0, windows=[], weights={}, last=None, eta_at={}, count=True)
+    159|         m.kh_lam, m.kh_tau, m.kh_task = float(lam), float(tau), task
+  plan_2026-10-13.md (main line), the register test's names: :50 in the caveat) -> X adopts it into `specs/test_register.md` -> V reviews -> X writes `test_register.py` -> V checks the
+  report_10.md at 6fc55b17: False; at the head: True (added ['2026-10-22T08:26:53+00:00', 'cbca3e36'])
+  README 'Session G — S90' section at 6fc55b17: True
+  spec_checks_register_v2_out.txt §3 on claude/review-V: True
+  test_register*.py / register_gate.py / specs/test_register*.md on origin/claude/bdh-growth-hebbian-inference-w90069: none
+  test_register*.py / register_gate.py / specs/test_register*.md on origin/claude/explore-G: none
+
+== 3. routed_bound (explore_g_rhl_parent.py:35-53 at 076005d) on G's records
+  r2 l.268-271 CHECK counts: 11/11 MATCH
+  records in the two files: 218 (186 Hebbian, 32 delta)
+  S87: BASELINE 0/20, BASELINE_D 0/10, ORACLE_ALL 2/2, REG3_D 0/10, REG3_FREQHINGE 17/20, REG3_FREQHINGE_D 10/10, REG3_KEYHINGE 20/20, REG3_KEYHINGE_D 10/10, REG3_SELFKL 0/20, REG3_TEMP 3/20
+  S89 POOL (delta): BASELINE_D 0/20, ORACLE_D 2/2, REG3_D 16/20, REG3_FREQHINGE_D 7/20, REG3_KEYHINGE_D 20/20, REG3_REPEATHINGE_D 20/20
+  S89 ALLPOOL (delta): BASELINE_D 0/20, ORACLE_D 2/2, REG3_D 0/20, REG3_FREQHINGE_D 0/20, REG3_KEYHINGE_D 0/20, REG3_REPEATHINGE_D 0/20
+  S89H POOL: BASELINE_H 0/20, PERFECT_H 2/2, REG3_FREQHINGE_H 18/20, REG3_H 9/20, REG3_KEYHINGE_H 18/20, REG3_REPEATHINGE_H 19/20
+  S89H ALLPOOL: BASELINE_H 0/20, PERFECT_H 2/2, REG3_FREQHINGE_H 0/20, REG3_H 0/20, REG3_KEYHINGE_H 0/20, REG3_REPEATHINGE_H 0/20
+  S90 (lite): REG3 4/20, REG3_REPEATHINGE 17/20
+  S89H iters: POOL [24000], ALLPOOL [24000]; ALLPOOL max stopped_at 24000
+  S90 iters [24000]; completed REG3 20, REPEAT 20; attempts [1]
+  S87/S90 failing seeds: {'KH': [], 'FREQ': [2700, 2709, 2713], 'REPEAT': [2700, 2713, 2717]}
+  pairs S90 KH(S87) vs REPEAT: b 3, c 0, n 20, one-sided p(b > c) 0.125
+  pairs S90 FREQ(S87) vs REPEAT: b 1, c 1, n 20, one-sided p(b > c) 0.75
+  pairs S90 KH(S87) vs REG3: b 16, c 0, n 20, one-sided p(b > c) 1.53e-05
+  pairs S90 REPEAT vs REG3: b 13, c 0, n 20, one-sided p(b > c) 0.000122
+  pairs S90 REPEAT vs BASELINE(S87): b 17, c 0, n 20, one-sided p(b > c) 7.63e-06
+  pairs S89H KH vs REG3: b 9, c 0, n 20, one-sided p(b > c) 0.00195
+  pairs S89H REPEAT vs REG3: b 10, c 0, n 20, one-sided p(b > c) 0.000977
+  pairs S89H KH vs REPEAT: b 0, c 1, n 20, one-sided p(b > c) 1
+  pairs S89H KH vs BASELINE: b 18, c 0, n 20, one-sided p(b > c) 3.81e-06
+  pairs S89 POOL KH vs REPEAT (delta): b 0, c 0, n 20, one-sided p(b > c) 1
+  pairs S89 POOL KH vs REG3 (delta): b 4, c 0, n 20, one-sided p(b > c) 0.0625
+  pairs S89 POOL KH vs BASELINE (delta): b 20, c 0, n 20, one-sided p(b > c) 9.54e-07
+  pairs S82 KH vs BASELINE: b 20, c 0, n 20, one-sided p(b > c) 9.54e-07
+  pairs S82 KH vs REG3: b 18, c 0, n 20, one-sided p(b > c) 3.81e-06
+  pairs S83 KH(S82) vs LOCAL3_KEYHINGE: b 20, c 0, n 20, one-sided p(b > c) 9.54e-07
+  pairs S87 KH vs BASELINE: b 20, c 0, n 20, one-sided p(b > c) 9.54e-07
+
+== 4. S90's spec rule (explore_g_s90.py:48-50, :99-101 at b57c1867), re-applied
+    s90:41|   3. REG3_REPEATHINGE gets exactly one of: "replaces the key hinge" (discovered, (KH only) - (REPEAT only) <= 1) / "is
+    s90:42|      weaker than the key hinge" (discovered, >= 2, not "needs") / "needs key identities" (p(KH > REPEAT) <= 0.0625) /
+    s90:43|      "does nothing here" (not discovered, not "needs"); and "clamps" if (REPEAT only) - (BASELINE only) <= 1 and its
+    s90:44|      median commitment at 2400 is below BASELINE's. (REG3_FREQHINGE, S87's, is named by the same function, descriptive.)
+    s90:45|   THE QUESTION: "holds, and the hinge is needed here" (REPEAT "replaces" and KH beats REG3) / "holds (descriptive: the
+    s90:46|      register does not need the hinge here either)" (REPEAT "replaces", 2b applies) / "does not hold" (another name) /
+    s90:47|      "cannot be asked here" (0, 1 or 2).
+    s90:48|   FOR THE SPEC (fixed now): the register spec's label-free arm is the repeat hinge if THE QUESTION reads "holds, and the hinge
+    s90:49|      is needed here". Every other outcome reads "the repeat hinge falls short" for the spec, which then carries the key
+    s90:50|      hinge as its only hinge arm and says why a label-free arm is not in it.
+    s90:51| OPERATING CHARACTERISTICS (V's v2 §2.10): at a ceiling of 20/20, "replaces" (within 1 pair) fires with probability 1.0 /
+    s90:52|   0.74 / 0.39 / 0.07 for an arm at 1.0 / 0.95 / 0.9 / 0.8; an arm at 0.9 reads "is weaker" about half the time. So "falls
+    s90:53|   short" here can mean a true rate as high as 0.9.
+    s90:99| def spec_decision(rd):
+    s90:100|     return ("the spec's label-free arm is the repeat hinge" if rd["question"] == s89h.Q[0] else
+    s90:101|             "the repeat hinge falls short: the spec carries the key hinge only")
+  S90: REPEAT 17/20, REG3 4/20, KH (S87) 20/20, BASELINE (S87) 0/20 -> with V's fixes 1-2: falls short (does not hold: is weaker); without: falls short (does not hold: is weaker)
+  G's s90_summary.json at 2c1913b2: question / FOR THE SPEC = 'does not hold' / 'the repeat hinge falls short: the spec carries the key hinge only'
+  OC of the rule (REG3 at 0.2): P(the repeat hinge) = P(REPEAT >= 19/20) * P(REG3 <= 15/20): 1.00: 1.000, 0.95: 0.736, 0.90: 0.392, 0.85: 0.176, 0.80: 0.069
+  'falls short' vs a test: p(KH > REPEAT) at 3 vs 0 = 0.125; two-sided 0.250
+  P(REPEAT <= 17/20 | true rate 0.85) = 0.595; P(<= 18/20) = 0.824
+  P(REPEAT <= 17/20 | true rate 0.9) = 0.323; P(<= 18/20) = 0.608
+  P(REPEAT <= 17/20 | true rate 0.95) = 0.075; P(<= 18/20) = 0.264
+  REPEAT 17/20: Wilson [0.640, 0.948]
+
+== 5. The rate claim R (>= 18/20 per machine) at the screens' KH rates
+  S82/S87/S89 KH 20/20 (as 0.975): MET on a machine 0.987; on both 0.974; on exactly one 0.026; on neither 0.000; pooled >= 36/40 0.997
+  0.95: MET on a machine 0.925; on both 0.855; on exactly one 0.140; on neither 0.006; pooled >= 36/40 0.952
+  S89H KH 18/20: MET on a machine 0.677; on both 0.458; on exactly one 0.437; on neither 0.104; pooled >= 36/40 0.629
+  0.85: MET on a machine 0.405; on both 0.164; on exactly one 0.482; on neither 0.354; pooled >= 36/40 0.263
+  0.80: MET on a machine 0.206; on both 0.042; on exactly one 0.327; on neither 0.630; pooled >= 36/40 0.076
+  r2 l.208-209 prints 0.04, 0.16, 0.46, 0.85: 0.04, 0.16, 0.46, 0.85
+
+== 6. McNemar power per claim (exact one-sided; observed discordance as the per-pair rates; 40 pooled / 20 per machine)
+  smallest b with c = 0 that shows: alpha 0.0500: b >= 5, alpha 0.0125: b >= 7
+  C1 at S82 KH vs BASELINE (20 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 1.000
+  C1 at S87 KH vs BASELINE (20 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 1.000
+  C1 at S89 POOL KH vs BASELINE (delta) (20 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 1.000
+  C1 at S89H KH vs BASELINE (18 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 1.000
+  C2 at S83 KH(S82) vs LOCAL3_KEYHINGE (20 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 1.000
+  C3 at S82 KH vs REG3 (18 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 1.000
+  C3 at S90 KH(S87) vs REG3 (16 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 1.000
+  C3 at S89 POOL KH vs REG3 (delta) (4 vs 0 of 20): P(SHOWN) 40 pairs 0.924 (Holm 0.0125: 0.714); 20 pairs 0.370
+  C3 at S89H KH vs REG3 (9 vs 0 of 20): P(SHOWN) 40 pairs 1.000 (Holm 0.0125: 1.000); 20 pairs 0.981
+  C4 (RESGATE_KEYHINGE unscreened): KH at p1, RESGATE at p2, nested; 40 pairs at 0.05 (Holm 0.0125):
+    KH 1.00: p2 0.00: 1.000 (1.000); p2 0.50: 1.000 (1.000); p2 0.75: 0.984 (0.904); p2 0.85: 0.737 (0.393); p2 0.90: 0.371 (0.100)
+    KH 0.95: p2 0.00: 1.000 (1.000); p2 0.50: 1.000 (1.000); p2 0.75: 0.924 (0.714); p2 0.85: 0.371 (0.100); p2 0.90: 0.048 (0.003)
+    KH 0.90: p2 0.00: 1.000 (1.000); p2 0.50: 1.000 (0.999); p2 0.75: 0.737 (0.393); p2 0.85: 0.048 (0.003); p2 0.90: 0.000 (0.000)
+  r2 l.200-202 prints 1.00, 0.98, 0.74, 0.37 at 0.50, 0.75, 0.85, 0.90 (KH 1.0): 1.00, 0.98, 0.74, 0.37
+  for comparison, the arm left out (REPEAT, at S90's discordance KH 3 vs 0): P(KH > REPEAT SHOWN) 40 pairs 0.737, 20 pairs 0.170; REPEAT vs BASELINE 17 vs 0: 40 pairs 1.000
+
+== 7. Readings as revision 2 words them (l.216-244)
+  C1-C4: 16 combinations, with no name or two names: 0
+  R X M, L M: literal ['R MET on both machines']; UNTESTED first ['R MET on both machines']
+  R X M, L N: literal ['R MET on X only']; UNTESTED first ['R MET on X only']
+  R X M, L U: literal ['R MET on X only', 'R UNTESTED on L']; UNTESTED first ['R UNTESTED on L']
+  R X N, L M: literal ['R MET on L only']; UNTESTED first ['R MET on L only']
+  R X N, L N: literal ['R MET on neither']; UNTESTED first ['R MET on neither']
+  R X N, L U: literal ['R MET on neither', 'R UNTESTED on L']; UNTESTED first ['R UNTESTED on L']
+  R X U, L M: literal ['R MET on L only', 'R UNTESTED on X']; UNTESTED first ['R UNTESTED on X']
+  R X U, L N: literal ['R MET on neither', 'R UNTESTED on X']; UNTESTED first ['R UNTESTED on X']
+  R X U, L U: literal ['R MET on neither', 'R UNTESTED on both machines']; UNTESTED first ['R UNTESTED on both machines']
+  states with exactly one name: literal 4/9; UNTESTED first 9/9
+
+== 8. The frequency / repeat sets on lite (RandHeaderTask P=4, S=2, n_vals=16)
+  simulated (200000 sequences): repeated VAL positions per sequence mean 2.638 (per position 0.330); P(none) 0.1574; distribution {0: 0.1574, 2: 0.4166, 3: 0.056, 4: 0.2723, 5: 0.0457, 6: 0.046, 7: 0.0051, 8: 0.0009}
+  exact per position: 1 - (1 - 2/16)^3 = 0.3301; x 8 = 2.641 (independence approximation)
+  draft: 5 CTX + 9 KEY + 2.63 VAL = 16.63 (draft '16.6'); frequency 8 + 1 + 5 = 14; G's CHECK rows: 16.63 = CTX 4 + KEY 8 + VAL 2.63 + QUERY 2; frequency 14.00 = CTX 4 + KEY 8 + QUERY 2
+  so the repeat set = the frequency set (on every sequence) + the chance-repeated VALs, grouped by the same token id
