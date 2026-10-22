@@ -326,3 +326,25 @@ So in this round's terms:
 
 The child is unchanged (code SHA 267d08456c38). Run time was 0.27 h, 03:28-03:46 UTC on 21 October, CHECKs included.
 Nothing else ran.
+
+## Erratum (22 October): the write-order split on -allpool
+
+`explore_f_tasks.write_order_acc` reads the query's stream as the CTX token before the query's key, and compares it with
+`stream_labels`.
+- That is right on lite and -pool, where the CTX ids are the stream indices.
+- **It is wrong on -allpool**, where the query's CTX token is a type 0..15 and the stream label is the index 0..1. They
+  differ in 485 of 512 sequences (CHECKed in S90-F).
+
+So **every last-write / not-last-write split and per-stream accuracy above for an -allpool run is invalid and is
+withdrawn**:
+- the "0.86 / 0.87" and "0.95 / 0.97" for ALLPOOL 2801 in the follow-up sections;
+- the ALLPOOL rows of `s89_post_tables.md`'s last / not last column;
+- the ALLPOOL part of the "differs by at most 0.06" statement on the S89 pilots. On -pool it stands.
+
+No reading used these numbers, and the models were not saved, so they cannot be recomputed. The overall accuracies and
+the transitions are unaffected.
+
+The corrected `write_order_acc_idx` (explore_f_tasks.py at 9017b82) reads the query's stream index. It equals the old
+function on -pool, and on every context-pool task its last-write mask equals the one computed on lite's own batch. G
+and H vendor the module, so any -allpool write-order split computed with `write_order_acc` should be withdrawn the same
+way.
