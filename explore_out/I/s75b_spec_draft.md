@@ -630,7 +630,8 @@ The review asked which consequence follows each of four outcomes (§2, "Outcomes
 of 6; the second half, runtimes over the estimate, is C.6 item 15), and offered alternatives: stop, retry the same seed,
 or a fresh seed; UNTESTED or a rerun. Each outcome gets exactly one name here, and the name fixes what follows: none of
 the review's alternatives is left open. Where the driver waits on the user (a halt, or an arm no card's benchmark
-allows), the name says so, and the user's decision is recorded.
+allows), the name says so. Clearing a halt (`--retry-halted`) and a code change (`--code-change-note`) are recorded;
+for an arm no card's benchmark allows, the driver records nothing and waits.
 
 **A run with a non-finite value is not a failed run under these names.** Such a value is in the evaluation logits, in
 the record's non-finite-loss check (the review's own example, `ok: False`), or in a statistic. The run is a value,
@@ -648,7 +649,7 @@ rules are the same; only the grouping differs.
 | 1 | a pilot run that fails operationally: out of memory, a crash, a kill (the review's other example, a non-finite loss, is DIVERGED, above) | **PILOT RERUN** | The same seed is run again: re-invoke `--stage 1`. Never a fresh seed. S75b does not stop on it. | B.2 l.377–390; B.3 l.401 | the stage-1 record: INCOMPLETE, "rerun --stage 1 (the same seeds)" (s75b.py l.947, l.1708); the seed's status: failed |
 | 2 | the code SHA changes between the stages | **PILOT RERUN UNDER THE NEW CODE** | 840–841 are run again under the new code, never fresh seeds. First come a committed, dated note (`--code-change-note`), the CUDA CHECKs and the benchmarks under the new code. The old code is superseded. Its stage-1 decision stands beside the new one: a value STOP under it is final, and stage 2 needs every complete stage-1 decision, under every code, to PROCEED (B.3 l.422). | B.3 l.412–430 | stage 2 under the new code refuses, "both pilot records under this code SHA are needed" (s75b.py l.1781); the earlier record is kept as `s75b_stage1_record_<sha>.*` |
 | 3 | a stage-2 ORACLE run (850 or 851) is missing or fails | **ORACLE RERUN** | The same seed is run again: re-invoke `--stage 2` on the card that runs ORACLE. VALID waits for it. Never the pilot in its place (l.88–90), never a fresh seed. | B.3 l.449–454 | VALIDITY "… -> incomplete" (s75b.py l.1978–1981); the stage-2 log, "an operational failure is rerun by re-invoking --stage 2" (s75b.py l.1850–1855) |
-| 4 | the L = 1536 benchmark fails: a case fails, the run crashes, or no workers fit | **ARM REFUSED** | Per arm and per card: the arm does not run on that card while the card's latest benchmark refuses it. It runs only where a card's latest benchmark allows it: on this card after its benchmark is rerun (B.3 l.470), or on the other card (the pilot: `--stage 1` there; stage 2: `--machine fallback` or `fallback-3070`, with `--arms` and `--reason`). If no card's benchmark allows it, it does not run: for the pilot, S75b cannot start; without ORACLE, validity stays incomplete, and without a read arm, the reading; the user decides (B.3 l.481–485). No configuration, R or batch is changed. | B.3 l.461–485 | stage 2's log, "REFUSED by this card's benchmark" (s75b.py l.1813); stage 1, "this card's benchmark allows none of ['ORACLE_PILOT']" (s75b.py l.1397); the report, "BENCHMARKS" (l.1894), "S75b CANNOT START" (l.1901), "ARMS NO CARD'S BENCHMARK ALLOWS" (l.1908) |
+| 4 | the L = 1536 benchmark fails: a case fails, the run crashes, or no workers fit | **ARM REFUSED** | Per arm and per card: the arm does not run on that card while the card's latest benchmark refuses it. It runs only where a card's latest benchmark allows it: on this card after its benchmark is rerun (B.3 l.470), or on the other card (the pilot: `--stage 1` there; stage 2: `--machine fallback` or `fallback-3070`, with `--arms` and `--reason`). If no card's benchmark allows it, it does not run: for the pilot, S75b cannot start; without ORACLE, validity stays incomplete, and without a read arm, the reading; the user decides (B.3 l.481–485). No configuration, R or batch is changed. | B.3 l.461–485 | stage 2's log, "REFUSED by this card's benchmark" (s75b.py l.1813); stage 1, "this card's benchmark allows none of ['ORACLE_PILOT']" (s75b.py l.1397); the report, "BENCHMARKS" (s75b.py l.1894), "S75b CANNOT START" (s75b.py l.1901), "ARMS NO CARD'S BENCHMARK ALLOWS" (s75b.py l.1908) |
 
 **The rerun's limit is not a fifth outcome.**
 - A seed whose operational failures fall in two invocations is HALTED (B.2 l.386–390). The driver stops rerunning it,
@@ -828,7 +829,7 @@ The review's §1 points 1–3 are fix items 1–3. Its point 4, the literal-numb
 "verified" failure at n = 512 (l.182), whose output is not committed. No run was made for this appendix.
 
 **Left open from the review's §4 table, none of them a constant:** a σ row in the constants table, the gap share's
-0.918 / 0.919 (the review finds the two versions swapped, ±0.001), and a committed script for the windowed learner.
+0.918 / 0.919 (the review says the two versions look swapped, ±0.001), and a committed script for the windowed learner.
 
 ### C.7 This appendix's edits above it (text only)
 
