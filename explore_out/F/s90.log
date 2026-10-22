@@ -1151,3 +1151,185 @@ EXPLORATORY, NOT A RESULT — Session F s90 (F/s90_ctx)
   CHECK C6 recorded run LOCAL3_SLOW|160 (batch 16, S43) through 2400 with to_delta(impl='hebb'): curve [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]] vs [[1200, 0.482421875, 2.1559665203094482], [2400, 1.0, 0.4127413034439087]]; statistics at [0, 1200, 2400] equal (True); decoder at 1200/2400 equal (True); bit for bit on Intel(R) Xeon(R) Processor @ 2.10GHz (recorded on Intel(R) Xeon(R) Processor @ 2.10GHz) (38 s): ok
   ALL CHECKS PASSED (26 ok, 0 n/a, 0 failed)
   (explore_f_delta_checks: 44 s, all passed)
+  CHECK F/s90_ctx: explore_f_tasks.py equals 9017b82's file (the module G vendors) and starts with b0c6332's 48457 bytes (round 6's classes byte-identical): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: shape: L 23 (lite at S = 2: 23), vocab 36 = 16 + 4 + 16; batch (4096, 23): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: every (stream, key) appears exactly once in the body: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: S distinct values per key: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: exactly one CTX per block, at its start; 4 blocks per sequence: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: block-length frequencies {1: 0.338, 2: 0.324, 3: 0.338} each within 0.03 of 0.33: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: the stream order of the blocks varies (6 distinct orders over 4096 sequences): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: stream_labels = the latest CTX token's stream at every position: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: lite's layout at S = 2: L = 23 = S(NB + 2P) + 3 n_q, qpos = [21]; select reads the query's KEY position and targets its value: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: the batch is lite's batch with only the contexts renamed: roles at the same positions (True), lite's key types (True) and values (True), one CTX type per lite stream (True), the sequence's 2 types distinct and from the pool of 16 (True): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: the stream index is lite's stream ranked by first appearance (True); the indices first appear in the order 0..1 (True); position 0 is a CTX of stream 0 (True): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: at S = 2 the index is -allpool's convention (the latched CTX differs from position 0's): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: every key occurs exactly 2 times, once under each stream (True); its 2 values are distinct (True): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: the query's (stream, key) occurs exactly once in the body (True), its target is that pair's value (True); make_batch's query stream equals stream_labels at the query (True): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: the perfect gate is the one-hot of the index, k = 2: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: frequencies: CTX 16 types 0.0135-0.0154, KEY 4 0.1017-0.1027, VAL 16 0.0220-0.0236; no CTX type as frequent as a value type (max CTX < min VAL): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: the cap of a fixed type -> channel map at k = 2: 64/120 = 0.5333 (best split [8, 8]; the balanced map's [8, 8]: 0.5333); the balanced map separates 0.5269 of 4096 sequences: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: synthetic gate 'relative': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: synthetic gate 'permuted per sequence': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: the balanced type-level gate (k = 2) separates 0.5469 of the probe's 256 sequences: seq_separated_frac 0.5469 equals it; sep_key_inv 0.5469, VAL cos 0.4531: ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: at S = k = 2, val_cos_inv_k equals inv_from_gate's val_cos_inv on a random gate (|diff| 0.0e+00): ok
+  CHECK F/s90_ctx: P4rh2S2ctx16: write_order_acc_idx's last-write mask equals the one on lite's own batch (993 of 2048 queries ask the last write): ok
+  CHECK F/s90_ctx: CTXPOOL frequencies (S87's sample): KEY 4 types 0.1017-0.1027; VAL 16 types 0.0220-0.0236; CTX 16 types 0.0135-0.0154; largest-ratio cut 4 types {'KEY': 4}; half-mass cut 8 types {'KEY': 4, 'VAL': 4} (mass 0.502): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: shape: L 33 (lite at S = 3: 33), vocab 36 = 16 + 4 + 16; batch (4096, 33): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: every (stream, key) appears exactly once in the body: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: S distinct values per key: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: exactly one CTX per block, at its start; 6 blocks per sequence: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: block-length frequencies {1: 0.336, 2: 0.327, 3: 0.336} each within 0.03 of 0.33: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: the stream order of the blocks varies (90 distinct orders over 4096 sequences): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: stream_labels = the latest CTX token's stream at every position: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: lite's layout at S = 3: L = 33 = S(NB + 2P) + 3 n_q, qpos = [31]; select reads the query's KEY position and targets its value: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: the batch is lite's batch with only the contexts renamed: roles at the same positions (True), lite's key types (True) and values (True), one CTX type per lite stream (True), the sequence's 3 types distinct and from the pool of 16 (True): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: the stream index is lite's stream ranked by first appearance (True); the indices first appear in the order 0..2 (True); position 0 is a CTX of stream 0 (True): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: every key occurs exactly 3 times, once under each stream (True); its 3 values are distinct (True): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: the query's (stream, key) occurs exactly once in the body (True), its target is that pair's value (True); make_batch's query stream equals stream_labels at the query (True): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: the perfect gate is the one-hot of the index, k = 3: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: frequencies: CTX 16 types 0.0126-0.0145, KEY 4 0.1013-0.1018, VAL 16 0.0229-0.0242; no CTX type as frequent as a value type (max CTX < min VAL): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: the cap of a fixed type -> channel map at k = 3: 150/560 = 0.2679 (best split [6, 5, 5]; the balanced map's [6, 5, 5]: 0.2679); the balanced map separates 0.2742 of 4096 sequences: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: synthetic gate 'relative': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: synthetic gate 'permuted per sequence': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0): ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: the balanced type-level gate (k = 3) separates 0.3789 of the probe's 256 sequences: seq_separated_frac 0.3789 equals it; sep_key_inv 0.7487, VAL cos 0.2513: ok
+  CHECK F/s90_ctx: P4rh2docs3ctx16: write_order_acc_idx's last-write mask equals the one on lite's own batch (693 of 2048 queries ask the last write): ok
+  CHECK F/s90_ctx: DOCS3 frequencies (S87's sample): KEY 4 types 0.1013-0.1018; VAL 16 types 0.0229-0.0242; CTX 16 types 0.0126-0.0145; largest-ratio cut 4 types {'KEY': 4}; half-mass cut 8 types {'KEY': 4, 'VAL': 4} (mass 0.502): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: shape: L 43 (lite at S = 4: 43), vocab 36 = 16 + 4 + 16; batch (4096, 43): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: every (stream, key) appears exactly once in the body: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: S distinct values per key: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: each query is answered by its own stream's value; make_batch returns the query streams: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: exactly one CTX per block, at its start; 8 blocks per sequence: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: block-length frequencies {1: 0.337, 2: 0.326, 3: 0.337} each within 0.03 of 0.33: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: the stream order of the blocks varies (2009 distinct orders over 4096 sequences): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: stream_labels = the latest CTX token's stream at every position: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: lite's layout at S = 4: L = 43 = S(NB + 2P) + 3 n_q, qpos = [41]; select reads the query's KEY position and targets its value: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: the batch is lite's batch with only the contexts renamed: roles at the same positions (True), lite's key types (True) and values (True), one CTX type per lite stream (True), the sequence's 4 types distinct and from the pool of 16 (True): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: the stream index is lite's stream ranked by first appearance (True); the indices first appear in the order 0..3 (True); position 0 is a CTX of stream 0 (True): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: every key occurs exactly 4 times, once under each stream (True); its 4 values are distinct (True): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: the query's (stream, key) occurs exactly once in the body (True), its target is that pair's value (True); make_batch's query stream equals stream_labels at the query (True): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: the perfect gate is the one-hot of the index, k = 4: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: frequencies: CTX 16 types 0.0128-0.0139, KEY 4 0.1010-0.1014, VAL 16 0.0233-0.0244; no CTX type as frequent as a value type (max CTX < min VAL): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: the cap of a fixed type -> channel map at k = 4: 256/1820 = 0.1407 (best split [4, 4, 4, 4]; the balanced map's [4, 4, 4, 4]: 0.1407); the balanced map separates 0.1360 of 4096 sequences: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: synthetic gate 'relative': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: synthetic gate 'permuted per sequence': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0): ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: the balanced type-level gate (k = 4) separates 0.1289 of the probe's 256 sequences: seq_separated_frac 0.1289 equals it; sep_key_inv 0.8040, VAL cos 0.1960: ok
+  CHECK F/s90_ctx: P4rh2docs4ctx16: write_order_acc_idx's last-write mask equals the one on lite's own batch (542 of 2048 queries ask the last write): ok
+  CHECK F/s90_ctx: DOCS4 frequencies (S87's sample): KEY 4 types 0.1010-0.1014; VAL 16 types 0.0233-0.0244; CTX 16 types 0.0128-0.0139; largest-ratio cut 4 types {'KEY': 4}; half-mass cut 8 types {'KEY': 4, 'VAL': 4} (mass 0.502): ok
+  CHECK F/s90_ctx: write_order_acc_idx equals write_order_acc on -pool (an initial model, 512 held-out sequences): True: ok
+  CHECK F/s90_ctx: ERRATUM: on -allpool the query's CTX token differs from its stream index in 485 of 512 sequences, so write_order_acc's split is invalid there (printed): ok
+  CHECK F/s90_ctx: P4rh2pool32ctx16: write_order_acc_idx's last-write mask equals the one on lite's own batch (993 of 2048 queries ask the last write): ok
+  CHECK F/s90_ctx: this module's path reproduces NOMEM_SELF_LITE|2800|ea9728c636c6|Intel(R) Xeon(R) Processor @ 2.80GHz (read at 52e2ea7) through 2400 bit for bit on this CPU (Intel(R) Xeon(R) Processor @ 2.10GHz): curve [[1200, 0.10546875, 2.7603092193603516], [2400, 0.15234375, 2.6712265014648438]] vs [[1200, 0.10546875, 2.7603092193603516], [2400, 0.15234375, 2.6712265014648438]]; statistics at [0, 1200, 2400] equal True: ok
+  CHECK F/s90_ctx: this module's path reproduces O_DELTA_ALLPOOL|2800|ea9728c636c6|Intel(R) Xeon(R) Processor @ 2.80GHz (read at 52e2ea7) through 2400 bit for bit on this CPU (Intel(R) Xeon(R) Processor @ 2.10GHz): curve [[1200, 0.28271484375, 2.7438831329345703], [2400, 0.89501953125, 1.3829681873321533]] vs [[1200, 0.28271484375, 2.7438831329345703], [2400, 0.89501953125, 1.3829681873321533]]; statistics at [0, 1200, 2400] equal True: ok
+  CHECK F/s90_ctx: this module's path reproduces O_HEBB_CONV_ALLPOOL|2801|267d08456c38|Intel(R) Xeon(R) Processor @ 2.10GHz (read at 3e3b1bf) through 2400 bit for bit on this CPU (Intel(R) Xeon(R) Processor @ 2.10GHz): curve [[1200, 0.27099609375, 2.67083477973938], [2400, 0.31298828125, 2.265213966369629]] vs [[1200, 0.27099609375, 2.67083477973938], [2400, 0.31298828125, 2.265213966369629]]; statistics at [0, 1200, 2400] equal True: ok
+  CHECK F/s90_ctx: CTXPOOL ORACLE HEBBCONV: the gate is task.perfect_gate (one-hot, k = 2) (True); conv layer: ok
+  CHECK F/s90_ctx: CTXPOOL ORACLE DELTA: the gate is task.perfect_gate (one-hot, k = 2) (True); conv None; the delta memory (beta 1.0) receives the gate: ok
+  CHECK F/s90_ctx: CTXPOOL TYPE HEBBCONV: the gate is the balanced type-level gate (one-hot, k = 2) (True); conv layer: ok
+  CHECK F/s90_ctx: CTXPOOL TYPE DELTA: the gate is the balanced type-level gate (one-hot, k = 2) (True); conv None; the delta memory (beta 1.0) receives the gate: ok
+  CHECK F/s90_ctx: CTXPOOL SINGLE_DELTA: one channel, no gate (k 1), conv None, memory FastDeltaMemory: ok
+  CHECK F/s90_ctx: CTXPOOL SINGLE_HEBBCONV: one channel, no gate (k 1), conv layer, memory GatedAttention: ok
+  CHECK F/s90_ctx: CTXPOOL NOMEM: the query's logits ignore a token 4 back (True) and see one 3 back (True): ok
+  CHECK F/s90_ctx: CTXPOOL NOMEM_SELF: the query's logits ignore a token 10 back (True) and see one 9 back (True): ok
+  CHECK F/s90_ctx: DOCS3 ORACLE HEBBCONV: the gate is task.perfect_gate (one-hot, k = 3) (True); conv layer: ok
+  CHECK F/s90_ctx: DOCS3 ORACLE DELTA: the gate is task.perfect_gate (one-hot, k = 3) (True); conv None; the delta memory (beta 1.0) receives the gate: ok
+  CHECK F/s90_ctx: DOCS3 TYPE HEBBCONV: the gate is the balanced type-level gate (one-hot, k = 3) (True); conv layer: ok
+  CHECK F/s90_ctx: DOCS3 TYPE DELTA: the gate is the balanced type-level gate (one-hot, k = 3) (True); conv None; the delta memory (beta 1.0) receives the gate: ok
+  CHECK F/s90_ctx: DOCS3 SINGLE_DELTA: one channel, no gate (k 1), conv None, memory FastDeltaMemory: ok
+  CHECK F/s90_ctx: DOCS3 SINGLE_HEBBCONV: one channel, no gate (k 1), conv layer, memory GatedAttention: ok
+  CHECK F/s90_ctx: DOCS3 NOMEM: the query's logits ignore a token 4 back (True) and see one 3 back (True): ok
+  CHECK F/s90_ctx: DOCS3 NOMEM_SELF: the query's logits ignore a token 10 back (True) and see one 9 back (True): ok
+  CHECK F/s90_ctx: DOCS4 ORACLE HEBBCONV: the gate is task.perfect_gate (one-hot, k = 4) (True); conv layer: ok
+  CHECK F/s90_ctx: DOCS4 ORACLE DELTA: the gate is task.perfect_gate (one-hot, k = 4) (True); conv None; the delta memory (beta 1.0) receives the gate: ok
+  CHECK F/s90_ctx: DOCS4 TYPE HEBBCONV: the gate is the balanced type-level gate (one-hot, k = 4) (True); conv layer: ok
+  CHECK F/s90_ctx: DOCS4 TYPE DELTA: the gate is the balanced type-level gate (one-hot, k = 4) (True); conv None; the delta memory (beta 1.0) receives the gate: ok
+  CHECK F/s90_ctx: DOCS4 SINGLE_DELTA: one channel, no gate (k 1), conv None, memory FastDeltaMemory: ok
+  CHECK F/s90_ctx: DOCS4 SINGLE_HEBBCONV: one channel, no gate (k 1), conv layer, memory GatedAttention: ok
+  CHECK F/s90_ctx: DOCS4 NOMEM: the query's logits ignore a token 4 back (True) and see one 3 back (True): ok
+  CHECK F/s90_ctx: DOCS4 NOMEM_SELF: the query's logits ignore a token 10 back (True) and see one 9 back (True): ok
+  CHECK F/s90_ctx: CTXPOOL positional bound (descriptive): P(the target pair inside the reach) and P + rest/(n_vals - S + 1): reach 4: 0.129, bound 0.187; reach 10: 0.382, bound 0.423: ok
+  CHECK F/s90_ctx: DOCS3 positional bound (descriptive): P(the target pair inside the reach) and P + rest/(n_vals - S + 1): reach 4: 0.091, bound 0.156; reach 10: 0.257, bound 0.310: ok
+  CHECK F/s90_ctx: DOCS4 positional bound (descriptive): P(the target pair inside the reach) and P + rest/(n_vals - S + 1): reach 4: 0.069, bound 0.141; reach 10: 0.187, bound 0.250: ok
+  CHECK F/s90_ctx: O_HEBBCONV_DOCS4: groups [] / 6 rest parameters (conv in rest: True); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s90_ctx: O_DELTA_CTXPOOL: groups [] / 5 rest parameters (conv in rest: False); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s90_ctx: TL_DELTA_DOCS3: groups [] / 5 rest parameters (conv in rest: False); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s90_ctx: SINGLE_DELTA_CTXPOOL: groups [] / 5 rest parameters (conv in rest: False); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  CHECK F/s90_ctx: SINGLE_HEBBCONV_DOCS4: groups [] / 6 rest parameters (conv in rest: True); lrs at 1 [0.001, 0.0001], 2400 [0.001, 0.0001], 2401 [0.001, 0.001]: ok
+  timings reused from explore_out/F/s90_runtime.json
+  0 runs queued; projected worst case 0.00 h of runs, makespan 0.00 h on 4 workers
+  runs left: 0
+### S90-F the context-pool family (seeds 3060-3071)
+
+Token-type frequencies over S87's sample (4096 sequences, torch.Generator(87_000), input tokens), both cuts, and the cap of a fixed type -> channel map (the fraction of sequences whose D contexts land on D distinct channels; exact):
+
+| task | CTX types | KEY types | VAL types | largest-ratio cut | half-mass cut | cap at k = D | k = 2D | k = 16 |
+|---|---|---|---|---|---|---|---|---|
+| CTXPOOL (D = 2) | 16 (0.0135-0.0154) | 4 (0.1017-0.1027) | 16 (0.0220-0.0236) | 4 KEY | 4 KEY, 4 VAL (mass 0.502) | 64/120 = 0.533 | 0.800 | 1.000 |
+| DOCS3 (D = 3) | 16 (0.0126-0.0145) | 4 (0.1013-0.1018) | 16 (0.0229-0.0242) | 4 KEY | 4 KEY, 4 VAL (mass 0.502) | 150/560 = 0.268 | 0.664 | 1.000 |
+| DOCS4 (D = 4) | 16 (0.0128-0.0139) | 4 (0.1010-0.1014) | 16 (0.0233-0.0244) | 4 KEY | 4 KEY, 4 VAL (mass 0.502) | 256/1820 = 0.141 | 0.615 | 1.000 |
+
+Phase 0, no-memory solvability (held-out accuracy at the end, seeds 3060 / 3061; rule: stopped if > 0.6), with P(the target pair inside the reach) and the positional bound P + (1 - P)/(n_vals - S + 1):
+
+| task | NOMEM (reach 4) | bound | NOMEM_SELF (reach 10) | bound | stopped |
+|---|---|---|---|---|---|
+| CTXPOOL | 0.168 / 0.166 | P 0.129, bound 0.187 | 0.366 / 0.365 | P 0.382, bound 0.423 | False |
+| DOCS3 | 0.123 / 0.123 | P 0.091, bound 0.156 | 0.190 / 0.200 | P 0.257, bound 0.310 | False |
+| DOCS4 | 0.110 / 0.110 | P 0.069, bound 0.141 | 0.165 / 0.121 | P 0.187, bound 0.250 | False |
+
+Phase 1, validity pilots (the perfect gate handed the per-sequence index, k = S, SLOW; seeds 3060 / 3061; transition or final accuracy), and the readings per task and memory:
+
+| task | memory | 24000 | 48000 (fallback) | reading |
+|---|---|---|---|---|
+| CTXPOOL | HEBBCONV | @2400; @4800 | not run | **the task is valid** |
+| CTXPOOL | DELTA | @1200; @2400 | not run | **the task is valid** |
+| DOCS3 | HEBBCONV | @3600; @3600 | not run | **the task is valid** |
+| DOCS3 | DELTA | @1200; @2400 | not run | **the task is valid** |
+| DOCS4 | HEBBCONV | @3600; @3600 | not run | **the task is valid** |
+| DOCS4 | DELTA | @1200; @2400 | not run | **the task is valid** |
+
+The type-level perfect gate (balanced map of the 16 types to k = S channels; 24000; descriptive): final accuracy; end fraction of probe sequences separated / the cap; end margin; sep_key_inv; VAL cos within sequences:
+
+| task | memory | 3060 | 3061 | separated (cap) | margin | sep_key_inv | VAL cos (within) |
+|---|---|---|---|---|---|---|---|
+| CTXPOOL | HEBBCONV | unbound 0.77 | unbound 0.76 | 0.53 (0.533) | 0.53 | 0.53 | 0.47 |
+| CTXPOOL | DELTA | @9600 | @10800 | 0.53 (0.533) | 0.53 | 0.53 | 0.47 |
+| DOCS3 | HEBBCONV | unbound 0.73 | unbound 0.72 | 0.32 (0.268) | 0.73 | 0.73 | 0.27 |
+| DOCS3 | DELTA | @8400 | @8400 | 0.32 (0.268) | 0.73 | 0.73 | 0.27 |
+| DOCS4 | HEBBCONV | unbound 0.81 | unbound 0.73 | 0.14 (0.141) | 0.80 | 0.80 | 0.20 |
+| DOCS4 | DELTA | @9600 | @10800 | 0.14 (0.141) | 0.80 | 0.80 | 0.20 |
+
+Phase 2, the screen (one channel, no gate; seeds 3062-3071 paired; at each (task, memory)'s budget):
+
+| task | arm | budget | BOUND | transitions (median; all) | unbound: final acc | write order: last / not last |
+|---|---|---|---|---|---|---|
+| CTXPOOL | SINGLE_HEBBCONV_CTXPOOL | 24000 | 0/10 [0.00, 0.28] NEVER | -- | 3062 0.48, 3063 0.50, 3064 0.49, 3065 0.51, 3066 0.49, 3067 0.49, 3068 0.50, 3069 0.51, 3070 0.51, 3071 0.49 | 0.52 / 0.48 |
+| CTXPOOL | SINGLE_DELTA_CTXPOOL | 24000 | 10/10 [0.72, 1.00] RELIABLE | 9600 (7200, 8400, 8400, 8400, 9600, 9600, 9600, 10800, 14400, 15600) | none | 0.99 / 0.99 |
+| DOCS3 | SINGLE_HEBBCONV_DOCS3 | 24000 | 0/10 [0.00, 0.28] NEVER | -- | 3062 0.34, 3063 0.33, 3064 0.32, 3065 0.35, 3066 0.35, 3067 0.33, 3068 0.34, 3069 0.35, 3070 0.34, 3071 0.33 | 0.35 / 0.33 |
+| DOCS3 | SINGLE_DELTA_DOCS3 | 24000 | 0/10 [0.00, 0.28] NEVER | -- | 3062 0.43, 3063 0.34, 3064 0.32, 3065 0.81, 3066 0.33, 3067 0.33, 3068 0.30, 3069 0.32, 3070 0.32, 3071 0.32 | 0.43 / 0.36 |
+| DOCS4 | SINGLE_HEBBCONV_DOCS4 | 24000 | 0/10 [0.00, 0.28] NEVER | -- | 3062 0.25, 3063 0.24, 3064 0.24, 3065 0.25, 3066 0.24, 3067 0.24, 3068 0.26, 3069 0.25, 3070 0.24, 3071 0.25 | 0.24 / 0.25 |
+| DOCS4 | SINGLE_DELTA_DOCS4 | 24000 | 0/10 [0.00, 0.28] NEVER | -- | 3062 0.22, 3063 0.23, 3064 0.24, 3065 0.24, 3066 0.20, 3067 0.24, 3068 0.22, 3069 0.25, 3070 0.22, 3071 0.24 | 0.25 / 0.22 |
+
+- CTXPOOL: SINGLE_DELTA 10/10 vs SINGLE_HEBBCONV 0/10: delta only 10, Hebbian + conv only 0; exact one-sided McNemar p (delta > Hebbian) = 0.0009766, (Hebbian > delta) = 1
+- DOCS3: SINGLE_DELTA 0/10 vs SINGLE_HEBBCONV 0/10: delta only 0, Hebbian + conv only 0; exact one-sided McNemar p (delta > Hebbian) = 1, (Hebbian > delta) = 1
+- DOCS4: SINGLE_DELTA 0/10 vs SINGLE_HEBBCONV 0/10: delta only 0, Hebbian + conv only 0; exact one-sided McNemar p (delta > Hebbian) = 1, (Hebbian > delta) = 1
+
+Per run (phase 2): seed outcome (B@t bound at t; else final accuracy):
+
+- SINGLE_HEBBCONV_CTXPOOL: 3062 0.48; 3063 0.50; 3064 0.49; 3065 0.51; 3066 0.49; 3067 0.49; 3068 0.50; 3069 0.51; 3070 0.51; 3071 0.49
+- SINGLE_DELTA_CTXPOOL: 3062 B@8400; 3063 B@8400; 3064 B@9600; 3065 B@9600; 3066 B@9600; 3067 B@7200; 3068 B@8400; 3069 B@14400; 3070 B@10800; 3071 B@15600
+- SINGLE_HEBBCONV_DOCS3: 3062 0.34; 3063 0.33; 3064 0.32; 3065 0.35; 3066 0.35; 3067 0.33; 3068 0.34; 3069 0.35; 3070 0.34; 3071 0.33
+- SINGLE_DELTA_DOCS3: 3062 0.43; 3063 0.34; 3064 0.32; 3065 0.81; 3066 0.33; 3067 0.33; 3068 0.30; 3069 0.32; 3070 0.32; 3071 0.32
+- SINGLE_HEBBCONV_DOCS4: 3062 0.25; 3063 0.24; 3064 0.24; 3065 0.25; 3066 0.24; 3067 0.24; 3068 0.26; 3069 0.25; 3070 0.24; 3071 0.25
+- SINGLE_DELTA_DOCS4: 3062 0.22; 3063 0.23; 3064 0.24; 3065 0.24; 3066 0.20; 3067 0.24; 3068 0.22; 3069 0.25; 3070 0.22; 3071 0.24
+
+READINGS per task and memory: **CTXPOOL HEBBCONV: the task is valid**; **CTXPOOL DELTA: the task is valid**; **DOCS3 HEBBCONV: the task is valid**; **DOCS3 DELTA: the task is valid**; **DOCS4 HEBBCONV: the task is valid**; **DOCS4 DELTA: the task is valid**
+
+SCREEN READING (CTXPOOL, one delta channel): **one channel binds without a context identity**
+
+F/s90_ctx: 96 runs ok (failed records 0), 11.48 h of run time; CPUs ['Intel(R) Xeon(R) Processor @ 2.10GHz']; code SHA 809fde1f5168; decision {'phase0': {'CTXPOOL': {'acc': {'NOMEM': [0.16845703125, 0.166015625], 'NOMEM_SELF': [0.36572265625, 0.365234375]}, 'stopped': False}, 'DOCS3': {'acc': {'NOMEM': [0.123046875, 0.12255859375], 'NOMEM_SELF': [0.1904296875, 0.2001953125]}, 'stopped': False}, 'DOCS4': {'acc': {'NOMEM': [0.1103515625, 0.1103515625], 'NOMEM_SELF': [0.16455078125, 0.12060546875]}, 'stopped': False}}, 'budget': {'CTXPOOL': {'HEBBCONV': 24000, 'DELTA': 24000}, 'DOCS3': {'HEBBCONV': 24000, 'DELTA': 24000}, 'DOCS4': {'HEBBCONV': 24000, 'DELTA': 24000}}, 'pilots': {'CTXPOOL': {'HEBBCONV': {'at24': True, 'double': False}, 'DELTA': {'at24': True, 'double': False}}, 'DOCS3': {'HEBBCONV': {'at24': True, 'double': False}, 'DELTA': {'at24': True, 'double': False}}, 'DOCS4': {'HEBBCONV': {'at24': True, 'double': False}, 'DELTA': {'at24': True, 'double': False}}}}
+exit 0
+  code SHA F/s90_ctx: 809fde1f5168 over 27 modules (bdh, bdh_recurrent, explore_b16_gates, explore_common, explore_common2, explore_delta_mem, explore_f_delta_fast, explore_f_s89_tasks_child, explore_f_s90_ctx_child, explore_f_tasks, explore_f_window_delta_child, explore_local_gate, explore_window_recipe_child, test_binding_capacity, test_binding_onset, test_binding_recipe, test_channel_binding, test_instrument_v2, test_interference, test_multilayer_binding, test_readout_path, test_router_confirm, test_router_curriculum, test_router_discovery, test_router_layout, test_router_reliability, test_short_conv)
+  decision: {"phase0": {"CTXPOOL": {"acc": {"NOMEM": [0.16845703125, 0.166015625], "NOMEM_SELF": [0.36572265625, 0.365234375]}, "stopped": false}, "DOCS3": {"acc": {"NOMEM": [0.123046875, 0.12255859375], "NOMEM_SELF": [0.1904296875, 0.2001953125]}, "stopped": false}, "DOCS4": {"acc": {"NOMEM": [0.1103515625, 0.1103515625], "NOMEM_SELF": [0.16455078125, 0.12060546875]}, "stopped": false}}, "budget": {"CTXPOOL": {"HEBBCONV": 24000, "DELTA": 24000}, "DOCS3": {"HEBBCONV": 24000, "DELTA": 24000}, "DOCS4": {"HEBBCONV": 24000, "DELTA": 24000}}, "pilots": {"CTXPOOL": {"HEBBCONV": {"at24": true, "double": false}, "DELTA": {"at24": true, "double": false}}, "DOCS3": {"HEBBCONV": {"at24": true, "double": false}, "DELTA": {"at24": true, "double": false}}, "DOCS4": {"HEBBCONV": {"at24": true, "double": false}, "DELTA": {"at24": true, "double": false}}}}
