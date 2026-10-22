@@ -731,3 +731,23 @@ the type-level routing cap (0.48-0.54 of sequences routed; the cap of a fixed CT
 not separate "keys are not frequent" from "contexts have no fixed identity". Handed back: the repeat hinge as the
 label-free candidate, with the caveat that POOL's margin over no hinge is 4 pairs; on lite it was not run. No Hebbian
 learned arm ran (F's conv pilot "partly"; no conv path in the register models).
+
+## Session G — S89H (S89's hinges on Hebbian memory + conv)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. F's RandHeaderTask-pool (24000) and -allpool (48000), Hebbian
+memory + conv 'layer' (F's valid Hebbian configuration of round 6), k = 2, SLOW, the REG3 model; S89's seeds (perfect gate
+2840-2841: 2/2 on both tasks; arms 2842-2861). Readings with V's two caveats committed at d5d48ee before any run.
+204/204 runs ok. Report `G/report_9.md`.
+
+| arm | POOL | ALLPOOL | S89 delta POOL | reading |
+|---|---|---|---|---|
+| BASELINE_H | 0/20 | 0/20 | 0/20 | – |
+| REG3_H | 9/20 | 0/20 | 16/20 | POOL 2b: the hinge is needed over the register (KH 9 / 0, p 0.002) |
+| REG3_KEYHINGE_H | 18/20 | 0/20 | 20/20 | ALLPOOL: "the labelled hinge itself fails here" |
+| REG3_FREQHINGE_H | 18/20 | 0/20 | 7/20 | POOL: "survives" (2 / 2); not hurting the register (vs REG3 9 / 0) |
+| REG3_REPEATHINGE_H | 19/20 | 0/20 | 20/20 | POOL: "replaces the key hinge" (0 / 1); vs REG3 10 / 0 |
+
+The question "does the repeat hinge's result hold on Hebbian memory": POOL **"holds, and the hinge is needed here"**;
+ALLPOOL "cannot be asked here" (every arm at the type-level routing cap). Read through the same function, S89's delta POOL
+gives "holds (descriptive: the register does not need the hinge here either)". Handed back: the repeat hinge, on Hebbian
+memory with the conv and on POOL, as the label-free replacement for the key hinge; a main-line spec would need the conv.

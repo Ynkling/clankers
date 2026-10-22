@@ -1,0 +1,49 @@
+{
+ "readings": {
+  "pool": {
+   "validity": "PERFECT_H (Hebbian + conv, SLOW, 24000) on 2840-2841 bound 2/2: 2840 bound @6000, 2841 bound @7200",
+   "counts": "BASELINE_H 0/20, REG3_H 9/20, REG3_KEYHINGE_H 18/20, REG3_FREQHINGE_H 18/20, REG3_REPEATHINGE_H 19/20",
+   "REG3_KEYHINGE vs BASELINE": "KH only 18, BASELINE only 0, p 3.81e-06",
+   "first": "the labelled hinge is discovered; per-arm names below",
+   "2b": "the hinge is needed over the register (KH only 9, REG3 only 0, p 0.00195, n 20)",
+   "REG3_FREQHINGE_H": "THE FREQUENCY HINGE SURVIVES (discovered yes (arm only 18, BASELINE only 0, p 3.81e-06); vs KH: KH only 2, arm only 2, p(KH >) 0.688, n 20; vs REG3: arm only 9, REG3 only 0, p(arm >) 0.00195, p(REG3 >) 1, n 20); clamps: does not apply (arm only 18, BASELINE only 0; commitment at 2400 0.1720 vs BASELINE 0.7079)",
+   "REG3_REPEATHINGE_H": "THE REPEAT HINGE REPLACES THE KEY HINGE (discovered yes (arm only 19, BASELINE only 0, p 1.91e-06); vs KH: KH only 0, arm only 1, p(KH >) 1, n 20; vs REG3: arm only 10, REG3 only 0, p(arm >) 0.000977, p(REG3 >) 1, n 20); clamps: does not apply (arm only 19, BASELINE only 0; commitment at 2400 0.9247 vs BASELINE 0.7079)",
+   "question": "holds, and the hinge is needed here",
+   "S89 delta, read through the same function (descriptive, after the fact)": "first: the labelled hinge is discovered; per-arm names below; 2b: the register does not need the hinge here (KH only 4, REG3 only 0, p 0.0625, n 20): the names below are descriptive; REPEAT: THE REPEAT HINGE REPLACES THE KEY HINGE; question: holds (descriptive: the register does not need the hinge here either)",
+   "commitment at 2400 (median spread)": "BASELINE_H 0.7079, REG3_H 0.9571, REG3_KEYHINGE_H 0.9154, REG3_FREQHINGE_H 0.1720, REG3_REPEATHINGE_H 0.9247"
+  },
+  "allpool": {
+   "validity": "PERFECT_H (Hebbian + conv, SLOW, 48000) on 2840-2841 bound 2/2: 2840 bound @9600, 2841 bound @6000",
+   "counts": "BASELINE_H 0/20, REG3_H 0/20, REG3_KEYHINGE_H 0/20, REG3_FREQHINGE_H 0/20, REG3_REPEATHINGE_H 0/20",
+   "REG3_KEYHINGE vs BASELINE": "KH only 0, BASELINE only 0, p 1",
+   "first": "the labelled hinge itself fails here",
+   "question": "cannot be asked here",
+   "S89 delta, read through the same function (descriptive, after the fact)": "first: the labelled hinge itself fails here; 2b: -; REPEAT: -; question: cannot be asked here",
+   "caveats": "the routing cap: a fixed CTX-type map separates at most 0.533 of sequences, so a null does not separate 'keys are not frequent' from 'contexts have no fixed identity'; F's type-level perfect gate ran on Hebbian without the conv only (O_TYPE_HEBB_ALLPOOL 0/2)",
+   "commitment at 2400 (median spread)": "BASELINE_H 0.9531, REG3_H 0.9322, REG3_KEYHINGE_H 0.1727, REG3_FREQHINGE_H 0.0733, REG3_REPEATHINGE_H 0.2039"
+  }
+ },
+ "memories": {
+  "pool.BASELINE_H vs BASELINE_D": "Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20",
+  "pool.REG3_H vs REG3_D": "Hebbian-conv 9/20, delta 16/20; Hebbian only 0, delta only 7, p(Hebbian >) 1, p(delta >) 0.00781, n 20",
+  "pool.REG3_KEYHINGE_H vs REG3_KEYHINGE_D": "Hebbian-conv 18/20, delta 20/20; Hebbian only 0, delta only 2, p(Hebbian >) 1, p(delta >) 0.25, n 20",
+  "pool.REG3_FREQHINGE_H vs REG3_FREQHINGE_D": "Hebbian-conv 18/20, delta 7/20; Hebbian only 11, delta only 0, p(Hebbian >) 0.000488, p(delta >) 1, n 20",
+  "pool.REG3_REPEATHINGE_H vs REG3_REPEATHINGE_D": "Hebbian-conv 19/20, delta 20/20; Hebbian only 0, delta only 1, p(Hebbian >) 1, p(delta >) 0.5, n 20",
+  "allpool.BASELINE_H vs BASELINE_D": "Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20",
+  "allpool.REG3_H vs REG3_D": "Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20",
+  "allpool.REG3_KEYHINGE_H vs REG3_KEYHINGE_D": "Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20",
+  "allpool.REG3_FREQHINGE_H vs REG3_FREQHINGE_D": "Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20",
+  "allpool.REG3_REPEATHINGE_H vs REG3_REPEATHINGE_D": "Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20"
+ },
+ "across": {
+  "BASELINE_H": "pool 0/20, allpool 0/20; pool only 0, allpool only 0, p(pool >) 1, n 20",
+  "REG3_H": "pool 9/20, allpool 0/20; pool only 9, allpool only 0, p(pool >) 0.00195, n 20",
+  "REG3_KEYHINGE_H": "pool 18/20, allpool 0/20; pool only 18, allpool only 0, p(pool >) 3.81e-06, n 20",
+  "REG3_REPEATHINGE_H": "pool 19/20, allpool 0/20; pool only 19, allpool only 0, p(pool >) 1.91e-06, n 20"
+ },
+ "lite": {
+  "BASELINE": "0/20 [0.00, 0.16] NEVER",
+  "REG3_KEYHINGE": "20/20 [0.84, 1.00] RELIABLE",
+  "REG3_FREQHINGE": "17/20 [0.64, 0.95] MAJORITY"
+ }
+}

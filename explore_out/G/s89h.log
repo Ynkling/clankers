@@ -525,3 +525,400 @@ EXPLORATORY, NOT A RESULT — Session G S89H
   [ 79/84]   84.2 min  pool.REG3_REPEATHINGE_H seed 2860  acc 0.988 trans  4800 ROUTED-BOUND
   [ 80/84]   86.9 min  pool.REG3_KEYHINGE_H seed 2861  acc 0.993 trans  6000 ROUTED-BOUND
   [ 81/84]   87.1 min  pool.REG3_FREQHINGE_H seed 2861  acc 0.994 trans  6000 ROUTED-BOUND
+  [ 82/84]   87.6 min  pool.BASELINE_H seed 2861  acc 0.963 trans 20400 BOUND unrouted
+  [ 83/84]   89.7 min  pool.REG3_REPEATHINGE_H seed 2861  acc 0.991 trans  6000 ROUTED-BOUND
+  [ 84/84]   90.3 min  pool.REG3_H  seed 2861  acc 0.381 trans  None OTHER
+  s89h: code SHA 0f1f20cb2fa8 (35 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  0 runs queued on 4 workers
+  S89H runs done in 98.3 min
+| arm | n | BOUND | ROUTED-BOUND | ROUTED*@end | DISCOVERED | BOUND ROUTED (mine) | unbound classes | transitions | median acc |
+|---|---|---|---|---|---|---|---|---|---|
+| pool.PERFECT_H | 2 | 2/2 [0.34, 1.00] RELIABLE | 2/2 [0.34, 1.00] RELIABLE | 2/2 | 2/2 | 2/2 | - | median 6600 (6000-7200) | 0.989 |
+| pool.BASELINE_H | 20 | 4/20 [0.08, 0.42] MINORITY | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 4/20 | KEY 1, OTHER 5, STREAM-PARTIAL 10 | median 20400 (16800-21600) | 0.750 |
+| pool.REG3_H | 20 | 9/20 [0.26, 0.66] MINORITY | 9/20 [0.26, 0.66] MINORITY | 9/20 | 9/20 | 9/20 | OTHER 11 | median 6000 (4800-9600) | 0.439 |
+| pool.REG3_KEYHINGE_H | 20 | 19/20 [0.76, 0.99] RELIABLE | 18/20 [0.70, 0.97] RELIABLE | 19/20 | 19/20 | 19/20 | STREAM-PARTIAL 1 | median 6000 (4800-9600) | 0.989 |
+| pool.REG3_FREQHINGE_H | 20 | 18/20 [0.70, 0.97] RELIABLE | 18/20 [0.70, 0.97] RELIABLE | 20/20 | 18/20 | 18/20 | STREAM-PARTIAL 2 | median 6600 (6000-20400) | 0.990 |
+| pool.REG3_REPEATHINGE_H | 20 | 19/20 [0.76, 0.99] RELIABLE | 19/20 [0.76, 0.99] RELIABLE | 20/20 | 19/20 | 19/20 | STREAM-PARTIAL 1 | median 6000 (4800-19200) | 0.989 |
+| allpool.PERFECT_H | 2 | 2/2 [0.34, 1.00] RELIABLE | 2/2 [0.34, 1.00] RELIABLE | 2/2 | 2/2 | 2/2 | - | median 7800 (6000-9600) | 0.983 |
+| allpool.BASELINE_H | 20 | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 0/20 | KEY 3, OTHER 17 | - | 0.373 |
+| allpool.REG3_H | 20 | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 0/20 | OTHER 19, POSITION 1 | - | 0.350 |
+| allpool.REG3_KEYHINGE_H | 20 | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 0/20 | MERGED 16, OTHER 1, POSITION 1, STREAM-PARTIAL 2 | - | 0.522 |
+| allpool.REG3_FREQHINGE_H | 20 | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 0/20 | KEY 2, MERGED 15, STREAM-PARTIAL 3 | - | 0.581 |
+| allpool.REG3_REPEATHINGE_H | 20 | 0/20 [0.00, 0.16] NEVER | 0/20 [0.00, 0.16] NEVER | 0/20 | 0/20 | 0/20 | KEY 2, MERGED 11, OTHER 1, POSITION 5, STREAM-PARTIAL 1 | - | 0.424 |
+OUTCOME FORM: pool pooled eta^2, allpool within-sequence (eta^2 and VAL cos). ROUTED-BOUND under the other form, descriptive: pool.PERFECT_H 2/2, allpool.PERFECT_H 2/2, pool.BASELINE_H 0/20, pool.REG3_H 9/20, pool.REG3_KEYHINGE_H 18/20, pool.REG3_FREQHINGE_H 18/20, pool.REG3_REPEATHINGE_H 19/20, allpool.BASELINE_H 0/20, allpool.REG3_H 0/20, allpool.REG3_KEYHINGE_H 0/20, allpool.REG3_FREQHINGE_H 0/20, allpool.REG3_REPEATHINGE_H 0/20
+
+READINGS:
+  pool:
+      validity: PERFECT_H (Hebbian + conv, SLOW, 24000) on 2840-2841 bound 2/2: 2840 bound @6000, 2841 bound @7200
+      counts: BASELINE_H 0/20, REG3_H 9/20, REG3_KEYHINGE_H 18/20, REG3_FREQHINGE_H 18/20, REG3_REPEATHINGE_H 19/20
+      REG3_KEYHINGE vs BASELINE: KH only 18, BASELINE only 0, p 3.81e-06
+      first: the labelled hinge is discovered; per-arm names below
+      2b: the hinge is needed over the register (KH only 9, REG3 only 0, p 0.00195, n 20)
+      REG3_FREQHINGE_H: THE FREQUENCY HINGE SURVIVES (discovered yes (arm only 18, BASELINE only 0, p 3.81e-06); vs KH: KH only 2, arm only 2, p(KH >) 0.688, n 20; vs REG3: arm only 9, REG3 only 0, p(arm >) 0.00195, p(REG3 >) 1, n 20); clamps: does not apply (arm only 18, BASELINE only 0; commitment at 2400 0.1720 vs BASELINE 0.7079)
+      REG3_REPEATHINGE_H: THE REPEAT HINGE REPLACES THE KEY HINGE (discovered yes (arm only 19, BASELINE only 0, p 1.91e-06); vs KH: KH only 0, arm only 1, p(KH >) 1, n 20; vs REG3: arm only 10, REG3 only 0, p(arm >) 0.000977, p(REG3 >) 1, n 20); clamps: does not apply (arm only 19, BASELINE only 0; commitment at 2400 0.9247 vs BASELINE 0.7079)
+      question: holds, and the hinge is needed here
+      S89 delta, read through the same function (descriptive, after the fact): first: the labelled hinge is discovered; per-arm names below; 2b: the register does not need the hinge here (KH only 4, REG3 only 0, p 0.0625, n 20): the names below are descriptive; REPEAT: THE REPEAT HINGE REPLACES THE KEY HINGE; question: holds (descriptive: the register does not need the hinge here either)
+      commitment at 2400 (median spread): BASELINE_H 0.7079, REG3_H 0.9571, REG3_KEYHINGE_H 0.9154, REG3_FREQHINGE_H 0.1720, REG3_REPEATHINGE_H 0.9247
+  allpool:
+      validity: PERFECT_H (Hebbian + conv, SLOW, 48000) on 2840-2841 bound 2/2: 2840 bound @9600, 2841 bound @6000
+      counts: BASELINE_H 0/20, REG3_H 0/20, REG3_KEYHINGE_H 0/20, REG3_FREQHINGE_H 0/20, REG3_REPEATHINGE_H 0/20
+      REG3_KEYHINGE vs BASELINE: KH only 0, BASELINE only 0, p 1
+      first: the labelled hinge itself fails here
+      question: cannot be asked here
+      S89 delta, read through the same function (descriptive, after the fact): first: the labelled hinge itself fails here; 2b: -; REPEAT: -; question: cannot be asked here
+      caveats: the routing cap: a fixed CTX-type map separates at most 0.533 of sequences, so a null does not separate 'keys are not frequent' from 'contexts have no fixed identity'; F's type-level perfect gate ran on Hebbian without the conv only (O_TYPE_HEBB_ALLPOOL 0/2)
+      commitment at 2400 (median spread): BASELINE_H 0.9531, REG3_H 0.9322, REG3_KEYHINGE_H 0.1727, REG3_FREQHINGE_H 0.0733, REG3_REPEATHINGE_H 0.2039
+  ACROSS MEMORIES (descriptive; memory and conv differ together):
+      pool.BASELINE_H vs BASELINE_D: Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20
+      pool.REG3_H vs REG3_D: Hebbian-conv 9/20, delta 16/20; Hebbian only 0, delta only 7, p(Hebbian >) 1, p(delta >) 0.00781, n 20
+      pool.REG3_KEYHINGE_H vs REG3_KEYHINGE_D: Hebbian-conv 18/20, delta 20/20; Hebbian only 0, delta only 2, p(Hebbian >) 1, p(delta >) 0.25, n 20
+      pool.REG3_FREQHINGE_H vs REG3_FREQHINGE_D: Hebbian-conv 18/20, delta 7/20; Hebbian only 11, delta only 0, p(Hebbian >) 0.000488, p(delta >) 1, n 20
+      pool.REG3_REPEATHINGE_H vs REG3_REPEATHINGE_D: Hebbian-conv 19/20, delta 20/20; Hebbian only 0, delta only 1, p(Hebbian >) 1, p(delta >) 0.5, n 20
+      allpool.BASELINE_H vs BASELINE_D: Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20
+      allpool.REG3_H vs REG3_D: Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20
+      allpool.REG3_KEYHINGE_H vs REG3_KEYHINGE_D: Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20
+      allpool.REG3_FREQHINGE_H vs REG3_FREQHINGE_D: Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20
+      allpool.REG3_REPEATHINGE_H vs REG3_REPEATHINGE_D: Hebbian-conv 0/20, delta 0/20; Hebbian only 0, delta only 0, p(Hebbian >) 1, p(delta >) 1, n 20
+  ACROSS TASKS (descriptive; FREQ not compared; budgets 24000 / 48000):
+      BASELINE_H: pool 0/20, allpool 0/20; pool only 0, allpool only 0, p(pool >) 1, n 20
+      REG3_H: pool 9/20, allpool 0/20; pool only 9, allpool only 0, p(pool >) 0.00195, n 20
+      REG3_KEYHINGE_H: pool 18/20, allpool 0/20; pool only 18, allpool only 0, p(pool >) 3.81e-06, n 20
+      REG3_REPEATHINGE_H: pool 19/20, allpool 0/20; pool only 19, allpool only 0, p(pool >) 1.91e-06, n 20
+  LITE REFERENCE (S87, Hebbian, no conv, 2700-2719): BASELINE 0/20 [0.00, 0.16] NEVER, REG3_KEYHINGE 20/20 [0.84, 1.00] RELIABLE, REG3_FREQHINGE 17/20 [0.64, 0.95] MAJORITY
+  pool.BASELINE_H: end median margin 0.457, eta^2 by stream at KEY pooled 0.495 / within 0.496, eta^2 by key at KEY 0.010, sequences routed median 0.00 (max 0.00)
+  pool.BASELINE_H: commitment (spread) by step 0 0.0018, 1200 0.7029, 2400 0.7079, 3600 0.6685
+  pool.REG3_H: end median margin 0.000, eta^2 by stream at KEY pooled 0.006 / within 0.201, eta^2 by key at KEY 0.013, sequences routed median 0.00 (max 1.00)
+  pool.REG3_H: commitment (spread) by step 0 0.0182, 1200 0.7727, 2400 0.9571, 3600 0.9827
+  pool.REG3_KEYHINGE_H: firings median 98.5 (71-137)
+  pool.REG3_KEYHINGE_H: end median margin 1.000, eta^2 by stream at KEY pooled 1.000 / within 1.000, eta^2 by key at KEY 0.000, sequences routed median 1.00 (max 1.00)
+  pool.REG3_KEYHINGE_H: commitment (spread) by step 0 0.0182, 1200 0.0471, 2400 0.9154, 3600 0.9734
+  pool.REG3_FREQHINGE_H: firings median 128.5 (66-264)
+  pool.REG3_FREQHINGE_H: end median margin 0.978, eta^2 by stream at KEY pooled 1.000 / within 1.000, eta^2 by key at KEY 0.000, sequences routed median 1.00 (max 1.00)
+  pool.REG3_FREQHINGE_H: commitment (spread) by step 0 0.0182, 1200 0.2012, 2400 0.1720, 3600 0.9602
+  pool.REG3_REPEATHINGE_H: firings median 123.5 (85-162)
+  pool.REG3_REPEATHINGE_H: end median margin 1.000, eta^2 by stream at KEY pooled 1.000 / within 1.000, eta^2 by key at KEY 0.000, sequences routed median 1.00 (max 1.00)
+  pool.REG3_REPEATHINGE_H: commitment (spread) by step 0 0.0182, 1200 0.0797, 2400 0.9247, 3600 0.9690
+  allpool.BASELINE_H: end median margin 0.000, eta^2 by stream at KEY pooled 0.002 / within 0.038, eta^2 by key at KEY 0.020, sequences routed median 0.00 (max 0.00)
+  allpool.BASELINE_H: commitment (spread) by step 0 0.0021, 1200 0.8977, 2400 0.9531, 3600 0.9925
+  allpool.REG3_H: end median margin 0.000, eta^2 by stream at KEY pooled 0.063 / within 0.092, eta^2 by key at KEY 0.016, sequences routed median 0.00 (max 0.02)
+  allpool.REG3_H: commitment (spread) by step 0 0.0170, 1200 0.7681, 2400 0.9322, 3600 0.9887
+  allpool.REG3_KEYHINGE_H: firings median 347.5 (233-393)
+  allpool.REG3_KEYHINGE_H: end median margin 0.464, eta^2 by stream at KEY pooled 0.001 / within 0.513, eta^2 by key at KEY 0.013, sequences routed median 0.46 (max 0.57)
+  allpool.REG3_KEYHINGE_H: commitment (spread) by step 0 0.0170, 1200 0.0985, 2400 0.1727, 3600 0.9579
+  allpool.REG3_FREQHINGE_H: firings median 126.0 (110-156)
+  allpool.REG3_FREQHINGE_H: end median margin 0.513, eta^2 by stream at KEY pooled 0.001 / within 0.578, eta^2 by key at KEY 0.013, sequences routed median 0.53 (max 0.57)
+  allpool.REG3_FREQHINGE_H: commitment (spread) by step 0 0.0170, 1200 0.0604, 2400 0.0733, 3600 0.9613
+  allpool.REG3_REPEATHINGE_H: firings median 186.5 (148-257)
+  allpool.REG3_REPEATHINGE_H: end median margin 0.369, eta^2 by stream at KEY pooled 0.001 / within 0.409, eta^2 by key at KEY 0.013, sequences routed median 0.37 (max 0.55)
+  allpool.REG3_REPEATHINGE_H: commitment (spread) by step 0 0.0170, 1200 0.1142, 2400 0.2039, 3600 0.7216
+
+DIAGNOSTICS:
+- pool.PERFECT_H:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  in-run probe (median held-out acc) L2|K 0.64, L2|V 0.56, L3|K 0.63, L3|V 0.55, final|K 0.56, final|V 0.54
+  write order: acc last-written 0.99, not-last 0.98
+- pool.BASELINE_H:
+  margin at VAL by layer (median) L1 0.46, L2 0.46, L3 0.46
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.12, 0.89], [0.51, 0.49]]; KEY [[0.53, 0.47], [0.38, 0.62]]; VAL [[0.69, 0.31], [0.39, 0.61]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.12, 0.89], [0.51, 0.49]]; KEY [[0.53, 0.47], [0.38, 0.62]]; VAL [[0.69, 0.31], [0.39, 0.61]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.12, 0.89], [0.51, 0.49]]; KEY [[0.53, 0.47], [0.38, 0.62]]; VAL [[0.69, 0.31], [0.39, 0.61]]
+  in-run probe (median held-out acc) L2|K 0.65, L2|V 0.62, L3|K 0.61, L3|V 0.59, final|K 0.55, final|V 0.52
+  plateau (16 unbound runs; acc 0.64): acc by (stream|block|index) 0|0|0 0.66, 0|0|1 0.58, 0|0|2 0.55, 0|1|0 0.67, 0|1|1 0.58, 0|1|2 0.65, 1|0|0 0.65, 1|0|1 0.59, 1|0|2 0.59, 1|1|0 0.71, 1|1|1 0.55, 1|1|2 0.63
+  write order: acc last-written 0.76, not-last 0.73
+- pool.REG3_H:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.5, 0.5], [0.6, 0.4]]; KEY [[0.5, 0.5], [0.21, 0.79]]; VAL [[0.99, 0.01], [0.5, 0.5]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.5, 0.5], [0.6, 0.4]]; KEY [[0.44, 0.56], [0.25, 0.75]]; VAL [[0.99, 0.01], [0.5, 0.5]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.5, 0.5], [0.54, 0.46]]; KEY [[0.34, 0.66], [0.3, 0.7]]; VAL [[0.99, 0.01], [0.5, 0.5]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.12/0.11/0.11; 2400 0.10/0.09/0.09; 4800 0.08/0.07/0.07; 9600 0.06/0.05/0.05; 14400 0.04/0.04/0.05; 19200 0.03/0.04/0.04; 24000 0.03/0.04/0.04; end 0.04/0.05/0.05
+  in-run probe (median held-out acc) L2|K 0.67, L2|V 0.57, L3|K 0.62, L3|V 0.55, final|K 0.56, final|V 0.53
+  plateau (11 unbound runs; acc 0.38): acc by (stream|block|index) 0|0|0 0.37, 0|0|1 0.33, 0|0|2 0.35, 0|1|0 0.38, 0|1|1 0.47, 0|1|2 0.42, 1|0|0 0.34, 1|0|1 0.34, 1|0|2 0.38, 1|1|0 0.41, 1|1|1 0.40, 1|1|2 0.40
+  write order: acc last-written 0.49, not-last 0.40
+- pool.REG3_KEYHINGE_H:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.42, 0.58], [0.59, 0.41]]; KEY [[0.99, 0.01], [0.01, 0.99]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.42, 0.58], [0.59, 0.41]]; KEY [[0.99, 0.01], [0.01, 0.99]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.42, 0.58], [0.59, 0.41]]; KEY [[0.99, 0.01], [0.01, 0.99]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.12/0.12/0.12; 2400 0.27/0.19/0.20; 4800 0.59/0.17/0.23; end 0.75/0.15/0.23
+  in-run probe (median held-out acc) L2|K 0.74, L2|V 0.70, L3|K 0.66, L3|V 0.65, final|K 0.54, final|V 0.57
+  plateau (1 unbound runs; acc 0.51): acc by (stream|block|index) 0|0|0 0.50, 0|0|1 0.47, 0|0|2 0.51, 0|1|0 0.53, 0|1|1 0.54, 0|1|2 0.55, 1|0|0 0.51, 1|0|1 0.46, 1|0|2 0.52, 1|1|0 0.50, 1|1|1 0.56, 1|1|2 0.40
+  write order: acc last-written 0.99, not-last 0.98
+- pool.REG3_FREQHINGE_H:
+  margin at VAL by layer (median) L1 0.98, L2 0.98, L3 0.98
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.43, 0.57], [0.6, 0.4]]; KEY [[0.99, 0.01], [0.05, 0.95]]; VAL [[0.99, 0.01], [0.05, 0.95]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.42, 0.58], [0.6, 0.4]]; KEY [[0.99, 0.01], [0.02, 0.98]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.41, 0.59], [0.6, 0.4]]; KEY [[0.99, 0.01], [0.01, 0.99]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.12/0.12/0.12; 2400 0.13/0.13/0.13; 4800 0.41/0.18/0.22; 9600 0.56/0.17/0.22; 14400 0.72/0.16/0.19; 19200 0.80/0.13/0.18; end 0.60/0.16/0.22
+  in-run probe (median held-out acc) L2|K 0.74, L2|V 0.69, L3|K 0.67, L3|V 0.65, final|K 0.54, final|V 0.55
+  plateau (2 unbound runs; acc 0.81): acc by (stream|block|index) 0|0|0 0.78, 0|0|1 0.79, 0|0|2 0.83, 0|1|0 0.82, 0|1|1 0.83, 0|1|2 0.88, 1|0|0 0.79, 1|0|1 0.81, 1|0|2 0.81, 1|1|0 0.83, 1|1|1 0.84, 1|1|2 0.81
+  write order: acc last-written 0.99, not-last 0.99
+- pool.REG3_REPEATHINGE_H:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.43, 0.57], [0.62, 0.38]]; KEY [[0.99, 0.01], [0.01, 0.99]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.43, 0.57], [0.61, 0.39]]; KEY [[0.99, 0.01], [0.01, 0.99]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.43, 0.57], [0.61, 0.39]]; KEY [[0.99, 0.01], [0.01, 0.99]]; VAL [[0.99, 0.01], [0.01, 0.99]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.13/0.12/0.12; 2400 0.28/0.19/0.20; 4800 0.61/0.17/0.23; end 0.79/0.16/0.23
+  in-run probe (median held-out acc) L2|K 0.73, L2|V 0.67, L3|K 0.65, L3|V 0.64, final|K 0.54, final|V 0.57
+  plateau (1 unbound runs; acc 0.51): acc by (stream|block|index) 0|0|0 0.50, 0|0|1 0.45, 0|0|2 0.46, 0|1|0 0.57, 0|1|1 0.50, 0|1|2 0.50, 1|0|0 0.50, 1|0|1 0.49, 1|0|2 0.49, 1|1|0 0.54, 1|1|1 0.59, 1|1|2 0.45
+  write order: acc last-written 0.99, not-last 0.98
+- allpool.PERFECT_H:
+  margin at VAL by layer (median) L1 1.00, L2 1.00, L3 1.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[1.0, 0.0], [0.0, 1.0]]; KEY [[1.0, 0.0], [0.0, 1.0]]; VAL [[1.0, 0.0], [0.0, 1.0]]
+  in-run probe (median held-out acc) L2|K 0.61, L2|V 0.59, L3|K 0.60, L3|V 0.58, final|K 0.52, final|V 0.52
+  write order: acc last-written 0.99, not-last 0.98
+- allpool.BASELINE_H:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.27, 0.73], [0.2, 0.8]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.53, 0.47], [0.53, 0.47]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.27, 0.73], [0.2, 0.8]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.53, 0.47], [0.53, 0.47]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.27, 0.73], [0.2, 0.8]]; KEY [[0.5, 0.5], [0.5, 0.5]]; VAL [[0.53, 0.47], [0.53, 0.47]]
+  in-run probe (median held-out acc) L2|K 0.67, L2|V 0.70, L3|K 0.70, L3|V 0.71, final|K 0.71, final|V 0.70
+  plateau (20 unbound runs; acc 0.37): acc by (stream|block|index) 0|0|0 0.32, 0|0|1 0.33, 0|0|2 0.31, 0|1|0 0.36, 0|1|1 0.40, 0|1|2 0.39, 1|0|0 0.35, 1|0|1 0.40, 1|0|2 0.42, 1|1|0 0.43, 1|1|1 0.42, 1|1|2 0.45
+  write order: acc last-written 0.40, not-last 0.34
+- allpool.REG3_H:
+  margin at VAL by layer (median) L1 0.00, L2 0.00, L3 0.00
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.07, 0.93], [0.08, 0.92]]; KEY [[0.2, 0.8], [0.41, 0.59]]; VAL [[1.0, 0.0], [1.0, 0.0]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.06, 0.94], [0.07, 0.93]]; KEY [[0.25, 0.75], [0.47, 0.53]]; VAL [[1.0, 0.0], [1.0, 0.0]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.07, 0.93], [0.07, 0.93]]; KEY [[0.28, 0.72], [0.48, 0.52]]; VAL [[1.0, 0.0], [1.0, 0.0]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.09/0.09/0.09; 2400 0.07/0.08/0.07; 4800 0.05/0.08/0.06; 9600 0.04/0.08/0.05; 14400 0.03/0.08/0.05; 19200 0.02/0.08/0.05; 24000 0.02/0.08/0.04; end 0.02/0.08/0.04
+  in-run probe (median held-out acc) L2|K 0.66, L2|V 0.69, L3|K 0.70, L3|V 0.70, final|K 0.69, final|V 0.70
+  plateau (20 unbound runs; acc 0.35): acc by (stream|block|index) 0|0|0 0.30, 0|0|1 0.30, 0|0|2 0.30, 0|1|0 0.33, 0|1|1 0.36, 0|1|2 0.38, 1|0|0 0.33, 1|0|1 0.36, 1|0|2 0.38, 1|1|0 0.39, 1|1|1 0.39, 1|1|2 0.42
+  write order: acc last-written 0.38, not-last 0.33
+- allpool.REG3_KEYHINGE_H:
+  margin at VAL by layer (median) L1 0.46, L2 0.46, L3 0.46
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.49, 0.51], [0.45, 0.55]]; KEY [[0.46, 0.54], [0.49, 0.51]]; VAL [[0.45, 0.55], [0.46, 0.54]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.49, 0.51], [0.48, 0.52]]; KEY [[0.46, 0.54], [0.49, 0.51]]; VAL [[0.45, 0.55], [0.46, 0.54]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.49, 0.51], [0.48, 0.52]]; KEY [[0.46, 0.54], [0.46, 0.54]]; VAL [[0.45, 0.55], [0.46, 0.54]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.14/0.14/0.14; 2400 0.16/0.16/0.17; 4800 0.34/0.21/0.23; 9600 0.48/0.20/0.23; 14400 0.58/0.19/0.22; 19200 0.66/0.18/0.21; 24000 0.73/0.17/0.21; end 0.73/0.17/0.21
+  in-run probe (median held-out acc) L2|K 0.64, L2|V 0.61, L3|K 0.66, L3|V 0.63, final|K 0.64, final|V 0.62
+  plateau (20 unbound runs; acc 0.52): acc by (stream|block|index) 0|0|0 0.46, 0|0|1 0.47, 0|0|2 0.51, 0|1|0 0.53, 0|1|1 0.54, 0|1|2 0.52, 1|0|0 0.49, 1|0|1 0.55, 1|0|2 0.49, 1|1|0 0.56, 1|1|1 0.54, 1|1|2 0.57
+  write order: acc last-written 0.55, not-last 0.50
+- allpool.REG3_FREQHINGE_H:
+  margin at VAL by layer (median) L1 0.51, L2 0.51, L3 0.51
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.5, 0.5], [0.47, 0.53]]; KEY [[0.48, 0.52], [0.48, 0.52]]; VAL [[0.48, 0.52], [0.48, 0.52]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.5, 0.5], [0.48, 0.52]]; KEY [[0.48, 0.52], [0.48, 0.52]]; VAL [[0.48, 0.52], [0.48, 0.52]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.51, 0.49], [0.48, 0.52]]; KEY [[0.48, 0.52], [0.48, 0.52]]; VAL [[0.48, 0.52], [0.48, 0.52]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.12/0.13/0.13; 2400 0.13/0.13/0.13; 4800 0.40/0.23/0.23; 9600 0.55/0.22/0.24; 14400 0.68/0.21/0.23; 19200 0.78/0.19/0.21; 24000 0.84/0.18/0.21; end 0.84/0.18/0.21
+  in-run probe (median held-out acc) L2|K 0.65, L2|V 0.62, L3|K 0.65, L3|V 0.62, final|K 0.63, final|V 0.61
+  plateau (20 unbound runs; acc 0.58): acc by (stream|block|index) 0|0|0 0.52, 0|0|1 0.53, 0|0|2 0.53, 0|1|0 0.61, 0|1|1 0.60, 0|1|2 0.58, 1|0|0 0.56, 1|0|1 0.57, 1|0|2 0.57, 1|1|0 0.63, 1|1|1 0.63, 1|1|2 0.63
+  write order: acc last-written 0.61, not-last 0.55
+- allpool.REG3_REPEATHINGE_H:
+  margin at VAL by layer (median) L1 0.37, L2 0.37, L3 0.37
+  contingency L1 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.48, 0.52], [0.5, 0.5]]; KEY [[0.5, 0.5], [0.46, 0.54]]; VAL [[0.5, 0.5], [0.46, 0.54]]
+  contingency L2 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.48, 0.52], [0.46, 0.54]]; KEY [[0.5, 0.5], [0.46, 0.54]]; VAL [[0.5, 0.5], [0.46, 0.54]]
+  contingency L3 (mean g; rows stream 0/1, cols ch 0/1): CTX [[0.48, 0.52], [0.45, 0.55]]; KEY [[0.5, 0.5], [0.46, 0.54]]; VAL [[0.5, 0.5], [0.46, 0.54]]
+  write rate (beta^R or z) CTX/KEY/VAL by step (median; runs stop early when bound): 0 0.10/0.10/0.10; 1200 0.13/0.13/0.13; 2400 0.13/0.14/0.14; 4800 0.28/0.20/0.22; 9600 0.39/0.20/0.22; 14400 0.47/0.18/0.22; 19200 0.56/0.17/0.21; 24000 0.63/0.15/0.20; end 0.63/0.15/0.20
+  in-run probe (median held-out acc) L2|K 0.66, L2|V 0.64, L3|K 0.67, L3|V 0.64, final|K 0.67, final|V 0.65
+  plateau (20 unbound runs; acc 0.42): acc by (stream|block|index) 0|0|0 0.35, 0|0|1 0.38, 0|0|2 0.41, 0|1|0 0.43, 0|1|1 0.46, 0|1|2 0.47, 1|0|0 0.41, 1|0|1 0.44, 1|0|2 0.47, 1|1|0 0.49, 1|1|1 0.51, 1|1|2 0.49
+  write order: acc last-written 0.47, not-last 0.39
+
+per run:
+  pool.PERFECT_H 2840: ROUTED-BOUND    acc 0.991 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.64/0.57
+  pool.PERFECT_H 2841: ROUTED-BOUND    acc 0.986 trans 7200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.62/0.53
+  pool.BASELINE_H 2842: OTHER           acc 0.395 trans None margin 0.00 etaS/K@KEY 0.00/0.01 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.56/0.51
+  pool.BASELINE_H 2843: STREAM-PARTIAL  acc 0.848 trans None margin 0.45 etaS/K@KEY 0.50/0.01 | L1 map [0, 1] m 0.45 | L2 map [0, 1] m 0.45 | L3 map [0, 1] m 0.45 | probe L3 0.66/0.57
+  pool.BASELINE_H 2844: BOUND unrouted  acc 0.977 trans 16800 margin 0.47 etaS/K@KEY 0.50/0.01 | L1 map [1, 0] m 0.47 | L2 map [1, 0] m 0.47 | L3 map [1, 0] m 0.47 | probe L3 0.74/0.65
+  pool.BASELINE_H 2845: KEY             acc 0.365 trans None margin -0.00 etaS/K@KEY 0.00/1.00 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.61/0.58
+  pool.BASELINE_H 2846: OTHER           acc 0.384 trans None margin 0.00 etaS/K@KEY 0.01/0.01 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.56/0.55
+  pool.BASELINE_H 2847: STREAM-PARTIAL  acc 0.906 trans None margin 0.46 etaS/K@KEY 0.49/0.01 | L1 map [0, 1] m 0.46 | L2 map [0, 1] m 0.46 | L3 map [0, 1] m 0.46 | probe L3 0.63/0.59
+  pool.BASELINE_H 2848: STREAM-PARTIAL  acc 0.696 trans None margin 0.46 etaS/K@KEY 0.50/0.01 | L1 map [1, 0] m 0.46 | L2 map [1, 0] m 0.46 | L3 map [1, 0] m 0.46 | probe L3 0.58/0.59
+  pool.BASELINE_H 2849: STREAM-PARTIAL  acc 0.805 trans None margin 0.50 etaS/K@KEY 0.49/0.01 | L1 map [0, 1] m 0.50 | L2 map [0, 1] m 0.50 | L3 map [0, 1] m 0.50 | probe L3 0.59/0.63
+  pool.BASELINE_H 2850: BOUND unrouted  acc 0.960 trans 21600 margin 0.46 etaS/K@KEY 0.50/0.01 | L1 map [0, 1] m 0.46 | L2 map [0, 1] m 0.46 | L3 map [0, 1] m 0.46 | probe L3 0.70/0.69
+  pool.BASELINE_H 2851: STREAM-PARTIAL  acc 0.804 trans None margin 0.44 etaS/K@KEY 0.50/0.01 | L1 map [1, 0] m 0.44 | L2 map [1, 0] m 0.44 | L3 map [1, 0] m 0.44 | probe L3 0.61/0.59
+  pool.BASELINE_H 2852: STREAM-PARTIAL  acc 0.873 trans None margin 0.47 etaS/K@KEY 0.50/0.01 | L1 map [1, 0] m 0.47 | L2 map [1, 0] m 0.47 | L3 map [1, 0] m 0.47 | probe L3 0.57/0.55
+  pool.BASELINE_H 2853: OTHER           acc 0.378 trans None margin 0.00 etaS/K@KEY 0.00/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.58/0.52
+  pool.BASELINE_H 2854: STREAM-PARTIAL  acc 0.934 trans None margin 0.52 etaS/K@KEY 0.50/0.01 | L1 map [1, 0] m 0.52 | L2 map [1, 0] m 0.52 | L3 map [1, 0] m 0.52 | probe L3 0.56/0.51
+  pool.BASELINE_H 2855: OTHER           acc 0.437 trans None margin 0.00 etaS/K@KEY 0.00/0.27 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.59/0.55
+  pool.BASELINE_H 2856: STREAM-PARTIAL  acc 0.621 trans None margin 0.47 etaS/K@KEY 0.50/0.01 | L1 map [0, 1] m 0.47 | L2 map [0, 1] m 0.47 | L3 map [0, 1] m 0.47 | probe L3 0.76/0.60
+  pool.BASELINE_H 2857: BOUND unrouted  acc 0.961 trans 20400 margin 0.45 etaS/K@KEY 0.50/0.01 | L1 map [1, 0] m 0.45 | L2 map [1, 0] m 0.45 | L3 map [1, 0] m 0.45 | probe L3 0.75/0.62
+  pool.BASELINE_H 2858: STREAM-PARTIAL  acc 0.495 trans None margin 0.46 etaS/K@KEY 0.49/0.01 | L1 map [0, 1] m 0.46 | L2 map [0, 1] m 0.46 | L3 map [0, 1] m 0.46 | probe L3 0.61/0.63
+  pool.BASELINE_H 2859: OTHER           acc 0.426 trans None margin 0.00 etaS/K@KEY 0.00/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.56/0.53
+  pool.BASELINE_H 2860: STREAM-PARTIAL  acc 0.654 trans None margin 0.52 etaS/K@KEY 0.50/0.01 | L1 map [0, 1] m 0.52 | L2 map [0, 1] m 0.52 | L3 map [0, 1] m 0.52 | probe L3 0.72/0.71
+  pool.BASELINE_H 2861: BOUND unrouted  acc 0.963 trans 20400 margin 0.46 etaS/K@KEY 0.49/0.01 | L1 map [0, 1] m 0.46 | L2 map [0, 1] m 0.46 | L3 map [0, 1] m 0.46 | probe L3 0.65/0.63
+  pool.REG3_H 2842: OTHER           acc 0.377 trans None margin 0.00 etaS/K@KEY 0.00/0.02 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.57/0.53 | w C/K/V 0.01/0.04/0.03
+  pool.REG3_H 2843: OTHER           acc 0.330 trans None margin 0.00 etaS/K@KEY 0.00/0.18 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.58/0.51 | w C/K/V 0.03/0.06/0.04
+  pool.REG3_H 2844: ROUTED-BOUND    acc 0.988 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.67/0.67 | w C/K/V 0.70/0.18/0.28
+  pool.REG3_H 2845: ROUTED-BOUND    acc 0.994 trans 4800 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.98 | L2 map [0, 1] m 0.98 | L3 map [0, 1] m 0.98 | probe L3 0.69/0.68 | w C/K/V 0.79/0.17/0.25
+  pool.REG3_H 2846: OTHER           acc 0.358 trans None margin 0.00 etaS/K@KEY 0.00/0.01 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.56/0.53 | w C/K/V 0.04/0.03/0.05
+  pool.REG3_H 2847: ROUTED-BOUND    acc 0.990 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.69 | w C/K/V 0.65/0.17/0.21
+  pool.REG3_H 2848: OTHER           acc 0.437 trans None margin -0.00 etaS/K@KEY 0.00/0.05 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.62/0.55 | w C/K/V 0.03/0.04/0.04
+  pool.REG3_H 2849: ROUTED-BOUND    acc 0.979 trans 9600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.65/0.56 | w C/K/V 0.87/0.13/0.18
+  pool.REG3_H 2850: ROUTED-BOUND    acc 0.987 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.62/0.64 | w C/K/V 0.83/0.14/0.22
+  pool.REG3_H 2851: OTHER           acc 0.401 trans None margin 0.00 etaS/K@KEY 0.00/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.63/0.52 | w C/K/V 0.02/0.03/0.03
+  pool.REG3_H 2852: OTHER           acc 0.442 trans None margin 0.00 etaS/K@KEY 0.01/0.03 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.58/0.53 | w C/K/V 0.03/0.03/0.05
+  pool.REG3_H 2853: OTHER           acc 0.381 trans None margin 0.00 etaS/K@KEY 0.00/0.08 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.62/0.52 | w C/K/V 0.03/0.04/0.04
+  pool.REG3_H 2854: ROUTED-BOUND    acc 0.991 trans 6000 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.98 | L2 map [1, 0] m 0.98 | L3 map [1, 0] m 0.98 | probe L3 0.65/0.67 | w C/K/V 0.63/0.16/0.23
+  pool.REG3_H 2855: OTHER           acc 0.363 trans None margin 0.00 etaS/K@KEY 0.01/0.01 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.59/0.51 | w C/K/V 0.03/0.02/0.04
+  pool.REG3_H 2856: ROUTED-BOUND    acc 0.982 trans 7200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.70/0.62 | w C/K/V 0.80/0.15/0.24
+  pool.REG3_H 2857: OTHER           acc 0.398 trans None margin -0.01 etaS/K@KEY 0.00/0.03 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.01 | probe L3 0.61/0.53 | w C/K/V 0.03/0.04/0.04
+  pool.REG3_H 2858: ROUTED-BOUND    acc 0.978 trans 9600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.68 | w C/K/V 0.79/0.15/0.24
+  pool.REG3_H 2859: OTHER           acc 0.351 trans None margin 0.00 etaS/K@KEY 0.00/0.03 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.61/0.55 | w C/K/V 0.02/0.05/0.04
+  pool.REG3_H 2860: ROUTED-BOUND    acc 0.985 trans 8400 margin 0.96 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.96 | L2 map [1, 0] m 0.96 | L3 map [1, 0] m 0.96 | probe L3 0.62/0.62 | w C/K/V 0.79/0.13/0.25
+  pool.REG3_H 2861: OTHER           acc 0.381 trans None margin 0.00 etaS/K@KEY 0.00/0.07 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.62/0.53 | w C/K/V 0.03/0.03/0.04
+  pool.REG3_KEYHINGE_H 2842: ROUTED-BOUND    acc 0.989 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.63/0.67 | w C/K/V 0.75/0.15/0.24
+  pool.REG3_KEYHINGE_H 2843: ROUTED-BOUND    acc 0.989 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.66 | w C/K/V 0.77/0.15/0.20
+  pool.REG3_KEYHINGE_H 2844: ROUTED-BOUND    acc 0.991 trans 6000 margin 0.99 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.99 | L2 map [0, 1] m 0.99 | L3 map [0, 1] m 0.99 | probe L3 0.71/0.63 | w C/K/V 0.72/0.17/0.25
+  pool.REG3_KEYHINGE_H 2845: ROUTED-BOUND    acc 0.987 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.70/0.74 | w C/K/V 0.72/0.15/0.27
+  pool.REG3_KEYHINGE_H 2846: ROUTED-BOUND    acc 0.986 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.64/0.67 | w C/K/V 0.72/0.15/0.21
+  pool.REG3_KEYHINGE_H 2847: ROUTED-BOUND    acc 0.986 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.70 | w C/K/V 0.71/0.18/0.25
+  pool.REG3_KEYHINGE_H 2848: ROUTED-BOUND    acc 0.992 trans 7200 margin 0.99 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.99 | L2 map [1, 0] m 0.99 | L3 map [1, 0] m 0.99 | probe L3 0.65/0.64 | w C/K/V 0.82/0.13/0.20
+  pool.REG3_KEYHINGE_H 2849: ROUTED-BOUND    acc 0.992 trans 6000 margin 0.99 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.99 | L2 map [0, 1] m 0.99 | L3 map [0, 1] m 0.99 | probe L3 0.64/0.64 | w C/K/V 0.76/0.16/0.20
+  pool.REG3_KEYHINGE_H 2850: ROUTED-BOUND    acc 0.995 trans 6000 margin 0.97 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.97 | L2 map [0, 1] m 0.97 | L3 map [0, 1] m 0.97 | probe L3 0.67/0.64 | w C/K/V 0.70/0.13/0.20
+  pool.REG3_KEYHINGE_H 2851: ROUTED-BOUND    acc 0.987 trans 6000 margin 0.99 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.99 | L2 map [1, 0] m 0.99 | L3 map [1, 0] m 0.99 | probe L3 0.60/0.65 | w C/K/V 0.71/0.13/0.21
+  pool.REG3_KEYHINGE_H 2852: BOUND unrouted  acc 0.986 trans 6000 margin 0.88 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.88 | L2 map [1, 0] m 0.88 | L3 map [1, 0] m 0.88 | probe L3 0.66/0.64 | w C/K/V 0.66/0.14/0.18
+  pool.REG3_KEYHINGE_H 2853: ROUTED-BOUND    acc 0.994 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.68/0.65 | w C/K/V 0.75/0.15/0.23
+  pool.REG3_KEYHINGE_H 2854: ROUTED-BOUND    acc 0.981 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.67/0.63 | w C/K/V 0.67/0.16/0.23
+  pool.REG3_KEYHINGE_H 2855: ROUTED-BOUND    acc 0.991 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.68/0.78 | w C/K/V 0.75/0.14/0.24
+  pool.REG3_KEYHINGE_H 2856: ROUTED-BOUND    acc 0.989 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.67/0.67 | w C/K/V 0.72/0.17/0.25
+  pool.REG3_KEYHINGE_H 2857: STREAM-PARTIAL  acc 0.505 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.70/0.59 | w C/K/V 0.83/0.11/0.13
+  pool.REG3_KEYHINGE_H 2858: ROUTED-BOUND    acc 0.986 trans 9600 margin 0.95 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.95 | L2 map [0, 1] m 0.95 | L3 map [0, 1] m 0.95 | probe L3 0.66/0.56 | w C/K/V 0.86/0.16/0.24
+  pool.REG3_KEYHINGE_H 2859: ROUTED-BOUND    acc 0.993 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.64/0.62 | w C/K/V 0.77/0.17/0.21
+  pool.REG3_KEYHINGE_H 2860: ROUTED-BOUND    acc 0.983 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.65 | w C/K/V 0.82/0.15/0.27
+  pool.REG3_KEYHINGE_H 2861: ROUTED-BOUND    acc 0.993 trans 6000 margin 0.97 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.97 | L2 map [0, 1] m 0.97 | L3 map [0, 1] m 0.97 | probe L3 0.64/0.65 | w C/K/V 0.80/0.16/0.26
+  pool.REG3_FREQHINGE_H 2842: ROUTED-BOUND    acc 0.989 trans 16800 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.98 | L2 map [0, 1] m 0.98 | L3 map [0, 1] m 0.98 | probe L3 0.61/0.62 | w C/K/V 0.80/0.12/0.18
+  pool.REG3_FREQHINGE_H 2843: STREAM-PARTIAL  acc 0.936 trans None margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.98 | L2 map [0, 1] m 0.98 | L3 map [0, 1] m 0.98 | probe L3 0.58/0.51 | w C/K/V 0.82/0.12/0.19
+  pool.REG3_FREQHINGE_H 2844: ROUTED-BOUND    acc 0.992 trans 6000 margin 0.97 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.96 | L2 map [1, 0] m 0.97 | L3 map [1, 0] m 0.97 | probe L3 0.67/0.65 | w C/K/V 0.50/0.17/0.23
+  pool.REG3_FREQHINGE_H 2845: ROUTED-BOUND    acc 0.994 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.70/0.68 | w C/K/V 0.60/0.18/0.24
+  pool.REG3_FREQHINGE_H 2846: ROUTED-BOUND    acc 0.989 trans 9600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.61/0.59 | w C/K/V 0.68/0.16/0.21
+  pool.REG3_FREQHINGE_H 2847: ROUTED-BOUND    acc 0.981 trans 6000 margin 0.93 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.93 | L2 map [1, 0] m 0.93 | L3 map [1, 0] m 0.93 | probe L3 0.65/0.70 | w C/K/V 0.65/0.17/0.23
+  pool.REG3_FREQHINGE_H 2848: STREAM-PARTIAL  acc 0.691 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.56 | w C/K/V 0.88/0.08/0.10
+  pool.REG3_FREQHINGE_H 2849: ROUTED-BOUND    acc 0.992 trans 7200 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.66 | w C/K/V 0.56/0.19/0.24
+  pool.REG3_FREQHINGE_H 2850: ROUTED-BOUND    acc 0.982 trans 6000 margin 0.95 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.91 | L2 map [0, 1] m 0.95 | L3 map [0, 1] m 0.95 | probe L3 0.72/0.66 | w C/K/V 0.59/0.16/0.22
+  pool.REG3_FREQHINGE_H 2851: ROUTED-BOUND    acc 0.991 trans 6000 margin 0.93 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.94 | L2 map [1, 0] m 0.93 | L3 map [1, 0] m 0.93 | probe L3 0.66/0.71 | w C/K/V 0.50/0.17/0.21
+  pool.REG3_FREQHINGE_H 2852: ROUTED-BOUND    acc 0.988 trans 6000 margin 0.96 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.96 | L2 map [1, 0] m 0.96 | L3 map [1, 0] m 0.96 | probe L3 0.70/0.65 | w C/K/V 0.58/0.18/0.23
+  pool.REG3_FREQHINGE_H 2853: ROUTED-BOUND    acc 0.995 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.64/0.67 | w C/K/V 0.60/0.16/0.22
+  pool.REG3_FREQHINGE_H 2854: ROUTED-BOUND    acc 0.994 trans 7200 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.98 | L2 map [1, 0] m 0.98 | L3 map [1, 0] m 0.98 | probe L3 0.69/0.64 | w C/K/V 0.56/0.16/0.24
+  pool.REG3_FREQHINGE_H 2855: ROUTED-BOUND    acc 0.990 trans 8400 margin 0.99 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.99 | L2 map [0, 1] m 0.99 | L3 map [0, 1] m 0.99 | probe L3 0.67/0.57 | w C/K/V 0.71/0.16/0.20
+  pool.REG3_FREQHINGE_H 2856: ROUTED-BOUND    acc 0.994 trans 8400 margin 0.97 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.97 | L2 map [1, 0] m 0.97 | L3 map [1, 0] m 0.97 | probe L3 0.65/0.62 | w C/K/V 0.59/0.14/0.22
+  pool.REG3_FREQHINGE_H 2857: ROUTED-BOUND    acc 0.977 trans 20400 margin 0.97 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.97 | L2 map [0, 1] m 0.97 | L3 map [0, 1] m 0.97 | probe L3 0.58/0.55 | w C/K/V 0.88/0.12/0.09
+  pool.REG3_FREQHINGE_H 2858: ROUTED-BOUND    acc 0.986 trans 19200 margin 0.96 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.88 | L2 map [0, 1] m 0.96 | L3 map [0, 1] m 0.96 | probe L3 0.68/0.55 | w C/K/V 0.80/0.14/0.17
+  pool.REG3_FREQHINGE_H 2859: ROUTED-BOUND    acc 0.991 trans 6000 margin 0.97 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.98 | L2 map [1, 0] m 0.98 | L3 map [1, 0] m 0.97 | probe L3 0.70/0.66 | w C/K/V 0.59/0.17/0.20
+  pool.REG3_FREQHINGE_H 2860: ROUTED-BOUND    acc 0.991 trans 7200 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.99 | L2 map [0, 1] m 0.99 | L3 map [0, 1] m 0.98 | probe L3 0.67/0.70 | w C/K/V 0.60/0.17/0.24
+  pool.REG3_FREQHINGE_H 2861: ROUTED-BOUND    acc 0.994 trans 6000 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.98 | L2 map [0, 1] m 0.98 | L3 map [0, 1] m 0.98 | probe L3 0.67/0.64 | w C/K/V 0.64/0.16/0.23
+  pool.REG3_REPEATHINGE_H 2842: ROUTED-BOUND    acc 0.992 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.77 | w C/K/V 0.77/0.17/0.25
+  pool.REG3_REPEATHINGE_H 2843: ROUTED-BOUND    acc 0.983 trans 8400 margin 0.96 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.96 | L2 map [0, 1] m 0.96 | L3 map [0, 1] m 0.96 | probe L3 0.64/0.63 | w C/K/V 0.86/0.15/0.18
+  pool.REG3_REPEATHINGE_H 2844: ROUTED-BOUND    acc 0.990 trans 6000 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.98 | L2 map [1, 0] m 0.98 | L3 map [1, 0] m 0.98 | probe L3 0.64/0.62 | w C/K/V 0.83/0.17/0.25
+  pool.REG3_REPEATHINGE_H 2845: ROUTED-BOUND    acc 0.989 trans 6000 margin 0.97 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.97 | L2 map [0, 1] m 0.97 | L3 map [0, 1] m 0.97 | probe L3 0.66/0.60 | w C/K/V 0.76/0.16/0.25
+  pool.REG3_REPEATHINGE_H 2846: ROUTED-BOUND    acc 0.989 trans 7200 margin 0.96 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.96 | L2 map [1, 0] m 0.96 | L3 map [1, 0] m 0.96 | probe L3 0.59/0.59 | w C/K/V 0.79/0.15/0.16
+  pool.REG3_REPEATHINGE_H 2847: ROUTED-BOUND    acc 0.982 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.60/0.63 | w C/K/V 0.80/0.16/0.24
+  pool.REG3_REPEATHINGE_H 2848: ROUTED-BOUND    acc 0.989 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.63/0.66 | w C/K/V 0.70/0.15/0.21
+  pool.REG3_REPEATHINGE_H 2849: ROUTED-BOUND    acc 0.991 trans 6000 margin 0.96 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.96 | L2 map [0, 1] m 0.96 | L3 map [0, 1] m 0.96 | probe L3 0.64/0.66 | w C/K/V 0.61/0.15/0.22
+  pool.REG3_REPEATHINGE_H 2850: ROUTED-BOUND    acc 0.986 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.69/0.71 | w C/K/V 0.76/0.16/0.26
+  pool.REG3_REPEATHINGE_H 2851: ROUTED-BOUND    acc 0.986 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.64/0.64 | w C/K/V 0.80/0.13/0.23
+  pool.REG3_REPEATHINGE_H 2852: ROUTED-BOUND    acc 0.993 trans 6000 margin 0.92 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 0.92 | L2 map [1, 0] m 0.92 | L3 map [1, 0] m 0.92 | probe L3 0.65/0.66 | w C/K/V 0.74/0.15/0.17
+  pool.REG3_REPEATHINGE_H 2853: ROUTED-BOUND    acc 0.989 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.67/0.73 | w C/K/V 0.74/0.16/0.19
+  pool.REG3_REPEATHINGE_H 2854: ROUTED-BOUND    acc 0.967 trans 15600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.59/0.56 | w C/K/V 0.88/0.11/0.27
+  pool.REG3_REPEATHINGE_H 2855: ROUTED-BOUND    acc 0.984 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.67/0.66 | w C/K/V 0.67/0.16/0.25
+  pool.REG3_REPEATHINGE_H 2856: ROUTED-BOUND    acc 0.990 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.68/0.66 | w C/K/V 0.59/0.18/0.23
+  pool.REG3_REPEATHINGE_H 2857: STREAM-PARTIAL  acc 0.513 trans None margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.70/0.62 | w C/K/V 0.82/0.11/0.15
+  pool.REG3_REPEATHINGE_H 2858: ROUTED-BOUND    acc 0.956 trans 19200 margin 0.98 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 0.98 | L2 map [0, 1] m 0.98 | L3 map [0, 1] m 0.98 | probe L3 0.56/0.54 | w C/K/V 0.91/0.12/0.16
+  pool.REG3_REPEATHINGE_H 2859: ROUTED-BOUND    acc 0.987 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [1, 0] m 1.00 | L2 map [1, 0] m 1.00 | L3 map [1, 0] m 1.00 | probe L3 0.64/0.64 | w C/K/V 0.81/0.19/0.24
+  pool.REG3_REPEATHINGE_H 2860: ROUTED-BOUND    acc 0.988 trans 4800 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.61 | w C/K/V 0.79/0.16/0.24
+  pool.REG3_REPEATHINGE_H 2861: ROUTED-BOUND    acc 0.991 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.66/0.64 | w C/K/V 0.81/0.15/0.21
+  allpool.PERFECT_H 2840: ROUTED-BOUND    acc 0.984 trans 9600 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.59/0.57
+  allpool.PERFECT_H 2841: ROUTED-BOUND    acc 0.981 trans 6000 margin 1.00 etaS/K@KEY 1.00/0.00 | L1 map [0, 1] m 1.00 | L2 map [0, 1] m 1.00 | L3 map [0, 1] m 1.00 | probe L3 0.61/0.59
+  allpool.BASELINE_H 2842: KEY             acc 0.302 trans None margin -0.00 etaS/K@KEY 0.02/1.00 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.70/0.71
+  allpool.BASELINE_H 2843: OTHER           acc 0.398 trans None margin -0.00 etaS/K@KEY 0.02/0.16 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.70/0.70
+  allpool.BASELINE_H 2844: OTHER           acc 0.429 trans None margin 0.00 etaS/K@KEY 0.06/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.71/0.71
+  allpool.BASELINE_H 2845: KEY             acc 0.322 trans None margin 0.00 etaS/K@KEY 0.01/1.00 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.72/0.70
+  allpool.BASELINE_H 2846: OTHER           acc 0.379 trans None margin 0.00 etaS/K@KEY 0.06/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.71/0.71
+  allpool.BASELINE_H 2847: OTHER           acc 0.416 trans None margin 0.05 etaS/K@KEY 0.04/0.02 | L1 map [1, 1] m 0.05 | L2 map [1, 1] m 0.05 | L3 map [1, 1] m 0.05 | probe L3 0.73/0.70
+  allpool.BASELINE_H 2848: OTHER           acc 0.354 trans None margin 0.00 etaS/K@KEY 0.05/0.03 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.69/0.71
+  allpool.BASELINE_H 2849: OTHER           acc 0.406 trans None margin 0.00 etaS/K@KEY 0.06/0.02 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.69/0.71
+  allpool.BASELINE_H 2850: OTHER           acc 0.348 trans None margin 0.00 etaS/K@KEY 0.01/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.68/0.69
+  allpool.BASELINE_H 2851: KEY             acc 0.358 trans None margin -0.00 etaS/K@KEY 0.01/1.00 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.76/0.77
+  allpool.BASELINE_H 2852: OTHER           acc 0.388 trans None margin 0.00 etaS/K@KEY 0.06/0.02 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.70/0.71
+  allpool.BASELINE_H 2853: OTHER           acc 0.366 trans None margin -0.00 etaS/K@KEY 0.00/0.02 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.69/0.69
+  allpool.BASELINE_H 2854: OTHER           acc 0.375 trans None margin -0.00 etaS/K@KEY 0.06/0.02 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.68/0.71
+  allpool.BASELINE_H 2855: OTHER           acc 0.411 trans None margin -0.00 etaS/K@KEY 0.00/0.04 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.69/0.72
+  allpool.BASELINE_H 2856: OTHER           acc 0.372 trans None margin 0.00 etaS/K@KEY 0.05/0.01 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.72/0.70
+  allpool.BASELINE_H 2857: OTHER           acc 0.431 trans None margin 0.00 etaS/K@KEY 0.01/0.12 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.68/0.72
+  allpool.BASELINE_H 2858: OTHER           acc 0.364 trans None margin 0.00 etaS/K@KEY 0.00/0.02 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.70/0.69
+  allpool.BASELINE_H 2859: OTHER           acc 0.392 trans None margin 0.00 etaS/K@KEY 0.05/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.71/0.71
+  allpool.BASELINE_H 2860: OTHER           acc 0.346 trans None margin 0.00 etaS/K@KEY 0.04/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.71/0.70
+  allpool.BASELINE_H 2861: OTHER           acc 0.346 trans None margin 0.00 etaS/K@KEY 0.03/0.19 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.69/0.69
+  allpool.REG3_H 2842: OTHER           acc 0.386 trans None margin 0.00 etaS/K@KEY 0.11/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.70/0.70 | w C/K/V 0.01/0.07/0.04
+  allpool.REG3_H 2843: OTHER           acc 0.387 trans None margin -0.00 etaS/K@KEY 0.16/0.02 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.70/0.71 | w C/K/V 0.01/0.06/0.03
+  allpool.REG3_H 2844: OTHER           acc 0.366 trans None margin 0.00 etaS/K@KEY 0.13/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.70/0.71 | w C/K/V 0.01/0.08/0.03
+  allpool.REG3_H 2845: OTHER           acc 0.379 trans None margin 0.00 etaS/K@KEY 0.09/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.70/0.69 | w C/K/V 0.02/0.09/0.04
+  allpool.REG3_H 2846: OTHER           acc 0.366 trans None margin 0.00 etaS/K@KEY 0.07/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.71/0.70 | w C/K/V 0.02/0.09/0.04
+  allpool.REG3_H 2847: OTHER           acc 0.300 trans None margin -0.00 etaS/K@KEY 0.17/0.02 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.68/0.66 | w C/K/V 0.01/0.08/0.04
+  allpool.REG3_H 2848: OTHER           acc 0.343 trans None margin 0.00 etaS/K@KEY 0.04/0.03 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.68/0.68 | w C/K/V 0.03/0.11/0.05
+  allpool.REG3_H 2849: OTHER           acc 0.396 trans None margin 0.00 etaS/K@KEY 0.07/0.03 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.68/0.69 | w C/K/V 0.01/0.05/0.04
+  allpool.REG3_H 2850: OTHER           acc 0.286 trans None margin 0.00 etaS/K@KEY 0.26/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.68/0.68 | w C/K/V 0.03/0.09/0.05
+  allpool.REG3_H 2851: OTHER           acc 0.313 trans None margin 0.00 etaS/K@KEY 0.04/0.03 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.67/0.67 | w C/K/V 0.02/0.09/0.05
+  allpool.REG3_H 2852: OTHER           acc 0.358 trans None margin 0.00 etaS/K@KEY 0.09/0.02 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.68/0.70 | w C/K/V 0.03/0.06/0.05
+  allpool.REG3_H 2853: OTHER           acc 0.319 trans None margin 0.00 etaS/K@KEY 0.19/0.01 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.72/0.71 | w C/K/V 0.02/0.07/0.05
+  allpool.REG3_H 2854: OTHER           acc 0.338 trans None margin -0.00 etaS/K@KEY 0.07/0.02 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.70/0.70 | w C/K/V 0.02/0.14/0.05
+  allpool.REG3_H 2855: OTHER           acc 0.298 trans None margin 0.00 etaS/K@KEY 0.09/0.02 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.68/0.67 | w C/K/V 0.02/0.08/0.05
+  allpool.REG3_H 2856: OTHER           acc 0.339 trans None margin 0.00 etaS/K@KEY 0.06/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.70/0.70 | w C/K/V 0.02/0.09/0.05
+  allpool.REG3_H 2857: OTHER           acc 0.375 trans None margin 0.00 etaS/K@KEY 0.08/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.70/0.70 | w C/K/V 0.02/0.09/0.05
+  allpool.REG3_H 2858: OTHER           acc 0.371 trans None margin 0.00 etaS/K@KEY 0.06/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.71/0.71 | w C/K/V 0.01/0.10/0.04
+  allpool.REG3_H 2859: OTHER           acc 0.324 trans None margin 0.00 etaS/K@KEY 0.32/0.02 | L1 map [0, 0] m -0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.67/0.69 | w C/K/V 0.01/0.07/0.04
+  allpool.REG3_H 2860: POSITION        acc 0.290 trans None margin 0.00 etaS/K@KEY 0.35/0.01 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m 0.00 | L3 map [0, 0] m 0.00 | probe L3 0.69/0.69 | w C/K/V 0.02/0.08/0.06
+  allpool.REG3_H 2861: OTHER           acc 0.385 trans None margin 0.00 etaS/K@KEY 0.22/0.01 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.70/0.70 | w C/K/V 0.02/0.07/0.04
+  allpool.REG3_KEYHINGE_H 2842: MERGED          acc 0.639 trans None margin 0.47 etaS/K@KEY 0.55/0.02 | L1 map [0, 0] m 0.47 | L2 map [0, 0] m 0.47 | L3 map [0, 0] m 0.47 | probe L3 0.65/0.63 | w C/K/V 0.81/0.16/0.20
+  allpool.REG3_KEYHINGE_H 2843: MERGED          acc 0.500 trans None margin 0.43 etaS/K@KEY 0.48/0.01 | L1 map [0, 0] m 0.43 | L2 map [0, 0] m 0.43 | L3 map [0, 0] m 0.43 | probe L3 0.67/0.66 | w C/K/V 0.61/0.20/0.21
+  allpool.REG3_KEYHINGE_H 2844: MERGED          acc 0.602 trans None margin 0.45 etaS/K@KEY 0.51/0.02 | L1 map [1, 1] m 0.45 | L2 map [1, 1] m 0.45 | L3 map [1, 1] m 0.45 | probe L3 0.67/0.63 | w C/K/V 0.66/0.16/0.20
+  allpool.REG3_KEYHINGE_H 2845: OTHER           acc 0.312 trans None margin 0.11 etaS/K@KEY 0.20/0.01 | L1 map [0, 0] m 0.11 | L2 map [0, 0] m 0.11 | L3 map [0, 0] m 0.11 | probe L3 0.69/0.66 | w C/K/V 0.41/0.19/0.23
+  allpool.REG3_KEYHINGE_H 2846: STREAM-PARTIAL  acc 0.730 trans None margin 0.46 etaS/K@KEY 0.47/0.01 | L1 map [1, 0] m 0.46 | L2 map [1, 0] m 0.46 | L3 map [1, 0] m 0.46 | probe L3 0.65/0.67 | w C/K/V 0.90/0.18/0.21
+  allpool.REG3_KEYHINGE_H 2847: MERGED          acc 0.410 trans None margin 0.49 etaS/K@KEY 0.55/0.01 | L1 map [1, 1] m 0.49 | L2 map [1, 1] m 0.49 | L3 map [1, 1] m 0.49 | probe L3 0.66/0.66 | w C/K/V 0.72/0.15/0.23
+  allpool.REG3_KEYHINGE_H 2848: MERGED          acc 0.411 trans None margin 0.47 etaS/K@KEY 0.52/0.02 | L1 map [0, 0] m 0.47 | L2 map [0, 0] m 0.47 | L3 map [0, 0] m 0.47 | probe L3 0.63/0.63 | w C/K/V 0.69/0.17/0.21
+  allpool.REG3_KEYHINGE_H 2849: MERGED          acc 0.633 trans None margin 0.53 etaS/K@KEY 0.58/0.01 | L1 map [1, 1] m 0.53 | L2 map [1, 1] m 0.53 | L3 map [1, 1] m 0.53 | probe L3 0.65/0.62 | w C/K/V 0.84/0.17/0.20
+  allpool.REG3_KEYHINGE_H 2850: MERGED          acc 0.525 trans None margin 0.40 etaS/K@KEY 0.45/0.01 | L1 map [0, 0] m 0.40 | L2 map [0, 0] m 0.40 | L3 map [0, 0] m 0.40 | probe L3 0.67/0.63 | w C/K/V 0.57/0.18/0.23
+  allpool.REG3_KEYHINGE_H 2851: MERGED          acc 0.396 trans None margin 0.54 etaS/K@KEY 0.57/0.01 | L1 map [1, 1] m 0.54 | L2 map [1, 1] m 0.54 | L3 map [1, 1] m 0.54 | probe L3 0.63/0.59 | w C/K/V 0.72/0.18/0.19
+  allpool.REG3_KEYHINGE_H 2852: MERGED          acc 0.450 trans None margin 0.37 etaS/K@KEY 0.44/0.01 | L1 map [1, 1] m 0.37 | L2 map [1, 1] m 0.37 | L3 map [1, 1] m 0.37 | probe L3 0.67/0.63 | w C/K/V 0.73/0.15/0.26
+  allpool.REG3_KEYHINGE_H 2853: MERGED          acc 0.520 trans None margin 0.52 etaS/K@KEY 0.57/0.01 | L1 map [1, 1] m 0.52 | L2 map [1, 1] m 0.52 | L3 map [1, 1] m 0.52 | probe L3 0.66/0.61 | w C/K/V 0.80/0.17/0.14
+  allpool.REG3_KEYHINGE_H 2854: MERGED          acc 0.576 trans None margin 0.44 etaS/K@KEY 0.50/0.01 | L1 map [1, 1] m 0.44 | L2 map [1, 1] m 0.44 | L3 map [1, 1] m 0.44 | probe L3 0.68/0.64 | w C/K/V 0.78/0.19/0.24
+  allpool.REG3_KEYHINGE_H 2855: POSITION        acc 0.385 trans None margin -0.00 etaS/K@KEY 0.31/0.12 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.70/0.69 | w C/K/V 0.02/0.07/0.04
+  allpool.REG3_KEYHINGE_H 2856: MERGED          acc 0.602 trans None margin 0.52 etaS/K@KEY 0.57/0.01 | L1 map [0, 0] m 0.52 | L2 map [0, 0] m 0.52 | L3 map [0, 0] m 0.52 | probe L3 0.67/0.64 | w C/K/V 0.84/0.23/0.23
+  allpool.REG3_KEYHINGE_H 2857: MERGED          acc 0.724 trans None margin 0.53 etaS/K@KEY 0.60/0.01 | L1 map [0, 0] m 0.53 | L2 map [0, 0] m 0.53 | L3 map [0, 0] m 0.53 | probe L3 0.66/0.66 | w C/K/V 0.85/0.15/0.16
+  allpool.REG3_KEYHINGE_H 2858: STREAM-PARTIAL  acc 0.397 trans None margin 0.45 etaS/K@KEY 0.51/0.01 | L1 map [1, 0] m 0.45 | L2 map [1, 0] m 0.45 | L3 map [1, 0] m 0.45 | probe L3 0.65/0.60 | w C/K/V 0.65/0.19/0.23
+  allpool.REG3_KEYHINGE_H 2859: MERGED          acc 0.583 trans None margin 0.51 etaS/K@KEY 0.56/0.01 | L1 map [1, 1] m 0.51 | L2 map [1, 1] m 0.51 | L3 map [1, 1] m 0.51 | probe L3 0.65/0.64 | w C/K/V 0.79/0.16/0.19
+  allpool.REG3_KEYHINGE_H 2860: MERGED          acc 0.452 trans None margin 0.41 etaS/K@KEY 0.46/0.01 | L1 map [1, 1] m 0.41 | L2 map [1, 1] m 0.41 | L3 map [1, 1] m 0.41 | probe L3 0.65/0.62 | w C/K/V 0.68/0.18/0.21
+  allpool.REG3_KEYHINGE_H 2861: MERGED          acc 0.545 trans None margin 0.57 etaS/K@KEY 0.60/0.01 | L1 map [1, 1] m 0.57 | L2 map [1, 1] m 0.57 | L3 map [1, 1] m 0.57 | probe L3 0.63/0.64 | w C/K/V 0.77/0.16/0.23
+  allpool.REG3_FREQHINGE_H 2842: MERGED          acc 0.558 trans None margin 0.54 etaS/K@KEY 0.59/0.01 | L1 map [1, 1] m 0.54 | L2 map [1, 1] m 0.54 | L3 map [1, 1] m 0.54 | probe L3 0.64/0.61 | w C/K/V 0.85/0.19/0.21
+  allpool.REG3_FREQHINGE_H 2843: MERGED          acc 0.566 trans None margin 0.51 etaS/K@KEY 0.58/0.01 | L1 map [0, 0] m 0.51 | L2 map [0, 0] m 0.51 | L3 map [0, 0] m 0.51 | probe L3 0.65/0.61 | w C/K/V 0.81/0.21/0.21
+  allpool.REG3_FREQHINGE_H 2844: STREAM-PARTIAL  acc 0.772 trans None margin 0.56 etaS/K@KEY 0.61/0.02 | L1 map [0, 1] m 0.56 | L2 map [0, 1] m 0.56 | L3 map [0, 1] m 0.56 | probe L3 0.67/0.63 | w C/K/V 0.87/0.18/0.25
+  allpool.REG3_FREQHINGE_H 2845: KEY             acc 0.371 trans None margin -0.00 etaS/K@KEY 0.03/1.00 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.73/0.72 | w C/K/V 0.43/0.70/0.30
+  allpool.REG3_FREQHINGE_H 2846: MERGED          acc 0.409 trans None margin 0.53 etaS/K@KEY 0.58/0.01 | L1 map [1, 1] m 0.53 | L2 map [1, 1] m 0.53 | L3 map [1, 1] m 0.53 | probe L3 0.65/0.64 | w C/K/V 0.73/0.18/0.19
+  allpool.REG3_FREQHINGE_H 2847: MERGED          acc 0.678 trans None margin 0.54 etaS/K@KEY 0.60/0.01 | L1 map [1, 1] m 0.54 | L2 map [1, 1] m 0.54 | L3 map [1, 1] m 0.54 | probe L3 0.64/0.64 | w C/K/V 0.90/0.17/0.25
+  allpool.REG3_FREQHINGE_H 2848: MERGED          acc 0.583 trans None margin 0.54 etaS/K@KEY 0.58/0.01 | L1 map [0, 0] m 0.54 | L2 map [0, 0] m 0.54 | L3 map [0, 0] m 0.54 | probe L3 0.62/0.61 | w C/K/V 0.77/0.23/0.20
+  allpool.REG3_FREQHINGE_H 2849: MERGED          acc 0.763 trans None margin 0.53 etaS/K@KEY 0.61/0.01 | L1 map [1, 1] m 0.53 | L2 map [1, 1] m 0.53 | L3 map [1, 1] m 0.53 | probe L3 0.65/0.64 | w C/K/V 0.88/0.15/0.27
+  allpool.REG3_FREQHINGE_H 2850: MERGED          acc 0.670 trans None margin 0.50 etaS/K@KEY 0.55/0.01 | L1 map [0, 0] m 0.50 | L2 map [0, 0] m 0.50 | L3 map [0, 0] m 0.50 | probe L3 0.68/0.65 | w C/K/V 0.86/0.18/0.18
+  allpool.REG3_FREQHINGE_H 2851: MERGED          acc 0.401 trans None margin 0.51 etaS/K@KEY 0.56/0.01 | L1 map [1, 1] m 0.51 | L2 map [1, 1] m 0.51 | L3 map [1, 1] m 0.51 | probe L3 0.65/0.60 | w C/K/V 0.85/0.19/0.17
+  allpool.REG3_FREQHINGE_H 2852: MERGED          acc 0.604 trans None margin 0.51 etaS/K@KEY 0.58/0.01 | L1 map [1, 1] m 0.51 | L2 map [1, 1] m 0.51 | L3 map [1, 1] m 0.51 | probe L3 0.67/0.64 | w C/K/V 0.86/0.17/0.21
+  allpool.REG3_FREQHINGE_H 2853: STREAM-PARTIAL  acc 0.600 trans None margin 0.57 etaS/K@KEY 0.61/0.01 | L1 map [1, 0] m 0.57 | L2 map [1, 0] m 0.57 | L3 map [1, 0] m 0.57 | probe L3 0.63/0.61 | w C/K/V 0.82/0.19/0.17
+  allpool.REG3_FREQHINGE_H 2854: MERGED          acc 0.559 trans None margin 0.51 etaS/K@KEY 0.57/0.01 | L1 map [1, 1] m 0.51 | L2 map [1, 1] m 0.51 | L3 map [1, 1] m 0.51 | probe L3 0.65/0.59 | w C/K/V 0.87/0.15/0.21
+  allpool.REG3_FREQHINGE_H 2855: MERGED          acc 0.530 trans None margin 0.54 etaS/K@KEY 0.59/0.01 | L1 map [1, 1] m 0.54 | L2 map [1, 1] m 0.54 | L3 map [1, 1] m 0.54 | probe L3 0.64/0.59 | w C/K/V 0.76/0.21/0.19
+  allpool.REG3_FREQHINGE_H 2856: MERGED          acc 0.579 trans None margin 0.47 etaS/K@KEY 0.52/0.01 | L1 map [0, 0] m 0.47 | L2 map [0, 0] m 0.47 | L3 map [0, 0] m 0.47 | probe L3 0.65/0.60 | w C/K/V 0.83/0.22/0.23
+  allpool.REG3_FREQHINGE_H 2857: MERGED          acc 0.639 trans None margin 0.50 etaS/K@KEY 0.57/0.01 | L1 map [1, 1] m 0.50 | L2 map [1, 1] m 0.50 | L3 map [1, 1] m 0.50 | probe L3 0.69/0.65 | w C/K/V 0.79/0.18/0.24
+  allpool.REG3_FREQHINGE_H 2858: MERGED          acc 0.405 trans None margin 0.48 etaS/K@KEY 0.53/0.01 | L1 map [1, 1] m 0.48 | L2 map [1, 1] m 0.48 | L3 map [1, 1] m 0.48 | probe L3 0.62/0.60 | w C/K/V 0.79/0.26/0.16
+  allpool.REG3_FREQHINGE_H 2859: STREAM-PARTIAL  acc 0.604 trans None margin 0.53 etaS/K@KEY 0.58/0.02 | L1 map [0, 1] m 0.53 | L2 map [0, 1] m 0.53 | L3 map [0, 1] m 0.53 | probe L3 0.63/0.61 | w C/K/V 0.80/0.23/0.17
+  allpool.REG3_FREQHINGE_H 2860: MERGED          acc 0.690 trans None margin 0.43 etaS/K@KEY 0.44/0.15 | L1 map [1, 1] m 0.43 | L2 map [1, 1] m 0.43 | L3 map [1, 1] m 0.43 | probe L3 0.65/0.64 | w C/K/V 0.95/0.13/0.20
+  allpool.REG3_FREQHINGE_H 2861: KEY             acc 0.405 trans None margin 0.08 etaS/K@KEY 0.12/0.75 | L1 map [0, 0] m 0.08 | L2 map [0, 0] m 0.08 | L3 map [0, 0] m 0.08 | probe L3 0.70/0.68 | w C/K/V 0.84/0.14/0.21
+  allpool.REG3_REPEATHINGE_H 2842: STREAM-PARTIAL  acc 0.412 trans None margin 0.52 etaS/K@KEY 0.57/0.01 | L1 map [0, 1] m 0.52 | L2 map [0, 1] m 0.52 | L3 map [0, 1] m 0.52 | probe L3 0.62/0.58 | w C/K/V 0.74/0.16/0.20
+  allpool.REG3_REPEATHINGE_H 2843: KEY             acc 0.503 trans None margin -0.00 etaS/K@KEY 0.02/0.99 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.72/0.72 | w C/K/V 0.09/0.18/0.16
+  allpool.REG3_REPEATHINGE_H 2844: OTHER           acc 0.388 trans None margin 0.00 etaS/K@KEY 0.21/0.04 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m 0.00 | probe L3 0.70/0.70 | w C/K/V 0.01/0.08/0.04
+  allpool.REG3_REPEATHINGE_H 2845: MERGED          acc 0.386 trans None margin 0.30 etaS/K@KEY 0.30/0.01 | L1 map [0, 0] m 0.30 | L2 map [0, 0] m 0.30 | L3 map [0, 0] m 0.30 | probe L3 0.67/0.62 | w C/K/V 0.57/0.19/0.23
+  allpool.REG3_REPEATHINGE_H 2846: MERGED          acc 0.397 trans None margin 0.41 etaS/K@KEY 0.42/0.01 | L1 map [0, 0] m 0.41 | L2 map [0, 0] m 0.41 | L3 map [0, 0] m 0.41 | probe L3 0.64/0.62 | w C/K/V 0.56/0.16/0.25
+  allpool.REG3_REPEATHINGE_H 2847: MERGED          acc 0.535 trans None margin 0.33 etaS/K@KEY 0.40/0.01 | L1 map [0, 0] m 0.33 | L2 map [0, 0] m 0.33 | L3 map [0, 0] m 0.33 | probe L3 0.65/0.65 | w C/K/V 0.61/0.16/0.24
+  allpool.REG3_REPEATHINGE_H 2848: POSITION        acc 0.301 trans None margin -0.00 etaS/K@KEY 0.25/0.03 | L1 map [1, 1] m -0.00 | L2 map [1, 1] m -0.00 | L3 map [1, 1] m -0.00 | probe L3 0.67/0.69 | w C/K/V 0.02/0.08/0.05
+  allpool.REG3_REPEATHINGE_H 2849: POSITION        acc 0.361 trans None margin -0.00 etaS/K@KEY 0.33/0.11 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.69/0.67 | w C/K/V 0.01/0.09/0.04
+  allpool.REG3_REPEATHINGE_H 2850: POSITION        acc 0.432 trans None margin -0.00 etaS/K@KEY 0.35/0.05 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m -0.00 | probe L3 0.69/0.67 | w C/K/V 0.02/0.06/0.05
+  allpool.REG3_REPEATHINGE_H 2851: KEY             acc 0.383 trans None margin 0.18 etaS/K@KEY 0.17/0.63 | L1 map [0, 0] m 0.19 | L2 map [0, 0] m 0.18 | L3 map [0, 0] m 0.18 | probe L3 0.69/0.66 | w C/K/V 0.85/0.13/0.19
+  allpool.REG3_REPEATHINGE_H 2852: MERGED          acc 0.573 trans None margin 0.44 etaS/K@KEY 0.50/0.01 | L1 map [1, 1] m 0.44 | L2 map [1, 1] m 0.44 | L3 map [1, 1] m 0.44 | probe L3 0.64/0.61 | w C/K/V 0.67/0.16/0.23
+  allpool.REG3_REPEATHINGE_H 2853: MERGED          acc 0.444 trans None margin 0.41 etaS/K@KEY 0.46/0.01 | L1 map [1, 1] m 0.41 | L2 map [1, 1] m 0.41 | L3 map [1, 1] m 0.41 | probe L3 0.67/0.61 | w C/K/V 0.72/0.17/0.20
+  allpool.REG3_REPEATHINGE_H 2854: POSITION        acc 0.378 trans None margin 0.00 etaS/K@KEY 0.26/0.03 | L1 map [0, 0] m 0.00 | L2 map [0, 0] m -0.00 | L3 map [0, 0] m 0.00 | probe L3 0.68/0.70 | w C/K/V 0.01/0.06/0.05
+  allpool.REG3_REPEATHINGE_H 2855: MERGED          acc 0.505 trans None margin 0.50 etaS/K@KEY 0.53/0.01 | L1 map [1, 1] m 0.50 | L2 map [1, 1] m 0.50 | L3 map [1, 1] m 0.50 | probe L3 0.65/0.62 | w C/K/V 0.65/0.18/0.24
+  allpool.REG3_REPEATHINGE_H 2856: MERGED          acc 0.613 trans None margin 0.54 etaS/K@KEY 0.59/0.01 | L1 map [1, 1] m 0.54 | L2 map [1, 1] m 0.54 | L3 map [1, 1] m 0.54 | probe L3 0.69/0.65 | w C/K/V 0.73/0.15/0.24
+  allpool.REG3_REPEATHINGE_H 2857: MERGED          acc 0.605 trans None margin 0.51 etaS/K@KEY 0.56/0.01 | L1 map [0, 0] m 0.51 | L2 map [0, 0] m 0.51 | L3 map [0, 0] m 0.51 | probe L3 0.63/0.61 | w C/K/V 0.66/0.17/0.22
+  allpool.REG3_REPEATHINGE_H 2858: MERGED          acc 0.513 trans None margin 0.44 etaS/K@KEY 0.51/0.01 | L1 map [0, 0] m 0.44 | L2 map [0, 0] m 0.44 | L3 map [0, 0] m 0.44 | probe L3 0.68/0.63 | w C/K/V 0.79/0.14/0.22
+  allpool.REG3_REPEATHINGE_H 2859: MERGED          acc 0.604 trans None margin 0.49 etaS/K@KEY 0.61/0.01 | L1 map [1, 1] m 0.49 | L2 map [1, 1] m 0.49 | L3 map [1, 1] m 0.49 | probe L3 0.66/0.62 | w C/K/V 0.76/0.16/0.19
+  allpool.REG3_REPEATHINGE_H 2860: POSITION        acc 0.301 trans None margin -0.00 etaS/K@KEY 0.39/0.04 | L1 map [1, 1] m 0.00 | L2 map [1, 1] m 0.00 | L3 map [1, 1] m -0.00 | probe L3 0.72/0.67 | w C/K/V 0.02/0.07/0.06
+  allpool.REG3_REPEATHINGE_H 2861: MERGED          acc 0.416 trans None margin 0.53 etaS/K@KEY 0.56/0.01 | L1 map [1, 1] m 0.53 | L2 map [1, 1] m 0.53 | L3 map [1, 1] m 0.53 | probe L3 0.63/0.59 | w C/K/V 0.71/0.14/0.20
+SCREEN_DONE
