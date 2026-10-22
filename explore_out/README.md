@@ -671,3 +671,26 @@ Descriptive summary:
 - The type-level gate's statistics behave as the cap predicts. It cannot separate the cap from the memory on a Hebbian
   channel without the conv.
 - The baselines stay unrun. Whether a conv configuration becomes the round's valid Hebbian one is the user's decision.
+
+### Session F, round 7: S90-F, the context-pool family (`explore_out/F/report_10.md`; module `explore_f_tasks.py` at 9017b82)
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| no-memory check, -ctxpool / -docs3 / -docs4 (3060-3061) | held-out acc (stop if > 0.6) | conv into the memory 0.37 / 0.19-0.20 / 0.12-0.16, each below its positional bound (0.42 / 0.31 / 0.25) | none stopped |
+| validity pilots, perfect gate (per-sequence index, k = D), Hebbian + conv and delta, SLOW, 24000 (3060-3061) | BOUND | 2/2 on every task and memory (Hebbian + conv 2400-4800; delta 1200-2400) | **the task is valid** (all six) |
+| type-level perfect gate (fixed balanced map, k = D) | BOUND | delta 2/2 on every task (8400-10800); Hebbian + conv 0/2 (0.72-0.81) | none (descriptive) |
+| screen: one channel, no gate (3062-3071, paired) | BOUND | -ctxpool: delta **10/10** (median 9600), Hebbian + conv 0/10 (0.48-0.51; 10 vs 0, p = 0.001); -docs3: 0/10 and 0/10; -docs4: 0/10 and 0/10 | **one channel binds without a context identity** |
+
+Descriptive summary:
+- -ctxpool (lite's 4 key types, the 2 contexts drawn from 16 types) separates the contexts' identity from the keys'
+  frequency.
+  - It is valid on both memories at 24000.
+  - On it, one delta channel binds without any routing. The contexts' missing identity is no obstacle to a delta channel
+    at two documents.
+- With three or four documents one channel fails on both memories. The failures sit near 1/D: the key's values are
+  retrieved, but not told apart.
+- Post hoc, one account fits the single channels and the type-level gate. A channel holding m documents answers 1/m of
+  their queries if Hebbian, and up to two documents if delta.
+- The cap of a fixed type → channel map at k = D is 0.533 / 0.268 / 0.141 (D = 2 / 3 / 4).
+- ERRATUM: `write_order_acc`'s split was invalid on -allpool (it read the CTX token as the stream index). Report 9's
+  -allpool splits are withdrawn; `write_order_acc_idx` is the corrected form.
