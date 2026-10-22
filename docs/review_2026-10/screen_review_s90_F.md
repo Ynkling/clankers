@@ -336,3 +336,5 @@ A "≤ 3/10" on -ctxpool would read "the partition's claim survives the context 
   - No task stopped (decision committed at `a4d14c24`, 05:34:06).
 - **Phase 1** (24 pilot and type-level runs) started 05:34:09, projected makespan 1.02 h. There are no pilot records yet.
 - **No learned arm has run.** Without fix 1, SINGLE_*_<T> at 24000 starts with the stage phase1b at about 06:37 UTC.
+
+**Correction (22 October, `check_F_report10.md`).** This review said phase 2 would start "at about 06:37". That used the log's worst-case makespan as the expected one. The stage that queued the single-channel runs started at 06:07:39, 15 minutes after this review was pushed.
