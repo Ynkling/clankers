@@ -834,3 +834,376 @@ def check_inv_stats(task, seed=2800):
     rows.append((f"{task.key}: the vectorised per-sequence eta^2 equals test_router_layout.eta2 on each sequence alone (max "
                  f"|diff| {d:.1e} on 64 sequences, a random gate)", d < 1e-12))
     return rows
+
+
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+# Round 7 (22 October): the context-pool family (S90-F). APPENDED ONLY: everything above is byte-identical to b0c6332 (the
+# commit G and H vendored for round 6), so every class and helper above behaves exactly as there.
+#
+# Round 6 showed that on -allpool the contexts' missing identity, not the keys, is what no learned gate crossed. -allpool
+# changes two things at once against lite (V's screen review of S89-F, fix 2; G's caveat): the keys stop being frequent
+# AND the contexts stop having a fixed identity. This family changes only the second.
+# RandHeaderTaskCtxPool ("RandHeaderTask-ctxpool"): lite (S = 2 streams, P = 4 keys per stream in NB = 2 blocks of 1-3
+#   pairs, the 4 blocks in random order, one CTX per block, one query; L = 23) with lite's 4 key types KEPT (lite's key i
+#   is key type i, every sequence) and only the S CTX tokens of each sequence drawn without replacement from a pool of
+#   N_CTX_POOL = 16 CTX types. Vocabulary: CTX 0..15, KEY 16..19, VAL 20..35 (36). make_batch draws lite's batch (the
+#   same generator calls in the same order) and then the S CTX types (one draw of B x 16 uniforms, argsorted; no key draw),
+#   and renames lite's contexts only: the batch IS lite's batch with the contexts renamed (CHECK).
+#   STREAM INDEX (any S): by order of first appearance in the sequence, stream 0 = the first block's context, stream 1 =
+#   the next new context, ...; stream_labels, the query's stream (make_batch's second output, (B, n_q)) and perfect_gate
+#   use it. At S = 2 it is -allpool's convention (CHECK).
+# RandHeaderTaskDocs ("RandHeaderTask-docs", D documents): RandHeaderTaskCtxPool at S = D streams ("documents"), D = 3 or
+#   4: each document's 4 pairs in 2 blocks of 1-3, the 2·D blocks in random order, one CTX per block, the D contexts of a
+#   sequence distinct and drawn from the 16, every key once in every document with D distinct values, one query naming a
+#   (document, key). L = D·(NB + 2P) + 3 (D = 3: 33; D = 4: 43). The MQAR-with-contexts layout at D documents (one query;
+#   MQAR proper has many queries and no context token; see the round-6 section).
+# THE ROUTING CAP for a fixed type -> channel map: with k channels and a map putting n_1..n_k of the 16 CTX types on each
+#   channel, a sequence's D contexts (a uniform D-subset of the 16) land on D distinct channels in e_D(n_1..n_k) of the
+#   C(16, D) subsets (e_D the elementary symmetric polynomial). type_map_cap(16, D, k) maximises this exactly over all
+#   channel sizes (the partitions of 16 into at most k parts); the maximum is the balanced split (balanced_map). At k = D
+#   (one channel per document, the perfect gate's k): D = 2: 64/120 = 0.533; D = 3: 150/560 = 0.268; D = 4: 256/1820 =
+#   0.141. With k = 16 channels (one per type) the cap is 1: the cap is a property of k = D channels, which is what the
+#   perfect gate and the type-level gate here use. A gate that reads context identity at k = D can route the rest only
+#   by comparing contexts within the sequence; the perfect gate is handed that comparison (the index).
+# WITHIN-SEQUENCE STATISTICS at any S and k (inv_from_gate_k): per sequence, each stream's mean read gate over its P body
+#   KEY positions and over its P body VAL positions;
+#     sep_key_inv          the mean over stream pairs of the total-variation distance between their mean KEY gates;
+#     seq_separated_frac   the fraction of sequences whose S mean KEY gates have S distinct argmax channels, each with
+#                          max >= ROUTED_ETA (0.9);
+#     val_cos_inv_k        the mean over stream pairs of the cosine between their mean VAL gates.
+#   All invariant to a per-sequence permutation of the channels. (eta^2 of a k-vector by stream is not used at S > 2: it
+#   is 1 whenever each stream's gate is constant, even when two streams share a channel.) At S = k = 2, val_cos_inv_k
+#   equals inv_from_gate's val_cos_inv (CHECK). ctx_stats(route_at): pool_stats plus inv_from_gate_k at every
+#   evaluation (and, at S = 2, pool_routing_stats_inv); gate_stats_k's key_sep and key_part, which read token ids
+#   S..S+P-1 (CTX types here), are set to NaN.
+# ERRATUM (22 October): write_order_acc reads the query's stream as the CTX TOKEN before the query's key and compares it
+#   with stream_labels. That is right where the CTX ids are the stream indices (lite, -pool) and WRONG on -allpool, where
+#   the query's CTX token is a type 0..15 and stream_labels is the index 0..1: its last / not-last split and acc_by_stream
+#   on -allpool are invalid (round 6's report 9 printed them for -allpool runs; withdrawn there). write_order_acc_idx reads
+#   the query's stream as stream_labels at the query's CTX position; it equals write_order_acc on -pool (CHECK) and is
+#   correct on every task here (its last-write mask equals the one computed on lite's own batch, CHECK).
+# check_ctx_task(task): the structure CHECKs (below); check_inv_stats_k(task): the synthetic-gate CHECK at any S.
+# ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+DOCS_D = (3, 4)
+
+
+class RandHeaderTaskCtxPool(RandHeaderTaskPool):
+    def __init__(self, P=4, S=2, n_vals=16, n_q=1, nb=2, lmin=1, lmax=3, n_ctx=N_CTX_POOL):
+        super().__init__(P, S=S, n_vals=n_vals, n_q=n_q, nb=nb, lmin=lmin, lmax=lmax, k_pool=P)
+        assert int(n_ctx) >= S
+        self.n_ctx = int(n_ctx)
+        self._vocab_ids()
+        self.ctx_tokens = tuple(range(self.n_ctx))
+        self.key = f"P{P}rh{nb}S{S}ctx{self.n_ctx}"
+        self.label = (f"P={P}: RandHeaderTask-ctxpool, S={S}, n_vals={n_vals}, n_q={n_q}, layout=randheader (NB={nb}, block "
+                      f"lengths {lmin}..{lmax}), lite's {P} key types, contexts from a pool of {self.n_ctx}")
+
+    def first_rank(self, x):
+        """(B, S): the order of first appearance of each LITE stream s (ids 0..S-1) in lite's batch x."""
+        B, T = x.shape
+        S = self.S
+        idx = torch.arange(T).expand(B, T)
+        pos = torch.stack([torch.where(x == s, idx, torch.full_like(idx, T)).min(1).values for s in range(S)], 1)
+        return pos.argsort(1).argsort(1)
+
+    def make_batch(self, B, gen):
+        x, qs = self._lite_batch(B, gen)
+        pair = torch.rand(B, self.n_ctx, generator=gen).argsort(-1)[:, :self.S]     # (B, S) distinct, by first appearance
+        rank = self.first_rank(x[:, :self.body_len])
+        ctxset = pair.gather(1, rank)                                                # ctxset[b, lite s] = CTX type
+        keyset = torch.arange(self.P).expand(B, self.P)                              # lite's keys, unchanged
+        return self._relabel(x, keyset, ctxset), rank.gather(1, qs)
+
+    def stream_labels(self, x):
+        """the stream index by first appearance of the latched CTX type (0 = the first block's), -1 before any CTX."""
+        B, T = x.shape
+        idx = torch.arange(T).expand(B, T)
+        isc = self.ctx_mask(x)
+        last = torch.where(isc, idx, torch.full_like(idx, -1)).cummax(dim=1).values
+        cur = x.gather(1, last.clamp(min=0))
+        first = torch.full((B, self.n_ctx), T, dtype=torch.long)
+        first.scatter_reduce_(1, torch.where(isc, x, torch.zeros_like(x)), torch.where(isc, idx, torch.full_like(idx, T)),
+                              reduce="amin")
+        rank_of_type = (first[:, None, :] < first[:, :, None]).sum(-1)              # (B, n_ctx)
+        lab = rank_of_type.gather(1, cur.clamp(0, self.n_ctx - 1))
+        return torch.where(last >= 0, lab, torch.full_like(lab, -1))
+
+
+class RandHeaderTaskDocs(RandHeaderTaskCtxPool):
+    def __init__(self, D=3, P=4, n_vals=16, n_q=1, nb=2, lmin=1, lmax=3, n_ctx=N_CTX_POOL):
+        super().__init__(P, S=D, n_vals=n_vals, n_q=n_q, nb=nb, lmin=lmin, lmax=lmax, n_ctx=n_ctx)
+        self.D = int(D)
+        self.key = f"P{P}rh{nb}docs{self.D}ctx{self.n_ctx}"
+        self.label = self.label.replace("RandHeaderTask-ctxpool", f"RandHeaderTask-docs (D={self.D} documents)")
+
+
+# ── The routing cap of a fixed type -> channel map ───────────────────────────
+def balanced_map(n_ctx, k):
+    """CTX type t -> channel t·k // n_ctx: sizes differ by at most 1."""
+    return tuple(t * k // n_ctx for t in range(n_ctx))
+
+
+def _esym(sizes, D):
+    e = [1] + [0] * D
+    for n in sizes:
+        for j in range(D, 0, -1):
+            e[j] += e[j - 1] * n
+    return e[D]
+
+
+def _partitions(n, k, top=None):
+    top = n if top is None else top
+    if n == 0:
+        yield ()
+        return
+    if k == 0:
+        return
+    for first in range(min(n, top), 0, -1):
+        for rest in _partitions(n - first, k - 1, first):
+            yield (first,) + rest
+
+
+def type_map_cap(n_ctx, D, k):
+    """(cap, best sizes, count, C(n_ctx, D)): the largest fraction of a sequence's D contexts (a uniform D-subset) that
+    a fixed map of the n_ctx types to k channels sends to D distinct channels, over every split of the types (exact)."""
+    import math
+    tot = math.comb(n_ctx, D)
+    best = max(_partitions(n_ctx, k), key=lambda s: _esym(s, D))
+    return _esym(best, D) / tot, best, _esym(best, D), tot
+
+
+# ── Within-sequence statistics at any S and k ────────────────────────────────
+def inv_from_gate_k(task, pinp, gr):
+    """sep_key_inv, seq_separated_frac, val_cos_inv_k from a read gate gr (B, T, k) on the probe input (module comment)."""
+    import itertools as it
+    import torch.nn.functional as F
+    kpos, vpos = _positions(task, pinp)
+    lab = task.stream_labels(pinp)
+    k = gr.shape[-1]
+    means = {}
+    for role, pos in (("key", kpos), ("val", vpos)):
+        g = gr.gather(1, pos.unsqueeze(-1).expand(-1, -1, k))
+        lb = lab.gather(1, pos)
+        ms = []
+        for s in range(task.S):
+            m = (lb == s).to(g.dtype).unsqueeze(-1)
+            ms.append((g * m).sum(1) / m.sum(1).clamp(min=1))
+        means[role] = torch.stack(ms, 1)                                     # (B, S, k)
+    pairs = list(it.combinations(range(task.S), 2))
+    mk, mv = means["key"].double(), means["val"]
+    tvd = torch.stack([0.5 * (mk[:, a] - mk[:, b]).abs().sum(-1) for a, b in pairs], 1).mean(1)
+    cos = torch.stack([F.cosine_similarity(mv[:, a], mv[:, b], dim=-1) for a, b in pairs], 1).double().mean(1)
+    mx, am = mk.max(-1)
+    distinct = torch.tensor([len(set(r)) == task.S for r in am.tolist()])
+    sep = distinct & (mx >= ROUTED_ETA).all(1)
+    return dict(sep_key_inv=tvd.mean().item(), seq_separated_frac=sep.double().mean().item(),
+                val_cos_inv_k=cos.mean().item())
+
+
+@torch.no_grad()
+def pool_routing_stats_inv_k(model, task, probe):
+    was = model.training
+    model.eval()
+    try:
+        pinp = probe[0]
+        gr = model(pinp, TAU_END)[2]
+    finally:
+        model.train(was)
+    return inv_from_gate_k(task, pinp, gr)
+
+
+def ctx_stats(route_at):
+    """run_one's stats_fn on the context-pool tasks (module comment above)."""
+    base = pool_stats(route_at)
+    nan = float("nan")
+
+    @torch.no_grad()
+    def stats(model, task, probe, step):
+        out = base(model, task, probe, step)
+        for f in ("key_sep", "key_part"):
+            if f in out:
+                out[f] = nan
+        if task.S == 2:
+            out.update(pool_routing_stats_inv(model, task, probe))
+        out.update(pool_routing_stats_inv_k(model, task, probe))
+        return out
+    return stats
+
+
+# ── The write order with the query's stream index (ERRATUM above) ────────────
+def last_write_mask(task, inp, qstream):
+    """(B,) bool: the query's pair is the last of its key's S writes; qstream (B,) the query's stream in the same
+    convention as task.stream_labels."""
+    qpos = task.qpos[0]
+    body = inp[:, :qpos - 1]
+    lab = task.stream_labels(inp)[:, :qpos - 1]
+    idx = torch.arange(body.shape[1]).expand_as(body)
+    hit = body == inp[:, qpos][:, None]
+    assert bool((hit.sum(1) == task.S).all())
+    last_pos = torch.where(hit, idx, torch.full_like(idx, -1)).max(1).values
+    return lab.gather(1, last_pos[:, None])[:, 0] == qstream, last_pos
+
+
+@torch.no_grad()
+def write_order_acc_idx(model, task, data):
+    """write_order_acc with the query's stream as stream_labels at the query's CTX position (ERRATUM above)."""
+    from test_binding_onset import logits_of
+    was = model.training
+    model.eval()
+    try:
+        inp, tgt = data[:, :-1], data[:, 1:]
+        lg = logits_of(model, inp)
+    finally:
+        model.train(was)
+    S = task.S
+    qpos = task.qpos[0]
+    pred = lg[:, qpos].argmax(-1)
+    ans = tgt[:, qpos]
+    qs = task.stream_labels(inp)[:, qpos - 1]
+    is_last, last_pos = last_write_mask(task, inp, qs)
+    last_val = inp.gather(1, (last_pos + 1)[:, None])[:, 0]
+    ok = pred == ans
+    out = dict(n=int(ok.numel()), acc=float(ok.float().mean()),
+               n_last=int(is_last.sum()), acc_last=float(ok[is_last].float().mean()) if is_last.any() else None,
+               n_notlast=int((~is_last).sum()),
+               acc_notlast=float(ok[~is_last].float().mean()) if (~is_last).any() else None,
+               lastval_notlast=float((pred[~is_last] == last_val[~is_last]).float().mean()) if (~is_last).any() else None)
+    out["acc_by_stream"] = [float(ok[qs == s].float().mean()) if (qs == s).any() else None for s in range(S)]
+    return out
+
+
+# ── CHECKs for the context-pool tasks ────────────────────────────────────────
+def check_ctx_task(task, B=4096, seed=7):
+    """[(name, ok)] for a RandHeaderTaskCtxPool / RandHeaderTaskDocs (module comment above)."""
+    rows = []
+    S, P, nb = task.S, task.P, task.nb
+    lite = RandHeaderTask(P, S=S, n_vals=task.n_vals, n_q=task.n_q, nb=nb, lmin=task.lmin, lmax=task.lmax)
+    x, qidx = task.make_batch(B, torch.Generator().manual_seed(seed))
+    xl, qsl = lite.make_batch(B, torch.Generator().manual_seed(seed))
+    rows.append((f"{task.key}: shape: L {task.L} (lite at S = {S}: {lite.L}), vocab {task.vocab} = {task.n_ctx} + {P} + "
+                 f"{task.n_vals}; batch {tuple(x.shape)}", x.shape == xl.shape and task.L == lite.L == x.shape[1]
+                 and task.vocab == task.n_ctx + P + task.n_vals))
+    for nm, v in check_rand_header(lite, B=B, seed=seed):
+        rows.append((f"{task.key}: lite's layout at S = {S}: {nm}", v))
+    same_roles = (torch.equal(task.ctx_mask(x), xl < S) and torch.equal(task.key_mask(x), (xl >= S) & (xl < S + P))
+                  and torch.equal(task.val_mask(x), xl >= S + P))
+    same_keys = torch.equal(x[task.key_mask(x)] - task.key0, xl[(xl >= S) & (xl < S + P)] - S)
+    same_vals = torch.equal(x[task.val_mask(x)] - task.val0, xl[xl >= S + P] - S - P)
+    cmap_ok, distinct = True, True
+    for b in range(0, B, 7):
+        m = {}
+        for t, tl in zip(x[b].tolist(), xl[b].tolist()):
+            if tl < S:
+                cmap_ok &= m.setdefault(tl, t) == t
+        distinct &= len(set(m.values())) == len(m) == S and all(0 <= t < task.n_ctx for t in m.values())
+    rows.append((f"{task.key}: the batch is lite's batch with only the contexts renamed: roles at the same positions "
+                 f"({same_roles}), lite's key types ({same_keys}) and values ({same_vals}), one CTX type per lite stream "
+                 f"({cmap_ok}), the sequence's {S} types distinct and from the pool of {task.n_ctx} ({distinct})",
+                 same_roles and same_keys and same_vals and cmap_ok and distinct))
+    lab = task.stream_labels(x)
+    rank = task.first_rank(xl[:, :task.body_len])
+    ll = BindTask.stream_labels(lite, xl)
+    want = torch.where(ll >= 0, rank.gather(1, ll.clamp(min=0)), ll)
+    firsts = True
+    for b in range(0, B, 11):
+        seen = []
+        for v in lab[b, :task.body_len].tolist():
+            if v not in seen:
+                seen.append(v)
+        firsts &= seen == list(range(S))
+    rows.append((f"{task.key}: the stream index is lite's stream ranked by first appearance ({torch.equal(lab, want)}); "
+                 f"the indices first appear in the order 0..{S - 1} ({firsts}); position 0 is a CTX of stream 0 "
+                 f"({bool(task.ctx_mask(x[:, :1]).all() and (lab[:, 0] == 0).all())})",
+                 torch.equal(lab, want) and firsts and bool(task.ctx_mask(x[:, :1]).all() and (lab[:, 0] == 0).all())))
+    if S == 2:
+        cur_first = (x.gather(1, torch.where(task.ctx_mask(x), torch.arange(x.shape[1]).expand_as(x),
+                                             torch.full_like(x, -1)).cummax(1).values.clamp(min=0)) != x[:, :1]).long()
+        rows.append((f"{task.key}: at S = 2 the index is -allpool's convention (the latched CTX differs from position 0's)",
+                     torch.equal(lab[:, 1:], cur_first[:, 1:])))
+    body = x[:, :task.qpos[0] - 1]
+    kidx = task.key_index(body)
+    ok_both = ok_val = True
+    for b in range(0, B, 3):
+        for k in range(P):
+            pos = (kidx[b] == k).nonzero()[:, 0]
+            ok_both &= len(pos) == S and sorted(lab[b, pos].tolist()) == list(range(S))
+            vals = x[b, pos + 1].tolist()
+            ok_val &= len(set(vals)) == S and all(v >= task.val0 for v in vals)
+    rows.append((f"{task.key}: every key occurs exactly {S} times, once under each stream ({ok_both}); its {S} values are "
+                 f"distinct ({ok_val})", ok_both and ok_val))
+    qp = task.qpos[0]
+    qk, qst = x[:, qp], lab[:, qp]
+    hit = (body == qk[:, None]) & (lab[:, :qp - 1] == qst[:, None])
+    one = bool((hit.sum(1) == 1).all())
+    kp = torch.where(hit, torch.arange(qp - 1).expand_as(hit), torch.full_like(hit, -1, dtype=torch.long)).max(1).values
+    tgt_ok = bool(torch.equal(x.gather(1, (kp + 1)[:, None])[:, 0], x[:, qp + 1]))
+    q_ok = bool(torch.equal(qidx.reshape(-1), qst))
+    rows.append((f"{task.key}: the query's (stream, key) occurs exactly once in the body ({one}), its target is that pair's "
+                 f"value ({tgt_ok}); make_batch's query stream equals stream_labels at the query ({q_ok})",
+                 one and tgt_ok and q_ok))
+    pg = task.perfect_gate(x[:, :-1])
+    rows.append((f"{task.key}: the perfect gate is the one-hot of the index, k = {S}",
+                 pg.shape[-1] == S and bool(torch.equal(pg.argmax(-1), lab[:, :-1].clamp(min=0)))
+                 and bool(((pg == 0) | (pg == 1)).all())))
+    fr = freq_report(task)
+    br = fr["by_role"]
+    rows.append((f"{task.key}: frequencies: CTX {br['CTX']['n']} types {br['CTX']['min']:.4f}-{br['CTX']['max']:.4f}, KEY "
+                 f"{br['KEY']['n']} {br['KEY']['min']:.4f}-{br['KEY']['max']:.4f}, VAL {br['VAL']['n']} "
+                 f"{br['VAL']['min']:.4f}-{br['VAL']['max']:.4f}; no CTX type as frequent as a value type (max CTX < min "
+                 f"VAL)", br["CTX"]["max"] < br["VAL"]["min"]))
+    cap, best, cnt, tot = type_map_cap(task.n_ctx, S, S)
+    sizes = [balanced_map(task.n_ctx, S).count(c) for c in range(S)]
+    bal = _esym(sizes, S) / tot
+    cm = torch.tensor(balanced_map(task.n_ctx, S))
+    isc = task.ctx_mask(x)
+    emp = torch.tensor([len(set(cm[x[b][isc[b]]].tolist())) == S for b in range(B)]).double().mean().item()
+    rows.append((f"{task.key}: the cap of a fixed type -> channel map at k = {S}: {cnt}/{tot} = {cap:.4f} (best split "
+                 f"{list(best)}; the balanced map's {sizes}: {bal:.4f}); the balanced map separates {emp:.4f} of {B} "
+                 f"sequences", abs(bal - cap) < 1e-12 and abs(emp - cap) < 4 * (cap * (1 - cap) / B) ** 0.5 + 1e-9))
+    return rows
+
+
+def check_inv_stats_k(task, seed=3060):
+    """[(name, ok)]: synthetic gates at any S (module comment above), on probe_batch(task, seed)."""
+    from test_multilayer_binding import probe_batch
+    probe = probe_batch(task, seed)
+    pinp = probe[0]
+    B, S = pinp.shape[0], task.S
+    perm = torch.rand(B, S, generator=torch.Generator().manual_seed(seed + 1)).argsort(-1)       # a channel order per seq
+    rel = lambda x: task.perfect_gate(x)
+    permuted = lambda x: task.perfect_gate(x).gather(-1, perm[:x.shape[0], None, :].expand(-1, x.shape[1], -1))
+    cm = balanced_map(task.n_ctx, S)
+    typ = lambda x: type_level_gate(task, x, cm)
+    rows = []
+    for nm, fn in (("relative", rel), ("permuted per sequence", permuted)):
+        iv = inv_from_gate_k(task, pinp, fn(pinp))
+        ok = abs(iv["sep_key_inv"] - 1) < 1e-9 and abs(iv["seq_separated_frac"] - 1) < 1e-12 and abs(iv["val_cos_inv_k"]) < 1e-6
+        rows.append((f"{task.key}: synthetic gate '{nm}': sep_key_inv {iv['sep_key_inv']:.6f} (1), separated "
+                     f"{iv['seq_separated_frac']:.4f} (1), VAL cos {iv['val_cos_inv_k']:.6f} (0)", ok))
+    iv = inv_from_gate_k(task, pinp, typ(pinp))
+    cmt = torch.tensor(cm)
+    isc = task.ctx_mask(pinp)
+    sep = torch.tensor([len(set(cmt[pinp[b][isc[b]]].tolist())) == S for b in range(B)]).double().mean().item()
+    rows.append((f"{task.key}: the balanced type-level gate (k = {S}) separates {sep:.4f} of the probe's {B} sequences: "
+                 f"seq_separated_frac {iv['seq_separated_frac']:.4f} equals it; sep_key_inv {iv['sep_key_inv']:.4f}, VAL cos "
+                 f"{iv['val_cos_inv_k']:.4f}", abs(iv["seq_separated_frac"] - sep) < 1e-12))
+    if S == 2:
+        g = torch.rand(B, pinp.shape[1], 2, generator=torch.Generator().manual_seed(seed + 2)).softmax(-1)
+        a, b = inv_from_gate(task, pinp, g), inv_from_gate_k(task, pinp, g)
+        d = abs(a["val_cos_inv"] - b["val_cos_inv_k"])
+        rows.append((f"{task.key}: at S = k = 2, val_cos_inv_k equals inv_from_gate's val_cos_inv on a random gate "
+                     f"(|diff| {d:.1e})", d < 1e-12))
+    return rows
+
+
+def check_write_order_idx(task, B=2048, seed=11):
+    """[(name, ok)]: the corrected write-order mask equals the one computed on lite's own batch (the same draws)."""
+    S, P = task.S, task.P
+    lite = RandHeaderTask(P, S=S, n_vals=task.n_vals, n_q=task.n_q, nb=task.nb, lmin=task.lmin, lmax=task.lmax)
+    x = task.make_batch(B, torch.Generator().manual_seed(seed))[0][:, :-1]
+    xl = lite.make_batch(B, torch.Generator().manual_seed(seed))[0][:, :-1]
+    qp = task.qpos[0]
+    mine, _ = last_write_mask(task, x, task.stream_labels(x)[:, qp - 1])
+    ref, _ = last_write_mask(lite, xl, xl[:, qp - 1])
+    return [(f"{task.key}: write_order_acc_idx's last-write mask equals the one on lite's own batch ({int(mine.sum())} of "
+             f"{B} queries ask the last write)", bool(torch.equal(mine, ref)))]
