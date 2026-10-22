@@ -246,3 +246,5 @@ G's CHECK rows give per sequence (4096 sequences):
 - Nothing in the run code needs to change for S90.
 - The budget is right by coincidence (default = intended), and fix 8 must land before S91.
 - On the records so far (REPEAT 5/6, REG3 0/4), S90 reads "the repeat hinge falls short" if one more REPEAT seed fails.
+
+**Correction (22 October, `check_G_report10.md`).** §1g and fix 8 said S91 "would again run 24000" and that its intended 48000 depends on fix 8. Both are wrong for S91 as G built it. S91's child defaults the budget by memory (`explore_g_s91_child.py:229`: 48000 for Hebbian, 24000 for delta), and every S91 record ran its intended budget. The harness defect at `explore_g_common.py:164` is described correctly and is still present. It stays latent for any run whose budget differs from its child's default.
