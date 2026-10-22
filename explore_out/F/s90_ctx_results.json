@@ -6236,6 +6236,1379 @@
     "n_notlast": 1528
    }
   },
+  "SINGLE_DELTA_CTXPOOL|3062|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.9970703125,
+   "arm": "SINGLE_DELTA_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.13916015625,
+     2.807800054550171
+    ],
+    [
+     2400,
+     0.4560546875,
+     2.314969301223755
+    ],
+    [
+     3600,
+     0.46875,
+     1.072073221206665
+    ],
+    [
+     4800,
+     0.48828125,
+     0.9673903584480286
+    ],
+    [
+     6000,
+     0.49365234375,
+     0.9368939995765686
+    ],
+    [
+     7200,
+     0.826171875,
+     0.40423783659935
+    ],
+    [
+     8400,
+     0.974609375,
+     0.14763574302196503
+    ],
+    [
+     9600,
+     0.97607421875,
+     0.09099189192056656
+    ],
+    [
+     10800,
+     0.9970703125,
+     0.017562542110681534
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.830222263706722,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.557984642150475,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.5627116060021384,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 195.84448385238647,
+   "secs_wall": 198.69670271873474,
+   "seed": 3062,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 10800,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": 8400,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.9970703125,
+    "acc_by_stream": [
+     0.9980178475379944,
+     0.9961501359939575
+    ],
+    "acc_last": 0.998062014579773,
+    "acc_notlast": 0.9960629940032959,
+    "lastval_notlast": 0.003937007859349251,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "SINGLE_DELTA_CTXPOOL|3063|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.99169921875,
+   "arm": "SINGLE_DELTA_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.1484375,
+     2.795914888381958
+    ],
+    [
+     2400,
+     0.4423828125,
+     2.220977783203125
+    ],
+    [
+     3600,
+     0.52197265625,
+     0.8768488764762878
+    ],
+    [
+     4800,
+     0.5146484375,
+     0.7866492867469788
+    ],
+    [
+     6000,
+     0.521484375,
+     0.7680575251579285
+    ],
+    [
+     7200,
+     0.9365234375,
+     0.18255457282066345
+    ],
+    [
+     8400,
+     0.96337890625,
+     0.08887125551700592
+    ],
+    [
+     9600,
+     0.9765625,
+     0.06829015910625458
+    ],
+    [
+     10800,
+     0.99169921875,
+     0.029290614649653435
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.462257612469351,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.6763892381020424,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.7344959706570033,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 198.3302125930786,
+   "secs_wall": 201.16657400131226,
+   "seed": 3063,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 10800,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": 8400,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.99169921875,
+    "acc_by_stream": [
+     0.9920713305473328,
+     0.9913378357887268
+    ],
+    "acc_last": 0.9893410801887512,
+    "acc_notlast": 0.9940944910049438,
+    "lastval_notlast": 0.005905511789023876,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "SINGLE_DELTA_CTXPOOL|3064|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.98974609375,
+   "arm": "SINGLE_DELTA_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.16845703125,
+     2.7913057804107666
+    ],
+    [
+     2400,
+     0.49365234375,
+     2.115671396255493
+    ],
+    [
+     3600,
+     0.49560546875,
+     1.097644329071045
+    ],
+    [
+     4800,
+     0.50390625,
+     0.9557721614837646
+    ],
+    [
+     6000,
+     0.50439453125,
+     0.8612409234046936
+    ],
+    [
+     7200,
+     0.51318359375,
+     0.8150959014892578
+    ],
+    [
+     8400,
+     0.93359375,
+     0.20460279285907745
+    ],
+    [
+     9600,
+     0.990234375,
+     0.05190932750701904
+    ],
+    [
+     10800,
+     0.99169921875,
+     0.028382262215018272
+    ],
+    [
+     12000,
+     0.98974609375,
+     0.04836437851190567
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.7565761528892234,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.437938772959852,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.53855937150373,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 218.0413556098938,
+   "secs_wall": 220.70712733268738,
+   "seed": 3064,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 12000,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": 9600,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.98974609375,
+    "acc_by_stream": [
+     0.9920713305473328,
+     0.9874879717826843
+    ],
+    "acc_last": 0.9854651093482971,
+    "acc_notlast": 0.9940944910049438,
+    "lastval_notlast": 0.003937007859349251,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "SINGLE_DELTA_CTXPOOL|3065|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.998046875,
+   "arm": "SINGLE_DELTA_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.107421875,
+     2.8047685623168945
+    ],
+    [
+     2400,
+     0.4521484375,
+     2.3315601348876953
+    ],
+    [
+     3600,
+     0.4775390625,
+     1.2417086362838745
+    ],
+    [
+     4800,
+     0.4638671875,
+     1.2005528211593628
+    ],
+    [
+     6000,
+     0.4775390625,
+     1.1783114671707153
+    ],
+    [
+     7200,
+     0.48388671875,
+     1.1677030324935913
+    ],
+    [
+     8400,
+     0.67333984375,
+     0.7608934640884399
+    ],
+    [
+     9600,
+     0.98974609375,
+     0.06727790832519531
+    ],
+    [
+     10800,
+     0.9970703125,
+     0.02305879257619381
+    ],
+    [
+     12000,
+     0.998046875,
+     0.01485841628164053
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     3.384908260415192,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.5749660096193576,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.5354538451946753,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 218.75253558158875,
+   "secs_wall": 221.602929353714,
+   "seed": 3065,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 12000,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": 9600,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.998046875,
+    "acc_by_stream": [
+     0.9980178475379944,
+     0.9980750679969788
+    ],
+    "acc_last": 0.998062014579773,
+    "acc_notlast": 0.998031497001648,
+    "lastval_notlast": 0.0009842519648373127,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "SINGLE_DELTA_CTXPOOL|3066|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.99609375,
+   "arm": "SINGLE_DELTA_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.16748046875,
+     2.800548791885376
+    ],
+    [
+     2400,
+     0.50048828125,
+     2.2152059078216553
+    ],
+    [
+     3600,
+     0.5087890625,
+     0.9363569617271423
+    ],
+    [
+     4800,
+     0.51708984375,
+     0.8463115096092224
+    ],
+    [
+     6000,
+     0.5087890625,
+     0.8419733047485352
+    ],
+    [
+     7200,
+     0.8505859375,
+     0.3816847503185272
+    ],
+    [
+     8400,
+     0.94775390625,
+     0.13624361157417297
+    ],
+    [
+     9600,
+     0.98828125,
+     0.043633315712213516
+    ],
+    [
+     10800,
+     0.9912109375,
+     0.03477490693330765
+    ],
+    [
+     12000,
+     0.99609375,
+     0.02011701837182045
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.35445760656441,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.763665383267276,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.80599752991424,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 224.53329420089722,
+   "secs_wall": 227.16512155532837,
+   "seed": 3066,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 12000,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": 9600,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.99609375,
+    "acc_by_stream": [
+     0.9950445890426636,
+     0.9971126317977905
+    ],
+    "acc_last": 0.9961240291595459,
+    "acc_notlast": 0.9960629940032959,
+    "lastval_notlast": 0.003937007859349251,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "SINGLE_DELTA_CTXPOOL|3067|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.9873046875,
+   "arm": "SINGLE_DELTA_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.20703125,
+     2.7749431133270264
+    ],
+    [
+     2400,
+     0.490234375,
+     2.0253167152404785
+    ],
+    [
+     3600,
+     0.51220703125,
+     0.8746581673622131
+    ],
+    [
+     4800,
+     0.52978515625,
+     0.8651784062385559
+    ],
+    [
+     6000,
+     0.89990234375,
+     0.2721608877182007
+    ],
+    [
+     7200,
+     0.9716796875,
+     0.09550289809703827
+    ],
+    [
+     8400,
+     0.9765625,
+     0.07994364947080612
+    ],
+    [
+     9600,
+     0.9873046875,
+     0.04863904044032097
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.7894445633125833,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.503227463243139,
+     0.0
+    ],
+    "100": [
+     0.0,
+     1.3577503383265892,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 182.27546977996826,
+   "secs_wall": 185.134135723114,
+   "seed": 3067,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 9600,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": 7200,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.9873046875,
+    "acc_by_stream": [
+     0.9851337671279907,
+     0.9894129037857056
+    ],
+    "acc_last": 0.9883720874786377,
+    "acc_notlast": 0.9862204790115356,
+    "lastval_notlast": 0.012795276008546352,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
+  "SINGLE_DELTA_CTXPOOL|3068|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.99267578125,
+   "arm": "SINGLE_DELTA_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": null,
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.1650390625,
+     2.793611764907837
+    ],
+    [
+     2400,
+     0.4619140625,
+     2.1876986026763916
+    ],
+    [
+     3600,
+     0.50439453125,
+     1.1380566358566284
+    ],
+    [
+     4800,
+     0.4892578125,
+     0.9784059524536133
+    ],
+    [
+     6000,
+     0.486328125,
+     0.9506803750991821
+    ],
+    [
+     7200,
+     0.8798828125,
+     0.3575838804244995
+    ],
+    [
+     8400,
+     0.9794921875,
+     0.07055427134037018
+    ],
+    [
+     9600,
+     0.9873046875,
+     0.05391348525881767
+    ],
+    [
+     10800,
+     0.99267578125,
+     0.026304826140403748
+    ]
+   ],
+   "delta_cfg": {
+    "beta": 1.0,
+    "decay": "fixed",
+    "impl": "fast",
+    "normalize": true,
+    "write": "tied"
+   },
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.563411341246197,
+     0.0
+    ],
+    "10": [
+     0.0,
+     2.814147826769836,
+     0.0
+    ],
+    "100": [
+     0.0,
+     2.28577637694526,
+     0.0
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "DELTA",
+   "muon_lr": null,
+   "ok": true,
+   "params": 26880,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 203.94805693626404,
+   "secs_wall": 206.8012340068817,
+   "seed": 3068,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 10800,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": 8400,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.99267578125,
+    "acc_by_stream": [
+     0.9970267415046692,
+     0.9884504079818726
+    ],
+    "acc_last": 0.9922480583190918,
+    "acc_notlast": 0.9931102395057678,
+    "lastval_notlast": 0.006889763753861189,
+    "n": 2048,
+    "n_last": 1032,
+    "n_notlast": 1016
+   }
+  },
   "SINGLE_DELTA_DOCS3|3062|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
    "acc": 0.43310546875,
    "arm": "SINGLE_DELTA_DOCS3",
@@ -13161,6 +14534,2486 @@
     "acc_last": 0.36825886368751526,
     "acc_notlast": 0.30521801114082336,
     "lastval_notlast": 0.36240172386169434,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3064|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.31591796875,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.13916015625,
+     2.774959087371826
+    ],
+    [
+     2400,
+     0.16552734375,
+     2.640875816345215
+    ],
+    [
+     3600,
+     0.30908203125,
+     1.764238715171814
+    ],
+    [
+     4800,
+     0.3232421875,
+     1.40017569065094
+    ],
+    [
+     6000,
+     0.32958984375,
+     1.3014321327209473
+    ],
+    [
+     7200,
+     0.34326171875,
+     1.262158751487732
+    ],
+    [
+     8400,
+     0.33544921875,
+     1.248043179512024
+    ],
+    [
+     9600,
+     0.33447265625,
+     1.2337716817855835
+    ],
+    [
+     10800,
+     0.34521484375,
+     1.2039536237716675
+    ],
+    [
+     12000,
+     0.34814453125,
+     1.198757529258728
+    ],
+    [
+     13200,
+     0.33251953125,
+     1.1968361139297485
+    ],
+    [
+     14400,
+     0.32763671875,
+     1.1888903379440308
+    ],
+    [
+     15600,
+     0.3466796875,
+     1.1827107667922974
+    ],
+    [
+     16800,
+     0.32177734375,
+     1.1908167600631714
+    ],
+    [
+     18000,
+     0.337890625,
+     1.170462965965271
+    ],
+    [
+     19200,
+     0.3369140625,
+     1.1613104343414307
+    ],
+    [
+     20400,
+     0.318359375,
+     1.1613719463348389
+    ],
+    [
+     21600,
+     0.3251953125,
+     1.1584677696228027
+    ],
+    [
+     22800,
+     0.34765625,
+     1.1527169942855835
+    ],
+    [
+     24000,
+     0.31591796875,
+     1.1523483991622925
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d",
+   "grad": {
+    "1": [
+     0.0,
+     2.406172131851397,
+     0.05311262936874861
+    ],
+    "10": [
+     0.0,
+     2.7515574076668767,
+     0.05171161515240983
+    ],
+    "100": [
+     0.0,
+     1.344084129820218,
+     0.01596589942620633
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 477.91269302368164,
+   "secs_wall": 480.9359223842621,
+   "seed": 3064,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.31591796875,
+    "acc_by_stream": [
+     0.2836676239967346,
+     0.30965909361839294,
+     0.3575851321220398
+    ],
+    "acc_last": 0.31432974338531494,
+    "acc_notlast": 0.3166547417640686,
+    "lastval_notlast": 0.33452466130256653,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3065|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.349609375,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.16162109375,
+     2.7599620819091797
+    ],
+    [
+     2400,
+     0.173828125,
+     2.634141445159912
+    ],
+    [
+     3600,
+     0.3251953125,
+     1.7826907634735107
+    ],
+    [
+     4800,
+     0.32373046875,
+     1.4594740867614746
+    ],
+    [
+     6000,
+     0.330078125,
+     1.3578159809112549
+    ],
+    [
+     7200,
+     0.314453125,
+     1.2904255390167236
+    ],
+    [
+     8400,
+     0.32763671875,
+     1.2938932180404663
+    ],
+    [
+     9600,
+     0.333984375,
+     1.2442727088928223
+    ],
+    [
+     10800,
+     0.326171875,
+     1.2375446557998657
+    ],
+    [
+     12000,
+     0.32958984375,
+     1.2282001972198486
+    ],
+    [
+     13200,
+     0.3447265625,
+     1.2025599479675293
+    ],
+    [
+     14400,
+     0.3291015625,
+     1.2143759727478027
+    ],
+    [
+     15600,
+     0.33447265625,
+     1.215747356414795
+    ],
+    [
+     16800,
+     0.31884765625,
+     1.219732642173767
+    ],
+    [
+     18000,
+     0.326171875,
+     1.187971830368042
+    ],
+    [
+     19200,
+     0.31689453125,
+     1.193289041519165
+    ],
+    [
+     20400,
+     0.328125,
+     1.1779122352600098
+    ],
+    [
+     21600,
+     0.341796875,
+     1.1804918050765991
+    ],
+    [
+     22800,
+     0.32958984375,
+     1.170196533203125
+    ],
+    [
+     24000,
+     0.349609375,
+     1.1600701808929443
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.4930497952792874,
+     0.047565940978713264
+    ],
+    "10": [
+     0.0,
+     2.401287460710113,
+     0.04683933788965203
+    ],
+    "100": [
+     0.0,
+     1.7951709462428462,
+     0.026352412446336147
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 475.9986436367035,
+   "secs_wall": 478.97653698921204,
+   "seed": 3065,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.349609375,
+    "acc_by_stream": [
+     0.32234957814216614,
+     0.35227271914482117,
+     0.37616097927093506
+    ],
+    "acc_last": 0.3713405132293701,
+    "acc_notlast": 0.33952823281288147,
+    "lastval_notlast": 0.3388134241104126,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3066|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.35107421875,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.1572265625,
+     2.768829345703125
+    ],
+    [
+     2400,
+     0.1591796875,
+     2.654447555541992
+    ],
+    [
+     3600,
+     0.3291015625,
+     1.781954288482666
+    ],
+    [
+     4800,
+     0.31689453125,
+     1.4406172037124634
+    ],
+    [
+     6000,
+     0.3359375,
+     1.3566930294036865
+    ],
+    [
+     7200,
+     0.3271484375,
+     1.3305102586746216
+    ],
+    [
+     8400,
+     0.337890625,
+     1.287035346031189
+    ],
+    [
+     9600,
+     0.3232421875,
+     1.2542285919189453
+    ],
+    [
+     10800,
+     0.3271484375,
+     1.2560607194900513
+    ],
+    [
+     12000,
+     0.32421875,
+     1.2299256324768066
+    ],
+    [
+     13200,
+     0.31982421875,
+     1.2280784845352173
+    ],
+    [
+     14400,
+     0.33056640625,
+     1.214040994644165
+    ],
+    [
+     15600,
+     0.33837890625,
+     1.1986604928970337
+    ],
+    [
+     16800,
+     0.33056640625,
+     1.2070045471191406
+    ],
+    [
+     18000,
+     0.3447265625,
+     1.1956875324249268
+    ],
+    [
+     19200,
+     0.361328125,
+     1.1774532794952393
+    ],
+    [
+     20400,
+     0.33056640625,
+     1.1746317148208618
+    ],
+    [
+     21600,
+     0.337890625,
+     1.1745895147323608
+    ],
+    [
+     22800,
+     0.359375,
+     1.1657156944274902
+    ],
+    [
+     24000,
+     0.35107421875,
+     1.1547850370407104
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     3.1899813922949245,
+     0.07196875112594027
+    ],
+    "10": [
+     0.0,
+     2.261822502115169,
+     0.04164500934053385
+    ],
+    "100": [
+     0.0,
+     1.6437189809969137,
+     0.028713920375057392
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 474.27798438072205,
+   "secs_wall": 477.3722229003906,
+   "seed": 3066,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.35107421875,
+    "acc_by_stream": [
+     0.3051576018333435,
+     0.33664771914482117,
+     0.4164086580276489
+    ],
+    "acc_last": 0.3929121792316437,
+    "acc_notlast": 0.3316654860973358,
+    "lastval_notlast": 0.33738383650779724,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3067|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.3291015625,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.13720703125,
+     2.7732245922088623
+    ],
+    [
+     2400,
+     0.166015625,
+     2.6503376960754395
+    ],
+    [
+     3600,
+     0.314453125,
+     1.8113738298416138
+    ],
+    [
+     4800,
+     0.34326171875,
+     1.4673913717269897
+    ],
+    [
+     6000,
+     0.3095703125,
+     1.3851603269577026
+    ],
+    [
+     7200,
+     0.3330078125,
+     1.3243769407272339
+    ],
+    [
+     8400,
+     0.34326171875,
+     1.2999169826507568
+    ],
+    [
+     9600,
+     0.3271484375,
+     1.2703394889831543
+    ],
+    [
+     10800,
+     0.32861328125,
+     1.262629747390747
+    ],
+    [
+     12000,
+     0.33447265625,
+     1.2463138103485107
+    ],
+    [
+     13200,
+     0.341796875,
+     1.2307966947555542
+    ],
+    [
+     14400,
+     0.32470703125,
+     1.2317513227462769
+    ],
+    [
+     15600,
+     0.31494140625,
+     1.2183040380477905
+    ],
+    [
+     16800,
+     0.32958984375,
+     1.2192268371582031
+    ],
+    [
+     18000,
+     0.3291015625,
+     1.2111868858337402
+    ],
+    [
+     19200,
+     0.33984375,
+     1.1984795331954956
+    ],
+    [
+     20400,
+     0.32373046875,
+     1.199074387550354
+    ],
+    [
+     21600,
+     0.33935546875,
+     1.1838064193725586
+    ],
+    [
+     22800,
+     0.3271484375,
+     1.1776186227798462
+    ],
+    [
+     24000,
+     0.3291015625,
+     1.1849106550216675
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     3.4106459468109533,
+     0.05146287610311766
+    ],
+    "10": [
+     0.0,
+     2.766891609712478,
+     0.05273969499809257
+    ],
+    "100": [
+     0.0,
+     1.2617841000949785,
+     0.021074546300112025
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 479.0010778903961,
+   "secs_wall": 481.9080922603607,
+   "seed": 3067,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.3291015625,
+    "acc_by_stream": [
+     0.3280802369117737,
+     0.33664771914482117,
+     0.32198143005371094
+    ],
+    "acc_last": 0.3281972408294678,
+    "acc_notlast": 0.3295210897922516,
+    "lastval_notlast": 0.32809150218963623,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3068|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.34130859375,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.146484375,
+     2.770113706588745
+    ],
+    [
+     2400,
+     0.146484375,
+     2.648433208465576
+    ],
+    [
+     3600,
+     0.3330078125,
+     1.6400659084320068
+    ],
+    [
+     4800,
+     0.3466796875,
+     1.370661973953247
+    ],
+    [
+     6000,
+     0.33251953125,
+     1.2956889867782593
+    ],
+    [
+     7200,
+     0.34375,
+     1.2522448301315308
+    ],
+    [
+     8400,
+     0.3330078125,
+     1.2534303665161133
+    ],
+    [
+     9600,
+     0.337890625,
+     1.218591570854187
+    ],
+    [
+     10800,
+     0.35400390625,
+     1.2201471328735352
+    ],
+    [
+     12000,
+     0.3408203125,
+     1.1952558755874634
+    ],
+    [
+     13200,
+     0.33154296875,
+     1.2082127332687378
+    ],
+    [
+     14400,
+     0.33154296875,
+     1.1989693641662598
+    ],
+    [
+     15600,
+     0.3154296875,
+     1.1994593143463135
+    ],
+    [
+     16800,
+     0.337890625,
+     1.1894519329071045
+    ],
+    [
+     18000,
+     0.3388671875,
+     1.1668809652328491
+    ],
+    [
+     19200,
+     0.34228515625,
+     1.1714969873428345
+    ],
+    [
+     20400,
+     0.3251953125,
+     1.1799287796020508
+    ],
+    [
+     21600,
+     0.349609375,
+     1.1649783849716187
+    ],
+    [
+     22800,
+     0.3349609375,
+     1.1568974256515503
+    ],
+    [
+     24000,
+     0.34130859375,
+     1.1579991579055786
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.6577738261787074,
+     0.058983691397867674
+    ],
+    "10": [
+     0.0,
+     3.172046055432957,
+     0.05517650916032938
+    ],
+    "100": [
+     0.0,
+     1.5279318318820687,
+     0.019296262929018287
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 489.0874569416046,
+   "secs_wall": 492.08526825904846,
+   "seed": 3068,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.34130859375,
+    "acc_by_stream": [
+     0.3065902590751648,
+     0.36647728085517883,
+     0.3513931930065155
+    ],
+    "acc_last": 0.36055469512939453,
+    "acc_notlast": 0.3323802649974823,
+    "lastval_notlast": 0.3509649634361267,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3069|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.34619140625,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.1484375,
+     2.775036096572876
+    ],
+    [
+     2400,
+     0.173828125,
+     2.6466119289398193
+    ],
+    [
+     3600,
+     0.30908203125,
+     1.7331987619400024
+    ],
+    [
+     4800,
+     0.32470703125,
+     1.4382762908935547
+    ],
+    [
+     6000,
+     0.31396484375,
+     1.3588447570800781
+    ],
+    [
+     7200,
+     0.3193359375,
+     1.2800835371017456
+    ],
+    [
+     8400,
+     0.3076171875,
+     1.300422191619873
+    ],
+    [
+     9600,
+     0.322265625,
+     1.2664284706115723
+    ],
+    [
+     10800,
+     0.33349609375,
+     1.2286015748977661
+    ],
+    [
+     12000,
+     0.328125,
+     1.2192633152008057
+    ],
+    [
+     13200,
+     0.33203125,
+     1.1962591409683228
+    ],
+    [
+     14400,
+     0.34912109375,
+     1.1880230903625488
+    ],
+    [
+     15600,
+     0.33935546875,
+     1.201085090637207
+    ],
+    [
+     16800,
+     0.322265625,
+     1.1923152208328247
+    ],
+    [
+     18000,
+     0.3408203125,
+     1.1799054145812988
+    ],
+    [
+     19200,
+     0.341796875,
+     1.1809651851654053
+    ],
+    [
+     20400,
+     0.3447265625,
+     1.1731730699539185
+    ],
+    [
+     21600,
+     0.34375,
+     1.1575531959533691
+    ],
+    [
+     22800,
+     0.35205078125,
+     1.1653915643692017
+    ],
+    [
+     24000,
+     0.34619140625,
+     1.1637769937515259
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.7069229830935053,
+     0.04404429044664619
+    ],
+    "10": [
+     0.0,
+     2.091066719227647,
+     0.0446638309754007
+    ],
+    "100": [
+     0.0,
+     1.7295318288799546,
+     0.020563646360709807
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 493.5632748603821,
+   "secs_wall": 496.8404505252838,
+   "seed": 3069,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.34619140625,
+    "acc_by_stream": [
+     0.31232091784477234,
+     0.3323863744735718,
+     0.39783281087875366
+    ],
+    "acc_last": 0.40215715765953064,
+    "acc_notlast": 0.3202287256717682,
+    "lastval_notlast": 0.37026447057724,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3070|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.34033203125,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.14794921875,
+     2.761108636856079
+    ],
+    [
+     2400,
+     0.16455078125,
+     2.642082929611206
+    ],
+    [
+     3600,
+     0.3505859375,
+     1.6221110820770264
+    ],
+    [
+     4800,
+     0.330078125,
+     1.370437741279602
+    ],
+    [
+     6000,
+     0.3251953125,
+     1.309094786643982
+    ],
+    [
+     7200,
+     0.34130859375,
+     1.2581334114074707
+    ],
+    [
+     8400,
+     0.3349609375,
+     1.2293413877487183
+    ],
+    [
+     9600,
+     0.33740234375,
+     1.2298862934112549
+    ],
+    [
+     10800,
+     0.31884765625,
+     1.2426486015319824
+    ],
+    [
+     12000,
+     0.3427734375,
+     1.2118412256240845
+    ],
+    [
+     13200,
+     0.33203125,
+     1.2077635526657104
+    ],
+    [
+     14400,
+     0.33740234375,
+     1.1956342458724976
+    ],
+    [
+     15600,
+     0.34765625,
+     1.181075930595398
+    ],
+    [
+     16800,
+     0.33935546875,
+     1.1814651489257812
+    ],
+    [
+     18000,
+     0.33056640625,
+     1.1955139636993408
+    ],
+    [
+     19200,
+     0.34619140625,
+     1.1739873886108398
+    ],
+    [
+     20400,
+     0.33349609375,
+     1.1961039304733276
+    ],
+    [
+     21600,
+     0.35205078125,
+     1.1546261310577393
+    ],
+    [
+     22800,
+     0.337890625,
+     1.167265772819519
+    ],
+    [
+     24000,
+     0.34033203125,
+     1.157068133354187
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.7014244551770283,
+     0.06330200549586398
+    ],
+    "10": [
+     0.0,
+     2.3669282248742545,
+     0.046450941901260624
+    ],
+    "100": [
+     0.0,
+     1.4171411342669775,
+     0.018970965470173417
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 496.27882051467896,
+   "secs_wall": 499.4289710521698,
+   "seed": 3070,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.34033203125,
+    "acc_by_stream": [
+     0.31375357508659363,
+     0.34090909361839294,
+     0.3684210479259491
+    ],
+    "acc_last": 0.3482280373573303,
+    "acc_notlast": 0.33666905760765076,
+    "lastval_notlast": 0.3445318043231964,
+    "n": 2048,
+    "n_last": 649,
+    "n_notlast": 1399
+   }
+  },
+  "SINGLE_HEBBCONV_DOCS3|3071|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.33056640625,
+   "arm": "SINGLE_HEBBCONV_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.15380859375,
+     2.7672922611236572
+    ],
+    [
+     2400,
+     0.16162109375,
+     2.647800922393799
+    ],
+    [
+     3600,
+     0.3310546875,
+     1.6697399616241455
+    ],
+    [
+     4800,
+     0.3330078125,
+     1.4273682832717896
+    ],
+    [
+     6000,
+     0.333984375,
+     1.3198097944259644
+    ],
+    [
+     7200,
+     0.33251953125,
+     1.296094536781311
+    ],
+    [
+     8400,
+     0.34033203125,
+     1.2728056907653809
+    ],
+    [
+     9600,
+     0.32763671875,
+     1.2705061435699463
+    ],
+    [
+     10800,
+     0.32861328125,
+     1.2524701356887817
+    ],
+    [
+     12000,
+     0.3232421875,
+     1.2503100633621216
+    ],
+    [
+     13200,
+     0.337890625,
+     1.2173680067062378
+    ],
+    [
+     14400,
+     0.34521484375,
+     1.2104101181030273
+    ],
+    [
+     15600,
+     0.3310546875,
+     1.2008100748062134
+    ],
+    [
+     16800,
+     0.33642578125,
+     1.1942358016967773
+    ],
+    [
+     18000,
+     0.33935546875,
+     1.189539909362793
+    ],
+    [
+     19200,
+     0.33935546875,
+     1.172690510749817
+    ],
+    [
+     20400,
+     0.34814453125,
+     1.1749863624572754
+    ],
+    [
+     21600,
+     0.33544921875,
+     1.1633546352386475
+    ],
+    [
+     22800,
+     0.34326171875,
+     1.1805124282836914
+    ],
+    [
+     24000,
+     0.33056640625,
+     1.1723313331604004
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "81f7a8d+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     3.685260124756261,
+     0.0700419638756678
+    ],
+    "10": [
+     0.0,
+     2.7842515115294524,
+     0.06352558810344851
+    ],
+    "100": [
+     0.0,
+     1.796878740057992,
+     0.025508800464821957
+    ]
+   },
+   "group_names": [
+    [],
+    [
+     "decoder",
+     "encoder",
+     "encoder_v",
+     "lm_head",
+     "embed.weight",
+     "short_conv.conv_w"
+    ]
+   ],
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "SINGLE",
+   "lr": 0.001,
+   "memory": "HEBB",
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "SLOW (rest 1e-4 to 2400)",
+   "secs": 488.7521824836731,
+   "secs_wall": 491.72359466552734,
+   "seed": 3071,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN,
+   "write_order": {
+    "acc": 0.33056640625,
+    "acc_by_stream": [
+     0.2936962842941284,
+     0.3338068127632141,
+     0.3668730556964874
+    ],
+    "acc_last": 0.3189522325992584,
+    "acc_notlast": 0.3359542489051819,
+    "lastval_notlast": 0.3266619145870209,
     "n": 2048,
     "n_last": 649,
     "n_notlast": 1399
