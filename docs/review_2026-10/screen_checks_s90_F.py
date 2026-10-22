@@ -205,7 +205,7 @@ for S in (2, 3, 4):
         h, _ = half_mass(inp[idx])
         nval[sum(1 for t in h if t >= NCTX + P)] += 1
     print(f"  half-mass cut over 200 resampled 4096-sequence samples: number of VAL types selected {dict(sorted(nval.items()))}"
-          f" (which VAL types: the most frequent by sampling noise; all 16 have the same expected frequency)")
+          f" (4 always: the 4 most frequent VAL types exceed the mean, and the expected mass at 4 + 4 is exactly 0.5; WHICH 4 VAL types is sampling noise, all 16 have the same expected frequency)")
     # the repeat set
     rep_pos = np.zeros_like(inp, bool)
     for b in range(N):
@@ -350,7 +350,7 @@ for S in (2, 3, 4):
         "relative (the perfect gate: one-hot of the index)": onehot(lab_in, S),
         "relative, channels permuted per sequence": onehot(np.take_along_axis(perm, lab_in, 1), S),
         f"balanced type-level map (k = {S})": onehot(np.array([t * S // 16 for t in range(16)])[lat], S),
-        f"a random fixed type map (k = {S}; drawn once)": onehot(randmap[lat], S),
+        f"a random fixed type map (k = {S}; sizes {sorted(np.bincount(randmap, minlength=S).tolist(), reverse=True)})": onehot(randmap[lat], S),
         "one channel per type (k = 16)": onehot(lat, 16),
         "all on one channel": onehot(np.zeros_like(lab_in), S),
         "position only (channel = body position x S // body length)": onehot(np.broadcast_to(pos_ch, lab_in.shape), S),
@@ -629,8 +629,15 @@ for f in tests:
             except TypeError:
                 pass
 att = {s + 1000 * j for s in lit for j in range(5)}
+bases = set(range(160, 190)) | set(range(200, 220)) | set(range(240, 260)) | set(range(260, 280))
+att_r = {s + 1000 * j for s in bases for j in range(5)} | set(range(1000, 1150))
 print(f"main line {MAIN} ({git('rev-parse', '--short', MAIN).strip()}): {len(tests)} test_*.py; literal range() integers "
-      f"{len(lit)}; with s + 1000 j (j < 5) {len(att)}; in 3060-3099: {sorted(set(SEEDS) & att) or 'none'}")
+      f"{len(lit)}, of them in 3060-3099: {sorted(set(SEEDS) & lit) or 'none'}")
+print(f"  over-inclusive: every literal integer s + 1000 j (j < 5) gives {len(att)} integers, {len(set(SEEDS) & att)} of them "
+      f"in 3060-3099 (bases {sorted({s - 1000 * j for s in set(SEEDS) & att for j in range(5)} & lit)[:3]}... = 60-99, "
+      f"which no restart test uses as a base)")
+print(f"  the restart tests' actual attempt seeds (bases below, s + 1000 j, j < 5; and 1000-1149): in 3060-3099: "
+      f"{sorted(set(SEEDS) & att_r) or 'none'}")
 print("restart bases in the main line's restart tests: 160-189 (test_load_curriculum l.259-261), 200-219 "
       "(test_curriculum_confirm l.254-257), 240-259 (test_stream_recipe l.278-280), 260-279 (test_stream_curriculum "
       "l.268-269); test_router_reliability's trials 1000 + 5i + j (l.62, l.214): none reaches 3060-3099")
@@ -655,3 +662,46 @@ for m_ in ("explore_f_s89_tasks_child", "explore_f_s90_ctx_child", "explore_f_s9
     log = git("log", "--format=%h %ci", "origin/claude/explore-F", "--", f"{m_}.py").splitlines()
     print(f"  commits touching {m_}.py on explore-F: {log[:4]}")
 print("\ndone")
+
+# ══ I ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════
+hdr("I. The ties (child l.222-244): the log's printed reference curves against the records at the pinned commits; the "
+    "code SHA from blobs; what has run")
+import hashlib
+TIP = git("rev-parse", "--short", "origin/claude/explore-F").strip()
+logtxt = git("show", "origin/claude/explore-F:explore_out/F/s90.log")
+for arm, seed, ref, path, sha in (("NOMEM_SELF_LITE", 2800, "52e2ea7", "explore_out/F/s89_tasks_results.json", "ea9728c636c6"),
+                                  ("O_DELTA_ALLPOOL", 2800, "52e2ea7", "explore_out/F/s89_tasks_results.json", "ea9728c636c6"),
+                                  ("O_HEBB_CONV_ALLPOOL", 2801, "3e3b1bf", "explore_out/F/s89_post_results.json", "267d08456c38")):
+    d = json.loads(git("show", f"{ref}:{path}"))
+    keys = [k for k in d["runs"] if k.startswith(f"{arm}|{seed}|{sha}|") and d["runs"][k].get("ok")]
+    rec = d["runs"][keys[0]]
+    want = [c for c in rec["curve"] if c[0] <= 2400]
+    lines = [ln for ln in logtxt.splitlines() if f"reproduces {arm}|{seed}|" in ln]
+    printed = [ln.split(" vs ")[1].split("; statistics")[0] for ln in lines]
+    print(f"  {arm}|{seed} at {ref}: {len(keys)} record(s) ({keys[0].split('|')[3][-8:]}); record curve to 2400 {want}; "
+          f"log lines {len(lines)}, printed reference equals the record in all: {all(json.loads(p) == want for p in printed)}; "
+          f"ok in all: {all(ln.endswith(': ok') for ln in lines)}")
+    blobs_at = {c: git("rev-parse", f"{c}:{path}").strip()[:10] for c in (ref, TIP)}
+    print(f"     store blob at {ref} {blobs_at[ref]}, at the tip {TIP} {blobs_at[TIP]}")
+mods27 = mods
+for c in (F_SCREEN, TIP):
+    rows = [[m_, hashlib.sha1(git("show", f"{c}:{m_}.py").encode()).hexdigest(), "branch"] for m_ in sorted(mods27)]
+    print(f"  code SHA over the 27 modules from blobs at {c}: {hashlib.sha1(json.dumps(rows).encode()).hexdigest()}")
+print(f"  records' code SHA and stage lines (tip {TIP}):")
+try:
+    st = json.loads(git("show", "origin/claude/explore-F:explore_out/F/s90_ctx_results.json"))
+    for k, r in sorted(st["runs"].items()):
+        print(f"    {k.split('|')[0]:<22} {k.split('|')[1]} {k.split('|')[2]} ok {r.get('ok')} iters {r.get('iters')} last eval "
+              f"{r['curve'][-1][0] if r.get('curve') else None} acc {r.get('acc')} transition {r.get('transition')} "
+              f"sched {r.get('sched')}")
+except RuntimeError:
+    print("    no store yet")
+for ln in logtxt.splitlines():
+    if ln.startswith("=== S90") or "runs queued" in ln or "decision:" in ln or "| git " in ln:
+        print("    " + ln[:240])
+for fname in ("explore_f_s90_ctx.py", "explore_f_s90_ctx_child.py", "explore_f_reports7.py", "explore_out/F/run_s90.sh",
+              "explore_f_tasks.py"):
+    bl = {git("rev-parse", f"{c}:{fname}").strip()[:10] for c in git("rev-list", f"{F_SCREEN}..origin/claude/explore-F").split()
+          + [F_SCREEN]}
+    print(f"  {fname}: blobs from {F_SCREEN} to the tip: {sorted(bl)}")
+print("\ndone (I)")
