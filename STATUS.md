@@ -147,9 +147,16 @@ source at two sources and nothing routes at four on the one screen run, which it
      fixes" (`spec_review_register_v2.md`), with one decision outstanding: which label-free hinge is its arm (S90 decides).
    - **The next problem**, named by the ALLPOOL null: contexts without fixed identity, where routing must compare the
      current context with what the sequence has already shown. No device for it has been screened.
-8. **Round 7** (to be written after S90 and S89H): H's budget/pool-size oracle screen on the grouped layout (both perfect
-   gates at 86,400; pools of 8 and 16); G's relative-routing device for ALLPOOL; the register spec adopted into `specs/`
-   with the label-free arm S90 names; Revision 11 after the referee's checks of the round.
+8. **G's report 9 (S89H, Hebbian + conv)** closes round 6: on POOL the repeat hinge 19/20, the key hinge 18/20, the
+   frequency hinge 18/20 and the register alone 9/20 — here **the hinge is needed over the register** (*p* = 0.002) and
+   the pre-fixed reading is **"the repeat hinge replaces the key hinge"** ("holds, and the hinge is needed here"); on
+   ALLPOOL every arm 0/20 at 48,000 ("cannot be asked here"). Awaiting the referee's check.
+9. **Round 7** (22 October; prompts in `parallel_sessions_prompts.md`, "Round 7"): G runs S90 (the repeat hinge on S87's
+   lite Hebbian setting), revises the register spec with the repeat hinge as its label-free arm (dated after S89/S89H/S90),
+   then S91, a gate that compares the current context with the register's content on ALLPOOL; H runs S92, the perfect
+   gates at pools of 4–32 to 86,400 and then the recipes at the largest reliable pool; F builds the which-document task
+   family (contexts pooled with fixed keys; three and four documents) and screens one channel on it; V checks each as
+   pushed. X adopts the register spec into `specs/` on V's "ready". Revision 11 after the round's checks.
 
 ## 5. How to resume
 

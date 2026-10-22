@@ -1259,3 +1259,114 @@ Four tasks, in order; nothing outside docs/review_2026-10/; nothing trained.
  are the user's decision; say for each what a referee would require before it ran, in one paragraph each,
  keyload_options_review.md.
 ```
+
+## Round 7 (22 October): after round 6 — the repeat hinge where the hinge is needed, the budget on the grouped layout, and contexts without fixed identity
+
+What round 6 left (STATUS.md §4 item 7; the referee's checks in `docs/review_2026-10/`): on the lite task with pooled
+keys, a hinge on which token types *repeat within the sequence* equals the labelled key hinge on both memories (delta
+20/20 against 20/20, where the hingeless register already binds 16/20; Hebbian + conv 19/20 against 18/20, where the
+register alone binds 9/20 and the hinge is needed, p = 0.002). On the grouped layout at eight streams the main line's
+recipe binds 1/10 at 32 key types, the trigger's schedule is not the limit, and both perfect gates are late or unbound
+at 43,200. On -allpool, where the two context tokens are drawn from 16 types, every learned arm on every memory is 0/20
+while the perfect gate, handed the per-sequence index, binds at 3600–9600: no learned gate found the relative routing,
+and a fixed type→channel map can route at most 0.533 of sequences. Round 7 takes each of the three.
+
+Seed blocks: G 2960-3019 (S90 reuses S87's 2700-2719 as the prompt of 21 October says), H 3020-3059, F 3060-3099. Each
+session checks every branch and the main line's seed list before its first run. Everything EXPLORATORY, readings fixed
+in the docstring before any run, the file pushed and reviewed by V before the learned arms. The laptop stays reserved
+for S75b. E is idle until the user decides the key-load draft's options.
+
+---
+## Session G — round 7 (S90, then the register spec's revision 2, then S91: a gate that compares; branch claude/explore-G)
+
+```
+1. S90 as relayed on 21 October: the repeat hinge on S87's exact lite setting (Hebbian, k = 2, no conv, 24000, SLOW, REG3;
+ seeds 2700-2719), paired with S87's records if your CPU reproduces one bit for bit, else with REG3 and REG3_KEYHINGE
+ rerun as controls; readings as relayed. It is the spec's own setting, which S89H (Hebbian + conv) is not.
+2. The register spec, revision 2 (explore_out/G/spec_draft_register.md), per V's spec_review_register_v2.md fixes 1-13,
+ with the decision V's fix 1 asks for, dated and stated as made after S89, S89H and S90: the test's label-free arm is
+ the repeat hinge (REG3_REPEATHINGE), not the frequency hinge; the task-structure caveat gives in counts what the repeat
+ set is on lite (5 CTX + 9 KEY + ~2.6 VAL positions; the key term's 8 positions and their grouping all inside it) and
+ says that it reads no label and no corpus statistic; RESGATE_KEYHINGE's four gaps closed as V lists them; the
+ small edits. If S90 reads "the repeat hinge falls short", the arm is the key hinge and the draft says why a label-free
+ arm is not in it. Push it before S91 so X can adopt it into specs/ and V can review it once more.
+3. S91, the question ALLPOOL named: a gate that routes by comparing the current context to what the sequence has already
+ shown, with no fixed identity for any context type. On -allpool (F's module at b0c6332; the within-sequence statistics;
+ the perfect gate 2/2 on both memories as validity, seeds 2960-2961), Hebbian + conv as S89H (and delta as S89,
+ descriptive, seeds 2982-2991), 20 paired seeds 2962-2981:
+   REG3_REPEATHINGE   S89H's arm: the control at 0/20.
+   MATCHGATE          the register gate's input gains one scalar per layer, the cosine between the current token's
+                      embedding and the register's current content (what the register holds since its last write);
+                      the register's write is as REG3's; the hinge as REPEATHINGE. Nothing else changes. A context
+                      token that matches the register's content is "the same document"; one that does not is "the
+                      other"; the gate can read that without any type having a fixed channel.
+   MATCHGATE_NOHINGE  the same without the hinge.
+   NOVELTY            the register's write gate also receives one scalar: whether the current token type has occurred
+                      earlier in the sequence (the repeat statistic, per position); otherwise REG3_REPEATHINGE.
+ Readings (ROUTED-BOUND within-sequence; exact one-sided McNemar): "a comparing gate discovers the relative routing" if
+ MATCHGATE is discovered against REG3_REPEATHINGE (p < 0.05) and >= 10/20; "it needs the hinge" if MATCHGATE beats
+ MATCHGATE_NOHINGE by >= 4 vs 0; "novelty alone suffices" if NOVELTY is discovered and within 1 pair of MATCHGATE;
+ "no device here" if none is discovered; "no reading applies" otherwise. Print with every reading the share of probe
+ sequences routed (the 0.533 line) and the per-arm type-level-map count. CHECKs: MATCHGATE with its scalar zeroed is
+ REG3_REPEATHINGE bit for bit through 2400; the scalar reads the embedding and the register only (no label, no index);
+ the perfect gate's statistics read ROUTED on the untrained model; S89H's REG3_REPEATHINGE|2842 reproduces. Budget: at
+ 48000 on ALLPOOL, about 84 runs, two days on 4 workers. report_10.md, README section.
+```
+
+## Session H — round 7 (S92: the budget and the pool on the grouped layout; seeds 3020-3059; branch claude/explore-H)
+
+```
+Report 11's two candidates, as a screen on the perfect gates first and the recipe second, so that no learned arm runs
+on a configuration whose oracle is not reliable (the lesson of S89b and of E's batch 21). Task: S89's PoolTask on
+test_window_gate Part C's grouped layout (S = 8, P = 4, k = 16, conv), the pool size a parameter.
+Phase 1, the oracles (seeds 3020-3023, 4 per cell; Hebbian ceil8_D8 + conv and the delta perfect gate, beta 1, L2):
+ pool 4 (the main line's; the reference), 8, 16 and 32, at 86400 updates with the evaluation every 1200 and the early
+ stop as before. Print each cell's transitions. Readings, fixed now, per memory: "the oracle is reliable at pool p"
+ if 4/4 bind by 43200; "needs the longer budget at p" if 4/4 by 86400 and not by 43200; "the oracle is the limit at
+ p" otherwise. The largest pool at which both memories read reliable or needs-the-longer-budget is P*.
+Phase 2, the recipe at P* (seeds 3024-3033, paired; only if P* > 4): BASE (the main line's recipe, the key-position
+ trigger) and DELTA_SPLIT (test_delta_recipe's delta recipe with the exact copy), each at the budget phase 1 named for
+ its memory, with DELTA_NOSPLIT (the delta recipe without a trigger) as the third arm. Readings: per memory, "the recipe
+ carries to P*" if the arm binds >= 7/10; "the recipe does not carry to P*" if <= 3/10; "no reading applies" otherwise;
+ and "the split is not needed on delta at P*" if DELTA_NOSPLIT is within 1 pair of DELTA_SPLIT. Print the caveat
+ (positional keys) with every reading, the operating characteristics of the 7/10 and 3/10 lines, every firing and the
+ map before it. CHECKs: pool 4 reproduces the main line's WIN3_SPLIT_D8|540 through 4800 (printed if the CPU differs);
+ S89's ORACLE|2900 and ORACLE_DELTA|2913 reproduce through 2400; the delta recipe's code is test_delta_recipe's by ast.
+Budget: phase 1 is 32 runs at up to 2 h each; phase 2 about 30 runs. Push after every saved run; the driver does not
+pull (your report 11's fix). report_12.md, README section. The two-stream spec's revision per V's review stays last.
+```
+
+## Session F — round 7 (the which-document task, and delta on it; seeds 3060-3099; branch claude/explore-F)
+
+```
+The -allpool task is the two-document layout at our size, and round 6 showed the context's missing identity, not the
+keys, is what no learned gate crossed. Build the task family that isolates it, in explore_f_tasks.py (appended; every
+existing class byte-identical, CHECKed):
+ (1) RandHeaderTask-ctxpool: lite's keys (4 fixed types) with only the 2 CTX tokens drawn from a pool of 16. This
+ separates the context's identity from the keys' frequency, which -allpool changes together (V's screen review of
+ S89-F, fix 2; G's caveat).
+ (2) RandHeaderTask-docs: the same with D documents per sequence, D = 3 and 4, S = D streams, the pool of 16 CTX types,
+ one query (the MQAR-with-contexts layout at D documents). Print the cap for a fixed type->channel map at each D.
+ For each: the frequency table and both cuts; the no-memory solvability check; and the pilots at S89-F's rules (the
+ perfect gate handed the per-sequence index, Hebbian + conv and delta, 2 seeds each at 24000, then 48000 by the
+ fallback; seeds 3060-3061; the type-level perfect gate printed, descriptive). Readings as S89-F's ("the task is
+ valid" / "needs the longer budget" / "untested"), per task and memory.
+Then one screen on the valid tasks, seeds 3062-3071 paired: one delta channel and one Hebbian + conv channel (no gate)
+ against the perfect gate: on -ctxpool and -docs the question is whether a single channel binds documents without any
+ routing when the contexts are not fixed types (on lite one delta channel bound the two-stream header layout 8/10,
+ Revision 10 section 11). Readings: "one channel binds without a context identity" if the delta channel binds >= 7/10
+ on -ctxpool; "the partition's claim survives the context pool" if <= 3/10 while the perfect gate is 2/2; "no reading
+ applies" otherwise; the Hebbian channel descriptive. report_10.md, README section; publish the module hash for G
+ (S91 may use -ctxpool as its cleaner task if it is valid and -allpool is not).
+```
+
+## Session V — round 7 (branch claude/review-V; docs/review_2026-10/)
+
+```
+In order, as each is pushed: G's report 9 (S89H; claude/explore-G 996e38b) as you checked report 8, with the 2b
+reading and the cross-memory table; G's S90 file before its runs and its report after; H's S92 file before its learned
+arms (phase 2) and its report; F's task module and pilots; G's register spec revision 2 against your v2 review item by
+item, with the label-free-arm decision's date checked against the S89/S89H/S90 records (spec_review_register_v3.md),
+which X adopts into specs/ on your "ready"; G's S91 file before its learned arms. One file each, as before. Nothing
+outside docs/review_2026-10/; nothing trained.
+```
