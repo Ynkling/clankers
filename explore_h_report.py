@@ -581,6 +581,60 @@ def s89b_section(L):
     return m
 
 
+def s90_section(L):
+    import explore_h_s90 as m
+    setup([m])
+    res, got = m.report()
+    P = res["phase1"]
+    L.append("## S90 explore_h_s90 — the oracles at key pools 4 / 8 / 16 / 32 and 86400 updates, then the recipe at P* "
+             "(S=8, P=4, k=16, conv)\n")
+    L.append("### Phase 1: the perfect gates (seeds 3020-3023 per cell; budget 86400, early stop)\n")
+    L.append("| memory | pool | transitions (3020-3023) | held-out accuracy at the end | reading |")
+    L.append("|---|---|---|---|---|")
+    for mem in m.MEMS:
+        for k in m.POOLS:
+            c = P[f"{mem}_P{k}"]
+            tr = ", ".join(str(c["trans"].get(s)) for s in m.P1_SEEDS)
+            ae = ", ".join(f"{c['acc_end'].get(s, float('nan')):.3f}" for s in m.P1_SEEDS)
+            L.append(f"| {mem} | {k} | {tr} | {ae} | {c['reading']} |")
+    L.append(f"\n**P* = {res['pstar']}**; budgets {res['budget']}.\n")
+    if res["arms"]:
+        A = res["arms"]
+        L.append(f"### Phase 2: the recipe at pool {res['pstar']} (seeds 3024-3033, paired)\n")
+        L.append("| arm | budget | BOUND ROUTED | band | Wilson 95% | failures v1 | failures v2 | transitions | splits | own pair ok | "
+                 "at probe < 0.2 | map 1:1 before | cap-blocked checks | held-out accuracy at the end |")
+        L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+        for a in m.P2:
+            x = A[a]
+            L.append(f"| {a} | {res['budget'][m.P2_MEM[a]]} | {x['br']}/{x['n']} | {x['band']} | {fmt_w(x['wilson'])} | "
+                     f"{cls_str(x['v1'])} | {cls_str(x['v2'])} | {', '.join(str(t) for t in x['trans']) or '--'} | "
+                     + (f"{x['ops']} | {x['op_ok']}/{x['ops']} | {x['flat']} | {x['one_to_one_before']} | {x['capped']}"
+                        if a != "DELTA_NOSPLIT" else "-- | -- | -- | -- | --")
+                     + f" | {', '.join(str(v) for v in x['acc_end'])} |")
+        for k, c in res["cmp"].items():
+            x, y = k.split(" vs ")
+            L.append(f"\n- {k}: {c['x']}/{c['n']} vs {c['y']}/{c['n']}; {x} only {c['b']}, {y} only {c['c']}; p({x}>{y}) "
+                     f"{c['p']:.3g}, p({y}>{x}) {c['p_rev']:.3g}")
+        rows = ["# S90 phase 2 per run (EXPLORATORY, not a result)\n", "Each firing: update (probe accuracy) c* -> c0, labelled ok "
+                "or not, the key-position and all-position pairs and their labels, and the stream -> channel map before it.\n",
+                "| arm | seed | outcome | transition | firings |", "|---|---|---|---|---|"]
+        for a in m.P2:
+            for s, r in sorted(got.get(a, {}).items()):
+                f = [c for c in r.get("checks") or [] if c.get("fired")]
+                fs = "<br>".join(f"{c['step']} ({c['acc']:.2f}) {c['op_cs']}->{c['op_c0']} {'ok' if c['op_ok'] else 'NOT ok'}; key "
+                                 f"{c['key_cs']}->{c['key_c0']} {c['key_ok']}, all {c['all_cs']}->{c['all_c0']} {c['all_ok']}; map "
+                                 f"{c['map_before']}" for c in f)
+                rows.append(f"| {a} | {s} | {r.get('outcome')} | {r.get('transition')} | {fs or '--'} |")
+        with open(os.path.join(OUT, "s90_runs.md"), "w") as fh:
+            fh.write("\n".join(rows) + "\n")
+    L.append("\n**Readings (fixed in explore_h_s90's docstring before any run):**\n")
+    for k, v in res["readings"].items():
+        L.append(f"- {k}: **{v}**")
+    L.append(f"\n*Caveat, with every reading:* {res['caveat']}\n")
+    L.append(f"*The rules' {res['oc']}*")
+    return m
+
+
 def write(n, body, notes):
     p = os.path.join(OUT, f"report_{n}.md")
     with open(p, "w") as f:
@@ -592,7 +646,7 @@ def write(n, body, notes):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
+    ap.add_argument("batch", type=int, choices=(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
     ap.add_argument("--notes", default=None)
     args = ap.parse_args()
     notes = open(args.notes).read() if args.notes else ""
@@ -610,6 +664,12 @@ def main():
             c = checks_line(m.NAME)
             L.append(f"\n**{m.NAME}:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}; CHECKs "
                      + (f"all passed ({c['time']}, git {c['git']})" if c else "NOT RECORDED"))
+    elif args.batch == 12:
+        m = s90_section(L)
+        nr, h, cpus, shas = runtime(m)
+        c = checks_line(m.NAME)
+        L.append(f"\n**Runtime:** {nr} runs, {h:.1f} CPU-hours on {', '.join(cpus)}; code SHA {', '.join(shas)}. **CHECKs:** "
+                 + (f"all passed ({c['time']}, git {c['git']}, {c['minutes']:.1f} min)" if c else "NOT RECORDED"))
     elif args.batch == 11:
         mods = [s89c_section(L)]
         L.append("")

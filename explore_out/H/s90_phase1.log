@@ -131,3 +131,14 @@ EXPLORATORY, NOT A RESULT — session H: H/s90
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7fd5edc, code 287fdd3941d0, attempt 1: acc 0.830  trans  None  outcome STREAM-PARTIAL one-to-one; map [0, 1, 2, 3, 4, 5, 6, 7]
   [  9]  476.6 min  H/s90            DELTA_P32                seed 3022  lr 0.001  (one Adam 1e-3)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 5231a39, code 287fdd3941d0, attempt 1: acc 0.697  trans  None  outcome STREAM-PARTIAL one-to-one; map [0, 1, 2, 3, 4, 5, 6, 7]
+  wall clock 476.6 min
+    HEBB_P4   transitions [3600, 4800, 2400, 2400]; accuracy at the end [0.978, 0.984, 0.964, 0.999]
+    HEBB_P8   transitions [10800, 8400, 10800, 8400]; accuracy at the end [0.965, 0.954, 0.95, 0.981]
+    HEBB_P16  transitions [10800, 14400, 13200, 9600]; accuracy at the end [0.971, 0.987, 0.971, 0.967]
+    HEBB_P32  transitions [19200, 14400, 18000, 18000]; accuracy at the end [0.969, 0.95, 0.958, 0.958]
+    DELTA_P4  transitions [1200, 1200, 1200, 1200]; accuracy at the end [1.0, 1.0, 1.0, 1.0]
+    DELTA_P8  transitions [8400, 7200, 14400, 22800]; accuracy at the end [0.969, 0.993, 0.959, 0.991]
+    DELTA_P16 transitions [14400, None, 12000, None]; accuracy at the end [0.972, 0.84, 0.952, 0.83]
+    DELTA_P32 transitions [19200, 25200, None, 40800]; accuracy at the end [0.967, 0.967, 0.697, 0.967]
+  H/s90: readings {'phase 1 HEBB': 'pool 4: reliable; pool 8: reliable; pool 16: reliable; pool 32: reliable', 'phase 1 DELTA': 'pool 4: reliable; pool 8: reliable; pool 16: the oracle is the limit; pool 32: the oracle is the limit', 'P*': "P* = 8; budgets {'HEBB': 43200, 'DELTA': 43200}", 'S90': 'INCOMPLETE (phase 2), no reading'}; complete False; valid True
+chain exit 0

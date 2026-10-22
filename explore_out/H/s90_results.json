@@ -1,6 +1,44 @@
 {
  "meta": {
   "arms": {
+   "BASE": {
+    "iters": 43200,
+    "label": "BASE, key pool 8",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW, hebb + exact-copy trigger",
+    "seeds": [
+     3024,
+     3025,
+     3026,
+     3027,
+     3028,
+     3029,
+     3030,
+     3031,
+     3032,
+     3033
+    ]
+   },
+   "DELTA_NOSPLIT": {
+    "iters": 43200,
+    "label": "DELTA_NOSPLIT, key pool 8",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW, delta",
+    "seeds": [
+     3024,
+     3025,
+     3026,
+     3027,
+     3028,
+     3029,
+     3030,
+     3031,
+     3032,
+     3033
+    ]
+   },
    "DELTA_P16": {
     "iters": 86400,
     "label": "perfect gate, DELTA_P16",
@@ -51,6 +89,25 @@
      3021,
      3022,
      3023
+    ]
+   },
+   "DELTA_SPLIT": {
+    "iters": 43200,
+    "label": "DELTA_SPLIT, key pool 8",
+    "lr": 0.001,
+    "opt": "adam",
+    "sched": "LOCAL3 + SLOW, delta + exact-copy trigger",
+    "seeds": [
+     3024,
+     3025,
+     3026,
+     3027,
+     3028,
+     3029,
+     3030,
+     3031,
+     3032,
+     3033
     ]
    },
    "HEBB_P16": {
