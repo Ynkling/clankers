@@ -126,8 +126,8 @@ CUDA, torch, CPU), the spec and the code SHA, and is reused only when spec and c
 `explore_out/I/gpu/mainline/<test>_<GPU>_results.json`, with machine `GPU:<model>` in the meta, never to `results/X` or
 `results/L`. A GPU run is a new run of its seed: compare outcomes, not curves.
 
-**(d) S75b** (`s75b.py`; spec `../explore_out/I/s75b_spec_draft.md`, approved at 114cd08, with Appendices A and B
-of post-approval changes, none of them blind).
+**(d) S75b** (`s75b.py`; spec `../explore_out/I/s75b_spec_draft.md`, approved at 114cd08, with Appendices A, B
+and C of post-approval changes, none of them blind).
 
 **General rules.**
 - Run every step from the repository root, on an up-to-date checkout of `claude/explore-I`.

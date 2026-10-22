@@ -22,7 +22,8 @@ statement; every change after the merge 142f47e is not blind by git (Appendix B)
   records and `s75_S4_summary.md` in the tree. They are not blind by git (Appendix B).
   - The review behind 114cd08 was run in this session.
   - That it, and the edits, were made without opening S75's learned-arm files is the author's statement.
-  - The same session committed the S75 write-up (03bffdf) 130 s after 114cd08.
+  - The same session committed the S75 write-up (03bffdf) 130 s after 114cd08, so the write-up was being prepared
+    alongside the revision; git cannot order the two.
   - On the author's statement, the edits draw on:
     - the two CUDA CHECKs' K9 benchmarks;
     - CPU profiles and memory measurements at L = 1536;
@@ -229,7 +230,7 @@ descriptions, that change is not blind, and S75b's record must say so.
 - Stage 2 on the 3070: REG3 (scan) about 17–20 h plus WIDE_SPLIT_G about 12.5 h, so about 30–32 h.
 - Stage 2 on the 1660: ORACLE, SINGLE and WIDE_SLOW, about 32 h.
 - Wall time with both cards: about 32–33 h (1.4 days).
-- Everything on the 1660 (the fallback, with REG3 on the loop): about 85–101 h, without the 3 h pilot (88–105 h with
+- Everything on the 1660 (the fallback, with REG3 on the loop): about 85–101 h, without the 3 h pilot (88–104 h with
   it).
 - For scale, K9 projected S75's core arms at 16.1 h on the 1660 (training only). Per run, S75b costs about 3.3× that,
   and REG3 3.5–4×.
@@ -606,7 +607,7 @@ driver does at the pilot.
 
 Referee V reviewed this draft at 114cd08 in `docs/review_2026-10/spec_review_s75b_draft.md` (3f7d84b, on the main line;
 read at 77221b8). On 13 October, Appendix B took the review's fix-list item 6 (the four uncovered outcomes) and parts of
-items 1, 2, 7 and 14. This appendix takes every item of the fix list, in the review's order.
+items 1, 2, 3, 7 and 14. This appendix takes every item of the fix list, in the review's order.
 
 **How to read it.**
 - "l.N" is a line of this file at 3cef609, the driver's commit after the fourth review. "114cd08 l.N" is a line the
@@ -617,37 +618,45 @@ items 1, 2, 7 and 14. This appendix takes every item of the fix list, in the rev
 **What does not change.**
 - No constant changes: not configuration B, the seeds, the arms, the bars, the proceed rule, SPLIT_THR's rule, the
   trigger's constants, or the guard and its precedence.
-- Nothing in the driver's code SHA changes. It is ee04da11a164 at this commit, as at 3cef609. So the CUDA CHECKs and
-  the benchmarks run on 3cef609 stay valid, and no code-change note is needed.
+- Nothing in the driver's code SHA changes. It is ee04da11a164 at this commit, as at 3cef609, so no code-change note is
+  needed, and CUDA CHECKs and benchmarks run at this commit count for 3cef609's code. None has run yet: the card outputs
+  committed so far are under 0759062126f5 and are rerun on each card (README (d)).
 - Two files are added outside the code SHA (the driver imports neither): `explore_gpu/s75b_rates.py` (items 4–5) and
   `explore_gpu/s75b_triggers.py` (items 9–10). Both describe and decide nothing.
 
 ### C.1 The four outcomes the pilot rules did not name (fix item 6)
 
-The review asked which consequence follows each of four outcomes (§2, "Outcomes not covered" 1, 3, 4 and 6), and offered
-alternatives: stop, retry the same seed, or a fresh seed; UNTESTED or a rerun. Each outcome gets exactly one name here,
-and the name fixes what follows. Nothing is left to choose when it happens.
+The review asked which consequence follows each of four outcomes (§2, "Outcomes not covered" 1, 3, 4 and the first half
+of 6; the second half, runtimes over the estimate, is C.6 item 15), and offered alternatives: stop, retry the same seed,
+or a fresh seed; UNTESTED or a rerun. Each outcome gets exactly one name here, and the name fixes what follows: none of
+the review's alternatives is left open. Where the driver waits on the user (a halt, or an arm no card's benchmark
+allows), the name says so, and the user's decision is recorded.
 
-**A run whose evaluation logits are not finite is not a failed run under these names.** It is a value, DIVERGED (B.2,
-l.371–376), which counts as below 0.9. So it falls under the rules that read values, which already name it:
+**A run with a non-finite value is not a failed run under these names.** Such a value is in the evaluation logits, in
+the record's non-finite-loss check (the review's own example, `ok: False`), or in a statistic. The run is a value,
+DIVERGED (B.2, l.371–376), which counts as below 0.9. So it falls under the rules that read values, which already name
+it:
 - in the pilot, the stop rule: a value STOP, "S = 4 is not usable at B" (l.103–105, B.3 l.397–400);
 - in stage 2, VALID: NOT VALID, so the reading is UNTESTED (B.3 l.451).
 
-B.3's item 1 (l.396–402) lists three bullets under "A failed pilot run". Under the names here they are: the value STOP
-(the stop rule, as above), PILOT RERUN, and PILOT RERUN's limit, HALTED (below). The rules are the same; only the
-grouping differs.
+B.3's item 1 (l.396–411) has four bullets under "A failed pilot run". Under the names here the first three are the value
+STOP (the stop rule, as above), PILOT RERUN, and PILOT RERUN's limit, HALTED (below); the fourth is about the record. The
+rules are the same; only the grouping differs.
 
 | | the review's outcome | its one name | what follows, and only that | taken at 3cef609 | what the record or the report prints |
 |---|---|---|---|---|---|
-| 1 | a pilot run that fails: out of memory, a crash, a kill | **PILOT RERUN** | The same seed is run again: re-invoke `--stage 1`. Never a fresh seed. S75b does not stop on it. | B.2 l.377–390; B.3 l.401 | the stage-1 record: INCOMPLETE, "rerun --stage 1 (the same seeds)" (s75b.py l.947, l.1708); the seed's status: failed |
-| 2 | the code SHA changes between the stages | **PILOT RERUN UNDER THE NEW CODE** | 840–841 are run again under the new code, never fresh seeds. First come a committed, dated note (`--code-change-note`), the CUDA CHECKs and the benchmarks under the new code. The old code is superseded. Its stage-1 decision stands beside the new one: a value STOP under it is final, and stage 2 needs both to PROCEED. | B.3 l.412–430 | stage 2 under the new code refuses, "both pilot records under this code SHA are needed" (s75b.py l.1781); the earlier record is kept as `s75b_stage1_record_<sha>.*` |
+| 1 | a pilot run that fails operationally: out of memory, a crash, a kill (the review's other example, a non-finite loss, is DIVERGED, above) | **PILOT RERUN** | The same seed is run again: re-invoke `--stage 1`. Never a fresh seed. S75b does not stop on it. | B.2 l.377–390; B.3 l.401 | the stage-1 record: INCOMPLETE, "rerun --stage 1 (the same seeds)" (s75b.py l.947, l.1708); the seed's status: failed |
+| 2 | the code SHA changes between the stages | **PILOT RERUN UNDER THE NEW CODE** | 840–841 are run again under the new code, never fresh seeds. First come a committed, dated note (`--code-change-note`), the CUDA CHECKs and the benchmarks under the new code. The old code is superseded. Its stage-1 decision stands beside the new one: a value STOP under it is final, and stage 2 needs every complete stage-1 decision, under every code, to PROCEED (B.3 l.422). | B.3 l.412–430 | stage 2 under the new code refuses, "both pilot records under this code SHA are needed" (s75b.py l.1781); the earlier record is kept as `s75b_stage1_record_<sha>.*` |
 | 3 | a stage-2 ORACLE run (850 or 851) is missing or fails | **ORACLE RERUN** | The same seed is run again: re-invoke `--stage 2` on the card that runs ORACLE. VALID waits for it. Never the pilot in its place (l.88–90), never a fresh seed. | B.3 l.449–454 | VALIDITY "… -> incomplete" (s75b.py l.1978–1981); the stage-2 log, "an operational failure is rerun by re-invoking --stage 2" (s75b.py l.1850–1855) |
-| 4 | the L = 1536 benchmark fails: a case fails, the run crashes, or no workers fit | **ARM REFUSED** | Per arm and per card: the arm does not run on that card. It runs on the other card if that card's benchmark allows it (`--machine fallback` or `fallback-3070`, with `--arms` and `--reason`). If neither card allows it, it does not run: for the pilot, S75b cannot start. No configuration, R or batch is changed. | B.3 l.461–485 | stage 2's log, "REFUSED by this card's benchmark" (s75b.py l.1813); stage 1, "this card's benchmark allows none of ['ORACLE_PILOT']" (s75b.py l.1397); the report, "BENCHMARKS", "ARMS NO CARD'S BENCHMARK ALLOWS", "S75b CANNOT START" (s75b.py l.1901) |
+| 4 | the L = 1536 benchmark fails: a case fails, the run crashes, or no workers fit | **ARM REFUSED** | Per arm and per card: the arm does not run on that card while the card's latest benchmark refuses it. It runs only where a card's latest benchmark allows it: on this card after its benchmark is rerun (B.3 l.470), or on the other card (the pilot: `--stage 1` there; stage 2: `--machine fallback` or `fallback-3070`, with `--arms` and `--reason`). If no card's benchmark allows it, it does not run: for the pilot, S75b cannot start; without ORACLE, validity stays incomplete, and without a read arm, the reading; the user decides (B.3 l.481–485). No configuration, R or batch is changed. | B.3 l.461–485 | stage 2's log, "REFUSED by this card's benchmark" (s75b.py l.1813); stage 1, "this card's benchmark allows none of ['ORACLE_PILOT']" (s75b.py l.1397); the report, "BENCHMARKS" (l.1894), "S75b CANNOT START" (l.1901), "ARMS NO CARD'S BENCHMARK ALLOWS" (l.1908) |
 
 **The rerun's limit is not a fifth outcome.**
 - A seed whose operational failures fall in two invocations is HALTED (B.2 l.386–390). The driver stops rerunning it,
-  and the user decides: `--retry-halted` (recorded), or a code fix under PILOT RERUN UNDER THE NEW CODE.
-- The halt applies to PILOT RERUN and ORACLE RERUN alike. It is never a STOP, and it says nothing about B.
+  and the user decides. The halt is never a STOP, and it says nothing about B.
+- **A halted pilot seed:** the user clears it with `--retry-halted` (recorded, the same seed), or, before stage 2, fixes
+  the code under PILOT RERUN UNDER THE NEW CODE.
+- **A halted ORACLE seed:** only `--retry-halted` (the same seed). Once stage 2 has a record or a failure, the code is
+  frozen for good, and a code change would halt the screen (B.3 l.431–433).
 
 ### C.2 The two cases where two rules fire (fix item 10; review §3, points 1 and 2)
 
@@ -667,13 +676,15 @@ grouping differs.
     its map's `one_to_one` and its outcome. So the eligible checks on one-to-one maps that cap or gap blocked appear
     there, row by row.
 - The review asked for a second total. `python -m explore_gpu.s75b_triggers --counts` prints it after stage 2, from the
-  records, beside the fires on a map whose `c0` was live (C.3). It does this outside the driver: a total in the report
-  would change the code SHA, and no rule's text needs it there.
-- **The guard CHECK for both cases has been in CHECK B2 since the driver's first commit** (8cb8dce; s75b_checks.py
-  l.156–214, the expected labels at l.182–183).
-  - The check at 9600 is eligible, gapped and one-to-one, and is labelled `gap`.
-  - The check at 21,600 is eligible, capped, gapped and one-to-one, and is labelled `cap`.
-  - Every row's `map_one_to_one` is asserted as scripted.
+  records, beside the fires off target and the fires on a map whose `c0` was live (C.3). It does this outside the
+  driver: a total in the report would change the code SHA, and no rule's text needs it there.
+- **The guard CHECK for both cases is in CHECK B2 at 3cef609** (s75b_checks.py l.156–214, the expected labels at
+  l.182–183).
+  - The check at 21,600 is eligible, capped, gapped and one-to-one, and is labelled `cap`. It has been there since the
+    driver's first commit (8cb8dce).
+  - The check at 9600 is eligible, gapped and one-to-one, and is labelled `gap`. It came at 48b2a80 (13 October), after
+    the review, with the assertion that every row's `map_one_to_one` is as scripted. At 8cb8dce the check at 9600 was
+    on a merged map.
 
 ### C.3 The guard: half of ROUTED's test (fix items 11 and 12; review §3, points 3 and 4)
 
@@ -701,14 +712,16 @@ to the channel with the highest mean gate at word positions (explore_i_common l.
   the least-used channel `c0` is in the map (`on_target` false), which overwrites a live channel (S75's declared hazard).
 - This stays as committed. Blocking it would be a design change made after the learned arms were known: in S75, 30 of
   30 fires were on target. It would not be blind.
-- Every row records `on_target` (s75b.py l.635), and `s75b_triggers --counts` totals the fires off target.
+- Every row records `on_target`, `c0` and the map (s75b.py l.634–635). `s75b_triggers --counts` totals the fires off
+  target (`on_target` false: `c0` in the map, or the busiest channel not shared) and, apart, the fires with `c0` in the
+  map.
 
 ### C.4 The check schedule (fix item 13; review §3, point 5; 114cd08 l.119 and l.169)
 
 **The draft said** "every 2400 updates from 4800" (l.127, l.177).
 
 **The trigger in fact runs at every multiple of 2400 from 2400 to 21,600** (explore_i_common l.104 and l.529: SPLIT_REF
-= 2400, and `last` is the run's updates − 2400).
+= 2400; `last` is the run's updates − 2400, passed at explore_gpu/run.py l.514).
 - The check at 2400 is the reference. It records the probe SET as `prev` and is never eligible: its `prev` is unset, and
   eligibility needs step ≥ SPLIT_FIRST = 4800.
 - Eligibility starts at 4800. S75's rows start at 2400.
@@ -724,12 +737,13 @@ to the channel with the highest mean gate at word positions (explore_i_common l.
 ### C.5 The two design changes after the merge: disclosed, not blind by git (fix item 14; review §4)
 
 1. **The proceed rule was loosened.** 1e31409 l.59 had "both ≥ 0.912"; l.92–96 have "mean ≥ 0.912 and each ≥ 0.9".
-2. **WIDE_SLOW was made unconditional.** ee97443 l.137 offered "without WIDE_SLOW … about 16 h"; l.125 and l.141 run it
-   always.
+2. **WIDE_SLOW was made unconditional.** ee97443 l.137 offered "without WIDE_SLOW … about 16 h"; l.125 runs it
+   always ("runs unconditionally"), and l.141's every-arm rule covers it.
 
 Both came in 114cd08, after the merge 142f47e. Their label is **disclosed, not blind by git.**
-- *Disclosed:* the spec states each change, its commit and its reason (l.31–34, l.97–101, B.1 l.326–352). This was
-  already so at 3cef609.
+- *Disclosed:* the spec states each change and its commit, and the proceed rule's reason (l.31–34, l.97–101, B.1
+  l.326–352). This was already so at 3cef609. The spec gives no reason of its own for WIDE_SLOW's change; the review
+  points to the pre-run note's role for it (below).
 - *Not blind by git:* 114cd08's tree held b649751's learned-arm records and `s75_S4_summary.md`.
 - The review judged neither change a function of a learned-arm quantity:
   - the proceed rule follows from ORACLE-only inputs;
@@ -748,6 +762,7 @@ Both came in 114cd08, after the merge 142f47e. Their label is **disclosed, not b
    - Taken now: 142f47e's push at 14:16:16 is added beside "14:16" (l.19).
 2. **The revisions were made with the records in the tree; whose statement "no learned-arm file opened" is; 03bffdf.**
    - Taken at 3cef609: "Later edits" (l.20–30), and report_2.md corrected (B.1 l.363).
+   - Taken now: that the write-up was being prepared alongside the revision, and that git cannot order the two (l.24).
 3. **B's first statement, before b649751.**
    - Taken at 3cef609 in B.1 l.322–324 ("Earlier evidence": 5bc6c2e note l.116–118).
    - Taken now in the constants table's NB, M, L row (l.172).
@@ -773,7 +788,7 @@ Both came in 114cd08, after the merge 142f47e. Their label is **disclosed, not b
 6. **The four outcomes.** C.1.
 7. **The pilot on the 3070.**
    - Taken at 3cef609 in Appendix A item 1 (l.265–266) and B.3 l.403–410: the pilot may run on either card, on one card
-     only, and the record names it.
+     at a time (it may be split across the cards after a failure, B.3 l.410), and the record names each seed's card.
    - In the plan of 22 October the pilot runs on the 1660, as the allocation (l.157) says.
 8. **"Not usable" and S74's statistic.**
    - Taken now. The words "S74's usability bar" are dropped from the stop rule (l.105). The label "S = 4 is not usable at
@@ -801,7 +816,7 @@ Both came in 114cd08, after the merge 142f47e. Their label is **disclosed, not b
       ratios are 3.24–3.35. The 9–13 GB host peak is an unsourced extrapolation (l.193–196, l.215–216).
     - The L = 1536 benchmark now measures both on each card: seconds per update per arm, and every process's host
       memory. `--stats-workers` is set from it (Appendix A item 3).
-    - "85–101 h" excludes the 3 h pilot; with it, 88–105 h (l.223).
+    - "85–101 h" excludes the 3 h pilot; with it, 88–104 h (l.223).
     - **Not taken: a rule for runtimes over the estimate** (review §2, outcome 6, second half). It would need a new
       constant, a factor. The benchmark decides usability by memory and workers, not by time; each run's time is
       recorded, and no rule reads it. It stays open for the user.
@@ -809,12 +824,16 @@ Both came in 114cd08, after the merge 142f47e. Their label is **disclosed, not b
 The review's §1 points 1–3 are fix items 1–3. Its point 4, the literal-number check, needs nothing.
 
 **The review could not check some numbers, and they stay unchecked by a referee.** These are the ideal-learner numbers
-(0.963, 0.927 / 0.939, 0.691, 0.517, the per-bin and fixed-reach transfers) and the CPU-profile figures. No run was made
-for this appendix.
+(0.963, 0.927 / 0.939, 0.691, 0.517, the per-bin and fixed-reach transfers), the CPU-profile figures, and `check_task`'s
+"verified" failure at n = 512 (l.182), whose output is not committed. No run was made for this appendix.
+
+**Left open from the review's §4 table, none of them a constant:** a σ row in the constants table, the gap share's
+0.918 / 0.919 (the review finds the two versions swapped, ±0.001), and a committed script for the windowed learner.
 
 ### C.7 This appendix's edits above it (text only)
 
-- **Provenance:** 142f47e's push time (l.19); "disclosed, not blind by git" in "The revision" (l.31–34).
+- **Provenance:** 142f47e's push time (l.19); the write-up prepared alongside the revision (l.24); "disclosed, not
+  blind by git" in "The revision" (l.31–34).
 - **The pilot:**
   - the proceed rule's first clause: 0.912 rounded up from 0.9114 (l.94);
   - "Why this rule": the pointer to C.6 item 5, and the label (l.97–101);

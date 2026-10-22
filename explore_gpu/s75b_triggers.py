@@ -14,8 +14,9 @@ code SHA.
       curves, ORACLE_PILOT 840-841 and, once they exist, ORACLE 850-851.
   python -m explore_gpu.s75b_triggers --counts
       After stage 2: WIDE_SPLIT_G's checks, per run and in total: fired; blocked by cap, by gap, by one-to-one; the
-      eligible checks on a one-to-one map (whatever blocked them); the fires on a map whose least-used channel c0 was in
-      use (on_target False).
+      eligible checks on a one-to-one map (whatever blocked them); the fires off target (on_target False: the least-used
+      channel c0 in the map, or the busiest channel cs not shared); and, apart, the fires with c0 in the map (a live
+      channel overwritten).
 
 THE REPLAY (as the pre-run note's). The trigger runs at every multiple of 2400 from 2400 (the reference check: it only
 sets prev) to iters - 2400. A check is eligible from 4800 when SET < thr and SET - prev < 0.02; it fires unless 3 have
@@ -70,7 +71,8 @@ def counts(rows):
                 blocked_one_to_one=sum(c.get("blocked_by") == "one-to-one" for c in rows),
                 eligible_on_one_to_one=len(oto),
                 eligible_on_one_to_one_blocked_by_cap_or_gap=sum(c.get("blocked_by") in ("cap", "gap") for c in oto),
-                fired_off_target=sum(bool(c.get("fired")) and c.get("on_target") is False for c in rows))
+                fired_off_target=sum(bool(c.get("fired")) and c.get("on_target") is False for c in rows),
+                fired_c0_live=sum(bool(c.get("fired")) and c.get("c0") in (c.get("map_before") or []) for c in rows))
 
 
 def _load_all():
@@ -165,15 +167,17 @@ def do_check():
     one, merged = [0, 1, 2, 3], [0, 0, 2, 3]
     scripted = [dict(step=2400, eligible=False, map_before=one, map_one_to_one=True),
                 dict(step=4800, eligible=True, blocked_by="one-to-one", map_before=one, map_one_to_one=True),
-                dict(step=7200, eligible=True, fired=True, on_target=True, map_before=merged, map_one_to_one=False),
+                dict(step=7200, eligible=True, fired=True, on_target=True, c0=1, map_before=merged, map_one_to_one=False),
                 dict(step=9600, eligible=True, blocked_by="gap", map_before=one, map_one_to_one=True),
-                dict(step=12000, eligible=True, fired=True, on_target=False, map_before=merged, map_one_to_one=False),
-                dict(step=16800, eligible=True, fired=True, on_target=True, map_before=merged, map_one_to_one=False),
+                dict(step=12000, eligible=True, fired=True, on_target=False, c0=2, map_before=merged,
+                     map_one_to_one=False),
+                dict(step=16800, eligible=True, fired=True, on_target=False, c0=1, map_before=[0, 0, 0, 2],
+                     map_one_to_one=False),
                 dict(step=19200, eligible=True, blocked_by="cap", map_before=one, map_one_to_one=True),
                 dict(step=21600, eligible=True, blocked_by="cap", map_before=merged, map_one_to_one=False)]
     c = counts(scripted)
     exp = dict(checks=8, eligible=7, fired=3, blocked_cap=2, blocked_gap=1, blocked_one_to_one=1, eligible_on_one_to_one=3,
-               eligible_on_one_to_one_blocked_by_cap_or_gap=2, fired_off_target=1)
+               eligible_on_one_to_one_blocked_by_cap_or_gap=2, fired_off_target=2, fired_c0_live=1)
     good = c == exp
     ok = ok and good
     print(f"{'ok  ' if good else 'FAIL'} counts on scripted rows: {c}")
