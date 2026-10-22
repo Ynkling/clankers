@@ -751,3 +751,22 @@ The question "does the repeat hinge's result hold on Hebbian memory": POOL **"ho
 ALLPOOL "cannot be asked here" (every arm at the type-level routing cap). Read through the same function, S89's delta POOL
 gives "holds (descriptive: the register does not need the hinge here either)". Handed back: the repeat hinge, on Hebbian
 memory with the conv and on POOL, as the label-free replacement for the key hinge; a main-line spec would need the conv.
+
+## Session G — S90 (the repeat hinge on S87's lite Hebbian setting)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. RandHeaderTask-lite, Hebbian, k = 2, no conv, 24000, SLOW, the REG3
+model; seeds 2700-2719, paired with S87's records (this CPU reproduces them bit for bit; BASELINE, REG3_KEYHINGE and
+REG3_FREQHINGE are S87's), REG3 and REG3_REPEATHINGE new. Readings (S89H's function) and the spec decision committed at
+b57c186 before any run. 40/40 runs ok. Written up in `G/report_10.md` (S90 part).
+
+| arm | ROUTED-BOUND | vs REG3_KEYHINGE (20/20) | name |
+|---|---|---|---|
+| BASELINE (S87) | 0/20 | – | – |
+| REG3 (new) | 4/20 | 0 / 16 (p 1.5e-5): the hinge is needed over the register | – |
+| REG3_FREQHINGE (S87) | 17/20 | 0 / 3 (p 0.125) | "is weaker than the key hinge" (descriptive) |
+| REG3_REPEATHINGE (new) | 17/20 | 0 / 3 (p 0.125) | **"is weaker than the key hinge"** |
+
+The question reads "does not hold", so the pre-fixed spec decision is **"the repeat hinge falls short"**: the register
+spec carries the key hinge as its only hinge arm. The repeat hinge fails on 2700, 2713, 2717 (FREQ on 2700, 2709, 2713;
+FREQ vs REPEAT 1 / 1). It beats REG3 13 / 0. At a 20/20 ceiling "within one pair" fires only 39% of the time for an arm
+that truly binds 0.9, so this is a statement about the rule, not a rate below 0.9.

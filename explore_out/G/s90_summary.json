@@ -1,0 +1,14 @@
+{
+ "readings": {
+  "validity": "S87's ORACLE_ALL 2/2 on 2700-2701 (and S71's 10/10)",
+  "counts": "REG3 (S90) 4/20, REG3_REPEATHINGE (S90) 17/20, BASELINE (S87) 0/20, REG3_KEYHINGE (S87) 20/20, REG3_FREQHINGE (S87) 17/20",
+  "REG3_KEYHINGE vs BASELINE": "KH only 20, BASELINE only 0, p 9.54e-07",
+  "first": "the labelled hinge is discovered; per-arm names below",
+  "2b": "the hinge is needed over the register (KH only 16, REG3 only 0, p 1.53e-05, n 20)",
+  "REG3_FREQHINGE (S87)": "THE FREQUENCY HINGE IS WEAKER THAN THE KEY HINGE (discovered yes (arm only 17, BASELINE only 0, p 7.63e-06); vs KH: KH only 3, arm only 0, p(KH >) 0.125, n 20; vs REG3: arm only 13, REG3 only 0, p(arm >) 0.000122, p(REG3 >) 1, n 20); clamps: does not apply (arm only 17, BASELINE only 0; commitment at 2400 0.5913 vs BASELINE 0.8734)",
+  "REG3_REPEATHINGE (S90)": "THE REPEAT HINGE IS WEAKER THAN THE KEY HINGE (discovered yes (arm only 17, BASELINE only 0, p 7.63e-06); vs KH: KH only 3, arm only 0, p(KH >) 0.125, n 20; vs REG3: arm only 13, REG3 only 0, p(arm >) 0.000122, p(REG3 >) 1, n 20); clamps: does not apply (arm only 17, BASELINE only 0; commitment at 2400 0.9376 vs BASELINE 0.8734)",
+  "question": "does not hold",
+  "FOR THE SPEC": "the repeat hinge falls short: the spec carries the key hinge only",
+  "commitment at 2400 (median spread)": "BASELINE (S87) 0.8734, REG3 (S90) 0.9521, REG3_KEYHINGE (S87) 0.9339, REG3_FREQHINGE (S87) 0.5913, REG3_REPEATHINGE (S90) 0.9376"
+ }
+}
