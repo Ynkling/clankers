@@ -1,0 +1,3437 @@
+{
+ "meta": {},
+ "runs": {
+  "NOMEM_CTXPOOL|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.16845703125,
+   "arm": "NOMEM_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "in",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.16748046875,
+     2.7196578979492188
+    ],
+    [
+     2400,
+     0.16748046875,
+     2.715594530105591
+    ],
+    [
+     3600,
+     0.16748046875,
+     2.7115514278411865
+    ],
+    [
+     4800,
+     0.16748046875,
+     2.641512393951416
+    ],
+    [
+     6000,
+     0.16748046875,
+     2.6095173358917236
+    ],
+    [
+     7200,
+     0.16748046875,
+     2.6007463932037354
+    ],
+    [
+     8400,
+     0.16748046875,
+     2.5998716354370117
+    ],
+    [
+     9600,
+     0.16748046875,
+     2.594566822052002
+    ],
+    [
+     10800,
+     0.16796875,
+     2.593859910964966
+    ],
+    [
+     12000,
+     0.16796875,
+     2.5967354774475098
+    ],
+    [
+     13200,
+     0.16748046875,
+     2.5878257751464844
+    ],
+    [
+     14400,
+     0.16748046875,
+     2.592433214187622
+    ],
+    [
+     15600,
+     0.1689453125,
+     2.5914394855499268
+    ],
+    [
+     16800,
+     0.1689453125,
+     2.5914506912231445
+    ],
+    [
+     18000,
+     0.16748046875,
+     2.5893142223358154
+    ],
+    [
+     19200,
+     0.1669921875,
+     2.5927493572235107
+    ],
+    [
+     20400,
+     0.1669921875,
+     2.5933573246002197
+    ],
+    [
+     21600,
+     0.17041015625,
+     2.5894644260406494
+    ],
+    [
+     22800,
+     0.16748046875,
+     2.5854640007019043
+    ],
+    [
+     24000,
+     0.16845703125,
+     2.5906598567962646
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     1.5558446670361878,
+     0.04713372513772551
+    ],
+    "10": [
+     0.0,
+     1.6849148693709373,
+     0.049484114127680515
+    ],
+    "100": [
+     0.0,
+     1.1693581574703726,
+     0.03780811410484014
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 226.93776178359985,
+   "secs_wall": 229.1692726612091,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_CTXPOOL|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.166015625,
+   "arm": "NOMEM_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "in",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.16748046875,
+     2.724966287612915
+    ],
+    [
+     2400,
+     0.16748046875,
+     2.7144105434417725
+    ],
+    [
+     3600,
+     0.16748046875,
+     2.7167346477508545
+    ],
+    [
+     4800,
+     0.16748046875,
+     2.6633877754211426
+    ],
+    [
+     6000,
+     0.16748046875,
+     2.614586591720581
+    ],
+    [
+     7200,
+     0.16748046875,
+     2.6085703372955322
+    ],
+    [
+     8400,
+     0.16748046875,
+     2.604323387145996
+    ],
+    [
+     9600,
+     0.16748046875,
+     2.5978968143463135
+    ],
+    [
+     10800,
+     0.16748046875,
+     2.5934646129608154
+    ],
+    [
+     12000,
+     0.16748046875,
+     2.590883493423462
+    ],
+    [
+     13200,
+     0.16748046875,
+     2.5906982421875
+    ],
+    [
+     14400,
+     0.16796875,
+     2.5929319858551025
+    ],
+    [
+     15600,
+     0.16748046875,
+     2.5913655757904053
+    ],
+    [
+     16800,
+     0.1640625,
+     2.592264175415039
+    ],
+    [
+     18000,
+     0.16650390625,
+     2.5888943672180176
+    ],
+    [
+     19200,
+     0.16845703125,
+     2.5941097736358643
+    ],
+    [
+     20400,
+     0.16748046875,
+     2.5916669368743896
+    ],
+    [
+     21600,
+     0.16943359375,
+     2.591026544570923
+    ],
+    [
+     22800,
+     0.1689453125,
+     2.589301109313965
+    ],
+    [
+     24000,
+     0.166015625,
+     2.589613199234009
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     1.5038726010211882,
+     0.03986962304654791
+    ],
+    "10": [
+     0.0,
+     1.6870456719742615,
+     0.052755413450525944
+    ],
+    "100": [
+     0.0,
+     1.1769877482176039,
+     0.03670438989148218
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 225.72020864486694,
+   "secs_wall": 227.83653354644775,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_DOCS3|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.123046875,
+   "arm": "NOMEM_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": true,
+   "conv": "in",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.12060546875,
+     2.763514518737793
+    ],
+    [
+     2400,
+     0.123046875,
+     2.7632927894592285
+    ],
+    [
+     3600,
+     0.123046875,
+     2.755408763885498
+    ],
+    [
+     4800,
+     0.123046875,
+     2.7542686462402344
+    ],
+    [
+     6000,
+     0.123046875,
+     2.7547061443328857
+    ],
+    [
+     7200,
+     0.123046875,
+     2.7501766681671143
+    ],
+    [
+     8400,
+     0.123046875,
+     2.7514939308166504
+    ],
+    [
+     9600,
+     0.123046875,
+     2.7500197887420654
+    ],
+    [
+     10800,
+     0.123046875,
+     2.7453513145446777
+    ],
+    [
+     12000,
+     0.123046875,
+     2.725694179534912
+    ],
+    [
+     13200,
+     0.1240234375,
+     2.71439528465271
+    ],
+    [
+     14400,
+     0.1259765625,
+     2.7107486724853516
+    ],
+    [
+     15600,
+     0.1240234375,
+     2.7102088928222656
+    ],
+    [
+     16800,
+     0.1201171875,
+     2.7078630924224854
+    ],
+    [
+     18000,
+     0.1220703125,
+     2.7144317626953125
+    ],
+    [
+     19200,
+     0.12109375,
+     2.7089781761169434
+    ],
+    [
+     20400,
+     0.12158203125,
+     2.7043514251708984
+    ],
+    [
+     21600,
+     0.12158203125,
+     2.7092549800872803
+    ],
+    [
+     22800,
+     0.1220703125,
+     2.712130308151245
+    ],
+    [
+     24000,
+     0.123046875,
+     2.7086052894592285
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     1.7175244557001335,
+     0.042566059747913255
+    ],
+    "10": [
+     0.0,
+     1.6425920592452963,
+     0.05512021440011777
+    ],
+    "100": [
+     0.0,
+     1.1636950021566792,
+     0.03138565444744115
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 300.54000186920166,
+   "secs_wall": 302.5459008216858,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_DOCS3|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.12255859375,
+   "arm": "NOMEM_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": true,
+   "conv": "in",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.123046875,
+     2.76029634475708
+    ],
+    [
+     2400,
+     0.123046875,
+     2.7551732063293457
+    ],
+    [
+     3600,
+     0.123046875,
+     2.7602646350860596
+    ],
+    [
+     4800,
+     0.123046875,
+     2.757208824157715
+    ],
+    [
+     6000,
+     0.123046875,
+     2.7560179233551025
+    ],
+    [
+     7200,
+     0.123046875,
+     2.754833936691284
+    ],
+    [
+     8400,
+     0.123046875,
+     2.7526276111602783
+    ],
+    [
+     9600,
+     0.123046875,
+     2.7533669471740723
+    ],
+    [
+     10800,
+     0.123046875,
+     2.7500040531158447
+    ],
+    [
+     12000,
+     0.123046875,
+     2.7486207485198975
+    ],
+    [
+     13200,
+     0.123046875,
+     2.7326600551605225
+    ],
+    [
+     14400,
+     0.12255859375,
+     2.717207431793213
+    ],
+    [
+     15600,
+     0.12353515625,
+     2.7110655307769775
+    ],
+    [
+     16800,
+     0.12158203125,
+     2.707563877105713
+    ],
+    [
+     18000,
+     0.123046875,
+     2.7058470249176025
+    ],
+    [
+     19200,
+     0.1240234375,
+     2.704084634780884
+    ],
+    [
+     20400,
+     0.123046875,
+     2.708303689956665
+    ],
+    [
+     21600,
+     0.12451171875,
+     2.7071714401245117
+    ],
+    [
+     22800,
+     0.1259765625,
+     2.705714464187622
+    ],
+    [
+     24000,
+     0.12255859375,
+     2.700976610183716
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     1.4353647544712445,
+     0.03845650179001085
+    ],
+    "10": [
+     0.0,
+     1.711895226104567,
+     0.0457267008601249
+    ],
+    "100": [
+     0.0,
+     0.9132390184648118,
+     0.0321102119108176
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 301.179260969162,
+   "secs_wall": 303.20771622657776,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_DOCS4|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.1103515625,
+   "arm": "NOMEM_DOCS4",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": true,
+   "conv": "in",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.10009765625,
+     2.7688937187194824
+    ],
+    [
+     2400,
+     0.1103515625,
+     2.7668001651763916
+    ],
+    [
+     3600,
+     0.10888671875,
+     2.7693841457366943
+    ],
+    [
+     4800,
+     0.1103515625,
+     2.7596757411956787
+    ],
+    [
+     6000,
+     0.1103515625,
+     2.7603816986083984
+    ],
+    [
+     7200,
+     0.1103515625,
+     2.7595231533050537
+    ],
+    [
+     8400,
+     0.1103515625,
+     2.759171962738037
+    ],
+    [
+     9600,
+     0.1103515625,
+     2.7605857849121094
+    ],
+    [
+     10800,
+     0.1103515625,
+     2.759319543838501
+    ],
+    [
+     12000,
+     0.1103515625,
+     2.7611615657806396
+    ],
+    [
+     13200,
+     0.1103515625,
+     2.757045030593872
+    ],
+    [
+     14400,
+     0.1103515625,
+     2.75838565826416
+    ],
+    [
+     15600,
+     0.1103515625,
+     2.75933837890625
+    ],
+    [
+     16800,
+     0.1103515625,
+     2.7609355449676514
+    ],
+    [
+     18000,
+     0.1103515625,
+     2.7560086250305176
+    ],
+    [
+     19200,
+     0.10986328125,
+     2.7530219554901123
+    ],
+    [
+     20400,
+     0.1103515625,
+     2.752260446548462
+    ],
+    [
+     21600,
+     0.11083984375,
+     2.752103328704834
+    ],
+    [
+     22800,
+     0.1103515625,
+     2.752643346786499
+    ],
+    [
+     24000,
+     0.1103515625,
+     2.750662088394165
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     1.5974314561803642,
+     0.046589758370043706
+    ],
+    "10": [
+     0.0,
+     1.671676944873484,
+     0.051191229290530826
+    ],
+    "100": [
+     0.0,
+     1.3282585076939706,
+     0.04291471692792386
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 376.0942940711975,
+   "secs_wall": 378.2557852268219,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS4",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_DOCS4|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.1103515625,
+   "arm": "NOMEM_DOCS4",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": true,
+   "conv": "in",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.09765625,
+     2.7693939208984375
+    ],
+    [
+     2400,
+     0.1064453125,
+     2.7653675079345703
+    ],
+    [
+     3600,
+     0.1103515625,
+     2.7613072395324707
+    ],
+    [
+     4800,
+     0.1103515625,
+     2.7616708278656006
+    ],
+    [
+     6000,
+     0.1103515625,
+     2.7597548961639404
+    ],
+    [
+     7200,
+     0.1103515625,
+     2.762057065963745
+    ],
+    [
+     8400,
+     0.1103515625,
+     2.7566709518432617
+    ],
+    [
+     9600,
+     0.1103515625,
+     2.759093999862671
+    ],
+    [
+     10800,
+     0.1103515625,
+     2.7600836753845215
+    ],
+    [
+     12000,
+     0.1103515625,
+     2.7613766193389893
+    ],
+    [
+     13200,
+     0.1103515625,
+     2.7617833614349365
+    ],
+    [
+     14400,
+     0.1103515625,
+     2.761259078979492
+    ],
+    [
+     15600,
+     0.1103515625,
+     2.7618868350982666
+    ],
+    [
+     16800,
+     0.1103515625,
+     2.7592623233795166
+    ],
+    [
+     18000,
+     0.1103515625,
+     2.7627899646759033
+    ],
+    [
+     19200,
+     0.1103515625,
+     2.761152505874634
+    ],
+    [
+     20400,
+     0.1103515625,
+     2.7616477012634277
+    ],
+    [
+     21600,
+     0.1103515625,
+     2.7602310180664062
+    ],
+    [
+     22800,
+     0.1103515625,
+     2.7601304054260254
+    ],
+    [
+     24000,
+     0.1103515625,
+     2.7634143829345703
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     1.7563532897332852,
+     0.04022944215284575
+    ],
+    "10": [
+     0.0,
+     1.4964637597600066,
+     0.0484963230038531
+    ],
+    "100": [
+     0.0,
+     1.4257943348741402,
+     0.05024670352460507
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 381.54168367385864,
+   "secs_wall": 383.62460684776306,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS4",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_SELF_CTXPOOL|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.36572265625,
+   "arm": "NOMEM_SELF_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.0986328125,
+     2.7600011825561523
+    ],
+    [
+     2400,
+     0.1396484375,
+     2.665025234222412
+    ],
+    [
+     3600,
+     0.21923828125,
+     2.5512354373931885
+    ],
+    [
+     4800,
+     0.2822265625,
+     2.438833475112915
+    ],
+    [
+     6000,
+     0.32861328125,
+     2.367554187774658
+    ],
+    [
+     7200,
+     0.34716796875,
+     2.317944288253784
+    ],
+    [
+     8400,
+     0.36572265625,
+     2.292804718017578
+    ],
+    [
+     9600,
+     0.37255859375,
+     2.2799153327941895
+    ],
+    [
+     10800,
+     0.3623046875,
+     2.2677743434906006
+    ],
+    [
+     12000,
+     0.36083984375,
+     2.2710506916046143
+    ],
+    [
+     13200,
+     0.36767578125,
+     2.2506279945373535
+    ],
+    [
+     14400,
+     0.3662109375,
+     2.2596638202667236
+    ],
+    [
+     15600,
+     0.36474609375,
+     2.2546472549438477
+    ],
+    [
+     16800,
+     0.36865234375,
+     2.2437074184417725
+    ],
+    [
+     18000,
+     0.3603515625,
+     2.2522947788238525
+    ],
+    [
+     19200,
+     0.349609375,
+     2.2661900520324707
+    ],
+    [
+     20400,
+     0.35986328125,
+     2.248689651489258
+    ],
+    [
+     21600,
+     0.3583984375,
+     2.2445549964904785
+    ],
+    [
+     22800,
+     0.3701171875,
+     2.235912799835205
+    ],
+    [
+     24000,
+     0.36572265625,
+     2.241589069366455
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.3501773189038784,
+     0.054624235651148406
+    ],
+    "10": [
+     0.0,
+     1.3720635003297514,
+     0.01941098798569316
+    ],
+    "100": [
+     0.0,
+     1.0164114522855803,
+     0.005373283943474673
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM_SELF",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 263.64244318008423,
+   "secs_wall": 265.5887475013733,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_SELF_CTXPOOL|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.365234375,
+   "arm": "NOMEM_SELF_CTXPOOL",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.09228515625,
+     2.7667272090911865
+    ],
+    [
+     2400,
+     0.1142578125,
+     2.722996234893799
+    ],
+    [
+     3600,
+     0.1806640625,
+     2.5896553993225098
+    ],
+    [
+     4800,
+     0.2177734375,
+     2.5285327434539795
+    ],
+    [
+     6000,
+     0.3125,
+     2.4092257022857666
+    ],
+    [
+     7200,
+     0.35791015625,
+     2.3061046600341797
+    ],
+    [
+     8400,
+     0.36767578125,
+     2.2883658409118652
+    ],
+    [
+     9600,
+     0.3671875,
+     2.2758421897888184
+    ],
+    [
+     10800,
+     0.36181640625,
+     2.2634124755859375
+    ],
+    [
+     12000,
+     0.3701171875,
+     2.254855155944824
+    ],
+    [
+     13200,
+     0.3642578125,
+     2.2492401599884033
+    ],
+    [
+     14400,
+     0.3681640625,
+     2.256540060043335
+    ],
+    [
+     15600,
+     0.36767578125,
+     2.2501962184906006
+    ],
+    [
+     16800,
+     0.3623046875,
+     2.2391152381896973
+    ],
+    [
+     18000,
+     0.36328125,
+     2.241786241531372
+    ],
+    [
+     19200,
+     0.36474609375,
+     2.248363971710205
+    ],
+    [
+     20400,
+     0.357421875,
+     2.2491419315338135
+    ],
+    [
+     21600,
+     0.36279296875,
+     2.239377737045288
+    ],
+    [
+     22800,
+     0.36376953125,
+     2.2352967262268066
+    ],
+    [
+     24000,
+     0.365234375,
+     2.2349114418029785
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     3.1536504785874686,
+     0.059799971092418074
+    ],
+    "10": [
+     0.0,
+     1.4301190115932725,
+     0.015298578835266386
+    ],
+    "100": [
+     0.0,
+     0.8948589561753031,
+     0.005445199748758237
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM_SELF",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 265.9493806362152,
+   "secs_wall": 268.01943469047546,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "CTXPOOL",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_SELF_DOCS3|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.1904296875,
+   "arm": "NOMEM_SELF_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.06396484375,
+     2.777322292327881
+    ],
+    [
+     2400,
+     0.0634765625,
+     2.7806894779205322
+    ],
+    [
+     3600,
+     0.0732421875,
+     2.7677924633026123
+    ],
+    [
+     4800,
+     0.10009765625,
+     2.7533037662506104
+    ],
+    [
+     6000,
+     0.126953125,
+     2.718567371368408
+    ],
+    [
+     7200,
+     0.1484375,
+     2.691082715988159
+    ],
+    [
+     8400,
+     0.1513671875,
+     2.68509578704834
+    ],
+    [
+     9600,
+     0.16015625,
+     2.676091432571411
+    ],
+    [
+     10800,
+     0.16357421875,
+     2.6703031063079834
+    ],
+    [
+     12000,
+     0.16455078125,
+     2.667022228240967
+    ],
+    [
+     13200,
+     0.16796875,
+     2.649693250656128
+    ],
+    [
+     14400,
+     0.18994140625,
+     2.6256937980651855
+    ],
+    [
+     15600,
+     0.1845703125,
+     2.61552095413208
+    ],
+    [
+     16800,
+     0.1845703125,
+     2.6082756519317627
+    ],
+    [
+     18000,
+     0.18408203125,
+     2.599775552749634
+    ],
+    [
+     19200,
+     0.1923828125,
+     2.5870161056518555
+    ],
+    [
+     20400,
+     0.1923828125,
+     2.5821588039398193
+    ],
+    [
+     21600,
+     0.19287109375,
+     2.589491844177246
+    ],
+    [
+     22800,
+     0.18994140625,
+     2.5719475746154785
+    ],
+    [
+     24000,
+     0.1904296875,
+     2.5663881301879883
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114",
+   "grad": {
+    "1": [
+     0.0,
+     2.8916288540114907,
+     0.05340314586227592
+    ],
+    "10": [
+     0.0,
+     1.484048222661698,
+     0.01611794599289069
+    ],
+    "100": [
+     0.0,
+     0.9347428874519544,
+     0.008871756146174373
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM_SELF",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 355.6650104522705,
+   "secs_wall": 357.73242259025574,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_SELF_DOCS3|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.2001953125,
+   "arm": "NOMEM_SELF_DOCS3",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.0693359375,
+     2.775895833969116
+    ],
+    [
+     2400,
+     0.06689453125,
+     2.777818202972412
+    ],
+    [
+     3600,
+     0.07470703125,
+     2.7734534740448
+    ],
+    [
+     4800,
+     0.0830078125,
+     2.7629928588867188
+    ],
+    [
+     6000,
+     0.1025390625,
+     2.7513065338134766
+    ],
+    [
+     7200,
+     0.14453125,
+     2.7075986862182617
+    ],
+    [
+     8400,
+     0.14794921875,
+     2.693910837173462
+    ],
+    [
+     9600,
+     0.15625,
+     2.6791162490844727
+    ],
+    [
+     10800,
+     0.17431640625,
+     2.6604769229888916
+    ],
+    [
+     12000,
+     0.18896484375,
+     2.6413557529449463
+    ],
+    [
+     13200,
+     0.19677734375,
+     2.6309664249420166
+    ],
+    [
+     14400,
+     0.189453125,
+     2.62203049659729
+    ],
+    [
+     15600,
+     0.18994140625,
+     2.6007585525512695
+    ],
+    [
+     16800,
+     0.19189453125,
+     2.597806215286255
+    ],
+    [
+     18000,
+     0.19873046875,
+     2.580535650253296
+    ],
+    [
+     19200,
+     0.19091796875,
+     2.577826499938965
+    ],
+    [
+     20400,
+     0.2041015625,
+     2.578624963760376
+    ],
+    [
+     21600,
+     0.1953125,
+     2.5512330532073975
+    ],
+    [
+     22800,
+     0.19091796875,
+     2.5573740005493164
+    ],
+    [
+     24000,
+     0.2001953125,
+     2.5455031394958496
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.5483818979003887,
+     0.0517130176566978
+    ],
+    "10": [
+     0.0,
+     1.4651809177191435,
+     0.019853621878717257
+    ],
+    "100": [
+     0.0,
+     0.7391409454036559,
+     0.004857505281637348
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM_SELF",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 360.0942134857178,
+   "secs_wall": 362.0589108467102,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS3",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_SELF_DOCS4|3060|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.16455078125,
+   "arm": "NOMEM_SELF_DOCS4",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": false,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.0654296875,
+     2.776320695877075
+    ],
+    [
+     2400,
+     0.06982421875,
+     2.773483991622925
+    ],
+    [
+     3600,
+     0.06103515625,
+     2.7784900665283203
+    ],
+    [
+     4800,
+     0.06884765625,
+     2.770747661590576
+    ],
+    [
+     6000,
+     0.09326171875,
+     2.766735076904297
+    ],
+    [
+     7200,
+     0.08203125,
+     2.766669273376465
+    ],
+    [
+     8400,
+     0.0771484375,
+     2.768214225769043
+    ],
+    [
+     9600,
+     0.083984375,
+     2.7651312351226807
+    ],
+    [
+     10800,
+     0.087890625,
+     2.7638285160064697
+    ],
+    [
+     12000,
+     0.09814453125,
+     2.7594492435455322
+    ],
+    [
+     13200,
+     0.10107421875,
+     2.7433974742889404
+    ],
+    [
+     14400,
+     0.1142578125,
+     2.740837335586548
+    ],
+    [
+     15600,
+     0.126953125,
+     2.7263574600219727
+    ],
+    [
+     16800,
+     0.1220703125,
+     2.7314443588256836
+    ],
+    [
+     18000,
+     0.13671875,
+     2.7182071208953857
+    ],
+    [
+     19200,
+     0.1357421875,
+     2.717930316925049
+    ],
+    [
+     20400,
+     0.13232421875,
+     2.7134556770324707
+    ],
+    [
+     21600,
+     0.140625,
+     2.7102890014648438
+    ],
+    [
+     22800,
+     0.146484375,
+     2.7059879302978516
+    ],
+    [
+     24000,
+     0.16455078125,
+     2.6945478916168213
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     2.741242683425233,
+     0.058569875462644125
+    ],
+    "10": [
+     0.0,
+     1.4976287367656076,
+     0.014953341286968734
+    ],
+    "100": [
+     0.0,
+     1.2002581404559347,
+     0.00576897072333141
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM_SELF",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 446.7633430957794,
+   "secs_wall": 448.81501603126526,
+   "seed": 3060,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS4",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  },
+  "NOMEM_SELF_DOCS4|3061|809fde1f5168|Intel(R) Xeon(R) Processor @ 2.10GHz": {
+   "acc": 0.12060546875,
+   "arm": "NOMEM_SELF_DOCS4",
+   "attempts": 1,
+   "code_sha": "809fde1f5168dcb53a4737e207af9cb8c7f4ed7a",
+   "collapsed": true,
+   "conv": "layer",
+   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+   "ctx_cos": NaN,
+   "curve": [
+    [
+     1200,
+     0.05908203125,
+     2.7778990268707275
+    ],
+    [
+     2400,
+     0.06396484375,
+     2.774331569671631
+    ],
+    [
+     3600,
+     0.0615234375,
+     2.7737879753112793
+    ],
+    [
+     4800,
+     0.0751953125,
+     2.772181987762451
+    ],
+    [
+     6000,
+     0.068359375,
+     2.7723584175109863
+    ],
+    [
+     7200,
+     0.068359375,
+     2.7716829776763916
+    ],
+    [
+     8400,
+     0.08154296875,
+     2.7653660774230957
+    ],
+    [
+     9600,
+     0.091796875,
+     2.7545413970947266
+    ],
+    [
+     10800,
+     0.09912109375,
+     2.7419638633728027
+    ],
+    [
+     12000,
+     0.10986328125,
+     2.7420897483825684
+    ],
+    [
+     13200,
+     0.11376953125,
+     2.7378745079040527
+    ],
+    [
+     14400,
+     0.11279296875,
+     2.7322676181793213
+    ],
+    [
+     15600,
+     0.11181640625,
+     2.7308576107025146
+    ],
+    [
+     16800,
+     0.1171875,
+     2.7138872146606445
+    ],
+    [
+     18000,
+     0.10546875,
+     2.6962270736694336
+    ],
+    [
+     19200,
+     0.11083984375,
+     2.6785225868225098
+    ],
+    [
+     20400,
+     0.11328125,
+     2.666815757751465
+    ],
+    [
+     21600,
+     0.11962890625,
+     2.664409637451172
+    ],
+    [
+     22800,
+     0.11376953125,
+     2.6556925773620605
+    ],
+    [
+     24000,
+     0.12060546875,
+     2.6576356887817383
+    ]
+   ],
+   "delta_cfg": null,
+   "discovered": false,
+   "dry": false,
+   "end": {
+    "ctx_cos": NaN,
+    "key_cos": NaN,
+    "step": "end",
+    "val_cos": NaN
+   },
+   "git": "7770114+dirty",
+   "grad": {
+    "1": [
+     0.0,
+     3.590023729463747,
+     0.06770293928020085
+    ],
+    "10": [
+     0.0,
+     1.3408770872183235,
+     0.014717549959429612
+    ],
+    "100": [
+     0.0,
+     1.2810154422483728,
+     0.007821957909410728
+    ]
+   },
+   "group_names": null,
+   "iters": 24000,
+   "k": 1,
+   "key_cos": NaN,
+   "kind": "NOMEM_SELF",
+   "lr": 0.001,
+   "memory": null,
+   "muon_lr": null,
+   "ok": true,
+   "params": 27008,
+   "sched": "Adam 1e-3 throughout",
+   "secs": 447.5953140258789,
+   "secs_wall": 449.5290107727051,
+   "seed": 3061,
+   "stats": [
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 0,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 1200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 2400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 3600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 4800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 6000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 7200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 8400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 9600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 10800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 12000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 13200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 14400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 15600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 16800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 18000,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 19200,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 20400,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 21600,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 22800,
+     "val_cos": NaN
+    },
+    {
+     "ctx_cos": NaN,
+     "key_cos": NaN,
+     "step": 24000,
+     "val_cos": NaN
+    }
+   ],
+   "stopped_at": 24000,
+   "task": "DOCS4",
+   "torch": "2.14.0+cu130",
+   "transition": null,
+   "val_cos": NaN
+  }
+ }
+}
