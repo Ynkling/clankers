@@ -633,6 +633,10 @@ l.371–376), which counts as below 0.9. So it falls under the rules that read v
 - in the pilot, the stop rule: a value STOP, "S = 4 is not usable at B" (l.103–105, B.3 l.397–400);
 - in stage 2, VALID: NOT VALID, so the reading is UNTESTED (B.3 l.451).
 
+B.3's item 1 (l.396–402) lists three bullets under "A failed pilot run". Under the names here they are: the value STOP
+(the stop rule, as above), PILOT RERUN, and PILOT RERUN's limit, HALTED (below). The rules are the same; only the
+grouping differs.
+
 | | the review's outcome | its one name | what follows, and only that | taken at 3cef609 | what the record or the report prints |
 |---|---|---|---|---|---|
 | 1 | a pilot run that fails: out of memory, a crash, a kill | **PILOT RERUN** | The same seed is run again: re-invoke `--stage 1`. Never a fresh seed. S75b does not stop on it. | B.2 l.377–390; B.3 l.401 | the stage-1 record: INCOMPLETE, "rerun --stage 1 (the same seeds)" (s75b.py l.947, l.1708); the seed's status: failed |
