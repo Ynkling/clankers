@@ -1,0 +1,602 @@
+{
+ "provenance": {
+  "banner": "EXPLORATORY, not a result",
+  "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "torch": "2.14.0+cu130",
+  "git": "9949e49+dirty",
+  "python": "3.13.16",
+  "threads": 1,
+  "started": "2026-10-22 17:43:26"
+ },
+ "rows": [
+  [
+   "S91b readings hand case [REPEAT 8, others 0]: the gate routes by type when it has the channels",
+   true
+  ],
+  [
+   "S91b readings hand case [all <= 3]: the channels do not suffice",
+   true
+  ],
+  [
+   "S91b readings hand case [KH 5]: no reading applies",
+   true
+  ],
+  [
+   "S91b readings hand case [all <= 3 but PTYPE 1/2]: no reading applies",
+   true
+  ],
+  [
+   "S91b readings hand case [PIDX 1/2]: UNTESTED (PIDX did not bind 2/2 on -ctxpool)",
+   true
+  ],
+  [
+   "S91b readings hand case [a missing KH seed]: UNTESTED (runs that did not complete: {'REG3_KEYHINGE': [3003]})",
+   true
+  ],
+  [
+   "TYPE-ROUTED needs ROUTED-BOUND and type_map_k > 0.9",
+   true
+  ],
+  [
+   "the k = 2 counterparts on -allpool (S89H / S89, within-sequence): {('REG3', 'H'): (0, 20), ('REG3', 'D'): (0, 20), ('REG3_KEYHINGE', 'H'): (0, 20), ('REG3_KEYHINGE', 'D'): (0, 20), ('REG3_REPEATHINGE', 'H'): (0, 20), ('REG3_REPEATHINGE', 'D'): (0, 20)}",
+   true
+  ],
+  [
+   "(S89, superseded by S91b's blob + prefix CHECK) explore_f_tasks.py is F's b0c6332 blob: git hash-object cfe3fe276f7c; expected e24d5e10815e; git rev-parse b0c6332:explore_f_tasks.py e24d5e10815e",
+   true
+  ],
+  [
+   "(S89) its first 35605 bytes equal 50dc8e4's blob ffe249bb6444 (F appended only): 35605 bytes, prefix equal True",
+   true
+  ],
+  [
+   "(S89) its first 14101 bytes equal a199d5e's blob de4746371dfa (F appended only): 14101 bytes, prefix equal True",
+   true
+  ],
+  [
+   "(S89) pool (F's check_pool_task): shape: L 23 (lite 23), vocab 50; batch (4096, 23)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_pool_task): the batch is lite's batch with the identities renamed: roles at the same positions (True), the same value ids (True), a one-to-one key map per sequence (True)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_pool_task): each sequence's 4 key types are distinct and from the pool of 32 (True); every key occurs exactly 2 times, once under each stream, i.e. in one block of each stream (True); its 2 values are distinct (True)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_pool_task): the query's (stream, key) occurs exactly once in the body (True) and its target is that pair's value (True); the query stream from make_batch equals stream_labels at the query (True)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_pool_task): 4 CTX tokens in each body, each followed by a key, position 0 a CTX",
+   true
+  ],
+  [
+   "(S89) pool (F's check_pool_task): pool: stream_labels equal BindTask's (CTX id) and perfect_gate equals perfect_gate_general(tokens, (0, 1))",
+   true
+  ],
+  [
+   "(S89) pool (F's check_pool_task): pool: no key type above any value type's frequency (max KEY 0.0138 < min VAL 0.0220)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_inv_stats): P4rh2pool32: synthetic gate 'relative': within-sequence eta^2 1.000000 (1), VAL cos 0.000000 (0), margin 1.000000 (1); pooled eta^2 1.0000, VAL cos 0.0000",
+   true
+  ],
+  [
+   "(S89) pool (F's check_inv_stats): P4rh2pool32: synthetic gate 'swapped': within-sequence eta^2 1.000000 (1), VAL cos 0.000000 (0), margin 1.000000 (1); pooled eta^2 0.0000, VAL cos 1.0000",
+   true
+  ],
+  [
+   "(S89) pool (F's check_inv_stats): P4rh2pool32: synthetic gate 'type_ordered': within-sequence eta^2 1.000000 (1), VAL cos 0.000000 (0), margin 1.000000 (1); pooled eta^2 1.0000, VAL cos 0.0000",
+   true
+  ],
+  [
+   "(S89) pool (F's check_inv_stats): P4rh2pool32: the relative perfect gate's pooled forms are eta^2 1 and VAL cos 0 (1.000000, 0.000000)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_inv_stats): P4rh2pool32: gate 'swapped' (separates every sequence): the pooled forms read the labelling, eta^2 0.0000 (~0) and VAL cos 1.0000 (~1)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_inv_stats): P4rh2pool32: gate 'type_ordered' is the fixed CTX -> channel map here: the pooled forms agree with the within-sequence ones (eta^2 1.000000, VAL cos 0.000000)",
+   true
+  ],
+  [
+   "(S89) pool (F's check_inv_stats): P4rh2pool32: the vectorised per-sequence eta^2 equals test_router_layout.eta2 on each sequence alone (max |diff| 0.0e+00 on 64 sequences, a random gate)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_pool_task): shape: L 23 (lite 23), vocab 64; batch (4096, 23)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_pool_task): the batch is lite's batch with the identities renamed: roles at the same positions (True), the same value ids (True), a one-to-one key map per sequence (True)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_pool_task): each sequence's 4 key types are distinct and from the pool of 32 (True); every key occurs exactly 2 times, once under each stream, i.e. in one block of each stream (True); its 2 values are distinct (True)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_pool_task): the query's (stream, key) occurs exactly once in the body (True) and its target is that pair's value (True); the query stream from make_batch equals stream_labels at the query (True)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_pool_task): 4 CTX tokens in each body, each followed by a key, position 0 a CTX",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_pool_task): allpool: each sequence's 2 CTX types are distinct (True); the stream index is by first appearance (stream 0 at position 0: True); the perfect gate is its one-hot (True)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_pool_task): allpool: no token type above 1/8 (max 0.0236; CTX 0.0151, KEY 0.0138, VAL 0.0236)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: synthetic gate 'relative': within-sequence eta^2 1.000000 (1), VAL cos 0.000000 (0), margin 1.000000 (1); pooled eta^2 1.0000, VAL cos 0.0000",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: synthetic gate 'swapped': within-sequence eta^2 1.000000 (1), VAL cos 0.000000 (0), margin 1.000000 (1); pooled eta^2 0.0000, VAL cos 1.0000",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: synthetic gate 'type_ordered': within-sequence eta^2 1.000000 (1), VAL cos 0.000000 (0), margin 1.000000 (1); pooled eta^2 0.0015, VAL cos 0.9970",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: the relative perfect gate's pooled forms are eta^2 1 and VAL cos 0 (1.000000, 0.000000)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: gate 'swapped' (separates every sequence): the pooled forms read the labelling, eta^2 0.0000 (~0) and VAL cos 1.0000 (~1)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: gate 'type_ordered' (separates every sequence): the pooled forms read the labelling, eta^2 0.0015 (~0) and VAL cos 0.9970 (~1)",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: the balanced type-level gate separates 0.5117 of the probe's 256 sequences (cap 64/120 = 0.5333): within-sequence eta^2 0.5117 equals it, VAL cos 0.4883 equals 1 minus it; pooled eta^2 0.0001, VAL cos 0.9997, margin 0.5117",
+   true
+  ],
+  [
+   "(S89) allpool (F's check_inv_stats): P4rh2pool32ctx16: the vectorised per-sequence eta^2 equals test_router_layout.eta2 on each sequence alone (max |diff| 0.0e+00 on 64 sequences, a random gate)",
+   true
+  ],
+  [
+   "(S89) ROUTED-BOUND: explore_g_rhl_parent.routed_bound on the record (pooled) and on inv_view(record) (within-sequence) equals F's pool_outcome(rec, False / True) on 54/54 grid records",
+   true
+  ],
+  [
+   "(S89) tasks: lite P4rh2 vocab 22; pool P4rh2pool32 vocab 50; allpool P4rh2pool32ctx16 vocab 64; L 23, qpos [21] on all three",
+   true
+  ],
+  [
+   "(S89) lite: frequent() is S87's freq_types on ft.freq_sample(task) = F's largest_ratio_cut (True): types [0, 1, 3, 4, 5, 2] (['CTX', 'KEY']); it raises when handed stream_labels(x), the key ids, a float tensor, a narrower tensor, another sample ([True, True, True, True, True])",
+   true
+  ],
+  [
+   "(S89) pool: frequent() is S87's freq_types on ft.freq_sample(task) = F's largest_ratio_cut (True): types [0, 1] (['CTX']); it raises when handed stream_labels(x), the key ids, a float tensor, a narrower tensor, another sample ([True, True, True, True, True])",
+   true
+  ],
+  [
+   "(S89) allpool: frequent() is S87's freq_types on ft.freq_sample(task) = F's largest_ratio_cut (True): types [60, 55, 52, 50, 48, 49, 53, 61, 57, 59, 54, 58, 56, 63, 62, 51] (['VAL']); it raises when handed stream_labels(x), the key ids, a float tensor, a narrower tensor, another sample ([True, True, True, True, True])",
+   true
+  ],
+  [
+   "(S89) lite: the frequent types are S87's {0, 1, 2, 3, 4, 5}",
+   true
+  ],
+  [
+   "(S89) repeat_mask(tokens) and freq_types(tokens) take one parameter ([['tokens'], ['tokens']]); repeat_mask by hand [[True, True, False, True, False, False, True]]",
+   true
+  ],
+  [
+   "(S89) the repeat hinge's positions are identical on the three tasks' samples (same generator state): True",
+   true
+  ],
+  [
+   "(S89) lite: the key hinge selects per sequence 8.00 positions (CTX 0.00, KEY 8.00, VAL 0.00, QUERY 0.00); of the key term's 8: 8.00",
+   true
+  ],
+  [
+   "(S89) lite: the freq hinge selects per sequence 14.00 positions (CTX 4.00, KEY 8.00, VAL 0.00, QUERY 2.00); of the key term's 8: 8.00; types [0, 1, 3, 4, 5, 2] ['CTX', 'KEY']",
+   true
+  ],
+  [
+   "(S89) lite: the repeat hinge selects per sequence 16.63 positions (CTX 4.00, KEY 8.00, VAL 2.63, QUERY 2.00); of the key term's 8: 8.00",
+   true
+  ],
+  [
+   "(S89) pool: the key hinge selects per sequence 8.00 positions (CTX 0.00, KEY 8.00, VAL 0.00, QUERY 0.00); of the key term's 8: 8.00",
+   true
+  ],
+  [
+   "(S89) pool: the freq hinge selects per sequence 5.00 positions (CTX 4.00, KEY 0.00, VAL 0.00, QUERY 1.00); of the key term's 8: 0.00; types [0, 1] ['CTX']",
+   true
+  ],
+  [
+   "(S89) pool: the repeat hinge selects per sequence 16.63 positions (CTX 4.00, KEY 8.00, VAL 2.63, QUERY 2.00); of the key term's 8: 8.00",
+   true
+  ],
+  [
+   "(S89) allpool: the key hinge selects per sequence 8.00 positions (CTX 0.00, KEY 8.00, VAL 0.00, QUERY 0.00); of the key term's 8: 8.00",
+   true
+  ],
+  [
+   "(S89) allpool: the freq hinge selects per sequence 8.00 positions (CTX 0.00, KEY 0.00, VAL 8.00, QUERY 0.00); of the key term's 8: 0.00; types [60, 55, 52, 50, 48, 49, 53, 61, 57, 59, 54, 58, 56, 63, 62, 51] ['VAL']",
+   true
+  ],
+  [
+   "(S89) allpool: the repeat hinge selects per sequence 16.63 positions (CTX 4.00, KEY 8.00, VAL 2.63, QUERY 2.00); of the key term's 8: 8.00",
+   true
+  ],
+  [
+   "(S89) pool: the frequency hinge is a CTX hinge (roles ['CTX'], key-term positions 0.00); allpool: a value hinge (roles ['VAL'], key-term positions 0.00)",
+   true
+  ],
+  [
+   "(S89) lite: the task-aware key term equals explore_g_devices_child.key_eta bit for bit (3 layers' gates, 64 seqs)",
+   true
+  ],
+  [
+   "(S89) pool: the key term's positions are task.key_mask's 8 body positions per sequence, ids in [0, 32) = task.key_index there",
+   true
+  ],
+  [
+   "(S89) allpool: the key term's positions are task.key_mask's 8 body positions per sequence, ids in [0, 32) = task.key_index there",
+   true
+  ],
+  [
+   "(S89) lite: the task-aware statistics equal the lite functions on REG3_D|2842 untrained: {'layer_stats': True, 'write_rate': True, 'stream_acc': True, 'acc_by_cell': True, 'write_order': True, 'roles': True}",
+   true
+  ],
+  [
+   "(S89) lite: the task-aware statistics equal the lite functions on BASELINE_D|2842 untrained: {'layer_stats': True, 'write_rate': True, 'stream_acc': True, 'acc_by_cell': True, 'write_order': True, 'roles': True}",
+   true
+  ],
+  [
+   "(S89) pool: layer_stats89's layer-3 eta^2 equal pool_routing_stats' (the shared gate's last layer is the returned gate)",
+   true
+  ],
+  [
+   "(S89) lite: ORACLE_D's gate is task.perfect_gate (k = 2), passed to the delta memory; = explore_g_rhl_child's ORACLE_ALL_D (parameters True, logits True, gates True)",
+   true
+  ],
+  [
+   "(S89) pool: ORACLE_D's gate is task.perfect_gate (k = 2), passed to the delta memory; = explore_g_rhl_child's ORACLE_ALL_D (parameters True, logits True, gates True)",
+   true
+  ],
+  [
+   "(S89) allpool: ORACLE_D's gate is task.perfect_gate (k = 2), passed to the delta memory",
+   true
+  ],
+  [
+   "(S89) lite: the untrained perfect gate reads ROUTED*: eta_key_by_stream 1.0000, margin 1.0000, eta_val_by_stream 1.0000",
+   true
+  ],
+  [
+   "(S89) pool: the untrained perfect gate reads ROUTED*: eta_key_by_stream 1.0000, within-sequence 1.0000, margin 1.0000, eta_val_by_stream 1.0000",
+   true
+  ],
+  [
+   "(S89) allpool: the untrained perfect gate reads ROUTED*: eta_key_by_stream 1.0000, within-sequence 1.0000, margin 1.0000, eta_val_by_stream 1.0000",
+   true
+  ],
+  [
+   "explore_f_tasks.py is F's 9017b82 blob (cfe3fe276f7c vs cfe3fe276f7c); its first 49923 bytes are b0c6332's e24d5e1 (True)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: shape: L 23 (lite at S = 2: 23), vocab 36 = 16 + 4 + 16; batch (4096, 23)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: every (stream, key) appears exactly once in the body",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: S distinct values per key",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: each query is answered by its own stream's value; make_batch returns the query streams",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: exactly one CTX per block, at its start; 4 blocks per sequence",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: each stream has 2 blocks whose lengths are a composition of P = 4 with parts in 1..3",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: block-length frequencies {1: 0.338, 2: 0.324, 3: 0.338} each within 0.03 of 0.33",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: the stream order of the blocks varies (6 distinct orders over 4096 sequences)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: stream_labels = the latest CTX token's stream at every position",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: lite's layout at S = 2: L = 23 = S(NB + 2P) + 3 n_q, qpos = [21]; select reads the query's KEY position and targets its value",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: the batch is lite's batch with only the contexts renamed: roles at the same positions (True), lite's key types (True) and values (True), one CTX type per lite stream (True), the sequence's 2 types distinct and from the pool of 16 (True)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: the stream index is lite's stream ranked by first appearance (True); the indices first appear in the order 0..1 (True); position 0 is a CTX of stream 0 (True)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: at S = 2 the index is -allpool's convention (the latched CTX differs from position 0's)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: every key occurs exactly 2 times, once under each stream (True); its 2 values are distinct (True)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: the query's (stream, key) occurs exactly once in the body (True), its target is that pair's value (True); make_batch's query stream equals stream_labels at the query (True)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: the perfect gate is the one-hot of the index, k = 2",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: frequencies: CTX 16 types 0.0135-0.0154, KEY 4 0.1017-0.1027, VAL 16 0.0220-0.0236; no CTX type as frequent as a value type (max CTX < min VAL)",
+   true
+  ],
+  [
+   "ctxpool (F's check_ctx_task): P4rh2S2ctx16: the cap of a fixed type -> channel map at k = 2: 64/120 = 0.5333 (best split [8, 8]; the balanced map's [8, 8]: 0.5333); the balanced map separates 0.5269 of 4096 sequences",
+   true
+  ],
+  [
+   "ctxpool (F's check_inv_stats_k): P4rh2S2ctx16: synthetic gate 'relative': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0)",
+   true
+  ],
+  [
+   "ctxpool (F's check_inv_stats_k): P4rh2S2ctx16: synthetic gate 'permuted per sequence': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0)",
+   true
+  ],
+  [
+   "ctxpool (F's check_inv_stats_k): P4rh2S2ctx16: the balanced type-level gate (k = 2) separates 0.5469 of the probe's 256 sequences: seq_separated_frac 0.5469 equals it; sep_key_inv 0.5469, VAL cos 0.4531",
+   true
+  ],
+  [
+   "ctxpool (F's check_inv_stats_k): P4rh2S2ctx16: at S = k = 2, val_cos_inv_k equals inv_from_gate's val_cos_inv on a random gate (|diff| 0.0e+00)",
+   true
+  ],
+  [
+   "allpool (F's check_inv_stats_k): P4rh2pool32ctx16: synthetic gate 'relative': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0)",
+   true
+  ],
+  [
+   "allpool (F's check_inv_stats_k): P4rh2pool32ctx16: synthetic gate 'permuted per sequence': sep_key_inv 1.000000 (1), separated 1.0000 (1), VAL cos 0.000000 (0)",
+   true
+  ],
+  [
+   "allpool (F's check_inv_stats_k): P4rh2pool32ctx16: the balanced type-level gate (k = 2) separates 0.5234 of the probe's 256 sequences: seq_separated_frac 0.5234 equals it; sep_key_inv 0.5234, VAL cos 0.4766",
+   true
+  ],
+  [
+   "allpool (F's check_inv_stats_k): P4rh2pool32ctx16: at S = k = 2, val_cos_inv_k equals inv_from_gate's val_cos_inv on a random gate (|diff| 0.0e+00)",
+   true
+  ],
+  [
+   "ctxpool: L 23, vocab 36, 16 context types, 4 key types, S 2; the type-level cap at k = 16 is 1.000, at k = 2 0.533",
+   true
+  ],
+  [
+   "k = 2: allpool.REG3_H built here equals S89H's / S89's model (parameters True, logits True)",
+   true
+  ],
+  [
+   "k = 2: allpool.REG3_REPEATHINGE_H built here equals S89H's / S89's model (parameters True, logits True)",
+   true
+  ],
+  [
+   "k = 2: allpool.REG3_D built here equals S89H's / S89's model (parameters True, logits True)",
+   true
+  ],
+  [
+   "k = 2: allpool.PIDX_H built here equals S89H's / S89's model (parameters True, logits True)",
+   true
+  ],
+  [
+   "k = 2: allpool.PIDX_D built here equals S89H's / S89's model (parameters True, logits True)",
+   true
+  ],
+  [
+   "ctxpool, H: REG3 at k = 16: W_g2 (16, 32), n_ch 16, conv layer",
+   true
+  ],
+  [
+   "ctxpool, H: the untrained PIDX reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 0.051 (~0)",
+   true
+  ],
+  [
+   "ctxpool, H: the untrained PTYPE reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 1.000 (~1)",
+   true
+  ],
+  [
+   "ctxpool, D: REG3 at k = 16: W_g2 (16, 32), n_ch 16, conv None",
+   true
+  ],
+  [
+   "ctxpool, D: the untrained PIDX reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 0.051 (~0)",
+   true
+  ],
+  [
+   "ctxpool, D: the untrained PTYPE reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 1.000 (~1)",
+   true
+  ],
+  [
+   "allpool, H: REG3 at k = 16: W_g2 (16, 32), n_ch 16, conv layer",
+   true
+  ],
+  [
+   "allpool, H: the untrained PIDX reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 0.039 (~0)",
+   true
+  ],
+  [
+   "allpool, H: the untrained PTYPE reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 1.000 (~1)",
+   true
+  ],
+  [
+   "allpool, D: REG3 at k = 16: W_g2 (16, 32), n_ch 16, conv None",
+   true
+  ],
+  [
+   "allpool, D: the untrained PIDX reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 0.039 (~0)",
+   true
+  ],
+  [
+   "allpool, D: the untrained PTYPE reads ROUTED_k (margin 1.000, sequences separated 1.000); type_map_k 1.000 (~1)",
+   true
+  ],
+  [
+   "allpool, k = 2 synthetic gates: within-sequence eta^2 > 0.9 vs sequences separated > 0.9 agree [('relative', True, True), ('type_balanced', False, False), ('random', False, False)]",
+   true
+  ],
+  [
+   "ctxpool: the key term's positions are task.key_mask's 8 body positions, ids in [0, 4)",
+   true
+  ],
+  [
+   "S89H's allpool.REG3_REPEATHINGE_H|2842 (on Intel(R) Xeon(R) Processor @ 2.10GHz) reproduces bit for bit through 2400 through S91b's run() at k = 2: curve [[1200, 0.146484375, 2.8107101917266846], [2400, 0.1884765625, 2.647282600402832]]",
+   true
+  ],
+  [
+   "S89's allpool.REG3_REPEATHINGE_D|2842 (on Intel(R) Xeon(R) Processor @ 2.10GHz) reproduces bit for bit through 2400 through S91b's run() at k = 2: curve [[1200, 0.09716796875, 2.84270977973938], [2400, 0.1513671875, 2.732234477996826]]",
+   true
+  ],
+  [
+   "ctxpool, H, k = 16: REG3_KEYHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.22314453125, 2.6787521839141846], [2400, 0.22705078125, 2.4738030433654785]])",
+   true
+  ],
+  [
+   "ctxpool, H, k = 16: REG3_REPEATHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.22314453125, 2.6787521839141846], [2400, 0.22705078125, 2.4738030433654785]])",
+   true
+  ],
+  [
+   "ctxpool, H: REG3 at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.030720282346010208; term fired None)",
+   true
+  ],
+  [
+   "ctxpool, H: REG3_KEYHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.1648959070444107; term fired 19)",
+   true
+  ],
+  [
+   "ctxpool, H: REG3_REPEATHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.2065362185239792; term fired 20)",
+   true
+  ],
+  [
+   "ctxpool, H: PIDX at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 0.043675247579813004; term fired None)",
+   true
+  ],
+  [
+   "ctxpool, H: PTYPE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 1.0; term fired None)",
+   true
+  ],
+  [
+   "ctxpool, D, k = 16: REG3_KEYHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.3056640625, 2.616861343383789], [2400, 0.48486328125, 1.5977272987365723]])",
+   true
+  ],
+  [
+   "ctxpool, D, k = 16: REG3_REPEATHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.3056640625, 2.616861343383789], [2400, 0.48486328125, 1.5977272987365723]])",
+   true
+  ],
+  [
+   "ctxpool, D: REG3 at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.023326311260461807; term fired None)",
+   true
+  ],
+  [
+   "ctxpool, D: REG3_KEYHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.1666320413351059; term fired 19)",
+   true
+  ],
+  [
+   "ctxpool, D: REG3_REPEATHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.19995668530464172; term fired 20)",
+   true
+  ],
+  [
+   "ctxpool, D: PIDX at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 0.043675247579813004; term fired None)",
+   true
+  ],
+  [
+   "ctxpool, D: PTYPE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 1.0; term fired None)",
+   true
+  ],
+  [
+   "allpool, H, k = 16: REG3_KEYHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.18798828125, 2.784583806991577], [2400, 0.21923828125, 2.5774803161621094]])",
+   true
+  ],
+  [
+   "allpool, H, k = 16: REG3_REPEATHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.18798828125, 2.784583806991577], [2400, 0.21923828125, 2.5774803161621094]])",
+   true
+  ],
+  [
+   "allpool, H: REG3 at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.03002934530377388; term fired None)",
+   true
+  ],
+  [
+   "allpool, H: REG3_KEYHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.08438646048307419; term fired 20)",
+   true
+  ],
+  [
+   "allpool, H: REG3_REPEATHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.09813038259744644; term fired 20)",
+   true
+  ],
+  [
+   "allpool, H: PIDX at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 0.018251756206154823; term fired None)",
+   true
+  ],
+  [
+   "allpool, H: PTYPE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 1.0; term fired None)",
+   true
+  ],
+  [
+   "allpool, D, k = 16: REG3_KEYHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.15966796875, 2.8072731494903564], [2400, 0.244140625, 2.5862982273101807]])",
+   true
+  ],
+  [
+   "allpool, D, k = 16: REG3_REPEATHINGE with its switch off equals REG3|2994 through 2400 bit for bit (curve [[1200, 0.15966796875, 2.8072731494903564], [2400, 0.244140625, 2.5862982273101807]])",
+   true
+  ],
+  [
+   "allpool, D: REG3 at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.028914978727698326; term fired None)",
+   true
+  ],
+  [
+   "allpool, D: REG3_KEYHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.08310820907354355; term fired 20)",
+   true
+  ],
+  [
+   "allpool, D: REG3_REPEATHINGE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 0.0; type_map_k 0.09625481069087982; term fired 20)",
+   true
+  ],
+  [
+   "allpool, D: PIDX at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 0.018251756206154823; term fired None)",
+   true
+  ],
+  [
+   "allpool, D: PTYPE at k = 16 runs 20 updates end to end (ok True; seq_separated_frac 1.0; type_map_k 1.0; term fired None)",
+   true
+  ]
+ ],
+ "secs": 570.6015174388885
+}
