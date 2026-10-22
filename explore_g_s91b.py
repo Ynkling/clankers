@@ -47,7 +47,8 @@ READINGS (fixed now; per memory, on -ctxpool, n = 10; computed by readings() bel
 NOTE (stated before the runs): F's report 10 found one delta channel (k = 1, no gate) binds -ctxpool 10/10 without any
   routing. So on delta BOUND alone says little here; ROUTED-BOUND requires the gate to separate the streams.
 CHECKS (asserted before any run): X's arm A bit for bit; S89's CHECK set (as it ran there); the child's:
-  - the vendored module's blob and its b0c6332 prefix; F's check_ctx_task (-ctxpool) and check_inv_stats_k (both tasks);
+  - the vendored module's blob and its b0c6332 prefix (S89's own blob row, which asserts e24d5e1 itself, is printed as
+    superseded by this one: added 22 October at the first CHECK pass, before any run); F's check_ctx_task (-ctxpool) and check_inv_stats_k (both tasks);
   - at k = 2 the builder equals S89H's / S89's REG3_H, REG3_REPEATHINGE_H, REG3_D, PERFECT_H and ORACLE_D (parameters and
     logits bit for bit), and S89H's / S89's allpool.REG3_REPEATHINGE_<M>|2842 reproduce bit for bit through 2400 through this
     screen's run() at k = 2 with S89's statistics;
@@ -252,7 +253,15 @@ def run_checks():
     jobs += [(CHILD, f, dict(task=t, mem=m)) for t in TASKS for m in MEMS for f in ("checks_off", "checks_on")]
     with ThreadPoolExecutor(gc.WORKERS) as ex:
         res = list(ex.map(lambda j: gc.run_child(j[0], j[1], j[2]), jobs))
-    return [[n if j[0] == CHILD else f"(S89) {n}", bool(ok)] for j, rr in zip(jobs, res) for n, ok in rr]
+    out = []
+    for j, rr in zip(jobs, res):
+        for n, ok in rr:
+            if j[0] != CHILD and n.startswith("explore_f_tasks.py is F's b0c6332 blob"):
+                # superseded (22 October, at the first CHECK pass, before any run): the vendored file is now F's 9017b82,
+                # append-only over b0c6332; S91b's own CHECK asserts its blob and its byte prefix e24d5e1
+                n, ok = f"(S89, superseded by S91b's blob + prefix CHECK) {n}", True
+            out.append([n if j[0] == CHILD else (n if n.startswith("(S89") else f"(S89) {n}"), bool(ok)])
+    return out
 
 
 def main():
