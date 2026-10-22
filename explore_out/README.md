@@ -695,7 +695,11 @@ Descriptive summary:
 - ERRATUM: `write_order_acc`'s split was invalid on -allpool (it read the CTX token as the stream index). Report 9's
   -allpool splits are withdrawn; `write_order_acc_idx` is the corrected form.
 
-| S90 addendum: type-level perfect gate at k = 16 (one channel per context type), seed 3060, SLOW | BOUND | -ctxpool: Hebbian + conv @2400, delta @1200; -allpool: Hebbian + conv @7200 (48000 budget), delta @3600 | **the type-level gate binds at k = 16** (4/4) |
+#### S90-F addendum (`report_10.md`): V's review and the k = 16 type-level ceiling
+
+| screen | outcome | result | reading |
+|---|---|---|---|
+| type-level perfect gate at k = 16 (one channel per context type), seed 3060, SLOW | BOUND | -ctxpool: Hebbian + conv @2400, delta @1200; -allpool: Hebbian + conv @7200 (48000 budget), delta @3600 | **the type-level gate binds at k = 16** (4/4) |
 
 - At k = 16 the type-level gate is the per-sequence perfect gate. It has the same same-channel matrix and parameters, and
   bit-identical logits at initialisation (CHECKed). On -ctxpool its runs equal S90-F's k = 2 pilots bit for bit across
