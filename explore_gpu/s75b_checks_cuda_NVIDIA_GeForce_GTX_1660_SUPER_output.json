@@ -6,13 +6,13 @@
   "threads": 1,
   "gpu": "NVIDIA GeForce GTX 1660 SUPER",
   "capability": "7.5",
-  "gpu_mem_gb": 5.61,
+  "gpu_mem_gb": 5.62,
   "cuda": "13.0",
   "cudnn": 92400,
   "tf32_matmul": false,
   "tf32_cudnn": false,
-  "started": "2026-10-13 20:41:40",
-  "s75b_sha": "0759062126f5",
+  "started": "2026-10-22 17:58:37Z",
+  "s75b_sha": "ee04da11a164",
   "only": null
  },
  "checks": {
@@ -64,7 +64,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 3.2945139126534614e-07,
+     "grad": 3.3427850105595665e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -79,7 +79,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 3.3164778324839245e-07,
+     "grad": 3.0956325302431077e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -94,7 +94,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 3.0356058952092856e-07,
+     "grad": 3.1519289962738035e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -109,7 +109,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 2.986491283161951e-07,
+     "grad": 2.8477670157012246e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -124,7 +124,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 3.015288396684912e-07,
+     "grad": 3.28248817328659e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -139,7 +139,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 3.185358458262521e-07,
+     "grad": 2.781739627683255e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -154,7 +154,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 3.270424694569616e-07,
+     "grad": 3.847593187271085e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -169,7 +169,7 @@
      "ok": true,
      "updates": 20,
      "logits": 0.0,
-     "grad": 2.929526360496887e-07,
+     "grad": 2.8270615071742736e-07,
      "grad_param": "embed.weight",
      "arbitrated": 0,
      "test_worse": 0,
@@ -183,31 +183,40 @@
     "REG3 (scan vs the sequential loop) seed 850": {
      "ok": true,
      "updates": 20,
-     "logits": 2.384185791015625e-07,
-     "grad": 0.0001597694103530578,
+     "logits": 2.086162567138672e-07,
+     "grad": 0.0007368231959249415,
      "grad_param": "b_R",
      "arbitrated": 1,
      "test_worse": 0,
      "ref_worse": 0,
      "sign_p": 1.0,
      "nonfinite": 0,
-     "worst_arbitration": 0.33592944461974084,
+     "worst_arbitration": 0.7262025490875113,
      "first_failures": [],
      "peak_gb": 2.0182695388793945
     },
     "REG3 (scan vs the sequential loop) seed 851": {
      "ok": true,
      "updates": 20,
-     "logits": 1.4901161193847656e-07,
-     "grad": 0.00010397597044659698,
+     "logits": 1.341104507446289e-07,
+     "grad": 0.0004354501207968309,
      "grad_param": "b_R",
-     "arbitrated": 1,
-     "test_worse": 0,
+     "arbitrated": 2,
+     "test_worse": 1,
      "ref_worse": 0,
-     "sign_p": 1.0,
+     "sign_p": 0.5,
      "nonfinite": 0,
-     "worst_arbitration": 0.43780089598264876,
-     "first_failures": [],
+     "worst_arbitration": 2.6335836174688625,
+     "first_failures": [
+      {
+       "step": 4,
+       "run": 0,
+       "score": 2.6335836174688625,
+       "where": "encoder",
+       "raw_logits": 1.1920928955078125e-07,
+       "raw_grad": 0.0002652199304155342
+      }
+     ],
      "peak_gb": 2.0182695388793945
     },
     "control: W_g gradient doubled (must fail)": {
@@ -268,12 +277,51 @@
      "failed_as_it_should": true
     }
    },
-   "secs": 73.7
+   "secs": 69.2
   },
   "B8": {
    "ok": true,
    "skipped": "cpu only",
    "secs": 0.0
+  },
+  "B9": {
+   "ok": true,
+   "cases": {
+    "ORACLE, in line, NaN": {
+     "ok": true,
+     "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"
+    },
+    "ORACLE, one worker, NaN": {
+     "ok": true,
+     "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"
+    },
+    "ORACLE, in line, inf": {
+     "ok": true,
+     "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"
+    },
+    "SINGLE, in line, NaN": {
+     "ok": true,
+     "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"
+    },
+    "REG3 loop, in line, NaN": {
+     "ok": true,
+     "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"
+    },
+    "WIDE_SPLIT_G (guarded), in line, NaN": {
+     "ok": true,
+     "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"
+    },
+    "REG3 scan, in line, NaN": {
+     "ok": true,
+     "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"
+    },
+    "run_arm on a poisoned run: one attempt, status diverged, no abort": {
+     "ok": true,
+     "calls": 1,
+     "status": "diverged"
+    }
+   },
+   "secs": 22.8
   }
  }
 }
