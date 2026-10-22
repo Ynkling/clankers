@@ -333,3 +333,9 @@ EXPLORATORY, NOT A RESULT — Session G S91b
   [ 12/16]    7.8 min  ctxpool.PIDX_D seed 2993  acc 1.000 trans  1200 ROUTED-BOUND
   [ 13/16]    8.6 min  allpool.PIDX_H seed 2993  acc 0.990 trans  7200 ROUTED-BOUND
   [ 14/16]    8.6 min  allpool.PTYPE_H seed 2993  acc 0.990 trans  7200 BOUND unrouted
+  [ 15/16]   11.3 min  allpool.PIDX_D seed 2993  acc 0.972 trans  3600 ROUTED-BOUND
+  [ 16/16]   11.3 min  allpool.PTYPE_D seed 2993  acc 0.972 trans  3600 BOUND unrouted
+  S91b validity: {'ctxpool.H': {'pidx_bound': 2, 'n': 2, 'ptype_bound': 2, 'valid': True}, 'ctxpool.D': {'pidx_bound': 2, 'n': 2, 'ptype_bound': 2, 'valid': True}, 'allpool.H': {'pidx_bound': 2, 'n': 2, 'ptype_bound': 2, 'valid': True}, 'allpool.D': {'pidx_bound': 2, 'n': 2, 'ptype_bound': 2, 'valid': True}, 'sha': 'a0134e14a2625671aefa7bd935698ee2a864ff41', 'time': '2026-10-22 18:04:20 UTC'}
+  s91b: code SHA a0134e14a262 (36 modules), cpu Intel(R) Xeon(R) Processor @ 2.10GHz
+  CHECK: each queued payload carries its arm's iters (120/120: [('allpool.REG3_D', 24000), ('allpool.REG3_H', 24000), ('allpool.REG3_KEYHINGE_D', 24000), ('allpool.REG3_KEYHINGE_H', 24000), ('allpool.REG3_REPEATHINGE_D', 24000), ('allpool.REG3_REPEATHINGE_H', 24000)] ...)
+  120 runs queued on 4 workers
