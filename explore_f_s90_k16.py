@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-explore_f_s90_k16.py — EXPLORATORY, not a result. Session F, after S90-F (23 October): the type-level perfect gate at
+explore_f_s90_k16.py — EXPLORATORY, not a result. Session F, after S90-F (22 October, evening): the type-level perfect gate at
 k = 16, the ceiling G's S91b reads against (G runs S91b at k = 16 on -ctxpool and -allpool because of report 10's cap
 table: a fixed type -> channel map separates every sequence at k = 16). Four runs; nothing else.
 
@@ -28,7 +28,7 @@ CHECKS (asserted before the runs): explore_f_delta_checks (26); the child's: the
   parameters and the initial logits against the k = 2 pilot (4 arms); groups and lrs (SLOW; the conv in the rest group);
   the tie: S90's path reproduces O_DELTA_CTXPOOL|3060 and O_HEBBCONV_CTXPOOL|3060 (2.10GHz records, read at d9783bb)
   through 2400 on this CPU, and the k = 16 path gives the same curves and k-invariant statistics.
-CPU: whichever this container is (a Xeon @ 2.80GHz on 23 October; S90-F ran on the 2.10GHz one); the tie above runs on
+CPU: whichever this container is (a Xeon @ 2.80GHz on the evening of 22 October; S90-F ran on the 2.10GHz one); the tie above runs on
   it before the runs.
 """
 import os

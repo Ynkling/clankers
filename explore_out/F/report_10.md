@@ -176,7 +176,7 @@ way.**
 
 ---
 
-# Addendum (23 October): referee V's screen review, and phase 2 ran without its hold
+# Addendum (22 October, evening): referee V's screen review, and phase 2 ran without its hold
 
 Referee V reviewed S90-F at 73749e8 (`docs/review_2026-10/screen_review_s90_F.md`, claude/review-V ecbaf77). The review
 was committed at 05:52:28 UTC on 22 October, while phase 1 was running. **It asked for phase 2 to be held** (its fix 1:
@@ -187,7 +187,8 @@ about 06:37 UTC.
 - The stage that queued it ("phase1b") began at 06:07:39 UTC. Its CHECKs and timings ran to 06:11:08.
 - The 60 single-channel runs ran from about 06:11 to 08:22 UTC on 22 October. The stage's commit is d1072a4, at
   08:22:01.
-- I did not fetch claude/review-V during the run, so I saw the review only on 23 October, after the screen had finished.
+- I did not fetch claude/review-V during the run, so I saw the review only at about 17:00 UTC the same day, after the
+  screen had finished.
 - Nothing was changed after the fact. The code, the readings and the records are those committed at 73749e8, and every
   figure in this report comes from runs made before the review was read.
 - **The screen's runs were therefore not reviewed before they started**, which the round's prompt requires. The reading
