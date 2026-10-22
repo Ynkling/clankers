@@ -1,4 +1,13 @@
-# Session G — report 9 (S89H: S89's hinges on Hebbian memory + conv; POOL 24000, ALLPOOL 48000). EXPLORATORY, not a result
+# Session G — report 9 (S89H: S89's hinges on Hebbian memory + conv; POOL and ALLPOOL at 24000, not 48000 as first written). EXPLORATORY, not a result
+
+**ERRATUM (22 October; Referee V's check_G_report9.md, claude/review-V a141e92).** Every ALLPOOL run of S89H, the perfect
+gate included, ran **24000** updates, not the 48000 the docstring fixed. The parent's ITERS never reached the child:
+explore_g_common.run_screen sent each child only the arm and the seed, and the child's default is 24000. All 102 ALLPOOL
+records carry iters 24000 and stop at 24000 at the latest; only the store's meta and s89h_validity.json said 48000. The
+perfect gate bound 2/2 within 24000 (9600, 6000), so validity holds at the budget actually run and the ALLPOOL null stands
+at 24000. Corrected below and in the README and the docstring; the commit headline of 996e38b cannot be changed. The
+bug was fixed in explore_g_common.py on 22 October (each payload carries its arm's iters, CHECKed) before S91b. S91's
+Hebbian validity runs did run 48000 (S91's child defaults to it; both records carry iters 48000).
 
 Branch `claude/explore-G`; Intel Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run; code SHA 0f1f20cb2fa8. F's
 RandHeaderTask-pool and -allpool (b0c6332), Hebbian memory (decay 0.95) + test_short_conv.LAYER (conv 'layer', K = 4, on
@@ -10,7 +19,7 @@ code SHA and continued from the cached runs.
 
 ## Counts (ROUTED-BOUND; Wilson 95%; band). POOL: pooled η²; ALLPOOL: within-sequence η² and VAL cos (the other form gives the same counts)
 
-| arm (Hebbian + conv) | POOL (24000) | ALLPOOL (48000) | S89 delta POOL / ALLPOOL (same seeds) | lite, S87 Hebbian, no conv (2700-2719) |
+| arm (Hebbian + conv) | POOL (24000) | ALLPOOL (24000) | S89 delta POOL / ALLPOOL (same seeds) | lite, S87 Hebbian, no conv (2700-2719) |
 |---|---|---|---|---|
 | PERFECT_H (validity) | 2/2 (6000, 7200) | 2/2 (9600, 6000) | ORACLE_D 2/2 / 2/2 | – |
 | BASELINE_H | **0/20** NEVER (4 bound unrouted) | **0/20** NEVER | 0/20 / 0/20 | 0/20 |
@@ -20,19 +29,25 @@ code SHA and continued from the cached runs.
 | REG3_REPEATHINGE_H | **19/20** [0.76, 0.99] RELIABLE | **0/20** NEVER | 20/20 / 0/20 | – |
 
 Transitions (median, range), POOL: KH 6000 (4800-9600), FREQ 6600 (6000-20400), REPEAT 6000 (4800-19200), REG3 6000
-(4800-9600). Unbound, POOL: REG3 OTHER 11; BASELINE STREAM-PARTIAL 10, OTHER 5. ALLPOOL: MERGED 11-16 per hinge arm;
-BASELINE and REG3 OTHER 17-19.
+(4800-9600). Unbound, POOL: REG3 OTHER 11; BASELINE STREAM-PARTIAL 10, OTHER 5, KEY 1; KH STREAM-PARTIAL 1; FREQ
+STREAM-PARTIAL 2; REPEAT STREAM-PARTIAL 1. ALLPOOL: KH MERGED 16, STREAM-PARTIAL 2, OTHER 1, POSITION 1; FREQ MERGED 15,
+STREAM-PARTIAL 3, KEY 2; REPEAT MERGED 11, POSITION 5, KEY 2, OTHER 1, STREAM-PARTIAL 1; BASELINE OTHER 17, KEY 3; REG3
+OTHER 19, POSITION 1.
 
 ## Readings (pre-fixed; explore_g_s89h.readings)
 
-| task | first | 2b (V's caveat 1: KH vs REG3_H) | REG3_FREQHINGE_H | REG3_REPEATHINGE_H | THE QUESTION |
+| task | first | 2b (V's caveat 1: KH vs REG3_H; does not apply here) | REG3_FREQHINGE_H | REG3_REPEATHINGE_H | THE QUESTION |
 |---|---|---|---|---|---|
 | POOL | KH discovered (18 / 0, p 3.8e-6) | **the hinge is needed over the register** (KH only 9, REG3 only 0, p 0.002) | **"survives"** (KH only 2, FREQ only 2; vs REG3 9 / 0) | **"replaces the key hinge"** (KH only 0, REPEAT only 1; vs REG3 10 / 0, p 0.001) | **"holds, and the hinge is needed here"** |
 | ALLPOOL | **"the labelled hinge itself fails here"** (0/20 = 0/20) | – | – | – | **"cannot be asked here"** |
 
+- **2b, as the referee states it (check_G_report9.md §3):** "On Hebbian + conv POOL, 2b correctly does not apply; every
+  hinge beats REG3_H, and both names mean what they say." (KH 9 / 0, FREQ 9 / 0, REPEAT 10 / 0 against REG3_H.) On
+  ALLPOOL 2b is not reached.
 - "clamps": does not apply on POOL (arm only 18 / 19 vs BASELINE only 0).
 - V's caveat 2 (the POOL frequency hinge penalises the stream): printed with the FREQ name. It did not bite here. REG3_H
-  does not beat REG3_FREQHINGE_H (0 / 9), so "the term hurts the register" does not apply. On delta (S89) it did: 1 / 10,
+  does not beat REG3_FREQHINGE_H (REG3 only 0, FREQ only 9), so "the term hurts the register" does not apply. On delta
+  (S89) it did: REG3_D only 10, FREQ only 1,
   p 0.006, and the name there was "needs frequent keys".
 - S89's delta records read through the same function, after the fact (descriptive; S89's readings at db14e9b had no 2b).
   POOL: KH vs REG3_D 4 / 0, p 0.0625, so "the register does not need the hinge here", and REPEAT's "replaces" is
@@ -54,7 +69,7 @@ BASELINE and REG3 OTHER 17-19.
   | FREQ | 18/20 | 7/20 | 11 / 0 | 5e-4 (Hebbian higher) |
   | BASELINE | 0/20 | 0/20 | – | – |
 
-- **POOL → ALLPOOL, same seeds, Hebbian.** FREQ is not compared, and the budgets differ (24000 / 48000).
+- **POOL → ALLPOOL, same seeds, Hebbian.** FREQ is not compared. The budgets are equal (24000 on both tasks; see the erratum).
 
   | arm | POOL | ALLPOOL | p |
   |---|---|---|---|
@@ -80,7 +95,8 @@ BASELINE and REG3 OTHER 17-19.
   18/20 here against 7/20 on delta. Its commitment stays low through 2400 (0.17) and commits after (0.96 at 3600). β^R at
   CTX rises later than under KH and REPEAT (0.41 at 4800). V's warning that it penalises the stream did not translate
   into harm on this memory. Why the memories differ is not tested here.
-- **ALLPOOL: still no arm routes, at twice the budget, on Hebbian too.** The hinge arms end at the type-level cap:
+- **ALLPOOL: still no arm routes at 24000, S89's budget, on Hebbian too.** The hinge arms end at or near the type-level cap
+  (BASELINE_H and REG3_H do not reach it: 0.00-0.02 of sequences routed):
   - within-sequence η² 0.41-0.58 (median), and 0.33-0.57 of sequences routed in 11-17 runs per arm;
   - MERGED failures (one channel takes both streams for the sequences the map cannot separate);
   - BASELINE and REG3 commit early (0.93-0.95 at 2400) to OTHER plateaus.
@@ -90,7 +106,7 @@ BASELINE and REG3 OTHER 17-19.
 
 ## CHECKs (139, asserted before each segment, all ok)
 
-S89's full set (93 rows: the vendored module, token ids only, the task-aware code, the perfect gate, S87's 7 records
+S89's full set (71 rows prefixed "(S89)", 73 counting the two re-run name enumerations; S89H's own rows 68: the vendored module, token ids only, the task-aware code, the perfect gate, S87's 7 records
 through S89's run()), plus:
 - **The conv model:**
   - The conv is the only extra parameter, with the shared ones equal to the no-conv model's.
@@ -106,7 +122,8 @@ through S89's run()), plus:
 - **Per task:**
   - each hinge off = REG3_H through 2400 bit for bit;
   - every arm runs end to end;
-  - each term's gradient reaches the gate only (not the stack, not the conv);
+  - each term's gradient reaches the register gate's parameters and the token embedding (embed.weight), not the stack
+    (encoder, decoder, lm_head) and not the conv;
   - the lrs (the conv in the rest group; the perfect gate's gate group empty).
 - **The readings:** hand cases for 2b, the hurt rule and the question; the four names exclusive and exhaustive (n = 10,
   20); inv_view's within-sequence DISCOVERED.
@@ -118,5 +135,6 @@ through S89's run()), plus:
   bound 16/20. It is the strongest label-free result so far, on a task where keys are not frequent.
 - **The configuration differs from the spec draft's.** The draft is Hebbian on lite without a conv. A main-line test of the
   repeat hinge would need its own spec, with the conv: F's pilots show the Hebbian perfect gate needs it on pooled keys.
-- **ALLPOOL stays unanswered:** 0/20 for every arm on both memories, with the type-level cap visible in the failures. A
+- **ALLPOOL stays unanswered:** 0/20 for every arm on both memories at 24000, with the type-level cap visible in the hinge
+  arms' failures (BASELINE_H and REG3_H route 0.00-0.02 of sequences). A
   gate that compares contexts within the sequence is the open question, not the hinge.
