@@ -19,7 +19,8 @@ are printed only: ALLMASS and REPEATMASS 3/10, NOSPLIT 0/10; ALLMASS vs NOSPLIT 
   the same CPU model with the same code SHA. No saved run changed.
 - No run failed.
 
-**Referee V's review.** V reviewed the screen at d4a9a7d (claude/review-V 3c772c3 / dcd549d,
+**Referee V's review.** (Text corrected 22 October per V's screen_review_s89bc_H.md: the review's commit, and the
+count of failures at their maximum, which was seven and is four.) V reviewed the screen at d4a9a7d (claude/review-V ee5217b (pushed 18:40:23 UTC on 19 October, within the 58 s in which the learned arms were launched; correction adecd3db;
 docs/review_2026-10/screen_review_s89_H.md: "fix first", text and the report path only) before the learned arms ran. I
 read it after they had finished. Fixes 1-6, and the text of 7 and 8, are now in explore_h_s89.py's docstring and
 report():
@@ -42,8 +43,8 @@ text, and fix 3's case does not arise.
     14400-26400.
   - The nine failures end at 0.60-0.85 with 2-6 streams below 0.9, two streams sharing a channel in seven and three
     in two.
-  - In seven of the nine the last evaluation (43200) is the curve's maximum: they were still rising when the budget
-    ended.
+  - In four of the nine the last evaluation (43200) is the curve's maximum; in the other five the maximum (at 42000,
+    or 37200 for 2905) is at most 0.009 above it. They were level or still rising slowly when the budget ended.
   - The one BASE bind (2910) reached 0.8 at 21600 and bound at 36000.
 - **ALLMASS on the same seeds (all 10 runs saved).**
   - 3/10 bound routed (2904, 2908, 2909, at 37200-40800). BASE bound none of these three.
