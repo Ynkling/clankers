@@ -757,7 +757,7 @@ memory with the conv and on POOL, as the label-free replacement for the key hing
 Branch `claude/explore-G`. EXPLORATORY, not a result. RandHeaderTask-lite, Hebbian, k = 2, no conv, 24000, SLOW, the REG3
 model; seeds 2700-2719, paired with S87's records (this CPU reproduces them bit for bit; BASELINE, REG3_KEYHINGE and
 REG3_FREQHINGE are S87's), REG3 and REG3_REPEATHINGE new. Readings (S89H's function) and the spec decision committed at
-b57c186 before any run. 40/40 runs ok. Written up in `G/report_10.md` (S90 part).
+b57c186 before any run. 40/40 runs ok. Report `G/report_10.md` (S90 part).
 
 | arm | ROUTED-BOUND | vs REG3_KEYHINGE (20/20) | name |
 |---|---|---|---|
@@ -770,3 +770,24 @@ The question reads "does not hold", so the pre-fixed spec decision is **"the rep
 spec carries the key hinge as its only hinge arm. The repeat hinge fails on 2700, 2713, 2717 (FREQ on 2700, 2709, 2713;
 FREQ vs REPEAT 1 / 1). It beats REG3 13 / 0. At a 20/20 ceiling "within one pair" fires only 39% of the time for an arm
 that truly binds 0.9, so this is a statement about the rule, not a rate below 0.9.
+
+## Session G — S91 (gates that compare, on ALLPOOL)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. F's RandHeaderTask-allpool (b0c6332). MATCHGATE (the match
+cos(W_R v_t, R_{t-1}) in the register gate's input), MATCHGATE_NOHINGE, NOVELTY (the causal repeat statistic in the
+register's write gate), against S89H's REG3_REPEATHINGE. Hebbian + conv primary (2962-2981, 48000), delta descriptive
+(2982-2991, 24000); the perfect gate on both (2960-2961) as validity. Readings committed at 60b1932 before any run.
+84/84 runs ok. Report `G/report_10.md`.
+
+| arm | Hebbian + conv | delta (descriptive) |
+|---|---|---|
+| perfect gate (validity) | **1/2** (2960 @16800; 2961 0.9375 at 48000): **UNTESTED** | 2/2 |
+| REG3_REPEATHINGE | not run | 0/10 |
+| MATCHGATE | not run | 0/10 |
+| MATCHGATE_NOHINGE | not run | 0/10 |
+| NOVELTY | not run | 0/10 |
+
+The Hebbian half is UNTESTED (not a negative): its perfect gate missed 2/2 by one seed still rising at the budget. On delta
+the reading is "no device here" (descriptive): the match weight trains (|a_M| median 0.21) but MATCHGATE's runs key-split.
+No run crosses the 0.533 routing cap meaningfully (one NOVELTY run at 0.54). A rerun of the Hebbian half needs the user's
+decision on its validity budget.
