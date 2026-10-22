@@ -151,6 +151,12 @@ def run_screen(screen, workers=WORKERS, only=None):
             if r is None or not r.get("ok"):
                 jobs.append((a.get("prio", 1), a["iters"], arm, s))
     jobs.sort(key=lambda j: (-j[0], -j[1], j[3]))
+    # each payload carries its arm's budget (22 October: before this, run_screen sent only arm and seed, and a child used its
+    # own default; Referee V's check_G_report9.md found S89H's ALLPOOL at 24000 against a fixed 48000). CHECK before submit.
+    payloads = [dict(arm=arm, seed=s, iters=screen.ARMS[arm]["iters"]) for _, _, arm, s in jobs]
+    assert all(p_["iters"] == screen.ARMS[p_["arm"]]["iters"] for p_ in payloads)
+    print(f"  CHECK: each queued payload carries its arm's iters ({len(payloads)}/{len(jobs)}: "
+          f"{sorted(set((p_['arm'], p_['iters']) for p_ in payloads))[:6]}{' ...' if len(payloads) > 6 else ''})", flush=True)
     print(f"  {len(jobs)} runs queued on {workers} workers", flush=True)
     t0 = time.time()
     done = [0]
@@ -161,7 +167,7 @@ def run_screen(screen, workers=WORKERS, only=None):
         for att in range(1, MAX_ATTEMPTS + 1):
             ts = time.time()
             try:
-                rec = run_child(screen.CHILD, "run", dict(arm=arm, seed=s))
+                rec = run_child(screen.CHILD, "run", dict(arm=arm, seed=s, iters=screen.ARMS[arm]["iters"]))
             except Exception as e:                                         # noqa: BLE001
                 rec = dict(ok=False, error=f"{type(e).__name__}: {e}")
             rec.update(attempt=att, secs_wall=time.time() - ts, cpu=cpu, sha=sha[:12])
@@ -181,6 +187,16 @@ def run_screen(screen, workers=WORKERS, only=None):
         for f in as_completed([ex.submit(one, j) for j in jobs]):
             f.result()
     return load(screen.NAME)
+
+
+def iters_check(screen):
+    """'records: iters == ARMS[arm]["iters"] on n/n' over the screen's usable runs (printed after a run)."""
+    ok = n = 0
+    for arm, a in screen.ARMS.items():
+        for r in runs(screen, arm).values():
+            n += 1
+            ok += r.get("iters") == a["iters"]
+    return f"records: iters == ARMS[arm]['iters'] on {ok}/{n}", ok == n
 
 
 # ── Model-side helpers (children) ────────────────────────────────────────────

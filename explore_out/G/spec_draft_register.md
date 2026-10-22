@@ -26,7 +26,9 @@ the test would not separate what a label-free arm is meant to show, even had one
   (values that recur; P = 0.33 each, none in 16% of sequences): 16.6 positions, the key term's 8 among them. At the key
   positions both group by token id, which on lite is the key term's grouping (key id = token − S) one to one. Neither
   is given a label (the repeat hinge reads only which token types repeat within the sequence, no corpus statistic), but
-  on this task each reads the key term's positions and grouping exactly, plus the stream at the context tokens.
+  on this task each reads the key term's positions and grouping exactly, plus the stream at the context tokens. On lite the repeat
+  set is the frequency set plus the ~2.6 chance-repeated value positions, with the same token-id grouping (added
+  2026-10-22 after S90; V's screen_review_s90_G.md §1i): S90's 17/20 and S87's 17/20 differ on 1 / 1 seeds.
 - The tasks where they differ from the key term (POOL, ALLPOOL) are other tasks: there the repeat hinge equals the key
   hinge (S89 delta 20/20 = 20/20; S89H Hebbian + conv 19/20 vs 18/20), but on another task and, for S89H, with a conv.
 So the test does not answer whether a distant cue is discovered label-free: its label-free arms are BASELINE and REG3,

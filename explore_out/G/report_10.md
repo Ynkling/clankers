@@ -1,11 +1,15 @@
 # Session G — report 10 (round 7: S90, the repeat hinge on lite Hebbian; S91, gates that compare on ALLPOOL). EXPLORATORY, not a result
 
 Branch `claude/explore-G`; Intel Xeon @ 2.10GHz, torch 2.14.0+cu130, 1 thread per run. S90 committed at b57c186 and S91
-at 60b1932, each before any of its runs. The register spec's revision 2 (6fc55b1) went between them.
+at 60b1932, each before any of its runs. S90's design (the readings applied to lite, the spec bar, the pairing branch)
+was chosen on 22 October at 05:03 UTC, after S89H's records and report 9; its readings function is S89H's, fixed before
+any S89H record. The relayed readings of 21 October did not reach this session. The register spec's revision 2 (6fc55b1) went between them.
 
 ## S90: counts (ROUTED-BOUND; lite, Hebbian, k = 2, no conv, 24000, SLOW, REG3; seeds 2700-2719)
 
-S90 is paired with S87's records, because this CPU reproduces them bit for bit. 40/40 new runs ok, none retried; 53 min.
+S90 is paired with S87's records: this CPU reproduces them bit for bit through 2400 (curve and statistics), and a
+descriptive rerun of REG3_KEYHINGE on all 20 seeds (added 22 October on V's screen_review_s90_G.md fix 4) equals S87's
+full records (curve, transition, stop, end statistics) on 20/20. 60/60 new runs ok, none retried.
 
 | arm | ROUTED-BOUND (Wilson 95%; band) | vs REG3_KEYHINGE | vs REG3 | name (pre-fixed) |
 |---|---|---|---|---|
@@ -20,6 +24,12 @@ S90 is paired with S87's records, because this CPU reproduces them bit for bit. 
 - **2b:** the hinge is needed over the register (16 / 0).
 - **The question:** "does not hold".
 - **For the spec:** "the repeat hinge falls short". The spec carries the key hinge only (revision 2, 6fc55b1).
+- **Corrections to the parent (22 October, after all 40 records, on V's screen_review_s90_G.md):** UNTESTED now gives no
+  spec decision (the b57c186 rule read it as "falls short"), and fewer than 18 completed REG3 seeds void it. On the
+  complete store neither changes anything: every run completed, and the reading and the decision are as above.
+- **Repeat against S87's frequency hinge** (descriptive): on lite the repeat set is the frequency set plus 2.63
+  chance-repeated value positions per sequence, with the same token-id grouping; REPEAT only 1, FREQ only 1 (p 0.75).
+  So S90 measured the effect of those value positions on an arm S87 had at 17/20, and found none.
 
 **What happened (exploratory):**
 - The repeat hinge's runs that bind look like the key hinge's:
@@ -41,7 +51,8 @@ S90 is paired with S87's records, because this CPU reproduces them bit for bit. 
 - **The repeat set on lite:** 16.63 positions = 4 CTX + 8 KEY + 2.63 VAL + 2 QUERY (the query's CTX and KEY). All 8
   key-term positions are inside it, and its grouping there equals the key term's one to one.
 - REG3_REPEATHINGE with its switch off equals REG3|2700 through 2400 bit for bit.
-- The term's gradient reaches the gate only.
+- The term's gradient reaches the register gate's parameters and the token embedding (embed.weight), not the encoder,
+  decoder or lm_head.
 - S89's static CHECKs pass, and readings() passes its hand cases.
 - A first start of S90 was launched by mistake before its commit and was stopped during its CHECK phase. No run had
   started and no store had been written; the log was deleted, and S90 was committed and started again.
@@ -57,6 +68,10 @@ S90 is paired with S87's records, because this CPU reproduces them bit for bit. 
 | NOVELTY | not run | 0/10 (2 BOUND unrouted; KEY 4, MERGED 2) | 0.00 / 0.54 | 3/10 |
 
 84 runs ok (4 validity + 40 delta), none retried; 140 min. The 80 Hebbian learned runs were not queued.
+
+**Budgets, checked against the records (22 October, after V's check_G_report9.md found S89H's ALLPOOL at 24000):** the
+two PERFECT_H records carry iters 48000 (S91's child defaults to 48000 on Hebbian, so the parent's ITERS did not need
+to reach it), and the 42 delta records carry 24000, as fixed. S91's numbers stand as printed.
 
 **Readings (pre-fixed):**
 - **Hebbian + conv: UNTESTED.** The perfect gate did not bind 2/2 within 48000. It bound 2960 at 16800. On 2961 it was at

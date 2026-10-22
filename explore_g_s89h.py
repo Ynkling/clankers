@@ -20,7 +20,11 @@ with _H for this configuration: BASELINE_H (LOCAL3 + conv), REG3_H, REG3_KEYHING
 (the hinges are explore_g_s89_child's, unchanged: on POOL the frequency hinge is a CTX hinge, 5 CTX positions; on ALLPOOL a
 value hinge, 8 VAL positions; the repeat hinge 5 CTX + 9 KEY + ~2.6 VAL positions on both); PERFECT_H the perfect gate +
 conv (validity). The tasks are S89's (F's b0c6332 module, vendored and asserted by S89's CHECKs).
-BUDGET: POOL 24000 updates; ALLPOOL 48000 (every arm, the perfect gate included). Evaluation every 1200, early stop after
+BUDGET: POOL 24000 updates; ALLPOOL 48000 (every arm, the perfect gate included). ERRATUM (22 October; Referee V's
+check_G_report9.md): ALLPOOL RAN 24000. ITERS below never reached the child (explore_g_common.run_screen sent only the
+arm and the seed; the child's default is 24000), so every S89H record, ALLPOOL included, carries iters 24000. The
+perfect gate bound 2/2 within 24000, so the ALLPOOL null stands at that budget. Fixed in explore_g_common.py on
+22 October (the payload carries the arm's iters). Evaluation every 1200, early stop after
 3 evaluations >= 0.95.
 SEEDS (S89's, as asked): PERFECT_H on 2840-2841 per task, run first; the five arms on 2842-2861 per task (20, paired
 across arms, across the two tasks and with S89's delta arms: the same batches; the same initial parameters wherever the
