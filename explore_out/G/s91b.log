@@ -423,3 +423,11 @@ EXPLORATORY, NOT A RESULT — Session G S91b
   [ 82/120]  268.0 min  ctxpool.REG3_H seed 3001  acc 0.493 trans  None POSITION
   [ 83/120]  270.0 min  allpool.REG3_KEYHINGE_D seed 3000  acc 0.816 trans  None MERGED
   [ 84/120]  270.5 min  allpool.REG3_D seed 3000  acc 0.373 trans  None OTHER
+=== RESTART after worker restart 2026-10-22 22:35 UTC ===
+====================================================================================================
+EXPLORATORY, NOT A RESULT — Session G S91b
+  cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 9660733+dirty | python 3.13.16 | torch threads 1
+====================================================================================================
+  repro_check: arm A seed 160, 2400 steps, lr 0.001: BIT-IDENTICAL to X (52s)
+    here [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
+    X    [[1200, 0.25732421875, 2.1073341369628906], [2400, 0.50244140625, 1.1376346349716187]]
