@@ -694,3 +694,13 @@ Descriptive summary:
 - The cap of a fixed type → channel map at k = D is 0.533 / 0.268 / 0.141 (D = 2 / 3 / 4).
 - ERRATUM: `write_order_acc`'s split was invalid on -allpool (it read the CTX token as the stream index). Report 9's
   -allpool splits are withdrawn; `write_order_acc_idx` is the corrected form.
+
+| S90 addendum: type-level perfect gate at k = 16 (one channel per context type), seed 3060, SLOW | BOUND | -ctxpool: Hebbian + conv @2400, delta @1200; -allpool: Hebbian + conv @7200 (48000 budget), delta @3600 | **the type-level gate binds at k = 16** (4/4) |
+
+- At k = 16 the type-level gate is the per-sequence perfect gate. It has the same same-channel matrix and parameters, and
+  bit-identical logits at initialisation (CHECKed). On -ctxpool its runs equal S90-F's k = 2 pilots bit for bit across
+  CPUs. This is the ceiling G's S91b reads against.
+- Report 10's addendum also records the following. Phase 2 of S90-F ran without the hold V's review asked for (06:11-08:22
+  UTC, 22 October; the review was committed at 05:52 and not fetched during the run). The lite references (S53 8/10,
+  S88b 9/10) ran under one Adam at 1e-3, not SLOW, so report 10's "no worse" comparison is withdrawn as a comparison; the
+  reading stands on -ctxpool's count alone. No stated number uses DISCOVERED.

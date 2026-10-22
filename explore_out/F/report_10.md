@@ -255,3 +255,51 @@ later round.
 
 **For G, the module is `explore_f_tasks.py` at 9017b82**, blob `cfe3fe276f7c…`. Its first 49,923 bytes (48,457
 characters; V's fix 9) are b0c6332's file.
+
+## The type-level perfect gate at k = 16 (22 October; S91b's ceiling)
+
+Four runs on seed 3060, SLOW (`explore_f_s90_k16.py`). The reading and the expectation were committed before the runs, at
+cb87c23 (with the date corrected at 0fbb933). Each run uses one channel per context type: k = 16, the identity map. Each
+arm runs at its task × memory's valid budget.
+
+| task | memory | budget | type-level gate, k = 16 (3060) | per-sequence gate, k = 2 (2/2 at that budget) |
+|---|---|---|---|---|
+| -ctxpool | Hebbian + conv | 24000 | **bound @2400** (final 1.000) | 3060 @2400; 3061 @4800 (S90-F) |
+| -ctxpool | delta | 24000 | **bound @1200** (final 1.000) | 3060 @1200; 3061 @2400 (S90-F) |
+| -allpool | Hebbian + conv | 48000 | **bound @7200** (final 0.985) | 2800 @6000; 2801 @28800 (S89-post) |
+| -allpool | delta | 24000 | **bound @3600** (final 0.988) | 2800 @3600; 2801 @3600 (S89-F) |
+
+**READING (fixed before the runs): "the type-level gate binds at k = 16"** (4/4).
+
+All four runs end with margin 1.00 and every probe sequence separated (`seq_separated_frac` 1.00).
+
+**At k = 16 the type-level ceiling is the per-sequence ceiling.**
+- A sequence's contexts are distinct types, so one channel per type gives exactly the per-sequence gate's same-channel
+  matrix.
+- The perfect-gate model's parameters do not depend on k.
+- So the two models are one model. Stated and CHECKed before the runs: equal parameters and bit-identical logits at
+  initialisation, on both tasks and memories.
+- **The -ctxpool runs confirm it in full:** TL16_*_CTXPOOL|3060 equals S90-F's O_*_CTXPOOL|3060 bit for bit over the
+  whole run, in the curve and the gradient norms.
+  - That holds across CPUs: the k = 16 runs ran on the 2.80GHz Xeon, the k = 2 pilots on the 2.10GHz one.
+- **On -allpool**, seed 3060 had no k = 2 pilot (S89's ran on 2800-2801). The k = 16 transitions, 7200 and 3600, lie
+  within the k = 2 pilots' range.
+
+**For G (S91b):**
+- At k = 16 the cap of report 10's table is 1, and the ceiling binds at the per-sequence gate's transitions. On seed
+  3060:
+
+| task | Hebbian + conv | delta |
+|---|---|---|
+| -ctxpool | 2400 | 1200 |
+| -allpool | 7200 | 3600 |
+
+- A k = 16 learned gate that reads context identity is therefore not capped by the map on these two tasks.
+- **CHECKs:** explore_f_delta_checks 26/26 and the child's 10, all passed before the runs:
+  - the gate, the same-channel matrix, the parameters and the initial logits against the k = 2 pilot (4 arms);
+  - groups and lrs;
+  - S90's path reproducing both -ctxpool pilot records through 2400 on this CPU, and the k = 16 path giving the same
+    curves.
+- Run time was 0.28 h, 17:36-17:50 UTC on 22 October. Code SHA 81f8f8098645. Tables: `s90_k16_tables.md`.
+
+The -docs tasks at k = 16 are a later round. At D ≤ 16 the same identity holds there, because the contexts are distinct.
