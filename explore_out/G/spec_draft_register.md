@@ -1,17 +1,44 @@
-# test_register_gate.py — specification (DRAFT, from Session G, for the user and X to adopt)
+# test_register.py — specification (DRAFT, from Session G, for the user and X to adopt as specs/test_register.md)
 
 Drafted 2026-10-11 on claude/explore-G from screens S71-S83 (EXPLORATORY). Revision 1 (2026-10-21): Referee V's review
-(`docs/review_2026-10/spec_review_register_draft.md` on the main line), fixes 1-10, applied as written; the changes are
-listed at the end. To be committed to `specs/` on the main line, reviewed, and amended (dated) before the test is written
-and before any run. Both machines run it, each on its own seeds.
+(`docs/review_2026-10/spec_review_register_draft.md` on the main line), fixes 1-10, applied as written. Revision 2
+(2026-10-22): Referee V's second review (`spec_review_register_v2.md`, claude/review-V), fixes 1-13, and the label-free-arm
+decision below. The changes are listed at the end. To be committed to `specs/` on the main line, reviewed, and amended
+(dated) before the test is written and before any run. Both machines run it, each on its own seeds.
+
+**Dating.** Revision 1 was written after S89's records (2026-10-20 22:16 to 2026-10-21 09:46 UTC). Its arms, seeds,
+thresholds and claims were fixed by the referee's review of 2026-10-12. Only the background's S87 and S89 bullets came
+after. Revision 2's decision on a label-free arm (below) was made on 2026-10-22, after S89's (delta, POOL / ALLPOOL),
+S89H's (Hebbian + conv, POOL / ALLPOOL; 2026-10-21 22:10 to 2026-10-22 03:11 UTC) and S90's records (lite Hebbian;
+2026-10-22 05:04-05:57 UTC; report 10's S90 part, README "Session G — S90"), by the rule S90 fixed before its runs
+(`explore_g_s90.py` at b57c186, "FOR THE SPEC").
+
+**No label-free hinge is an arm (decided 2026-10-22, after S89, S89H and S90).** The main line's plan of 2026-10-13
+(`plan_2026-10-13.md:48-50`) asked for S87's frequency hinge as an arm; the round-7 prompt (2026-10-22) named the repeat
+hinge instead, conditional on S90. S90 put the repeat hinge in this test's own setting (lite, Hebbian, no conv, SLOW, REG3;
+seeds 2700-2719, paired with S87's records): REG3_REPEATHINGE 17/20 against REG3_KEYHINGE 20/20 (key hinge only 3, repeat
+only 0, p 0.125), "is weaker than the key hinge", so by S90's pre-fixed rule "the repeat hinge falls short" and the arm is
+the key hinge. S87's frequency hinge read the same on the same seeds (17/20; FREQ vs REPEAT 1 / 1). Two further reasons
+the test would not separate what a label-free arm is meant to show, even had one held:
+- On lite, either hinge reads a superset of what the key term reads. The frequency cut selects the 2 context and 4 key
+  types: 14 positions per sequence, the key term's 8 among them, plus the query's key and the 5 context tokens. The
+  repeat set is 5 CTX (4 block heads and the query's) + 9 KEY (8 body and the query's) + 2.63 VAL positions per sequence
+  (values that recur; P = 0.33 each, none in 16% of sequences): 16.6 positions, the key term's 8 among them. At the key
+  positions both group by token id, which on lite is the key term's grouping (key id = token − S) one to one. Neither
+  is given a label (the repeat hinge reads only which token types repeat within the sequence, no corpus statistic), but
+  on this task each reads the key term's positions and grouping exactly, plus the stream at the context tokens.
+- The tasks where they differ from the key term (POOL, ALLPOOL) are other tasks: there the repeat hinge equals the key
+  hinge (S89 delta 20/20 = 20/20; S89H Hebbian + conv 19/20 vs 18/20), but on another task and, for S89H, with a conv.
+So the test does not answer whether a distant cue is discovered label-free: its label-free arms are BASELINE and REG3,
+its comparators. A test of the repeat hinge would be its own spec, on POOL with Hebbian + conv (S89H's setting).
 
 ## The specification (proposed wording)
 
-> test_register_gate.py — REG3 with the key term routes and binds a distant-cue stream (pull first; spec committed to
+> test_register.py — REG3 with the key term routes and binds a distant-cue stream (pull first; spec committed to
 > specs/ before the test is written; both machines, disjoint seeds, X 600-619, L 1600-1619; --machine X|L; --also pools).
 >
 > Task: RandHeaderTask-lite (Session F's explore_f_tasks.RandHeaderTask(P=4, nb=2, lmin=1, lmax=3), S=2, n_vals=16,
-> n_q=1; copied byte for byte from claude/explore-F at 9a6c2bf), k = 2, no conv, Hebbian memory (decay 0.95), 24000
+> n_q=1; copied byte for byte from claude/explore-F at 9a6c2bf, blob de47463), k = 2, no conv, Hebbian memory (decay 0.95), 24000
 > updates, evaluation every 1200 on 2048 held-out sequences, early stop after three evaluations >= 0.95.
 > Arms (20 seeds per machine, paired by seed: the same batches; the same initial parameters wherever the models share
 > them):
@@ -19,10 +46,10 @@ and before any run. Both machines run it, each on its own seeds.
 >   REG3              the register gate shared by the three layers (below), SLOW, no term
 >   REG3_KEYHINGE     REG3 + the key term for updates 1-2400
 >   LOCAL3_KEYHINGE   BASELINE + the key term on the window gate for updates 1-2400 (no register, no residual input)
->   RESGATE_KEYHINGE  REG3 without the register (reg = False) + the key term for updates 1-2400
+>   RESGATE_KEYHINGE  REG3 without the register (reg = False) + the key term for updates 1-2400 (unscreened)
 > Validity, on the first two seeds per machine: CEIL (the perfect gate at all three layers, single-rate Adam 1e-3) and
 > REG3_NUDGE (REG3 + the 5% labelled nudge). VALID: CEIL binds 2/2 and REG3_NUDGE is ROUTED-BOUND on at least 1 of 2.
-> Outcome: ROUTED-BOUND = test_register_gate.routed_bound (copied from Session G's explore_g_rhl_parent.py at 076005d):
+> Outcome: ROUTED-BOUND = test_register.routed_bound (copied from Session G's explore_g_rhl_parent.py:35-53 at 076005d):
 > bound, and the routing at the end, margin >= 0.9 and eta^2 by stream at KEY > 0.9.
 > Claims, pooled over both machines primary, per machine secondary, exact one-sided McNemar on ROUTED-BOUND:
 >   C1 REG3_KEYHINGE beats BASELINE.  C2 REG3_KEYHINGE beats LOCAL3_KEYHINGE.  C3 REG3_KEYHINGE beats REG3.
@@ -30,7 +57,7 @@ and before any run. Both machines run it, each on its own seeds.
 >   R  REG3_KEYHINGE ROUTED-BOUND >= 18/20 on a machine: MET / NOT MET / UNTESTED per machine, with Wilson and
 >      Clopper-Pearson intervals; the pooled count beside it.
 
-## Background (claude/explore-G, EXPLORATORY; reports 3-8 in explore_out/G/)
+## Background (claude/explore-G, EXPLORATORY; reports 3-10 in explore_out/G/)
 
 - S71 (seeds 700-709): on Hebbian memory the routing that matters is layer 1's.
   - The perfect gate at layers 2-3 with LOCAL3 at layer 1 binds 0/10, against 10/10 for all three layers.
@@ -50,15 +77,28 @@ and before any run. Both machines run it, each on its own seeds.
 - S87 (2700-2719): a frequency hinge (the key term at the positions of the most frequent token types, grouped by token
   id; it reads no labels) 17/20 against the key term's 20/20 (3 vs 0, p 0.125); 10/10 on delta memory. On this task its
   frequent types are the 2 CTX and 4 key types, so it reads about what the key term reads, plus the stream tokens.
-- S89 (2842-2861, delta memory, F's round-6 pool tasks; report 8): on RandHeaderTask-pool (keys from 32 types) REG3
-  alone routes and binds 16/20, the key term 20/20, a label-free repeat hinge (the term at every token type that repeats
-  in the sequence) 20/20; on -allpool (contexts from 16 types) every arm, the key term included, 0/20. These are delta
-  results on other tasks; the claims below stay Hebbian on lite.
+- S89 (2842-2861, delta memory, F's round-6 pool tasks; report 8). On RandHeaderTask-pool (keys from 32 types):
+  - BASELINE 0/20;
+  - REG3 alone 16/20 (descriptive in S89);
+  - the key term 20/20;
+  - the frequency hinge 7/20 (its cut selects only the 2 CTX types there; "needs frequent keys", 13 vs 0 against the key
+    term);
+  - a label-free repeat hinge (the term at every token type that repeats in the sequence) 20/20.
+
+  On -allpool (contexts from 16 types) every learned arm, the key term included, is 0/20 (the perfect gate 2/2). These
+  are delta results on other tasks; the claims below stay Hebbian on lite.
+- S89H (2842-2861, Hebbian + conv 'layer', the same tasks; report 9): POOL BASELINE 0/20, REG3 9/20, the key term 18/20,
+  the frequency hinge 18/20, the repeat hinge 19/20 (the hinge needed over the register, 9 vs 0, p 0.002); ALLPOOL every
+  arm 0/20 at 48000. Hebbian with a conv, on other tasks.
+- S90 (2700-2719, this test's setting, paired with S87; report 10): REG3 4/20, the repeat hinge 17/20 against the key term's
+  20/20 (3 vs 0, p 0.125): "is weaker than the key hinge". The basis of the decision above.
 
 ## Interpretation, fixed here before any code
 
 **The task.** `explore_f_tasks.py` copied byte for byte (RandHeaderTask, body_positions, rand_header_routing_stats,
-check_rand_header, write_order_acc). Each stream's 4 keys come in 2 blocks of 1-3 pairs, each block headed by one CTX
+check_rand_header, write_order_acc): blob `de47463` (claude/explore-F at 9a6c2bf). claude/explore-G now carries F's
+`b0c6332` module, blob `e24d5e1`, whose first 14,101 bytes are `de47463` and which redefines no name. Vendor `de47463`, or
+`e24d5e1` with a CHECK that its first 14,101 bytes are `de47463`. Each stream's 4 keys come in 2 blocks of 1-3 pairs, each block headed by one CTX
 token, and the 4 blocks are in random order. L = 23, qpos 21, vocabulary 22. No position determines a token's stream.
 
 **The models** (one new module, `register_gate.py`, written from these definitions and CHECKed against Session G's
@@ -80,7 +120,10 @@ classes on every machine, below):
 - LOCAL3's W_in and W_g stay in the model, unused by REG3.
 - RESGATE_KEYHINGE is REG3 with reg = False (no register: no A_R term, and none of W_R, w_R, b_R; Session G's S73
   RESGATE_ONLY_D construction on Hebbian memory), plus the key term. It differs from REG3_KEYHINGE by the register only,
-  and from LOCAL3_KEYHINGE by the residual input only.
+  and from LOCAL3_KEYHINGE by the residual input only (with it, a gate that differs by layer; the CHECK below asserts the
+  rest). Its reference construction: `explore_g_rhl_child.make_reg3(task, seed, "hebb", reg=False)` (:137), given
+  `KeyHingeBDH`'s class and term state as `explore_g_devices_child.make_model` does (:151-159). No Hebbian record of this
+  construction exists. S73's RESGATE_ONLY_D is delta and has no term: 0/10 ROUTED-BOUND, 5/10 BOUND.
 
 **The key term.** On training forwards of updates 1-2400 only, the loss gains λ · mean_ℓ relu(η²_key(g^(ℓ)) − τ), with
 λ = 1.0 and τ = 0.2 (batch 18's W2_KEYHINGE constants).
@@ -109,8 +152,9 @@ claims below are about this term on this task and nothing wider.
   toward 0.475 + 0.05 · onehot(stream) at every position of all three layers' gates (MSE), batches of 64 from a
   generator seeded seed + 55555.
 
-**Outcome (a function, fixed now).** ROUTED-BOUND(r) = `test_register_gate.routed_bound(r)`, copied from
-`explore_g_rhl_parent.py` at `076005d` (`bound` :39, `routed_star` :43, `routed_bound` :52, thresholds :35). It holds when:
+**Outcome (a function, fixed now).** ROUTED-BOUND(r) = `test_register.routed_bound(r)` in `test_register.py` (the plan's
+file name, `plan_2026-10-13.md:50`; X records the name at adoption if it differs), copied from `explore_g_rhl_parent.py:35-53`
+at `076005d` (blob `0e1b03a`; `bound` :39, `routed_star` :43, `routed_bound` :52, thresholds :35). It holds when:
 - `r["transition"] is not None`, where the transition is run_one's `test_binding_onset.transition(curve)` (BIND_PASS 0.95);
 - `r["end"]["margin"] >= 0.9`;
 - `r["end"]["eta_key_by_stream"] > 0.9`.
@@ -153,7 +197,9 @@ Exact one-sided McNemar on seed pairs (b = first arm only, c = second arm only),
 - **C1** REG3_KEYHINGE beats BASELINE (ROUTED-BOUND).
 - **C2** REG3_KEYHINGE beats LOCAL3_KEYHINGE (ROUTED-BOUND).
 - **C3** REG3_KEYHINGE beats REG3 (ROUTED-BOUND).
-- **C4** REG3_KEYHINGE beats RESGATE_KEYHINGE (ROUTED-BOUND).
+- **C4** REG3_KEYHINGE beats RESGATE_KEYHINGE (ROUTED-BOUND). RESGATE_KEYHINGE is unscreened. At REG3_KEYHINGE 1.0,
+  P(C4 SHOWN, 40 pairs) is 1.00, 0.98, 0.74 and 0.37 at RESGATE_KEYHINGE's true rate 0.50, 0.75, 0.85 and 0.90. C4 not
+  SHOWN is printed with both arms' pooled counts.
 - **R** REG3_KEYHINGE ROUTED-BOUND ≥ 18/20 on a machine (the RELIABLE band at n = 20).
   - **Per machine:** MET, NOT MET or UNTESTED (machine not VALID). Printed with the count, its Wilson and
     Clopper-Pearson 95% intervals (at 18/20: [0.699, 0.972] and [0.683, 0.988]), and the band.
@@ -176,12 +222,14 @@ reading is printed with the caveat line below.
 - C1 and C2 SHOWN, C3 not SHOWN (C4 either way): "REG3 with the key term routes and binds more often than the baseline
   and than the key term on the window gate; not shown more often than REG3 without the term."
 - C1, C2 and C3 SHOWN, C4 not SHOWN: "REG3 with the key term routes and binds more often than the baseline, than the key
-  term on the window gate, and than REG3 without the term; not shown more often than the same gate without the register."
+  term on the window gate, and than REG3 without the term; not shown more often than the same gate and term without the
+  register."
 - C1, C2, C3 and C4 SHOWN: "REG3 with the key term routes and binds more often than the baseline, than the key term on
-  the window gate, than REG3 without the term, and than the same gate without the register."
+  the window gate, than REG3 without the term, and than the same gate and term without the register."
 
 Caveat line: "The key term reads which tokens are keys and each key's identity, during updates 1-2400 only. REG3 differs
-from the window gate by the register and the residual input together; C4 isolates the register."
+from the window gate by the register and the residual input together; C4 isolates the register. No label-free hinge is
+an arm (S90: the repeat hinge 17/20 against the key term's 20/20 on this setting)."
 
 "Discovers" is not used: the report reserves DISCOVERED (bound and VAL cos < 0.5), which is printed beside ROUTED-BOUND.
 
@@ -190,7 +238,8 @@ The rate reading is one of:
 - "R MET on X only";
 - "R MET on L only";
 - "R MET on neither";
-- "R UNTESTED on <machine>", with the other machine's verdict printed.
+- "R UNTESTED on <machine>", with the other machine's verdict printed;
+- "R UNTESTED on both machines".
 
 None of these is read as a difference between the machines.
 
@@ -202,28 +251,32 @@ None of these is read as a difference between the machines.
 - REG3 vs BASELINE; RESGATE_KEYHINGE vs LOCAL3_KEYHINGE (the residual input, given the term).
 - Bands with Wilson 95% intervals for every arm, per machine and pooled (RELIABLE >= ceil(0.9 n), MAJORITY >= ceil(0.5 n),
   MINORITY >= 1, else NEVER).
-- The count of runs where ROUTED* on the returned gate differs from ROUTED* at every layer, listed.
+- The count of runs where ROUTED* (margin ≥ 0.9 and η² by stream > 0.9) on the returned gate differs from ROUTED* on each
+  of layers 1-3 separately, listed.
 - fail_class_v2 against v1 on every unbound run, with η² by key and the margin of each disagreement.
 
 ## CHECKs (all before any run; numbered from the main line's next free number)
 
 - **The inherited chain** (test_window_gate's verification and below, on this machine's own results files).
-- **The task:** explore_f_tasks.check_rand_header (every (stream, key) once; S distinct values per key; one CTX per block
+- **The task:** the vendored file's blob is `de47463` (or `e24d5e1` with its first 14,101 bytes equal to `de47463`);
+  explore_f_tasks.check_rand_header (every (stream, key) once; S distinct values per key; one CTX per block
   at its start; the block-length frequencies; the block order varies; stream_labels; L, qpos, select), plus L = 23,
   qpos 21, vocabulary 22.
 - **The outcome function:**
   - ROUTED-BOUND is True on a constructed record that meets every condition. It is False when any one condition fails
     (no transition; margin 0.89; η² by stream 0.90).
-  - On every record of `explore_out/G/s82_devices_results.json` and `s83_results.json` at `076005d` (vendored in
+  - On the 186 Hebbian records of `explore_out/G/s82_devices_results.json` and `s83_results.json` at `076005d` (vendored in
     `results/refs/` with commit, path and key), `routed_bound` gives Session G's counts: BASELINE 0/20, REG3 2/20,
     REG3_KEYHINGE 20/20, REG3_SLOWGATE 0/20, REG3_NOWIN 5/20, LOCAL3_KEYHINGE 0/20, REG3_KEYHINGE_POS 1/20, REG3_FLAT
     0/20, REG3_KEYHINGE_1200 18/20, REG3_NUDGE 2/2 and 2/2. The recorded `transition` equals
-    `test_binding_onset.transition(curve)` on all 186 records. (Session G re-scored these counts with its own
-    `routed_bound` on 2026-10-21: all equal.)
+    `test_binding_onset.transition(curve)` on all 218 records (186 Hebbian, 32 delta). (Re-scored by the referee on
+    2026-10-21, `docs/review_2026-10/spec_checks_register_v2_out.txt` §3: all equal.)
 - **The models:**
   - With A_r = A_R = 0, REG3's gate at every layer equals LOCAL3's gate and its logits equal BASELINE's, bit for bit.
   - REG3's initial parameters other than the new ones equal BASELINE's; RESGATE_KEYHINGE's equal REG3's minus the
     register's.
+  - With A_r = 0, RESGATE_KEYHINGE's gate at every layer equals LOCAL3_KEYHINGE's window gate, and its logits and its key
+    term equal LOCAL3_KEYHINGE's, bit for bit, on one forward of 16 sequences.
   - β^R at initialisation lies in (0.09, 0.11) at every position of 16 sequences (Session G's CHECK,
     `explore_g_rhl_child.py:466-468`).
   - Strict causality: changing token t changes no logit and no gate at positions < t. Changing token t's register write
@@ -235,7 +288,8 @@ None of these is read as a difference between the machines.
   - At seed 600, on 16 training sequences, with the parameters `register_gate.py` builds: REG3's and REG3_KEYHINGE's
     logits, every layer's gate, β^R and every parameter gradient, against the same from `explore_g_rhl_child.Reg3BDH` and
     `explore_g_devices_child.KeyHingeBDH`; LOCAL3_KEYHINGE's against `explore_g_s83_child.TermLocal`;
-    RESGATE_KEYHINGE's against `Reg3BDH` with reg = False plus `KeyHingeBDH`'s term. G's classes are extracted from
+    RESGATE_KEYHINGE's against `explore_g_rhl_child.make_reg3(task, seed, "hebb", reg=False)` (:137), given
+    `KeyHingeBDH`'s class and term state as `explore_g_devices_child.make_model` does (:151-159). G's classes are extracted from
     `076005d` and run on the same parameters.
   - Tolerance: bit for bit, or, where the operation order differs, to 1e-6 relative, with the measured difference
     printed.
@@ -257,7 +311,8 @@ None of these is read as a difference between the machines.
   source commit (`076005d`), path and key, and where the commit is present the CHECK prints whether the copy equals it
   (as test_delta_recipe Amendment 2(h)). Asserted on a matching CPU (Intel Xeon @ 2.10GHz), printed otherwise.
 - **The nudge:** it moves only the REG3 parameters. After it, the stream lean |mean p₀ at stream-0 positions − mean p₀
-  at stream-1 positions| on the probe is > 0.02 at every layer (`explore_g_rhl_child.py:514`).
+  at stream-1 positions| on run_one's statistics probe is > 0.02 at every layer (`explore_g_rhl_child.py:514`; Session G's
+  CHECK used 256 sequences of its own, `explore_g_rhl_child.py:509-514`).
 - **The perfect gate:** one-hot on the stream at every position and layer. The query's logits are bit-identical when
   every VAL token of the other stream changes.
 - **Seeds.** Every arm runs on the machine's range (X 600-619, L 1600-1619); CEIL and REG3_NUDGE run on its first two
@@ -299,3 +354,28 @@ Nothing is cut. The results row goes in results/README.md; push.
 9. The printed outcome renamed ROUTED AT EVERY LAYER.
 10. The optional arm adopted: RESGATE_KEYHINGE and C4, so that a claim can speak of the register alone (about 1-2
     CPU-hours per machine). Without C4 the C2 wording stands as "the register and the residual input together".
+
+## Revision 2 (2026-10-22): what changed, per Referee V's second review (`spec_review_register_v2.md`)
+
+1. The label-free arm (fix 1): decided, dated and stated as made after S89, S89H and S90 — no label-free hinge is an arm
+   (fix 1's option B), because S90 read "the repeat hinge falls short" by its pre-fixed rule (17/20 vs 20/20, "is weaker
+   than the key hinge"); the reasons and the plan's earlier request are written in the header.
+2. The caveat (fix 2): the frequency and repeat sets on lite in counts (14 and 16.6 positions; the key term's 8 and its
+   grouping inside both; the repeat hinge reads no label and no corpus statistic), in the header's decision paragraph,
+   and one sentence in the caveat line.
+3. The S89 bullet (fix 3) with the frequency hinge's 7/20 and BASELINE 0/20; S89H and S90 added.
+4. RESGATE_KEYHINGE (fixes 4-7): the A_r = 0 CHECK against LOCAL3_KEYHINGE; "the residual input only" qualified; its
+   reference construction named (no Hebbian record exists); C4's power printed with it; the comparator named "the same
+   gate and term without the register".
+5. The outcome's name and scope (fix 8): `test_register.py` / `specs/test_register.md` (the plan's names), the function's
+   lines and blob; the CHECK's 186 Hebbian / 218 records; the re-score cited to the referee's committed output.
+6. The task file's blob pinned (fix 9).
+7. "R UNTESTED on both machines" (fix 10).
+8. The lean's sample named (fix 11).
+9. The per-layer ROUTED* count renamed so that it is not read as ROUTED AT EVERY LAYER (fix 12).
+10. This list (fix 13). Revision 1's background edits: S87 and S89 added (written after S89's records, 2026-10-21); report
+    6's quoted readings removed from the S83 bullet.
+
+Seeds re-checked by the referee on 2026-10-21: 13 heads, 359 JSON/JSONL blobs, 35,196 seed values, no hit
+(`spec_checks_register_v2_out.txt` §1). Session G's S89/S89H/S90/S91 use 2700-2719, 2840-2861 and 2960-2991, disjoint
+from X 600-619 and L 1600-1619.
