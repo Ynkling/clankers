@@ -69,3 +69,6 @@ EXPLORATORY, NOT A RESULT — session H: H/s90
   [ 18]  441.0 min  H/s90            DELTA_NOSPLIT            seed 3024  lr 0.001  (LOCAL3 + SLOW, delta)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 7d2b3bd, code 287fdd3941d0, attempt 1: acc 0.980  trans 18000  outcome BOUND ROUTED; map [10, 3, 15, 6, 13, 2, 11, 14]
   start  441.0 min  H/s90            DELTA_NOSPLIT            seed 3025  (projected worst case 720 min)
+  [ 19]  479.1 min  H/s90            DELTA_SPLIT              seed 3032  lr 0.001  (LOCAL3 + SLOW, delta + exact-copy trigger)
+          on Intel(R) Xeon(R) Processor @ 2.10GHz, git fe6bf1b, code 287fdd3941d0, attempt 1: acc 0.964  trans 33600  outcome BOUND ROUTED; map [5, 4, 3, 12, 0, 13, 8, 14]; None fired at [7200, 12000]
+  start  479.1 min  H/s90            DELTA_NOSPLIT            seed 3026  (projected worst case 720 min)
