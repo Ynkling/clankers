@@ -50,6 +50,10 @@ explore_i_pilot.py (S74), explore_i_dense.py (S75, a draft with placeholders, no
   each of the four uncovered outcomes has one name, the two-rule cases and the guard's half-test are stated, the 2400
   check is in the text, and the two post-merge design changes are labelled disclosed, not blind by git. No constant
   changes, and nothing in the driver's code SHA (ee04da11a164); two description scripts are added outside it.
+  - **Pre-run note** (gpu/s75b_prerun_note_2026-10-23.md, committed before the pilot). It records what had been seen:
+    S75's learned-arm records, Appendices A–C, and both cards' CUDA CHECK and benchmark outputs under the final driver
+    (all pass; every arm usable on both cards; REG3's scan and 1 stats worker on each, by rule). No learned-arm constant
+    was chosen from them.
   - Configuration B: S = 4, NB = 32, M = 352, L = 1536, bound 0.963.
   - A 2-seed ORACLE pilot with proceed and stop rules fixed in advance.
   - SPLIT_THR set from the pilot, and the split guarded against one-to-one maps.
