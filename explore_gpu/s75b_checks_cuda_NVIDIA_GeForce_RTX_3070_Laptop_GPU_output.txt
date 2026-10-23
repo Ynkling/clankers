@@ -1,4 +1,4 @@
-explore_gpu.s75b CHECKs on {'device': 'cuda:0', 'torch': '2.14.0+cu130', 'cpu': '12th Gen Intel(R) Core(TM) i7-12650H', 'threads': 1, 'gpu': 'NVIDIA GeForce RTX 3070 Laptop GPU', 'capability': '8.6', 'gpu_mem_gb': 7.71, 'cuda': '13.0', 'cudnn': 92400, 'tf32_matmul': False, 'tf32_cudnn': False}; S75b code SHA 0759062126f5
+explore_gpu.s75b CHECKs on {'device': 'cuda:0', 'torch': '2.14.0+cu130', 'cpu': '12th Gen Intel(R) Core(TM) i7-12650H', 'threads': 1, 'gpu': 'NVIDIA GeForce RTX 3070 Laptop GPU', 'capability': '8.6', 'gpu_mem_gb': 7.71, 'cuda': '13.0', 'cudnn': 92400, 'tf32_matmul': False, 'tf32_cudnn': False}; S75b code SHA ee04da11a164
 
 SKIP B1 task CHECK at B (0 s): {"ok": true, "skipped": "cpu only"}
 SKIP B2 guarded trigger mechanics (0 s): {"ok": true, "skipped": "cpu only"}
@@ -6,18 +6,27 @@ SKIP B3 margin in 16-sequence chunks (0 s): {"ok": true, "skipped": "cpu only"}
 SKIP B4 rules (0 s): {"ok": true, "skipped": "cpu only"}
 SKIP B5 refusals and allocation (0 s): {"ok": true, "skipped": "cpu only"}
 SKIP B6 S75's code SHA unchanged (0 s): {"ok": true, "skipped": "cpu only"}
-ok   B7 lock-step at L = 1536, R = 1 (40 s): {"ok": true, "tol": {"logits": 1e-05, "grad": 0.0001}, "updates": 20, "seeds": [850, 851], "batch": 8, "R": 1}
-       ORACLE seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.245261572990467e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.5739150047302246}
-       ORACLE seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.9278179112727823e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.5747799873352051}
-       SINGLE seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.2219239379060266e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.47005367279052734}
-       SINGLE seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.259440267833873e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.47005367279052734}
-       WIDE (WIDE_SPLIT_G / WIDE_SLOW) seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.2238863138469693e-07, "grad_param": "W_g", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.8595809936523438}
-       WIDE (WIDE_SPLIT_G / WIDE_SLOW) seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.6902789199748076e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.8595809936523438}
-       REG3 (loop) seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 7.111477363733067e-07, "grad_param": "A_R", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 1.0176849365234375}
-       REG3 (loop) seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 4.3834135174347155e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 1.0176849365234375}
-       REG3 (scan vs the sequential loop) seed 850: {"ok": true, "updates": 20, "logits": 1.7881393432617188e-07, "grad": 0.0008280212119551651, "grad_param": "b_R", "arbitrated": 1, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.3105361333634743, "peak_gb": 2.0182695388793945}
-       REG3 (scan vs the sequential loop) seed 851: {"ok": true, "updates": 20, "logits": 1.1920928955078125e-07, "grad": 0.0004348523125240852, "grad_param": "b_R", "arbitrated": 1, "test_worse": 1, "ref_worse": 0, "sign_p": 0.5, "nonfinite": 0, "worst_arbitration": 2.633634862875085, "peak_gb": 2.0182695388793945}
+ok   B7 lock-step at L = 1536, R = 1 (46 s): {"ok": true, "tol": {"logits": 1e-05, "grad": 0.0001}, "updates": 20, "seeds": [850, 851], "batch": 8, "R": 1}
+       ORACLE seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.201238692185748e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.5739150047302246}
+       ORACLE seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.4282577960552966e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.5747799873352051}
+       SINGLE seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.3837980561101036e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.47005367279052734}
+       SINGLE seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.4000343662767603e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.47005367279052734}
+       WIDE (WIDE_SPLIT_G / WIDE_SLOW) seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.168159723639639e-07, "grad_param": "W_g", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.8595809936523438}
+       WIDE (WIDE_SPLIT_G / WIDE_SLOW) seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.43887359371864e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 0.8595809936523438}
+       REG3 (loop) seed 850: {"ok": true, "updates": 20, "logits": 0.0, "grad": 6.207483260172133e-07, "grad_param": "A_R", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 1.0176849365234375}
+       REG3 (loop) seed 851: {"ok": true, "updates": 20, "logits": 0.0, "grad": 3.9558636165472147e-07, "grad_param": "embed.weight", "arbitrated": 0, "test_worse": 0, "ref_worse": 0, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.0, "peak_gb": 1.0176849365234375}
+       REG3 (scan vs the sequential loop) seed 850: {"ok": true, "updates": 20, "logits": 2.086162567138672e-07, "grad": 0.0006455496353647579, "grad_param": "W_R", "arbitrated": 3, "test_worse": 0, "ref_worse": 2, "sign_p": 1.0, "nonfinite": 0, "worst_arbitration": 0.19987052673884081, "peak_gb": 2.0182695388793945}
+       REG3 (scan vs the sequential loop) seed 851: {"ok": true, "updates": 20, "logits": 1.341104507446289e-07, "grad": 0.00043216399448582643, "grad_param": "b_R", "arbitrated": 2, "test_worse": 1, "ref_worse": 1, "sign_p": 0.75, "nonfinite": 0, "worst_arbitration": 2.633526467349372, "peak_gb": 2.0182695388793945}
        control: W_g gradient doubled (must fail): {"ok": true, "updates": 20, "logits": 0.0, "grad": 1.0, "grad_param": "W_g", "arbitrated": 20, "test_worse": 20, "ref_worse": 0, "sign_p": 9.5367431640625e-07, "nonfinite": 0, "worst_arbitration": 4288.798387136471, "peak_gb": 0.07316303253173828, "failed_as_it_should": true}
 SKIP B8 end to end (small configuration) (0 s): {"ok": true, "skipped": "cpu only"}
+ok   B9 a real divergence is recognised (25 s): {"ok": true}
+       ORACLE, in line, NaN: {"ok": true, "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"}
+       ORACLE, one worker, NaN: {"ok": true, "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"}
+       ORACLE, in line, inf: {"ok": true, "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"}
+       SINGLE, in line, NaN: {"ok": true, "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"}
+       REG3 loop, in line, NaN: {"ok": true, "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"}
+       WIDE_SPLIT_G (guarded), in line, NaN: {"ok": true, "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"}
+       REG3 scan, in line, NaN: {"ok": true, "error": "NonFinite: non-finite logits in the evaluation (the run diverged)"}
+       run_arm on a poisoned run: one attempt, status diverged, no abort: {"ok": true, "calls": 1, "status": "diverged"}
 
 ALL CHECKS PASSED
