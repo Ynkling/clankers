@@ -793,3 +793,22 @@ The Hebbian half is UNTESTED (not a negative): its perfect gate missed 2/2 by on
 the reading is "no device here" (descriptive): the match weight trains (|a_M| median 0.21) but MATCHGATE's runs key-split.
 No run crosses the 0.533 routing cap meaningfully (one NOVELTY run at 0.54). A rerun of the Hebbian half needs the user's
 decision on its validity budget.
+
+## Session G — S91b (the register gate with a channel per context type, k = 16)
+
+Branch `claude/explore-G`. EXPLORATORY, not a result. F's RandHeaderTask-ctxpool and -allpool (9017b82), k = 16, the register
+gate at all three layers, Hebbian + conv and delta, 24000, SLOW; seeds 2992-2993 (perfect gates) and 2994-3003 (10 paired).
+Readings committed at b981c3f before any run. 136/136 runs ok (iters 24000 on 136/136). Report `G/report_11.md`. Replaces
+S91's remaining Hebbian half.
+
+| arm | -ctxpool Hebbian + conv | -ctxpool delta | -allpool (both memories) |
+|---|---|---|---|
+| PIDX / PTYPE perfect gates | 2/2 / 2/2 | 2/2 / 2/2 | 2/2 / 2/2 |
+| REG3 | 0/10 | 0/10 | 0/10 |
+| REG3_KEYHINGE | 0/10 (type map 0.97, ~6 channels, separated 0.20) | 0/10 | 0/10 |
+| REG3_REPEATHINGE | 0/10 | 0/10 | 0/10 |
+
+Reading on both memories: **"the channels do not suffice"** (every arm ≤ 3/10 while both perfect gates bind 2/2). The
+Hebbian key hinge comes closest: its gate keys on context type but folds the 16 types onto about 6 channels without
+committing (all STREAM-PARTIAL, held-out 0.89). The two perfect gates coincide by construction (within a sequence "same
+stream" equals "same type").
