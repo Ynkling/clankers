@@ -246,3 +246,5 @@ None of the fixes changed a rule, and none needed to on these records. Every tex
 - No other error was found in `check_G_report9.md` or `screen_review_s90_G.md` against these records.
   - S90's outcome falls in the review's §1a map as predicted: c = 17 gives "is weaker" and "does not hold".
   - The review's §1i repeat-set table matches the spec's counts.
+
+**Note (23 October).** "Fix 8 was not applied" was true at `cbca3e36`. G applied it at `4314e35c` (22 October 17:23), before S91b's code: payloads now carry `iters`.
