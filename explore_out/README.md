@@ -663,3 +663,24 @@ Incidents:
   with a dated note.
 
 Report: explore_out/H/report_11.md (per run: s89c_runs.md).
+
+### Session H round 7: S92 (files and store keyed "s90"): the oracles at key pools 4-32, then the recipe at P*; seeds 3020-3033
+
+| screen | outcome | reading (pre-fixed) |
+|---|---|---|
+| S92 phase 1 (perfect gates, Hebbian + conv and delta, at pools 4 / 8 / 16 / 32; 86400 updates; 4 seeds per cell, 3020-3023) | Hebbian 4/4 by 43200 at every pool (2400-4800, 8400-10800, 9600-14400, 14400-19200); delta 4/4 at 4 (1200) and 8 (7200-22800), 2/4 at 16, 3/4 at 32 | Hebbian: reliable at 4, 8, 16, 32. Delta: reliable at 4 and 8; the oracle is the limit at 16 and 32. P* = 8 (budgets 43200 and 43200) |
+| S92 phase 2 (pool 8, 10 paired seeds 3024-3033) | BOUND ROUTED: BASE 6, DELTA_SPLIT 10, DELTA_NOSPLIT 7 | Hebbian: no reading applies. Delta: the recipe carries to P*. Delta split: no reading applies (DELTA_SPLIT ahead by >= 2 pairs; 3 vs 0, p = 0.125) |
+
+Every reading carries the caveat that the keys stay at the positional slots 3j+1, so these are readings about rare key
+types, not unmarked keys.
+- **Delta.** The delta perfect gate fails at 16 and 32 with each stream on its own channel and recall short of the bar
+  (0.70-0.84). The three DELTA_NOSPLIT failures at pool 8 have the same shape; with the split, those seeds bound. Only
+  7 of DELTA_SPLIT's 22 firings were on labelled targets, and 9 came on maps that were already one-to-one; every run
+  bound.
+- **Hebbian.** The recipe falls from pool 4 (S87a / S86: 17/20, 9/10) to 6/10 at 8 and 1-2/10 at 32 (S89, S89c), while
+  its perfect gate stays reliable.
+
+Referee V's screen review (980498e) was read after phase 1 and after phase 2's first record. Its fixes are in the parent
+and the report path, and its three added CHECK rows ran after phase 2 started; no run changed.
+
+Report: explore_out/H/report_12.md (per run: s90_runs.md).

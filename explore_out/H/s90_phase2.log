@@ -119,3 +119,44 @@ EXPLORATORY, NOT A RESULT — session H: H/s90
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git d5ecc16, code 287fdd3941d0, attempt 1: acc 0.985  trans 19200  outcome BOUND ROUTED; map [4, 13, 0, 7, 2, 6, 11, 1]
   [  8]  345.4 min  H/s90            DELTA_NOSPLIT            seed 3032  lr 0.001  (LOCAL3 + SLOW, delta)
           on Intel(R) Xeon(R) Processor @ 2.10GHz, git 491409d, code 287fdd3941d0, attempt 1: acc 0.956  trans 30000  outcome BOUND ROUTED; map [5, 3, 0, 1, 11, 6, 7, 10]
+  wall clock 345.4 min
+    HEBB_P4   transitions [3600, 4800, 2400, 2400]; accuracy at the end [0.978, 0.984, 0.964, 0.999]
+    HEBB_P8   transitions [10800, 8400, 10800, 8400]; accuracy at the end [0.965, 0.954, 0.95, 0.981]
+    HEBB_P16  transitions [10800, 14400, 13200, 9600]; accuracy at the end [0.971, 0.987, 0.971, 0.967]
+    HEBB_P32  transitions [19200, 14400, 18000, 18000]; accuracy at the end [0.969, 0.95, 0.958, 0.958]
+    DELTA_P4  transitions [1200, 1200, 1200, 1200]; accuracy at the end [1.0, 1.0, 1.0, 1.0]
+    DELTA_P8  transitions [8400, 7200, 14400, 22800]; accuracy at the end [0.969, 0.993, 0.959, 0.991]
+    DELTA_P16 transitions [14400, None, 12000, None]; accuracy at the end [0.972, 0.84, 0.952, 0.83]
+    DELTA_P32 transitions [19200, 25200, None, 40800]; accuracy at the end [0.967, 0.967, 0.697, 0.967]
+    BASE          3024: MERGED (3 share) (transition None); 4800 (probe 0.02) 11->0 op_ok True map before [11, 11, 11, 11, 11, 11, 11, 11]; 14400 (probe 0.16) 0->9 op_ok True map before [10, 0, 10, 1, 0, 0, 10, 0]; 26400 (probe 0.33) 9->8 op_ok True map before [10, 9, 10, 1, 9, 11, 10, 9]
+    BASE          3025: BOUND ROUTED (transition 20400); 19200 (probe 0.81) 14->0 op_ok True map before [14, 15, 10, 8, 12, 9, 14, 2]
+    BASE          3026: BOUND ROUTED (transition 15600); 4800 (probe 0.03) 11->15 op_ok True map before [11, 11, 0, 11, 0, 11, 0, 0]
+    BASE          3027: MERGED (2 share) (transition None); 7200 (probe 0.05) 14->1 op_ok True map before [5, 14, 5, 6, 14, 14, 14, 5]; 19200 (probe 0.67) 1->12 op_ok True map before [5, 1, 15, 6, 14, 11, 1, 5]; 26400 (probe 0.69) 5->4 op_ok True map before [5, 1, 15, 6, 14, 11, 1, 5]
+    BASE          3028: MERGED (2 share) (transition None); 4800 (probe 0.05) 10->5 op_ok True map before [4, 10, 10, 10, 4, 10, 10, 10]; 9600 (probe 0.08) 2->14 op_ok True map before [4, 10, 10, 2, 4, 2, 2, 2]; 19200 (probe 0.34) 14->7 op_ok True map before [4, 10, 10, 14, 4, 2, 2, 14]
+    BASE          3029: BOUND ROUTED (transition 25200); 4800 (probe 0.06) 0->9 op_ok True map before [14, 0, 0, 0, 4, 14, 0, 0]; 12000 (probe 0.22) 9->3 op_ok True map before [4, 9, 4, 0, 4, 1, 9, 9]; 24000 (probe 0.83) 9->15 op_ok True map before [7, 9, 11, 0, 4, 1, 3, 9]
+    BASE          3030: BOUND ROUTED (transition 30000); 21600 (probe 0.73) 2->14 op_ok True map before [2, 15, 3, 2, 3, 11, 6, 13]; 26400 (probe 0.73) 3->12 op_ok True map before [14, 15, 3, 14, 3, 11, 6, 13]
+    BASE          3031: MERGED (2 share) (transition None); 9600 (probe 0.17) 1->5 op_ok True map before [1, 9, 1, 7, 1, 9, 13, 7]; 19200 (probe 0.42) 7->10 op_ok True map before [1, 9, 5, 7, 1, 9, 13, 7]; 24000 (probe 0.58) 9->6 op_ok True map before [1, 9, 5, 7, 1, 9, 13, 10]
+    BASE          3032: BOUND ROUTED (transition 18000); 4800 (probe 0.03) 15->10 op_ok True map before [15, 15, 1, 1, 1, 1, 15, 15]; 9600 (probe 0.08) 1->4 op_ok True map before [14, 14, 1, 1, 12, 1, 14, 10]; 16800 (probe 0.81) 14->5 op_ok True map before [14, 14, 1, 11, 12, 4, 15, 10]
+    BASE          3033: BOUND ROUTED (transition 19200); 14400 (probe 0.72) 4->15 op_ok True map before [4, 11, 5, 10, 3, 10, 4, 6]
+    DELTA_SPLIT   3024: BOUND ROUTED (transition 34800); 4800 (probe 0.02) 10->15 op_ok False map before [13, 3, 12, 13, 12, 14, 8, 14]; 9600 (probe 0.06) 1->5 op_ok False map before [13, 2, 13, 13, 11, 2, 11, 1]; 21600 (probe 0.88) 7->0 op_ok False map before [15, 1, 12, 13, 8, 9, 3, 7]
+    DELTA_SPLIT   3025: BOUND ROUTED (transition 26400); 21600 (probe 0.94) 15->2 op_ok False map before [8, 3, 12, 13, 10, 15, 4, 14]
+    DELTA_SPLIT   3026: BOUND ROUTED (transition 24000); 4800 (probe 0.06) 2->6 op_ok True map before [13, 2, 13, 2, 2, 2, 10, 13]
+    DELTA_SPLIT   3027: BOUND ROUTED (transition 40800); 7200 (probe 0.02) 5->1 op_ok True map before [5, 6, 5, 10, 8, 5, 6, 2]; 28800 (probe 0.88) 1->3 op_ok False map before [5, 11, 10, 6, 4, 1, 0, 14]; 40800 (probe 0.92) 11->12 op_ok False map before [5, 11, 7, 6, 4, 1, 0, 14]
+    DELTA_SPLIT   3028: BOUND ROUTED (transition 30000); 4800 (probe 0.05) 1->5 op_ok True map before [1, 14, 14, 2, 1, 2, 14, 14]; 24000 (probe 0.80) 0->3 op_ok False map before [0, 4, 14, 8, 13, 5, 2, 11]; 28800 (probe 0.84) 8->15 op_ok False map before [3, 4, 14, 8, 13, 1, 12, 11]
+    DELTA_SPLIT   3029: BOUND ROUTED (transition 24000); 4800 (probe 0.06) 5->10 op_ok False map before [0, 9, 0, 4, 4, 13, 0, 11]; 9600 (probe 0.09) 8->0 op_ok False map before [14, 7, 14, 14, 8, 14, 5, 14]
+    DELTA_SPLIT   3030: BOUND ROUTED (transition 26400); 4800 (probe 0.03) 15->1 op_ok True map before [4, 15, 15, 15, 0, 0, 0, 15]; 16800 (probe 0.77) 2->4 op_ok False map before [2, 1, 9, 14, 13, 3, 10, 5]; 26400 (probe 0.94) 12->14 op_ok False map before [2, 15, 9, 12, 13, 8, 0, 11]
+    DELTA_SPLIT   3031: BOUND ROUTED (transition 40800); 4800 (probe 0.03) 7->9 op_ok True map before [7, 7, 7, 7, 7, 7, 7, 7]; 9600 (probe 0.02) 4->8 op_ok False map before [9, 7, 10, 9, 9, 10, 9, 7]; 19200 (probe 0.23) 3->11 op_ok False map before [1, 14, 13, 8, 6, 0, 9, 3]
+    DELTA_SPLIT   3032: BOUND ROUTED (transition 33600); 7200 (probe 0.06) 10->14 op_ok True map before [15, 10, 10, 1, 1, 15, 1, 10]; 12000 (probe 0.09) 7->4 op_ok True map before [6, 7, 7, 7, 7, 6, 7, 1]
+    DELTA_SPLIT   3033: BOUND ROUTED (transition 28800); 7200 (probe 0.08) 5->14 op_ok False map before [14, 5, 14, 5, 15, 5, 15, 5]
+    DELTA_NOSPLIT 3024: BOUND ROUTED (transition 18000); 
+    DELTA_NOSPLIT 3025: BOUND ROUTED (transition 25200); 
+    DELTA_NOSPLIT 3026: BOUND ROUTED (transition 28800); 
+    DELTA_NOSPLIT 3027: STREAM-PARTIAL one-to-one (transition None); 
+    DELTA_NOSPLIT 3028: STREAM-PARTIAL one-to-one (transition None); 
+    DELTA_NOSPLIT 3029: STREAM-PARTIAL one-to-one (transition None); 
+    DELTA_NOSPLIT 3030: BOUND ROUTED (transition 33600); 
+    DELTA_NOSPLIT 3031: BOUND ROUTED (transition 18000); 
+    DELTA_NOSPLIT 3032: BOUND ROUTED (transition 30000); 
+    DELTA_NOSPLIT 3033: BOUND ROUTED (transition 19200); 
+  H/s90: readings {'phase 1 HEBB': 'pool 4: reliable (4/4 by 43200, 4/4 by 86400); pool 8: reliable (4/4 by 43200, 4/4 by 86400); pool 16: reliable (4/4 by 43200, 4/4 by 86400); pool 32: reliable (4/4 by 43200, 4/4 by 86400)', 'phase 1 DELTA': 'pool 4: reliable (4/4 by 43200, 4/4 by 86400); pool 8: reliable (4/4 by 43200, 4/4 by 86400); pool 16: the oracle is the limit (2/4 by 43200, 2/4 by 86400); pool 32: the oracle is the limit (3/4 by 43200, 3/4 by 86400)', "phase 1, 43200 by the cut curve vs the run's transition": 'differ in no run', 'P*': "P* = 8; budgets {'HEBB': 43200, 'DELTA': 43200}; the passing pools are nested", 'Hebbian (BASE)': 'no reading applies (BASE 6/10 at pool 8, budget 43200)', 'delta (DELTA_SPLIT)': 'the recipe carries to P* (DELTA_SPLIT 10/10 at pool 8, budget 43200)', 'delta split': 'no reading applies (DELTA_SPLIT ahead by >= 2 pairs) (DELTA_SPLIT 10/10, DELTA_NOSPLIT 7/10; DELTA_SPLIT only 3, DELTA_NOSPLIT only 0; p(SPLIT>NOSPLIT) 0.125, p(NOSPLIT>SPLIT) 1)', 'caveat (with every reading)': "the pool makes key types rare across the corpus (at K = 32, 0.0105 per type; 16: 0.021; 8: 0.042; 4: 0.084); it does not move the keys: they stay at 3j+1, are the most repeated types within a sequence (8 each; CTX 4, VAL 1-4), and each sits next to its stream's CTX token, which the window gate reads. The key-position mask is the main line's, unchanged. A reading is about rare key types on a layout with positional keys, not about unmarked key positions.", 'operating characteristics': "operating characteristics (exact): P(>= 7/10) = 0.001, 0.011, 0.172, 0.382, 0.650, 0.879, 0.987 and P(<= 3/10) = 0.879, 0.650, 0.172, 0.055, 0.011, 0.001, 0.000 at a true rate of 0.2, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9; 'split not needed' (V's model, rho 0 / 0.5 / 1) at SPLIT / NOSPLIT 0.9 / 0.9: 0.88/0.95/1.00, 0.9 / 0.7: 0.39/0.38/0.38, 0.9 / 0.5: 0.09/0.07/0.05, 0.7 / 0.7: 0.77/0.86/1.00; the moot branch 0.86/0.93/0.99 at SPLIT = NOSPLIT = 0.1 and 0.38/0.47/0.65 at 0.3; phase 1: a cell passes 4/4 with probability q^4 (0.81 at q = 0.95), both memories (q_h q_d)^4 (0.66 at 0.95 each); P* is the largest pool that passed, not the largest reliable one (with q = 0.95 everywhere, P* = 32 with probability 0.66); 'the oracle is the limit' can mean 3 of 4 (Wilson 0.30-0.95)."}; complete True; valid True
+chain exit 0
