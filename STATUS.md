@@ -56,19 +56,21 @@ keeps binding within two pairs of the key-position rule on 30 seeds; under a den
 to carry the source at two sources and nothing routes at four on the one screen run, untested by its own rule. Rounds
 6–7 (19–23 October; Revision 11 §11–12), which removed the task's marked keys and then its fixed context identities:
 
-- With routing given, a **Hebbian channel cannot bind four keys drawn from 32 types** on the lite task (the perfect gate
-  0/2 at 24,000 and 48,000, under either recipe) where **a delta channel binds in 2400–3600**; the short convolution
+- With routing given, a **Hebbian channel did not bind four keys drawn from 32 types** on the lite task (the perfect gate
+  0/2 on each of two tasks at 24,000 and 48,000, under either recipe; two seeds per cell) where **a delta channel binds in
+  2400–3600**; the short convolution
   restores the Hebbian oracle (POOL 2/2, ALLPOOL 2/2 at 48,000). One delta channel with no gate binds the two-document
   task whose contexts are drawn from 16 types **10/10** (F, reports 9–10).
 - On the lite task with pooled keys, a hinge that reads only **which token types repeat within the sequence** — no
-  labels, no corpus table — equals the labelled key hinge: 20/20 against 20/20 on delta memory, where the hingeless
+  labels, no corpus table — matches the labelled key hinge within one pair (the committed rule's "replaces the key hinge"): 20/20 against 20/20 on delta memory, where the hingeless
   register already binds 16/20; **19/20 against 18/20 on Hebbian memory with the convolution**, where the register
   alone binds 9/20 and the hinge is needed (*p* = 0.002). On the original lite task (Hebbian, no convolution) it falls
   short, 17/20 against 20/20 (G, reports 8–10). The frequency hinge hurts on delta (7/20) and survives on Hebbian (18/20).
 - When the **context tokens have no fixed identity** (drawn from 16 types), every learned arm is 0/20 or 0/10 on both
   memories, with two channels and with sixteen, while the perfect gate handed the per-sequence index binds in 1200–9600:
   no learned gate found the relative routing; a comparing gate and a novelty signal did nothing (G, reports 8, 9, 11;
-  the referee: a learning negative, not a capacity limit).
+  at sixteen channels, the referee's reading, a learning negative at the budget and not a capacity limit; at two, the
+  null is confounded with the 0.533 cap on any fixed type→channel map).
 - On the eight-stream grouped layout with keys from 32 types, the main line's recipe binds **1/10** where it binds 38/40
   at four keys; neither a later first check nor a larger split cap helps (1/10, 2/10 against a 2/10 rerun); the delta
   perfect gate is itself unreliable at pools of 16 and 32. At the largest pool where both oracles are reliable (8),
@@ -85,7 +87,7 @@ to carry the source at two sources and nothing routes at four on the one screen 
 | `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged in full; its last file is `check_G_report11.md` (23 October) |
 | `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 21 complete (15 October); `explore_out/spec_draft_keyload.md` carries a NOT READY status section with five unscreened options |
 | `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta; the pool and context-pool tasks (reports 1–10) | complete; the task module G and H vendor is `explore_f_tasks.py` at `9017b82` |
-| `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–11) | complete; `explore_out/G/spec_draft_register.md` revision 2 is "ready for adoption after ten text fixes" (`spec_review_register_v3.md`), not adopted (see `specs/drafts/`) |
+| `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–11) | complete; `explore_out/G/spec_draft_register.md` revision 2 is "ready for X's adoption after the fixes at the end", ten, all text (`spec_review_register_v3.md`), not adopted (see `specs/drafts/`) |
 | `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams, the split on pooled keys (reports 1–12) | complete; report 12 (S92) is the one exploratory report the referee did not check; `explore_out/H/spec_draft_two_keyterm.md` awaits revision |
 | `claude/explore-I` | session I: the dense-loss task (S74, S75), the GPU package (`explore_gpu/`), the GPU run of `test_window_gate` (report 3), S75b | S75b specified (Appendices A–C), both cards' CUDA CHECKs and benchmarks on the final driver, the pre-run note committed (`005a59a`); **the pilot was never run** |
 | `claude/replicate-R` | session R: the clean-room replication, Phases 2–5, `UNSTATED.md`, `replicate_report.md` | Phase 5 complete |
@@ -98,7 +100,7 @@ Two tests were ready to run when the author stopped. Either can be run by whoeve
 nothing about them needs re-deciding:
 
 1. **The register test** (`specs/drafts/test_register_draft_rev2.md`, G's revision 2; the referee's verdict
-   `docs/review_2026-10/spec_review_register_v3.md`: "ready for X's adoption after ten text fixes", listed there). It is
+   `docs/review_2026-10/spec_review_register_v3.md`: "ready for X's adoption after the fixes at the end", ten, all text, listed there; nine remain to apply, the sixth being in the file in substance through G's edit `4314e35`). It is
    the main line's fifth pre-registered test and the one that answers the project's own open question — a distant cue
    discovered by a register gate — with a labelled hinge; its label-free arm was decided against after S90 (the repeat
    hinge 17/20 against 20/20 on the test's own setting), and that decision is dated in the draft. To run it: take the
@@ -106,7 +108,7 @@ nothing about them needs re-deciding:
    (the referee reviews the test file against the spec before any run), then X and L with disjoint seeds.
 2. **S75b** (`explore_out/I/s75b_spec_draft.md` with Appendices A–C; `explore_gpu/README.md` (d) has every command).
    Both cards are checked and benchmarked on the final driver and the pre-run note is committed. The pilot is
-   `python -m explore_gpu.s75b --stage 1 --device cuda` on the 1660 (about three hours); stage 2 on both cards
+   `python -m explore_gpu.s75b --stage 1 --device cuda` on the 1660 (about three to four hours); stage 2 on both cards
    (about a day and a half) only if the stage-1 record says PROCEED. Session I reads the record.
 
 Three threads were left open with no runnable next step:
@@ -155,5 +157,5 @@ hand with each revision.
 - `Test cross channel result.odt` in the root is an early note of the author's, kept as found.
 - `LICENSE.md` is Pathway's; an attribution line for this fork is the author's decision.
 - The exploratory branches are not merged into the main line, by design; their records are large.
-- The laptop clone's git identity carries a clock six hours ahead of UTC (its commits of 22 October on
-  `claude/explore-I` are stamped UTC+6); the server's is right.
+- The laptop's commits of 22 October on `claude/explore-I` are stamped −0600 (its local offset); the UTC instants agree
+  with the times the driver writes, so no record's timing is affected (session I's pre-run note).
