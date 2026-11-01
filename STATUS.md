@@ -86,9 +86,9 @@ to carry the source at two sources and nothing routes at four on the one screen 
 | `claude/rev9-draft`, `claude/rev10-draft`, `claude/rev11-draft` | the versions of each revision's draft that were checked | merged into the main line; kept because the report cites their commits |
 | `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged in full; its last file is `check_G_report11.md` (23 October) |
 | `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 21 complete (15 October); `explore_out/spec_draft_keyload.md` carries a NOT READY status section with five unscreened options |
-| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta; the pool and context-pool tasks (reports 1–10) | complete; the task module G and H vendor is `explore_f_tasks.py` at `9017b82` |
+| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta; the pool and context-pool tasks (reports 1–10) | complete; the task module G vendors is `explore_f_tasks.py` at `9017b82` (H draws its own pool on the main line's task) |
 | `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–11) | complete; `explore_out/G/spec_draft_register.md` revision 2 is "ready for X's adoption after the fixes at the end", ten, all text (`spec_review_register_v3.md`), not adopted (see `specs/drafts/`) |
-| `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams, the split on pooled keys (reports 1–12) | complete; report 12 (S92) is the one exploratory report the referee did not check; `explore_out/H/spec_draft_two_keyterm.md` awaits revision |
+| `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams, the split on pooled keys (reports 1–12) | complete; report 12 (S92) is the one exploratory report of rounds 5–7 the referee did not check; `explore_out/H/spec_draft_two_keyterm.md` awaits revision |
 | `claude/explore-I` | session I: the dense-loss task (S74, S75), the GPU package (`explore_gpu/`), the GPU run of `test_window_gate` (report 3), S75b | S75b specified (Appendices A–C), both cards' CUDA CHECKs and benchmarks on the final driver, the pre-run note committed (`005a59a`); **the pilot was never run** |
 | `claude/replicate-R` | session R: the clean-room replication, Phases 2–5, `UNSTATED.md`, `replicate_report.md` | Phase 5 complete |
 | `docs/reading/parallel_sessions_prompts.md` | every prompt each session was given, round by round | round 7 is the last |
@@ -101,7 +101,7 @@ nothing about them needs re-deciding:
 
 1. **The register test** (`specs/drafts/test_register_draft_rev2.md`, G's revision 2; the referee's verdict
    `docs/review_2026-10/spec_review_register_v3.md`: "ready for X's adoption after the fixes at the end", ten, all text, listed there; nine remain to apply, the sixth being in the file in substance through G's edit `4314e35`). It is
-   the main line's fifth pre-registered test and the one that answers the project's own open question — a distant cue
+   Phase VI's fifth pre-registered test and the one that answers the project's own open question — a distant cue
    discovered by a register gate — with a labelled hinge; its label-free arm was decided against after S90 (the repeat
    hinge 17/20 against 20/20 on the test's own setting), and that decision is dated in the draft. To run it: take the
    ten fixes, move the file to `specs/test_register.md`, write `test_register.py` to the discipline in `CONTRIBUTING.md`

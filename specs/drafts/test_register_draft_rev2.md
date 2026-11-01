@@ -1,10 +1,10 @@
-<!-- NOT ADOPTED. This is session G's revision 2 of the register test's specification, copied from claude/explore-G at
-its tip, 4314e35 (22 October 2026): revision 2 (6fc55b1) plus one sentence G added the same day after the referee's
-S90 review. The referee's review of revision 2, docs/review_2026-10/spec_review_register_v3.md, reads "ready for X's
-adoption after the fixes at the end" and lists ten, all text; nine have not been applied here (the sixth is in the
-file in substance, through that added sentence), and no test file was written. The project concluded on 1 November
-2026 before adoption (STATUS.md §4). A specification in specs/ proper is one that was adopted, reviewed and run; this
-one was not. -->
+<!-- NOT ADOPTED. This is session G's revision 2 of the register test's specification, copied from claude/explore-G as
+the file stands at its tip (last changed at 4314e35, 22 October 2026): revision 2 (6fc55b1) plus one sentence G added
+the same day after the referee's S90 review. The referee's review of revision 2,
+docs/review_2026-10/spec_review_register_v3.md, reads "ready for X's adoption after the fixes at the end" and lists
+ten, all text; nine have not been applied here (the sixth is in the file in substance, through that added sentence),
+and no test file was written. The project concluded on 1 November 2026 before adoption (STATUS.md §4). A specification
+in specs/ proper is one that was adopted, reviewed and run; this one was not. -->
 
 # test_register.py — specification (DRAFT, from Session G, for the user and X to adopt as specs/test_register.md)
 
