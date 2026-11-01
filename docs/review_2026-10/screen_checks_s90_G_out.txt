@@ -1,0 +1,129 @@
+
+====================================================================================================
+0. commits and times (UTC)
+====================================================================================================
+origin/claude/explore-G now at afe7a1e6 (read here: afe7a1e6)
+  2026-10-21 22:01:48 +0000  d5d48eeb  S89H readings commit
+  2026-10-22 03:07:32 +0000  d60e8668  S89H last progress (201 records)
+  2026-10-22 03:12:24 +0000  996e38b7  G report 9
+  2026-10-22 05:03:55 +0000  b57c1867  S90 commit
+  2026-10-22 05:08:29 +0000  00348e77  S90 progress 1
+  2026-10-22 05:13:57 +0000  5c04a858  S90 progress 2
+  2026-10-22 05:18:59 +0000  82d37ae0  S90 progress 3
+  2026-10-22 05:24:02 +0000  afe7a1e6  S90 progress 4
+  2026-10-22 03:38:40 +0000 5e51a294  round-7 prompt
+  2026-10-22 05:14:13 +0000 a141e92b  V's check_G_report9
+
+files changed b57c1867..TIP: ['explore_out/G/checks_s90_20261022_050720.json', 'explore_out/G/s90.log', 'explore_out/G/s90_results.json']
+
+blob of each module S90 imports (d5d48eeb / b57c1867 / TIP):
+  explore_g_s90.py               - / 341c4ff345 / 341c4ff345
+  explore_g_s90_child.py         - / ff97ce7345 / ff97ce7345
+  explore_g_s89h.py              c31538f1bb / c31538f1bb / c31538f1bb
+  explore_g_s89.py               c76877d6c7 / c76877d6c7 / c76877d6c7
+  explore_g_s89_child.py         cd9998ab37 / cd9998ab37 / cd9998ab37
+  explore_g_rhl_parent.py        0e1b03ad69 / 0e1b03ad69 / 0e1b03ad69
+  explore_g_rhl_child.py         c70b54bae7 / c70b54bae7 / c70b54bae7
+  explore_g_common.py            a398eb7972 / a398eb7972 / a398eb7972
+  explore_g_s87_child.py         b1b996fa38 / b1b996fa38 / b1b996fa38
+  explore_g_devices_child.py     2fe70a3f11 / 2fe70a3f11 / 2fe70a3f11
+  explore_f_tasks.py             e24d5e1081 / e24d5e1081 / e24d5e1081
+  test_router_reliability.py     8929c2d857 / 8929c2d857 / 8929c2d857
+  test_binding_onset.py          3179ec974e / 3179ec974e / 3179ec974e
+
+====================================================================================================
+1. S87's records (s87_results.json at TIP) read by S90's records(): explore_g_s89.recorded('s87', ...)
+====================================================================================================
+S87 store: sha f205db31dfed, provenance {'banner': 'EXPLORATORY, not a result', 'cpu': 'Intel(R) Xeon(R) Processor @ 2.10GHz', 'git': '3919ac1+dirty', 'python': '3.13.16', 'started': '2026-10-13 01:24:13', 'threads': 1, 'torch': '2.14.0+cu130'}
+  B: 20/20 records; ROUTED-BOUND 0/20; failing seeds [2700, 2701, 2702, 2703, 2704, 2705, 2706, 2707, 2708, 2709, 2710, 2711, 2712, 2713, 2714, 2715, 2716, 2717, 2718, 2719]; iters [24000]; max stopped_at 24000; recipe ['slow']; k [2]
+  KH: 20/20 records; ROUTED-BOUND 20/20; failing seeds []; iters [24000]; max stopped_at 12000; recipe ['slow']; k [2]
+  FQ: 20/20 records; ROUTED-BOUND 17/20; failing seeds [2700, 2709, 2713]; iters [24000]; max stopped_at 24000; recipe ['slow']; k [2]
+  KH|2700 (the CHECKed record): transition 3600, stopped 6000 -> the CHECK (through 2400) ends before its transition
+  FQ|2700: transition None, stopped 24000 (unbound; CHECKed through 2400 of 24000)
+  ORACLE_ALL: 2/2 bound; transitions [1200, 1200]
+
+====================================================================================================
+2. what S90 has run (TIP)
+====================================================================================================
+meta: sha 5d4a9b1dba33, cpu Intel(R) Xeon(R) Processor @ 2.10GHz, arms {'lite.REG3': (24000, 20), 'lite.REG3_REPEATHINGE': (24000, 20)}
+  lite.REG3_REPEATHINGE|2700|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 24000 transition None ROUTED-BOUND False curve steps [1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800, 12000, 13200, 14400, 15600, 16800, 18000, 19200, 20400, 21600, 22800, 24000] k 2 recipe slow task lite term fired 114 weights {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}
+  lite.REG3_REPEATHINGE|2701|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 6000 transition 3600 ROUTED-BOUND True curve steps [1200, 2400, 3600, 4800, 6000] k 2 recipe slow task lite term fired 95 weights {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}
+  lite.REG3_REPEATHINGE|2702|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 6000 transition 3600 ROUTED-BOUND True curve steps [1200, 2400, 3600, 4800, 6000] k 2 recipe slow task lite term fired 89 weights {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}
+  lite.REG3_REPEATHINGE|2703|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 6000 transition 3600 ROUTED-BOUND True curve steps [1200, 2400, 3600, 4800, 6000] k 2 recipe slow task lite term fired 125 weights {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}
+  lite.REG3_REPEATHINGE|2704|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 6000 transition 3600 ROUTED-BOUND True curve steps [1200, 2400, 3600, 4800, 6000] k 2 recipe slow task lite term fired 78 weights {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}
+  lite.REG3_REPEATHINGE|2705|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 6000 transition 3600 ROUTED-BOUND True curve steps [1200, 2400, 3600, 4800, 6000] k 2 recipe slow task lite term fired 122 weights {'1': 1.0, '2399': 1.0, '2400': 1.0, '2401': 0.0, '2402': 0.0}
+  lite.REG3|2700|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 24000 transition None ROUTED-BOUND False curve steps [1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800, 12000, 13200, 14400, 15600, 16800, 18000, 19200, 20400, 21600, 22800, 24000] k 2 recipe slow task lite term fired None weights None
+  lite.REG3|2701|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 24000 transition None ROUTED-BOUND False curve steps [1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800, 12000, 13200, 14400, 15600, 16800, 18000, 19200, 20400, 21600, 22800, 24000] k 2 recipe slow task lite term fired None weights None
+  lite.REG3|2702|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 24000 transition None ROUTED-BOUND False curve steps [1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800, 12000, 13200, 14400, 15600, 16800, 18000, 19200, 20400, 21600, 22800, 24000] k 2 recipe slow task lite term fired None weights None
+  lite.REG3|2703|5d4a9b1dba33|Intel(R) Xeon(R) Processor @ 2.10GHz: ok True attempt 1 iters 24000 stopped 24000 transition None ROUTED-BOUND False curve steps [1200, 2400, 3600, 4800, 6000, 7200, 8400, 9600, 10800, 12000, 13200, 14400, 15600, 16800, 18000, 19200, 20400, 21600, 22800, 24000] k 2 recipe slow task lite term fired None weights None
+CHECK file: 81 rows, 81 ok; provenance git b57c186, started 2026-10-22 05:03:59, torch 2.14.0+cu130
+CHECK rows mentioning iters / budget / 24000: none
+queue order (first 8): [('REG3', 2700), ('REG3_REPEATHINGE', 2700), ('REG3', 2701), ('REG3_REPEATHINGE', 2701), ('REG3', 2702), ('REG3_REPEATHINGE', 2702), ('REG3', 2703), ('REG3_REPEATHINGE', 2703)]
+
+====================================================================================================
+3. the budget: does each run get the intended iters?
+====================================================================================================
+  explore_g_common.py:164: run_child(screen.CHILD, 'run', dict(arm=arm, seed=s))
+  explore_g_s89_child.py:481: rec = run_one(a, seed, p.get("iters", rc.ITERS), p.get("eval_every", tbo.EVAL_EVERY), task=task, stats_fn=stats_fn89,
+  explore_g_rhl_child.py:81: ITERS = 24000
+  S90 intends [24000] (explore_g_s90.py:85); the child default is 24000: equal, so the defect is latent here. Records so far: iters [24000]
+
+====================================================================================================
+4. readings(): explore_g_s89h.readings (imported, explore_g_s90.py:109) on every outcome of the two new arms, with S87's B / KH / FQ records fixed
+====================================================================================================
+22800 paired configurations of (REG3, REPEAT) over the 20 seeds (by counts within S87-FQ-pass / FQ-fail seeds); question outside Q: 0
+question counts: {'does not hold': 22484, 'holds, and the hinge is needed here': 257, 'holds (descriptive: the register does not need the hinge here either)': 59}
+does the question / spec decision / REPEAT name depend on anything but the marginal counts (r = REG3, c = REPEAT)? no
+closed form holds on every (r, c): Q0 iff REPEAT >= 19 and REG3 <= 15; Q1 iff REPEAT >= 19 and REG3 >= 16; else Q2: True
+REPEAT's name by its count c: {0: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 1: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 2: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 3: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 4: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 5: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 6: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 7: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 8: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 9: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 10: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 11: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 12: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 13: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 14: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 15: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 16: ['THE REPEAT HINGE NEEDS KEY IDENTITIES'], 17: ['THE REPEAT HINGE IS WEAKER THAN THE KEY HINGE'], 18: ['THE REPEAT HINGE IS WEAKER THAN THE KEY HINGE'], 19: ['THE REPEAT HINGE REPLACES THE KEY HINGE'], 20: ['THE REPEAT HINGE REPLACES THE KEY HINGE']}
+spec decision by question: [('does not hold', 'the repeat hinge falls short: the spec carrie'), ('holds (descriptive: ', 'the repeat hinge falls short: the spec carrie'), ('holds, and the hinge', "the spec's label-free arm is the repeat hinge")]
+
+missing-run cases (spec_decision, explore_g_s90.py:99-101):
+  RP 20/20, REG3 0/20 (complete): first 'the labelled hinge is discovered; per-arm nam'; 2b 'the hinge is needed over the register (KH only 20, REG3 only'; question 'holds, and the hinge is needed here'; spec 'the spec's label-free arm is the repeat hinge'
+  RP one seed missing (19 ok, all bound): first 'UNTESTED (runs that did not complete: {'REG3_'; 2b '-'; question 'cannot be asked here'; spec 'the repeat hinge falls short: the spec carries the key hinge only'
+  RP 20/20, REG3: no completed run: first 'the labelled hinge is discovered; per-arm nam'; 2b 'the register does not need the hinge here (KH only 0, REG3 o'; question 'holds (descriptive: the register does no'; spec 'the repeat hinge falls short: the spec carries the key hinge only'
+  RP 20/20, REG3: 4 completed, all unbound: first 'the labelled hinge is discovered; per-arm nam'; 2b 'the register does not need the hinge here (KH only 4, REG3 o'; question 'holds (descriptive: the register does no'; spec 'the repeat hinge falls short: the spec carries the key hinge only'
+  RP 20/20, REG3: 5 completed, all unbound: first 'the labelled hinge is discovered; per-arm nam'; 2b 'the hinge is needed over the register (KH only 5, REG3 only '; question 'holds, and the hinge is needed here'; spec 'the spec's label-free arm is the repeat hinge'
+  RP 20/20, REG3: 15 completed, 11 bound: first 'the labelled hinge is discovered; per-arm nam'; 2b 'the register does not need the hinge here (KH only 4, REG3 o'; question 'holds (descriptive: the register does no'; spec 'the repeat hinge falls short: the spec carries the key hinge only'
+
+====================================================================================================
+5. operating characteristics (exact; KH 20/20 and BASELINE 0/20 fixed as recorded, so every decisive test is marginal)
+====================================================================================================
+P(REPEAT 'replaces') = P(c >= 19): {1.0: 1.0, 0.95: 0.7358, 0.9: 0.3917, 0.85: 0.1756, 0.8: 0.0692, 0.7: 0.0076}
+P(REPEAT 'is weaker') = P(c in {17, 18}): {1.0: 0.0, 0.95: 0.2483, 0.9: 0.4753, 0.85: 0.4722, 0.8: 0.3423}
+P(2b applies) = P(REG3 >= 16): {0.1: 0.0, 0.45: 0.0015, 0.6: 0.051, 0.8: 0.6296, 0.9: 0.9568}
+P(spec's label-free arm = the repeat hinge) by (p_REPEAT, p_REG3), from the enumerated readings:
+  p_RP \ p_REG3     0.1    0.45     0.8
+  1.0             1.0000  0.9985  0.3704
+  0.95            0.7358  0.7347  0.2725
+  0.9             0.3917  0.3911  0.1451
+  0.85            0.1756  0.1753  0.0650
+  0.8             0.0692  0.0691  0.0256
+  (S82's lite Hebbian REG3: 2/20 on 2100-2119 -> 0.1; S89H POOL REG3_H 9/20 -> 0.45; S87's FQ on these seeds 17/20 -> 0.85)
+S87's FQ records read as if they were REPEAT's (with REG3 0/20): name 'THE REPEAT HINGE IS WEAKER THAN THE KEY HINGE', question 'does not hold'
+
+====================================================================================================
+6. the repeat hinge's positions vs S87's frequency hinge on lite (CHECK rows, checks_s90_20261022_050720.json)
+====================================================================================================
+  [True] lite: the frequent types are S87's {0, 1, 2, 3, 4, 5}
+  [True] lite: the freq hinge selects per sequence 14.00 positions (CTX 4.00, KEY 8.00, VAL 0.00, QUERY 2.00); of the key term's 8: 8.00; types [0, 1, 3, 4, 5, 2] ['CTX', 'KEY']
+  [True] lite: the repeat hinge selects per sequence 16.63 positions (CTX 4.00, KEY 8.00, VAL 2.63, QUERY 2.00); of the key term's 8: 8.00
+  CTX + KEY + QUERY of the frequency hinge = 4 + 8 + 2 = 14 (every CTX and KEY position: the frequent types are all 6 CTX/KEY ids); the repeat hinge has the same 14 at their maxima (mean = max, so on every sample sequence) plus VAL 2.63: on lite the repeat set is the frequency set plus the chance-repeated values, grouped by the same token id.
+
+====================================================================================================
+7. what the repeat statistic reads (AST of explore_g_s89_child at b57c1867)
+====================================================================================================
+  _assert_tokens (l.148-151): args ['tokens', 'task']; free names ['int', 'isinstance', 'torch']; attributes of args ['task.L', 'task.vocab', 'tokens.dim', 'tokens.dtype', 'tokens.max', 'tokens.min', 'tokens.shape']
+  repeat_mask (l.154-159): args ['tokens']; free names ['V', 'cnt', 'int', 'isinstance', 'torch']; attributes of args ['tokens.dim', 'tokens.dtype', 'tokens.max', 'tokens.shape']
+  hinge_mask (l.179-186): args ['kind', 'tokens', 'task_name']; free names ['KeyError', '_assert_tokens', 'frequent', 'repeat_mask', 'sel', 'task_of', 'torch']; attributes of args ['tokens.unsqueeze']
+  term_value (l.189-196): args ['kind', 'gates', 'tokens', 'task_name']; free names ['F', 'TAU', 'V', 'bool', 'g', 'g18', 'hinge_mask', 'int', 'key_eta89', 'len', 'mask', 'task_of', 'torch']; attributes of args ['tokens.max']
+  Term89.forward l.228: term_value(self.t_kind, live, tokens, self.t_task) (tokens = forward's input; _assert_tokens requires width L - 1)
+  numpy replica on [[3, 3, 7, 5, 9, 1, 5]]: [[True, True, False, True, False, False, True]] (G's hand case reads [[True, True, False, True, False, False, True]])
+
+====================================================================================================
+8. G's report() (explore_g_s90.py:104-129) on the store at TIP, file write to memory
+====================================================================================================
+READINGS:
+  first: UNTESTED (runs that did not complete: {'REG3_REPEATHINGE (S90)': [2706, 2707, 2708, 2709, 2710, 2711, 2712, 2713, 2714, 2715, 2716, 2717, 2718, 2719]})
+  question: cannot be asked here
+  FOR THE SPEC: the repeat hinge falls short: the spec carries the key hinge only

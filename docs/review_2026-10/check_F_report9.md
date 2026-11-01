@@ -261,3 +261,5 @@ None found.
 - **The parent's working-tree content at run time.** "8ba99bb+dirty" is not covered by the code SHA. It is only shown to be consistent through the `decide()` recomputation.
 - **The smoke runs (row 58)**, and whether G and H have vendored 50dc8e4 (row 3).
 - **The diagnostic's Adam path and the perfect gate on LITE.** No CHECK covers either. Their learning-rate groups are inferred from the code and from `group_names` in the records.
+
+**Correction (22 October).** Row 30's -allpool write-order figure (0.064) is withdrawn with F's erratum `a0dc3c34`: `write_order_acc` read the CTX token as the stream index on -allpool. The records' 0.069 share of "last write" queries on -allpool would have shown the field was wrong. Row 30 stays PARTIAL on the -pool figure (0.082). `screen_review_s89_F_v2.md` row 10 (0.86 / 0.87) quoted the same withdrawn field.
