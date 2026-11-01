@@ -5,6 +5,9 @@ fixed in writing before the runs that test it, every run leaves a record that an
 and the text of the report is checked against those records by a referee who had no part in the work.
 Contributions are welcome under the same rules. They are short, and they are the whole method.
 
+> The author concluded the project on 1 November 2026. [`STATUS.md`](STATUS.md) records what was found, the final
+> state of every branch, what was left ready to run and how to resume; the rules below apply to whoever does.
+
 ## The branches
 
 - **The main line** (`claude/bdh-growth-hebbian-inference-w90069`, merged into the default branch by

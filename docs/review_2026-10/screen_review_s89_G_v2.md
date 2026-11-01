@@ -336,3 +336,9 @@ The run is already under way at SHA `5d4a9b1dba33`, so the rule is simply: **no 
     > "…; F's type-level perfect gate was run on Hebbian only (O_TYPE_HEBB_ALLPOOL 0/2), so whether a gate that reads context identity can bind -allpool on delta is not known here."
 
 *Commits reviewed: `claude/explore-G` `003a370e` and `db14e9b9`, with the progress commits up to `67f3897c` (CHECK log, validity, the first three learned records). Out §0 and §8 were written at `67f3897c`. The vendored module was compared with `claude/explore-F` `b0c6332`, `50dc8e4` and `a199d5e`. The checks are in `screen_checks_s89_G_v2.py`, with output in `screen_checks_s89_G_v2_out.txt`.*
+
+**Correction (21 October, after report 8).**
+- **The inert-hinge mechanism was overstated.** This review (l.45, l.269) and the correction in `screen_review_s89_G.md` say an inert hinge reads "survives" or "replaces the key hinge". That holds only if REG3_D binds nearly every seed. At the observed POOL rate (REG3_D 16/20), an inert hinge has REG3_D's own records and reads "needs key identities" (4 vs 0, p = 0.0625). A hinge that perturbs training but adds nothing reads "replaces" with probability about 0.07. §2.10's table already implies this. Fix 1's point stands: the hinges must be read against REG3_D, which binds POOL 16/20, so neither hinge is shown needed there (4 vs 0, two-sided p = 0.125).
+- **§2.8's "routed solution" is the perfect gate.** The learned routed runs on POOL end with partial stream separation at the context positions (median 0.23–0.25), so "hinge 0.80, five times lite" describes the perfect gate, not what the arms learned.
+
+Both points are from `check_G_report8.md`.

@@ -1,11 +1,12 @@
-# Project status — 19 October 2026 (resumed; paused 14–19 October)
+# Project status — concluded on 1 November 2026
 
-This file is the entry point for anyone picking the project up, including its author after a break. It says what the
-project is, what it found, what is pre-registered and what is not, where every thread stands, and how to resume. The
-technical report (Revision 10.2, `multichannel_hebbian_report_v10.pdf`, 20 October) is the current account; the README
-follows it; this file covers what the report does not. The project paused on 14 October and resumed on 19 October with
-Revision 10, which records everything listed here as "not yet in the report" on 14 October; the 1660 server left the
-project the same day.
+This file is the entry point for anyone picking the project up. It says what the project is, what it found, what is
+pre-registered and what is not, where every thread stood when the work stopped, and how to resume it. The technical
+report, **Revision 11 (final), `multichannel_hebbian_report_v11.pdf`**, is the account; the README follows it; this
+file covers what the report does not. The author concluded the project on 1 November 2026, by choice, with two
+pre-registered tests specified and ready to run and one exploratory frontier named but not crossed (§4). Nothing here
+is abandoned mid-run: every screen that started has its report, every report was read by the referee or by a check
+the report names, and every record is on its branch.
 
 ## 1. What this is
 
@@ -34,93 +35,92 @@ person orchestrating Claude Code sessions in named roles, on two CPU machines an
 
 - A referee session recomputed every number of the report's tables from the records (Revision 8: 140 of 156
   reproduce, the rest statements, corrected), audited the pre-registration of every claim (none edited after a run),
-  compiled the claim registry (53 pre-registered tests per machine), and checked seven versions of Revision 9's draft
-  before passing it (`docs/review_2026-10/rev9/`).
+  compiled the claim registry (53 pre-registered tests per machine), checked seven versions of Revision 9's draft
+  before passing it (`docs/review_2026-10/rev9/`), found nine false statements in the merged Revision 10 (corrected in
+  10.1 and 10.2, the latter passed before its merge; `rev10/`), and checked every exploratory report of rounds 5–7
+  against its records (`check_*_report*.md`). Revision 11 was checked by a separate checking agent, not by the referee;
+  the report says so.
 - A clean-room replication from the report's text alone (session R, its own implementation) bound eight streams 17/20
   against 7/20 without the split, 18/20 on twenty further seeds with the split's probe and key positions taken from
-  our code, and reproduced `test_split_copy`'s results from the specification (18/20, 9/20, 0/20).
+  our code, and reproduced `test_split_copy`'s three counts on fresh seeds (18/20, 9/20, 0/20; the delta arm from the
+  specification alone).
 - The headline arms ran on a third machine class, a GPU with CUDA arithmetic, on fresh seeds: the recipe 19/20, no
   split 6/20, the recurrent gate 0/20 (descriptions only, by that run's pre-run note).
 
 **Exploratory, not claims** (screens of ten to twenty seeds on the sessions' branches; a screen's finding becomes a
-claim only when a main-line test repeats it): the recipe's constants are scale-free to four times the width and twice
-the depth; at a distance, a register that overwrites at the context token is found label-free on a fifth of seeds and
-on every seed when a hinge holds key splits off during the slow phase; a hinge that reads only a frequency table of
-token ids, no labels, does most of that work (17/20); a split trigger that reads no task structure keeps binding
-within two pairs of the key-position rule on 30 seeds; under a dense next-token loss one channel learns to carry the
-source at two sources and nothing routes at four on the one screen run, which its own validity rule left untested.
+claim only when a main-line test repeats it). Through round 5 (Revision 10): the recipe's constants are scale-free
+to four times the width and twice the depth; at a distance, a register that overwrites at the context token is found
+label-free on a fifth of seeds and on every seed when a hinge holds key splits off during the slow phase; a hinge that
+reads only a frequency table of token ids does most of that work (17/20); a split trigger that reads no task structure
+keeps binding within two pairs of the key-position rule on 30 seeds; under a dense next-token loss one channel learns
+to carry the source at two sources and nothing routes at four on the one screen run, untested by its own rule. Rounds
+6–7 (19–23 October; Revision 11 §11–12), which removed the task's marked keys and then its fixed context identities:
+
+- With routing given, a **Hebbian channel did not bind four keys drawn from 32 types** on the lite task (the perfect gate
+  0/2 on each of two tasks at 24,000 and 48,000, under either recipe; two seeds per cell) where **a delta channel binds in
+  2400–3600**; the short convolution
+  restores the Hebbian oracle (POOL 2/2, ALLPOOL 2/2 at 48,000). One delta channel with no gate binds the two-document
+  task whose contexts are drawn from 16 types **10/10** (F, reports 9–10).
+- On the lite task with pooled keys, a hinge that reads only **which token types repeat within the sequence** — no
+  labels, no corpus table — matches the labelled key hinge within one pair (the committed rule's "replaces the key hinge"): 20/20 against 20/20 on delta memory, where the hingeless
+  register already binds 16/20; **19/20 against 18/20 on Hebbian memory with the convolution**, where the register
+  alone binds 9/20 and the hinge is needed (*p* = 0.002). On the original lite task (Hebbian, no convolution) it falls
+  short, 17/20 against 20/20 (G, reports 8–10). The frequency hinge hurts on delta (7/20) and survives on Hebbian (18/20).
+- When the **context tokens have no fixed identity** (drawn from 16 types), every learned arm is 0/20 or 0/10 on both
+  memories, with two channels and with sixteen, while the perfect gate handed the per-sequence index binds in 1200–9600:
+  no learned gate found the relative routing; a comparing gate and a novelty signal did nothing (G, reports 8, 9, 11;
+  at sixteen channels, the referee's reading, a learning negative at the budget and not a capacity limit; at two, the
+  null is confounded with the 0.533 cap on any fixed type→channel map).
+- On the eight-stream grouped layout with keys from 32 types, the main line's recipe binds **1/10** where it binds 38/40
+  at four keys; neither a later first check nor a larger split cap helps (1/10, 2/10 against a 2/10 rerun); the delta
+  perfect gate is itself unreliable at pools of 16 and 32. At the largest pool where both oracles are reliable (8),
+  **the delta recipe with the split carries, 10/10**, the Hebbian recipe 6/10, and the delta recipe without a trigger
+  7/10 (H, reports 10–12).
 
 ## 3. Where things are
 
-| place | what it holds | state at the pause |
+| place | what it holds | final state |
 |---|---|---|
-| `claude/bdh-repo-curl-obgdqk` (default) | the merged main line | equal to the main line after PR #26 |
-| `claude/bdh-growth-hebbian-inference-w90069` (the main line) | the tests (`test_*.py`), their specifications (`specs/`), the records (`results/`), the report, the referee's files, this file | Revision 10 merged (19 October); `test_delta_recipe` complete on both machines |
-| `claude/rev9-draft` | the seven versions of Revision 9's draft that the referee checked | merged into the main line; kept because the report cites its commits |
-| `claude/rev10-draft` | the three versions of Revision 10's draft and the two passes of its check (`docs/review_2026-10/rev10/`) | merged into the main line |
-| `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged at 00290a8; its last items were the reviews of the three spec drafts below |
-| `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 21 complete (`419368a`, 15 October): the *D* = 128 oracle is not a usable validity check at 40,800; `explore_out/spec_draft_keyload.md` carries a NOT READY FOR V status section with five unscreened options |
-| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta (reports 1–8) | S88 complete, report 8 at `a199d5e` (14 October): the learned write strength "no reading applies"; the horizon screen "untested" |
-| `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–7) | S87 complete; `explore_out/G/spec_draft_register.md` awaits revision after the referee's review |
-| `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams (reports 1–9) | round 5 complete; `explore_out/H/spec_draft_two_keyterm.md` awaits revision after the referee's review |
-| `claude/explore-I` | session I: the dense-loss task (S74, S75), the GPU package (`explore_gpu/`), the GPU run of `test_window_gate` (report 3), S75b (`explore_out/I/s75b_spec_draft.md`, `explore_gpu/s75b.py`) | S75 closed; S75b's driver final (3cef609, mutation pass 8d2e89f), CPU CHECKs pass, the cards' CUDA CHECKs passed on the driver of 13 October and must be rerun on the final one; the pilot was not run |
+| `claude/bdh-repo-curl-obgdqk` (default) | the merged main line | equal to the main line after the Revision 11 merge |
+| `claude/bdh-growth-hebbian-inference-w90069` (the main line) | the tests (`test_*.py`), their specifications (`specs/`), the records (`results/`), the report, the referee's files, this file | Revision 11 (final) merged |
+| `claude/rev9-draft`, `claude/rev10-draft`, `claude/rev11-draft` | the versions of each revision's draft that were checked | merged into the main line; kept because the report cites their commits |
+| `claude/review-V` | Referee V's working branch (`docs/review_2026-10/` only) | merged in full; its last file is `check_G_report11.md` (23 October) |
+| `claude/outside-ideas` | session E: batches 1–21 of exploratory screens (`explore_*.py`, `explore_out/`, verdicts in `explore_out/README.md`) | batch 21 complete (15 October); `explore_out/spec_draft_keyload.md` carries a NOT READY status section with five unscreened options |
+| `claude/explore-F` | session F: delta-rule channels, forget gates, the lite task, the trigger on delta; the pool and context-pool tasks (reports 1–10) | complete; the task module G vendors is `explore_f_tasks.py` at `9017b82` (H draws its own pool on the main line's task) |
+| `claude/explore-G` | session G: distant cues, the register, the hinges (reports 1–11) | complete; `explore_out/G/spec_draft_register.md` revision 2 is "ready for X's adoption after the fixes at the end", ten, all text (`spec_review_register_v3.md`), not adopted (see `specs/drafts/`) |
+| `claude/explore-H` | session H: anti-collapse devices, the copy, the split's constants, two streams, the split on pooled keys (reports 1–12) | complete; report 12 (S92) is the one exploratory report of rounds 5–7 the referee did not check; `explore_out/H/spec_draft_two_keyterm.md` awaits revision |
+| `claude/explore-I` | session I: the dense-loss task (S74, S75), the GPU package (`explore_gpu/`), the GPU run of `test_window_gate` (report 3), S75b | S75b specified (Appendices A–C), both cards' CUDA CHECKs and benchmarks on the final driver, the pre-run note committed (`005a59a`); **the pilot was never run** |
 | `claude/replicate-R` | session R: the clean-room replication, Phases 2–5, `UNSTATED.md`, `replicate_report.md` | Phase 5 complete |
-| `docs/reading/parallel_sessions_prompts.md` | every prompt each session was given, round by round | round 5 is the last |
-| `docs/reading/plan_2026-10-13.md` | the state and plan written the day before the pause | superseded by this file where they differ |
+| `docs/reading/parallel_sessions_prompts.md` | every prompt each session was given, round by round | round 7 is the last |
+| `specs/drafts/` | specifications drafted by the sessions and reviewed by the referee but never adopted into `specs/` or run | the register test (G, revision 2) |
 
-## 4. Open threads, and the next step of each
+## 4. What was left ready, and what was left open
 
-1. **Revision 10 of the report: done** (19 October, `claude/rev10-draft`, three versions). It records `test_delta_recipe`
-   pooled as primary, the GPU run of the headline, R's Phase 5, F's S88, G's S87, H's round 5, E's batches 20–21, S75
-   closed and S75b's state, and the referee's round-6 checks and spec reviews; no claim of Revision 9 changes. Its
-   draft was checked in two passes by a checking agent run from the author's own session (git cannot show their
-   independence; `docs/review_2026-10/rev10/first_pass.md`, `second_pass.md`), which recomputed `test_delta_recipe`, the
-   GPU run and H's screens and read the other screens' reports. Referee V then passed the merged revision and the fifth
-   round's screens (`rev10/referee_pass.md`): every number of every pre-registered claim holds; nine statements false,
-   corrected in **Revision 10.1** the same day — itself merged before V read it; V's check (`rev10/revision_10_1_check.md`)
-   found the nine corrected and a dozen residues, taken in **Revision 10.2**, the first revision since 9 passed by the
-   referee before its merge. V's judgement that the checking agent's passes were not a substitute for a referee pass is
-   recorded in the report (§15, §17).
-2. **The register test** (the next pre-registered test; the project's open question, a distant cue discovered
-   label-free). G's draft specification exists; the referee's review (`docs/review_2026-10/spec_review_register_draft.md`)
-   lists what must change (a named outcome function with a CHECK against the recorded verdicts, the validity rule's
-   dependence on a nudged arm, the probe named, a seed-collision CHECK), and S87's frequency hinge belongs in it as an
-   arm. Pipeline: G revises → X adopts into `specs/test_register.md` → the referee reviews → X writes the test → the
-   referee checks it → X and L run it (seeds X 600–619, L 1600–1619).
-3. **The two-stream key-term test.** H's draft is underpowered against a 69/80 baseline
-   (`spec_review_two_keyterm_draft.md`); it needs more seeds, a harder configuration or a different primary claim before
-   adoption. H's dose screen found the drafted constants robust.
-4. **The key-load test** (sixteen keys at *D* = 128 against *D* = 32). E's draft (`explore_out/spec_draft_keyload.md`,
-   budget 40,800 by its rule) relied on the *D* = 128 oracle as its validity check, so E screened that first (batch 21,
-   S69: the perfect gate at *D* = 128, sixteen keys, seeds 270–279, the recorded single-Adam recipe against SLOW,
-   40,800 updates; readings fixed before any run; complete 15 October). The oracle bound **4/10** under the recorded
-   recipe (271, 273, 274, 278; three more ended at 0.91–0.92, under the 0.95 bar; three stuck near 0.30) and **0/10**
-   under SLOW (every seed 0.33–0.36). Pre-registered reading: **"no *D* = 128 validity check at 40,800"** — the draft
-   does not go to the referee as written. E's status section in the draft lists five unscreened options (a longer
-   budget for the oracle only; the *P* = 8 oracle as the validity check; one validity seed; claims conditional on the
-   learned arms alone; drop *D* = 128 until it has a reliable oracle). None is adopted; the choice is the user's.
-5. **S75b** (the dense loss at four sources on a configuration where the perfect gate can reach its bar). Approved spec
-   with a mechanical pilot rule; what remains is in `explore_gpu/README.md` (d): rerun the CUDA CHECK and the benchmark
-   with the final driver, run the pilot (two perfect-gate runs, about three hours), and stage 2 only if the pilot record
-   says PROCEED. The spec was written for two cards; since 19 October only the laptop's RTX 3070 is available (the
-   server left the project), so stage 2 would take 54–57 hours on one card by the specification's run times and cannot share the laptop with a
-   main-line test. The referee's review of the draft (`spec_review_s75b_draft.md`) has points to take before the
-   pilot.
-6. **F's S88**, complete (report 8 at `a199d5e`; 78 runs on a Xeon @ 2.80 GHz; readings fixed before the first run,
-   `40087cb`; EXPLORATORY, not a result). **S88a**, the write strength (the delta recipe with the exact-copy split at
-   eight streams, seeds 2400–2409): the fixed write strength binds and routes 10/10, a learned per-token strength 7/10
-   (0 vs 3 discordant pairs) and the learned strength on the slow schedule 3/10 (0 vs 7, *p* = 0.0078); reading **"no
-   reading applies"** (the better learned arm is 3 pairs behind — more than the 1 that "keeps the partition" allowed,
-   fewer than the 4 that "costs it" needed). Printed, not a reading: the learned strength collapses to about 0 within
-   ~1200 updates of its learning rate reaching 1e-3, in every run, and never diverges by stream; it keeps writing only
-   at layer-1 VAL positions. **S88b**, the horizon (one delta channel on the lite task at 1× and 2× cue-to-key
-   distance, seeds 2420–2429): fixed decay 9/10 and the learned forget gate 6/10 at 1×, 4/10 against 5/10 at 2×;
-   reading **"untested"** (the gate's 6/10 at 1× is under the 8/10 the rule required); every failure is a stream
-   confusion at 0.5, flat across distance. Both screens are closed; nothing follows from them.
-7. **Round 6 of screens**, proposed in `docs/reading/plan_2026-10-13.md` §4E, none started.
+Two tests were ready to run when the author stopped. Either can be run by whoever resumes, in the order below, and
+nothing about them needs re-deciding:
+
+1. **The register test** (`specs/drafts/test_register_draft_rev2.md`, G's revision 2; the referee's verdict
+   `docs/review_2026-10/spec_review_register_v3.md`: "ready for X's adoption after the fixes at the end", ten, all text, listed there; nine remain to apply, the sixth being in the file in substance through G's edit `4314e35`). It is
+   Phase VI's fifth pre-registered test and the one that answers the project's own open question — a distant cue
+   discovered by a register gate — with a labelled hinge; its label-free arm was decided against after S90 (the repeat
+   hinge 17/20 against 20/20 on the test's own setting), and that decision is dated in the draft. To run it: take the
+   ten fixes, move the file to `specs/test_register.md`, write `test_register.py` to the discipline in `CONTRIBUTING.md`
+   (the referee reviews the test file against the spec before any run), then X and L with disjoint seeds.
+2. **S75b** (`explore_out/I/s75b_spec_draft.md` with Appendices A–C; `explore_gpu/README.md` (d) has every command).
+   Both cards are checked and benchmarked on the final driver and the pre-run note is committed. The pilot is
+   `python -m explore_gpu.s75b --stage 1 --device cuda` on the 1660 (about three to four hours); stage 2 on both cards
+   (about a day and a half) only if the stage-1 record says PROCEED. Session I reads the record.
+
+Three threads were left open with no runnable next step:
+
+3. **Contexts without fixed identity.** The one frontier rounds 6–7 named and did not cross: when the cue token is
+   drawn from a pool, every learned gate fails while the perfect gate succeeds, at two channels and at sixteen. A
+   comparing gate and a novelty signal (G, S91) did nothing. Whoever takes this up starts from G's report 11 and F's
+   report 10 (the cap table: with a channel per context type the capacity problem vanishes, so what remains is learning).
+4. **The two-stream key-term test** (H's draft): underpowered against a 69/80 baseline (`spec_review_two_keyterm_draft.md`).
+5. **The key-load test** (E's draft): no validity check at its budget (batch 21); five options, none screened.
 
 ## 5. How to resume
-
 **The method.** Read `CONTRIBUTING.md` (one page). Every test's docstring states its design and, after the run, its
 result on each machine and pooled; `specs/` holds the specifications; `results/README.md` says which machine and
 commit produced each record. Nothing is a result until the docstring carries the recorded outcome, and nothing from an
@@ -139,14 +139,11 @@ segment of a screen opens by reproducing a recorded run bit for bit. The referee
 | X (a cloud container) | the session's own | the main line | the session's |
 | the laptop (i7-12650H, 15 GB; RTX 3070 Laptop GPU) | `~/Documents/clankers` | the default branch, pulled before each test | system Python with torch 2.14.1 (CPU); main-line tests run here with `--machine L` |
 | the laptop, GPU work | `~/Documents/clankers-gpu` | `claude/explore-I` | `source ~/venv-gpu/bin/activate` (torch 2.14.0+cu130) |
-
-The server (Ryzen 5 3600; GTX 1660 SUPER) left the project on 19 October for work reasons. Its finished runs — the
-GPU replication of `test_window_gate` (I, report 3) and S75's arms — stay on `claude/explore-I`; nothing else ran
-there.
+| the server (Ryzen 5 3600, 35 GB; GTX 1660 SUPER) | `~/jellyfin/clankers` (single-branch) | `claude/explore-I` | `source .venv/bin/activate` in the clone (torch 2.14.0+cu130) |
 
 Long runs go through `longrun.py` (`start`, `watch --resume`, `status`; a stopped run resumes from its records with
-`start --again`); the README's "Repository layout and how to run the tests" has the commands. Two lessons from the
-last week: do not run a GPU job beside a main-line test on the laptop (15 GB is not enough; it lost a start to the
+`start --again`); the README's "Repository layout and how to run the tests" has the commands. Two lessons from
+October: do not run a GPU job beside a main-line test on the laptop (15 GB is not enough; it lost a start to the
 OOM killer), and start a test's L half with `--also results/X/<test>_results.json` so the pooled block is printed in
 the run itself (`test_delta_recipe`'s was regenerated afterwards with `--report --also`).
 
@@ -155,8 +152,10 @@ the run itself (`test_delta_recipe`'s was regenerated afterwards with `--report 
 `tools/readme/parts/` (the Summary, the status section, the repository layout, the references), which are updated by
 hand with each revision.
 
-## 6. Housekeeping known at the pause
+## 6. Housekeeping
 
 - `Test cross channel result.odt` in the root is an early note of the author's, kept as found.
 - `LICENSE.md` is Pathway's; an attribution line for this fork is the author's decision.
 - The exploratory branches are not merged into the main line, by design; their records are large.
+- The laptop's commits of 22 October on `claude/explore-I` are stamped −0600 (its local offset); the UTC instants agree
+  with the times the driver writes, so no record's timing is affected (session I's pre-run note).

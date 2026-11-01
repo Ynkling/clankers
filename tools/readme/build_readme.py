@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build README.md from the technical report's tex and the hand-written parts in parts/.
 
-    python3 tools/readme/build_readme.py [multichannel_hebbian_report_v10.tex]
+    python3 tools/readme/build_readme.py [multichannel_hebbian_report_v11.tex]
 
 Stages: tex_to_md.py (pandoc, references resolved) -> md_cleanup.py (inline math, headings, tables) -> this file,
 which assembles header + Summary + Status + the report's sections + the repository layout + the appendices + the
@@ -14,7 +14,7 @@ import os, re, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-TEX = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'multichannel_hebbian_report_v10.tex')
+TEX = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'multichannel_hebbian_report_v11.tex')
 W = os.path.join(HERE, 'work')
 P = os.path.join(HERE, 'parts')
 
@@ -26,9 +26,9 @@ def part(name):
 
 st2 = open(os.path.join(W, 'stage2.md'), encoding='utf-8').read()
 lines = st2.split('\n')
-# the Revision paragraphs come first in the body: Revision 9's and Revision 10's
-revs = [l for l in lines[:16] if re.match(r'^\*\*Revisions?.(9|10)', l)]
-assert len(revs) == 3, revs
+# the Revision paragraphs come first in the body: Revision 9's, 10's, 10.1/10.2's and 11's
+revs = [l for l in lines[:20] if re.match(r'^\*\*Revisions?.(9|10|11)', l)]
+assert len(revs) == 4, revs
 rev_paras = '\n\n'.join(revs)
 # Table 1 block: from '**Table 1.**' to the end of its table
 i = [k for k, l in enumerate(lines) if l.startswith('**Table 1.**')][0]
@@ -48,6 +48,9 @@ refs = part('references.md')
 upstream = part('upstream_bdh_readme.md')
 header = part('header.md')
 
+# headings keep no non-breaking space (pandoc's rendering of ~), since GitHub's anchors are built from plain spaces
+body_main = re.sub(r'^(#{2,3} .*)$', lambda m: m.group(1).replace('\u00a0', ' '), body_main, flags=re.M)
+appendix = re.sub(r'^(#{2,3} .*)$', lambda m: m.group(1).replace('\u00a0', ' '), appendix, flags=re.M)
 heads = re.findall(r'^## (.+)$', body_main + appendix, flags=re.M)
 def slug(t):
     t = re.sub(r'[`*]', '', t).lower(); t = re.sub(r'[^\w\- ]', '', t); return t.replace(' ', '-')

@@ -16,6 +16,7 @@ def _guard_cells(block):
     block = re.sub(r'(&\s*)(?=\d)', r'\1{}', block)
     return re.sub(r'^(\s*)(?=\d)', r'\1{}', block, flags=re.M)
 body = re.sub(r'(\\begin\{tabular\}.*?\\end\{tabular\})', lambda m: _guard_cells(m.group(1)), body, flags=re.S)
+body = re.sub(r'(\\begin\{longtable\}.*?\\end\{longtable\})', lambda m: _guard_cells(m.group(1)), body, flags=re.S)
 # section map
 secs={}; n=0; sub=0; app=False; n_app=0
 for m in re.finditer(r'\\(section|subsection|appendix)(?:\{([^}]*)\})?(?:\s*\\label\{([^}]*)\})?', body):
@@ -54,6 +55,12 @@ def ref(m):
     return '??'+lab
 md=re.sub(r'<a href="#([^"]+)" data-reference-type="ref" data-reference="[^"]+">[^<]*</a>', ref, md)
 md=md.replace('Appendix [Provenance](#provenance)','the [Provenance](#provenance) section')
+# a longtable's repeated head (\endfirsthead ... \endhead) comes out of pandoc as the header row printed twice: drop the copy
+_lines = md.split('\n')
+for _i in range(2, len(_lines)):
+    if _lines[_i].startswith('|') and _lines[_i] == _lines[_i-2] and re.match(r'^\|[:\- |]+\|$', _lines[_i-1]):
+        _lines[_i] = None
+md = '\n'.join(l for l in _lines if l is not None)
 md=md.replace('equation~(','equation (').replace('equation (3)','equation (3)')
 open(os.path.join(W,'stage1.md'),'w',encoding='utf-8').write(md)
 import json; json.dump({'secs':secs,'tabs':tabs},open(os.path.join(W,'maps.json'),'w'),indent=1)

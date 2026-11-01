@@ -1,0 +1,260 @@
+
+====================================================================================================
+A. The module: explore_f_tasks.py at 9017b823 against b0c6332
+====================================================================================================
+blob b0c6332: e24d5e10815eb1234d1947aa6b74b128d2696882  (49923 bytes, 48457 characters, 836 lines)
+blob 9017b823: cfe3fe276f7c8c1592b469f2efaa8a0074a88f19  (73009 bytes, 1209 lines)
+parent of 9017b823: e24d5e10815eb1234d1947aa6b74b128d2696882
+blob at 73749e8a: cfe3fe276f7c8c1592b469f2efaa8a0074a88f19
+blob at origin/claude/explore-F: cfe3fe276f7c8c1592b469f2efaa8a0074a88f19
+byte prefix: new.startswith(old) = True; appended 23086 bytes
+top-level statements: old 37, new 52; the first 37 identical by source segment: True
+appended top-level names (15): ['DOCS_D', 'RandHeaderTaskCtxPool', 'RandHeaderTaskDocs', '_esym', '_partitions', 'balanced_map', 'check_ctx_task', 'check_inv_stats_k', 'check_write_order_idx', 'ctx_stats', 'inv_from_gate_k', 'last_write_mask', 'pool_routing_stats_inv_k', 'type_map_cap', 'write_order_acc_idx']
+  of them already defined above: []
+  module-level attribute stores / setattr in the appended code: none
+  'global' statements in the appended code: none
+child CHECK (l.191-195): old = s89._git("show", "9017b82:explore_f_tasks.py")
+           new = open(s89.os.path.join(s89.HERE, "explore_f_tasks.py")).read()
+           prev = s89._git("show", "b0c6332:explore_f_tasks.py")
+           rows.append((f"explore_f_tasks.py equals 9017b82's file (the module G vendors) and starts with b0c6332's "
+                        f"{len(prev)} bytes (round 6's classes byte-identical)", new == old and new.startswith(prev)))
+           for t, T in NEW.items():
+
+====================================================================================================
+B. The generators (numpy replica of RandHeaderTask.make_batch + the context renaming; 20,000 sequences per task)
+====================================================================================================
+
+CTXPOOL (S = D = 2): L 23, input 22 tokens: per sequence CTX 5, KEY 9, VAL 8
+  CTX: 16 types, frequency 0.0139-0.0147 (expected 0.0142 each)
+  KEY: 4 types, frequency 0.1022-0.1023 (expected 0.1023 each)
+  VAL: 16 types, frequency 0.0222-0.0233 (expected 0.0227 each)
+  largest-ratio cut: 4 types, roles Counter({'KEY': 4}), ratio at the cut 4.39; its positions = the KEY positions in 1.000 of sequences
+  half-mass cut: 8 types, roles Counter({'KEY': 4, 'VAL': 4}), mass 0.5010; expected mass of 4 KEY + 4 VAL = 0.500000 (exactly 0.5)
+  half-mass cut over 200 resampled 4096-sequence samples: number of VAL types selected {4: 200} (4 always: the 4 most frequent VAL types exceed the mean, and the expected mass at 4 + 4 is exactly 0.5; WHICH 4 VAL types is sampling noise, all 16 have the same expected frequency)
+  repeat set (type occurs >= 2 times in the input): CTX 5.00 of 5, KEY 9.00 of 9, VAL 2.64 of 8 positions; exactly the KEY positions in 0.0000 of sequences; exactly KEY + CTX in 0.1583; a repeated VAL type in 0.8417
+  P(index 0 | position) for positions 0-7: [1.0, 1.0, 1.0, 0.777, 0.777, 0.554, 0.591, 0.368]; index 0 at position 0 always: True
+  queries asking the last write of their key: 0.4969 (1/S = 0.5000); a last-write-only memory scores about this
+  reach 4: P(target KEY and VAL inside) 0.121 -> bound 0.180; P(target VAL inside) 0.121 -> bound 0.180; chance-only floor 1/16 = 0.0625
+  reach 10: P(target KEY and VAL inside) 0.374 -> bound 0.415; P(target VAL inside) 0.468 -> bound 0.503; chance-only floor 1/16 = 0.0625
+
+DOCS3 (S = D = 3): L 33, input 32 tokens: per sequence CTX 7, KEY 13, VAL 12
+  CTX: 16 types, frequency 0.0135-0.0139 (expected 0.0137 each)
+  KEY: 4 types, frequency 0.1014-0.1016 (expected 0.1016 each)
+  VAL: 16 types, frequency 0.0230-0.0239 (expected 0.0234 each)
+  largest-ratio cut: 4 types, roles Counter({'KEY': 4}), ratio at the cut 4.25; its positions = the KEY positions in 1.000 of sequences
+  half-mass cut: 8 types, roles Counter({'KEY': 4, 'VAL': 4}), mass 0.5010; expected mass of 4 KEY + 4 VAL = 0.500000 (exactly 0.5)
+  half-mass cut over 200 resampled 4096-sequence samples: number of VAL types selected {4: 200} (4 always: the 4 most frequent VAL types exceed the mean, and the expected mass at 4 + 4 is exactly 0.5; WHICH 4 VAL types is sampling noise, all 16 have the same expected frequency)
+  repeat set (type occurs >= 2 times in the input): CTX 7.00 of 7, KEY 13.00 of 13, VAL 5.59 of 12 positions; exactly the KEY positions in 0.0000 of sequences; exactly KEY + CTX in 0.0060; a repeated VAL type in 0.9940
+  P(index 0 | position) for positions 0-7: [1.0, 1.0, 1.0, 0.737, 0.737, 0.471, 0.495, 0.225]; index 0 at position 0 always: True
+  queries asking the last write of their key: 0.3348 (1/S = 0.3333); a last-write-only memory scores about this
+  reach 4: P(target KEY and VAL inside) 0.087 -> bound 0.152; P(target VAL inside) 0.087 -> bound 0.152; chance-only floor 1/16 = 0.0625
+  reach 10: P(target KEY and VAL inside) 0.255 -> bound 0.308; P(target VAL inside) 0.316 -> bound 0.365; chance-only floor 1/16 = 0.0625
+
+DOCS4 (S = D = 4): L 43, input 42 tokens: per sequence CTX 9, KEY 17, VAL 16
+  CTX: 16 types, frequency 0.0132-0.0137 (expected 0.0134 each)
+  KEY: 4 types, frequency 0.1011-0.1013 (expected 0.1012 each)
+  VAL: 16 types, frequency 0.0236-0.0241 (expected 0.0238 each)
+  largest-ratio cut: 4 types, roles Counter({'KEY': 4}), ratio at the cut 4.19; its positions = the KEY positions in 1.000 of sequences
+  half-mass cut: 8 types, roles Counter({'KEY': 4, 'VAL': 4}), mass 0.5006; expected mass of 4 KEY + 4 VAL = 0.500000 (exactly 0.5)
+  half-mass cut over 200 resampled 4096-sequence samples: number of VAL types selected {4: 200} (4 always: the 4 most frequent VAL types exceed the mean, and the expected mass at 4 + 4 is exactly 0.5; WHICH 4 VAL types is sampling noise, all 16 have the same expected frequency)
+  repeat set (type occurs >= 2 times in the input): CTX 9.00 of 9, KEY 17.00 of 17, VAL 9.24 of 16 positions; exactly the KEY positions in 0.0000 of sequences; exactly KEY + CTX in 0.0000; a repeated VAL type in 1.0000
+  P(index 0 | position) for positions 0-7: [1.0, 1.0, 1.0, 0.719, 0.719, 0.438, 0.455, 0.163]; index 0 at position 0 always: True
+  queries asking the last write of their key: 0.2514 (1/S = 0.2500); a last-write-only memory scores about this
+  reach 4: P(target KEY and VAL inside) 0.062 -> bound 0.134; P(target VAL inside) 0.062 -> bound 0.134; chance-only floor 1/16 = 0.0625
+  reach 10: P(target KEY and VAL inside) 0.188 -> bound 0.250; P(target VAL inside) 0.232 -> bound 0.291; chance-only floor 1/16 = 0.0625
+
+====================================================================================================
+C. The cap of a fixed type -> channel map (exact over every split of the 16 types; balanced map simulated)
+====================================================================================================
+  D 2, k  2: cap 64/120 = 0.5333 (best split [8, 8]; balanced 64/120)
+  D 2, k  4: cap 96/120 = 0.8000 (best split [4, 4, 4, 4]; balanced 96/120)
+  D 2, k 16: cap 120/120 = 1.0000 (best split [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; balanced 120/120)
+  D 2, k 2: brute force over all 2^15 maps (type 15 fixed): best 64/120
+  D 2: the balanced map separates 0.5353 of 20000 replica sequences (cap 0.5333)
+  D 3, k  2: cap 0 (fewer channels than documents)
+  D 3, k  3: cap 150/560 = 0.2679 (best split [6, 5, 5]; balanced 150/560)
+  D 3, k  6: cap 372/560 = 0.6643 (best split [3, 3, 3, 3, 2, 2]; balanced 372/560)
+  D 3, k 16: cap 560/560 = 1.0000 (best split [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; balanced 560/560)
+  D 3: the balanced map separates 0.2725 of 20000 replica sequences (cap 0.2679)
+  D 4, k  2: cap 0 (fewer channels than documents)
+  D 4, k  4: cap 256/1820 = 0.1407 (best split [4, 4, 4, 4]; balanced 256/1820)
+  D 4, k  8: cap 1120/1820 = 0.6154 (best split [2, 2, 2, 2, 2, 2, 2, 2]; balanced 1120/1820)
+  D 4, k 16: cap 1820/1820 = 1.0000 (best split [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]; balanced 1820/1820)
+  D 4: the balanced map separates 0.1427 of 20000 replica sequences (cap 0.1407)
+F's printed caps (s90 l.28-29, log CHECK lines): 0.5333 / 0.2679 / 0.1407 at k = D; k = 2D 0.800 / 0.664 / 0.615
+
+====================================================================================================
+D. Within-sequence statistics (numpy replica of explore_f_tasks.inv_from_gate_k l.976-1000, ROUTED_ETA 0.9) and the margin (pool_routing_stats l.437-447) on synthetic gates, 20,000 replica sequences
+====================================================================================================
+
+CTXPOOL (S = 2; 5000 sequences): sep_key_inv / seq_separated_frac / val_cos_inv_k / margin;  'DISCOVERED' = val_cos_inv_k < 0.5
+  relative (the perfect gate: one-hot of the index)              1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  relative, channels permuted per sequence                       1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  balanced type-level map (k = 2)                                0.532 / 0.532 / 0.468 / 0.532   DISCOVERED-form
+  a random fixed type map (k = 2; sizes [9, 7])                  0.532 / 0.532 / 0.468 / 0.532   DISCOVERED-form
+  one channel per type (k = 16)                                  1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  all on one channel                                             0.000 / 0.000 / 1.000 / 0.000   
+  position only (channel = body position x S // body length)     0.554 / 0.328 / 0.527 / -0.000   
+  first document vs the rest (index 0 -> ch 0, else ch 1)        1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  uniform 1/k everywhere                                         0.000 / 0.000 / 1.000 / 0.000   
+  expected for the balanced map: val_cos_inv_k = P(two of the sequence's types share a channel) = 0.4667; sep_key_inv = 1 - that = 0.5333; separated = cap
+
+DOCS3 (S = 3; 5000 sequences): sep_key_inv / seq_separated_frac / val_cos_inv_k / margin;  'DISCOVERED' = val_cos_inv_k < 0.5
+  relative (the perfect gate: one-hot of the index)              1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  relative, channels permuted per sequence                       1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  balanced type-level map (k = 3)                                0.709 / 0.273 / 0.291 / 0.714   DISCOVERED-form
+  a random fixed type map (k = 3; sizes [6, 5, 5])               0.709 / 0.274 / 0.291 / 0.717   DISCOVERED-form
+  one channel per type (k = 16)                                  1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  all on one channel                                             0.000 / 0.000 / 1.000 / 0.000   
+  position only (channel = body position x S // body length)     0.665 / 0.062 / 0.362 / 0.013   DISCOVERED-form
+  first document vs the rest (index 0 -> ch 0, else ch 1)        0.667 / 0.000 / 0.333 / 0.661   DISCOVERED-form
+  uniform 1/k everywhere                                         0.000 / 0.000 / 1.000 / 0.000   
+  expected for the balanced map: val_cos_inv_k = P(two of the sequence's types share a channel) = 0.2917; sep_key_inv = 1 - that = 0.7083; separated = cap
+
+DOCS4 (S = 4; 5000 sequences): sep_key_inv / seq_separated_frac / val_cos_inv_k / margin;  'DISCOVERED' = val_cos_inv_k < 0.5
+  relative (the perfect gate: one-hot of the index)              1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  relative, channels permuted per sequence                       1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  balanced type-level map (k = 4)                                0.801 / 0.143 / 0.199 / 0.800   DISCOVERED-form
+  a random fixed type map (k = 4; sizes [5, 4, 4, 3])            0.794 / 0.132 / 0.206 / 0.791   DISCOVERED-form
+  one channel per type (k = 16)                                  1.000 / 1.000 / 0.000 / 1.000   DISCOVERED-form
+  all on one channel                                             0.000 / 0.000 / 1.000 / 0.000   
+  position only (channel = body position x S // body length)     0.740 / 0.011 / 0.271 / 0.003   DISCOVERED-form
+  first document vs the rest (index 0 -> ch 0, else ch 1)        0.500 / 0.000 / 0.500 / 0.511   
+  uniform 1/k everywhere                                         0.000 / 0.000 / 1.000 / 0.000   
+  expected for the balanced map: val_cos_inv_k = P(two of the sequence's types share a channel) = 0.2000; sep_key_inv = 1 - that = 0.8000; separated = cap
+
+====================================================================================================
+E. The readings: decide / _arms / outcomes / reading_task / reading_screen exec'd from explore_f_s90_ctx.py at 73749e8a
+====================================================================================================
+exec'd 14 statements: LR, MEMS, NOMEM_THR, P0_SEEDS, P2_SEEDS, SCREEN_HI, SCREEN_LO, SLOW, TASKS, _arms, decide, decision, outcomes, reading_screen, reading_task
+task readings over every outcome (3 tasks x 2 memories; phase-0 accuracies in ('0.6', '0.61', 'F') on the target's 4 runs; pilot runs bound / unbound / failed x3 at 24K and at 48K): 35478 combinations
+  solvable without memory              28470
+  the task is valid                    96
+  the task needs the longer budget     768
+  untested                             6144
+  disagreements with the docstring's rule (s90 l.49-56), applied independently: 0; errors 0
+  SINGLE_<M>_<T> exists iff the reading is valid / needs the longer budget, with iters = that budget: True
+  stage at which SINGLE_<M>_<T> is first queued: {(24000, 'phase1b'): 96, (48000, 'phase2'): 768}
+
+screen reading over every outcome of SINGLE_DELTA_CTXPOOL's 10 runs (bound / unbound / failed x3; or missing), at each (CTXPOOL, DELTA) budget state (all 3^10 complete patterns, 10 with one record missing, 1 empty): 118123 combinations
+  budget 24000                                INCOMPLETE, no reading                             11
+  budget 24000                                no reading applies                                 24864
+  budget 24000                                one channel binds without a context identity       1161
+  budget 24000                                the partition's claim survives the context pool    33024
+  budget 48000                                INCOMPLETE, no reading                             11
+  budget 48000                                no reading applies                                 24864
+  budget 48000                                one channel binds without a context identity       1161
+  budget 48000                                the partition's claim survives the context pool    33024
+  budget None                                 INCOMPLETE, no reading                             1
+  budget STOPPED (solvable without memory)    untested                                           1
+  budget UNTESTED                             untested                                           1
+  disagreements with the docstring (s90 l.67-72): 0
+  note: a STOPPED (solvable-without-memory) CTXPOOL reads 'untested' in reading_screen (l.296-298), not 'solvable without memory'
+
+====================================================================================================
+F. Operating characteristics (exact binomial, 10 independent seeds; the 2-seed validity rule)
+====================================================================================================
+  p     P(>= 7/10) 'binds'   P(<= 3/10) 'survives'   P(4-6) 'no reading'   P(valid: 2/2)   P(valid or 48K, p48 = p)
+  0.05     0.0000               0.9990                 0.0010           0.0025        0.0050
+  0.1      0.0000               0.9872                 0.0128           0.0100        0.0199
+  0.2      0.0009               0.8791                 0.1200           0.0400        0.0784
+  0.3      0.0106               0.6496                 0.3398           0.0900        0.1719
+  0.4      0.0548               0.3823                 0.5630           0.1600        0.2944
+  0.5      0.1719               0.1719                 0.6562           0.2500        0.4375
+  0.6      0.3823               0.0548                 0.5630           0.3600        0.5904
+  0.7      0.6496               0.0106                 0.3398           0.4900        0.7399
+  0.8      0.8791               0.0009                 0.1200           0.6400        0.8704
+  0.9      0.9872               0.0000                 0.0128           0.8100        0.9639
+  0.95     0.9990               0.0000                 0.0010           0.9025        0.9905
+  'survives' also needs the delta perfect gate valid (2/2 at 24K or at 48K); at a perfect-gate rate q the conjunct holds with q^2 + (1 - q^2) q48^2
+
+====================================================================================================
+G. Seeds 3060-3099: every remote branch tip and history; the main line's seed list
+====================================================================================================
+13 remote branches: origin/claude/bdh-growth-hebbian-inference-w90069, origin/claude/bdh-repo-curl-obgdqk, origin/claude/explore-F, origin/claude/explore-G, origin/claude/explore-H, origin/claude/explore-I, origin/claude/outside-ideas, origin/claude/relaxed-edison-he00cc, origin/claude/replicate-R, origin/claude/rev10-draft, origin/claude/rev9-draft, origin/claude/review-V, origin/feature/per-channel-plasticity
+tip hits (branch, file, count):
+  origin/claude/explore-F explore_out/F/s90.log 32
+  origin/claude/explore-F explore_out/F/s90_ctx_results.json 24
+history: 5126 distinct json/jsonl/log blobs reachable from the remotes
+history hits (path: count over blobs): explore_out/F/s90.log: 120, explore_out/F/s90_ctx_results.json: 24
+main line origin/claude/bdh-growth-hebbian-inference-w90069 (5e51a294): 38 test_*.py; literal range() integers 910, of them in 3060-3099: none
+  over-inclusive: every literal integer s + 1000 j (j < 5) gives 3270 integers, 40 of them in 3060-3099 (bases [60, 61, 62]... = 60-99, which no restart test uses as a base)
+  the restart tests' actual attempt seeds (bases below, s + 1000 j, j < 5; and 1000-1149): in 3060-3099: none
+restart bases in the main line's restart tests: 160-189 (test_load_curriculum l.259-261), 200-219 (test_curriculum_confirm l.254-257), 240-259 (test_stream_recipe l.278-280), 260-279 (test_stream_curriculum l.268-269); test_router_reliability's trials 1000 + 5i + j (l.62, l.214): none reaches 3060-3099
+round-7 blocks (prompt l.1274): G 2960-3019, H 3020-3059, F 3060-3099: disjoint
+
+====================================================================================================
+H. Modules the S90 child's code SHA covers (log: 27 modules): F's blob at 73749e8a vs the main line
+====================================================================================================
+  bdh                              F 4cfff79df9  main 4cfff79df9  same
+  bdh_recurrent                    F 9f2b31fec4  main 9f2b31fec4  same
+  explore_b16_gates                F f5b2984947  main absent  branch-only
+  explore_common                   F 2fa431cad6  main absent  branch-only
+  explore_common2                  F 9663c7f023  main absent  branch-only
+  explore_delta_mem                F 7a3cc9a4cd  main 7a3cc9a4cd  same
+  explore_f_delta_fast             F b1f8efdac9  main b1f8efdac9  same
+  explore_f_s89_tasks_child        F 2a014b8184  main absent  branch-only
+  explore_f_s90_ctx_child          F bfb78389e8  main absent  branch-only
+  explore_f_tasks                  F cfe3fe276f  main absent  branch-only
+  explore_f_window_delta_child     F 5953afc7f5  main absent  branch-only
+  explore_local_gate               F 4a2f1565c3  main absent  branch-only
+  explore_window_recipe_child      F e2f74d38e7  main absent  branch-only
+  test_binding_capacity            F 8c293fff28  main e7e5a1c511  DIFFERENT
+  test_binding_onset               F 3179ec974e  main 3179ec974e  same
+  test_binding_recipe              F 2ffb3effe9  main 2ffb3effe9  same
+  test_channel_binding             F 0877781a42  main 0877781a42  same
+  test_instrument_v2               F 2de6bdfb51  main 2de6bdfb51  same
+  test_interference                F 816515b32f  main 816515b32f  same
+  test_multilayer_binding          F a16a1eb221  main a16a1eb221  same
+  test_readout_path                F 06a7c48893  main 06a7c48893  same
+  test_router_confirm              F e6541ee2f3  main e6541ee2f3  same
+  test_router_curriculum           F ba9b5edf7a  main ba9b5edf7a  same
+  test_router_discovery            F 00b6803366  main 00b6803366  same
+  test_router_layout               F 5d9cd84ed2  main 5d9cd84ed2  same
+  test_router_reliability          F 8929c2d857  main 8929c2d857  same
+  test_short_conv                  F d74f39909d  main 452a931ca2  DIFFERENT
+  commits touching explore_f_s89_tasks_child.py on explore-F: ['3dd5b746 2026-10-20 21:47:35 +0000', '8ba99bb9 2026-10-19 18:02:14 +0000']
+  commits touching explore_f_s90_ctx_child.py on explore-F: ['73749e8a 2026-10-22 05:13:59 +0000']
+  commits touching explore_f_s90_ctx.py on explore-F: ['73749e8a 2026-10-22 05:13:59 +0000']
+  commits touching explore_f_reports7.py on explore-F: ['73749e8a 2026-10-22 05:13:59 +0000']
+
+done
+
+====================================================================================================
+I. The ties (child l.222-244): the log's printed reference curves against the records at the pinned commits; the code SHA from blobs; what has run
+====================================================================================================
+  NOMEM_SELF_LITE|2800 at 52e2ea7: 1 record(s) ( 2.80GHz); record curve to 2400 [[1200, 0.10546875, 2.7603092193603516], [2400, 0.15234375, 2.6712265014648438]]; log lines 2, printed reference equals the record in all: True; ok in all: True
+     store blob at 52e2ea7 aa3335f39d, at the tip b20642ad aa3335f39d
+  O_DELTA_ALLPOOL|2800 at 52e2ea7: 1 record(s) ( 2.80GHz); record curve to 2400 [[1200, 0.28271484375, 2.7438831329345703], [2400, 0.89501953125, 1.3829681873321533]]; log lines 2, printed reference equals the record in all: True; ok in all: True
+     store blob at 52e2ea7 aa3335f39d, at the tip b20642ad aa3335f39d
+  O_HEBB_CONV_ALLPOOL|2801 at 3e3b1bf: 1 record(s) ( 2.10GHz); record curve to 2400 [[1200, 0.27099609375, 2.67083477973938], [2400, 0.31298828125, 2.265213966369629]]; log lines 2, printed reference equals the record in all: True; ok in all: True
+     store blob at 3e3b1bf 6e9865974c, at the tip b20642ad 6e9865974c
+  code SHA over the 27 modules from blobs at 73749e8a: 809fde1f5168dcb53a4737e207af9cb8c7f4ed7a
+  code SHA over the 27 modules from blobs at b20642ad: 809fde1f5168dcb53a4737e207af9cb8c7f4ed7a
+  records' code SHA and stage lines (tip b20642ad):
+    NOMEM_CTXPOOL          3060 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.16845703125 transition None sched Adam 1e-3 throughout
+    NOMEM_CTXPOOL          3061 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.166015625 transition None sched Adam 1e-3 throughout
+    NOMEM_DOCS3            3060 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.123046875 transition None sched Adam 1e-3 throughout
+    NOMEM_DOCS3            3061 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.12255859375 transition None sched Adam 1e-3 throughout
+    NOMEM_DOCS4            3060 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.1103515625 transition None sched Adam 1e-3 throughout
+    NOMEM_DOCS4            3061 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.1103515625 transition None sched Adam 1e-3 throughout
+    NOMEM_SELF_CTXPOOL     3060 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.36572265625 transition None sched Adam 1e-3 throughout
+    NOMEM_SELF_CTXPOOL     3061 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.365234375 transition None sched Adam 1e-3 throughout
+    NOMEM_SELF_DOCS3       3060 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.1904296875 transition None sched Adam 1e-3 throughout
+    NOMEM_SELF_DOCS3       3061 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.2001953125 transition None sched Adam 1e-3 throughout
+    NOMEM_SELF_DOCS4       3060 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.16455078125 transition None sched Adam 1e-3 throughout
+    NOMEM_SELF_DOCS4       3061 809fde1f5168 ok True iters 24000 last eval 24000 acc 0.12060546875 transition None sched Adam 1e-3 throughout
+    === S90 phase0 Thu Oct 22 05:14:21 UTC 2026
+      cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git 73749e8 | python 3.11.17 | torch threads 1 | started 2026-10-22 05:14:22
+      12 runs queued; projected worst case 1.32 h of runs, makespan 0.34 h on 4 workers
+      decision: {"phase0": {"CTXPOOL": {"acc": {"NOMEM": [0.16845703125, 0.166015625], "NOMEM_SELF": [0.36572265625, 0.365234375]}, "stopped": false}, "DOCS3": {"acc": {"NOMEM": [0.123046875, 0.12255859375], "NOMEM_SELF": [0.1904296875, 0.20019
+    === S90 phase1 Thu Oct 22 05:34:08 UTC 2026
+      cpu Intel(R) Xeon(R) Processor @ 2.10GHz | torch 2.14.0+cu130 | git a4d14c2+dirty | python 3.11.17 | torch threads 1 | started 2026-10-22 05:34:09
+      24 runs queued; projected worst case 4.07 h of runs, makespan 1.02 h on 4 workers
+  explore_f_s90_ctx.py: blobs from 73749e8a to the tip: ['cadbaba54e']
+  explore_f_s90_ctx_child.py: blobs from 73749e8a to the tip: ['bfb78389e8']
+  explore_f_reports7.py: blobs from 73749e8a to the tip: ['8b3c65cf5d']
+  explore_out/F/run_s90.sh: blobs from 73749e8a to the tip: ['8fe3219914']
+  explore_f_tasks.py: blobs from 73749e8a to the tip: ['cfe3fe276f']
+
+done (I)
